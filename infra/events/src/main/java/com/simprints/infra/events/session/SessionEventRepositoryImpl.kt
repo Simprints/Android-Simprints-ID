@@ -6,7 +6,6 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.events.event.local.EventLocalDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 

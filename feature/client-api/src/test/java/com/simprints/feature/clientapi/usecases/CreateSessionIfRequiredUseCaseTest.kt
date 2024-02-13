@@ -29,10 +29,6 @@ internal class CreateSessionIfRequiredUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-//        coEvery { sessionEventRepository.getCurrentSessionScope() } returns mockk {
-//            coEvery { id } returns SESSION_ID
-//        }
-
         useCase = CreateSessionIfRequiredUseCase(sessionEventRepository, timeHelper)
     }
 
@@ -78,10 +74,5 @@ internal class CreateSessionIfRequiredUseCaseTest {
             sessionEventRepository.createSession()
             sessionEventRepository.addOrUpdateEvent(withArg { Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java) })
         }
-    }
-
-    companion object {
-
-        private const val SESSION_ID = "sessionId"
     }
 }

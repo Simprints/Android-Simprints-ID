@@ -2,7 +2,6 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.SessionEventRepository
 import javax.inject.Inject
 

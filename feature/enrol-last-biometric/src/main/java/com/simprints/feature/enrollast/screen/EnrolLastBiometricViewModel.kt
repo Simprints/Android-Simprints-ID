@@ -23,8 +23,6 @@ import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

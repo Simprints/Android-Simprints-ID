@@ -2,7 +2,6 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.core.DeviceID
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.Simber
