@@ -330,7 +330,7 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
-    fun loadAllEventJsonFromSession() = runTest {
+    fun loadAllEventJsonFromEventScope() = runTest {
         val sessionId = GUID1
         eventLocalDataSource.loadEventJsonInScope(sessionId)
 
@@ -338,7 +338,7 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
-    fun loadAllFromSession() = runTest {
+    fun loadAllFromEventScope() = runTest {
         val sessionId = GUID1
         eventLocalDataSource.loadEventsInScope(sessionId)
 
@@ -346,14 +346,14 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
-    fun countSessions() = runTest {
+    fun countEventScopes() = runTest {
         eventLocalDataSource.countEventScopes(EventScopeType.SESSION)
 
         coVerify { scopeDao.count(EventScopeType.SESSION) }
     }
 
     @Test
-    fun saveSessionScope() = runTest {
+    fun saveEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         eventLocalDataSource.saveEventScope(mockk())
 
@@ -361,7 +361,7 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
-    fun loadOpenedSessions() = runTest {
+    fun loadOpenedEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         val dbSessionCaptureEvent = mockk<DbEventScope> {
             every { fromDbToDomain(any()) } returns mockk()
@@ -374,7 +374,7 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
-    fun loadClosedSessions() = runTest {
+    fun loadClosedEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         val dbSessionCaptureEvent = mockk<DbEventScope> {
             every { fromDbToDomain(any()) } returns mockk()
@@ -387,7 +387,20 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
-    fun deleteSession() = runTest {
+    fun loadEventScope() = runTest {
+        mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
+        val dbSessionCaptureEvent = mockk<DbEventScope> {
+            every { fromDbToDomain(any()) } returns mockk()
+        }
+        coEvery { scopeDao.loadScope(GUID1) } returns dbSessionCaptureEvent
+        eventLocalDataSource.loadEventScope(GUID1)
+
+        coVerify { scopeDao.loadScope(any()) }
+        verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
+    }
+
+    @Test
+    fun deleteEventScope() = runTest {
         eventLocalDataSource.deleteEventScope(GUID1)
 
         coVerify { scopeDao.delete(listOf(GUID1)) }

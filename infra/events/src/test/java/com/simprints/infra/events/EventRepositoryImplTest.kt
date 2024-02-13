@@ -127,6 +127,13 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `should delegate event scope fetch`() = runTest {
+        eventRepo.getEventScope("scopeId")
+
+        coVerify { eventLocalDataSource.loadEventScope("scopeId") }
+    }
+
+    @Test
     fun `should close event scope correctly`() = runTest {
         val scope = createSessionScope("scopeId", isClosed = false)
         val event = createAlertScreenEvent()
@@ -137,6 +144,25 @@ internal class EventRepositoryImplTest {
             event.copy(payload = event.payload.copy(endedAt = Timestamp(1))),
         )
         eventRepo.closeEventScope(scope, null)
+
+        coVerify {
+            eventLocalDataSource.saveEventScope(match {
+                assertThat(it.endedAt).isEqualTo(Timestamp(5L))
+                true
+            })
+        }
+    }
+
+    @Test
+    fun `should close event scope by id`() = runTest {
+        val scope = createSessionScope("scopeId", isClosed = false)
+        val event = createAlertScreenEvent()
+
+        coEvery { eventLocalDataSource.loadEventScope(any()) } returns scope
+        coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+        )
+        eventRepo.closeEventScope("scopeId", null)
 
         coVerify {
             eventLocalDataSource.saveEventScope(match {

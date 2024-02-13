@@ -12,8 +12,10 @@ interface EventRepository {
 
     val libSimprintsVersionName: String
 
-    suspend fun createEventScope(type: EventScopeType): EventScope
+    suspend fun createEventScope(type: EventScopeType, scopeId: String? = null): EventScope
+    suspend fun getEventScope(downSyncEventScopeId: String): EventScope?
     suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?)
+    suspend fun closeEventScope(eventScopeId: String, reason: EventScopeEndCause?)
     suspend fun closeAllOpenScopes(type: EventScopeType, reason: EventScopeEndCause?)
     suspend fun saveEventScope(eventScope: EventScope)
     suspend fun getOpenEventScopes(type: EventScopeType): List<EventScope>
@@ -29,7 +31,7 @@ interface EventRepository {
         event: Event,
         scopeEvents: List<Event>? = null,
     ): Event
-
     suspend fun deleteAll()
+
 
 }

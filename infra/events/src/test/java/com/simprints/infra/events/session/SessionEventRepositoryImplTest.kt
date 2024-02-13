@@ -3,6 +3,7 @@ package com.simprints.infra.events.session
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.sampledata.createEventWithSessionId
 import com.simprints.infra.events.sampledata.createSessionScope
@@ -193,7 +194,7 @@ internal class SessionEventRepositoryImplTest {
 
         sessionEventRepository.closeCurrentSession(null)
 
-        coVerify { eventRepository.closeEventScope(any(), null) }
+        coVerify { eventRepository.closeEventScope(any<EventScope>(), null) }
         assertThat(sessionDataCache.eventScope).isNull()
         assertThat(sessionDataCache.eventCache).isEmpty()
     }

@@ -16,6 +16,9 @@ internal interface SessionScopeRoomDao {
     @Query("select * from DbEventScope where type = :type AND end_unixMs IS NOT NULL order by start_unixMs desc")
     suspend fun loadClosed(type: EventScopeType): List<DbEventScope>
 
+    @Query("select * from DbEventScope where id = :scopeId order by start_unixMs desc limit 1")
+    suspend fun loadScope(scopeId: String): DbEventScope?
+
     @Query("select count(*) from DbEventScope where type = :type")
     suspend fun count(type: EventScopeType): Int
 
