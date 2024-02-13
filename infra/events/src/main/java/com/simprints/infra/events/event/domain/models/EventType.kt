@@ -121,7 +121,11 @@ enum class EventType {
     FACE_CAPTURE_CONFIRMATION,
 
     /* key added: PERSON_CREATION_KEY */
-    PERSON_CREATION;
+    PERSON_CREATION,
+
+    /* key added: EVENT_DOWN_SYNC_REQUEST_KEY */
+    EVENT_DOWN_SYNC_REQUEST,
+    ;
 
     companion object {
         const val CALLBACK_ENROLMENT_KEY = "CALLBACK_ENROLMENT"
@@ -162,5 +166,6 @@ enum class EventType {
         const val COMPLETION_CHECK_KEY = "COMPLETION_CHECK"
         const val SUSPICIOUS_INTENT_KEY = "SUSPICIOUS_INTENT"
         const val VERO_2_INFO_SNAPSHOT_KEY = "VERO_2_INFO_SNAPSHOT"
+        const val EVENT_DOWN_SYNC_REQUEST_KEY = "EVENT_DOWN_SYNC_REQUEST"
     }
 }

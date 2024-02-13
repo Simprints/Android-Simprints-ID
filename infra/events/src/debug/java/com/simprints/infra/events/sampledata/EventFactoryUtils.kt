@@ -39,6 +39,7 @@ import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEv
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
@@ -379,4 +380,21 @@ fun createVero2InfoSnapshotEvent() = Vero2InfoSnapshotEvent(
     CREATED_AT,
     version = Vero2Version.Vero2NewApiVersion("E-1", "cypressApp", "stmApp", "un20App"),
     battery = BatteryInfo(0, 1, 2, 3)
+)
+
+fun createEventDownSyncRequestEvent() = EventDownSyncRequestEvent(
+    createdAt = CREATED_AT,
+    endedAt = ENDED_AT,
+    requestId = GUID1,
+    query = EventDownSyncRequestEvent.QueryParameters(
+        moduleId = DEFAULT_MODULE_ID.value,
+        attendantId = DEFAULT_USER_ID.value,
+        subjectId = GUID2,
+        modes = listOf("mode"),
+        lastEventId = GUID1
+    ),
+    responseStatus = 404,
+    errorType = "Not found",
+    msToFirstResponseByte = 100,
+    eventRead = 10,
 )

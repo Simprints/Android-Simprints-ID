@@ -628,4 +628,20 @@ fun validateFingerprintCaptureBiometricsEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateDownSyncRequestEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "EventDownSyncRequest")
+    with(json.getJSONObject("payload")) {
+        assertThat(getInt("version")).isEqualTo(0)
+        validateTimestamp(getJSONObject("startTime"))
+        validateTimestamp(getJSONObject("endTime"))
+        assertThat(getString("requestId")).isNotNull()
+        assertThat(getString("queryParameters")).isNotNull()
+        assertThat(getString("responseStatus")).isNotNull()
+        assertThat(getInt("responseStatus")).isNotNull()
+        assertThat(getString("errorType")).isNotNull()
+        assertThat(getInt("msToFirstResponseByte")).isNotNull()
+        assertThat(getInt("eventsRead")).isNotNull()
+    }
+}
+
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

@@ -33,6 +33,7 @@ import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEv
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent.EventDownSyncRequestPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
@@ -80,7 +81,8 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
     JsonSubTypes.Type(value = ScannerConnectionPayload::class, name = EventType.SCANNER_CONNECTION_KEY),
     JsonSubTypes.Type(value = ScannerFirmwareUpdatePayload::class, name = Companion.SCANNER_FIRMWARE_UPDATE_KEY),
     JsonSubTypes.Type(value = Vero2InfoSnapshotPayload::class, name = EventType.VERO_2_INFO_SNAPSHOT_KEY),
-    JsonSubTypes.Type(value = SuspiciousIntentPayload::class, name = EventType.SUSPICIOUS_INTENT_KEY)
+    JsonSubTypes.Type(value = SuspiciousIntentPayload::class, name = EventType.SUSPICIOUS_INTENT_KEY),
+    JsonSubTypes.Type(value = EventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
 )
 abstract class EventPayload {
     abstract val type: EventType

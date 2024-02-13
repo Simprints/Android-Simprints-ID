@@ -6,7 +6,7 @@ import androidx.annotation.Keep
 enum class EventScopeType {
 
     SESSION,
-    UPSYNC,
-    DOWNSYNC,
+    UP_SYNC,
+    DOWN_SYNC,
     ;
 }

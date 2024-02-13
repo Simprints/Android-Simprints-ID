@@ -32,6 +32,7 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
@@ -74,6 +75,7 @@ import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEv
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
@@ -84,6 +86,7 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayload
+import com.simprints.infra.eventsync.event.remote.models.downsync.ApiEventDownSyncRequestPayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureBiometricsPayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConfirmationPayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload
@@ -119,7 +122,8 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceOnboardingC
     JsonSubTypes.Type(value = ApiSuspiciousIntentPayload::class, name = Companion.SUSPICIOUS_INTENT_KEY),
     JsonSubTypes.Type(value = ApiVero2InfoSnapshotPayload::class, name = Companion.VERO_2_INFO_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ApiCallbackPayload::class, name = Companion.CALLOUT_KEY),
-    JsonSubTypes.Type(value = ApiCalloutPayload::class, name = Companion.CALLBACK_KEY)
+    JsonSubTypes.Type(value = ApiCalloutPayload::class, name = Companion.CALLBACK_KEY),
+    JsonSubTypes.Type(value = ApiEventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
 )
 @Keep
 internal abstract class ApiEventPayload(
@@ -171,4 +175,5 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload =
         CALLBACK_CONFIRMATION -> ApiCallbackPayload(this as ConfirmationCallbackPayload)
         FINGERPRINT_CAPTURE_BIOMETRICS -> ApiFingerprintCaptureBiometricsPayload(this as FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload)
         FACE_CAPTURE_BIOMETRICS -> ApiFaceCaptureBiometricsPayload(this as FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload)
+        EVENT_DOWN_SYNC_REQUEST -> ApiEventDownSyncRequestPayload(this as EventDownSyncRequestEvent.EventDownSyncRequestPayload)
     }

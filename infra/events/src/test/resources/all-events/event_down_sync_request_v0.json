@@ -1,0 +1,27 @@
+{
+  "id": "75b56875-de20-4e59-a835-08b04ea91598",
+  "type": "EVENT_DOWN_SYNC_REQUEST",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },  
+  "payload": {
+    "type": "EVENT_DOWN_SYNC_REQUEST",
+    "eventVersion": 0,
+    "createdAt": 221675670,
+    "endedAt": 9141278930,
+    "requestId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "queryParameters": {
+      "subjectId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+      "modes": [
+        "mode1"
+      ],
+      "lastEventId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4"
+    },
+    "responseStatus": 200,
+    "errorType": "java.lang.NullPointerException",
+    "msToFirstResponseByte": 100,
+    "eventsRead": 100
+  }
+}
