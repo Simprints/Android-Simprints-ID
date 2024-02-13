@@ -30,7 +30,7 @@ class EventMigration11to12Test {
         }
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 12, true, EventMigration11to12())
-        MigrationTestingTools.retrieveCursorWithScopeById(db, "session-id").use { scope ->
+        MigrationTestingTools.retrieveCursorWithSessionScopeById(db, "session-id").use { scope ->
             assertThat(scope.getLongWithColumnName("start_unixMs")).isEqualTo(12)
             assertThat(scope.getIntWithColumnName("start_isTrustworthy")).isEqualTo(0)
 
@@ -52,7 +52,7 @@ class EventMigration11to12Test {
         }
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 12, true, EventMigration11to12())
-        MigrationTestingTools.retrieveCursorWithScopeById(db, "session-id").use { scope ->
+        MigrationTestingTools.retrieveCursorWithSessionScopeById(db, "session-id").use { scope ->
             assertThat(scope.getLongWithColumnName("end_unixMs")).isEqualTo(34)
             assertThat(scope.getIntWithColumnName("end_isTrustworthy")).isEqualTo(0)
         }

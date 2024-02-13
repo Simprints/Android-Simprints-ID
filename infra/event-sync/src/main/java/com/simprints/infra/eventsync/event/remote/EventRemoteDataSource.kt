@@ -9,11 +9,11 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
-import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionScope
+import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
@@ -121,11 +121,11 @@ internal class EventRemoteDataSource @Inject constructor(
 
     suspend fun post(
         projectId: String,
-        sessionScopes: Map<SessionScope, List<Event>>,
+        eventScopes: Map<EventScope, List<Event>>,
         acceptInvalidEvents: Boolean = true,
     ) = executeCall { remoteInterface ->
         val body = ApiUploadEventsBody(
-            sessionScopes.map { (scope, events) -> ApiSessionScope.fromDomain(scope, events) }
+            eventScopes.map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
         )
         remoteInterface.uploadEvents(projectId, acceptInvalidEvents, body)
     }

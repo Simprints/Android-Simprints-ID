@@ -7,7 +7,7 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
@@ -17,7 +17,7 @@ import javax.inject.Inject
 internal class AddCaptureEventsUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val encoder: EncodingUtils,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
 ) {
 
     suspend operator fun invoke(

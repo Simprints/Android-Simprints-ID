@@ -5,14 +5,12 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.orchestration.data.ActionConstants
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -20,7 +18,7 @@ import org.junit.Test
 internal class CreateSessionIfRequiredUseCaseTest {
 
     @MockK
-    private lateinit var coreEventRepository: EventRepository
+    private lateinit var sessionEventRepository: SessionEventRepository
 
     @MockK
     private lateinit var timeHelper: TimeHelper
@@ -31,25 +29,21 @@ internal class CreateSessionIfRequiredUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { coreEventRepository.getCurrentSessionScope() } returns mockk {
-            coEvery { id } returns SESSION_ID
-        }
-
-        useCase = CreateSessionIfRequiredUseCase(coreEventRepository, timeHelper)
+        useCase = CreateSessionIfRequiredUseCase(sessionEventRepository, timeHelper)
     }
 
     @Test
     fun `Does not create session for confirm actions`() = runTest {
         useCase("${LibSimprintsConstants.PACKAGE_NAME}.${ActionConstants.ACTION_CONFIRM_IDENTITY}")
 
-        coVerify(exactly = 0) { coreEventRepository.createSession() }
+        coVerify(exactly = 0) { sessionEventRepository.createSession() }
     }
 
     @Test
     fun `Does not create session for last biometric actions`() = runTest {
         useCase("${LibSimprintsConstants.PACKAGE_NAME}.${ActionConstants.ACTION_ENROL_LAST_BIOMETRICS}")
 
-        coVerify(exactly = 0) { coreEventRepository.createSession() }
+        coVerify(exactly = 0) { sessionEventRepository.createSession() }
     }
 
     @Test
@@ -57,8 +51,8 @@ internal class CreateSessionIfRequiredUseCaseTest {
         useCase("${LibSimprintsConstants.PACKAGE_NAME}.${ActionConstants.ACTION_ENROL}")
 
         coVerify {
-            coreEventRepository.createSession()
-            coreEventRepository.addOrUpdateEvent(withArg { Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java) })
+            sessionEventRepository.createSession()
+            sessionEventRepository.addOrUpdateEvent(withArg { Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java) })
         }
     }
 
@@ -67,8 +61,8 @@ internal class CreateSessionIfRequiredUseCaseTest {
         useCase("${OdkConstants.PACKAGE_NAME}.${ActionConstants.ACTION_ENROL}")
 
         coVerify {
-            coreEventRepository.createSession()
-            coreEventRepository.addOrUpdateEvent(withArg { Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java) })
+            sessionEventRepository.createSession()
+            sessionEventRepository.addOrUpdateEvent(withArg { Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java) })
         }
     }
 
@@ -77,13 +71,8 @@ internal class CreateSessionIfRequiredUseCaseTest {
         useCase("${CommCareConstants.PACKAGE_NAME}.${ActionConstants.ACTION_ENROL}")
 
         coVerify {
-            coreEventRepository.createSession()
-            coreEventRepository.addOrUpdateEvent(withArg { Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java) })
+            sessionEventRepository.createSession()
+            sessionEventRepository.addOrUpdateEvent(withArg { Truth.assertThat(it).isInstanceOf(IntentParsingEvent::class.java) })
         }
-    }
-
-    companion object {
-
-        private const val SESSION_ID = "sessionId"
     }
 }

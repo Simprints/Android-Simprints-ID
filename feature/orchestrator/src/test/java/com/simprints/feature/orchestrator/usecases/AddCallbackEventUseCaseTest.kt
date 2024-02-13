@@ -9,7 +9,6 @@ import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
-import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent
@@ -19,6 +18,7 @@ import com.simprints.infra.events.event.domain.models.callback.VerificationCallb
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -37,7 +37,7 @@ class AddCallbackEventUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: SessionEventRepository
 
     @MockK
     private lateinit var timeHelper: TimeHelper

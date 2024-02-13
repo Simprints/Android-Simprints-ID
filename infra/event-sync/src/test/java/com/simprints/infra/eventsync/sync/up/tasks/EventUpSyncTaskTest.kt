@@ -93,27 +93,27 @@ internal class EventUpSyncTaskTest {
     fun `upload fetches events for all provided closed sessions`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(
             createSessionScope(GUID1),
             createSessionScope(GUID2)
         )
         coEvery {
-            eventRepo.getEventsFromSession(GUID1)
+            eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
         coEvery {
-            eventRepo.getEventsFromSession(GUID2)
+            eventRepo.getEventsFromScope(GUID2)
         } returns listOf(createEventWithSessionId(GUID2, GUID2))
 
         eventUpSyncTask.upSync(operation).toList()
 
-        coVerify(exactly = 2) { eventRepo.getEventsFromSession(any()) }
+        coVerify(exactly = 2) { eventRepo.getEventsFromScope(any()) }
     }
 
     @Test
     fun `upload should not filter any events on upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
-        coEvery { eventRepo.getEventsFromSession(any()) } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getEventsFromScope(any()) } returns listOf(
             createAuthenticationEvent(),
             createEnrolmentEventV2(),
         )
@@ -137,8 +137,8 @@ internal class EventUpSyncTaskTest {
     fun `upload should filter biometric events on upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
-        coEvery { eventRepo.getEventsFromSession(any()) } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getEventsFromScope(any()) } returns listOf(
             createAuthenticationEvent(),
             createAlertScreenEvent(),
             // only following should be uploaded
@@ -167,8 +167,8 @@ internal class EventUpSyncTaskTest {
     fun `upload should filter analytics events on upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
-        coEvery { eventRepo.getEventsFromSession(any()) } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getEventsFromScope(any()) } returns listOf(
             createFingerprintCaptureBiometricsEvent(),
             createFaceCaptureBiometricsEvent(),
             // only following should be uploaded
@@ -203,22 +203,22 @@ internal class EventUpSyncTaskTest {
     fun `when upload succeeds it should delete events`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(
             createSessionScope(GUID1),
             createSessionScope(GUID2)
         )
         coEvery {
-            eventRepo.getEventsFromSession(GUID1)
+            eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
         coEvery {
-            eventRepo.getEventsFromSession(GUID2)
+            eventRepo.getEventsFromScope(GUID2)
         } returns listOf(createEventWithSessionId(GUID2, GUID2))
 
         eventUpSyncTask.upSync(operation).toList()
 
         coVerify {
-            eventRepo.deleteSession(GUID1)
-            eventRepo.deleteSession(GUID2)
+            eventRepo.deleteEventScope(GUID1)
+            eventRepo.deleteEventScope(GUID2)
         }
     }
 
@@ -226,14 +226,14 @@ internal class EventUpSyncTaskTest {
     fun `upload in progress should emit progress`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(
             createSessionScope(GUID1),
             createSessionScope(GUID2)
         )
-        coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(
+        coEvery { eventRepo.getEventsFromScope(GUID1) } returns listOf(
             createEventWithSessionId(GUID1, GUID1),
         )
-        coEvery { eventRepo.getEventsFromSession(GUID2) } returns listOf(
+        coEvery { eventRepo.getEventsFromScope(GUID2) } returns listOf(
             createEnrolmentEventV2(),
             createAlertScreenEvent(),
         )
@@ -249,25 +249,25 @@ internal class EventUpSyncTaskTest {
     fun `when upload fails due to generic error should not delete events`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
         coEvery {
-            eventRepo.getEventsFromSession(GUID1)
+            eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
         coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("")
 
         eventUpSyncTask.upSync(operation).toList()
 
-        coVerify(exactly = 0) { eventRepo.deleteSession(any()) }
+        coVerify(exactly = 0) { eventRepo.deleteEventScope(any()) }
     }
 
     @Test
     fun `when upload fails due to network issue should not delete events`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
         coEvery {
-            eventRepo.getEventsFromSession(GUID1)
+            eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
         coEvery { eventRemoteDataSource.post(any(), any()) } throws NetworkConnectionException(
@@ -276,22 +276,22 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation).toList()
 
-        coVerify(exactly = 0) { eventRepo.deleteSession(any()) }
+        coVerify(exactly = 0) { eventRepo.deleteEventScope(any()) }
     }
 
     @Test
     fun `upload should not dump events when fetch fails`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
-        coEvery { eventRepo.getEventsFromSession(GUID1) } throws IllegalStateException()
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getEventsFromScope(GUID1) } throws IllegalStateException()
 
         eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
-            eventRepo.deleteSession(GUID1)
+            eventRepo.deleteEventScope(GUID1)
         }
     }
 
@@ -299,20 +299,20 @@ internal class EventUpSyncTaskTest {
     fun `upload should dump invalid events and delete the events`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
         coEvery {
-            eventRepo.getEventsFromSession(GUID1)
+            eventRepo.getEventsFromScope(GUID1)
         } throws JsonParseException(mockk(relaxed = true), "")
 
-        coEvery { eventRepo.getEventsJsonFromSession(GUID1) } returns listOf("{}")
+        coEvery { eventRepo.getEventsJsonFromScope(GUID1) } returns listOf("{}")
 
         eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 0) { eventRemoteDataSource.post(any(), any()) }
         coVerify {
-            eventRepo.getEventsJsonFromSession(any())
+            eventRepo.getEventsJsonFromScope(any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
-            eventRepo.deleteSession(GUID1)
+            eventRepo.deleteEventScope(GUID1)
         }
     }
 
@@ -320,11 +320,11 @@ internal class EventUpSyncTaskTest {
     fun `fail dump of invalid events should not delete the events`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
-        coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
         coEvery {
-            eventRepo.getEventsFromSession(GUID1)
+            eventRepo.getEventsFromScope(GUID1)
         } throws JsonParseException(mockk(relaxed = true), "")
-        coEvery { eventRepo.getEventsJsonFromSession(GUID1) } returns listOf("{}")
+        coEvery { eventRepo.getEventsJsonFromScope(GUID1) } returns listOf("{}")
         coEvery { eventRemoteDataSource.dumpInvalidEvents(any(), any()) } throws HttpException(
             Response.error<String>(503, "".toResponseBody(null))
         )
@@ -333,18 +333,18 @@ internal class EventUpSyncTaskTest {
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
-            eventRepo.deleteSession(GUID1)
+            eventRepo.deleteEventScope(GUID1)
         }
 
         coVerify {
-            eventRepo.getEventsJsonFromSession(any())
+            eventRepo.getEventsJsonFromScope(any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
         }
     }
 
     @Test
     fun `upSync should emit a failure if upload fails`() = runTest {
-        coEvery { eventRepo.getAllClosedSessions() } throws IllegalStateException()
+        coEvery { eventRepo.getClosedEventScopes(any()) } throws IllegalStateException()
 
         val progress = eventUpSyncTask.upSync(operation).toList()
         assertThat(progress.first().operation.lastState).isEqualTo(UpSyncState.FAILED)

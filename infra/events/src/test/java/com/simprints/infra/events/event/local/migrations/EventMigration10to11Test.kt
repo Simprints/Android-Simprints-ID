@@ -15,11 +15,11 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.Location
-import com.simprints.infra.events.event.domain.models.session.SessionEndCause
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
+import com.simprints.infra.events.event.domain.models.scope.Location
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.local.EventRoomDatabase
 
 import org.junit.Rule
@@ -219,7 +219,7 @@ class EventMigration10to11Test {
     ) {
         val scopePayload = JsonHelper.fromJson(
             scopeCursor.getStringWithColumnName("payloadJson").orEmpty(),
-            object : TypeReference<SessionScopePayload>() {}
+            object : TypeReference<EventScopePayload>() {}
         )
 
         assertThat(scopeCursor.getStringWithColumnName("id")).isEqualTo(sessionId)
@@ -240,7 +240,7 @@ class EventMigration10to11Test {
 
         if (shouldHaveEnded) {
             assertThat(scopeCursor.getLongWithColumnName("endedAt")).isEqualTo(ENDED_AT)
-            assertThat(scopePayload.endCause).isEqualTo(SessionEndCause.NEW_SESSION)
+            assertThat(scopePayload.endCause).isEqualTo(EventScopeEndCause.NEW_SESSION)
         } else {
             assertThat(scopeCursor.getLongWithColumnName("endedAt")).isNull()
             assertThat(scopePayload.endCause).isNull()

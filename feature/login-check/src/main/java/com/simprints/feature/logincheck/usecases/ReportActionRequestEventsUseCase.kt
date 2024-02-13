@@ -3,7 +3,7 @@ package com.simprints.feature.logincheck.usecases
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class ReportActionRequestEventsUseCase @Inject constructor(
-    private val coreEventRepository: EventRepository,
+    private val sessionEventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
     private val simNetworkUtils: SimNetworkUtils,
     private val recentUserActivityManager: RecentUserActivityManager,
@@ -40,13 +40,13 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private fun reportUnknownExtras(actionRequest: ActionRequest) {
         if (actionRequest.unknownExtras.isNotEmpty()) {
             externalScope.launch {
-                coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
+                sessionEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
             }
         }
     }
 
     private suspend fun addConnectivityStateEvent() {
-        coreEventRepository.addOrUpdateEvent(ConnectivitySnapshotEvent(timeHelper.now(), simNetworkUtils.connectionsStates))
+        sessionEventRepository.addOrUpdateEvent(ConnectivitySnapshotEvent(timeHelper.now(), simNetworkUtils.connectionsStates))
     }
 
     private suspend fun addRequestActionEvent(request: ActionRequest) {
@@ -60,6 +60,6 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                 is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEvent(startTime, projectId, userId, moduleId, metadata, sessionId)
             }
         }
-        coreEventRepository.addOrUpdateEvent(event)
+        sessionEventRepository.addOrUpdateEvent(event)
     }
 }

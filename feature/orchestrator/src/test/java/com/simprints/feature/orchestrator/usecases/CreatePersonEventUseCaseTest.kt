@@ -5,7 +5,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
@@ -13,6 +12,7 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -20,7 +20,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -32,7 +31,7 @@ internal class CreatePersonEventUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: SessionEventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -52,14 +51,13 @@ internal class CreatePersonEventUseCaseTest {
         coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns "sessionId"
         }
-        coEvery { eventRepository.observeEventsFromSession(any()) }
 
         useCase = CreatePersonEventUseCase(eventRepository, timeHelper, encodingUtils)
     }
 
     @Test
     fun `Does not create event if has person creation in session`() = runTest {
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<FingerprintCaptureBiometricsEvent>(),
             mockk<FaceCaptureBiometricsEvent>(),
             mockk<PersonCreationEvent>(),
@@ -72,7 +70,7 @@ internal class CreatePersonEventUseCaseTest {
 
     @Test
     fun `Does not create event if no biometric data`() = runTest {
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<FingerprintCaptureEvent>(),
             mockk<FaceCaptureEvent>(),
         )
@@ -84,7 +82,7 @@ internal class CreatePersonEventUseCaseTest {
 
     @Test
     fun `Create event if there is face biometric data`() = runTest {
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<FaceCaptureBiometricsEvent> {
                 every { payload.id } returns "eventFaceId1"
                 every { payload.face.template } returns TEMPLATE
@@ -102,7 +100,7 @@ internal class CreatePersonEventUseCaseTest {
 
     @Test
     fun `Create event if there is fingerprint biometric data`() = runTest {
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<FingerprintCaptureBiometricsEvent> {
                 every { payload.id } returns "eventFinger1"
                 every { payload.fingerprint.template } returns TEMPLATE

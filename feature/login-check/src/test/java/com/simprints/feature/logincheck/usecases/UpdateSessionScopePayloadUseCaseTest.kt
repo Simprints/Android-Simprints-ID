@@ -4,16 +4,16 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +21,7 @@ import org.junit.Test
 internal class UpdateSessionScopePayloadUseCaseTest {
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: SessionEventRepository
 
     @MockK
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -59,12 +59,13 @@ internal class UpdateSessionScopePayloadUseCaseTest {
         }
     }
 
-    private fun createBlankSessionScope() = SessionScope(
+    private fun createBlankSessionScope() = EventScope(
         id = "eventId",
         projectId = "projectId",
+        type = EventScopeType.SESSION,
         createdAt = Timestamp(0L),
         endedAt = null,
-        payload = SessionScopePayload(
+        payload = EventScopePayload(
             endCause = null,
             modalities = emptyList(),
             sidVersion = "appVersionName",

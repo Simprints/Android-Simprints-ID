@@ -2,11 +2,11 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import javax.inject.Inject
 
 internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val authStore: AuthStore,
     private val configRepository: ConfigRepository,
 ) {
@@ -27,10 +27,8 @@ internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
             eventRepository.saveSessionScope(updatedSessionScope)
         }
 
-        val associatedEvents = eventRepository.observeEventsFromSession(sessionScope.id)
-        associatedEvents.collect {
-            it.projectId = signedProjectId
-            eventRepository.addOrUpdateEvent(it)
-        }
+        // Calling addOrUpdate will update the project ID of the event
+        val associatedEvents = eventRepository.getEventsInCurrentSession()
+        associatedEvents.forEach { eventRepository.addOrUpdateEvent(it) }
     }
 }

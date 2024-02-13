@@ -37,6 +37,7 @@ class EventMigration12to13Test {
             assertThat(event.getLongWithColumnName("createdAt_msSinceBoot")).isNull()
             assertThat(event.getStringWithColumnName("eventJson")).isEqualTo(NEW_EVENT)
         }
+        helper.closeWhenFinished(db)
     }
 
     @Test

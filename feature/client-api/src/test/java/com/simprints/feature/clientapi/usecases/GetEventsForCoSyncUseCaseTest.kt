@@ -17,7 +17,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +44,7 @@ class GetEventsForCoSyncUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsFromScope(any()) } returns listOf(
             mockk<EnrolmentEventV2>(relaxed = true),
             mockk<PersonCreationEvent>(relaxed = true),
             mockk<FingerprintCaptureBiometricsEvent>(relaxed = true),

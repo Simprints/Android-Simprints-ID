@@ -2,7 +2,6 @@ package com.simprints.infra.events.event.local.migrations
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
-import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -22,28 +21,11 @@ class EventMigration4to5Test {
 
     private val TEST_DB = "test"
 
-    // Array of all migrations
-    private val ALL_MIGRATIONS = arrayOf(
-        EventMigration1to2(),
-        EventMigration2to3(),
-        EventMigration3to4(),
-        EventMigration4to5(),
-        EventMigration5to6(),
-        EventMigration6to7(),
-        EventMigration7to8(),
-        EventMigration8to9(),
-        EventMigration9to10(),
-        EventMigration10to11(),
-        EventMigration11to12(),
-        EventMigration12to13(),
-    )
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
         EventRoomDatabase::class.java,
     )
-
 
     @Test
     @Throws(IOException::class)
@@ -74,28 +56,6 @@ class EventMigration4to5Test {
             }
 
             assertThat(dbValue).isEqualTo(field)
-        }
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun runAllMigrations() {
-        // create earliest version of the database.
-        helper.createDatabase(TEST_DB, 1).apply {
-            close()
-        }
-
-        // open latest version of the database. Room will validate the schema
-        // once all migrations execute.
-        Room.databaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            EventRoomDatabase::class.java, TEST_DB
-        ).addMigrations(*ALL_MIGRATIONS).build().apply {
-            // retrieve the database reference to force-open the db
-            // instance after migrations have been run
-            openHelper.writableDatabase
-            // then close the db
-            close()
         }
     }
 

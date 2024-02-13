@@ -5,7 +5,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -18,7 +18,7 @@ import javax.inject.Inject
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy as ConfigFingerComparisonStrategy
 
 internal class SaveMatchEventUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val configRepository: ConfigRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {

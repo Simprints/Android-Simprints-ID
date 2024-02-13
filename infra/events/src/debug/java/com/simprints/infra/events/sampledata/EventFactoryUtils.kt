@@ -47,11 +47,12 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.Location
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.Location
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -66,7 +67,7 @@ fun createSessionScope(
     createdAt: Timestamp = CREATED_AT,
     projectId: String = DEFAULT_PROJECT_ID,
     isClosed: Boolean = false,
-): SessionScope {
+): EventScope {
 
     val appVersionNameArg = "appVersionName"
     val libSimprintsVersionNameArg = "libSimprintsVersionName"
@@ -80,12 +81,13 @@ fun createSessionScope(
     val databaseInfoArg = DatabaseInfo(2, 2)
     val locationArg = Location(0.0, 0.0)
 
-    return SessionScope(
+    return EventScope(
         id = id,
         projectId = projectId,
         createdAt = createdAt,
+        type = EventScopeType.SESSION,
         endedAt = ENDED_AT.takeIf { isClosed },
-        payload = SessionScopePayload(
+        payload = EventScopePayload(
             sidVersion = appVersionNameArg,
             libSimprintsVersion = libSimprintsVersionNameArg,
             language = languageArg,
@@ -105,7 +107,7 @@ fun createEventWithSessionId(eventId: String, sessionId: String): Event = AlertS
         AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
     ),
     type = EventType.ALERT_SCREEN,
-    sessionId = sessionId,
+    scopeId = sessionId,
 )
 
 const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"

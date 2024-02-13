@@ -5,13 +5,15 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -27,7 +29,7 @@ import org.junit.Test
 internal class UpdateProjectInCurrentSessionUseCaseTest {
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: SessionEventRepository
 
     @MockK
     lateinit var authStore: AuthStore
@@ -52,7 +54,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     @Test
     fun `Does not update session project ID when same as signed in project ID`() = runTest {
         coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(SIGNED_PROJECT_ID)
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
 
         useCase()
 
@@ -62,7 +64,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     @Test
     fun `Update session project ID when same as signed in project ID`() = runTest {
         coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(OTHER_PROJECT_ID)
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
 
         useCase()
 
@@ -76,14 +78,12 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     @Test
     fun `Update session project ID in all session events`() = runTest {
         coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(SIGNED_PROJECT_ID)
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(createBlankSessionEvent(OTHER_PROJECT_ID))
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(createBlankSessionEvent(OTHER_PROJECT_ID))
 
         useCase()
 
         coVerify(exactly = 1) {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it.projectId).isEqualTo(SIGNED_PROJECT_ID)
-            })
+            eventRepository.addOrUpdateEvent(any())
         }
     }
 
@@ -94,7 +94,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
             every { this@mockk.language } returns language
         }
         coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(OTHER_PROJECT_ID)
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
 
         useCase()
 
@@ -105,12 +105,13 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         }
     }
 
-    private fun createBlankSessionScope(projectId: String) = SessionScope(
+    private fun createBlankSessionScope(projectId: String) = EventScope(
         id = "eventId",
         projectId = projectId,
+        type = EventScopeType.SESSION,
         createdAt = Timestamp(0L),
         endedAt = null,
-        payload = SessionScopePayload(
+        payload = EventScopePayload(
             endCause = null,
             modalities = emptyList(),
             sidVersion = "appVersionName",
