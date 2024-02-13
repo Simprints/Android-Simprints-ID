@@ -158,6 +158,22 @@ class SetupViewModelTest {
         viewModel.overallSetupResult.test().assertValue(true)
     }
 
+
+@Test
+    fun `should not download required licenses if there are no required licenses`() = runTest {
+        // Given
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { general } returns mockk {
+                every { modalities } returns emptyList()
+            }
+        }
+
+        // When
+        viewModel.downloadRequiredLicenses()
+
+        // Then
+        viewModel.overallSetupResult.test().assertValue(true)
+    }
     @Test
     fun `should fail if any license fails`() = runTest {
         // Given
