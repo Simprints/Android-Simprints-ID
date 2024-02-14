@@ -13,7 +13,7 @@ internal class RemoteTestingHelper {
             ApiEventPayloadType.ScannerConnection, ApiEventPayloadType.Vero2InfoSnapshot, ApiEventPayloadType.ScannerFirmwareUpdate, ApiEventPayloadType.InvalidIntent, ApiEventPayloadType.SuspiciousIntent, ApiEventPayloadType.IntentParsing,
             ApiEventPayloadType.CompletionCheck, ApiEventPayloadType.FaceOnboardingComplete, ApiEventPayloadType.FaceFallbackCapture, ApiEventPayloadType.FaceCapture,
             ApiEventPayloadType.FaceCaptureConfirmation, ApiEventPayloadType.FingerprintCaptureBiometrics, ApiEventPayloadType.FaceCaptureBiometrics,
-            ApiEventPayloadType.EventDownSyncRequest,
+            ApiEventPayloadType.EventDownSyncRequest, ApiEventPayloadType.EventUpSyncRequest,
             null, -> {
                 // ADD TEST FOR NEW EVENT IN THIS CLASS
             }

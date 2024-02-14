@@ -97,6 +97,9 @@ internal enum class ApiEventPayloadType {
 
     /* key added: EVENT_DOWN_SYNC_REQUEST_KEY */
     EventDownSyncRequest,
+
+    /* key added: EVENT_UP_SYNC_REQUEST_KEY */
+    EventUpSyncRequest,
     ;
 
     companion object {
@@ -130,6 +133,7 @@ internal enum class ApiEventPayloadType {
         const val FACE_CAPTURE_BIOMETRICS_KEY = "FaceCaptureBiometrics"
         const val FINGERPRINT_CAPTURE_BIOMETRICS_KEY = "FingerprintCaptureBiometrics"
         const val EVENT_DOWN_SYNC_REQUEST_KEY = "EventDownSyncRequest"
+        const val EVENT_UP_SYNC_REQUEST_KEY = "EventUpSyncRequest"
     }
 }
 
@@ -176,6 +180,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     FINGERPRINT_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FingerprintCaptureBiometrics
     FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
     EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
+    EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
 }
 
 
@@ -207,6 +212,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.FingerprintCaptureBiometrics -> FINGERPRINT_CAPTURE_BIOMETRICS
     ApiEventPayloadType.FaceCaptureBiometrics -> FACE_CAPTURE_BIOMETRICS
     ApiEventPayloadType.EventDownSyncRequest -> EVENT_DOWN_SYNC_REQUEST
+    ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }

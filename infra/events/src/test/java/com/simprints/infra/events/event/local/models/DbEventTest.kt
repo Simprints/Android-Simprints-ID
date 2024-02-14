@@ -302,4 +302,12 @@ class DbEventTest {
 
         assertThat(original).isEqualTo(transformed)
     }
+
+    @Test
+    fun convert_EventUpSyncRequestEvent() {
+        val original = createEventUpSyncRequestEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
 }

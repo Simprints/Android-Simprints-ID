@@ -54,6 +54,7 @@ import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -397,4 +398,15 @@ fun createEventDownSyncRequestEvent() = EventDownSyncRequestEvent(
     errorType = "Not found",
     msToFirstResponseByte = 100,
     eventRead = 10,
+)
+
+fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
+    createdAt = CREATED_AT,
+    endedAt = ENDED_AT,
+    requestId = GUID1,
+    sessionCount = 1,
+    eventUpSyncCount = 2,
+    eventDownSyncCount = 3,
+    responseStatus = 200,
+    errorType = "OK",
 )

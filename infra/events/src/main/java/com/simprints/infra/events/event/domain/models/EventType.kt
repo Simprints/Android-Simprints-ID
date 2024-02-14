@@ -125,6 +125,9 @@ enum class EventType {
 
     /* key added: EVENT_DOWN_SYNC_REQUEST_KEY */
     EVENT_DOWN_SYNC_REQUEST,
+
+    /* key added: EVENT_UP_SYNC_REQUEST_KEY */
+    EVENT_UP_SYNC_REQUEST,
     ;
 
     companion object {
@@ -167,5 +170,6 @@ enum class EventType {
         const val SUSPICIOUS_INTENT_KEY = "SUSPICIOUS_INTENT"
         const val VERO_2_INFO_SNAPSHOT_KEY = "VERO_2_INFO_SNAPSHOT"
         const val EVENT_DOWN_SYNC_REQUEST_KEY = "EVENT_DOWN_SYNC_REQUEST"
+        const val EVENT_UP_SYNC_REQUEST_KEY = "EVENT_UP_SYNC_REQUEST"
     }
 }

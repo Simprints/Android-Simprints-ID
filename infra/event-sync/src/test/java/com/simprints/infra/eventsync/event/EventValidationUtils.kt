@@ -636,11 +636,23 @@ fun validateDownSyncRequestEventApiModel(json: JSONObject) {
         validateTimestamp(getJSONObject("endTime"))
         assertThat(getString("requestId")).isNotNull()
         assertThat(getString("queryParameters")).isNotNull()
-        assertThat(getString("responseStatus")).isNotNull()
         assertThat(getInt("responseStatus")).isNotNull()
         assertThat(getString("errorType")).isNotNull()
         assertThat(getInt("msToFirstResponseByte")).isNotNull()
         assertThat(getInt("eventsRead")).isNotNull()
+    }
+}
+
+fun validateUpSyncRequestEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "EventUpSyncRequest")
+    with(json.getJSONObject("payload")) {
+        assertThat(getInt("version")).isEqualTo(0)
+        validateTimestamp(getJSONObject("startTime"))
+        validateTimestamp(getJSONObject("endTime"))
+        assertThat(getString("requestId")).isNotNull()
+        assertThat(getString("content")).isNotNull()
+        assertThat(getInt("responseStatus")).isNotNull()
+        assertThat(getString("errorType")).isNotNull()
     }
 }
 
