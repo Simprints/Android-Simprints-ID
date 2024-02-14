@@ -36,6 +36,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -281,7 +282,10 @@ internal class EventUpSyncTaskTest {
     fun `when upload fails due to network issue should not delete session events`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
 
-        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
+            createSessionScope(GUID1)
+        )
         coEvery {
             eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
@@ -359,14 +363,31 @@ internal class EventUpSyncTaskTest {
     }
 
     @Test
-    fun `upSync should emit a failure if upload fails`() = runTest {
-        coEvery { eventRepo.getClosedEventScopes(any()) } throws IllegalStateException()
+    fun `upSync should emit a failure if data fetch fails`() = runTest {
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } throws IllegalStateException()
 
         val progress = eventUpSyncTask.upSync(operation, eventScope).toList()
 
         assertThat(progress.first().operation.lastState).isEqualTo(UpSyncState.FAILED)
+        coVerify(exactly = 1) { eventUpSyncScopeRepository.insertOrUpdate(any()) }
+    }
+
+    @Test
+    fun `upSync should log network failures and continue execution`() = runTest {
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
+            createSessionScope(GUID1),
+        )
+        coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
+            Response.error<ResponseBody>(427, "".toResponseBody(null))
+        )
+
+        val progress = eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        assertThat(progress.first().operation.lastState).isEqualTo(UpSyncState.RUNNING)
+        assertThat(progress.last().operation.lastState).isEqualTo(UpSyncState.COMPLETE)
         coVerify(exactly = 1) {
-            eventUpSyncScopeRepository.insertOrUpdate(any())
             eventRepo.addOrUpdateEvent(any(), match {
                 it is EventUpSyncRequestEvent && !it.payload.errorType.isNullOrEmpty()
             })
