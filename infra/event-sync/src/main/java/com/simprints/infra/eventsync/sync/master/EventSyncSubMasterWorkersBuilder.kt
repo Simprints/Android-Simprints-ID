@@ -20,6 +20,7 @@ internal class EventSyncSubMasterWorkersBuilder @Inject constructor() {
     fun buildEndSyncReporterWorker(
         uniqueSyncID: String,
         downSyncWorkerScopeId: String,
+        upSyncWorkerScopeId: String,
     ): OneTimeWorkRequest = OneTimeWorkRequest
         .Builder(EventEndSyncReporterWorker::class.java)
         .addTagForMasterSyncId(uniqueSyncID)
@@ -30,6 +31,7 @@ internal class EventSyncSubMasterWorkersBuilder @Inject constructor() {
             workDataOf(
                 EventEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID,
                 EventEndSyncReporterWorker.EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to downSyncWorkerScopeId,
+                EventEndSyncReporterWorker.EVENT_UP_SYNC_SCOPE_TO_CLOSE to upSyncWorkerScopeId,
             )
         )
         .build() as OneTimeWorkRequest

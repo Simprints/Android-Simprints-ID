@@ -36,7 +36,7 @@ internal class EventEndSyncReporterWorkerTest {
 
     @Test
     fun `doWork should fail when the sync id is empty`() = runTest {
-        val endSyncReportWorker = createWorker("", null)
+        val endSyncReportWorker = createWorker("", null, null)
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -45,7 +45,7 @@ internal class EventEndSyncReporterWorkerTest {
 
     @Test
     fun `doWork should fail when the sync id is null`() = runTest {
-        val endSyncReportWorker = createWorker(null, null)
+        val endSyncReportWorker = createWorker(null, null, null)
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -54,7 +54,7 @@ internal class EventEndSyncReporterWorkerTest {
 
     @Test
     fun `doWork should succeed otherwise and save the last success time`() = runTest {
-        val endSyncReportWorker = createWorker("sync id", null)
+        val endSyncReportWorker = createWorker("sync id", null, null)
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
@@ -63,24 +63,37 @@ internal class EventEndSyncReporterWorkerTest {
 
     @Test
     fun `doWork should close down sync scope if id provided`() = runTest {
-        val endSyncReportWorker = createWorker("sync id", "scopeId")
+        val endSyncReportWorker = createWorker("sync id", null, "scopeId")
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
         coVerify(exactly = 1) { eventRepository.closeEventScope("scopeId", any()) }
     }
 
-    private fun createWorker(syncId: String?, scopeId: String?): EventEndSyncReporterWorker =
-        EventEndSyncReporterWorker(
-            mockk(relaxed = true),
-            mockk(relaxed = true) {
-                every { inputData } returns workDataOf(
-                    SYNC_ID_TO_MARK_AS_COMPLETED to syncId,
-                    EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to scopeId,
-                )
-            },
-            syncCache,
-            eventRepository,
-            testCoroutineRule.testCoroutineDispatcher
-        )
+    @Test
+    fun `doWork should close up sync scope if id provided`() = runTest {
+        val endSyncReportWorker = createWorker("sync id", null, "scopeId")
+        val result = endSyncReportWorker.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        coVerify(exactly = 1) { eventRepository.closeEventScope("scopeId", any()) }
+    }
+
+    private fun createWorker(
+        syncId: String?,
+        downScopeId: String?,
+        upScopeId: String?,
+    ) = EventEndSyncReporterWorker(
+        mockk(relaxed = true),
+        mockk(relaxed = true) {
+            every { inputData } returns workDataOf(
+                SYNC_ID_TO_MARK_AS_COMPLETED to syncId,
+                EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to downScopeId,
+                EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to upScopeId,
+            )
+        },
+        syncCache,
+        eventRepository,
+        testCoroutineRule.testCoroutineDispatcher
+    )
 }

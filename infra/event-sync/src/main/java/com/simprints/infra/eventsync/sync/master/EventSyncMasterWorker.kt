@@ -77,16 +77,23 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
                 timeHelper.ensureTrustworthiness()
 
                 val downSyncWorkerScopeId = UUID.randomUUID().toString()
+                val upSyncWorkerScopeId = UUID.randomUUID().toString()
 
                 if (!isSyncRunning()) {
                     val startSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val workerChain = mutableListOf<OneTimeWorkRequest>()
-                    if (configuration.canSyncDataToSimprints())
-                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId)
-                            .also {
-                                Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
-                            }
+                    if (configuration.canSyncDataToSimprints()) {
+                        eventRepository.createEventScope(
+                            EventScopeType.UP_SYNC,
+                            upSyncWorkerScopeId
+                        )
+
+                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(
+                            uniqueSyncId,
+                            upSyncWorkerScopeId,
+                        ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers") }
+                    }
 
                     if (configuration.isEventDownSyncAllowed()) {
                         eventRepository.createEventScope(
@@ -100,8 +107,12 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
                         ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers") }
                     }
 
-                    val endSyncReporterWorker = eventSyncSubMasterWorkersBuilder
-                        .buildEndSyncReporterWorker(uniqueSyncId, downSyncWorkerScopeId)
+                    val endSyncReporterWorker =
+                        eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
+                            uniqueSyncId,
+                            downSyncWorkerScopeId,
+                            upSyncWorkerScopeId
+                        )
 
                     wm.beginWith(startSyncReporterWorker)
                         .then(workerChain)

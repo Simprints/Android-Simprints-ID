@@ -17,6 +17,7 @@ import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -125,11 +126,18 @@ internal class EventRemoteDataSource @Inject constructor(
         projectId: String,
         eventScopes: Map<EventScope, List<Event>>,
         acceptInvalidEvents: Boolean = true,
-    ) = executeCall { remoteInterface ->
-        val body = ApiUploadEventsBody(
-            eventScopes.map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
+    ): EventUpSyncResult {
+        val response = executeCall { remoteInterface ->
+            val body = ApiUploadEventsBody(
+                eventScopes.map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
+            )
+            remoteInterface.uploadEvents(projectId, acceptInvalidEvents, body)
+        }
+
+        return EventUpSyncResult(
+            requestId = response.headers()[REQUEST_ID_HEADER].orEmpty(),
+            status = response.code(),
         )
-        remoteInterface.uploadEvents(projectId, acceptInvalidEvents, body)
     }
 
     private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =

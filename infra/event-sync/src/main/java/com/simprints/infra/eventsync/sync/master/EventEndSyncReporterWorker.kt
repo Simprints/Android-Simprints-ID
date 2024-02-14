@@ -40,6 +40,10 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
                     eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
                 }
 
+                inputData.getString(EVENT_UP_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
+                    eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
+                }
+
                 if (!syncId.isNullOrEmpty()) {
                     syncCache.storeLastSuccessfulSyncTime(Date())
                     success()
@@ -55,5 +59,6 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
 
         const val SYNC_ID_TO_MARK_AS_COMPLETED = "SYNC_ID_TO_MARK_AS_COMPLETED"
         const val EVENT_DOWN_SYNC_SCOPE_TO_CLOSE = "EVENT_DOWN_SYNC_SCOPE_TO_CLOSE "
+        const val EVENT_UP_SYNC_SCOPE_TO_CLOSE = "EVENT_UP_SYNC_SCOPE_TO_CLOSE "
     }
 }
