@@ -221,6 +221,16 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `deleting scope should delete events in scopes`() = runTest {
+        eventRepo.deleteEventScopes(listOf("scopeId"))
+
+        coVerify {
+            eventLocalDataSource.deleteEventScopes(listOf("scopeId"))
+            eventLocalDataSource.deleteEventsInScopes(listOf("scopeId"))
+        }
+    }
+
+    @Test
     fun `should delegate event fetch`() = runTest {
         eventRepo.getEventsFromScope("scopeId")
 

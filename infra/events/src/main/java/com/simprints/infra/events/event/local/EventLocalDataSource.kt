@@ -118,6 +118,12 @@ internal open class EventLocalDataSource @Inject constructor(
         scopeDao.delete(listOf(scopeId))
     }
 
+    suspend fun deleteEventScopes(scopeIds: List<String>) = useRoom(writingContext) {
+        scopeIds.chunked(SQLITE_VARIABLE_LIMIT).forEach { chunk ->
+            scopeDao.delete(chunk)
+        }
+    }
+
     suspend fun saveEvent(event: Event) = useRoom(writingContext) {
         eventDao.insertOrUpdate(event.fromDomainToDb())
     }
@@ -146,8 +152,20 @@ internal open class EventLocalDataSource @Inject constructor(
         eventDao.deleteAllFromScope(scopeId = scopeId)
     }
 
+    suspend fun deleteEventsInScopes(scopeIds: List<String>) = useRoom(writingContext) {
+        scopeIds.chunked(SQLITE_VARIABLE_LIMIT).forEach { chunk ->
+            eventDao.deleteAllFromScopes(scopeIds = chunk)
+        }
+    }
+
     suspend fun deleteAll() = useRoom(writingContext) {
         scopeDao.deleteAll()
         eventDao.deleteAll()
+    }
+
+    companion object {
+
+        // Actual limit is 999, but it is better to leave some wiggle room
+        private const val SQLITE_VARIABLE_LIMIT = 900
     }
 }

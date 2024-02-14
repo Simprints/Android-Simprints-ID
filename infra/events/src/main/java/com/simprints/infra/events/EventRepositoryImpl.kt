@@ -81,6 +81,7 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.saveEventScope(eventScope)
         return eventScope
     }
+
     override suspend fun getEventScope(downSyncEventScopeId: String): EventScope? =
         eventLocalDataSource.loadEventScope(downSyncEventScopeId)
 
@@ -123,6 +124,11 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun deleteEventScope(scopeId: String) = reportException {
         eventLocalDataSource.deleteEventScope(scopeId = scopeId)
         eventLocalDataSource.deleteEventsInScope(scopeId = scopeId)
+    }
+
+    override suspend fun deleteEventScopes(scopeIds: List<String>) = reportException {
+        eventLocalDataSource.deleteEventScopes(scopeIds = scopeIds)
+        eventLocalDataSource.deleteEventsInScopes(scopeIds = scopeIds)
     }
 
     override suspend fun getEventsFromScope(scopeId: String): List<Event> =
