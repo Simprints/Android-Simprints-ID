@@ -129,9 +129,8 @@ internal class EventUpSyncTaskTest {
             eventRemoteDataSource.post(
                 any(),
                 withArg {
-                    val (scope, events) = it.entries.first()
-                    assertThat(scope.id).isEqualTo(GUID1)
-                    assertThat(events).hasSize(2)
+                    assertThat(it.sessions.first().id).isEqualTo(GUID1)
+                    assertThat(it.sessions.first().events).hasSize(2)
                 },
                 any()
             )
@@ -159,9 +158,8 @@ internal class EventUpSyncTaskTest {
             eventRemoteDataSource.post(
                 any(),
                 withArg {
-                    val (scope, events) = it.entries.first()
-                    assertThat(scope.id).isEqualTo(GUID1)
-                    assertThat(events).hasSize(4)
+                    assertThat(it.sessions.first().id).isEqualTo(GUID1)
+                    assertThat(it.sessions.first().events).hasSize(4)
                 },
                 any()
             )
@@ -188,9 +186,8 @@ internal class EventUpSyncTaskTest {
             eventRemoteDataSource.post(
                 any(),
                 withArg {
-                    val (scope, events) = it.entries.first()
-                    assertThat(scope.id).isEqualTo(GUID1)
-                    assertThat(events).hasSize(3)
+                    assertThat(it.sessions.first().id).isEqualTo(GUID1)
+                    assertThat(it.sessions.first().events).hasSize(3)
                 },
                 any()
             )

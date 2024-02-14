@@ -5,6 +5,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -323,7 +324,12 @@ class EventRemoteDataSourceTest {
 
         val events = listOf(createAlertScreenEvent())
         val scope = createSessionScope()
-        eventRemoteDataSource.post(DEFAULT_PROJECT_ID, mapOf(scope to events))
+        eventRemoteDataSource.post(
+            DEFAULT_PROJECT_ID,
+            ApiUploadEventsBody(
+                sessions = listOf(ApiEventScope.fromDomain(scope, events))
+            )
+        )
 
         coVerify(exactly = 1) {
             eventRemoteInterface.uploadEvents(
@@ -353,7 +359,7 @@ class EventRemoteDataSourceTest {
             assertThrows<Throwable> {
                 eventRemoteDataSource.post(
                     DEFAULT_PROJECT_ID,
-                    mapOf(createSessionScope() to listOf(createAlertScreenEvent()))
+                    ApiUploadEventsBody()
                 )
             }
         }

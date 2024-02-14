@@ -5,5 +5,7 @@ import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 
 @Keep
 internal data class ApiUploadEventsBody(
-    val sessions: List<ApiEventScope>,
+    val sessions: List<ApiEventScope> = emptyList(),
+    val eventUpSyncs: List<ApiEventScope> = emptyList(),
+    val eventDownSyncs: List<ApiEventScope> = emptyList(),
 )

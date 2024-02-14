@@ -126,12 +126,17 @@ internal class EventUpSyncTask @Inject constructor(
                 .mapValues { (_, events) ->
                     events?.let { filterEventsToUpSync(events, config) }.orEmpty()
                 }
+                .map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
+
             if (scopesToUpload.isNotEmpty()) {
-                result = eventRemoteDataSource.post(projectId, scopesToUpload)
+                result = eventRemoteDataSource.post(
+                    projectId,
+                    ApiUploadEventsBody(sessions = scopesToUpload)
+                )
             }
 
             Simber.d("[EVENT_REPO] Deleting ${scopesToUpload.size} session scopes")
-            scopesToUpload.keys.forEach { eventRepository.deleteEventScope(it.id) }
+            scopesToUpload.forEach { eventRepository.deleteEventScope(it.id) }
 
             addRequestEvent(
                 eventScope = eventScope,
