@@ -31,6 +31,7 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -65,22 +66,29 @@ internal class EventDownSyncTask @Inject constructor(
                 scope
             )
 
-            result.eventStream.consumeAsFlow().collect {
-                batchOfEventsToProcess.add(it)
-                count++
-                //We immediately process the first event to initialise a progress
-                if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
-                    if (count == 1) {
-                        // Track the moment when the first event is received
-                        firstEventTimestamp = timeHelper.now()
-                    }
-
-                    lastOperation =
-                        processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-                    emitProgress(lastOperation, count, result.totalCount)
-                    batchOfEventsToProcess.clear()
+            result.eventStream
+                .consumeAsFlow()
+                .catch {
+                    // Track a case when event stream is closed due to a parser error,
+                    // but the exception is handled gracefully and channel is closed correctly.
+                    errorType = it.toString()
                 }
-            }
+                .collect {
+                    batchOfEventsToProcess.add(it)
+                    count++
+                    //We immediately process the first event to initialise a progress
+                    if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
+                        if (count == 1) {
+                            // Track the moment when the first event is received
+                            firstEventTimestamp = timeHelper.now()
+                        }
+
+                        lastOperation =
+                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                        emitProgress(lastOperation, count, result.totalCount)
+                        batchOfEventsToProcess.clear()
+                    }
+                }
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
             emitProgress(lastOperation, count, result.totalCount)
