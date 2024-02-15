@@ -86,12 +86,14 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.loadEventScope(downSyncEventScopeId)
 
     override suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?) {
+        val events = eventLocalDataSource.loadEventsInScope(eventScope.id)
+        if (events.isEmpty()) {
+            eventLocalDataSource.deleteEventScope(scopeId = eventScope.id)
+            return
+        }
+
         val maxTimestamp = eventLocalDataSource.loadEventsInScope(eventScope.id)
-            .takeIf { it.isNotEmpty() }
-            ?.maxOf { event ->
-                event.payload.let { payload -> payload.endedAt ?: payload.createdAt }
-            }
-            ?: timeHelper.now()
+            .maxOf { event -> event.payload.let { it.endedAt ?: it.createdAt } }
 
         val updatedSessionScope = eventScope.copy(
             endedAt = maxTimestamp,
