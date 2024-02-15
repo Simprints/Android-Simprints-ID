@@ -477,6 +477,22 @@ internal class EventUpSyncTaskTest {
     fun `upload does not reports events if no scopes to upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.UP_SYNC) } returns listOf(
+            createSessionScope(GUID2),
+        )
+        coEvery {
+            eventRepo.getEventsFromScope(any())
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        coVerify(exactly = 0) { eventRepo.addOrUpdateEvent(any(), any()) }
+    }
+
+    @Test
+    fun `upload does not reports events if only up-sync scopes are present to upload`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 

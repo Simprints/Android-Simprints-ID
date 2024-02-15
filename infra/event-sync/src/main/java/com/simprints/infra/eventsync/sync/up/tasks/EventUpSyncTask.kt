@@ -229,7 +229,10 @@ internal class EventUpSyncTask @Inject constructor(
         uploadedUpSyncScopes: Int = 0,
         uploadedDownSyncScopes: Int = 0,
     ) {
-        if (uploadedSessionScopes > 0 || uploadedUpSyncScopes > 0 || uploadedDownSyncScopes > 0) {
+        if (uploadedSessionScopes > 0 || uploadedDownSyncScopes > 0) {
+            // Not tracking cases when only up sync scopes are uploaded as it is likely
+            // to cause a feedback loop of up-syncing the previous up-sync event.
+
             eventRepository.addOrUpdateEvent(
                 eventScope,
                 EventUpSyncRequestEvent(
