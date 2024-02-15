@@ -17,8 +17,8 @@ import com.simprints.infra.eventsync.sync.common.addTagFoUpSyncId
 import com.simprints.infra.eventsync.sync.common.addTagForMasterSyncId
 import com.simprints.infra.eventsync.sync.common.addTagForScheduledAtNow
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker
+import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -27,8 +27,10 @@ internal class EventUpSyncWorkersBuilder @Inject constructor(
     private val jsonHelper: JsonHelper,
 ) {
 
-    suspend fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
-        val uniqueUpSyncId = UUID.randomUUID().toString()
+    suspend fun buildUpSyncWorkerChain(
+        uniqueSyncId: String,
+        uniqueUpSyncId: String,
+    ): List<OneTimeWorkRequest> {
         val upSyncScope = upSyncScopeRepository.getUpSyncScope()
 
         return listOf(buildUpSyncWorkers(uniqueSyncId, uniqueUpSyncId, upSyncScope))
@@ -40,7 +42,10 @@ internal class EventUpSyncWorkersBuilder @Inject constructor(
         upSyncScope: EventUpSyncScope,
     ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventUpSyncUploaderWorker::class.java)
-            .setInputData(workDataOf(INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope)))
+            .setInputData(workDataOf(
+                INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope),
+                INPUT_EVENT_UP_SYNC_SCOPE_ID to uniqueUpSyncId,
+            ))
             .upSyncWorker(uniqueSyncID, uniqueUpSyncId, getUpSyncWorkerConstraints())
             .addCommonTagForUploaders()
             .build() as OneTimeWorkRequest

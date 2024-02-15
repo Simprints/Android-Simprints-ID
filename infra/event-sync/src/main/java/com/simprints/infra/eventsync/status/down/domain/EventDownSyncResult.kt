@@ -5,5 +5,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 
 data class EventDownSyncResult(
     val totalCount: Int?,
+    val requestId: String,
+    val status: Int,
     val eventStream: ReceiveChannel<EnrolmentRecordEvent>
 )

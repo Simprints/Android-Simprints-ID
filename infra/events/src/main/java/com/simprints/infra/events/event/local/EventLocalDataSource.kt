@@ -110,6 +110,10 @@ internal open class EventLocalDataSource @Inject constructor(
             scopeDao.loadClosed(type).map { it.fromDbToDomain(jsonHelper) }
         }
 
+    suspend fun loadEventScope(scopeId: String): EventScope? = useRoom(writingContext) {
+        scopeDao.loadScope(scopeId)?.fromDbToDomain(jsonHelper)
+    }
+
     suspend fun deleteEventScope(scopeId: String) = useRoom(writingContext) {
         scopeDao.delete(listOf(scopeId))
     }
@@ -130,15 +134,13 @@ internal open class EventLocalDataSource @Inject constructor(
         eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
 
-    suspend fun loadEventJsonInScope(scopeId: String): List<String> =
-        useRoom(readingDispatcher) {
-            eventDao.loadEventJsonFromScope(scopeId)
-        }
+    suspend fun loadEventJsonInScope(scopeId: String): List<String> = useRoom(readingDispatcher) {
+        eventDao.loadEventJsonFromScope(scopeId)
+    }
 
-    suspend fun loadEventsInScope(scopeId: String): List<Event> =
-        useRoom(readingDispatcher) {
-            eventDao.loadFromScope(scopeId = scopeId).map { it.fromDbToDomain() }
-        }
+    suspend fun loadEventsInScope(scopeId: String): List<Event> = useRoom(readingDispatcher) {
+        eventDao.loadFromScope(scopeId = scopeId).map { it.fromDbToDomain() }
+    }
 
     suspend fun deleteEventsInScope(scopeId: String) = useRoom(writingContext) {
         eventDao.deleteAllFromScope(scopeId = scopeId)

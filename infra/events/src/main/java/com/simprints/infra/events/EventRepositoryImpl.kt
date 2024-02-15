@@ -50,14 +50,14 @@ internal open class EventRepositoryImpl @Inject constructor(
             PROJECT_ID_FOR_NOT_SIGNED_IN
         }
 
-    override suspend fun createEventScope(type: EventScopeType): EventScope {
+    override suspend fun createEventScope(type: EventScopeType, scopeId: String?): EventScope {
         val eventScope = reportException {
             val projectConfiguration = configRepository.getProjectConfiguration()
             val deviceConfiguration = configRepository.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.countEventScopes(EventScopeType.SESSION)
 
             EventScope(
-                id = UUID.randomUUID().toString(),
+                id = scopeId ?: UUID.randomUUID().toString(),
                 projectId = currentProject,
                 type = type,
                 createdAt = timeHelper.now(),
@@ -81,6 +81,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.saveEventScope(eventScope)
         return eventScope
     }
+    override suspend fun getEventScope(downSyncEventScopeId: String): EventScope? =
+        eventLocalDataSource.loadEventScope(downSyncEventScopeId)
 
     override suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?) {
         val maxTimestamp = eventLocalDataSource.loadEventsInScope(eventScope.id)
@@ -97,6 +99,10 @@ internal open class EventRepositoryImpl @Inject constructor(
             )
         )
         saveEventScope(updatedSessionScope)
+    }
+
+    override suspend fun closeEventScope(eventScopeId: String, reason: EventScopeEndCause?) {
+        getEventScope(eventScopeId)?.let { closeEventScope(it, reason) }
     }
 
     override suspend fun closeAllOpenScopes(type: EventScopeType, reason: EventScopeEndCause?) {

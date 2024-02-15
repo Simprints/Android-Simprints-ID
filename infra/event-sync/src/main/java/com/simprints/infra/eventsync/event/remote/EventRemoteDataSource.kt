@@ -17,6 +17,7 @@ import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -68,6 +69,8 @@ internal class EventRemoteDataSource @Inject constructor(
 
             EventDownSyncResult(
                 totalCount = totalCount.takeUnless { isTotalLowerBound },
+                requestId = response.headers()[REQUEST_ID_HEADER].orEmpty(),
+                status = response.code(),
                 eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
                     parseStreamAndEmitEvents(streaming, this)
                 }
@@ -123,11 +126,18 @@ internal class EventRemoteDataSource @Inject constructor(
         projectId: String,
         eventScopes: Map<EventScope, List<Event>>,
         acceptInvalidEvents: Boolean = true,
-    ) = executeCall { remoteInterface ->
-        val body = ApiUploadEventsBody(
-            eventScopes.map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
+    ): EventUpSyncResult {
+        val response = executeCall { remoteInterface ->
+            val body = ApiUploadEventsBody(
+                eventScopes.map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
+            )
+            remoteInterface.uploadEvents(projectId, acceptInvalidEvents, body)
+        }
+
+        return EventUpSyncResult(
+            requestId = response.headers()[REQUEST_ID_HEADER].orEmpty(),
+            status = response.code(),
         )
-        remoteInterface.uploadEvents(projectId, acceptInvalidEvents, body)
     }
 
     private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
@@ -142,6 +152,7 @@ internal class EventRemoteDataSource @Inject constructor(
         private const val TOO_MANY_REQUEST_STATUS = 429
 
         private const val COUNT_HEADER = "x-event-count"
+        private const val REQUEST_ID_HEADER = "x-request-id"
         private const val IS_COUNT_HEADER_LOWER_BOUND = "x-event-count-is-lower-bound"
     }
 }

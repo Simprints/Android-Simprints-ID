@@ -20,6 +20,8 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
@@ -101,6 +103,9 @@ internal class EventSyncMasterWorkerTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
+    @MockK
+    lateinit var eventRepository: EventRepository
+
     @RelaxedMockK
     private lateinit var securityManager: SecurityManager
 
@@ -117,12 +122,12 @@ internal class EventSyncMasterWorkerTest {
         every { workManager.beginWith(any<OneTimeWorkRequest>()) } returns workContinuation
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns listOf(
+        coEvery { downSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
             downSyncWorker
         )
-        coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns listOf(upSyncWorker)
+        coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any(), any()) } returns listOf(upSyncWorker)
         every { eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns startSyncReporterWorker
-        every { eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns endSyncReporterWorker
+        every { eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any(), any(), any()) } returns endSyncReporterWorker
 
         every { synchronizationConfiguration.up.simprints } returns bfsidUpSynchronizationConfiguration
         every { projectConfiguration.projectId } returns "projectId"
@@ -141,7 +146,8 @@ internal class EventSyncMasterWorkerTest {
             eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
             timeHelper = timeHelper,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
-            securityManager = securityManager
+            securityManager = securityManager,
+            eventRepository = eventRepository,
         )
     }
 
@@ -161,7 +167,10 @@ internal class EventSyncMasterWorkerTest {
         val result = masterWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        coVerify(exactly = 0) { eventSyncCache.clearProgresses() }
+        coVerify(exactly = 0) {
+            eventSyncCache.clearProgresses()
+            eventRepository.createEventScope(any(), any())
+        }
         assertUpSyncWorkerPresence(false, uniqueSyncId)
         assertDownSyncWorkerPresence(false, uniqueSyncId)
         assertWorkerChainBuild(false, uniqueSyncId)
@@ -184,7 +193,10 @@ internal class EventSyncMasterWorkerTest {
             )
         )
 
-        coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
+        coVerify(exactly = 1) {
+            eventSyncCache.clearProgresses()
+            eventRepository.createEventScope(EventScopeType.UP_SYNC, any())
+        }
         assertUpSyncWorkerPresence(true, uniqueSyncId)
         assertDownSyncWorkerPresence(false, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
@@ -207,7 +219,10 @@ internal class EventSyncMasterWorkerTest {
             )
         )
 
-        coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
+        coVerify(exactly = 1) {
+            eventSyncCache.clearProgresses()
+            eventRepository.createEventScope(EventScopeType.DOWN_SYNC, any())
+        }
         assertUpSyncWorkerPresence(false, uniqueSyncId)
         assertDownSyncWorkerPresence(true, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
@@ -231,6 +246,7 @@ internal class EventSyncMasterWorkerTest {
         )
 
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
+        coVerify(exactly = 2) { eventRepository.createEventScope(any(), any()) }
         assertUpSyncWorkerPresence(true, uniqueSyncId)
         assertDownSyncWorkerPresence(true, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
@@ -332,7 +348,9 @@ internal class EventSyncMasterWorkerTest {
         }
         verify(exactly = times) {
             eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
-                uniqueSyncId
+                uniqueSyncId,
+                any(),
+                any()
             )
         }
         verify(exactly = times) { workManager.beginWith(any<OneTimeWorkRequest>()) }
@@ -340,7 +358,7 @@ internal class EventSyncMasterWorkerTest {
 
     private fun assertUpSyncWorkerPresence(isPresent: Boolean, uniqueSyncId: String) {
         val times = if (isPresent) 1 else 0
-        coVerify(exactly = times) { upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId) }
+        coVerify(exactly = times) { upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId, any()) }
         verify(exactly = times) {
             workContinuation.then(match<List<OneTimeWorkRequest>> {
                 it.contains(upSyncWorker)
@@ -350,7 +368,7 @@ internal class EventSyncMasterWorkerTest {
 
     private fun assertDownSyncWorkerPresence(isPresent: Boolean, uniqueSyncId: String) {
         val times = if (isPresent) 1 else 0
-        coVerify(exactly = times) { downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId) }
+        coVerify(exactly = times) { downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
         verify(exactly = times) {
             workContinuation.then(match<List<OneTimeWorkRequest>> {
                 it.contains(downSyncWorker)

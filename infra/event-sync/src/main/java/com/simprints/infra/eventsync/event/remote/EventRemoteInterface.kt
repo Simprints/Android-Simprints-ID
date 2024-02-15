@@ -29,7 +29,7 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Path("projectId") projectId: String,
         @Query("acceptInvalidEvents") acceptInvalidEvents: Boolean = true,
         @Body body: ApiUploadEventsBody
-    )
+    ): Response<ResponseBody>
 
     @Streaming
     @Headers("X-Force-Version: 2024.1.1")

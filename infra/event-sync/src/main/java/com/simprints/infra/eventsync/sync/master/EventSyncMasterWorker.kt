@@ -12,6 +12,8 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
@@ -31,6 +33,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
     private val configRepository: ConfigRepository,
     private val eventSyncCache: EventSyncCache,
+    private val eventRepository: EventRepository,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
     private val timeHelper: TimeHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -73,25 +76,46 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
                 // Requests NTP sync now as device is surely ONLINE,
                 timeHelper.ensureTrustworthiness()
 
+                val downSyncWorkerScopeId = UUID.randomUUID().toString()
+                val upSyncWorkerScopeId = UUID.randomUUID().toString()
+
                 if (!isSyncRunning()) {
                     val startSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val workerChain = mutableListOf<OneTimeWorkRequest>()
-                    if (configuration.canSyncDataToSimprints())
-                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId)
-                            .also {
-                                Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
-                            }
+                    if (configuration.canSyncDataToSimprints()) {
+                        eventRepository.createEventScope(
+                            EventScopeType.UP_SYNC,
+                            upSyncWorkerScopeId
+                        )
 
-                    if (configuration.isEventDownSyncAllowed())
-                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId)
-                            .also {
-                                Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
-                            }
+                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(
+                            uniqueSyncId,
+                            upSyncWorkerScopeId,
+                        ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers") }
+                    }
+
+                    if (configuration.isEventDownSyncAllowed()) {
+                        eventRepository.createEventScope(
+                            EventScopeType.DOWN_SYNC,
+                            downSyncWorkerScopeId
+                        )
+
+                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(
+                            uniqueSyncId,
+                            downSyncWorkerScopeId
+                        ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers") }
+                    }
 
                     val endSyncReporterWorker =
-                        eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                    wm.beginWith(startSyncReporterWorker).then(workerChain)
+                        eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
+                            uniqueSyncId,
+                            downSyncWorkerScopeId,
+                            upSyncWorkerScopeId
+                        )
+
+                    wm.beginWith(startSyncReporterWorker)
+                        .then(workerChain)
                         .then(endSyncReporterWorker)
                         .enqueue()
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -18,6 +19,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometrics
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
@@ -25,6 +27,7 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.FAILED
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -44,7 +47,10 @@ internal class EventUpSyncTask @Inject constructor(
     private val jsonHelper: JsonHelper,
 ) {
 
-    fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
+    fun upSync(
+        operation: EventUpSyncOperation,
+        eventScope: EventScope,
+    ): Flow<EventUpSyncProgress> = flow {
         if (operation.projectId != authStore.signedInProjectId) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
                 Simber.e(it)
@@ -56,9 +62,10 @@ internal class EventUpSyncTask @Inject constructor(
         var count = 0
 
         try {
-            lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
+            lastOperation =
+                lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
 
-            uploadEvents(projectId = operation.projectId, config).collect {
+            uploadEvents(projectId = operation.projectId, config, eventScope).collect {
                 count = it
                 lastOperation =
                     lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
@@ -71,7 +78,9 @@ internal class EventUpSyncTask @Inject constructor(
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
             Simber.e(t)
-            lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now().ms)
+
+            lastOperation =
+                lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now().ms)
 
             emitProgress(lastOperation, count)
         }
@@ -88,19 +97,24 @@ internal class EventUpSyncTask @Inject constructor(
     private fun uploadEvents(
         projectId: String,
         config: ProjectConfiguration,
+        eventScope: EventScope,
     ) = flow {
+        val requestStartTime = timeHelper.now()
+        var result: EventUpSyncResult? = null
+
         Simber.d("[EVENT_REPO] Uploading")
         try {
-            val sessionScopes = eventRepository.getClosedEventScopes(EventScopeType.SESSION).associateWith {
-                try {
-                    eventRepository.getEventsFromScope(it.id)
-                        .also { listOfEvents -> emit(listOfEvents.size) }
-                } catch (ex: JsonParseException) {
-                    Simber.i("Failed to un-marshal events")
-                    Simber.e(ex)
-                    null
+            val sessionScopes = eventRepository.getClosedEventScopes(EventScopeType.SESSION)
+                .associateWith {
+                    try {
+                        eventRepository.getEventsFromScope(it.id)
+                            .also { listOfEvents -> emit(listOfEvents.size) }
+                    } catch (ex: JsonParseException) {
+                        Simber.i("Failed to un-marshal events")
+                        Simber.e(ex)
+                        null
+                    }
                 }
-            }
 
             val corruptedScopes = sessionScopes.filterValues { it == null }.keys
 
@@ -113,12 +127,26 @@ internal class EventUpSyncTask @Inject constructor(
                     events?.let { filterEventsToUpSync(events, config) }.orEmpty()
                 }
             if (scopesToUpload.isNotEmpty()) {
-                eventRemoteDataSource.post(projectId, scopesToUpload)
+                result = eventRemoteDataSource.post(projectId, scopesToUpload)
             }
 
             Simber.d("[EVENT_REPO] Deleting ${scopesToUpload.size} session scopes")
             scopesToUpload.keys.forEach { eventRepository.deleteEventScope(it.id) }
+
+            addRequestEvent(
+                eventScope = eventScope,
+                startTime = requestStartTime,
+                result = result,
+                uploadedSessionScopes = scopesToUpload.size,
+            )
         } catch (ex: Exception) {
+            addRequestEvent(
+                eventScope = eventScope,
+                startTime = requestStartTime,
+                result = result,
+                errorType = ex.toString()
+            )
+
             when (ex) {
                 is JsonParseException, is JsonMappingException -> {
                     Simber.i("Failed to un-marshal events")
@@ -133,6 +161,28 @@ internal class EventUpSyncTask @Inject constructor(
                     throw ex
                 }
             }
+        }
+    }
+
+    private suspend fun addRequestEvent(
+        eventScope: EventScope,
+        startTime: Timestamp,
+        result: EventUpSyncResult?,
+        errorType: String? = null,
+        uploadedSessionScopes: Int = 0,
+    ) {
+        if (result != null || errorType != null) {
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                EventUpSyncRequestEvent(
+                    createdAt = startTime,
+                    endedAt = timeHelper.now(),
+                    requestId = result?.requestId.orEmpty(),
+                    sessionCount = uploadedSessionScopes,
+                    responseStatus = result?.status,
+                    errorType = errorType,
+                )
+            )
         }
     }
 
