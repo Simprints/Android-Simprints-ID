@@ -69,16 +69,19 @@ internal class EventUpSyncTask @Inject constructor(
 
             uploadSessionEvents(projectId = operation.projectId, config, eventScope).collect {
                 count = it
-                lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
+                lastOperation =
+                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
                 emitProgress(lastOperation, count)
             }
             uploadOutOfSessionEvents(operation.projectId, eventScope).collect {
                 count = it
-                lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
+                lastOperation =
+                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
                 emitProgress(lastOperation, count)
             }
 
-            lastOperation = lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now().ms)
+            lastOperation =
+                lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
             Simber.e(t)
@@ -226,18 +229,20 @@ internal class EventUpSyncTask @Inject constructor(
         uploadedUpSyncScopes: Int = 0,
         uploadedDownSyncScopes: Int = 0,
     ) {
-        eventRepository.addOrUpdateEvent(
-            eventScope,
-            EventUpSyncRequestEvent(
-                createdAt = startTime,
-                endedAt = timeHelper.now(),
-                requestId = result.requestId,
-                sessionCount = uploadedSessionScopes,
-                eventUpSyncCount = uploadedUpSyncScopes,
-                eventDownSyncCount = uploadedDownSyncScopes,
-                responseStatus = result.status,
+        if (uploadedSessionScopes > 0 || uploadedUpSyncScopes > 0 || uploadedDownSyncScopes > 0) {
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                EventUpSyncRequestEvent(
+                    createdAt = startTime,
+                    endedAt = timeHelper.now(),
+                    requestId = result.requestId,
+                    sessionCount = uploadedSessionScopes,
+                    eventUpSyncCount = uploadedUpSyncScopes,
+                    eventDownSyncCount = uploadedDownSyncScopes,
+                    responseStatus = result.status,
+                )
             )
-        )
+        }
     }
 
     private suspend fun handleFailedRequest(

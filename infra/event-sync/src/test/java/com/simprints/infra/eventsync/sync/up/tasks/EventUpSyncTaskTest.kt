@@ -99,7 +99,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `upload fetches events for all provided closed sessions`() = runTest {
-        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
         coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
@@ -240,7 +240,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `upload in progress should emit progress`() = runTest {
-        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
         coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
@@ -264,7 +264,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `when upload fails due to generic error should not delete session events`() = runTest {
-        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
         coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(createSessionScope(GUID1))
         coEvery {
@@ -280,7 +280,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `when upload fails due to network issue should not delete session events`() = runTest {
-        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
         coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
@@ -396,7 +396,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `upload should save request event for each upload request`() = runTest {
-        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
         coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(
             createSessionScope(GUID1),
@@ -420,7 +420,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `upload fetches events for all non-session scopes`() = runTest {
-        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.UP_SYNC) } returns listOf(
@@ -444,7 +444,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `upload reports separate events for session and out-of-session scopes`() = runTest {
-        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
             createSessionScope(GUID1),
@@ -471,6 +471,16 @@ internal class EventUpSyncTaskTest {
                     it.payload.content == EventUpSyncRequestEvent.UpSyncContent(0, 1, 1)
             })
         }
+    }
+
+    @Test
+    fun `upload does not reports events if no scopes to upload`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        coVerify(exactly = 0) { eventRepo.addOrUpdateEvent(any(), any()) }
     }
 
     private fun setUpSyncKind(kind: UpSynchronizationConfiguration.UpSynchronizationKind) {

@@ -170,6 +170,17 @@ class EventDownSyncTaskTest {
     }
 
     @Test
+    fun downSync_shouldNotAddEventToProvidedScopeIfNoEvents() = runTest {
+        mockProgressEmission(emptyList())
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
+        coVerify(exactly = 0) {
+            eventRepository.addOrUpdateEvent(any(), any())
+        }
+    }
+
+    @Test
     fun downSync_shouldEmitAFailureIfDownloadFails() = runTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws Throwable("IO Exception")
 
