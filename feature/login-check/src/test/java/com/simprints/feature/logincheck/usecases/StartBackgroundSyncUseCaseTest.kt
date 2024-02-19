@@ -7,6 +7,7 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
@@ -49,9 +50,11 @@ class StartBackgroundSyncUseCaseTest {
 
         verify {
             eventSyncManager.scheduleSync()
-            imageUpSyncScheduler.scheduleImageUpSync()
             configScheduler.scheduleProjectSync()
             configScheduler.scheduleDeviceSync()
+        }
+        coVerify {
+            imageUpSyncScheduler.scheduleImageUpSync()
         }
     }
 

@@ -6,6 +6,7 @@ import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
@@ -53,10 +54,12 @@ class ScheduleBackgroundSyncUseCaseTest {
 
         verify {
             eventSyncManager.scheduleSync()
-            imageUpSyncScheduler.scheduleImageUpSync()
             configScheduler.scheduleProjectSync()
             configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
+        }
+        coVerify {
+            imageUpSyncScheduler.scheduleImageUpSync()
         }
     }
 
@@ -68,10 +71,12 @@ class ScheduleBackgroundSyncUseCaseTest {
 
         verify(exactly = 0) {
             eventSyncManager.scheduleSync()
-            imageUpSyncScheduler.scheduleImageUpSync()
             configScheduler.scheduleProjectSync()
             configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
+        }
+        coVerify(exactly = 0) {
+            imageUpSyncScheduler.scheduleImageUpSync()
         }
     }
 }

@@ -3,6 +3,7 @@ package com.simprints.id
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.simprints.core.AppScope
 import com.simprints.core.CoreApplication
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extentions.deviceHardwareId
@@ -13,6 +14,8 @@ import com.simprints.infra.logging.SimberBuilder
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("There is no complex business logic to test")
@@ -27,6 +30,10 @@ open class Application : CoreApplication(), Configuration.Provider {
 
     @Inject
     lateinit var scheduleBackgroundSync: ScheduleBackgroundSyncUseCase
+
+    @AppScope
+    @Inject
+    lateinit var appScope: CoroutineScope
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
@@ -49,8 +56,10 @@ open class Application : CoreApplication(), Configuration.Provider {
         handleUndeliverableExceptionInRxJava()
         SimberBuilder.initialize(this)
         Simber.tag(DEVICE_ID, true).i(deviceHardwareId)
-        cleanupDeprecatedWorkers()
-        scheduleBackgroundSync()
+        appScope.launch {
+            cleanupDeprecatedWorkers()
+            scheduleBackgroundSync()
+        }
     }
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
