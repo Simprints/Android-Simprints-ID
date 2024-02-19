@@ -7,6 +7,7 @@ internal fun UpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationCon
     ProtoUpSynchronizationConfiguration.newBuilder()
         .setSimprints(simprints.toProto())
         .setCoSync(coSync.toProto())
+        .setImagesRequireUnmeteredConnection(imagesRequireUnmeteredConnection)
         .build()
 
 internal fun UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
@@ -28,7 +29,7 @@ internal fun UpSynchronizationConfiguration.UpSynchronizationKind.toProto(): Pro
     }
 
 internal fun ProtoUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration =
-    UpSynchronizationConfiguration(simprints.toDomain(), coSync.toDomain())
+    UpSynchronizationConfiguration(simprints.toDomain(), coSync.toDomain(), imagesRequireUnmeteredConnection)
 
 internal fun ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
     UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(kind.toDomain())

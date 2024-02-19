@@ -38,3 +38,6 @@ fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
 
 fun ProjectConfiguration.isEventDownSyncAllowed(): Boolean =
     synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+
+fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean =
+    synchronization.up.imagesRequireUnmeteredConnection
