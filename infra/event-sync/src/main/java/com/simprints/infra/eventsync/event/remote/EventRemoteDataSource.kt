@@ -8,12 +8,9 @@ import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
-import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
@@ -24,6 +21,8 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
+import okhttp3.ResponseBody
+import retrofit2.Response
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import javax.inject.Inject
@@ -69,7 +68,7 @@ internal class EventRemoteDataSource @Inject constructor(
 
             EventDownSyncResult(
                 totalCount = totalCount.takeUnless { isTotalLowerBound },
-                requestId = response.headers()[REQUEST_ID_HEADER].orEmpty(),
+                requestId = getRequestId(response),
                 status = response.code(),
                 eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
                     parseStreamAndEmitEvents(streaming, this)
@@ -124,21 +123,20 @@ internal class EventRemoteDataSource @Inject constructor(
 
     suspend fun post(
         projectId: String,
-        eventScopes: Map<EventScope, List<Event>>,
+        body: ApiUploadEventsBody,
         acceptInvalidEvents: Boolean = true,
     ): EventUpSyncResult {
         val response = executeCall { remoteInterface ->
-            val body = ApiUploadEventsBody(
-                eventScopes.map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
-            )
             remoteInterface.uploadEvents(projectId, acceptInvalidEvents, body)
         }
 
         return EventUpSyncResult(
-            requestId = response.headers()[REQUEST_ID_HEADER].orEmpty(),
+            requestId = getRequestId(response),
             status = response.code(),
         )
     }
+
+    fun getRequestId(response: Response<*>) = response.headers()[REQUEST_ID_HEADER].orEmpty()
 
     private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
         getEventsApiClient().executeCall { block(it) }
@@ -152,7 +150,7 @@ internal class EventRemoteDataSource @Inject constructor(
         private const val TOO_MANY_REQUEST_STATUS = 429
 
         private const val COUNT_HEADER = "x-event-count"
-        private const val REQUEST_ID_HEADER = "x-request-id"
+        internal const val REQUEST_ID_HEADER = "x-request-id"
         private const val IS_COUNT_HEADER_LOWER_BOUND = "x-event-count-is-lower-bound"
     }
 }

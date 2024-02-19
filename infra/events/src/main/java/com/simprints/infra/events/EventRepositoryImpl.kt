@@ -81,16 +81,19 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.saveEventScope(eventScope)
         return eventScope
     }
+
     override suspend fun getEventScope(downSyncEventScopeId: String): EventScope? =
         eventLocalDataSource.loadEventScope(downSyncEventScopeId)
 
     override suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?) {
+        val events = eventLocalDataSource.loadEventsInScope(eventScope.id)
+        if (events.isEmpty()) {
+            eventLocalDataSource.deleteEventScope(scopeId = eventScope.id)
+            return
+        }
+
         val maxTimestamp = eventLocalDataSource.loadEventsInScope(eventScope.id)
-            .takeIf { it.isNotEmpty() }
-            ?.maxOf { event ->
-                event.payload.let { payload -> payload.endedAt ?: payload.createdAt }
-            }
-            ?: timeHelper.now()
+            .maxOf { event -> event.payload.let { it.endedAt ?: it.createdAt } }
 
         val updatedSessionScope = eventScope.copy(
             endedAt = maxTimestamp,
@@ -123,6 +126,11 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun deleteEventScope(scopeId: String) = reportException {
         eventLocalDataSource.deleteEventScope(scopeId = scopeId)
         eventLocalDataSource.deleteEventsInScope(scopeId = scopeId)
+    }
+
+    override suspend fun deleteEventScopes(scopeIds: List<String>) = reportException {
+        eventLocalDataSource.deleteEventScopes(scopeIds = scopeIds)
+        eventLocalDataSource.deleteEventsInScopes(scopeIds = scopeIds)
     }
 
     override suspend fun getEventsFromScope(scopeId: String): List<Event> =

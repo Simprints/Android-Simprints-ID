@@ -106,27 +106,30 @@ internal class EventDownSyncTask @Inject constructor(
             emitProgress(lastOperation, count, count)
         }
 
-        eventRepository.addOrUpdateEvent(
-            eventScope,
-            EventDownSyncRequestEvent(
-                createdAt = requestStartTime,
-                endedAt = timeHelper.now(),
-                requestId = result?.requestId.orEmpty(),
-                query = operation.queryEvent.let { query ->
-                    EventDownSyncRequestEvent.QueryParameters(
-                        query.moduleId,
-                        query.attendantId,
-                        query.subjectId,
-                        query.modes.map { it.name },
-                        query.lastEventId
-                    )
-                },
-                msToFirstResponseByte = firstEventTimestamp?.let { it.ms - requestStartTime.ms },
-                eventRead = count,
-                errorType = errorType,
-                responseStatus = result?.status,
+        if (count > 0 || errorType != null) {
+            // Track only events that have any useful data
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                EventDownSyncRequestEvent(
+                    createdAt = requestStartTime,
+                    endedAt = timeHelper.now(),
+                    requestId = result?.requestId.orEmpty(),
+                    query = operation.queryEvent.let { query ->
+                        EventDownSyncRequestEvent.QueryParameters(
+                            query.moduleId,
+                            query.attendantId,
+                            query.subjectId,
+                            query.modes.map { it.name },
+                            query.lastEventId
+                        )
+                    },
+                    msToFirstResponseByte = firstEventTimestamp?.let { it.ms - requestStartTime.ms },
+                    eventRead = count,
+                    errorType = errorType,
+                    responseStatus = result?.status,
+                )
             )
-        )
+        }
     }
 
     private suspend fun FlowCollector<EventDownSyncProgress>.emitProgress(

@@ -154,6 +154,18 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `should delete scope on closing if there are no events`() = runTest {
+        val scope = createSessionScope("scopeId", isClosed = false)
+
+        coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns emptyList()
+        eventRepo.closeEventScope(scope, null)
+
+        coVerify {
+            eventLocalDataSource.deleteEventScope("scopeId")
+        }
+    }
+
+    @Test
     fun `should close event scope by id`() = runTest {
         val scope = createSessionScope("scopeId", isClosed = false)
         val event = createAlertScreenEvent()
@@ -177,6 +189,11 @@ internal class EventRepositoryImplTest {
         coEvery {
             eventLocalDataSource.loadOpenedScopes(any())
         } returns listOf(createSessionScope("scopeId"), createSessionScope("scopeId2"))
+
+        val event = createAlertScreenEvent()
+        coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+        )
 
         eventRepo.closeAllOpenScopes(EventScopeType.SESSION, null)
 
@@ -217,6 +234,16 @@ internal class EventRepositoryImplTest {
         coVerify {
             eventLocalDataSource.deleteEventScope("scopeId")
             eventLocalDataSource.deleteEventsInScope("scopeId")
+        }
+    }
+
+    @Test
+    fun `deleting scope should delete events in scopes`() = runTest {
+        eventRepo.deleteEventScopes(listOf("scopeId"))
+
+        coVerify {
+            eventLocalDataSource.deleteEventScopes(listOf("scopeId"))
+            eventLocalDataSource.deleteEventsInScopes(listOf("scopeId"))
         }
     }
 

@@ -29,6 +29,9 @@ internal interface EventRoomDao {
     @Query("delete from DbEvent where scopeId = :scopeId")
     suspend fun deleteAllFromScope(scopeId: String)
 
+    @Query("delete from DbEvent where scopeId in (:scopeIds)")
+    suspend fun deleteAllFromScopes(scopeIds: List<String>)
+
     @Query("delete from DbEvent")
     suspend fun deleteAll()
 
