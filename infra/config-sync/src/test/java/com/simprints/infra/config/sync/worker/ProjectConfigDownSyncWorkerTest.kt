@@ -8,6 +8,7 @@ import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.testtools.project
 import com.simprints.infra.config.sync.testtools.projectConfiguration
 import com.simprints.infra.config.sync.usecase.HandleProjectStateUseCase
+import com.simprints.infra.config.sync.usecase.RescheduleWorkersIfConfigChangedUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -34,6 +35,9 @@ class ProjectConfigDownSyncWorkerTest {
     @MockK
     private lateinit var handleProjectStateUseCase: HandleProjectStateUseCase
 
+    @MockK
+    private lateinit var rescheduleWorkersIfConfigChangedUseCase: RescheduleWorkersIfConfigChangedUseCase
+
     private lateinit var projectConfigDownSyncWorker: ProjectConfigDownSyncWorker
 
     @Before
@@ -46,6 +50,7 @@ class ProjectConfigDownSyncWorkerTest {
             authStore = authStore,
             configRepository = configRepository,
             handleProjectState = handleProjectStateUseCase,
+            rescheduleWorkersIfConfigChanged = rescheduleWorkersIfConfigChangedUseCase,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -70,12 +75,18 @@ class ProjectConfigDownSyncWorkerTest {
     @Test
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configRepository.refreshProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
+        coEvery { configRepository.refreshProject(PROJECT_ID) } returns ProjectWithConfig(
+            project,
+            projectConfiguration
+        )
 
         val result = projectConfigDownSyncWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
 
-        coVerify { handleProjectStateUseCase.invoke(any()) }
+        coVerify {
+            handleProjectStateUseCase.invoke(any())
+            rescheduleWorkersIfConfigChangedUseCase.invoke(any(), any())
+        }
     }
 
     companion object {
