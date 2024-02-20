@@ -2,7 +2,6 @@ package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -18,9 +17,6 @@ class LogoutUseCaseTest {
     private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
-    private lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
-
-    @MockK
     private lateinit var eventSyncManager: EventSyncManager
 
     @MockK
@@ -34,7 +30,6 @@ class LogoutUseCaseTest {
 
         useCase = LogoutUseCase(
             syncOrchestrator = syncOrchestrator,
-            imageUpSyncScheduler = imageUpSyncScheduler,
             eventSyncManager = eventSyncManager,
             authManager = authManager,
         )
@@ -45,7 +40,6 @@ class LogoutUseCaseTest {
         useCase.invoke()
 
         verify {
-            imageUpSyncScheduler.cancelImageUpSync()
             eventSyncManager.cancelScheduledSync()
         }
         coVerify {

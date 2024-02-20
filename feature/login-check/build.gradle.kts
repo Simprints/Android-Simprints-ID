@@ -15,7 +15,6 @@ dependencies {
     implementation(project(":infra:sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
-    implementation(project(":infra:images"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:recent-user-activity"))

@@ -1,4 +1,4 @@
-package com.simprints.infra.images.worker
+package com.simprints.infra.sync.images
 
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat

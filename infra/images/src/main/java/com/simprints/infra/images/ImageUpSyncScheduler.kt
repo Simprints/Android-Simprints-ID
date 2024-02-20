@@ -7,10 +7,7 @@ interface ImageUpSyncScheduler {
      */
     suspend fun scheduleImageUpSync()
 
-    /**
-     * Fully reschedule the background worker.
-     * Should be used in when the configuration that affects scheduling has changed.
-     */
+
     suspend fun rescheduleImageUpSync()
     fun cancelImageUpSync()
 

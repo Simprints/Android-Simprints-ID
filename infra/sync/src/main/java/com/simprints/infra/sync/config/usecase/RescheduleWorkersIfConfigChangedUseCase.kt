@@ -2,11 +2,11 @@ package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
-import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import javax.inject.Inject
 
 internal class RescheduleWorkersIfConfigChangedUseCase @Inject constructor(
-    private val imageUpSyncScheduler: ImageUpSyncScheduler,
+    private val syncOrchestrator: SyncOrchestrator
 ) {
 
     suspend operator fun invoke(
@@ -14,7 +14,7 @@ internal class RescheduleWorkersIfConfigChangedUseCase @Inject constructor(
         newConfig: ProjectConfiguration,
     ) {
         if (shouldRescheduleImageUpload(oldConfig, newConfig)) {
-            imageUpSyncScheduler.rescheduleImageUpSync()
+            syncOrchestrator.rescheduleImageUpSync()
         }
     }
 

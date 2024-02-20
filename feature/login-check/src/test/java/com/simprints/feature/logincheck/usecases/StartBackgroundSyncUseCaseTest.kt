@@ -3,7 +3,6 @@ package com.simprints.feature.logincheck.usecases
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -20,9 +19,6 @@ class StartBackgroundSyncUseCaseTest {
     lateinit var eventSyncManager: EventSyncManager
 
     @MockK
-    lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
-
-    @MockK
     lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
@@ -37,7 +33,6 @@ class StartBackgroundSyncUseCaseTest {
         useCase = StartBackgroundSyncUseCase(
             syncOrchestrator,
             eventSyncManager,
-            imageUpSyncScheduler,
             configRepository,
         )
     }
@@ -53,7 +48,6 @@ class StartBackgroundSyncUseCaseTest {
         }
         coVerify {
             syncOrchestrator.scheduleBackgroundWork()
-            imageUpSyncScheduler.scheduleImageUpSync()
         }
     }
 

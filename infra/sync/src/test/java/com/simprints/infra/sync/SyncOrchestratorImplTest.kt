@@ -1,10 +1,12 @@
 package com.simprints.infra.sync
 
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
+import com.simprints.infra.sync.SyncConstants.IMAGE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import io.mockk.MockKAnnotations
@@ -60,6 +62,7 @@ class SyncOrchestratorImplTest {
         verify {
             workManager.enqueueUniquePeriodicWork(PROJECT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(DEVICE_SYNC_WORK_NAME, any(), any())
+            workManager.enqueueUniquePeriodicWork(IMAGE_UP_SYNC_WORK_NAME, any(), any())
         }
     }
 
@@ -70,6 +73,7 @@ class SyncOrchestratorImplTest {
         verify {
             workManager.cancelUniqueWork(PROJECT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(DEVICE_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
         }
     }
 
@@ -79,6 +83,19 @@ class SyncOrchestratorImplTest {
 
         verify {
             workManager.enqueueUniqueWork(DEVICE_SYNC_WORK_NAME_ONE_TIME, any(), any<OneTimeWorkRequest>())
+        }
+    }
+
+    @Test
+    fun `reschedules image worker when requested`() = runTest {
+        syncOrchestrator.rescheduleImageUpSync()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                IMAGE_UP_SYNC_WORK_NAME,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                any(),
+            )
         }
     }
 

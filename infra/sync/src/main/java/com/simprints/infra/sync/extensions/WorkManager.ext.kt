@@ -11,11 +11,12 @@ internal fun defaultWorkerConstraints() = Constraints.Builder()
 internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicWorker(
     workName: String,
     repeatInterval: Long,
+    existingWorkPolicy: ExistingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.UPDATE,
     constraints: Constraints = defaultWorkerConstraints(),
     inputData: Data? = null,
 ) = enqueueUniquePeriodicWork(
     workName,
-    ExistingPeriodicWorkPolicy.UPDATE,
+    existingWorkPolicy,
     PeriodicWorkRequestBuilder<T>(repeatInterval, SyncConstants.SYNC_REPEAT_UNIT)
         .setConstraints(constraints)
         .let { if (inputData != null) it.setInputData(inputData) else it }

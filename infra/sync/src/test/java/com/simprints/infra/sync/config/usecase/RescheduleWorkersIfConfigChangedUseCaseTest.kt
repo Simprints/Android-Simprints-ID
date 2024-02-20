@@ -1,9 +1,8 @@
 package com.simprints.infra.sync.config.usecase
 
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.testtools.synchronizationConfiguration
-import com.simprints.infra.images.ImageUpSyncScheduler
-import com.simprints.infra.sync.config.usecase.RescheduleWorkersIfConfigChangedUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
@@ -14,7 +13,7 @@ import org.junit.Test
 class RescheduleWorkersIfConfigChangedUseCaseTest {
 
     @MockK
-    private lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
+    private lateinit var syncOrchestrator: SyncOrchestrator
 
     private lateinit var useCase: RescheduleWorkersIfConfigChangedUseCase
 
@@ -22,7 +21,7 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = RescheduleWorkersIfConfigChangedUseCase(imageUpSyncScheduler)
+        useCase = RescheduleWorkersIfConfigChangedUseCase(syncOrchestrator)
     }
 
     @Test
@@ -41,7 +40,7 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
                 ),
             )
 
-            coVerify(exactly = 0) { imageUpSyncScheduler.rescheduleImageUpSync() }
+            coVerify(exactly = 0) { syncOrchestrator.rescheduleImageUpSync() }
         }
 
     @Test
@@ -60,7 +59,7 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
                 ),
             )
 
-            coVerify { imageUpSyncScheduler.rescheduleImageUpSync() }
+            coVerify { syncOrchestrator.rescheduleImageUpSync() }
         }
 
 }

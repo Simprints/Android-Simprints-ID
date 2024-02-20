@@ -8,16 +8,19 @@ android {
 
     buildTypes {
         getByName("release") {
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
+            buildConfigField("long", "PROJECT_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
             buildConfigField("long", "DEVICE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
+            buildConfigField("long", "IMAGE_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
         }
         getByName("staging") {
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "PROJECT_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "DEVICE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "IMAGE_PERIODIC_WORKER_INTERVAL_MINUTES", "15LL")
         }
         getByName("debug") {
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "PROJECT_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "DEVICE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "IMAGE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
     }
 }
