@@ -117,12 +117,4 @@ internal class ParentalConsentTextHelper @Inject constructor(
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
         else -> ""
     }
-
-    private fun StringBuilder.appendSentence(text: String): StringBuilder {
-        if (isNotEmpty()) {
-            append(" ")
-        }
-        append(text)
-        return this
-    }
 }

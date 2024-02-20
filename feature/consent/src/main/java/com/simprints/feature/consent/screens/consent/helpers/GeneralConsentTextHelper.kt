@@ -115,12 +115,4 @@ internal class GeneralConsentTextHelper @Inject constructor(
         GeneralConfiguration.Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
         GeneralConfiguration.Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
     }
-
-    private fun StringBuilder.appendSentence(text: String): StringBuilder {
-        if (isNotEmpty()) {
-            append(" ")
-        }
-        append(text)
-        return this
-    }
 }
