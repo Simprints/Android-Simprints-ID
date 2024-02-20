@@ -1,13 +1,13 @@
 package com.simprints.feature.dashboard.logout.usecase
 
 import com.simprints.infra.authlogic.AuthManager
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import javax.inject.Inject
 
 internal class LogoutUseCase @Inject constructor(
-    private val configScheduler: ProjectConfigurationScheduler,
+    private val syncOrchestrator: SyncOrchestrator,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
     private val eventSyncManager: EventSyncManager,
     private val authManager: AuthManager,
@@ -17,9 +17,7 @@ internal class LogoutUseCase @Inject constructor(
         // Cancel all background sync
         eventSyncManager.cancelScheduledSync()
         imageUpSyncScheduler.cancelImageUpSync()
-        configScheduler.cancelProjectSync()
-        configScheduler.cancelDeviceSync()
-
+        syncOrchestrator.cancelBackgroundWork()
         eventSyncManager.deleteSyncInfo()
         authManager.signOut()
     }

@@ -2,15 +2,15 @@ package com.simprints.id
 
 import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import javax.inject.Inject
 
 class ScheduleBackgroundSyncUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
-    private val configScheduler: ProjectConfigurationScheduler,
+    private val syncOrchestrator: SyncOrchestrator,
     private val authStore: AuthStore,
     private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
 ) {
@@ -19,8 +19,7 @@ class ScheduleBackgroundSyncUseCase @Inject constructor(
         if (authStore.signedInProjectId.isNotEmpty()) {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()
-            configScheduler.scheduleProjectSync()
-            configScheduler.scheduleDeviceSync()
+            syncOrchestrator.scheduleBackgroundWork()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }

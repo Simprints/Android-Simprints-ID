@@ -1,10 +1,9 @@
 package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.authlogic.AuthManager
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
-import com.simprints.infra.sync.config.usecase.LogoutUseCase
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
@@ -16,7 +15,7 @@ import org.junit.Test
 class LogoutUseCaseTest {
 
     @MockK
-    private lateinit var configScheduler: ProjectConfigurationScheduler
+    private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     private lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
@@ -34,7 +33,7 @@ class LogoutUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = LogoutUseCase(
-            configScheduler = configScheduler,
+            syncOrchestrator = syncOrchestrator,
             imageUpSyncScheduler = imageUpSyncScheduler,
             eventSyncManager = eventSyncManager,
             authManager = authManager,
@@ -47,11 +46,10 @@ class LogoutUseCaseTest {
 
         verify {
             imageUpSyncScheduler.cancelImageUpSync()
-            configScheduler.cancelProjectSync()
-            configScheduler.cancelDeviceSync()
             eventSyncManager.cancelScheduledSync()
         }
         coVerify {
+            syncOrchestrator.cancelBackgroundWork()
             authManager.signOut()
             eventSyncManager.deleteSyncInfo()
         }

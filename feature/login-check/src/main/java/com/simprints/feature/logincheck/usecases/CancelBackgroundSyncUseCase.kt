@@ -1,20 +1,19 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import javax.inject.Inject
 
 internal class CancelBackgroundSyncUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
-    private val configScheduler: ProjectConfigurationScheduler,
+    private val syncOrchestrator: SyncOrchestrator,
 ) {
 
-    operator fun invoke() {
+    suspend operator fun invoke() {
         eventSyncManager.cancelScheduledSync()
         imageUpSyncScheduler.cancelImageUpSync()
-        configScheduler.cancelProjectSync()
-        configScheduler.cancelDeviceSync()
+        syncOrchestrator.cancelBackgroundWork()
     }
 }

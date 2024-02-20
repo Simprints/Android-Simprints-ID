@@ -1,17 +1,30 @@
 package com.simprints.infra.sync
 
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
-import com.simprints.infra.sync.config.ProjectConfigurationSchedulerImpl
+import android.content.Context
+import androidx.work.WorkManager
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class SyncModule {
+object SyncModule {
+
+    @Provides
+    fun provideWorkManager(
+        @ApplicationContext context: Context,
+    ): WorkManager = WorkManager.getInstance(context)
+
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class SyncOrchestratorModule {
 
     @Binds
-    internal abstract fun provideConfigurationScheduler(configurationScheduler: ProjectConfigurationSchedulerImpl): ProjectConfigurationScheduler
+    internal abstract fun provideSyncOrchestrator(syncOrchestratorImpl: SyncOrchestratorImpl): SyncOrchestrator
 
 }

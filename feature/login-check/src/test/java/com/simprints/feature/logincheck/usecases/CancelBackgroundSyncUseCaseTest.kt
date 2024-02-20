@@ -1,11 +1,13 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -18,7 +20,7 @@ class CancelBackgroundSyncUseCaseTest {
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
-    lateinit var configScheduler: ProjectConfigurationScheduler
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     private lateinit var useCase: CancelBackgroundSyncUseCase
 
@@ -29,19 +31,20 @@ class CancelBackgroundSyncUseCaseTest {
         useCase = CancelBackgroundSyncUseCase(
             eventSyncManager,
             imageUpSyncScheduler,
-            configScheduler
+            syncOrchestrator
         )
     }
 
     @Test
-    fun `Cancels all syncs when called`() {
+    fun `Cancels all syncs when called`() = runTest {
         useCase.invoke()
 
         verify {
             eventSyncManager.cancelScheduledSync()
             imageUpSyncScheduler.cancelImageUpSync()
-            configScheduler.cancelProjectSync()
-            configScheduler.cancelDeviceSync()
+        }
+        coVerify {
+            syncOrchestrator.cancelBackgroundWork()
         }
     }
 }

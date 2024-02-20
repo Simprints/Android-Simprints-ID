@@ -2,9 +2,9 @@ package com.simprints.id
 
 import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -23,7 +23,7 @@ class ScheduleBackgroundSyncUseCaseTest {
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
-    lateinit var configScheduler: ProjectConfigurationScheduler
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var authStore: AuthStore
@@ -40,7 +40,7 @@ class ScheduleBackgroundSyncUseCaseTest {
         useCase = ScheduleBackgroundSyncUseCase(
             eventSyncManager,
             imageUpSyncScheduler,
-            configScheduler,
+            syncOrchestrator,
             authStore,
             firmwareFileUpdateScheduler,
         )
@@ -54,11 +54,10 @@ class ScheduleBackgroundSyncUseCaseTest {
 
         verify {
             eventSyncManager.scheduleSync()
-            configScheduler.scheduleProjectSync()
-            configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
         coVerify {
+            syncOrchestrator.scheduleBackgroundWork()
             imageUpSyncScheduler.scheduleImageUpSync()
         }
     }
@@ -71,11 +70,10 @@ class ScheduleBackgroundSyncUseCaseTest {
 
         verify(exactly = 0) {
             eventSyncManager.scheduleSync()
-            configScheduler.scheduleProjectSync()
-            configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
         coVerify(exactly = 0) {
+            syncOrchestrator.scheduleBackgroundWork()
             imageUpSyncScheduler.scheduleImageUpSync()
         }
     }

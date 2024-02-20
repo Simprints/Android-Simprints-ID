@@ -2,9 +2,9 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,7 +23,7 @@ class StartBackgroundSyncUseCaseTest {
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
-    lateinit var configScheduler: ProjectConfigurationScheduler
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -35,9 +35,9 @@ class StartBackgroundSyncUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = StartBackgroundSyncUseCase(
+            syncOrchestrator,
             eventSyncManager,
             imageUpSyncScheduler,
-            configScheduler,
             configRepository,
         )
     }
@@ -50,10 +50,9 @@ class StartBackgroundSyncUseCaseTest {
 
         verify {
             eventSyncManager.scheduleSync()
-            configScheduler.scheduleProjectSync()
-            configScheduler.scheduleDeviceSync()
         }
         coVerify {
+            syncOrchestrator.scheduleBackgroundWork()
             imageUpSyncScheduler.scheduleImageUpSync()
         }
     }

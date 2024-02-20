@@ -15,11 +15,11 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -38,7 +38,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var configRepository: ConfigRepository
 
     @Inject
-    lateinit var configScheduler: ProjectConfigurationScheduler
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @Inject
     lateinit var authStore: AuthStore
@@ -105,7 +105,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncDevice.setOnClickListener {
-            configScheduler.startDeviceSync()
+            syncOrchestrator.startDeviceSync()
         }
 
         binding.printRoomDb.setOnClickListener {
