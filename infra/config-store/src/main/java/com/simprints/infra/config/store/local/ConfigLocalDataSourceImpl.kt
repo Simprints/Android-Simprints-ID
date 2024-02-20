@@ -183,7 +183,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         ),
                         coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                             kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                        )
+                        ),
+                        imagesRequireUnmeteredConnection = false,
                     ),
                     down = DownSynchronizationConfiguration(
                         partitionType = DownSynchronizationConfiguration.PartitionType.USER,

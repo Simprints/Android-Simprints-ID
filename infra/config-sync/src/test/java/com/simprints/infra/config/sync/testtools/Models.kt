@@ -67,7 +67,8 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
         ),
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-        )
+        ),
+        false,
     ),
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,

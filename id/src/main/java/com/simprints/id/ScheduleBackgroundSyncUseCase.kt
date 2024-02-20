@@ -15,7 +15,7 @@ class ScheduleBackgroundSyncUseCase @Inject constructor(
     private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
 ) {
 
-    operator fun invoke() {
+    suspend operator fun invoke() {
         if (authStore.signedInProjectId.isNotEmpty()) {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()

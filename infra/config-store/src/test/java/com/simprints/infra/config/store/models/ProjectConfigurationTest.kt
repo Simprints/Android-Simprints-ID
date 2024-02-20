@@ -212,4 +212,18 @@ class ProjectConfigurationTest {
             assertThat(config.isEventDownSyncAllowed()).isEqualTo(it.value)
         }
     }
+
+    @Test
+    fun `imagesRequireUnmeteredConnection should return the correct value`() {
+        val values = listOf(true, false)
+
+        values.forEach {
+            val config = projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    up = synchronizationConfiguration.up.copy(imagesRequireUnmeteredConnection = it)
+                )
+            )
+            assertThat(config.imagesUploadRequiresUnmeteredConnection()).isEqualTo(it)
+        }
+    }
 }

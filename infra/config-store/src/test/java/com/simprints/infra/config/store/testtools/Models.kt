@@ -204,7 +204,8 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
         ),
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
             ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE
-        )
+        ),
+        false,
     ),
     ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration.PartitionType.PROJECT,
@@ -221,7 +222,8 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
         ),
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-        )
+        ),
+        false,
     ),
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
