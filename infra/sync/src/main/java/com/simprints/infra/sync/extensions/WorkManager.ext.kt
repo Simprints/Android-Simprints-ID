@@ -13,6 +13,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicW
     repeatInterval: Long,
     existingWorkPolicy: ExistingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.UPDATE,
     constraints: Constraints = defaultWorkerConstraints(),
+    tags: List<String> = emptyList(),
     inputData: Data? = null,
 ) = enqueueUniquePeriodicWork(
     workName,
@@ -20,12 +21,14 @@ internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicW
     PeriodicWorkRequestBuilder<T>(repeatInterval, SyncConstants.SYNC_REPEAT_UNIT)
         .setConstraints(constraints)
         .let { if (inputData != null) it.setInputData(inputData) else it }
+        .let { tags.fold(it) { builder, tag -> builder.addTag(tag) } }
         .build()
 )
 
 internal inline fun <reified T : ListenableWorker> WorkManager.startWorker(
     workName: String,
     constraints: Constraints = defaultWorkerConstraints(),
+    tags: List<String> = emptyList(),
     inputData: Data? = null,
 ) = this.enqueueUniqueWork(
     workName,
@@ -33,6 +36,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.startWorker(
     OneTimeWorkRequestBuilder<T>()
         .setConstraints(constraints)
         .let { if (inputData != null) it.setInputData(inputData) else it }
+        .let { tags.fold(it) { builder, tag -> builder.addTag(tag) } }
         .build()
 )
 

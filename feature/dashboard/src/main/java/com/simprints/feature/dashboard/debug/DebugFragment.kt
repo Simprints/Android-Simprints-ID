@@ -79,15 +79,15 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncStart.setOnClickListener {
-            eventSyncManager.sync()
+            syncOrchestrator.startEventSync()
         }
 
         binding.syncStop.setOnClickListener {
-            eventSyncManager.stop()
+            syncOrchestrator.stopEventSync()
         }
 
         binding.syncSchedule.setOnClickListener {
-            eventSyncManager.scheduleSync()
+            syncOrchestrator.rescheduleEventSync()
         }
 
         binding.syncConfig.setOnClickListener {
@@ -125,8 +125,9 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
         binding.cleanAll.setOnClickListener {
             lifecycleScope.launch(dispatcher) {
-                eventSyncManager.cancelScheduledSync()
-                eventSyncManager.stop()
+                syncOrchestrator.stopEventSync()
+                syncOrchestrator.cancelEventSync()
+
                 eventRepository.deleteAll()
                 eventSyncManager.resetDownSyncInfo()
                 enrolmentRecordRepository.deleteAll()

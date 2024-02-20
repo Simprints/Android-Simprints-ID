@@ -24,6 +24,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
@@ -72,6 +73,9 @@ class SyncInfoViewModelTest {
     private lateinit var eventSyncManager: EventSyncManager
 
     @MockK
+    private lateinit var syncOrchestrator: SyncOrchestrator
+
+    @MockK
     private lateinit var project: Project
 
     @MockK(relaxed = true)
@@ -101,6 +105,7 @@ class SyncInfoViewModelTest {
             authStore = authStore,
             imageRepository = imageRepository,
             eventSyncManager = eventSyncManager,
+            syncOrchestrator = syncOrchestrator,
             tokenizationProcessor = tokenizationProcessor
         )
     }
@@ -295,7 +300,7 @@ class SyncInfoViewModelTest {
     fun `should invoke sync manager when sync is requested`() = runTest {
         viewModel.forceSync()
 
-        verify(exactly = 1) { eventSyncManager.sync() }
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isEqualTo(false)
     }
 

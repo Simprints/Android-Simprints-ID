@@ -4,8 +4,11 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
+import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
+import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.FIRMWARE_UPDATE_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.IMAGE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
@@ -33,6 +36,9 @@ class SyncOrchestratorImplTest {
     private lateinit var authStore: AuthStore
 
     @MockK
+    private lateinit var eventSyncManager: EventSyncManager
+
+    @MockK
     private lateinit var shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase
 
     @MockK
@@ -47,6 +53,7 @@ class SyncOrchestratorImplTest {
         syncOrchestrator = SyncOrchestratorImpl(
             workManager,
             authStore,
+            eventSyncManager,
             shouldScheduleFirmwareUpdate,
             cleanupDeprecatedWorkers,
         )
@@ -75,6 +82,7 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniquePeriodicWork(PROJECT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(DEVICE_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(IMAGE_UP_SYNC_WORK_NAME, any(), any())
+            workManager.enqueueUniquePeriodicWork(EVENT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(FIRMWARE_UPDATE_WORK_NAME, any(), any())
         }
     }
@@ -93,13 +101,19 @@ class SyncOrchestratorImplTest {
 
     @Test
     fun `cancels all necessary background workers`() = runTest {
+        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
+
         syncOrchestrator.cancelBackgroundWork()
 
         verify {
             workManager.cancelUniqueWork(PROJECT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(DEVICE_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME)
+
+            // Explicitly cancel event sync sub-workers
+            workManager.cancelAllWorkByTag("syncWorkers")
         }
     }
 
@@ -113,6 +127,60 @@ class SyncOrchestratorImplTest {
                 any(),
                 any<OneTimeWorkRequest>()
             )
+        }
+    }
+
+    @Test
+    fun `reschedules event sync worker with correct tags`() = runTest {
+        every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
+
+        syncOrchestrator.rescheduleEventSync()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                EVENT_SYNC_WORK_NAME,
+                any(),
+                match { it.tags.containsAll(setOf("tag1", "tag2")) })
+        }
+    }
+
+    @Test
+    fun `cancel event sync worker cancels correct worker`() = runTest {
+        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
+
+        syncOrchestrator.cancelEventSync()
+
+        verify {
+            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelAllWorkByTag("syncWorkers")
+        }
+    }
+
+    @Test
+    fun `start event sync worker with correct tags`() = runTest {
+        every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+
+        syncOrchestrator.startEventSync()
+
+        verify {
+            workManager.enqueueUniqueWork(
+                EVENT_SYNC_WORK_NAME_ONE_TIME,
+                any(),
+                match<OneTimeWorkRequest> { it.tags.containsAll(setOf("tag1", "tag2")) }
+            )
+        }
+    }
+
+    @Test
+    fun `stop event sync worker cancels correct worker`() = runTest {
+        every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
+
+        syncOrchestrator.cancelEventSync()
+
+        verify {
+            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
+            workManager.cancelAllWorkByTag("syncWorkers")
         }
     }
 
@@ -149,6 +217,12 @@ class SyncOrchestratorImplTest {
                 }
             )
         }
+    }
+
+    @Test
+    fun `delegates sync info deletion`() = runTest {
+        syncOrchestrator.deleteEventSyncInfo()
+        coVerify { eventSyncManager.deleteSyncInfo() }
     }
 
     @Test

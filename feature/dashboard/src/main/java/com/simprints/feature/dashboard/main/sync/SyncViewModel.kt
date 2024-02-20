@@ -33,6 +33,7 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -44,6 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SyncViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
+    private val syncOrchestrator: SyncOrchestrator,
     private val connectivityTracker: ConnectivityTracker,
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
@@ -108,7 +110,7 @@ internal class SyncViewModel @Inject constructor(
 
     fun sync() {
         _syncCardLiveData.postValue(SyncConnecting(null, 0, null))
-        eventSyncManager.sync()
+        syncOrchestrator.startEventSync()
     }
 
     private fun startInitialSyncIfRequired() {

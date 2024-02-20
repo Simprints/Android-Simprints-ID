@@ -22,4 +22,8 @@ internal object SyncConstants {
 
     const val FIRMWARE_UPDATE_WORK_NAME = "firmware-file-update-work-v2"
     const val FIRMWARE_UPDATE_REPEAT_INTERVAL = BuildConfig.FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES
+
+    const val EVENT_SYNC_WORK_NAME = "event-sync-work"
+    const val EVENT_SYNC_WORK_NAME_ONE_TIME = "event-sync-work-one-time"
+    const val EVENT_SYNC_WORKER_INTERVAL = BuildConfig.EVENT_SYNC_WORKER_INTERVAL_MINUTES
 }

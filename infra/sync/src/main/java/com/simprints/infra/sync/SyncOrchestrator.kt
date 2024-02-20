@@ -7,6 +7,11 @@ interface SyncOrchestrator {
 
     fun startDeviceSync()
 
+    fun rescheduleEventSync()
+    fun cancelEventSync()
+    fun startEventSync()
+    fun stopEventSync()
+
     /**
      * Fully reschedule the background worker.
      * Should be used in when the configuration that affects scheduling has changed.
@@ -18,5 +23,6 @@ interface SyncOrchestrator {
      */
     fun uploadEnrolmentRecords(id: String, subjectIds: List<String>)
 
+    suspend fun deleteEventSyncInfo()
     fun cleanupWorkers()
 }

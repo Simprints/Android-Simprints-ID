@@ -31,6 +31,8 @@ internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
         "device-sync-work", // 2024.1.1
         "image-upsync-work-v2", // 2024.1.1
         "firmware-file-update-work", // 2024.1.1
+        "TAG_MASTER_SYNC_SCHEDULER_PERIODIC_TIME", // 2024.1.1, tag was indeed used as worker name
+        "TAG_MASTER_SYNC_SCHEDULER_ONE_TIME", // 2024.1.1, tag was indeed used as worker name
     )
 
     private fun tagsForDeprecatedWorkers() = listOf(
