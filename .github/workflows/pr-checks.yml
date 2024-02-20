@@ -31,7 +31,7 @@ jobs:
                 infra:realm
                 infra:recent-user-activity
                 infra:config-store
-                infra:config-sync
+                infra:sync
                 infra:auth-store
                 infra:auth-logic
             reportsId: infra1
@@ -45,7 +45,6 @@ jobs:
                 infra:events
                 infra:event-sync
                 infra:enrolment-records-store
-                infra:enrolment-records-sync
                 infra:license
                 infra:images
             reportsId: infra2
