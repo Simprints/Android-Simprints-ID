@@ -1,6 +1,6 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.config.sync.ProjectConfigurationScheduler
+import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import javax.inject.Inject

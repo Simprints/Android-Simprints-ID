@@ -117,10 +117,7 @@ include(
     ":infra:core",
     ":infra:test-tools",
     ":infra:events",
-    ":infra:event-sync",
     ":infra:config-store",
-    ":infra:config-sync",
-    ":infra:enrolment-records-sync",
     ":infra:enrolment-records-store",
     ":infra:images",
     ":infra:license",
@@ -134,4 +131,7 @@ include(
     ":infra:security",
     ":infra:orchestrator-data",
     ":infra:ui-base",
+    ":infra:sync",
+    ":infra:event-sync",
+    ":infra:enrolment-records-sync",
 )

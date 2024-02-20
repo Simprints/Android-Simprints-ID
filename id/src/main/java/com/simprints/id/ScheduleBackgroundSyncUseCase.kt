@@ -2,7 +2,7 @@ package com.simprints.id
 
 import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ProjectConfigurationScheduler
+import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import javax.inject.Inject

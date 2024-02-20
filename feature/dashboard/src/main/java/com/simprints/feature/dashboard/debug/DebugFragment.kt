@@ -15,7 +15,7 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.sync.ProjectConfigurationScheduler
+import com.simprints.infra.sync.config.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
