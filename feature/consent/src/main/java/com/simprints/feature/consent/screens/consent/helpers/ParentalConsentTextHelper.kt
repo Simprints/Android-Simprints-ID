@@ -42,12 +42,12 @@ internal class ParentalConsentTextHelper @Inject constructor(
         programName: String,
         modalityUseCase: String,
     ) = when (config?.enrolmentVariant) {
-        ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY -> append(
+        ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY -> appendSentence(
             context.getString(R.string.consent_parental_enrol_only)
                 .format(programName, modalityUseCase)
         )
 
-        ConsentConfiguration.ConsentEnrolmentVariant.STANDARD -> append(
+        ConsentConfiguration.ConsentEnrolmentVariant.STANDARD -> appendSentence(
             context.getString(R.string.consent_parental_enrol)
                 .format(programName, modalityUseCase)
         )
@@ -55,7 +55,7 @@ internal class ParentalConsentTextHelper @Inject constructor(
         else -> this
     }
 
-    private fun StringBuilder.appendTextForIdentifyOrVerify(programName: String, modalityUseCase: String) = append(
+    private fun StringBuilder.appendTextForIdentifyOrVerify(programName: String, modalityUseCase: String) = appendSentence(
         context.getString(R.string.consent_parental_id_verify).format(programName, modalityUseCase)
     )
 
@@ -65,22 +65,22 @@ internal class ParentalConsentTextHelper @Inject constructor(
         modalityAccess: String
     ) {
         if (config.parentalPrompt?.dataSharedWithPartner == true) {
-            append(
+            appendSentence(
                 context.getString(R.string.consent_parental_share_data_yes).format(config.organizationName, modalityAccess)
             )
         } else {
-            append(
+            appendSentence(
                 context.getString(R.string.consent_parental_share_data_no).format(modalityAccess)
             )
         }
         if (config.parentalPrompt?.dataUsedForRAndD == true) {
-            append(context.getString(R.string.consent_collect_yes))
+            appendSentence(context.getString(R.string.consent_collect_yes))
         }
         if (config.parentalPrompt?.privacyRights == true) {
-            append(context.getString(R.string.consent_parental_privacy_rights))
+            appendSentence(context.getString(R.string.consent_parental_privacy_rights))
         }
         if (config.parentalPrompt?.confirmation == true) {
-            append(
+            appendSentence(
                 context.getString(R.string.consent_parental_confirmation).format(modalityUseCase)
             )
         }
@@ -116,5 +116,13 @@ internal class ParentalConsentTextHelper @Inject constructor(
         Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
         else -> ""
+    }
+
+    private fun StringBuilder.appendSentence(text: String): StringBuilder {
+        if (isNotEmpty()) {
+            append(" ")
+        }
+        append(text)
+        return this
     }
 }
