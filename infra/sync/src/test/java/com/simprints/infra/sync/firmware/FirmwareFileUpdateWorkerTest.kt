@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.infra.scanner.data.worker
+package com.simprints.infra.sync.firmware
 
 import androidx.work.ListenableWorker.Result.Retry
 import androidx.work.ListenableWorker.Result.Success

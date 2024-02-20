@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.infra.scanner.data.worker
+package com.simprints.infra.sync.firmware
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -15,11 +15,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 /**
- * This class is responsible for regularly downloading the latest versions of the firmware binaries,
+ * This class is responsible for downloading the latest versions of the firmware binaries,
  * if any update are available, ensuring that the latest versions are always on the phone.
  */
 @HiltWorker
-internal class FirmwareFileUpdateWorker @AssistedInject constructor(
+class FirmwareFileUpdateWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val firmwareRepository: FirmwareRepository,

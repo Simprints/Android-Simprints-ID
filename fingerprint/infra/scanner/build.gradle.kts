@@ -8,20 +8,6 @@ android {
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }
-
-    buildTypes {
-        getByName("release") {
-            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "1440L")
-        }
-
-        getByName("staging") {
-            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
-        }
-
-        getByName("debug") {
-            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
-        }
-    }
 }
 
 dependencies {
@@ -29,7 +15,6 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.coroutine.rx2.adapter)
 
-    implementation(libs.workManager.work)
     implementation(libs.retrofit.core)
     runtimeOnly(libs.jackson.core)
 

@@ -36,3 +36,6 @@ internal inline fun <reified T : ListenableWorker> WorkManager.startWorker(
         .build()
 )
 
+internal fun WorkManager.cancelWorkers(vararg workNames: String) {
+    workNames.forEach(this::cancelUniqueWork)
+}

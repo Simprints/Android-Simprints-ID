@@ -9,13 +9,17 @@ import com.simprints.infra.sync.extensions.startWorker
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
 import com.simprints.infra.sync.config.worker.ProjectConfigDownSyncWorker
 import com.simprints.infra.sync.enrolments.EnrolmentRecordWorker
+import com.simprints.infra.sync.extensions.cancelWorkers
+import com.simprints.infra.sync.firmware.FirmwareFileUpdateWorker
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import com.simprints.infra.sync.images.ImageUpSyncWorker
+import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
 import javax.inject.Inject
 
 internal class SyncOrchestratorImpl @Inject constructor(
     private val workManager: WorkManager,
     private val authStore: AuthStore,
+    private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
     private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
 ) : SyncOrchestrator {
 
@@ -34,14 +38,25 @@ internal class SyncOrchestratorImpl @Inject constructor(
                 SyncConstants.IMAGE_UP_SYNC_REPEAT_INTERVAL,
             )
             // TODO eventSyncManager.scheduleSync()
-            // TODO firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
+
+            if (shouldScheduleFirmwareUpdate()) {
+                workManager.schedulePeriodicWorker<FirmwareFileUpdateWorker>(
+                    SyncConstants.FIRMWARE_UPDATE_WORK_NAME,
+                    SyncConstants.FIRMWARE_UPDATE_REPEAT_INTERVAL,
+                )
+            } else {
+                workManager.cancelWorkers(SyncConstants.FIRMWARE_UPDATE_WORK_NAME)
+            }
         }
     }
 
     override suspend fun cancelBackgroundWork() {
-        workManager.cancelUniqueWork(SyncConstants.PROJECT_SYNC_WORK_NAME)
-        workManager.cancelUniqueWork(SyncConstants.DEVICE_SYNC_WORK_NAME)
-        workManager.cancelUniqueWork(SyncConstants.IMAGE_UP_SYNC_WORK_NAME)
+        workManager.cancelWorkers(
+            SyncConstants.PROJECT_SYNC_WORK_NAME,
+            SyncConstants.DEVICE_SYNC_WORK_NAME,
+            SyncConstants.IMAGE_UP_SYNC_WORK_NAME,
+            SyncConstants.FIRMWARE_UPDATE_WORK_NAME,
+        )
     }
 
     override fun startDeviceSync() {

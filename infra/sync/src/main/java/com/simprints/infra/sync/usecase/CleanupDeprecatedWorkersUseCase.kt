@@ -30,6 +30,7 @@ internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
         "project-sync-work", // 2024.1.1
         "device-sync-work", // 2024.1.1
         "image-upsync-work-v2", // 2024.1.1
+        "firmware-file-update-work", // 2024.1.1
     )
 
     private fun tagsForDeprecatedWorkers() = listOf(

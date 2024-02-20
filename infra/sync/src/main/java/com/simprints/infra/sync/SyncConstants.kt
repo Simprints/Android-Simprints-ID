@@ -19,4 +19,7 @@ internal object SyncConstants {
     const val RECORD_UPLOAD_WORK_NAME = "upload-enrolment-record-work-one-time"
     const val RECORD_UPLOAD_INPUT_ID_NAME = "INPUT_ID_NAME"
     const val RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME = "INPUT_SUBJECT_IDS_NAME"
+
+    const val FIRMWARE_UPDATE_WORK_NAME = "firmware-file-update-work-v2"
+    const val FIRMWARE_UPDATE_REPEAT_INTERVAL = BuildConfig.FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES
 }

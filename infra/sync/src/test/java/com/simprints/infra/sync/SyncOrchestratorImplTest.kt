@@ -6,12 +6,15 @@ import androidx.work.WorkManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
+import com.simprints.infra.sync.SyncConstants.FIRMWARE_UPDATE_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.IMAGE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
+import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -30,6 +33,9 @@ class SyncOrchestratorImplTest {
     private lateinit var authStore: AuthStore
 
     @MockK
+    private lateinit var shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase
+
+    @MockK
     private lateinit var cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase
 
     private lateinit var syncOrchestrator: SyncOrchestratorImpl
@@ -41,6 +47,7 @@ class SyncOrchestratorImplTest {
         syncOrchestrator = SyncOrchestratorImpl(
             workManager,
             authStore,
+            shouldScheduleFirmwareUpdate,
             cleanupDeprecatedWorkers,
         )
     }
@@ -48,6 +55,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `does not schedules any workers if not logged in`() = runTest {
         every { authStore.signedInProjectId } returns ""
+        coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
 
         syncOrchestrator.scheduleBackgroundWork()
 
@@ -59,6 +67,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules all necessary background workers if logged in`() = runTest {
         every { authStore.signedInProjectId } returns "projectId"
+        coEvery { shouldScheduleFirmwareUpdate.invoke() } returns true
 
         syncOrchestrator.scheduleBackgroundWork()
 
@@ -66,6 +75,19 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniquePeriodicWork(PROJECT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(DEVICE_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(IMAGE_UP_SYNC_WORK_NAME, any(), any())
+            workManager.enqueueUniquePeriodicWork(FIRMWARE_UPDATE_WORK_NAME, any(), any())
+        }
+    }
+
+    @Test
+    fun `schedules cancel firmware update worker if no support for vero 2`() = runTest {
+        every { authStore.signedInProjectId } returns "projectId"
+        coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
+
+        syncOrchestrator.scheduleBackgroundWork()
+
+        verify {
+            workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME)
         }
     }
 
@@ -77,6 +99,7 @@ class SyncOrchestratorImplTest {
             workManager.cancelUniqueWork(PROJECT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(DEVICE_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME)
         }
     }
 
