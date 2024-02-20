@@ -8,23 +8,23 @@ android {
 
     buildTypes {
         getByName("release") {
-            buildConfigField("long", "PROJECT_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
-            buildConfigField("long", "DEVICE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
-            buildConfigField("long", "IMAGE_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
+            buildConfigField("long", "PROJECT_DOWN_SYNC_WORKER_INTERVAL_MINUTES", "60L")
+            buildConfigField("long", "DEVICE_DOWN_SYNC_WORKER_INTERVAL_MINUTES", "30L")
+            buildConfigField("long", "IMAGE_UP_SYNC_WORKER_INTERVAL_MINUTES", "60L")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "1440L")
             buildConfigField("long", "EVENT_SYNC_WORKER_INTERVAL_MINUTES", "60L")
         }
         getByName("staging") {
-            buildConfigField("long", "PROJECT_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "DEVICE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "IMAGE_PERIODIC_WORKER_INTERVAL_MINUTES", "15LL")
-            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15LL")
-            buildConfigField("long", "EVENT_SYNC_WORKER_INTERVAL_MINUTES", "15LL")
+            buildConfigField("long", "PROJECT_DOWN_SYNC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "DEVICE_DOWN_SYNC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "IMAGE_UP_SYNC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "EVENT_SYNC_WORKER_INTERVAL_MINUTES", "15L")
         }
         getByName("debug") {
-            buildConfigField("long", "PROJECT_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "DEVICE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "IMAGE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "PROJECT_DOWN_SYNC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "DEVICE_DOWN_SYNC_WORKER_INTERVAL_MINUTES", "15L")
+            buildConfigField("long", "IMAGE_UP_SYNC_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
             buildConfigField("long", "EVENT_SYNC_WORKER_INTERVAL_MINUTES", "15L")
         }
