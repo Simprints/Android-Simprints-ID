@@ -381,6 +381,23 @@ class ParentalConsentTextHelperTest {
         assertThat(parentalConsentText).doesNotContain(expectedString)
     }
 
+    @Test
+    fun `should not start a new sentence after a period without a following space`() {
+        val parentalConsentText = ParentalConsentTextHelper(context).assembleText(
+            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
+                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                dataSharedWithPartner = true,
+                dataUsedForRAndD = true,
+                privacyRights = true,
+                confirmation = true,
+            )),
+            listOf(GeneralConfiguration.Modality.FINGERPRINT),
+            ConsentType.IDENTIFY,
+        )
+
+        assertThat(parentalConsentText).doesNotContainMatch("\\.\\w")
+    }
+
     private fun configWithPrompt(prompt: ConsentConfiguration.ConsentPromptConfiguration) = ConsentConfiguration(
         programName = PROGRAM_NAME,
         organizationName = ORGANIZATION_NAME,
