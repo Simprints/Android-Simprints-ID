@@ -2,11 +2,13 @@ package com.simprints.infra.sync
 
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.sync.extensions.schedulePeriodicWorker
 import com.simprints.infra.sync.extensions.startWorker
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
 import com.simprints.infra.sync.config.worker.ProjectConfigDownSyncWorker
+import com.simprints.infra.sync.enrolments.EnrolmentRecordWorker
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import com.simprints.infra.sync.images.ImageUpSyncWorker
 import javax.inject.Inject
@@ -51,6 +53,16 @@ internal class SyncOrchestratorImpl @Inject constructor(
             SyncConstants.IMAGE_UP_SYNC_WORK_NAME,
             SyncConstants.IMAGE_UP_SYNC_REPEAT_INTERVAL,
             existingWorkPolicy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+        )
+    }
+
+    override fun uploadEnrolmentRecords(id: String, subjectIds: List<String>) {
+        workManager.startWorker<EnrolmentRecordWorker>(
+            SyncConstants.RECORD_UPLOAD_WORK_NAME,
+            inputData = workDataOf(
+                SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME to id,
+                SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME to subjectIds.toTypedArray()
+            ),
         )
     }
 

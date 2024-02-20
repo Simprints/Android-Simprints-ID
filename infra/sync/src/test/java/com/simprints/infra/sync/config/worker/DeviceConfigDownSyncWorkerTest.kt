@@ -6,8 +6,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.UpSyncEnrolmentRecords
 import com.simprints.infra.sync.config.usecase.LogoutUseCase
-import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
-import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -29,7 +28,7 @@ class DeviceConfigDownSyncWorkerTest {
     private lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
-    private lateinit var enrolmentRecordScheduler: EnrolmentRecordScheduler
+    private lateinit var syncOrchestrator: SyncOrchestrator
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -45,7 +44,7 @@ class DeviceConfigDownSyncWorkerTest {
             params = mockk(relaxed = true),
             configRepository = configRepository,
             logoutUseCase = logoutUseCase,
-            enrolmentRecordScheduler = enrolmentRecordScheduler,
+            syncOrchestrator = syncOrchestrator,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -61,7 +60,7 @@ class DeviceConfigDownSyncWorkerTest {
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
         coVerify(exactly = 0) { logoutUseCase.invoke() }
-        verify(exactly = 0) { enrolmentRecordScheduler.upload(any(), any()) }
+        verify(exactly = 0) { syncOrchestrator.uploadEnrolmentRecords(any(), any()) }
     }
 
     @Test
@@ -76,7 +75,7 @@ class DeviceConfigDownSyncWorkerTest {
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
         coVerify { logoutUseCase.invoke() }
-        verify(exactly = 0) { enrolmentRecordScheduler.upload(any(), any()) }
+        verify(exactly = 0) { syncOrchestrator.uploadEnrolmentRecords(any(), any()) }
     }
 
     @Test
@@ -91,6 +90,6 @@ class DeviceConfigDownSyncWorkerTest {
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
         coVerify(exactly = 0) { logoutUseCase.invoke() }
-        verify { enrolmentRecordScheduler.upload(any(), any()) }
+        verify { syncOrchestrator.uploadEnrolmentRecords(any(), any()) }
     }
 }

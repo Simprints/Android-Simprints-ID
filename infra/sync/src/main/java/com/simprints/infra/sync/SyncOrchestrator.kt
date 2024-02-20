@@ -13,5 +13,10 @@ interface SyncOrchestrator {
      */
     suspend fun rescheduleImageUpSync()
 
+    /**
+     * Schedule a worker to upload subjects with IDs in the provided list.
+     */
+    fun uploadEnrolmentRecords(id: String, subjectIds: List<String>)
+
     fun cleanupWorkers()
 }

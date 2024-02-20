@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records.worker
+package com.simprints.infra.sync.enrolments
 
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -6,9 +6,12 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordSchedulerImpl
-import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordWorker
-import io.mockk.*
+import com.simprints.infra.sync.SyncConstants
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -24,11 +27,11 @@ class EnrolmentRecordWorkerTest {
     private val configRepository = mockk<ConfigRepository>()
     private val params = mockk<WorkerParameters>(relaxed = true) {
         every { inputData } returns workDataOf(
-            EnrolmentRecordSchedulerImpl.INPUT_ID_NAME to INSTRUCTION_ID,
-            EnrolmentRecordSchedulerImpl.INPUT_SUBJECT_IDS_NAME to arrayOf(SUBJECT_ID),
+            SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME to INSTRUCTION_ID,
+            SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME to arrayOf(SUBJECT_ID),
         )
     }
-    private val worker = EnrolmentRecordWorker(
+    private val worker = com.simprints.infra.sync.enrolments.EnrolmentRecordWorker(
         mockk(relaxed = true),
         params,
         repository,

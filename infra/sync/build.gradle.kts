@@ -30,7 +30,6 @@ dependencies {
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:enrolment-records-store"))
-    implementation(project(":infra:enrolment-records-sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:images"))

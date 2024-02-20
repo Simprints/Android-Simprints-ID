@@ -5,8 +5,8 @@ import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.usecase.LogoutUseCase
-import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,7 +17,7 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val configRepository: ConfigRepository,
     private val logoutUseCase: LogoutUseCase,
-    private val enrolmentRecordScheduler: EnrolmentRecordScheduler,
+    private val syncOrchestrator: SyncOrchestrator,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
 
@@ -36,7 +36,7 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
                 } else if (state.recordsToUpSync != null) {
                     state.recordsToUpSync?.let { records ->
                         crashlyticsLog("subject ids ${records.subjectIds.size}")
-                        enrolmentRecordScheduler.upload(records.id, records.subjectIds)
+                        syncOrchestrator.uploadEnrolmentRecords(records.id, records.subjectIds)
                     }
                 }
                 success()

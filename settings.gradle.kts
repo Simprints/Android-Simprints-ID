@@ -133,5 +133,4 @@ include(
     ":infra:ui-base",
     ":infra:sync",
     ":infra:event-sync",
-    ":infra:enrolment-records-sync",
 )

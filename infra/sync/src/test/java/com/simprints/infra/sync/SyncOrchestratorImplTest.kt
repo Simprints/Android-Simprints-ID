@@ -8,8 +8,11 @@ import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.IMAGE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
+import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
+import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import io.mockk.MockKAnnotations
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
@@ -82,7 +85,11 @@ class SyncOrchestratorImplTest {
         syncOrchestrator.startDeviceSync()
 
         verify {
-            workManager.enqueueUniqueWork(DEVICE_SYNC_WORK_NAME_ONE_TIME, any(), any<OneTimeWorkRequest>())
+            workManager.enqueueUniqueWork(
+                DEVICE_SYNC_WORK_NAME_ONE_TIME,
+                any(),
+                any<OneTimeWorkRequest>()
+            )
         }
     }
 
@@ -100,9 +107,36 @@ class SyncOrchestratorImplTest {
     }
 
     @Test
+    fun `schedules record upload`() = runTest {
+        syncOrchestrator.uploadEnrolmentRecords(INSTRUCTION_ID, listOf(SUBJECT_ID))
+
+        coVerify(exactly = 1) {
+            workManager.enqueueUniqueWork(
+                any(),
+                any(),
+                match<OneTimeWorkRequest> { oneTimeWorkRequest ->
+                    val subjectIdsInput = oneTimeWorkRequest.workSpec.input.getStringArray(
+                        RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
+                    )
+                    val instructionIdInput = oneTimeWorkRequest.workSpec.input.getString(
+                        RECORD_UPLOAD_INPUT_ID_NAME
+                    )
+                    instructionIdInput == INSTRUCTION_ID &&
+                        subjectIdsInput.contentEquals(arrayOf(SUBJECT_ID))
+                }
+            )
+        }
+    }
+
+    @Test
     fun `delegates worker cleanup requests`() = runTest {
         syncOrchestrator.cleanupWorkers()
         verify { cleanupDeprecatedWorkers.invoke() }
     }
 
+    companion object {
+
+        private const val INSTRUCTION_ID = "id"
+        private const val SUBJECT_ID = "subjectId"
+    }
 }

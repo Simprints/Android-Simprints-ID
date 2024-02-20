@@ -15,4 +15,8 @@ internal object SyncConstants {
 
     const val IMAGE_UP_SYNC_WORK_NAME = "image-upsync-work-v3"
     const val IMAGE_UP_SYNC_REPEAT_INTERVAL = BuildConfig.IMAGE_PERIODIC_WORKER_INTERVAL_MINUTES
+
+    const val RECORD_UPLOAD_WORK_NAME = "upload-enrolment-record-work-one-time"
+    const val RECORD_UPLOAD_INPUT_ID_NAME = "INPUT_ID_NAME"
+    const val RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME = "INPUT_SUBJECT_IDS_NAME"
 }
