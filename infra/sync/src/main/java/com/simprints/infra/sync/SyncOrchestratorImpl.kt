@@ -1,9 +1,13 @@
 package com.simprints.infra.sync
 
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.extensions.schedulePeriodicWorker
@@ -21,6 +25,7 @@ import javax.inject.Inject
 internal class SyncOrchestratorImpl @Inject constructor(
     private val workManager: WorkManager,
     private val authStore: AuthStore,
+    private val configRepo: ConfigRepository,
     private val eventSyncManager: EventSyncManager,
     private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
     private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
@@ -39,6 +44,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
             workManager.schedulePeriodicWorker<ImageUpSyncWorker>(
                 SyncConstants.IMAGE_UP_SYNC_WORK_NAME,
                 SyncConstants.IMAGE_UP_SYNC_REPEAT_INTERVAL,
+                constraints = getImageUploadConstraints()
             )
             rescheduleEventSync()
             if (shouldScheduleFirmwareUpdate()) {
@@ -98,6 +104,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
             SyncConstants.IMAGE_UP_SYNC_WORK_NAME,
             SyncConstants.IMAGE_UP_SYNC_REPEAT_INTERVAL,
             existingWorkPolicy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            constraints = getImageUploadConstraints()
         )
     }
 
@@ -118,5 +125,14 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
     override fun cleanupWorkers() {
         cleanupDeprecatedWorkers()
+    }
+
+
+    private suspend fun getImageUploadConstraints(): Constraints {
+        val networkType = configRepo
+            .getProjectConfiguration()
+            .imagesUploadRequiresUnmeteredConnection()
+            .let { if (it) NetworkType.UNMETERED else NetworkType.CONNECTED }
+        return Constraints.Builder().setRequiredNetworkType(networkType).build()
     }
 }

@@ -1,9 +1,11 @@
 package com.simprints.infra.sync
 
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
@@ -36,6 +38,9 @@ class SyncOrchestratorImplTest {
     private lateinit var authStore: AuthStore
 
     @MockK
+    private lateinit var configRepo: ConfigRepository
+
+    @MockK
     private lateinit var eventSyncManager: EventSyncManager
 
     @MockK
@@ -53,6 +58,7 @@ class SyncOrchestratorImplTest {
         syncOrchestrator = SyncOrchestratorImpl(
             workManager,
             authStore,
+            configRepo,
             eventSyncManager,
             shouldScheduleFirmwareUpdate,
             cleanupDeprecatedWorkers,
@@ -84,6 +90,43 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniquePeriodicWork(IMAGE_UP_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(EVENT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(FIRMWARE_UPDATE_WORK_NAME, any(), any())
+        }
+    }
+
+    @Test
+    fun `schedules images with any connection if not specified`() = runTest {
+        coEvery {
+            configRepo.getProjectConfiguration().synchronization.up.imagesRequireUnmeteredConnection
+        } returns false
+        every { authStore.signedInProjectId } returns "projectId"
+
+        syncOrchestrator.scheduleBackgroundWork()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                IMAGE_UP_SYNC_WORK_NAME,
+                any(),
+                match { it.workSpec.constraints.requiredNetworkType == NetworkType.CONNECTED }
+            )
+        }
+    }
+
+    @Test
+    fun `schedules images with unmetered constraint if requested`() = runTest {
+        coEvery {
+            configRepo.getProjectConfiguration().synchronization.up.imagesRequireUnmeteredConnection
+        } returns true
+        every { authStore.signedInProjectId } returns "projectId"
+        coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
+
+        syncOrchestrator.scheduleBackgroundWork()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                IMAGE_UP_SYNC_WORK_NAME,
+                any(),
+                match { it.workSpec.constraints.requiredNetworkType == NetworkType.UNMETERED }
+            )
         }
     }
 
