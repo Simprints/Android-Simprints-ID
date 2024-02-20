@@ -6,6 +6,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
+import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -23,6 +24,9 @@ class SyncOrchestratorImplTest {
     @MockK
     private lateinit var authStore: AuthStore
 
+    @MockK
+    private lateinit var cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase
+
     private lateinit var syncOrchestrator: SyncOrchestratorImpl
 
     @Before
@@ -32,6 +36,7 @@ class SyncOrchestratorImplTest {
         syncOrchestrator = SyncOrchestratorImpl(
             workManager,
             authStore,
+            cleanupDeprecatedWorkers,
         )
     }
 
@@ -75,6 +80,12 @@ class SyncOrchestratorImplTest {
         verify {
             workManager.enqueueUniqueWork(DEVICE_SYNC_WORK_NAME_ONE_TIME, any(), any<OneTimeWorkRequest>())
         }
+    }
+
+    @Test
+    fun `delegates worker cleanup requests`() = runTest {
+        syncOrchestrator.cleanupWorkers()
+        verify { cleanupDeprecatedWorkers.invoke() }
     }
 
 }

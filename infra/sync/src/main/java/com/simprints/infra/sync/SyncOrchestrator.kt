@@ -7,4 +7,5 @@ interface SyncOrchestrator {
 
     fun startDeviceSync()
 
+    fun cleanupWorkers()
 }

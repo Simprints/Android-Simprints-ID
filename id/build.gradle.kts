@@ -29,21 +29,11 @@ dependencies {
     implementation(project(":infra:core"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:sync"))
-    implementation(project(":infra:images"))
-    implementation(project(":infra:auth-logic"))
-    implementation(project(":infra:auth-store"))
 
     implementation(project(":feature:orchestrator"))
     implementation(project(":feature:dashboard"))
 
-    implementation(project(":fingerprint:infra:scanner"))
-
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
     implementation(libs.rxJava2.core)
-
-    testImplementation(libs.testing.junit)
-    testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.coroutines)
-    testImplementation(project(":infra:test-tools"))
 }

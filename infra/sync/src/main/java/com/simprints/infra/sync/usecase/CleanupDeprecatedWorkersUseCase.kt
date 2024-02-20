@@ -1,17 +1,13 @@
-package com.simprints.id
+package com.simprints.infra.sync.usecase
 
-import android.content.Context
 import androidx.work.WorkManager
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("There is no complex business logic to test")
-class CleanupDeprecatedWorkersUseCase @Inject constructor(
-    @ApplicationContext private val ctx: Context,
+internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
+    private val workManager: WorkManager,
 ) {
-
-    private val wm = WorkManager.getInstance(ctx)
 
     /**
      * Removes deprecated workers from the work manager.
@@ -20,8 +16,8 @@ class CleanupDeprecatedWorkersUseCase @Inject constructor(
      * its tag or name should change with the old one added to respective list.
      */
     operator fun invoke() {
-        namesForDeprecatedWorkers().forEach { wm.cancelUniqueWork(it) }
-        tagsForDeprecatedWorkers().forEach { wm.cancelAllWorkByTag(it) }
+        namesForDeprecatedWorkers().forEach { workManager.cancelUniqueWork(it) }
+        tagsForDeprecatedWorkers().forEach { workManager.cancelAllWorkByTag(it) }
     }
 
     private fun namesForDeprecatedWorkers() = listOf(
