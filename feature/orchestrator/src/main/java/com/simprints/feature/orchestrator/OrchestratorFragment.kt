@@ -61,9 +61,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
-    private var isActivityRestored = false
-    private var requestProcessed = false
-
     @Inject
     lateinit var alertConfigurationMapper: AlertConfigurationMapper
 
@@ -79,6 +76,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        orchestratorVm.isActivityRestored = savedInstanceState != null
 
         observeLoginCheckVm()
         observeClientApiVm()
@@ -177,9 +175,9 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     override fun onResume() {
         super.onResume()
 
-        if (!isActivityRestored && !requestProcessed) {
+        if (!orchestratorVm.isActivityRestored && !orchestratorVm.requestProcessed) {
             if (loginCheckVm.isDeviceSafe()) {
-                requestProcessed = true
+                orchestratorVm.requestProcessed = true
                 lifecycleScope.launch {
                     val actionRequest = clientApiVm.handleIntent(args.requestAction, args.requestParams)
                     if (actionRequest != null) {
