@@ -1,7 +1,7 @@
 package com.simprints.face.capture.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -21,7 +21,7 @@ class SaveFaceImageUseCaseTest {
     lateinit var imageRepo: ImageRepository
 
     @MockK
-    lateinit var eventRepo: EventRepository
+    lateinit var eventRepo: SessionEventRepository
 
     private lateinit var useCase: SaveFaceImageUseCase
 

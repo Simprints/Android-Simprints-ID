@@ -14,11 +14,11 @@ internal interface EventRoomDao {
     @Query("select * from DbEvent order by createdAt_unixMs desc")
     suspend fun loadAll(): List<DbEvent>
 
-    @Query("select * from DbEvent where sessionId = :sessionId order by createdAt_unixMs desc")
-    suspend fun loadFromSession(sessionId: String): List<DbEvent>
+    @Query("select * from DbEvent where scopeId = :scopeId order by createdAt_unixMs desc")
+    suspend fun loadFromScope(scopeId: String): List<DbEvent>
 
-    @Query("select eventJson from DbEvent where sessionId = :sessionId order by createdAt_unixMs desc")
-    suspend fun loadEventJsonFromSession(sessionId: String): List<String>
+    @Query("select eventJson from DbEvent where scopeId = :scopeId order by createdAt_unixMs desc")
+    suspend fun loadEventJsonFromScope(scopeId: String): List<String>
 
     @Query("select count(*) from DbEvent")
     fun observeCount(): Flow<Int>
@@ -26,8 +26,11 @@ internal interface EventRoomDao {
     @Query("select count(*) from DbEvent where type = :type")
     fun observeCountFromType(type: EventType): Flow<Int>
 
-    @Query("delete from DbEvent where sessionId = :sessionId")
-    suspend fun deleteAllFromSession(sessionId: String)
+    @Query("delete from DbEvent where scopeId = :scopeId")
+    suspend fun deleteAllFromScope(scopeId: String)
+
+    @Query("delete from DbEvent where scopeId in (:scopeIds)")
+    suspend fun deleteAllFromScopes(scopeIds: List<String>)
 
     @Query("delete from DbEvent")
     suspend fun deleteAll()

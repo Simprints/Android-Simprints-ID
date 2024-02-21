@@ -8,6 +8,7 @@ import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -33,12 +34,14 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val syncCache: EventSyncCache,
     private val jsonHelper: JsonHelper,
+    private val eventRepository: EventRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
 
         const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
+        const val INPUT_EVENT_DOWN_SYNC_SCOPE_ID = "INPUT_EVENT_DOWN_SYNC_SCOPE_ID"
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
         const val PROGRESS_DOWN_MAX_SYNC = "PROGRESS_DOWN_MAX_SYNC"
         const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
@@ -55,6 +58,11 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
         )
     }
 
+    private suspend fun getEventScope() = inputData
+        .getString(INPUT_EVENT_DOWN_SYNC_SCOPE_ID)
+        ?.let { eventRepository.getEventScope(it) }
+        ?: throw IllegalArgumentException("input required")
+
     private suspend fun getDownSyncOperation() =
         eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
@@ -69,7 +77,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
 
             crashlyticsLog("Start")
 
-            downSyncTask.downSync(this, getDownSyncOperation()).collect {
+            downSyncTask.downSync(this, getDownSyncOperation(), getEventScope()).collect {
                 count = it.progress
                 max = it.maxProgress
                 syncCache.saveProgress(workerId, count)
@@ -92,6 +100,8 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     }
 
     private fun handleSyncException(t: Throwable) = when (t) {
+        is IllegalArgumentException -> fail(t, t.message)
+
         is BackendMaintenanceException -> fail(
             t,
             t.message,
@@ -102,17 +112,11 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
         )
 
         is SyncCloudIntegrationException -> fail(
-            t,
-            t.message,
-            workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
+            t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
         )
 
         is TooManyRequestsException -> fail(
-            t,
-            t.message,
-            workDataOf(
-                OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
-            )
+            t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true)
         )
 
         else -> retry(t)

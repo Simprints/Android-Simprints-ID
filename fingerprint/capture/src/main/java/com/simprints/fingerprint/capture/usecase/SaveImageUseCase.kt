@@ -4,7 +4,7 @@ import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedExcepti
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.infra.config.store.models.Vero2Configuration
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 internal class SaveImageUseCase @Inject constructor(
     private val coreImageRepository: ImageRepository,
-    private val coreEventRepository: EventRepository,
+    private val coreEventRepository: SessionEventRepository,
 ) {
 
     suspend operator fun invoke(

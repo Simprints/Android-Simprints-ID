@@ -11,7 +11,14 @@ object MigrationTestingTools {
     fun retrieveCursorWithEventByType(db: SupportSQLiteDatabase, type: String): Cursor =
         db.query("SELECT * from DbEvent where type= ?", arrayOf(type)).apply { moveToNext() }
 
-    fun retrieveCursorWithScopeById(db: SupportSQLiteDatabase, id: String): Cursor =
+    /**
+     * Only helpful in 11-13 migrations, in version 14 DbSessionScope
+     * table has been renamed to DbEventScope
+     */
+    fun retrieveCursorWithSessionScopeById(db: SupportSQLiteDatabase, id: String): Cursor =
         db.query("SELECT * from DbSessionScope where id= ?", arrayOf(id)).apply { moveToNext() }
+
+    fun retrieveCursorWithEventScopeById(db: SupportSQLiteDatabase, id: String): Cursor =
+        db.query("SELECT * from DbEventScope where id= ?", arrayOf(id)).apply { moveToNext() }
 
 }

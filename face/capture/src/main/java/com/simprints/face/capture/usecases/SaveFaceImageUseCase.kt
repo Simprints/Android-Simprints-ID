@@ -1,21 +1,21 @@
 package com.simprints.face.capture.usecases
 
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
-import com.simprints.infra.images.model.Path
 
 internal class SaveFaceImageUseCase @Inject constructor(
     private val coreImageRepository: ImageRepository,
-    private val coreEventRepository: EventRepository,
+    private val sessionEventRepository: SessionEventRepository,
 ) {
 
     suspend operator fun invoke(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
         determinePath(captureEventId)?.let { path ->
             Simber.d("Saving face image ${path.compose()}")
-            val sessionScope = coreEventRepository.getCurrentSessionScope()
+            val sessionScope = sessionEventRepository.getCurrentSessionScope()
             val projectId = sessionScope.projectId
             val securedImageRef =
                 coreImageRepository.storeImageSecurely(imageBytes, projectId, path)
@@ -29,7 +29,7 @@ internal class SaveFaceImageUseCase @Inject constructor(
         }
 
     private suspend fun determinePath(captureEventId: String): Path? = try {
-        val sessionScope = coreEventRepository.getCurrentSessionScope()
+        val sessionScope = sessionEventRepository.getCurrentSessionScope()
         val sessionId = sessionScope.id
         Path(
             arrayOf(

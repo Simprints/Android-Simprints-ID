@@ -375,6 +375,24 @@ class ApiEventTest {
     }
 
     @Test
+    fun validate_DownSyncRequestEventApiModel() {
+        val event = createEventDownSyncRequestEvent()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateDownSyncRequestEventApiModel(json)
+    }
+
+    @Test
+    fun validate_UpSyncRequestEventApiModel() {
+        val event = createEventUpSyncRequestEvent()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateUpSyncRequestEventApiModel(json)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -455,6 +473,8 @@ class ApiEventTest {
             FaceCaptureConfirmation -> validate_FaceCaptureConfirmationEventApiModel()
             FingerprintCaptureBiometrics -> validate_FingerprintCaptureBiometricsEventApiModel()
             FaceCaptureBiometrics -> validate_FaceCaptureBiometricsEventApiModel()
+            EventDownSyncRequest -> validate_DownSyncRequestEventApiModel()
+            EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

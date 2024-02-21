@@ -5,6 +5,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -16,7 +17,7 @@ import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
-import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionScope
+import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -29,6 +30,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.test.runTest
+import okhttp3.Headers
+import okhttp3.Headers.Companion.headersOf
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
@@ -266,6 +269,38 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
+    fun getEvents_shouldReturnCorrectRequestId() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
+        } returns Response.success(
+            "".toResponseBody(),
+            mapOf("x-request-id" to "requestId").toHeaders()
+        )
+
+        val mockedScope: CoroutineScope = mockk()
+
+        every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
+        assertThat(
+            eventRemoteDataSource.getEvents(
+                query,
+                mockedScope
+            ).requestId
+        ).isEqualTo("requestId")
+    }
+
+    @Test
+    fun getEvents_shouldReturnCorrectStatus() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
+        } returns Response.success(205, "".toResponseBody())
+
+        val mockedScope: CoroutineScope = mockk()
+
+        every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
+        assertThat(eventRemoteDataSource.getEvents(query, mockedScope).status).isEqualTo(205)
+    }
+
+    @Test
     fun getEvents_shouldNotReturnTotalHeaderWhenLowerBound() = runTest {
         coEvery {
             eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
@@ -282,11 +317,19 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun postEvent_shouldUploadEvents() = runTest {
-        coEvery { eventRemoteInterface.uploadEvents(any(), any(), any()) } returns mockk()
+        coEvery { eventRemoteInterface.uploadEvents(any(), any(), any()) } returns Response.success(
+            "".toResponseBody(),
+            mapOf("x-request-id" to "requestId").toHeaders()
+        )
 
         val events = listOf(createAlertScreenEvent())
         val scope = createSessionScope()
-        eventRemoteDataSource.post(DEFAULT_PROJECT_ID, mapOf(scope to events))
+        eventRemoteDataSource.post(
+            DEFAULT_PROJECT_ID,
+            ApiUploadEventsBody(
+                sessions = listOf(ApiEventScope.fromDomain(scope, events))
+            )
+        )
 
         coVerify(exactly = 1) {
             eventRemoteInterface.uploadEvents(
@@ -295,7 +338,7 @@ class EventRemoteDataSourceTest {
                 match { body ->
                     assertThat(body.sessions).hasSize(1)
                     assertThat(body.sessions.firstOrNull())
-                        .isEqualTo(ApiSessionScope.fromDomain(scope, events))
+                        .isEqualTo(ApiEventScope.fromDomain(scope, events))
                     true
                 }
             )
@@ -316,7 +359,7 @@ class EventRemoteDataSourceTest {
             assertThrows<Throwable> {
                 eventRemoteDataSource.post(
                     DEFAULT_PROJECT_ID,
-                    mapOf(createSessionScope() to listOf(createAlertScreenEvent()))
+                    ApiUploadEventsBody()
                 )
             }
         }

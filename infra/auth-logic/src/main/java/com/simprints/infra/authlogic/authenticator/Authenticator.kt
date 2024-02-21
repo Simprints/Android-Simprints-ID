@@ -10,7 +10,7 @@ import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authlogic.model.toDomainResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
@@ -25,7 +25,7 @@ internal class Authenticator @Inject constructor(
     private val authStore: AuthStore,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
 ) {
 
     private var loginStartTime = timeHelper.now()

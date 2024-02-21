@@ -171,6 +171,7 @@ message ProtoDownSynchronizationConfiguration {
 message ProtoUpSynchronizationConfiguration {
     SimprintsUpSynchronizationConfiguration simprints = 1;
     CoSyncUpSynchronizationConfiguration co_sync = 2;
+    bool imagesRequireUnmeteredConnection = 3;
 
     message SimprintsUpSynchronizationConfiguration {
         UpSynchronizationKind kind = 1;

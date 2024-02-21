@@ -211,7 +211,8 @@ internal data class OldProjectConfig(
                             coSync
                         )
                     }
-                )
+                ),
+                imagesRequireUnmeteredConnection = false,
             ),
             down = DownSynchronizationConfiguration(
                 partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(

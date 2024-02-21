@@ -2,19 +2,19 @@ package com.simprints.infra.eventsync.event.remote.models.session
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiModality
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
-internal data class ApiSessionScope(
+internal data class ApiEventScope(
     val id: String,
     val projectId: String,
     val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
-    val endCause: ApiSessionEndCause,
+    val endCause: ApiEventScopeEndCause,
     val modalities: List<ApiModality>,
     val sidVersion: String,
     val libSimprintsVersion: String,
@@ -29,9 +29,9 @@ internal data class ApiSessionScope(
     companion object {
 
         fun fromDomain(
-            scope: SessionScope,
+            scope: EventScope,
             events: List<Event>,
-        ) = ApiSessionScope(
+        ) = ApiEventScope(
             id = scope.id,
             projectId = scope.projectId,
             startTime = scope.createdAt.fromDomainToApi(),

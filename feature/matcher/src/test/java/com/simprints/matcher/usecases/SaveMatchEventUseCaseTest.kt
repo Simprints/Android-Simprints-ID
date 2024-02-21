@@ -7,7 +7,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.matcher.FaceMatchResult
@@ -31,7 +31,7 @@ class SaveMatchEventUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: SessionEventRepository
 
     @MockK
     private lateinit var configRepository: ConfigRepository

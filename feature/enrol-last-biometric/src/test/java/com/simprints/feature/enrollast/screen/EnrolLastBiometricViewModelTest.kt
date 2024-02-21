@@ -13,7 +13,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -46,7 +46,7 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var projectConfig: ProjectConfiguration
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: SessionEventRepository
 
     @MockK
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -73,7 +73,7 @@ internal class EnrolLastBiometricViewModelTest {
         coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns SESSION_ID
         }
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<PersonCreationEvent> { every { id } returns SESSION_ID }
         )
 

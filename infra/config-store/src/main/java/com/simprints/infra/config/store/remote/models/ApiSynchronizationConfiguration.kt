@@ -38,12 +38,14 @@ internal data class ApiSynchronizationConfiguration(
     data class ApiUpSynchronizationConfiguration(
         val simprints: ApiSimprintsUpSynchronizationConfiguration,
         val coSync: ApiCoSyncUpSynchronizationConfiguration,
+        val imagesRequireUnmeteredConnection: Boolean,
     ) {
 
         fun toDomain(): UpSynchronizationConfiguration =
             UpSynchronizationConfiguration(
                 simprints.toDomain(),
-                coSync.toDomain()
+                coSync.toDomain(),
+                imagesRequireUnmeteredConnection
             )
 
         @Keep

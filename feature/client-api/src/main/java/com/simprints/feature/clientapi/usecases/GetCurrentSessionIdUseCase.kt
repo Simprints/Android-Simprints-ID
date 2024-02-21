@@ -1,12 +1,12 @@
 package com.simprints.feature.clientapi.usecases
 
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import javax.inject.Inject
 
 internal class GetCurrentSessionIdUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val sessionEventRepository: SessionEventRepository,
 ) {
 
-    suspend operator fun invoke(): String = eventRepository.getCurrentSessionScope().id
+    suspend operator fun invoke(): String = sessionEventRepository.getCurrentSessionScope().id
 
 }

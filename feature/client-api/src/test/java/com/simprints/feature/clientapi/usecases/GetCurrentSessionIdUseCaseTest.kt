@@ -1,7 +1,7 @@
 package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -18,7 +18,7 @@ class GetCurrentSessionIdUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: SessionEventRepository
 
     private lateinit var useCase: GetCurrentSessionIdUseCase
 
