@@ -36,8 +36,8 @@ internal class OrchestratorActivity : BaseActivity() {
     }
 
     override fun onStart() {
+        super.onStart()
         if(!isGraphInitialized) {
-            super.onStart()
             val action = intent.action.orEmpty()
             val extras = intent.extras ?: bundleOf()
 
