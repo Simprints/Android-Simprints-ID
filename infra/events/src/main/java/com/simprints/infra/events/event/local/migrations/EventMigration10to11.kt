@@ -9,14 +9,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.Location
-import com.simprints.infra.events.event.domain.models.session.SessionEndCause
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration10to11 : Migration(10, 11) {
@@ -60,27 +58,23 @@ internal class EventMigration10to11 : Migration(10, 11) {
                     Simber.d("Could not parse session scope from event with id $id")
                     continue
                 }
-                writeSessionScopeToDatabase(database, scope)
+                database.insert(SCOPE_TABLE_NAME, SQLiteDatabase.CONFLICT_NONE, scope)
             }
         }
     }
 
-    private fun getScopeFromCursor(it: Cursor): SessionScope? {
+    private fun getScopeFromCursor(it: Cursor): ContentValues? {
         val jsonData = it.getStringWithColumnName("eventJson") ?: return null
         val event = fromJsonToDomain(jsonData)
         val sessionId = event.labels.sessionId ?: return null
 
-        val endedAt = event.payload.endedAt.takeIf { it > 0 }?.let { Timestamp(it) }
+        val endedAt = event.payload.endedAt.takeIf { it > 0 }
 
-        return SessionScope(
-            id = sessionId,
-            projectId = event.payload.projectId,
-            createdAt = Timestamp(event.payload.createdAt),
-            endedAt = endedAt,
-            payload = SessionScopePayload(
+        val payloadJson = JsonHelper.toJson(
+            EventScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume
                 // that all previous sessions ended with new session termination cause
-                endCause = if (endedAt != null) SessionEndCause.NEW_SESSION else null,
+                endCause = if (endedAt != null) EventScopeEndCause.NEW_SESSION else null,
                 sidVersion = event.payload.appVersionName,
                 libSimprintsVersion = event.payload.libVersionName,
                 language = event.payload.language,
@@ -91,25 +85,22 @@ internal class EventMigration10to11 : Migration(10, 11) {
                 location = event.payload.location,
             )
         )
+
+        return ContentValues().apply {
+            put("id", sessionId)
+            put("projectId", event.payload.projectId)
+            put("createdAt", event.payload.createdAt)
+            if (endedAt != null) {
+                put("endedAt", endedAt)
+            }
+            put("payloadJson", payloadJson)
+        }
     }
 
     private fun fromJsonToDomain(eventJson: String): OldSessionCaptureEvent = JsonHelper.fromJson(
         json = eventJson,
         type = object : TypeReference<OldSessionCaptureEvent>() {}
     )
-
-    private fun writeSessionScopeToDatabase(database: SupportSQLiteDatabase, scope: SessionScope) {
-        val payloadJson = JsonHelper.toJson(scope.payload)
-        database.insert(SCOPE_TABLE_NAME, SQLiteDatabase.CONFLICT_NONE, ContentValues().apply {
-            put("id", scope.id)
-            put("projectId", scope.projectId)
-            put("createdAt", scope.createdAt.ms)
-            if (scope.endedAt != null) {
-                put("endedAt", scope.endedAt!!.ms)
-            }
-            put("payloadJson", payloadJson)
-        })
-    }
 
     private fun deleteSessionCaptureEvents(database: SupportSQLiteDatabase) {
         database.execSQL(

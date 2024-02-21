@@ -15,6 +15,7 @@ import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_UP_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.common.TAG_UP_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker
+import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -53,7 +54,7 @@ class EventUpSyncWorkersBuilderTest {
             eventUpSyncScopeRepository.getUpSyncScope()
         } returns SampleSyncScopes.projectUpSyncScope
 
-        val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain("")
+        val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain("uniqueSyncId", "scopeId")
 
         chain.assertNumberOfUpSyncUploaderWorkers(1)
         chain.assertUpSyncUploaderWorkerInput(SampleSyncScopes.projectUpSyncScope)
@@ -68,8 +69,7 @@ class EventUpSyncWorkersBuilderTest {
             eventUpSyncScopeRepository.getUpSyncScope()
         } returns SampleSyncScopes.projectUpSyncScope
 
-        val uniqueSyncId = "uniqueSyncId"
-        val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain(uniqueSyncId)
+        val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain("uniqueSyncId", "scopeId")
 
         chain.assertNumberOfUpSyncUploaderWorkers(1)
         chain.first { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
@@ -84,7 +84,7 @@ class EventUpSyncWorkersBuilderTest {
             eventUpSyncScopeRepository.getUpSyncScope()
         } returns SampleSyncScopes.projectUpSyncScope
 
-        val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain(null)
+        val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain("uniqueSyncId", "scopeId")
         chain.assertNumberOfUpSyncUploaderWorkers(1)
         chain.first { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
             .assertSubjectsUpSyncDownloaderWorkerTagsForOneTime()
@@ -99,7 +99,7 @@ class EventUpSyncWorkersBuilderTest {
     }
 
     private fun WorkRequest.assertSubjectsUpSyncDownloaderWorkerTagsForOneTime() {
-        assertThat(tags.size).isEqualTo(6)
+        assertThat(tags.size).isEqualTo(7)
         assertCommonUpSyncWorkersTags()
     }
 
@@ -133,7 +133,10 @@ class EventUpSyncWorkersBuilderTest {
         val jsonHelper = JsonHelper
 
         assertThat(uploaders.any {
-            it.workSpec.input == workDataOf(INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope))
+            it.workSpec.input == workDataOf(
+                INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope),
+                INPUT_EVENT_UP_SYNC_SCOPE_ID to "scopeId"
+            )
         }).isTrue()
 
         assertThat(uploaders).hasSize(1)

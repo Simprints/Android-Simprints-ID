@@ -7,8 +7,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
 import com.simprints.core.DispatcherMain
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.session.Location
+import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val locationManager: LocationManager,
     @DispatcherMain private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {

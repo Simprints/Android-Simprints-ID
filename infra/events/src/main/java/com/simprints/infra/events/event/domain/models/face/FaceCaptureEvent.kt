@@ -16,7 +16,7 @@ data class FaceCaptureEvent(
     override val id: String = randomUUID(),
     override val payload: FaceCapturePayload,
     override val type: EventType,
-    override var sessionId: String? = null,
+    override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
 

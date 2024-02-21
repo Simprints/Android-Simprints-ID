@@ -12,7 +12,7 @@ data class PersonCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: PersonCreationPayload,
     override val type: EventType,
-    override var sessionId: String? = null,
+    override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
 

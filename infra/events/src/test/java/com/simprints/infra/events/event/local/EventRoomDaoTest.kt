@@ -55,9 +55,9 @@ internal class EventRoomDaoTest {
     @Test
     fun loadBySessionId() {
         runTest {
-            val wrongEvent = event.copy(id = randomUUID(), sessionId = GUID2)
+            val wrongEvent = event.copy(id = randomUUID(), scopeId = GUID2)
             addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.loadFromSession(sessionId = GUID1))
+            verifyEvents(listOf(event), eventDao.loadFromScope(scopeId = GUID1))
         }
     }
 
@@ -65,7 +65,7 @@ internal class EventRoomDaoTest {
     fun loadEventJsonFormSession() {
         runTest {
             addIntoDb(event)
-            val results = eventDao.loadEventJsonFromSession(GUID1)
+            val results = eventDao.loadEventJsonFromScope(GUID1)
             assertThat(results).containsExactlyElementsIn(listOf(eventJson))
         }
     }
@@ -83,11 +83,11 @@ internal class EventRoomDaoTest {
     fun deletionBySessionId() {
         runTest {
             val eventSameSession =
-                event.copy(id = randomUUID(), sessionId = GUID1)
+                event.copy(id = randomUUID(), scopeId = GUID1)
             val eventDifferentSession =
-                event.copy(id = randomUUID(), sessionId = GUID2)
+                event.copy(id = randomUUID(), scopeId = GUID2)
             addIntoDb(event, eventSameSession, eventDifferentSession)
-            db.eventDao.deleteAllFromSession(sessionId = GUID1)
+            db.eventDao.deleteAllFromScope(scopeId = GUID1)
             verifyEvents(listOf(eventDifferentSession), eventDao.loadAll())
         }
     }

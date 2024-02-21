@@ -1,16 +1,17 @@
-package com.simprints.infra.events.event.local
+package com.simprints.infra.events.session
 
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class SessionDataCacheImpl @Inject constructor() : SessionDataCache {
+internal class SessionDataCache @Inject constructor() {
 
     private val scopeLock = Any()
-    override var sessionScope: SessionScope? = null
+
+    var eventScope: EventScope? = null
         get() = synchronized(scopeLock) { field }
         set(value) = synchronized(scopeLock) { field = value }
 
@@ -19,5 +20,5 @@ internal class SessionDataCacheImpl @Inject constructor() : SessionDataCache {
     // a ConcurrentModificationException will happen.
     // In access-ordered linked hash maps, merely querying the map with get is a structural modification.
     // We should use ConcurrentHashMap instead mutableMapOf which creates an empty linkedhashmap
-    override val eventCache: MutableMap<String, Event> = ConcurrentHashMap()
+    val eventCache: MutableMap<String, Event> = ConcurrentHashMap()
 }

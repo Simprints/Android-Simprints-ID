@@ -10,7 +10,7 @@ import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTok
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -34,7 +34,7 @@ internal class AuthenticatorTest {
     private lateinit var projectAuthenticator: ProjectAuthenticator
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: SessionEventRepository
 
     private lateinit var authenticator: Authenticator
 

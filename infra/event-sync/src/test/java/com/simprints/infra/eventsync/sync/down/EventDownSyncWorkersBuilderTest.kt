@@ -23,6 +23,7 @@ import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORK
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
+import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -35,6 +36,7 @@ import org.junit.Test
 class EventDownSyncWorkersBuilderTest {
 
     companion object {
+
         private val SELECTED_MODULE = listOf("MODULE_1".asTokenizableEncrypted())
     }
 
@@ -87,10 +89,10 @@ class EventDownSyncWorkersBuilderTest {
             )
         } returns SampleSyncScopes.projectDownSyncScope
 
-        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("", "scopeId")
 
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
-        chain.assertDownSyncDownloaderWorkerInput(SampleSyncScopes.projectDownSyncScope)
+        chain.assertDownSyncDownloaderWorkerInput(SampleSyncScopes.projectDownSyncScope, "scopeId")
         assertThat(chain.size).isEqualTo(1)
     }
 
@@ -106,9 +108,9 @@ class EventDownSyncWorkersBuilderTest {
             )
         } returns SampleSyncScopes.userDownSyncScope
 
-        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("", "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
-        chain.assertDownSyncDownloaderWorkerInput(SampleSyncScopes.userDownSyncScope)
+        chain.assertDownSyncDownloaderWorkerInput(SampleSyncScopes.userDownSyncScope, "scopeId")
         assertThat(chain.size).isEqualTo(1)
     }
 
@@ -124,9 +126,9 @@ class EventDownSyncWorkersBuilderTest {
             )
         } returns SampleSyncScopes.modulesDownSyncScope
 
-        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("", "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(2)
-        chain.assertDownSyncDownloaderWorkerInput(SampleSyncScopes.modulesDownSyncScope)
+        chain.assertDownSyncDownloaderWorkerInput(SampleSyncScopes.modulesDownSyncScope, "scopeId")
         assertThat(chain.size).isEqualTo(2)
     }
 
@@ -142,7 +144,7 @@ class EventDownSyncWorkersBuilderTest {
             )
         } returns SampleSyncScopes.projectDownSyncScope
         val uniqueSyncId = "uniqueSyncId"
-        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain(uniqueSyncId)
+        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain(uniqueSyncId, "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
         chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
             .assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
@@ -160,7 +162,7 @@ class EventDownSyncWorkersBuilderTest {
             )
         } returns SampleSyncScopes.projectDownSyncScope
 
-        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain(null)
+        val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("", "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
         chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
             .assertSubjectsDownSyncDownloaderWorkerTagsForOneTime()
@@ -174,22 +176,10 @@ class EventDownSyncWorkersBuilderTest {
         assertCommonDownSyncDownloadersWorkersTag()
     }
 
-    private fun WorkRequest.assertSubjectsDownSyncCountWorkerTagsForPeriodic() {
-        assertThat(tags.size).isEqualTo(7)
-        assertUniqueMasterIdTag()
-
-        assertCommonDownSyncWorkersTags()
-    }
-
     private fun WorkRequest.assertSubjectsDownSyncDownloaderWorkerTagsForOneTime() {
-        assertThat(tags.size).isEqualTo(6)
+        assertThat(tags.size).isEqualTo(7)
         assertCommonDownSyncWorkersTags()
         assertCommonDownSyncDownloadersWorkersTag()
-    }
-
-    private fun WorkRequest.assertSubjectsDownSyncCountWorkerTagsForOneTime() {
-        assertThat(tags.size).isEqualTo(6)
-        assertCommonDownSyncWorkersTags()
     }
 
     private fun WorkRequest.assertCommonDownSyncWorkersTags() {
@@ -222,14 +212,20 @@ class EventDownSyncWorkersBuilderTest {
             count
         )
 
-    private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(downSyncScope: EventDownSyncScope) {
+    private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(
+        downSyncScope: EventDownSyncScope,
+        scopeId: String,
+    ) {
         val downloaders =
             filter { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
         val jsonHelper = JsonHelper
         val ops = downSyncScope.operations
         ops.forEach { op ->
             assertThat(downloaders.any {
-                it.workSpec.input == workDataOf(INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(op))
+                it.workSpec.input == workDataOf(
+                    INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(op),
+                    INPUT_EVENT_DOWN_SYNC_SCOPE_ID to scopeId
+                )
             }).isTrue()
         }
         assertThat(downloaders).hasSize(ops.size)

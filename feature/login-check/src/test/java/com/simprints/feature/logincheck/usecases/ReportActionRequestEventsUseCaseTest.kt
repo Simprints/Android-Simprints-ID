@@ -3,7 +3,7 @@ package com.simprints.feature.logincheck.usecases
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
@@ -28,7 +28,7 @@ internal class ReportActionRequestEventsUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var coreEventRepository: EventRepository
+    private lateinit var sessionEventRepository: SessionEventRepository
 
     @MockK
     private lateinit var timeHelper: TimeHelper
@@ -52,7 +52,7 @@ internal class ReportActionRequestEventsUseCaseTest {
         }
 
         useCase = ReportActionRequestEventsUseCase(
-            coreEventRepository,
+            sessionEventRepository,
             timeHelper,
             simNetworkUtils,
             recentUserActivityManager,
@@ -66,7 +66,7 @@ internal class ReportActionRequestEventsUseCaseTest {
         useCase.invoke(ActionFactory.getFlowRequest(extras = mapOf("key" to "value")))
         //Then
         coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { it is SuspiciousIntentEvent })
+            sessionEventRepository.addOrUpdateEvent(withArg { it is SuspiciousIntentEvent })
         }
     }
 
@@ -75,7 +75,7 @@ internal class ReportActionRequestEventsUseCaseTest {
         // When
         useCase.invoke(ActionFactory.getFlowRequest(extras = emptyMap()))
         //Then
-        coVerify { coreEventRepository.addOrUpdateEvent(withArg { it !is SuspiciousIntentEvent }) }
+        coVerify { sessionEventRepository.addOrUpdateEvent(withArg { it !is SuspiciousIntentEvent }) }
     }
 
     @Test
@@ -83,8 +83,8 @@ internal class ReportActionRequestEventsUseCaseTest {
         useCase(ActionFactory.getFlowRequest())
 
         coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { it is ConnectivitySnapshotEvent })
-            coreEventRepository.addOrUpdateEvent(withArg { it is EnrolmentCalloutEvent })
+            sessionEventRepository.addOrUpdateEvent(withArg { it is ConnectivitySnapshotEvent })
+            sessionEventRepository.addOrUpdateEvent(withArg { it is EnrolmentCalloutEvent })
             recentUserActivityManager.updateRecentUserActivity(any())
         }
     }
@@ -94,11 +94,11 @@ internal class ReportActionRequestEventsUseCaseTest {
         useCase(ActionFactory.getFolowUpRequest())
 
         coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { it is EnrolmentCalloutEvent })
+            sessionEventRepository.addOrUpdateEvent(withArg { it is EnrolmentCalloutEvent })
             recentUserActivityManager.updateRecentUserActivity(any())
         }
         coVerify{
-            coreEventRepository.addOrUpdateEvent(withArg { it !is ConnectivitySnapshotEvent })
+            sessionEventRepository.addOrUpdateEvent(withArg { it !is ConnectivitySnapshotEvent })
         }
     }
 

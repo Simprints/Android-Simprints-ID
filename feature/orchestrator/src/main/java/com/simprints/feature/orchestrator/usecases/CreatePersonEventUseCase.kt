@@ -8,23 +8,21 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import kotlinx.coroutines.flow.toList
 import java.io.Serializable
 import javax.inject.Inject
 
 internal class CreatePersonEventUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
     private val encodingUtils: EncodingUtils,
 ) {
 
     suspend operator fun invoke(results: List<Serializable>) {
-        val currentSessionId = eventRepository.getCurrentSessionScope().id
-        val sessionEvents = eventRepository.observeEventsFromSession(currentSessionId).toList()
+        val sessionEvents = eventRepository.getEventsInCurrentSession()
 
         // If a personCreationEvent is already in the current session,
         // we don' want to add it again (the capture steps would still be the same)

@@ -2,11 +2,11 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import javax.inject.Inject
 
 internal class UpdateSessionScopePayloadUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configRepository: ConfigRepository,
 ) {

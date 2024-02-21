@@ -13,7 +13,7 @@ data class EnrolmentEventV1(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: EnrolmentPayload,
     override val type: EventType,
-    override var sessionId: String? = null,
+    override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
 

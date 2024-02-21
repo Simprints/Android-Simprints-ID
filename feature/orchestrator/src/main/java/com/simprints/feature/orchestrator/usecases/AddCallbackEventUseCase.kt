@@ -4,7 +4,7 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class AddCallbackEventUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {

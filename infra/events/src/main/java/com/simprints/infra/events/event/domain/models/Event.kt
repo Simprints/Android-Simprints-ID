@@ -23,8 +23,10 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.CANDID
 import com.simprints.infra.events.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONSENT_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_DOWN_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V1_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_KEY
@@ -54,6 +56,7 @@ import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEv
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
@@ -61,6 +64,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 
 
 @JsonTypeInfo(
@@ -128,7 +132,9 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
         name = SCANNER_FIRMWARE_UPDATE_KEY
     ),
     JsonSubTypes.Type(value = SuspiciousIntentEvent::class, name = SUSPICIOUS_INTENT_KEY),
-    JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY)
+    JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY),
+    JsonSubTypes.Type(value = EventDownSyncRequestEvent::class, name = EVENT_DOWN_SYNC_REQUEST_KEY),
+    JsonSubTypes.Type(value = EventUpSyncRequestEvent::class, name = EVENT_UP_SYNC_REQUEST_KEY),
 )
 abstract class Event {
 
@@ -136,7 +142,7 @@ abstract class Event {
     abstract val type: EventType
     abstract val payload: EventPayload
 
-    abstract var sessionId: String?
+    abstract var scopeId: String?
     abstract var projectId: String?
 
     @JsonIgnore

@@ -19,7 +19,7 @@ internal data class DbEvent(
     @Embedded("createdAt_") val createdAt: DbTimestamp,
     val type: EventType,
     val projectId: String? = null,
-    val sessionId: String? = null,
+    val scopeId: String? = null,
     var eventJson: String,
 ) {
 
@@ -36,7 +36,7 @@ internal data class DbEvent(
 internal fun Event.fromDomainToDb(): DbEvent {
     return DbEvent(
         id = id,
-        sessionId = sessionId,
+        scopeId = scopeId,
         projectId = projectId,
         type = payload.type,
         eventJson = JsonHelper.toJson(this, module = dbSerializationModule),

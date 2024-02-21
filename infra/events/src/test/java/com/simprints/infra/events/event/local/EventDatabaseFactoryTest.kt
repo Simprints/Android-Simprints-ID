@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Test
 
 
-internal class DbEventDatabaseFactoryImplTest {
+internal class EventDatabaseFactoryTest {
 
     private val dbName = "dbevents"
     private val localDbKey = LocalDbKey(
@@ -24,11 +24,12 @@ internal class DbEventDatabaseFactoryImplTest {
     )
     private val context: Context = mockk()
     private val securityManager: SecurityManager = mockk()
+
     lateinit var dbEventDatabaseFactory: EventDatabaseFactory
 
     @Before
     fun setUp() {
-        dbEventDatabaseFactory = DbEventDatabaseFactoryImpl(context, securityManager)
+        dbEventDatabaseFactory = EventDatabaseFactory(context, securityManager)
     }
 
     @Test

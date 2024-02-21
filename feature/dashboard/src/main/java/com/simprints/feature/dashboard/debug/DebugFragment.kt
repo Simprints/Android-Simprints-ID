@@ -114,7 +114,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 val logStringBuilder = StringBuilder()
                 logStringBuilder.append("\nSubjects ${enrolmentRecordRepository.count()}")
 
-                val events = eventRepository.loadAll().toList().groupBy { it.type }
+                val events = eventRepository.getAllEvents().toList().groupBy { it.type }
                 events.forEach {
                     logStringBuilder.append("\n${it.key} ${it.value.size}")
                 }

@@ -18,10 +18,6 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 
 internal class GetEventsForCoSyncUseCase @Inject constructor(
@@ -39,17 +35,17 @@ internal class GetEventsForCoSyncUseCase @Inject constructor(
         }
 
         val events = when {
-            config.canCoSyncAllData() -> eventRepository.observeEventsFromSession(sessionId)
+            config.canCoSyncAllData() -> eventRepository.getEventsFromScope(sessionId)
 
-            config.canCoSyncBiometricData() -> eventRepository.observeEventsFromSession(sessionId)
+            config.canCoSyncBiometricData() -> eventRepository.getEventsFromScope(sessionId)
                 .filter { it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent }
 
-            config.canCoSyncAnalyticsData() -> eventRepository.observeEventsFromSession(sessionId)
+            config.canCoSyncAnalyticsData() -> eventRepository.getEventsFromScope(sessionId)
                 .filterNot { it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent }
 
-            else -> emptyFlow()
+            else -> emptyList()
         }
-        val decryptedEvents = decryptTokenizedFields(events = events.toList(), project = project)
+        val decryptedEvents = decryptTokenizedFields(events = events, project = project)
         val serializationModule = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationAsStringSerializer())
         }

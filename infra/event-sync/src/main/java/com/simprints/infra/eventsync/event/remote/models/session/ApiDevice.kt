@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.event.remote.models.session
 
 import android.os.Build
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.session.Device
+import com.simprints.infra.events.event.domain.models.scope.Device
 
 @Keep
 internal data class ApiDevice(
