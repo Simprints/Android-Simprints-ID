@@ -27,21 +27,10 @@ internal class ImageProxyToBitmapUseCase @Inject constructor() {
         bitmap.copyPixelsFromBuffer(buffer)
         val rotationMatrix = Matrix()
         rotationMatrix.postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
-
-        // If cropRect.left or cropRect.right is less than 0, then Bitmap.createBitmap throws an exception.
-        // cropRect.left is < 0 on some devices when in landscape mode
-        // TODO Revert these changes and review the most appropriate way to solve the issue.
-        var left = cropRect.left.takeIf { it >= 0 } ?: 0
-        var right = cropRect.right.takeIf { it >= 0 } ?: 0
-
-        if(right + cropRect.height() > bitmap.height) {
-            val currentSum = right + cropRect.height()
-            right = right - ((right + cropRect.height()) - bitmap.height)
-        }
         val croppedRotatedBitmap = Bitmap.createBitmap(
             bitmap,
-            left,
-            right,
+            cropRect.left,
+            cropRect.top,
             cropRect.width(),
             cropRect.height(),
             rotationMatrix,
