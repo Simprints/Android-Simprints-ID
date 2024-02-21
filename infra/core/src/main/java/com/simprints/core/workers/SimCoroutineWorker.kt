@@ -102,7 +102,7 @@ abstract class SimCoroutineWorker(
     }
 
     protected fun crashlyticsLog(message: String) {
-        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message")
+        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message".take(99))
     }
 
     private fun logExceptionIfRequired(t: Throwable?) {

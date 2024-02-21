@@ -4,24 +4,31 @@ import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.WorkManager
+import androidx.work.WorkQuery
 import androidx.work.workDataOf
+import com.simprints.core.AppScope
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.imagesUploadRequiresUnmeteredConnection
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
-import com.simprints.infra.sync.extensions.schedulePeriodicWorker
-import com.simprints.infra.sync.extensions.startWorker
 import com.simprints.infra.sync.config.worker.DeviceConfigDownSyncWorker
 import com.simprints.infra.sync.config.worker.ProjectConfigDownSyncWorker
 import com.simprints.infra.sync.enrolments.EnrolmentRecordWorker
+import com.simprints.infra.sync.extensions.anyRunning
 import com.simprints.infra.sync.extensions.cancelWorkers
+import com.simprints.infra.sync.extensions.schedulePeriodicWorker
+import com.simprints.infra.sync.extensions.startWorker
 import com.simprints.infra.sync.firmware.FirmwareFileUpdateWorker
-import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
-import com.simprints.infra.sync.images.ImageUpSyncWorker
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
+import com.simprints.infra.sync.images.ImageUpSyncWorker
+import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class SyncOrchestratorImpl @Inject constructor(
     private val workManager: WorkManager,
     private val authStore: AuthStore,
@@ -29,7 +36,22 @@ internal class SyncOrchestratorImpl @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val shouldScheduleFirmwareUpdate: ShouldScheduleFirmwareUpdateUseCase,
     private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
+    @AppScope private val appScope: CoroutineScope,
 ) : SyncOrchestrator {
+
+    init {
+        appScope.launch {
+            // Stop image upload when event sync starts
+            workManager.getWorkInfosFlow(
+                WorkQuery.fromUniqueWorkNames(
+                    SyncConstants.EVENT_SYNC_WORK_NAME,
+                    SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
+                )
+            ).collect { workInfoList ->
+                if (workInfoList.anyRunning()) rescheduleImageUpSync()
+            }
+        }
+    }
 
     override suspend fun scheduleBackgroundWork() {
         if (authStore.signedInProjectId.isNotEmpty()) {
@@ -103,6 +125,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
         workManager.schedulePeriodicWorker<ImageUpSyncWorker>(
             SyncConstants.IMAGE_UP_SYNC_WORK_NAME,
             SyncConstants.IMAGE_UP_SYNC_REPEAT_INTERVAL,
+            initialDelay = SyncConstants.DEFAULT_BACKOFF_INTERVAL_MINUTES,
             existingWorkPolicy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             constraints = getImageUploadConstraints()
         )

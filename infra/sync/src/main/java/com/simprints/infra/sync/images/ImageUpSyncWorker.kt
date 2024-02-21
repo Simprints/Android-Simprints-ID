@@ -25,7 +25,6 @@ internal class ImageUpSyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         crashlyticsLog("Image upload start")
-        showProgressNotification()
 
         try {
             if (imageRepository.uploadStoredImagesAndDelete(authStore.signedInProjectId)) {

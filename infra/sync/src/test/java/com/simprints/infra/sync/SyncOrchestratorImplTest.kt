@@ -3,7 +3,9 @@ package com.simprints.infra.sync
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.EventSyncManager
@@ -18,18 +20,26 @@ import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import java.util.UUID
 
 class SyncOrchestratorImplTest {
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     private lateinit var workManager: WorkManager
@@ -55,14 +65,7 @@ class SyncOrchestratorImplTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        syncOrchestrator = SyncOrchestratorImpl(
-            workManager,
-            authStore,
-            configRepo,
-            eventSyncManager,
-            shouldScheduleFirmwareUpdate,
-            cleanupDeprecatedWorkers,
-        )
+        syncOrchestrator = createSyncOrchestrator()
     }
 
     @Test
@@ -273,6 +276,59 @@ class SyncOrchestratorImplTest {
         syncOrchestrator.cleanupWorkers()
         verify { cleanupDeprecatedWorkers.invoke() }
     }
+
+    @Test
+    fun `stops image worker when event sync starts`() = runTest {
+        val eventStartFlow = MutableSharedFlow<List<WorkInfo>>()
+        every { workManager.getWorkInfosFlow(any()) } returns eventStartFlow
+        every {
+            workManager.getWorkInfosForUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
+        } returns mockFuture(createWorkInfo(WorkInfo.State.RUNNING))
+
+        // Recreating orchestrator with new mocks since the subscription is done in init
+        syncOrchestrator = createSyncOrchestrator()
+        eventStartFlow.emit(createWorkInfo(WorkInfo.State.RUNNING))
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                IMAGE_UP_SYNC_WORK_NAME,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                any()
+            )
+        }
+    }
+
+    @Test
+    fun `does not stop image worker when event sync is not running`() = runTest {
+        val eventStartFlow = MutableSharedFlow<List<WorkInfo>>()
+        every { workManager.getWorkInfosFlow(any()) } returns eventStartFlow
+
+        // Recreating orchestrator with new mocks since the subscription is done in init
+        syncOrchestrator = createSyncOrchestrator()
+        eventStartFlow.emit(createWorkInfo(WorkInfo.State.CANCELLED))
+
+        verify(exactly = 0) {
+            workManager.getWorkInfosForUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
+            workManager.cancelWorkById(any())
+        }
+    }
+
+    private fun createSyncOrchestrator() = SyncOrchestratorImpl(
+        workManager,
+        authStore,
+        configRepo,
+        eventSyncManager,
+        shouldScheduleFirmwareUpdate,
+        cleanupDeprecatedWorkers,
+        CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+    )
+
+    private fun mockFuture(workInfo: List<WorkInfo>) =
+        mockk<ListenableFuture<List<WorkInfo>>> { every { get() } returns workInfo }
+
+    private fun createWorkInfo(state: WorkInfo.State) = listOf(
+        WorkInfo(UUID.randomUUID(), state, emptySet())
+    )
 
     companion object {
 

@@ -1,5 +1,6 @@
 package com.simprints.feature.dashboard.tools.di
 
+import com.simprints.core.AppScope
 import com.simprints.core.CoreModule
 import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherIO
@@ -52,6 +53,10 @@ object FakeCoreModule {
     @ExternalScope
     @Provides
     fun provideExternalScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
+
+    @AppScope
+    @Provides
+    fun provideAppScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     @Provides
     @Singleton
