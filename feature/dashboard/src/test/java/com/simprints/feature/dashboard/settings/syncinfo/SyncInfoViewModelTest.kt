@@ -73,6 +73,9 @@ class SyncInfoViewModelTest {
     private lateinit var eventSyncManager: EventSyncManager
 
     @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
     private lateinit var project: Project
 
     @MockK(relaxed = true)
@@ -102,7 +105,8 @@ class SyncInfoViewModelTest {
             authStore = authStore,
             imageRepository = imageRepository,
             eventSyncManager = eventSyncManager,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
+            recentUserActivityManager = recentUserActivityManager
         )
     }
 

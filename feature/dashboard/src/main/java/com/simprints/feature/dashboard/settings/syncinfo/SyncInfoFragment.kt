@@ -47,7 +47,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         findNavController().handleResult<LoginResult>(
             viewLifecycleOwner,
             R.id.syncInfoFragment,
-            LoginContract.LOGIN_DESTINATION_ID,
+            LoginContract.DESTINATION,
         ) { result -> viewModel.handleLoginResult(result) }
     }
 

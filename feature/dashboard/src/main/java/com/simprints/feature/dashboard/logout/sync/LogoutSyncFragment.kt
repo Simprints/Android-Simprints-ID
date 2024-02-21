@@ -10,15 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncBinding
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
-import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.main.sync.SyncViewModel
+import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,7 +36,7 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         findNavController().handleResult<LoginResult>(
             viewLifecycleOwner,
             R.id.logOutSyncFragment,
-            LoginContract.LOGIN_DESTINATION_ID,
+            LoginContract.DESTINATION,
         ) { result -> syncViewModel.handleLoginResult(result) }
     }
 

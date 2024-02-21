@@ -159,7 +159,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_relogin_required)).check(matches(isDisplayed()))
         onView(withId(R.id.sync_card_relogin_required_login_button)).check(matches(isDisplayed()))

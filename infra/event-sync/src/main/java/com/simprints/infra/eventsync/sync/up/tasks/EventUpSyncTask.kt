@@ -22,6 +22,7 @@ import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.flow.Flow
@@ -65,6 +66,10 @@ internal class EventUpSyncTask @Inject constructor(
             lastOperation = lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now())
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
+            if (t is RemoteDbNotSignedInException) {
+                throw t
+            }
+
             Simber.e(t)
             lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now())
 

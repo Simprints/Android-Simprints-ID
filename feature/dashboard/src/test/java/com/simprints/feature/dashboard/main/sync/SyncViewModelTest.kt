@@ -310,11 +310,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a ReloginRequired card state if the sync fails with such problem`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(

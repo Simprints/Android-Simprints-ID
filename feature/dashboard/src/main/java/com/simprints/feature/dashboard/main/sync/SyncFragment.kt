@@ -33,7 +33,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         findNavController().handleResult<LoginResult>(
             viewLifecycleOwner,
             R.id.mainFragment,
-            LoginContract.LOGIN_DESTINATION_ID,
+            LoginContract.DESTINATION,
         ) { result -> viewModel.handleLoginResult(result) }
     }
 
