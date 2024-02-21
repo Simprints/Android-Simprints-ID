@@ -171,10 +171,9 @@ object Simber {
 
     private fun limitLength(message: String, max: Int): String {
         if (message.length > max) {
-            // TODO revert comment
-//            if (BuildConfig.DEBUG) {
-//                throw IllegalArgumentException("String must be less than $max characters.")
-//            }
+            if (BuildConfig.DEBUG) {
+                throw IllegalArgumentException("String must be less than $max characters.")
+            }
 
             return message.substring(0, max)
         }
