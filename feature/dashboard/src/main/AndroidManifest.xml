@@ -5,8 +5,8 @@
         <activity
             android:name="com.simprints.feature.dashboard.DashboardActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
