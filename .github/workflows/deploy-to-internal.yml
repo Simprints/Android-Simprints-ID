@@ -15,6 +15,7 @@ jobs:
     deploy-to-internal:
 
         runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         concurrency:
             group: release-internal-workflow #only one instance of this workflow can run at a time

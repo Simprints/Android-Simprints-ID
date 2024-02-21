@@ -19,6 +19,7 @@ on:
 jobs:
     promote-artifact:
         runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         environment: ${{inputs.deployment-track}}   # Dynamically set the job environment based on the input
 
