@@ -62,32 +62,84 @@ internal class EventUpSyncTask @Inject constructor(
         val config = configRepository.getProjectConfiguration()
         var lastOperation = operation.copy()
         var count = 0
+        var isUsefulUpload = false
 
         try {
-            lastOperation =
-                lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
+            lastOperation = lastOperation.copy(
+                lastState = RUNNING,
+                lastSyncTime = timeHelper.now().ms
+            )
 
-            uploadSessionEvents(projectId = operation.projectId, config, eventScope).collect {
+            uploadEventScopeType(
+                eventScope = eventScope,
+                projectId = operation.projectId,
+                eventScopeTypeToUpload = EventScopeType.SESSION,
+                batchSize = config.synchronization.up.simprints.batchSizes.sessions,
+                eventFilter = { scopes ->
+                    scopes.mapValues { (_, events) ->
+                        events?.let { filterEventsToUpSync(it, config) }
+                    }
+                },
+                createUpSyncContentContent = {
+                    isUsefulUpload = it > 0
+                    EventUpSyncRequestEvent.UpSyncContent(sessionCount = it)
+                },
+            ).collect {
                 count = it
-                lastOperation =
-                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
+                lastOperation = lastOperation.copy(
+                    lastState = RUNNING,
+                    lastSyncTime = timeHelper.now().ms
+                )
                 emitProgress(lastOperation, count)
             }
-            uploadOutOfSessionEvents(operation.projectId, eventScope).collect {
+            uploadEventScopeType(
+                eventScope = eventScope,
+                projectId = operation.projectId,
+                eventScopeTypeToUpload = EventScopeType.DOWN_SYNC,
+                batchSize = config.synchronization.up.simprints.batchSizes.downSyncs,
+                createUpSyncContentContent = {
+                    isUsefulUpload = it > 0
+                    EventUpSyncRequestEvent.UpSyncContent(eventDownSyncCount = it)
+                },
+            ).collect {
                 count = it
-                lastOperation =
-                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
+                lastOperation = lastOperation.copy(
+                    lastState = RUNNING,
+                    lastSyncTime = timeHelper.now().ms
+                )
                 emitProgress(lastOperation, count)
             }
+            uploadEventScopeType(
+                eventScope = eventScope,
+                projectId = operation.projectId,
+                eventScopeTypeToUpload = EventScopeType.UP_SYNC,
+                batchSize = config.synchronization.up.simprints.batchSizes.upSyncs,
+                createUpSyncContentContent = {
+                    // Only tracking up-sync if there have been ay events in other scopes.
+                    EventUpSyncRequestEvent.UpSyncContent(
+                        eventUpSyncCount = if (isUsefulUpload) it else 0
+                    )
+                },
+            ).collect {
+                count = it
+                lastOperation = lastOperation.copy(
+                    lastState = RUNNING,
+                    lastSyncTime = timeHelper.now().ms
+                )
+                emitProgress(lastOperation, count)
+            }
+            lastOperation = lastOperation.copy(
+                lastState = COMPLETE,
+                lastSyncTime = timeHelper.now().ms
+            )
 
-            lastOperation =
-                lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
             Simber.e(t)
-
-            lastOperation =
-                lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now().ms)
+            lastOperation = lastOperation.copy(
+                lastState = FAILED,
+                lastSyncTime = timeHelper.now().ms
+            )
 
             emitProgress(lastOperation, count)
         }
@@ -101,13 +153,16 @@ internal class EventUpSyncTask @Inject constructor(
         this.emit(EventUpSyncProgress(lastOperation, count))
     }
 
-    private fun uploadSessionEvents(
-        projectId: String,
-        config: ProjectConfiguration,
+    private fun uploadEventScopeType(
         eventScope: EventScope,
+        projectId: String,
+        eventScopeTypeToUpload: EventScopeType,
+        batchSize: Int,
+        eventFilter: (Map<EventScope, List<Event>?>) -> Map<EventScope, List<Event>?> = { it },
+        createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
-        Simber.d("[EVENT_REPO] Uploading session scopes")
-        val sessionScopes = getClosedScopesForType(EventScopeType.SESSION)
+        Simber.d("[EVENT_REPO] Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
+        val sessionScopes = getClosedScopesForType(eventScopeTypeToUpload)
 
         // Re-emitting the number of uploaded corrupted events
         attemptInvalidEventUpload(
@@ -117,13 +172,11 @@ internal class EventUpSyncTask @Inject constructor(
 
         val scopesToUpload = sessionScopes
             .filterValues { it != null }
-            .mapValues { (_, events) ->
-                events?.let { filterEventsToUpSync(events, config) }.orEmpty()
-            }
-            .map { (scope, events) -> ApiEventScope.fromDomain(scope, events) }
+            .let(eventFilter)
+            .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty()) }
         val uploadedScopes = mutableListOf<String>()
 
-        scopesToUpload.chunked(UPLOAD_BATCH_SIZE).forEach { scope ->
+        scopesToUpload.chunked(batchSize).forEach { scope ->
             val requestStartTime = timeHelper.now()
             try {
                 val result = eventRemoteDataSource.post(
@@ -134,7 +187,7 @@ internal class EventUpSyncTask @Inject constructor(
                     eventScope = eventScope,
                     startTime = requestStartTime,
                     result = result,
-                    uploadedSessionScopes = scope.size,
+                    content = createUpSyncContentContent(scope.size),
                 )
                 uploadedScopes.addAll(scope.map { it.id })
             } catch (ex: Exception) {
@@ -145,55 +198,6 @@ internal class EventUpSyncTask @Inject constructor(
         Simber.d("[EVENT_REPO] Deleting ${uploadedScopes.size} session scopes")
         eventRepository.deleteEventScopes(uploadedScopes)
     }
-
-    private fun uploadOutOfSessionEvents(projectId: String, eventScope: EventScope) = flow {
-        Simber.d("[EVENT_REPO] Uploading event scopes")
-
-        val upSyncScopes = getClosedScopesForType(EventScopeType.UP_SYNC)
-        val downSyncScopes = getClosedScopesForType(EventScopeType.DOWN_SYNC)
-
-        // Re-emitting the number of uploaded corrupted events
-        attemptInvalidEventUpload(
-            projectId,
-            upSyncScopes.getCorruptedScopes() + downSyncScopes.getCorruptedScopes()
-        ).collect { emit(it) }
-
-        val upSyncScopesToUpload = upSyncScopes
-            .filterValues { it != null }
-            .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty()) }
-
-        val downSyncScopesToUpload = downSyncScopes
-            .filterValues { it != null }
-            .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty()) }
-
-        if (upSyncScopesToUpload.isNotEmpty() || downSyncScopesToUpload.isNotEmpty()) {
-            val requestStartTime = timeHelper.now()
-            try {
-                val result = eventRemoteDataSource.post(
-                    projectId,
-                    ApiUploadEventsBody(
-                        eventUpSyncs = upSyncScopesToUpload,
-                        eventDownSyncs = downSyncScopesToUpload,
-                    )
-                )
-                addRequestEvent(
-                    eventScope = eventScope,
-                    startTime = requestStartTime,
-                    result = result,
-                    uploadedUpSyncScopes = upSyncScopesToUpload.size,
-                    uploadedDownSyncScopes = downSyncScopesToUpload.size,
-                )
-            } catch (ex: Exception) {
-                handleFailedRequest(ex, eventScope, requestStartTime)
-            }
-        }
-
-        val uploadedScopes =
-            upSyncScopesToUpload.map { it.id } + downSyncScopesToUpload.map { it.id }
-        Simber.d("[EVENT_REPO] Deleting ${uploadedScopes.size} event scopes")
-        uploadedScopes.forEach { eventRepository.deleteEventScope(it) }
-    }
-
 
     private fun Map<EventScope, List<Event>?>.getCorruptedScopes() =
         filterValues { it == null }.keys
@@ -225,23 +229,16 @@ internal class EventUpSyncTask @Inject constructor(
         eventScope: EventScope,
         startTime: Timestamp,
         result: EventUpSyncResult,
-        uploadedSessionScopes: Int = 0,
-        uploadedUpSyncScopes: Int = 0,
-        uploadedDownSyncScopes: Int = 0,
+        content: EventUpSyncRequestEvent.UpSyncContent,
     ) {
-        if (uploadedSessionScopes > 0 || uploadedDownSyncScopes > 0) {
-            // Not tracking cases when only up sync scopes are uploaded as it is likely
-            // to cause a feedback loop of up-syncing the previous up-sync event.
-
+        if (content.sessionCount > 0 || content.eventDownSyncCount > 0 || content.eventUpSyncCount > 0) {
             eventRepository.addOrUpdateEvent(
                 eventScope,
                 EventUpSyncRequestEvent(
                     createdAt = startTime,
                     endedAt = timeHelper.now(),
                     requestId = result.requestId,
-                    sessionCount = uploadedSessionScopes,
-                    eventUpSyncCount = uploadedUpSyncScopes,
-                    eventDownSyncCount = uploadedDownSyncScopes,
+                    content = content,
                     responseStatus = result.status,
                 )
             )
@@ -328,12 +325,6 @@ internal class EventUpSyncTask @Inject constructor(
                 }
             }
         }
-    }
-
-    companion object {
-
-        // TODO: This should be configurable via project configuration
-        private const val UPLOAD_BATCH_SIZE = 100
     }
 
 }
