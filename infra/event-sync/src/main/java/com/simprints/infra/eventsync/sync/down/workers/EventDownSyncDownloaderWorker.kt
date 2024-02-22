@@ -110,7 +110,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
             )
         )
         is RemoteDbNotSignedInException -> {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_SIGN_IN_REQUIRED to true))
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
         }
         else -> retry(t)
     }
