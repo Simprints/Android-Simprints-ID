@@ -12,8 +12,6 @@ import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
-private const val KEY_IS_GRAPH_INITIALIZED = "KEY_IS_GRAPH_INITIALIZED"
-
 @AndroidEntryPoint
 internal class OrchestratorActivity : BaseActivity() {
 
@@ -52,5 +50,9 @@ internal class OrchestratorActivity : BaseActivity() {
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         outState.putBoolean(KEY_IS_GRAPH_INITIALIZED, isGraphInitialized)
         super.onSaveInstanceState(outState, outPersistentState)
+    }
+
+    companion object {
+        private const val KEY_IS_GRAPH_INITIALIZED = "KEY_IS_GRAPH_INITIALIZED"
     }
 }
