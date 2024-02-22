@@ -120,10 +120,9 @@ internal class SyncViewModel @Inject constructor(
 
     fun login() {
         viewModelScope.launch {
-            val userId = recentUserActivityManager.getRecentUserActivity().lastUserUsed
             val loginArgs = LoginContract.toArgs(
                 authStore.signedInProjectId,
-                userId
+                authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed
             )
             _loginRequestedEventLiveData.send(loginArgs)
         }
