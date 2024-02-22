@@ -63,7 +63,7 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
         try {
-            crashlyticsLog("Start - Params: $downSyncScope")
+            crashlyticsLog("Start")
 
             val downCount = eventDownSyncCountTask.getCount(downSyncScope)
             val output = jsonHelper.toJson(downCount)
