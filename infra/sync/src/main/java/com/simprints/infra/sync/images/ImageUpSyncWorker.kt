@@ -21,7 +21,7 @@ internal class ImageUpSyncWorker @AssistedInject constructor(
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
 
-    override val tag: String = ImageUpSyncWorker::class.java.simpleName
+    override val tag: String = "ImageUpSyncWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         crashlyticsLog("Image upload start")
