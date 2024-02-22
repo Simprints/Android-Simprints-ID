@@ -22,6 +22,7 @@ internal data class ApiSynchronizationConfiguration(
 
     @Keep
     enum class Frequency {
+
         ONLY_PERIODICALLY_UP_SYNC,
         PERIODICALLY,
         PERIODICALLY_AND_ON_SESSION_START;
@@ -49,19 +50,28 @@ internal data class ApiSynchronizationConfiguration(
             )
 
         @Keep
-        data class ApiSimprintsUpSynchronizationConfiguration(val kind: UpSynchronizationKind) {
+        data class ApiSimprintsUpSynchronizationConfiguration(
+            val kind: UpSynchronizationKind,
+            val batchSizes: ApiUpSyncBatchSizes?,
+        ) {
+
             fun toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
-                UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(kind.toDomain())
+                UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+                    kind.toDomain(),
+                    batchSizes?.toDomain() ?: UpSynchronizationConfiguration.UpSyncBatchSizes.default()
+                )
         }
 
         @Keep
         data class ApiCoSyncUpSynchronizationConfiguration(val kind: UpSynchronizationKind) {
+
             fun toDomain(): UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration =
                 UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(kind.toDomain())
         }
 
         @Keep
         enum class UpSynchronizationKind {
+
             NONE,
             ONLY_ANALYTICS,
             ONLY_BIOMETRICS,
@@ -75,13 +85,24 @@ internal data class ApiSynchronizationConfiguration(
                     ALL -> UpSynchronizationConfiguration.UpSynchronizationKind.ALL
                 }
         }
+
+        @Keep
+        data class ApiUpSyncBatchSizes(
+            val sessions: Int,
+            val upSyncs: Int,
+            val downSyncs: Int,
+        ) {
+
+            fun toDomain(): UpSynchronizationConfiguration.UpSyncBatchSizes =
+                UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, upSyncs, downSyncs)
+        }
     }
 
     @Keep
     data class ApiDownSynchronizationConfiguration(
         val partitionType: PartitionType,
         val maxNbOfModules: Int,
-        val moduleOptions: List<String>?
+        val moduleOptions: List<String>?,
     ) {
 
         fun toDomain(): DownSynchronizationConfiguration =
@@ -93,6 +114,7 @@ internal data class ApiSynchronizationConfiguration(
 
         @Keep
         enum class PartitionType {
+
             PROJECT,
             MODULE,
             USER;

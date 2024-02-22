@@ -23,6 +23,7 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.eventsync.EventSyncManager
@@ -95,7 +96,7 @@ internal class SyncViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns syncState
         every { connectivityTracker.observeIsConnected() } returns isConnected
         coEvery { configRepository.getProjectConfiguration().synchronization } returns mockk {
-            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL)
+            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL, batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default())
             every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
             every { down.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }

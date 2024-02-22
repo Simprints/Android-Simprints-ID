@@ -6,9 +6,24 @@ data class UpSynchronizationConfiguration(
     val imagesRequireUnmeteredConnection: Boolean,
 ) {
 
-    data class SimprintsUpSynchronizationConfiguration(val kind: UpSynchronizationKind)
+    data class SimprintsUpSynchronizationConfiguration(
+        val kind: UpSynchronizationKind,
+        val batchSizes: UpSyncBatchSizes,
+    )
 
     data class CoSyncUpSynchronizationConfiguration(val kind: UpSynchronizationKind)
+
+    data class UpSyncBatchSizes(
+        val sessions: Int,
+        val upSyncs: Int,
+        val downSyncs: Int,
+    ) {
+
+        companion object {
+
+            fun default() = UpSyncBatchSizes(1, 1, 1)
+        }
+    }
 
     enum class UpSynchronizationKind {
         NONE,

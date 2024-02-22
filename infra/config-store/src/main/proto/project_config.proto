@@ -175,6 +175,7 @@ message ProtoUpSynchronizationConfiguration {
 
     message SimprintsUpSynchronizationConfiguration {
         UpSynchronizationKind kind = 1;
+        ProtoUpSyncBatchSizes batchSizes = 2;
     }
 
     message CoSyncUpSynchronizationConfiguration {
@@ -189,6 +190,11 @@ message ProtoUpSynchronizationConfiguration {
     }
 }
 
+message ProtoUpSyncBatchSizes {
+    int32 sessions = 1;
+    int32 upSyncs = 2;
+    int32 downSyncs = 3;
+}
 
 message ProtoDecisionPolicy {
     int32 low = 1;

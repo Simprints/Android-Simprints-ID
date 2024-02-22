@@ -63,7 +63,8 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     SynchronizationConfiguration.Frequency.PERIODICALLY,
     UpSynchronizationConfiguration(
         UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+            UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+            UpSynchronizationConfiguration.UpSyncBatchSizes.default()
         ),
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE

@@ -117,7 +117,12 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                            kind = it.key,
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+                                sessions = 1,
+                                upSyncs = 1,
+                                downSyncs = 1
+                            ),
                         )
                     )
                 )
@@ -140,7 +145,12 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                            kind = it.key,
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+                                sessions = 1,
+                                upSyncs = 1,
+                                downSyncs = 1
+                            ),
                         )
                     )
                 )
@@ -163,7 +173,12 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                            kind = it.key,
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+                                sessions = 1,
+                                upSyncs = 1,
+                                downSyncs = 1
+                            ),
                         )
                     )
                 )
@@ -186,7 +201,12 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                            kind = it.key,
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+                                sessions = 1,
+                                upSyncs = 1,
+                                downSyncs = 1
+                            ),
                         )
                     )
                 )

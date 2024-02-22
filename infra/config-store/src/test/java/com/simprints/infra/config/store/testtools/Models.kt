@@ -11,6 +11,7 @@ import com.simprints.infra.config.store.local.models.ProtoIdentificationConfigur
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.local.models.toProto
@@ -200,7 +201,8 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
     ApiSynchronizationConfiguration.Frequency.PERIODICALLY,
     ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiSimprintsUpSynchronizationConfiguration(
-            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL
+            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiUpSyncBatchSizes(1, 2, 3),
         ),
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
             ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE
@@ -218,7 +220,8 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     SynchronizationConfiguration.Frequency.PERIODICALLY,
     UpSynchronizationConfiguration(
         UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+            UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+            UpSynchronizationConfiguration.UpSyncBatchSizes(1, 2, 3),
         ),
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
@@ -239,6 +242,13 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .setSimprints(
                 ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                     .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                    .setBatchSizes(
+                        ProtoUpSyncBatchSizes.newBuilder()
+                            .setSessions(1)
+                            .setUpSyncs(2)
+                            .setDownSyncs(3)
+                            .build()
+                    )
                     .build()
             )
             .setCoSync(

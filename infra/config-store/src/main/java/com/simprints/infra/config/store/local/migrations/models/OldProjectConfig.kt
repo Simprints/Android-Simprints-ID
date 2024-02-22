@@ -197,7 +197,12 @@ internal data class OldProjectConfig(
                         UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(
                             simprintsSync
                         )
-                    }
+                    },
+                    batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+                        sessions = 1,
+                        upSyncs = 1,
+                        downSyncs = 1,
+                    ),
                 ),
                 coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                     kind = if (coSync == null) {

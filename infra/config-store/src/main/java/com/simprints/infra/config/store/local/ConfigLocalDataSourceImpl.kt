@@ -179,7 +179,8 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     frequency = SynchronizationConfiguration.Frequency.PERIODICALLY,
                     up = UpSynchronizationConfiguration(
                         simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-                            kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                            kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
                         ),
                         coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                             kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE
