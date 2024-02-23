@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.tabs.TabLayout
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.consent.R
 import com.simprints.feature.consent.databinding.FragmentConsentBinding
 import com.simprints.feature.exitform.ExitFormContract
@@ -20,6 +19,7 @@ import com.simprints.feature.exitform.toArgs
 import com.simprints.infra.uibase.listeners.OnTabSelectedListener
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -89,16 +89,20 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
             if (state.showParentalConsent) {
                 addParentalConsentTab(state.consentText, state.parentalConsentText)
             }
+            getTabAt(state.selectedTab)?.select()
         }
     }
 
     private fun TabLayout.addParentalConsentTab(generalConsentText: String, parentalConsentText: String) {
         addTab(newTab().setText(IDR.string.consent_parental_title), PARENTAL_CONSENT_TAB)
         addOnTabSelectedListener(OnTabSelectedListener { tab ->
-            binding.consentTextHolderView.text = when (tab.position) {
-                PARENTAL_CONSENT_TAB -> parentalConsentText
-                else -> generalConsentText
+            val position = tab.position
+            val (consentText, tabIndex) = when (position) {
+                PARENTAL_CONSENT_TAB -> parentalConsentText to PARENTAL_CONSENT_TAB
+                else -> generalConsentText to GENERAL_CONSENT_TAB
             }
+            binding.consentTextHolderView.text = consentText
+            viewModel.setSelectedTab(tabIndex)
         })
     }
 
