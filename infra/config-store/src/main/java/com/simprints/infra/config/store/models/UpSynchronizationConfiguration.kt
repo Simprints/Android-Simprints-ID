@@ -3,12 +3,12 @@ package com.simprints.infra.config.store.models
 data class UpSynchronizationConfiguration(
     val simprints: SimprintsUpSynchronizationConfiguration,
     val coSync: CoSyncUpSynchronizationConfiguration,
-    val imagesRequireUnmeteredConnection: Boolean,
 ) {
 
     data class SimprintsUpSynchronizationConfiguration(
         val kind: UpSynchronizationKind,
         val batchSizes: UpSyncBatchSizes,
+        val imagesRequireUnmeteredConnection: Boolean,
     )
 
     data class CoSyncUpSynchronizationConfiguration(val kind: UpSynchronizationKind)

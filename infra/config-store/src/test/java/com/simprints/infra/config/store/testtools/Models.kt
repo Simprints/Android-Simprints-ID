@@ -203,11 +203,11 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiSimprintsUpSynchronizationConfiguration(
             ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL,
             ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiUpSyncBatchSizes(1, 2, 3),
+            false,
         ),
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
             ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE
         ),
-        false,
     ),
     ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration.PartitionType.PROJECT,
@@ -216,17 +216,19 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
     )
 )
 
+internal val simprintsUpSyncConfigurationConfiguration = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+    UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+    UpSynchronizationConfiguration.UpSyncBatchSizes(1, 2, 3),
+    false
+)
+
 internal val synchronizationConfiguration = SynchronizationConfiguration(
     SynchronizationConfiguration.Frequency.PERIODICALLY,
     UpSynchronizationConfiguration(
-        UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
-            UpSynchronizationConfiguration.UpSyncBatchSizes(1, 2, 3),
-        ),
+        simprintsUpSyncConfigurationConfiguration,
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         ),
-        false,
     ),
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,

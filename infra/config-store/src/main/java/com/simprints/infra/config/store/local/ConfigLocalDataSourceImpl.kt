@@ -181,11 +181,11 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
                             kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
                             batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                            imagesRequireUnmeteredConnection = false,
                         ),
                         coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                             kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE
                         ),
-                        imagesRequireUnmeteredConnection = false,
                     ),
                     down = DownSynchronizationConfiguration(
                         partitionType = DownSynchronizationConfiguration.PartitionType.USER,

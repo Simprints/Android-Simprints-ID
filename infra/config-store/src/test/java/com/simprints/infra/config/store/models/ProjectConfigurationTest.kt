@@ -6,6 +6,7 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Co
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
 import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test
 
@@ -116,13 +117,8 @@ class ProjectConfigurationTest {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
-                        simprints = SimprintsUpSynchronizationConfiguration(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
                             kind = it.key,
-                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
-                                sessions = 1,
-                                upSyncs = 1,
-                                downSyncs = 1
-                            ),
                         )
                     )
                 )
@@ -144,13 +140,8 @@ class ProjectConfigurationTest {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
-                        simprints = SimprintsUpSynchronizationConfiguration(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
                             kind = it.key,
-                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
-                                sessions = 1,
-                                upSyncs = 1,
-                                downSyncs = 1
-                            ),
                         )
                     )
                 )
@@ -174,11 +165,8 @@ class ProjectConfigurationTest {
                     up = synchronizationConfiguration.up.copy(
                         simprints = SimprintsUpSynchronizationConfiguration(
                             kind = it.key,
-                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
-                                sessions = 1,
-                                upSyncs = 1,
-                                downSyncs = 1
-                            ),
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                            imagesRequireUnmeteredConnection = false
                         )
                     )
                 )
@@ -200,13 +188,8 @@ class ProjectConfigurationTest {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
-                        simprints = SimprintsUpSynchronizationConfiguration(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
                             kind = it.key,
-                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
-                                sessions = 1,
-                                upSyncs = 1,
-                                downSyncs = 1
-                            ),
                         )
                     )
                 )
@@ -240,7 +223,11 @@ class ProjectConfigurationTest {
         values.forEach {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
-                    up = synchronizationConfiguration.up.copy(imagesRequireUnmeteredConnection = it)
+                    up = synchronizationConfiguration.up.copy(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            imagesRequireUnmeteredConnection = it
+                        ),
+                    )
                 )
             )
             assertThat(config.imagesUploadRequiresUnmeteredConnection()).isEqualTo(it)

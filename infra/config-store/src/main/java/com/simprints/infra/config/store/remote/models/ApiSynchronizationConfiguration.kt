@@ -39,26 +39,27 @@ internal data class ApiSynchronizationConfiguration(
     data class ApiUpSynchronizationConfiguration(
         val simprints: ApiSimprintsUpSynchronizationConfiguration,
         val coSync: ApiCoSyncUpSynchronizationConfiguration,
-        val imagesRequireUnmeteredConnection: Boolean,
     ) {
 
         fun toDomain(): UpSynchronizationConfiguration =
             UpSynchronizationConfiguration(
                 simprints.toDomain(),
                 coSync.toDomain(),
-                imagesRequireUnmeteredConnection
             )
 
         @Keep
         data class ApiSimprintsUpSynchronizationConfiguration(
             val kind: UpSynchronizationKind,
             val batchSizes: ApiUpSyncBatchSizes?,
+            val imagesRequireUnmeteredConnection: Boolean?,
         ) {
 
             fun toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
                 UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-                    kind.toDomain(),
-                    batchSizes?.toDomain() ?: UpSynchronizationConfiguration.UpSyncBatchSizes.default()
+                    kind = kind.toDomain(),
+                    batchSizes = batchSizes?.toDomain()
+                        ?: UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                    imagesRequireUnmeteredConnection = imagesRequireUnmeteredConnection ?: false,
                 )
         }
 

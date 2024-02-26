@@ -96,7 +96,11 @@ internal class SyncViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns syncState
         every { connectivityTracker.observeIsConnected() } returns isConnected
         coEvery { configRepository.getProjectConfiguration().synchronization } returns mockk {
-            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL, batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default())
+            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(
+                kind = ALL,
+                batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                false,
+            )
             every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
             every { down.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }

@@ -203,6 +203,7 @@ internal data class OldProjectConfig(
                         upSyncs = 1,
                         downSyncs = 1,
                     ),
+                    imagesRequireUnmeteredConnection = false,
                 ),
                 coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                     kind = if (coSync == null) {
@@ -217,7 +218,6 @@ internal data class OldProjectConfig(
                         )
                     }
                 ),
-                imagesRequireUnmeteredConnection = false,
             ),
             down = DownSynchronizationConfiguration(
                 partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(

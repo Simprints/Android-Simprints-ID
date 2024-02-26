@@ -99,7 +99,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with any connection if not specified`() = runTest {
         coEvery {
-            configRepo.getProjectConfiguration().synchronization.up.imagesRequireUnmeteredConnection
+            configRepo.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns false
         every { authStore.signedInProjectId } returns "projectId"
 
@@ -117,7 +117,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with unmetered constraint if requested`() = runTest {
         coEvery {
-            configRepo.getProjectConfiguration().synchronization.up.imagesRequireUnmeteredConnection
+            configRepo.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns true
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
