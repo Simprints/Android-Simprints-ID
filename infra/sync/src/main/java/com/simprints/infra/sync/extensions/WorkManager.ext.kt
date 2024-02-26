@@ -1,6 +1,7 @@
 package com.simprints.infra.sync.extensions
 
 import androidx.work.*
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.sync.SyncConstants
 
 
@@ -8,6 +9,7 @@ internal fun defaultWorkerConstraints() = Constraints.Builder()
     .setRequiredNetworkType(NetworkType.CONNECTED)
     .build()
 
+@ExcludedFromGeneratedTestCoverageReports("Basic API wrapper to provide default values for most parameters")
 internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicWorker(
     workName: String,
     repeatInterval: Long,
@@ -29,6 +31,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicW
         .build()
 )
 
+@ExcludedFromGeneratedTestCoverageReports("Basic API wrapper to provide default values for most parameters")
 internal inline fun <reified T : ListenableWorker> WorkManager.startWorker(
     workName: String,
     existingWorkPolicy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP,
