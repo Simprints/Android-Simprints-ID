@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherIO
+import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.sync.SyncConstants
@@ -20,9 +21,12 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configRepository: ConfigRepository,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
-) : CoroutineWorker(context, params) {
+) : SimCoroutineWorker(context, params) {
+
+    override val tag: String = "EnrolmentRecordWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("Enrolment record upload start")
         try {
             val instructionId =
                 inputData.getString(SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME)

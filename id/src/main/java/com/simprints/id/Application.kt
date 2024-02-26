@@ -16,6 +16,7 @@ import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,6 +43,11 @@ open class Application : CoreApplication(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         initApplication()
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        appScope.cancel()
     }
 
     override val workManagerConfiguration: Configuration

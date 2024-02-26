@@ -4,7 +4,8 @@ import java.util.concurrent.TimeUnit
 
 internal object SyncConstants {
 
-    val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
+    val SYNC_TIME_UNIT = TimeUnit.MINUTES
+    const val DEFAULT_BACKOFF_INTERVAL_MINUTES = 5L
 
     const val PROJECT_SYNC_WORK_NAME = "project-sync-work-v2"
     const val PROJECT_SYNC_REPEAT_INTERVAL = BuildConfig.PROJECT_DOWN_SYNC_WORKER_INTERVAL_MINUTES

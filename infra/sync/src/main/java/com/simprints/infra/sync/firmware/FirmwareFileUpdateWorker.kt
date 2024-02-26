@@ -2,9 +2,9 @@ package com.simprints.infra.sync.firmware
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
+import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.fingerprint.infra.scanner.data.FirmwareRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -24,16 +24,17 @@ class FirmwareFileUpdateWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val firmwareRepository: FirmwareRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
-) : CoroutineWorker(context, params) {
+) : SimCoroutineWorker(context, params) {
 
+    override val tag: String = "FirmwareFileUpdateWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("FirmwareFileUpdateWorker started")
         try {
-            Simber.d("FirmwareFileUpdateWorker started")
             firmwareRepository.updateStoredFirmwareFilesWithLatest()
             firmwareRepository.cleanUpOldFirmwareFiles()
 
-            Simber.d("FirmwareFileUpdateWorker succeeded")
+            crashlyticsLog("FirmwareFileUpdateWorker succeeded")
             Result.success()
         } catch (e: Throwable) {
             when {
