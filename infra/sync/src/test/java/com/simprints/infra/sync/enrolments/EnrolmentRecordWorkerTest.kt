@@ -31,7 +31,7 @@ class EnrolmentRecordWorkerTest {
             SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME to arrayOf(SUBJECT_ID),
         )
     }
-    private val worker = com.simprints.infra.sync.enrolments.EnrolmentRecordWorker(
+    private val worker = EnrolmentRecordWorker(
         mockk(relaxed = true),
         params,
         repository,
