@@ -43,6 +43,7 @@ internal class ConsentViewModel @Inject constructor(
     val viewState: LiveData<ConsentViewState>
         get() = _viewState
     private val _viewState = MutableLiveData(ConsentViewState())
+    private var selectedTab: Int = 0
 
     val showExitForm: LiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>
         get() = _showExitForm
@@ -55,7 +56,13 @@ internal class ConsentViewModel @Inject constructor(
     fun loadConfiguration(consentType: ConsentType) {
         viewModelScope.launch {
             val projectConfig = configRepository.getProjectConfiguration()
-            _viewState.postValue(mapConfigToViewState(projectConfig, consentType))
+            _viewState.postValue(
+                mapConfigToViewState(
+                    projectConfig = projectConfig,
+                    consentType = consentType,
+                    selectedTabIndex = selectedTab
+                )
+            )
         }
     }
 
@@ -82,6 +89,7 @@ internal class ConsentViewModel @Inject constructor(
     private fun mapConfigToViewState(
         projectConfig: ProjectConfiguration,
         consentType: ConsentType,
+        selectedTabIndex: Int
     ): ConsentViewState {
         val allowParentalConsent = projectConfig.consent.allowParentalConsent
 
@@ -94,6 +102,7 @@ internal class ConsentViewModel @Inject constructor(
                 .takeIf { allowParentalConsent }
                 ?.assembleText(projectConfig.consent, projectConfig.general.modalities, consentType)
                 .orEmpty(),
+            selectedTab = selectedTabIndex
         )
     }
 
@@ -129,6 +138,10 @@ internal class ConsentViewModel @Inject constructor(
 
     private fun deleteLocationInfoFromSession() = externalScope.launch {
         eventRepository.removeLocationDataFromCurrentSession()
+    }
+
+    fun setSelectedTab(index: Int) {
+        selectedTab = index
     }
 
 }

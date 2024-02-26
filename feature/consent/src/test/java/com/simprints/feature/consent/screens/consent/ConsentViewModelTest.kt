@@ -116,6 +116,20 @@ class ConsentViewModelTest {
         Truth.assertThat(state.parentalConsentText).isEmpty()
     }
 
+
+    @Test
+    fun `selected tab index is saved in the state`() = runTest {
+        every { projectConfig.consent.allowParentalConsent } returns false
+        every { projectConfig.general.modalities } returns defaultModalityList
+
+        val selectedTabIndex = 3
+        vm.setSelectedTab(selectedTabIndex)
+        vm.loadConfiguration(ConsentType.ENROL)
+        val state = vm.viewState.getOrAwaitValue()
+
+        Truth.assertThat(state.selectedTab).isEqualTo(selectedTabIndex)
+    }
+
     @Test
     fun `acceptClicked saves event and triggers correct return result`() {
         vm.acceptClicked(ConsentTab.INDIVIDUAL)
