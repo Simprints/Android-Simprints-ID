@@ -198,21 +198,35 @@ class SyncInfoViewModelTest {
     }
 
     @Test
-    fun `should initialize the recordsToDownSync and recordsToDelete live data to the count otherwise`() =
+    fun `should initialize the recordsToDownSync live data to the count otherwise`() =
         runTest {
             val module1 = "module1".asTokenizableEncrypted()
-            val creationForModules = 10
-            val deletionForModules = 5
             coEvery { configRepo.getDeviceConfiguration() } returns mockk {
                 every { selectedModules } returns listOf(module1)
             }
             coEvery {
                 eventSyncManager.countEventsToDownload()
-            } returns DownSyncCounts(creationForModules, deletionForModules)
+            } returns DownSyncCounts(15, isLowerBound = false)
 
             viewModel.refreshInformation()
 
-            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(15)
+            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(15)
+        }
+
+    @Test
+    fun `should initialize the recordsToDownSync live data to the default count value if fetch fails`() =
+        runTest {
+            val module1 = "module1".asTokenizableEncrypted()
+            coEvery { configRepo.getDeviceConfiguration() } returns mockk {
+                every { selectedModules } returns listOf(module1)
+            }
+            coEvery {
+                eventSyncManager.countEventsToDownload()
+            } throws Exception()
+
+            viewModel.refreshInformation()
+
+            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(0)
         }
 
     @Test

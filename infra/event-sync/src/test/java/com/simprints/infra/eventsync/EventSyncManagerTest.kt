@@ -9,12 +9,12 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.scope.EventScope
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.*
@@ -118,14 +118,8 @@ internal class EventSyncManagerTest {
         } returns SampleSyncScopes.modulesDownSyncScope
 
         coEvery { eventRemoteDataSource.count(any()) } returnsMany listOf(
-            listOf(
-                EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, 3),
-                EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 5),
-            ),
-            listOf(
-                EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, 7),
-                EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 11),
-            )
+            EventCount(8, false),
+            EventCount(18, true),
         )
         coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
@@ -133,33 +127,7 @@ internal class EventSyncManagerTest {
 
         val result = eventSyncManagerImpl.countEventsToDownload()
 
-        assertThat(result.toCreate).isEqualTo(10)
-        assertThat(result.toDelete).isEqualTo(16)
-    }
-
-    @Test
-    fun `getDownSyncCounts does not count record move`() = runTest {
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
-        } returns SampleSyncScopes.modulesDownSyncScope
-
-        coEvery { eventRemoteDataSource.count(any()) } returnsMany listOf(
-            listOf(
-                EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, 3),
-            ),
-            listOf(
-                EventCount(EnrolmentRecordEventType.EnrolmentRecordMove, 7),
-                EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 5),
-            )
-        )
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
-        }
-
-        val result = eventSyncManagerImpl.countEventsToDownload()
-
-        assertThat(result.toCreate).isEqualTo(3)
-        assertThat(result.toDelete).isEqualTo(5)
+        assertThat(result).isEqualTo(DownSyncCounts(26, isLowerBound = true))
     }
 
     @Test

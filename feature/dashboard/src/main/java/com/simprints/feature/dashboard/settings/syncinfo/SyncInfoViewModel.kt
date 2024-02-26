@@ -7,22 +7,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,9 +57,9 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _imagesToUpload
     private val _imagesToUpload = MutableLiveData<Int?>(null)
 
-    val recordsToDownSync: LiveData<Int?>
+    val recordsToDownSync: LiveData<DownSyncCounts?>
         get() = _recordsToDownSync
-    private val _recordsToDownSync = MutableLiveData<Int?>(null)
+    private val _recordsToDownSync = MutableLiveData<DownSyncCounts?>(null)
 
     val moduleCounts: LiveData<List<ModuleCount>>
         get() = _moduleCounts
@@ -180,19 +181,19 @@ internal class SyncInfoViewModel @Inject constructor(
             .firstOrNull()
             ?: 0
 
-    private suspend fun fetchRecordsToCreateAndDeleteCount(): Int =
+    private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
         if (configRepository.getProjectConfiguration().isEventDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
-            0
+            DownSyncCounts(0, isLowerBound = false)
         }
 
-    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): Int =
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts =
         try {
-            eventSyncManager.countEventsToDownload().let { it.toCreate + it.toDelete }
+            eventSyncManager.countEventsToDownload()
         } catch (t: Throwable) {
             Simber.d(t)
-            0
+            DownSyncCounts(0, isLowerBound = false)
         }
 
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =

@@ -1,6 +1,5 @@
 package com.simprints.infra.eventsync.event.remote
 
-import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.network.SimRemoteInterface
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -10,7 +9,8 @@ import retrofit2.http.*
 @JvmSuppressWildcards
 internal interface EventRemoteInterface : SimRemoteInterface {
 
-    @GET("projects/{projectId}/events/count")
+    @Headers("X-Force-Version: 2024.1.1")
+    @HEAD("projects/{projectId}/events")
     suspend fun countEvents(
         @Path("projectId") projectId: String,
         @Query("l_moduleId") moduleId: String?,
@@ -18,7 +18,7 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_subjectId") subjectId: String?,
         @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?
-    ): List<ApiEventCount>
+    ): Response<ResponseBody>
 
     @Headers(
         "Content-Encoding: gzip",
