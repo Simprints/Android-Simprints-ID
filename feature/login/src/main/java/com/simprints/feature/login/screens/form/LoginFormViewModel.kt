@@ -30,6 +30,9 @@ internal class LoginFormViewModel @Inject constructor(
     private val jsonHelper: JsonHelper,
 ) : ViewModel() {
 
+    val isProcessingSignIn: LiveData<Boolean>
+        get() = _isProcessingSignIn
+    private val _isProcessingSignIn = MutableLiveData<Boolean>()
     val signInState: LiveData<LiveDataEventWithContent<SignInState>>
         get() = _signInState
     private val _signInState = MutableLiveData<LiveDataEventWithContent<SignInState>>(null)
@@ -46,8 +49,15 @@ internal class LoginFormViewModel @Inject constructor(
             _signInState.send(SignInState.ProjectIdMismatch)
         } else {
             viewModelScope.launch {
-                val result = authManager.authenticateSafely(loginParams.userId.value, projectId, projectSecret, deviceId)
+                _isProcessingSignIn.value = true
+                val result = authManager.authenticateSafely(
+                    userId = loginParams.userId.value,
+                    projectId = projectId,
+                    projectSecret = projectSecret,
+                    deviceId = deviceId
+                )
                 _signInState.send(mapAuthDataResult(result))
+                _isProcessingSignIn.value = false
             }
         }
     }
@@ -81,7 +91,12 @@ internal class LoginFormViewModel @Inject constructor(
 
                 Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning successful")
                 qrContent.apiBaseUrl?.let { simNetwork.setApiBaseUrl(it) }
-                _signInState.send(SignInState.QrCodeValid(qrContent.projectId, qrContent.projectSecret))
+                _signInState.send(
+                    SignInState.QrCodeValid(
+                        qrContent.projectId,
+                        qrContent.projectSecret
+                    )
+                )
             } catch (e: Exception) {
                 Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning unsuccessful")
                 _signInState.send(SignInState.QrInvalidCode)
