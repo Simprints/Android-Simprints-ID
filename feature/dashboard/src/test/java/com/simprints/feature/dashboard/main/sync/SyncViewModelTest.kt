@@ -30,6 +30,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -68,6 +69,9 @@ internal class SyncViewModelTest {
 
     @MockK
     lateinit var eventSyncManager: EventSyncManager
+
+    @MockK
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var connectivityTracker: ConnectivityTracker
@@ -117,7 +121,7 @@ internal class SyncViewModelTest {
 
         val viewModel = initViewModel()
 
-        verify(exactly = 1) { eventSyncManager.sync() }
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
         assertThat(viewModel.syncCardLiveData.value).isEqualTo(SyncConnecting(null, 0, null))
     }
 
@@ -129,7 +133,7 @@ internal class SyncViewModelTest {
 
         val viewModel = initViewModel()
 
-        verify(exactly = 1) { eventSyncManager.sync() }
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
         assertThat(viewModel.syncCardLiveData.value).isEqualTo(SyncConnecting(null, 0, null))
     }
 
@@ -147,7 +151,7 @@ internal class SyncViewModelTest {
 
         initViewModel()
 
-        verify(exactly = 0) { eventSyncManager.sync() }
+        verify(exactly = 0) { syncOrchestrator.startEventSync() }
     }
 
     @Test
@@ -379,6 +383,7 @@ internal class SyncViewModelTest {
 
     private fun initViewModel(): SyncViewModel = SyncViewModel(
         eventSyncManager = eventSyncManager,
+        syncOrchestrator = syncOrchestrator,
         connectivityTracker = connectivityTracker,
         configRepository = configRepository,
         timeHelper = timeHelper,

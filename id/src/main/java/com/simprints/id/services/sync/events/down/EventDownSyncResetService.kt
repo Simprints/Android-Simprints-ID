@@ -14,6 +14,7 @@ import com.simprints.core.ExternalScope
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,6 +30,9 @@ class EventDownSyncResetService : Service() {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
+    lateinit var syncOrchestrator: SyncOrchestrator
+
+    @Inject
     @ExternalScope
     lateinit var externalScope: CoroutineScope
 
@@ -39,7 +43,7 @@ class EventDownSyncResetService : Service() {
             // Reset current downsync state
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
-            eventSyncManager.sync()
+            syncOrchestrator.startEventSync()
             stopSelf()
         }
 

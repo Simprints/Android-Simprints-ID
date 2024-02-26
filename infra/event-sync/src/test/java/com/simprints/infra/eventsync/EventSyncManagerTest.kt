@@ -1,13 +1,10 @@
 package com.simprints.infra.eventsync
 
-import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
@@ -32,7 +29,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 
 @RunWith(AndroidJUnit4::class)
 internal class EventSyncManagerTest {
@@ -41,10 +37,7 @@ internal class EventSyncManagerTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var ctx: Context
-
-    @MockK
-    lateinit var workManager: WorkManager
+    lateinit var timeHelper: TimeHelper
 
     @MockK
     lateinit var eventSyncStateProcessor: EventSyncStateProcessor
@@ -79,16 +72,14 @@ internal class EventSyncManagerTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        mockkStatic(WorkManager::class)
-        every { WorkManager.getInstance(ctx) } returns workManager
-
+        every { timeHelper.now() } returns Timestamp(1)
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every { synchronization.down.partitionType.toDomain() } returns Partitioning.MODULE
         }
 
         eventSyncManagerImpl = EventSyncManagerImpl(
-            ctx = ctx,
+            timeHelper = timeHelper,
             eventSyncStateProcessor = eventSyncStateProcessor,
             downSyncScopeRepository = eventDownSyncScopeRepository,
             eventRepository = eventRepository,
@@ -111,57 +102,6 @@ internal class EventSyncManagerTest {
     fun `getLastSyncState should call sync processor`() = runTest {
         eventSyncManagerImpl.getLastSyncState()
         verify { eventSyncStateProcessor.getLastSyncState() }
-    }
-
-    @Test
-    fun `sync should enqueue a one time sync master worker`() = runTest {
-        eventSyncManagerImpl.sync()
-
-        verify(exactly = 1) {
-            workManager.beginUniqueWork(
-                MASTER_SYNC_SCHEDULER_ONE_TIME,
-                ExistingWorkPolicy.KEEP,
-                match<OneTimeWorkRequest> { req ->
-                    assertThat(req.tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
-                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULER_ONE_TIME)
-                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULERS)
-                    true
-                }
-            )
-        }
-    }
-
-    @Test
-    fun `sync should enqueue periodic sync master worker`() = runTest {
-        eventSyncManagerImpl.scheduleSync()
-
-        verify(exactly = 1) {
-            workManager.enqueueUniquePeriodicWork(
-                MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
-                ExistingPeriodicWorkPolicy.UPDATE,
-                match { req ->
-                    assertThat(req.tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
-                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULERS)
-                    true
-                }
-            )
-        }
-    }
-
-    @Test
-    fun `cancelScheduledSync should clear periodic master workers`() = runTest {
-        eventSyncManagerImpl.cancelScheduledSync()
-
-        verify(exactly = 1) { workManager.cancelAllWorkByTag(MASTER_SYNC_SCHEDULERS) }
-        verify(exactly = 1) { workManager.cancelAllWorkByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS) }
-    }
-
-    @Test
-    fun `stop should stop all workers`() = runTest {
-        eventSyncManagerImpl.stop()
-
-        verify(exactly = 1) { workManager.cancelAllWorkByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS) }
     }
 
     @Test
@@ -247,7 +187,6 @@ internal class EventSyncManagerTest {
         coVerify(exactly = 1) { eventDownSyncScopeRepository.deleteAll() }
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
         coVerify(exactly = 1) { eventSyncCache.storeLastSuccessfulSyncTime(null) }
-        verify(exactly = 1) { workManager.pruneWork() }
     }
 
     @Test

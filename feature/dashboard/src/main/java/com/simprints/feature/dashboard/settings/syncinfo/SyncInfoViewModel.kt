@@ -25,6 +25,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -40,6 +41,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val authStore: AuthStore,
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
+    private val syncOrchestrator: SyncOrchestrator,
     private val tokenizationProcessor: TokenizationProcessor
 ) : ViewModel() {
 
@@ -121,7 +123,7 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     fun forceSync() {
-        eventSyncManager.sync()
+        syncOrchestrator.startEventSync()
         // There is a delay between starting sync and lastSyncState
         // reporting it so this prevents starting multiple syncs by accident
         _isSyncAvailable.postValue(false)

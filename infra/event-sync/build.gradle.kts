@@ -7,18 +7,6 @@ plugins {
 android {
     namespace = "com.simprints.infra.eventsync"
 
-    buildTypes {
-        getByName("release") {
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
-        }
-        getByName("staging") {
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-        }
-        getByName("debug") {
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-        }
-    }
-
     sourceSets {
         // Adds exported room schema location as test app assets.
         getByName("debug") {

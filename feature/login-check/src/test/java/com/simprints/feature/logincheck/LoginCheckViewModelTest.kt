@@ -5,21 +5,12 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
-import com.simprints.feature.logincheck.usecases.ActionFactory
-import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
-import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
-import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUseCase
-import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
-import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
-import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
-import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
-import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
+import com.simprints.feature.logincheck.usecases.*
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -65,7 +56,7 @@ internal class LoginCheckViewModelTest {
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
 
     @MockK
-    lateinit var cancelBackgroundSync: CancelBackgroundSyncUseCase
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var updateSessionScopePayloadUseCase: UpdateSessionScopePayloadUseCase
@@ -91,7 +82,7 @@ internal class LoginCheckViewModelTest {
             isUserSignedInUseCase,
             configRepository,
             startBackgroundSync,
-            cancelBackgroundSync,
+            syncOrchestrator,
             updateSessionScopePayloadUseCase,
             updateProjectStateUseCase,
             updateStoredUserIdUseCase,
@@ -161,7 +152,7 @@ internal class LoginCheckViewModelTest {
 
         coVerify {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
-            cancelBackgroundSync.invoke()
+            syncOrchestrator.cancelBackgroundWork()
         }
         viewModel.showLoginFlow.test()
             .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
