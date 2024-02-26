@@ -365,7 +365,7 @@
     <string name="dashboard_sync_info_title">Sync Information</string>
     <string name="dashboard_sync_info_select_modules_button">Select modules</string>
     <string name="dashboard_sync_info_records_to_upload">Records to upload</string>
-    <string name="dashboard_sync_info_records_to_download">Records to download</string>
+    <string name="dashboard_sync_info_records_to_download">Records to download or delete</string>
     <string name="dashboard_sync_info_records_to_delete">Records to delete</string>
     <string name="dashboard_sync_info_total_records_on_device">Total records on device</string>
     <string name="dashboard_sync_info_selected_modules">Selected modules</string>

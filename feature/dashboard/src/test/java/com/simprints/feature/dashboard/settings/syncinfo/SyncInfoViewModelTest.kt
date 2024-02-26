@@ -212,8 +212,7 @@ class SyncInfoViewModelTest {
 
             viewModel.refreshInformation()
 
-            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(creationForModules)
-            assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(deletionForModules)
+            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(15)
         }
 
     @Test

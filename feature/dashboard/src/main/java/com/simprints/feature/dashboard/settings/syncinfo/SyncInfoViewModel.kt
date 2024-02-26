@@ -14,7 +14,6 @@ import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
@@ -42,7 +41,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
     private val syncOrchestrator: SyncOrchestrator,
-    private val tokenizationProcessor: TokenizationProcessor
+    private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -60,10 +59,6 @@ internal class SyncInfoViewModel @Inject constructor(
     val recordsToDownSync: LiveData<Int?>
         get() = _recordsToDownSync
     private val _recordsToDownSync = MutableLiveData<Int?>(null)
-
-    val recordsToDelete: LiveData<Int?>
-        get() = _recordsToDelete
-    private val _recordsToDelete = MutableLiveData<Int?>(null)
 
     val moduleCounts: LiveData<List<ModuleCount>>
         get() = _moduleCounts
@@ -116,7 +111,6 @@ internal class SyncInfoViewModel @Inject constructor(
         _recordsInLocal.postValue(null)
         _recordsToUpSync.postValue(null)
         _recordsToDownSync.postValue(null)
-        _recordsToDelete.postValue(null)
         _imagesToUpload.postValue(null)
         _moduleCounts.postValue(listOf())
         load()
@@ -154,12 +148,7 @@ internal class SyncInfoViewModel @Inject constructor(
             async { _configuration.postValue(configRepository.getProjectConfiguration()) },
             async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
             async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
-            async {
-                fetchRecordsToCreateAndDeleteCount().let {
-                    _recordsToDownSync.postValue(it.toCreate)
-                    _recordsToDelete.postValue(it.toDelete)
-                }
-            },
+            async { _recordsToDownSync.postValue(fetchRecordsToCreateAndDeleteCount()) },
             async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
             async { _moduleCounts.postValue(getModuleCounts(projectId)) }
         )
@@ -170,8 +159,8 @@ internal class SyncInfoViewModel @Inject constructor(
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
     ) = isConnected == true
-            && isSyncRunning == false
-            && syncConfiguration?.let {
+        && isSyncRunning == false
+        && syncConfiguration?.let {
         !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(
             it
         )
@@ -191,19 +180,19 @@ internal class SyncInfoViewModel @Inject constructor(
             .firstOrNull()
             ?: 0
 
-    private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
+    private suspend fun fetchRecordsToCreateAndDeleteCount(): Int =
         if (configRepository.getProjectConfiguration().isEventDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
-            DownSyncCounts(0, 0)
+            0
         }
 
-    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts =
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): Int =
         try {
-            eventSyncManager.countEventsToDownload()
+            eventSyncManager.countEventsToDownload().let { it.toCreate + it.toDelete }
         } catch (t: Throwable) {
             Simber.d(t)
-            DownSyncCounts(0, 0)
+            0
         }
 
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =

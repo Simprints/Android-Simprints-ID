@@ -81,11 +81,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
         }
 
-        viewModel.recordsToDelete.observe(viewLifecycleOwner) {
-            binding.recordsToDeleteCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
-        }
-
         viewModel.moduleCounts.observe(viewLifecycleOwner) {
             updateModuleCounts(it)
         }
@@ -119,7 +114,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
         if (!configuration.isEventDownSyncAllowed()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
-            binding.recordsToDeleteCardView.visibility = View.GONE
         }
 
         if (!configuration.canSyncDataToSimprints()) {
