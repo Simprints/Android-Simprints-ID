@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
@@ -319,6 +320,13 @@ internal class EventUpSyncTaskTest {
         val progress = eventUpSyncTask.upSync(operation).toList()
         assertThat(progress.first().operation.lastState).isEqualTo(UpSyncState.FAILED)
         coVerify(exactly = 1) { eventUpSyncScopeRepository.insertOrUpdate(any()) }
+    }
+
+    @Test(expected = RemoteDbNotSignedInException::class)
+    fun `upSync should throw up if RemoteDbNotSignedInException occurs`() = runTest {
+        coEvery { eventRepo.getAllClosedSessionIds(any()) } throws RemoteDbNotSignedInException()
+
+        eventUpSyncTask.upSync(operation).toList()
     }
 
     private fun setUpSyncKind(kind: UpSynchronizationConfiguration.UpSynchronizationKind) {

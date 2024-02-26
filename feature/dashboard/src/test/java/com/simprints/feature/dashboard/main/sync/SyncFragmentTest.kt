@@ -43,12 +43,13 @@ class SyncFragmentTest {
     internal val viewModel = mockk<SyncViewModel>(relaxed = true)
 
     private val context = InstrumentationRegistry.getInstrumentation().context
+    private val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
     @Test
     fun `should hide the sync card view if it can't sync to BFSID`() {
         mockSyncToBFSIDAllowed(false)
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         onView(withId(R.id.dashboardSyncCard)).check(matches(not(isDisplayed())))
     }
@@ -57,7 +58,7 @@ class SyncFragmentTest {
     fun `should display the sync card view if it can sync to BFSID`() {
         mockSyncToBFSIDAllowed(true)
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         onView(withId(R.id.dashboardSyncCard)).check(matches(isDisplayed()))
     }
@@ -67,7 +68,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncDefault(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -76,6 +77,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
@@ -94,7 +96,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -103,6 +105,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
@@ -116,13 +119,35 @@ class SyncFragmentTest {
         verify(exactly = 1) { viewModel.sync() }
     }
 
-
     @Test
     fun `should display the correct sync card view for the SyncFailed state`() {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncFailed(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
+
+        checkHiddenViews(
+            listOf(
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
+            )
+        )
+
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_failed_message)))
+    }
+
+    @Test
+    fun `should display the correct sync card view for the SyncFailedReloginRequired state`() {
+        mockSyncToBFSIDAllowed(true)
+        mockSyncCardLiveData(SyncCardState.SyncFailedReloginRequired(LAST_SYNC_TIME))
+
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -136,7 +161,10 @@ class SyncFragmentTest {
 
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_failed_message)))
+        onView(withId(R.id.sync_card_relogin_required)).check(matches(isDisplayed()))
+        onView(withId(R.id.sync_card_relogin_required_login_button)).check(matches(isDisplayed()))
+            .perform(click())
+        verify(exactly = 1) { viewModel.login() }
     }
 
     @Test
@@ -144,7 +172,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncFailedBackendMaintenance(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -153,6 +181,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
@@ -170,7 +199,7 @@ class SyncFragmentTest {
             )
         )
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -179,6 +208,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -194,7 +224,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncTooManyRequests(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -203,6 +233,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -216,7 +247,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncTryAgain(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -225,6 +256,7 @@ class SyncFragmentTest {
                 R.id.sync_card_select_no_modules,
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -241,8 +273,6 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncHasNoModules(LAST_SYNC_TIME))
 
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
-
         launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
@@ -252,6 +282,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -269,7 +300,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncOffline(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -278,6 +309,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_progress,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -293,7 +325,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -302,6 +334,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -323,7 +356,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncConnecting(LAST_SYNC_TIME, 20, 40))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -332,6 +365,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -350,7 +384,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncComplete(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -359,6 +393,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
+                R.id.sync_card_relogin_required,
             )
         )
 

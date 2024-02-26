@@ -130,19 +130,6 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/syncButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="15dp"
-        android:text="@string/dashboard_sync_info_sync_now_button"
-        app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
-        app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
-        app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordsInLocalCardView"
@@ -297,6 +284,53 @@
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:id="@+id/sync_action_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView"
+        app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
+        app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
+        app:layout_constraintStart_toStartOf="@+id/modulesTabHost">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/syncButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_sync_info_sync_now_button"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/relogin_required_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/relogin_required_message"
+                style="@style/Text.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/dashboard_sync_card_relogin_required" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/relogin_required_login_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login_log_in_button" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/modulesTabHost"

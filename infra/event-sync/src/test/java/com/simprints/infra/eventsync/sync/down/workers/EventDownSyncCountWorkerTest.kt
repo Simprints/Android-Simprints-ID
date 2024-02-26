@@ -8,11 +8,13 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncCountTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
@@ -87,6 +89,19 @@ internal class EventDownSyncCountWorkerTest {
         val output = JsonHelper.toJson(listOf(counts))
         val expectedSuccessfulOutput = workDataOf(OUTPUT_COUNT_WORKER_DOWN to output)
         assertThat(result).isEqualTo(ListenableWorker.Result.success(expectedSuccessfulOutput))
+    }
+
+
+    @Test
+    fun `when worker encounters RemoteDbNotSignedInException then it should fail with RELOGIN_REQUIRED`() {
+        runTest {
+            coEvery { eventDownSyncCountTask.getCount(any()) } throws RemoteDbNotSignedInException()
+
+            val result = countWorker.doWork()
+
+            val expectedFailureOutput = workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true)
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure(expectedFailureOutput))
+        }
     }
 
     @Test

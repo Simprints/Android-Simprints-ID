@@ -8,10 +8,18 @@ import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
+import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
@@ -74,7 +82,8 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 "Total downloaded: $0"
             )
         } catch (t: Throwable) {
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
+            Simber.d(t)
+            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed ${t.message}")
             handleSyncException(t)
         }
     }
@@ -100,6 +109,9 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
             )
         )
+        is RemoteDbNotSignedInException -> {
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
+        }
         else -> retry(t)
     }
 

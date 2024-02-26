@@ -121,6 +121,7 @@ internal class EventSyncStateProcessor @Inject constructor(
     private fun WorkInfo.toEventSyncWorkerState(): EventSyncWorkerState =
         fromWorkInfo(
             state,
+            didFailBecauseReloginRequired(),
             didFailBecauseCloudIntegration(),
             didFailBecauseBackendMaintenance(),
             didFailBecauseTooManyRequests(),

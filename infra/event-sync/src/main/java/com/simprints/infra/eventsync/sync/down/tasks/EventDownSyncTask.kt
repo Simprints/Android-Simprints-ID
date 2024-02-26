@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -67,7 +68,11 @@ internal class EventDownSyncTask @Inject constructor(
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
-            Simber.d(t)
+            if (t is RemoteDbNotSignedInException) {
+                throw t
+            }
+
+            Simber.e(t)
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
             emitProgress(lastOperation, count)

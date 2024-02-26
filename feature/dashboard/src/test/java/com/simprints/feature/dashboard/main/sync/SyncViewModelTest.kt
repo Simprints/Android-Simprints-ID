@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
@@ -16,6 +17,7 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -31,6 +33,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -86,6 +89,9 @@ class SyncViewModelTest {
 
     @MockK
     lateinit var authManager: AuthManager
+
+    @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
 
     @Before
     fun setUp() {
@@ -303,6 +309,51 @@ class SyncViewModelTest {
     }
 
     @Test
+    fun `should post a ReloginRequired card state if the sync fails with such problem`() {
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
+        isConnected.value = true
+        syncState.value = EventSyncState(
+            "", 10, 40, listOf(), listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
+                )
+            )
+        )
+        val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
+
+        assertThat(syncCardLiveData).isEqualTo(SyncCardState.SyncFailedReloginRequired(DATE))
+    }
+
+    @Test
+    fun `calling login() sends respective event to the view`() {
+        val viewModel = initViewModel()
+
+        viewModel.login()
+
+        val loginRequestedEvent = viewModel.loginRequestedEventLiveData.getOrAwaitValue()
+        assertThat(loginRequestedEvent).isNotNull()
+    }
+
+    @Test
+    fun `calling handleLoginResult() triggers sync if result is success`() {
+        val viewModel = initViewModel()
+
+        viewModel.handleLoginResult(LoginResult(true))
+
+        verify(exactly = 1) { eventSyncManager.sync() }
+    }
+
+    @Test
+    fun `calling handleLoginResult() does not trigger sync if result is not success`() {
+        val viewModel = initViewModel()
+
+        viewModel.handleLoginResult(LoginResult(false))
+
+        verify(exactly = 0) { eventSyncManager.sync() }
+    }
+
+    @Test
     fun `should post a SyncFailedBackendMaintenance card state if the sync fails because of cloud maintenance`() {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
@@ -386,8 +437,9 @@ class SyncViewModelTest {
         configManager = configManager,
         timeHelper = timeHelper,
         authStore = authStore,
-        securityStateRepository = securityStateRepository,
         authManager = authManager,
+        securityStateRepository = securityStateRepository,
+        recentUserActivityManager = recentUserActivityManager,
         externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
     )
 }

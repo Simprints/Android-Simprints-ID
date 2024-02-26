@@ -22,6 +22,7 @@ import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.flow.Flow
@@ -65,6 +66,10 @@ internal class EventUpSyncTask @Inject constructor(
             lastOperation = lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now())
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
+            if (t is RemoteDbNotSignedInException) {
+                throw t
+            }
+
             Simber.e(t)
             lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now())
 
@@ -111,11 +116,12 @@ internal class EventUpSyncTask @Inject constructor(
                     this.emit(it.size)
                 }
             } catch (ex: Exception) {
-                if (ex is JsonParseException || ex is JsonMappingException) {
-                    attemptInvalidEventUpload(projectId, sessionId)?.let { this.emit(it) }
-                } else {
-                    Simber.i("Failed to un-marshal events for $sessionId")
-                    Simber.e(ex)
+                Simber.i("Failed to upload events for $sessionId")
+                when (ex) {
+                    is JsonParseException, is JsonMappingException ->
+                        attemptInvalidEventUpload(projectId, sessionId)?.let { this.emit(it) }
+                    is RemoteDbNotSignedInException -> throw ex
+                    else -> Simber.e(ex)
                 }
             }
         }
@@ -171,6 +177,7 @@ internal class EventUpSyncTask @Inject constructor(
             is NetworkConnectionException -> Simber.i(t)
             // We don't need to report http exceptions as cloud logs all of them.
             is HttpException -> Simber.i(t)
+            is RemoteDbNotSignedInException -> throw t
             else -> Simber.e(t)
         }
     }

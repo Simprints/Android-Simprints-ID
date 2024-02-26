@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
@@ -141,6 +142,13 @@ class EventDownSyncTaskTest {
 
         assertThat(progress.last().operation.state).isEqualTo(FAILED)
         coVerify(exactly = 2) { eventDownSyncScopeRepository.insertOrUpdate(any()) }
+    }
+
+    @Test(expected = RemoteDbNotSignedInException::class)
+    fun downSync_shouldThrowUpIfRemoteDbNotSignedInExceptionOccurs() = runTest {
+        coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws RemoteDbNotSignedInException()
+
+        eventDownSyncTask.downSync(this, projectOp).toList()
     }
 
     @Test

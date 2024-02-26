@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
@@ -20,6 +21,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncCountTask
@@ -50,6 +52,7 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
 
     override val tag: String = EventDownSyncCountWorker::class.java.simpleName
 
+
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
             ?: throw IllegalArgumentException("input required")
@@ -66,7 +69,7 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
             val output = jsonHelper.toJson(downCount)
 
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Done $downCount")
-            success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output))
+            success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
 
         } catch (t: Throwable) {
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Failed. ${t.message}")
@@ -76,17 +79,18 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
                     fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
                 }
                 t is BackendMaintenanceException -> fail(
-                    t,
-                    t.message,
+                    t, t.message,
                     workDataOf(
                         OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
                         OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
                     )
                 )
+                t is RemoteDbNotSignedInException -> {
+                    fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
+                }
                 isSyncStillRunning() -> retry(t)
                 else -> {
                     Simber.d(t)
-                    t.printStackTrace()
                     success(message = "Succeed because count is not required any more.")
                 }
             }
