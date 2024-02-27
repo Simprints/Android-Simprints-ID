@@ -29,26 +29,14 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(
-        value = FingerprintCaptureResult.Item::class,
-        name = "FingerprintCaptureResult.Item"
-    ),
-    JsonSubTypes.Type(
-        value = FingerprintCaptureResult.Sample::class,
-        name = "FingerprintCaptureResult.Sample"
-    ),
-
+    JsonSubTypes.Type(value = FingerprintCaptureResult.Item::class, name = "FingerprintCaptureResult.Item"),
+    JsonSubTypes.Type(value = FingerprintCaptureResult.Sample::class, name = "FingerprintCaptureResult.Sample"),
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
-    JsonSubTypes.Type(
-        value = FingerprintMatchResult.Item::class,
-        name = "FingerprintMatchResult.Item"
-    ),
-
+    JsonSubTypes.Type(value = FingerprintMatchResult.Item::class, name = "FingerprintMatchResult.Item"),
     JsonSubTypes.Type(value = FaceConfigurationResult::class, name = "FaceConfigurationResult"),
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
     JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
-
     JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
     JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
