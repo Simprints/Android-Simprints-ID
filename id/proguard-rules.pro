@@ -52,6 +52,21 @@
 -keep class com.simprints.infra.events.event.domain.models.** { *; }
 -keep class com.simprints.infra.events.event.local.** { *; }
 
+-keep class com.simprints.feature.orchestrator.steps.** { *; }
+-keep class com.simprints.face.capture.** { *; }
+-keep class com.simprints.face.configuration.** { *; }
+-keep class com.simprints.feature.alert.** { *; }
+-keep class com.simprints.feature.consent.** { *; }
+-keep class com.simprints.feature.enrollast.** { *; }
+-keep class com.simprints.feature.exitform.** { *; }
+-keep class com.simprints.feature.fetchsubject.** { *; }
+-keep class com.simprints.feature.login.** { *; }
+-keep class com.simprints.feature.selectsubject.** { *; }
+-keep class com.simprints.feature.setup.** { *; }
+-keep class com.simprints.fingerprint.capture.** { *; }
+-keep class com.simprints.fingerprint.connect.** { *; }
+-keep class com.simprints.matcher.** { *; }
+
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
 -keepattributes SourceFile,LineNumberTable,*Annotation*
