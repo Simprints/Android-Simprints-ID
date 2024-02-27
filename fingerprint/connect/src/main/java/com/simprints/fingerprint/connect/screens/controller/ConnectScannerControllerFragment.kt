@@ -84,7 +84,12 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.init(args.params)
+        shouldRequestPermissions = savedInstanceState?.getBoolean(KEY_SHOULD_REQUEST_PERMISSIONS)
+            ?: shouldRequestPermissions
+
+        if (savedInstanceState == null) {
+            viewModel.init(args.params)
+        }
 
         findNavController().handleResult(this, R.id.connectScannerControllerFragment, ExitFormContract.DESTINATION, ::handleExitForm)
         findNavController().handleResult(this, R.id.connectScannerControllerFragment, AlertContract.DESTINATION, ::handleResult)
@@ -160,6 +165,11 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(KEY_SHOULD_REQUEST_PERMISSIONS, shouldRequestPermissions)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onResume() {
         super.onResume()
         alertHelper.handleResume { shouldRequestPermissions = true }
@@ -222,6 +232,10 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
     private fun finishWithResult(isSuccess: Boolean) {
         findNavController().finishWithResult(this, FingerprintConnectResult(isSuccess))
+    }
+
+    companion object {
+        private const val KEY_SHOULD_REQUEST_PERMISSIONS = "KEY_SHOULD_REQUEST_PERMISSIONS"
     }
 
 }
