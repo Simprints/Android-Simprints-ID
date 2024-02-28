@@ -72,16 +72,20 @@ internal class LoginFormViewModel @Inject constructor(
         userId: String
     ) = projectId.isNotEmpty() && projectSecret.isNotEmpty() && userId.isNotEmpty()
 
-    fun handleQrResult(result: QrScannerResult) {
+    fun handleQrResult(projectId: String, result: QrScannerResult) {
         if (result.error != null) {
             _signInState.send(mapQrError(result.error))
         } else if (!result.content.isNullOrEmpty()) {
             try {
                 val qrContent = jsonHelper.fromJson<QrCodeContent>(result.content)
-
                 Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning successful")
-                qrContent.apiBaseUrl?.let { simNetwork.setApiBaseUrl(it) }
-                _signInState.send(SignInState.QrCodeValid(qrContent.projectId, qrContent.projectSecret))
+
+                if (projectId != qrContent.projectId) {
+                    _signInState.send(SignInState.ProjectIdMismatch)
+                } else {
+                    qrContent.apiBaseUrl?.let { simNetwork.setApiBaseUrl(it) }
+                    _signInState.send(SignInState.QrCodeValid(qrContent.projectId, qrContent.projectSecret))
+                }
             } catch (e: Exception) {
                 Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning unsuccessful")
                 _signInState.send(SignInState.QrInvalidCode)

@@ -77,7 +77,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             viewLifecycleOwner,
             R.id.loginFormFragment,
             R.id.loginQrScanner
-        ) { viewModel.handleQrResult(it) }
+        ) { viewModel.handleQrResult(args.loginParams.projectId, it) }
 
         initUi()
         observeUiState()
@@ -150,7 +150,6 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     }
 
     private fun updateFields(result: QrCodeValid) {
-        binding.loginProjectId.setText(result.projectId)
         binding.loginProjectSecret.setText(result.projectSecret)
     }
 
