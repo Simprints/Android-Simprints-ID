@@ -39,8 +39,6 @@
                 android:inputType="text"
                 android:minWidth="150dp"
                 tools:text="UserName" />
-
-            <requestFocus />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -52,6 +50,7 @@
                 android:id="@+id/loginProjectId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:enabled="false"
                 android:hint="@string/login_id_hint"
                 android:inputType="textVisiblePassword"
                 tools:text="qwerty1235" />
@@ -69,6 +68,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/login_secret_hint"
                 android:inputType="textPassword" />
+
+            <requestFocus />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton

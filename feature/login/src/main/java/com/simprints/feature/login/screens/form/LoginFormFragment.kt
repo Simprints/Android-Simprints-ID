@@ -52,6 +52,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private val viewModel by viewModels<LoginFormViewModel>()
 
     private lateinit var checkForPlayServicesResultLauncher: ActivityResultLauncher<IntentSenderRequest>
+
     init {
         checkForPlayServicesResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
@@ -87,6 +88,8 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
     private fun initUi() {
         binding.loginUserId.setText(args.loginParams.userId.value)
+        binding.loginProjectId.setText(args.loginParams.projectId)
+
         binding.loginButtonScanQr.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Scan QR button clicked")
             findNavController().navigate(R.id.action_loginFormFragment_to_loginQrScanner)
