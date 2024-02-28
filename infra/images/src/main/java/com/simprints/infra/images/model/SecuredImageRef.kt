@@ -1,6 +1,6 @@
 package com.simprints.infra.images.model
 
-import com.google.errorprone.annotations.Keep
+import androidx.annotation.Keep
 
 @Keep
 data class SecuredImageRef(override val relativePath: Path) : ImageRef(relativePath)
