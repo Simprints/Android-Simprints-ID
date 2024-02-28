@@ -59,16 +59,19 @@ internal val consentConfiguration = ConsentConfiguration(
     ),
 )
 
+internal val simprintsUpSyncConfigurationConfiguration = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+    UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+    UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+    false,
+)
+
 internal val synchronizationConfiguration = SynchronizationConfiguration(
     SynchronizationConfiguration.Frequency.PERIODICALLY,
     UpSynchronizationConfiguration(
-        UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-        ),
+        simprintsUpSyncConfigurationConfiguration,
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         ),
-        false,
     ),
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,

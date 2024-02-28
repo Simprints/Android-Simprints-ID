@@ -501,6 +501,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(
@@ -526,6 +527,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(
@@ -551,6 +553,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(
@@ -577,6 +580,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(

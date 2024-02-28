@@ -22,9 +22,7 @@ data class EventUpSyncRequestEvent(
         createdAt: Timestamp,
         endedAt: Timestamp,
         requestId: String,
-        sessionCount: Int = 0,
-        eventUpSyncCount: Int = 0,
-        eventDownSyncCount: Int = 0,
+        content: UpSyncContent = UpSyncContent(),
         responseStatus: Int? = null,
         errorType: String? = null,
     ) : this(
@@ -33,11 +31,7 @@ data class EventUpSyncRequestEvent(
             createdAt,
             endedAt,
             requestId,
-            UpSyncContent(
-                sessionCount,
-                eventUpSyncCount,
-                eventDownSyncCount,
-            ),
+            content,
             responseStatus,
             errorType,
             EVENT_VERSION,

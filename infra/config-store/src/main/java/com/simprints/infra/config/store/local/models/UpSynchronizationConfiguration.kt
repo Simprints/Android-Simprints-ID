@@ -7,12 +7,13 @@ internal fun UpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationCon
     ProtoUpSynchronizationConfiguration.newBuilder()
         .setSimprints(simprints.toProto())
         .setCoSync(coSync.toProto())
-        .setImagesRequireUnmeteredConnection(imagesRequireUnmeteredConnection)
         .build()
 
 internal fun UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
     ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
         .setKind(kind.toProto())
+        .setBatchSizes(batchSizes.toProto())
+        .setImagesRequireUnmeteredConnection(imagesRequireUnmeteredConnection)
         .build()
 
 internal fun UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration =
@@ -28,11 +29,17 @@ internal fun UpSynchronizationConfiguration.UpSynchronizationKind.toProto(): Pro
         UpSynchronizationConfiguration.UpSynchronizationKind.ALL -> ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL
     }
 
+internal fun UpSynchronizationConfiguration.UpSyncBatchSizes.toProto(): ProtoUpSyncBatchSizes = ProtoUpSyncBatchSizes.newBuilder()
+        .setSessions(sessions)
+        .setUpSyncs(upSyncs)
+        .setDownSyncs(downSyncs)
+        .build()
+
 internal fun ProtoUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration =
-    UpSynchronizationConfiguration(simprints.toDomain(), coSync.toDomain(), imagesRequireUnmeteredConnection)
+    UpSynchronizationConfiguration(simprints.toDomain(), coSync.toDomain())
 
 internal fun ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
-    UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(kind.toDomain())
+    UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(kind.toDomain(), batchSizes.toDomain(), imagesRequireUnmeteredConnection)
 
 internal fun ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration =
     UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(kind.toDomain())
@@ -47,3 +54,6 @@ internal fun ProtoUpSynchronizationConfiguration.UpSynchronizationKind.toDomain(
             "invalid UpSynchronizationKind $name"
         )
     }
+
+internal fun ProtoUpSyncBatchSizes.toDomain(): UpSynchronizationConfiguration.UpSyncBatchSizes =
+    UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, upSyncs, downSyncs)

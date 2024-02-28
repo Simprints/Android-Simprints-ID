@@ -2,6 +2,7 @@ package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.testtools.projectConfiguration
+import com.simprints.infra.sync.config.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.sync.config.testtools.synchronizationConfiguration
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -30,12 +31,20 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
             useCase(
                 projectConfiguration.copy(
                     synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(imagesRequireUnmeteredConnection = true)
+                        up = synchronizationConfiguration.up.copy(
+                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                                imagesRequireUnmeteredConnection = true
+                            )
+                        )
                     )
                 ),
                 projectConfiguration.copy(
                     synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(imagesRequireUnmeteredConnection = true)
+                        up = synchronizationConfiguration.up.copy(
+                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                                imagesRequireUnmeteredConnection = true
+                            )
+                        )
                     )
                 ),
             )
@@ -49,12 +58,20 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
             useCase(
                 projectConfiguration.copy(
                     synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(imagesRequireUnmeteredConnection = false)
+                        up = synchronizationConfiguration.up.copy(
+                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                                imagesRequireUnmeteredConnection = false
+                            )
+                        )
                     )
                 ),
                 projectConfiguration.copy(
                     synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(imagesRequireUnmeteredConnection = true)
+                        up = synchronizationConfiguration.up.copy(
+                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                                imagesRequireUnmeteredConnection = true
+                            )
+                        )
                     )
                 ),
             )

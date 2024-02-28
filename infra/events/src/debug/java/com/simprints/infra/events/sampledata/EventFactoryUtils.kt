@@ -404,9 +404,11 @@ fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
     createdAt = CREATED_AT,
     endedAt = ENDED_AT,
     requestId = GUID1,
-    sessionCount = 1,
-    eventUpSyncCount = 2,
-    eventDownSyncCount = 3,
+    content = EventUpSyncRequestEvent.UpSyncContent(
+        sessionCount = 1,
+        eventUpSyncCount = 2,
+        eventDownSyncCount = 3,
+    ),
     responseStatus = 200,
     errorType = "OK",
 )
