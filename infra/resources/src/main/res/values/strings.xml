@@ -91,6 +91,10 @@
     <string name="login_no_network_error">Currently offline. Please check your internet connection.</string>
     <string name="login_integrity_service_down_error">A problem occurred trying to contact the Integrity Service. Please try again later.</string>
     <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
+    <string name="login_change_url">Change backend URL</string>
+    <string name="login_change_url_save">Save</string>
+    <string name="login_change_url_reset">Use default</string>
+    <string name="login_change_url_cancel">Cancel</string>
 
     <!-- Matcher -->
     <string name="matcher_please_wait">Please wait while we proceed to identification</string>

@@ -22,7 +22,7 @@
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginBottom="48dp"
+            android:layout_marginBottom="36dp"
             android:src="@drawable/simprints_logo" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -139,4 +139,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/loginChangeUrlButton"
+        style="@style/Widget.Simprints.Button.TextButton.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:alpha="0.5"
+        android:text="@string/login_change_url"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

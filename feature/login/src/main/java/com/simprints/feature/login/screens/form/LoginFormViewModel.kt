@@ -46,7 +46,12 @@ internal class LoginFormViewModel @Inject constructor(
             _signInState.send(SignInState.ProjectIdMismatch)
         } else {
             viewModelScope.launch {
-                val result = authManager.authenticateSafely(loginParams.userId.value, projectId, projectSecret, deviceId)
+                val result = authManager.authenticateSafely(
+                    loginParams.userId.value,
+                    projectId,
+                    projectSecret,
+                    deviceId
+                )
                 _signInState.send(mapAuthDataResult(result))
             }
         }
@@ -69,7 +74,7 @@ internal class LoginFormViewModel @Inject constructor(
     private fun areMandatoryCredentialsPresent(
         projectId: String,
         projectSecret: String,
-        userId: String
+        userId: String,
     ) = projectId.isNotEmpty() && projectSecret.isNotEmpty() && userId.isNotEmpty()
 
     fun handleQrResult(projectId: String, result: QrScannerResult) {
@@ -84,7 +89,12 @@ internal class LoginFormViewModel @Inject constructor(
                     _signInState.send(SignInState.ProjectIdMismatch)
                 } else {
                     qrContent.apiBaseUrl?.let { simNetwork.setApiBaseUrl(it) }
-                    _signInState.send(SignInState.QrCodeValid(qrContent.projectId, qrContent.projectSecret))
+                    _signInState.send(
+                        SignInState.QrCodeValid(
+                            qrContent.projectId,
+                            qrContent.projectSecret
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning unsuccessful")
@@ -100,6 +110,16 @@ internal class LoginFormViewModel @Inject constructor(
         QrScannerError.NoPermission -> SignInState.QrNoCameraPermission
         QrScannerError.CameraNotAvailable -> SignInState.QrCameraUnavailable
         QrScannerError.UnknownError -> SignInState.QrGenericError
+    }
+
+    fun changeUrlClicked() {
+        _signInState.send(SignInState.ShowUrlChangeDialog(simNetwork.getApiBaseUrlPrefix()))
+    }
+
+    fun saveNewUrl(newUrl: String?) = if (newUrl.isNullOrEmpty()) {
+        simNetwork.resetApiBaseUrl()
+    } else {
+        simNetwork.setApiBaseUrl(newUrl)
     }
 
 }

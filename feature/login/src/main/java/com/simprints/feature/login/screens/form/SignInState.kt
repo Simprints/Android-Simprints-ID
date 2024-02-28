@@ -17,6 +17,8 @@ internal sealed class SignInState {
     data object QrInvalidCode : SignInState()
     data object QrGenericError : SignInState()
 
+    data class ShowUrlChangeDialog(val currentUrl: String) : SignInState()
+
     data object BadCredentials : SignInState()
     data object Offline : SignInState()
     data object TechnicalFailure : SignInState()

@@ -192,6 +192,28 @@ internal class LoginFormViewModelTest {
         verify { simNetwork.setApiBaseUrl(eq(URL)) }
     }
 
+    @Test
+    fun `updates UI state when change URL clicked`() {
+        viewModel.changeUrlClicked()
+
+        val result = viewModel.signInState.getOrAwaitValue()
+        assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.ShowUrlChangeDialog::class.java)
+    }
+
+    @Test
+    fun `saves provided base URL`() {
+        viewModel.saveNewUrl(URL)
+
+        verify { simNetwork.setApiBaseUrl(URL) }
+    }
+
+    @Test
+    fun `resets provided base URL`() {
+        viewModel.saveNewUrl(null)
+
+        verify { simNetwork.resetApiBaseUrl() }
+    }
+
     companion object {
 
 
