@@ -9,7 +9,6 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -77,21 +76,13 @@ internal class EventSyncManagerImpl @Inject constructor(
             syncPartitioning = projectConfig.synchronization.down.partitionType.toDomain()
         )
 
-        var creationsToDownload = 0
-        var deletionsToDownload = 0
+        val counts = downSyncScope.operations
+            .map { eventRemoteDataSource.count(it.queryEvent.fromDomainToApi()) }
 
-        downSyncScope.operations.forEach { syncOperation ->
-            val counts = eventRemoteDataSource.count(syncOperation.queryEvent.fromDomainToApi())
-
-            creationsToDownload += counts
-                .firstOrNull { it.type == EnrolmentRecordEventType.EnrolmentRecordCreation }
-                ?.count ?: 0
-            deletionsToDownload += counts
-                .firstOrNull { it.type == EnrolmentRecordEventType.EnrolmentRecordDeletion }
-                ?.count ?: 0
-        }
-
-        return DownSyncCounts(creationsToDownload, deletionsToDownload)
+        return DownSyncCounts(
+            count = counts.sumOf { it.count },
+            isLowerBound = counts.any { it.isLowerBound }
+        )
     }
 
     override suspend fun downSyncSubject(

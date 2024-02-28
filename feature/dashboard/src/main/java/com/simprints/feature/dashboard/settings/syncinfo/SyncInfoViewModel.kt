@@ -7,10 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
@@ -19,11 +24,6 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,7 +42,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
     private val syncOrchestrator: SyncOrchestrator,
-    private val tokenizationProcessor: TokenizationProcessor
+    private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -57,13 +57,9 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _imagesToUpload
     private val _imagesToUpload = MutableLiveData<Int?>(null)
 
-    val recordsToDownSync: LiveData<Int?>
+    val recordsToDownSync: LiveData<DownSyncCounts?>
         get() = _recordsToDownSync
-    private val _recordsToDownSync = MutableLiveData<Int?>(null)
-
-    val recordsToDelete: LiveData<Int?>
-        get() = _recordsToDelete
-    private val _recordsToDelete = MutableLiveData<Int?>(null)
+    private val _recordsToDownSync = MutableLiveData<DownSyncCounts?>(null)
 
     val moduleCounts: LiveData<List<ModuleCount>>
         get() = _moduleCounts
@@ -116,7 +112,6 @@ internal class SyncInfoViewModel @Inject constructor(
         _recordsInLocal.postValue(null)
         _recordsToUpSync.postValue(null)
         _recordsToDownSync.postValue(null)
-        _recordsToDelete.postValue(null)
         _imagesToUpload.postValue(null)
         _moduleCounts.postValue(listOf())
         load()
@@ -154,12 +149,7 @@ internal class SyncInfoViewModel @Inject constructor(
             async { _configuration.postValue(configRepository.getProjectConfiguration()) },
             async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
             async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
-            async {
-                fetchRecordsToCreateAndDeleteCount().let {
-                    _recordsToDownSync.postValue(it.toCreate)
-                    _recordsToDelete.postValue(it.toDelete)
-                }
-            },
+            async { _recordsToDownSync.postValue(fetchRecordsToCreateAndDeleteCount()) },
             async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
             async { _moduleCounts.postValue(getModuleCounts(projectId)) }
         )
@@ -170,8 +160,8 @@ internal class SyncInfoViewModel @Inject constructor(
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
     ) = isConnected == true
-            && isSyncRunning == false
-            && syncConfiguration?.let {
+        && isSyncRunning == false
+        && syncConfiguration?.let {
         !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(
             it
         )
@@ -195,7 +185,7 @@ internal class SyncInfoViewModel @Inject constructor(
         if (configRepository.getProjectConfiguration().isEventDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
-            DownSyncCounts(0, 0)
+            DownSyncCounts(0, isLowerBound = false)
         }
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts =
@@ -203,7 +193,7 @@ internal class SyncInfoViewModel @Inject constructor(
             eventSyncManager.countEventsToDownload()
         } catch (t: Throwable) {
             Simber.d(t)
-            DownSyncCounts(0, 0)
+            DownSyncCounts(0, isLowerBound = false)
         }
 
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =

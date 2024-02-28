@@ -5,7 +5,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -16,9 +15,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
-import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
-import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -30,8 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.test.runTest
-import okhttp3.Headers
-import okhttp3.Headers.Companion.headersOf
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
@@ -84,31 +79,15 @@ class EventRemoteDataSourceTest {
     @Test
     fun count_shouldMakeANetworkRequest() = runTest {
         coEvery {
-            eventRemoteInterface.countEvents(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
-            )
-        } returns listOf(
-            ApiEventCount(
-                ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation,
-                1
-            )
+            eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any())
+        } returns Response.success(
+            "".toResponseBody(null),
+            mapOf("x-event-count" to "6", "x-event-count-is-lower-bound" to "true").toHeaders()
         )
 
         val count = eventRemoteDataSource.count(query)
 
-        assertThat(count).isEqualTo(
-            listOf(
-                EventCount(
-                    EnrolmentRecordEventType.EnrolmentRecordCreation,
-                    1
-                )
-            )
-        )
+        assertThat(count).isEqualTo(EventCount(6, true))
         coVerify(exactly = 1) {
             eventRemoteInterface.countEvents(
                 projectId = DEFAULT_PROJECT_ID,

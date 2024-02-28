@@ -23,6 +23,7 @@ import com.simprints.infra.resources.R as IDR
 internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     companion object {
+
         private const val TOTAL_RECORDS_INDEX = 0
     }
 
@@ -77,13 +78,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
 
         viewModel.recordsToDownSync.observe(viewLifecycleOwner) {
-            binding.recordsToDownloadCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
-        }
-
-        viewModel.recordsToDelete.observe(viewLifecycleOwner) {
-            binding.recordsToDeleteCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
+            binding.recordsToDownloadCount.text = it?.let {
+                if (it.isLowerBound) "${it.count}+" else "${it.count}"
+            } ?: ""
+            setProgressBar(it?.count, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
         }
 
         viewModel.moduleCounts.observe(viewLifecycleOwner) {
@@ -119,7 +117,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
         if (!configuration.isEventDownSyncAllowed()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
-            binding.recordsToDeleteCardView.visibility = View.GONE
         }
 
         if (!configuration.canSyncDataToSimprints()) {
