@@ -1,6 +1,7 @@
 package com.simprints.infra.images.model
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import java.io.File
 
@@ -12,6 +13,7 @@ import java.io.File
  *           e.g.: for dir1/dir2/file.txt [parts] should be
  *           @sample [arrayOf("dir1", "dir2", "file.txt")]
  */
+@Keep
 @Parcelize
 data class Path(val parts: Array<String>) : Parcelable {
 
