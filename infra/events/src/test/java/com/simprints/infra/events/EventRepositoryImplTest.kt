@@ -22,6 +22,7 @@ import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -216,7 +217,7 @@ internal class EventRepositoryImplTest {
     fun `add event to current session should add event related to current session into DB`() {
         runTest {
             mockDbToHaveOneOpenSession(GUID1)
-            val newEvent = createAlertScreenEvent()
+            val newEvent = createAlertScreenEvent().removeLabels()
 
             eventRepo.addOrUpdateEvent(newEvent)
 
@@ -227,6 +228,30 @@ internal class EventRepositoryImplTest {
                             sessionId = GUID1,
                             deviceId = DEVICE_ID,
                             projectId = DEFAULT_PROJECT_ID
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `adding event to should not override existing session id in the event`() {
+        runTest {
+            mockDbToHaveOneOpenSession(GUID1)
+            val newEvent = createAlertScreenEvent().also {
+                it.labels = EventLabels(sessionId = GUID2)
+            }
+
+            eventRepo.addOrUpdateEvent(newEvent)
+
+            coVerify {
+                eventLocalDataSource.insertOrUpdate(
+                    newEvent.copy(
+                        labels = EventLabels(
+                            sessionId = GUID2,
+                            deviceId = DEVICE_ID,
+                            projectId = DEFAULT_PROJECT_ID,
                         )
                     )
                 )
