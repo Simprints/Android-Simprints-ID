@@ -15,8 +15,16 @@ import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.*
+import io.mockk.CapturingSlot
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -65,6 +73,29 @@ internal class MatchViewModelTest {
             timeHelper
         )
     }
+    @Test
+    fun `when setup is called, then view model becomes initialized`() = runTest {
+        val responseItems = listOf(
+            FaceMatchResult.Item("1", 90f),
+        )
+
+        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
+            cb1.captured.invoke("tag1")
+            responseItems to responseItems.size
+        }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
+
+        assertThat(viewModel.isInitialized).isFalse()
+
+        viewModel.matchState.test()
+        viewModel.setupMatch(MatchParams(
+            probeFaceSamples = listOf(getFaceSample()),
+            flowType = FlowType.ENROL,
+            queryForCandidates = mockk {}
+        ))
+
+        assertThat(viewModel.isInitialized).isTrue()
+    }
 
     @Test
     fun `Handle face match request correctly`() = runTest {
@@ -90,6 +121,8 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        // Waiting for the ::delay in viewModel::setupMatch
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
@@ -130,6 +163,8 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        // Waiting for the ::delay in viewModel::setupMatch
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
