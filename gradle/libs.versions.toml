@@ -25,7 +25,7 @@ androidx_annotation_version = "1.7.1"
 androidx_arch_core_version = "2.2.0"
 matertial_version = "1.11.0"
 
-hilt_version = "2.50"
+hilt_version = "2.51"
 hilt_androidx_version = "1.2.0"
 
 play_base_services_version = "18.3.0"
