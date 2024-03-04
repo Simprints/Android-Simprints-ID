@@ -21,9 +21,6 @@ jobs:
             group: release-internal-workflow #only one instance of this workflow can run at a time
             cancel-in-progress: true
 
-        permissions:
-            contents: write # A write permission For Auto tagging the releases
-
         environment: internal
 
         env:
@@ -70,6 +67,3 @@ jobs:
 
             -   name: Publish Release bundle
                 run: ./gradlew id:publishReleaseBundle
-
-            -   name: Set release tag
-                run: bash ci/deployment/release_tag_setup
