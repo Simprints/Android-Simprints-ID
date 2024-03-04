@@ -8,15 +8,18 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentLoginFormBinding
+import com.simprints.feature.login.databinding.ViewUrlChangeInputBinding
 import com.simprints.feature.login.screens.form.SignInState.BackendMaintenanceError
 import com.simprints.feature.login.screens.form.SignInState.BadCredentials
 import com.simprints.feature.login.screens.form.SignInState.IntegrityException
@@ -30,6 +33,7 @@ import com.simprints.feature.login.screens.form.SignInState.QrCodeValid
 import com.simprints.feature.login.screens.form.SignInState.QrGenericError
 import com.simprints.feature.login.screens.form.SignInState.QrInvalidCode
 import com.simprints.feature.login.screens.form.SignInState.QrNoCameraPermission
+import com.simprints.feature.login.screens.form.SignInState.ShowUrlChangeDialog
 import com.simprints.feature.login.screens.form.SignInState.Success
 import com.simprints.feature.login.screens.form.SignInState.TechnicalFailure
 import com.simprints.feature.login.screens.form.SignInState.Unknown
@@ -52,6 +56,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private val viewModel by viewModels<LoginFormViewModel>()
 
     private lateinit var checkForPlayServicesResultLauncher: ActivityResultLauncher<IntentSenderRequest>
+
     init {
         checkForPlayServicesResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
@@ -76,7 +81,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             viewLifecycleOwner,
             R.id.loginFormFragment,
             R.id.loginQrScanner
-        ) { viewModel.handleQrResult(it) }
+        ) { viewModel.handleQrResult(args.loginParams.projectId, it) }
 
         initUi()
         observeUiState()
@@ -87,6 +92,13 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
     private fun initUi() {
         binding.loginUserId.setText(args.loginParams.userId.value)
+        binding.loginProjectId.setText(args.loginParams.projectId)
+
+        binding.loginChangeUrlButton.setOnClickListener {
+            Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Change URL button clicked")
+            viewModel.changeUrlClicked()
+        }
+
         binding.loginButtonScanQr.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Scan QR button clicked")
             findNavController().navigate(R.id.action_loginFormFragment_to_loginQrScanner)
@@ -132,6 +144,8 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             QrInvalidCode -> showToast(IDR.string.login_invalid_qr_code_error)
             QrNoCameraPermission -> showToast(IDR.string.login_qr_code_scanning_camera_permission_error)
 
+            is ShowUrlChangeDialog -> createChangeUrlDialog(result).show()
+
             // Showing error card
             is BackendMaintenanceError -> showOutageErrorCard(result.estimatedOutage)
 
@@ -147,19 +161,41 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     }
 
     private fun updateFields(result: QrCodeValid) {
-        binding.loginProjectId.setText(result.projectId)
         binding.loginProjectSecret.setText(result.projectSecret)
     }
 
     private fun showOutageErrorCard(estimatedOutage: String?) {
         binding.loginErrorText.text = estimatedOutage
-            ?.let { getString(IDR.string.error_backend_maintenance_with_time_message, estimatedOutage) }
+            ?.let {
+                getString(
+                    IDR.string.error_backend_maintenance_with_time_message,
+                    estimatedOutage
+                )
+            }
             ?: getString(IDR.string.error_backend_maintenance_message)
         binding.loginErrorCard.isVisible = true
     }
 
     private fun showToast(@StringRes messageId: Int) {
         Toast.makeText(requireContext(), getString(messageId), Toast.LENGTH_LONG).show()
+    }
+
+    private fun createChangeUrlDialog(result: ShowUrlChangeDialog): AlertDialog {
+        val binding = ViewUrlChangeInputBinding.inflate(layoutInflater)
+            .apply { loginUrlChangeInput.setText(result.currentUrl) }
+        return MaterialAlertDialogBuilder(requireContext())
+            .setTitle(IDR.string.login_change_url)
+            .setView(binding.root)
+            .setNeutralButton(IDR.string.login_change_url_reset) { di, _ ->
+                viewModel.saveNewUrl(null)
+                di.dismiss()
+            }
+            .setPositiveButton(IDR.string.login_change_url_save) { di, _ ->
+                viewModel.saveNewUrl(binding.loginUrlChangeInput.text.toString())
+                di.dismiss()
+            }
+            .setNegativeButton(IDR.string.login_change_url_cancel) { di, _ -> di.dismiss() }
+            .create()
     }
 
     private fun finishWithSuccess() {

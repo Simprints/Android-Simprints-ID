@@ -110,6 +110,7 @@
         <item name="android:textColorHint">@color/simprints_text_grey_light</item>
         <item name="endIconTint">@color/simprints_text_grey_light</item>
         <item name="android:textColor">@color/simprints_text_black</item>
+        <item name="boxBackgroundColor">@color/input_text_background</item>
     </style>
 
     <style name="ThemeOverlay.Simprints.TextInputLayout" parent="">
