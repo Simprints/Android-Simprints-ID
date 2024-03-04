@@ -87,6 +87,9 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val isFirstLaunch = !fragmentViewModel.isInitialized
+        shouldRequestPermissions = savedInstanceState?.getBoolean(KEY_SHOULD_REQUEST_PERMISSIONS)
+            ?: shouldRequestPermissions
+
         if (isFirstLaunch) {
             activityViewModel.init(args.params)
             fragmentViewModel.isInitialized = true
@@ -166,6 +169,11 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(KEY_SHOULD_REQUEST_PERMISSIONS, shouldRequestPermissions)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onResume() {
         super.onResume()
         alertHelper.handleResume { shouldRequestPermissions = true }
@@ -228,6 +236,10 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
     private fun finishWithResult(isSuccess: Boolean) {
         findNavController().finishWithResult(this, FingerprintConnectResult(isSuccess))
+    }
+
+    companion object {
+        private const val KEY_SHOULD_REQUEST_PERMISSIONS = "KEY_SHOULD_REQUEST_PERMISSIONS"
     }
 
 }
