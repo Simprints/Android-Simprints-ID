@@ -49,16 +49,6 @@ internal class OrchestratorCache @Inject constructor(
         }
     }
 
-    /**
-     * There have been a number of cases when calling app makes several requests tens of ms apart, while it
-     * is not exactly clear why this is happening, it is clear that it is not the intended behavior.
-     *
-     * This in-memory flag is used to prevent the orchestrator from starting multiple times.
-     * It will cause any consecutive requests to return `Activity.RESULT_CANCELED` and it is callers
-     * responsibility to handle this case.
-     */
-    val isExecuting = AtomicBoolean(false)
-
     companion object {
         private const val ORCHESTRATION_CACHE = "ORCHESTRATOR_CACHE"
         private const val KEY_STEPS = "steps"
