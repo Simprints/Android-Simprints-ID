@@ -64,7 +64,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
-    private var isActivityRestored = false
     private var requestProcessed = false
 
     @Inject
@@ -182,7 +181,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     override fun onResume() {
         super.onResume()
 
-        if (!isActivityRestored && !requestProcessed) {
+        if (!requestProcessed) {
             if (loginCheckVm.isDeviceSafe()) {
                 requestProcessed = true
                 lifecycleScope.launch {

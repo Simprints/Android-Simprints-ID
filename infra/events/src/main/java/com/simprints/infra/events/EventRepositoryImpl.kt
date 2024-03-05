@@ -108,7 +108,7 @@ internal open class EventRepositoryImpl @Inject constructor(
 
     private fun checkAndUpdateLabels(event: Event, session: SessionCaptureEvent) {
         event.labels = event.labels.copy(
-            sessionId = session.id,
+            sessionId = event.labels.sessionId ?: session.id,
             projectId = session.payload.projectId,
             deviceId = deviceId,
         )
