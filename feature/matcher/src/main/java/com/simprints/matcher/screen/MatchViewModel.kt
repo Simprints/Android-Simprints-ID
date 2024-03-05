@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -14,8 +15,8 @@ import com.simprints.matcher.MatchResultItem
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
-import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
@@ -29,6 +30,8 @@ internal class MatchViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
 
+    var isInitialized = false
+        private set
     val matchState: LiveData<MatchState>
         get() = _matchState
     private val _matchState = MutableLiveData<MatchState>(MatchState.NotStarted)
@@ -38,6 +41,7 @@ internal class MatchViewModel @Inject constructor(
     private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
+        isInitialized = true
         val startTime = timeHelper.now()
 
         val isFaceMatch = params.isFaceMatch()
@@ -66,6 +70,9 @@ internal class MatchViewModel @Inject constructor(
         )
 
         setMatchState(totalCandidates, sortedResults)
+
+        // wait a bit for the user to see the results
+        delay(matchingEndWaitTimeInMillis)
 
         _matchResponse.send(when {
             isFaceMatch -> FaceMatchResult(sortedResults)
