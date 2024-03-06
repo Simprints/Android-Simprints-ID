@@ -7,6 +7,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
@@ -525,6 +526,13 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 0) { eventRepo.addOrUpdateEvent(any(), any()) }
+    }
+
+    @Test(expected = RemoteDbNotSignedInException::class)
+    fun `upSync should throw up if RemoteDbNotSignedInException occurs`() = runTest {
+        coEvery { eventRepo.getClosedEventScopes(any()) } throws RemoteDbNotSignedInException()
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
     }
 
     private fun setUpSyncKind(kind: UpSynchronizationConfiguration.UpSynchronizationKind) {

@@ -7,15 +7,19 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
+import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -38,6 +42,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         setupClickListeners()
         observeUI()
         viewModel.refreshInformation()
+
+        findNavController().handleResult<LoginResult>(
+            viewLifecycleOwner,
+            R.id.syncInfoFragment,
+            LoginContract.DESTINATION,
+        ) { result -> viewModel.handleLoginResult(result) }
     }
 
     private fun setupClickListeners() {
@@ -54,6 +64,9 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.syncButton.setOnClickListener {
             viewModel.forceSync()
             updateSyncButton(isSyncInProgress = true)
+        }
+        binding.reloginRequiredLoginButton.setOnClickListener {
+            viewModel.login()
         }
     }
 
@@ -95,6 +108,21 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
             binding.syncButton.isEnabled = it
         }
+        viewModel.isReloginRequired.observe(viewLifecycleOwner) { reloginRequired ->
+            if (reloginRequired) {
+                binding.reloginRequiredSection.visibility = View.VISIBLE
+                binding.syncButton.visibility = View.GONE
+            } else {
+                binding.reloginRequiredSection.visibility = View.GONE
+                binding.syncButton.visibility = View.VISIBLE
+            }
+        }
+        viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
+            findNavController().navigate(
+                R.id.action_syncInfoFragment_to_login,
+                loginArgs
+            )
+        })
     }
 
     private fun updateSyncButton(isSyncInProgress: Boolean) {

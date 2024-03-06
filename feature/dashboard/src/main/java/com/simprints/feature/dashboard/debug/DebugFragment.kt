@@ -90,6 +90,11 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             syncOrchestrator.rescheduleEventSync()
         }
 
+        binding.clearFirebaseToken.setOnClickListener {
+            authStore.clearFirebaseToken()
+            binding.logs.append("\nFirebase token deleted")
+        }
+
         binding.syncConfig.setOnClickListener {
             binding.logs.append("\nGetting Configs from BFSID")
             lifecycleScope.launch {
