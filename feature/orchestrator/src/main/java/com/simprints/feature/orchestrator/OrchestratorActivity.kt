@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
-import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBinding
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.results.AppResult
@@ -20,10 +19,13 @@ internal class OrchestratorActivity : BaseActivity() {
     private val binding by viewBinding(ActivityOrchestratorBinding::inflate)
 
     @Inject
-    lateinit var orchestratorCache: OrchestratorCache
+    lateinit var activityTracker: ExecutionTracker
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycle.addObserver(activityTracker)
+
         setContentView(binding.root)
 
         binding.orchestrationHost.handleResult<AppResult>(
@@ -32,14 +34,15 @@ internal class OrchestratorActivity : BaseActivity() {
         ) { result ->
             setResult(result.resultCode, Intent().putExtras(result.extras))
 
-            orchestratorCache.isExecuting.set(false)
+            activityTracker.isExecuting.set(false)
             finish()
         }
     }
 
     override fun onStart() {
         super.onStart()
-        if (orchestratorCache.isExecuting.compareAndSet(false, true))  {
+
+        if (activityTracker.isExecuting.compareAndSet(false, true)) {
             val action = intent.action.orEmpty()
             val extras = intent.extras ?: bundleOf()
 
@@ -52,5 +55,4 @@ internal class OrchestratorActivity : BaseActivity() {
             finish()
         }
     }
-
 }
