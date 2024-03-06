@@ -342,7 +342,7 @@
         app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/syncButton"
+        app:layout_constraintTop_toBottomOf="@+id/sync_action_section"
         tools:ignore="SpeakableTextPresentCheck">
 
         <TextView
