@@ -1,5 +1,8 @@
 package com.simprints.core.tools.time
 
+import com.google.errorprone.annotations.Keep
+
+@Keep
 data class Timestamp(
     val ms: Long,
     val isTrustworthy: Boolean = false,
