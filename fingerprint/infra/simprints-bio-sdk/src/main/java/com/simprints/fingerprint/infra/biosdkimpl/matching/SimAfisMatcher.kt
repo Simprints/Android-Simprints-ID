@@ -15,7 +15,6 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifi
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
-import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfis
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
@@ -32,20 +31,25 @@ import javax.inject.Inject
  * list. It does not currently support progress indication and matching results are only available
  * when all matching is completed.
  */
-internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
-
-    @Inject
-    constructor() : this(JNILibAfis)
+internal class SimAfisMatcher @Inject constructor(private val jniLibAfis: JNILibAfisInterface) {
 
     fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
         crossFingerComparison: Boolean
     ): List<MatchResult> {
+        // if probe template format is not supported by SimAfisMatcher, return empty list
+        if (probe.templateFormatNotSupportedBySimAfisMatcher()) {
+            return emptyList()
+        }
+        // if any candidate template format is not supported by SimAfisMatcher, ignore those candidates
+        val supportedCandidates =
+            candidates.filterNot { it.templateFormatNotSupportedBySimAfisMatcher() }
+
         return if (crossFingerComparison) {
-            crossFingerMatch(probe, candidates)
+            crossFingerMatch(probe, supportedCandidates)
         } else {
-            match(probe, candidates)
+            match(probe, supportedCandidates)
         }
     }
 
@@ -99,8 +103,6 @@ internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
 
-
-
     /**
      * This method gets the matching score by:
      * - Getting the maximum matching score for each probe finger template with all candidate finger templates
@@ -132,7 +134,6 @@ internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         return MatchResult(candidate.id, getOverallScore(total, fingers))
     }
 
-
     private fun getOverallScore(total: Double, fingers: Int) =
         if (fingers == 0) {
             0.toFloat()
@@ -140,13 +141,15 @@ internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
             (total / fingers).toFloat()
         }
 
-
-
     companion object {
         const val SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT = "ISO_19794_2"
     }
 }
+
 val FingerprintIdentity.fingerprintsTemplates
     get() = fingerprints.map { it.template.toByteBuffer() }
 private fun ByteArray.toByteBuffer(): ByteBuffer =
     ByteBuffer.allocateDirect(size).put(this)
+
+fun FingerprintIdentity.templateFormatNotSupportedBySimAfisMatcher(): Boolean =
+    fingerprints.any { it.format != SimAfisMatcher.SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }

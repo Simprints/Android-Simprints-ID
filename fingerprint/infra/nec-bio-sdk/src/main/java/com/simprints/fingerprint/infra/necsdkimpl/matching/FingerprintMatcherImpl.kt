@@ -19,10 +19,18 @@ internal class FingerprintMatcherImpl @Inject constructor(
         candidates: List<FingerprintIdentity>,
         settings: NecMatchingSettings?
     ): List<MatchResult> {
+        // if probe template format is not supported by NEC matcher, return empty list
+        if (probe.templateFormatNotSupportedByNecMatcher()) {
+            return emptyList()
+        }
+        // if any candidate template format is not supported by NEC matcher, ignore those candidates
+        val supportedCandidates =
+            candidates.filterNot { it.templateFormatNotSupportedByNecMatcher() }
+
         return if (settings?.crossFingerComparison == true) {
-            crossFingerMatching(probe, candidates)
+            crossFingerMatching(probe, supportedCandidates)
         } else {
-            sameFingerMatching(probe, candidates)
+            sameFingerMatching(probe, supportedCandidates)
         }
     }
 
@@ -102,3 +110,6 @@ internal class FingerprintMatcherImpl @Inject constructor(
             (total / fingers).toFloat()
         }
 }
+
+private fun FingerprintIdentity.templateFormatNotSupportedByNecMatcher(): Boolean =
+    fingerprints.any { it.format != NEC_TEMPLATE_FORMAT }
