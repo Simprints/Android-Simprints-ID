@@ -24,8 +24,10 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
         return if (firebaseProjectName != null) {
             val projectId = authStore.signedInProjectId
 
-            if (projectId.isEmpty())
+            if (projectId.isEmpty()) {
+                Simber.i("AuthStore projectId is empty")
                 return UploadResult(imageRef, UploadResult.Status.FAILED)
+            }
 
             val bucketUrl = imageUrlProvider.getProject(projectId).imageBucket
 
@@ -51,6 +53,7 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
 
             UploadResult(imageRef, status)
         } else {
+            Simber.i("Firebase projectId is null")
             UploadResult(imageRef, UploadResult.Status.FAILED)
         }
     }

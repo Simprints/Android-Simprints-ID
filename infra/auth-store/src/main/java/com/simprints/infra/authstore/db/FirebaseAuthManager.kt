@@ -153,13 +153,13 @@ internal class FirebaseAuthManager @Inject constructor(
         // We try to return the core app right away in case there are follow on synchronized requests
         getCoreFirebaseApp()
     } catch (ex: IllegalStateException) {
+
         val token = Token(
             "",
             loginInfoStore.coreFirebaseProjectId,
             loginInfoStore.coreFirebaseApiKey,
             loginInfoStore.coreFirebaseApplicationId
         )
-
         check(!(token.projectId.isEmpty() || token.apiKey.isEmpty() || token.applicationId.isEmpty())) {
             "Core Firebase App options are not stored"
         }

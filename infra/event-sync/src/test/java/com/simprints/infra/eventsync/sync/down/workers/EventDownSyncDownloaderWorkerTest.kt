@@ -10,6 +10,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -157,6 +158,24 @@ internal class EventDownSyncDownloaderWorkerTest {
             ListenableWorker.Result.failure(
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
+                )
+            )
+        )
+    }
+
+    @Test
+    fun worker_failForRemoteDbNotSignedInException_shouldFail() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
+        coEvery {
+            downSyncTask.downSync(any(), any(), any())
+        } throws RemoteDbNotSignedInException()
+
+        val result = eventDownSyncDownloaderWorker.doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.failure(
+                workDataOf(
+                    OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true
                 )
             )
         )

@@ -6,6 +6,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
@@ -135,6 +136,10 @@ internal class EventUpSyncTask @Inject constructor(
 
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
+            if (t is RemoteDbNotSignedInException) {
+                throw t
+            }
+
             Simber.e(t)
             lastOperation = lastOperation.copy(
                 lastState = FAILED,
@@ -262,6 +267,7 @@ internal class EventUpSyncTask @Inject constructor(
                     )
                 }
             }
+            is RemoteDbNotSignedInException -> throw ex
 
             else -> {
                 Simber.e(ex)
@@ -321,6 +327,7 @@ internal class EventUpSyncTask @Inject constructor(
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.
                     is NetworkConnectionException, is HttpException -> Simber.i(t)
+                    is RemoteDbNotSignedInException -> throw t
                     else -> Simber.e(t)
                 }
             }
