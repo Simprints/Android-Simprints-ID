@@ -16,6 +16,7 @@ internal class SerialEntryPairViewModel @Inject constructor(
     private val serialNumberConverter: SerialNumberConverter
 ) : ViewModel() {
 
+    var scannerNumber: String? = null
     val awaitingToPairToMacAddress: LiveData<LiveDataEventWithContent<String>>
         get() = _awaitingToPairToMacAddress
     private val _awaitingToPairToMacAddress = MutableLiveData<LiveDataEventWithContent<String>>()
