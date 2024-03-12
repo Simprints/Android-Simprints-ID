@@ -2,7 +2,9 @@ package com.simprints.fingerprint.capture.views.timeoutbar
 
 import android.os.CountDownTimer
 import android.widget.ProgressBar
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class ScanningTimeoutBar(
     val progressBar: ProgressBar, private val scanningTimeoutMs: Long
 ) {
