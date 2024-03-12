@@ -86,11 +86,10 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val isFirstLaunch = !fragmentViewModel.isInitialized
         shouldRequestPermissions = savedInstanceState?.getBoolean(KEY_SHOULD_REQUEST_PERMISSIONS)
             ?: shouldRequestPermissions
 
-        if (isFirstLaunch) {
+        if (!fragmentViewModel.isInitialized) {
             activityViewModel.init(args.params)
             fragmentViewModel.isInitialized = true
         }
