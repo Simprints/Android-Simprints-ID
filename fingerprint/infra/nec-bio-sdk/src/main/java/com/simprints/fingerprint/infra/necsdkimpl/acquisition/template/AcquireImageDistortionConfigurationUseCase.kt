@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
+import androidx.core.content.edit
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.security.SecurityManager
@@ -24,8 +25,9 @@ internal class AcquireImageDistortionConfigurationUseCase @Inject constructor(
     suspend operator fun invoke(): ByteArray =
         sharedPreferences.getString(getDistortionConfigurationKey(), null)?.hexToByteArray()
             ?: acquireImageDistortionConfigurationFromScanner().also {
-                sharedPreferences.edit()
-                    .putString(getDistortionConfigurationKey(), it.toHexString()).apply()
+                sharedPreferences.edit {
+                    putString(getDistortionConfigurationKey(), it.toHexString())
+                }
             }
 
     // Each scanner has a unique distortion configuration file
@@ -33,8 +35,10 @@ internal class AcquireImageDistortionConfigurationUseCase @Inject constructor(
     private suspend fun getDistortionConfigurationKey() =
         "$DISTORTION_CONFIGURATION_KEY-${recentUserActivityManager.getRecentUserActivity().lastScannerUsed}"
 
-    private suspend fun acquireImageDistortionConfigurationFromScanner(): ByteArray {
-        val captureWrapper = fingerprintCaptureWrapperFactory.captureWrapper
-        return captureWrapper.acquireImageDistortionMatrixConfiguration().configurationBytes
-    }
+    private suspend fun acquireImageDistortionConfigurationFromScanner() =
+        fingerprintCaptureWrapperFactory
+            .captureWrapper
+            .acquireImageDistortionMatrixConfiguration()
+
 }
+

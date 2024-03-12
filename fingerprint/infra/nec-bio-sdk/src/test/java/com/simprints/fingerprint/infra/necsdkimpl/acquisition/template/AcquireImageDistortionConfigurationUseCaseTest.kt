@@ -58,7 +58,7 @@ class AcquireImageDistortionConfigurationUseCaseTest {
             val distortionConfiguration = byteArrayOf(1, 2, 3).toHexString()
             every { sharedPreferences.getString(any(),null) } returns null
             coEvery {
-                captureWrapper.acquireImageDistortionMatrixConfiguration().configurationBytes
+                captureWrapper.acquireImageDistortionMatrixConfiguration()
             } returns distortionConfiguration.hexToByteArray()
 
 
