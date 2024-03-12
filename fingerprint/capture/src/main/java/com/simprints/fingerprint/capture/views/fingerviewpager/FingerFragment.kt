@@ -7,7 +7,9 @@ import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.R
+import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
 import com.simprints.fingerprint.capture.resources.captureNumberTextId
 import com.simprints.fingerprint.capture.resources.directionTextColour
 import com.simprints.fingerprint.capture.resources.directionTextId
@@ -20,12 +22,8 @@ import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
-import com.simprints.fingerprint.capture.views.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningTimeoutBar
-import com.simprints.fingerprint.capture.views.timeoutbar.ScanningWithImageTransferTimeoutBar
-import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,7 +39,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        fingerId = IFingerIdentifier.values()[arguments?.getInt(FINGER_ID_BUNDLE_KEY)
+        fingerId = IFingerIdentifier.entries.toTypedArray()[arguments?.getInt(FINGER_ID_BUNDLE_KEY)
             ?: throw IllegalArgumentException()]
 
         initTimeoutBars()
@@ -49,10 +47,10 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
         vm.stateLiveData.observe(viewLifecycleOwner) {
             updateOrHideFingerImageAccordingToSettings()
             updateFingerNameText()
-            updateFingerCaptureNumberText(it)
-            updateFingerResultText(it)
+            updateFingerCaptureNumberText()
+            updateFingerResultText()
             updateFingerDirectionText(it)
-            updateTimeoutBars(it)
+            updateTimeoutBars()
         }
     }
 
@@ -70,18 +68,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
             }
         }.map { progressBar ->
             binding.progressBarContainer.addView(progressBar)
-            if (vm.isImageTransferRequired()) {
-                ScanningWithImageTransferTimeoutBar(
-                    progressBar,
-                    FingerprintCaptureViewModel.scanningTimeoutMs,
-                    FingerprintCaptureViewModel.imageTransferTimeoutMs
-                )
-            } else {
-                ScanningOnlyTimeoutBar(
-                    progressBar,
-                    FingerprintCaptureViewModel.scanningTimeoutMs
-                )
-            }
+            ScanningTimeoutBar(progressBar, vm.progressBarTimeout())
         }
     }
 
@@ -104,7 +91,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
         binding.fingerNumberText.setTextColor(resources.getColor(fingerId.nameTextColour(), null))
     }
 
-    private fun updateFingerCaptureNumberText(state: CollectFingerprintsState) = withFingerState {
+    private fun updateFingerCaptureNumberText() = withFingerState {
         if (isMultiCapture()) {
             binding.fingerCaptureNumberText.setTextColor(
                 resources.getColor(
@@ -121,7 +108,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     }
 
 
-    private fun updateFingerResultText(state: CollectFingerprintsState) = withFingerState {
+    private fun updateFingerResultText() = withFingerState {
         binding.fingerResultText.text = getString(currentCapture().resultTextId())
         binding.fingerResultText.setTextColor(
             resources.getColor(
@@ -141,7 +128,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
         )
     }
 
-    private fun updateTimeoutBars(state: CollectFingerprintsState) = withFingerState {
+    private fun updateTimeoutBars() = withFingerState {
         timeoutBars.forEachIndexed { captureIndex, timeoutBar ->
             with(timeoutBar) {
                 when (val fingerState = captures[captureIndex]) {
@@ -155,7 +142,10 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                     }
 
                     is CaptureState.Scanning -> startTimeoutBar()
-                    is CaptureState.TransferringImage -> handleScanningFinished()
+                    is CaptureState.TransferringImage -> {
+                        //Do nothing
+                    }
+
                     is CaptureState.NotDetected -> {
                         handleCancelled()
                         progressBar.progressDrawable = ContextCompat.getDrawable(
@@ -169,12 +159,6 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                         progressBar.progressDrawable = ContextCompat.getDrawable(
                             requireContext(),
                             R.drawable.timer_progress_good
-                        )
-                    } else {
-                        handleCancelled()
-                        progressBar.progressDrawable = ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.timer_progress_bad
                         )
                     }
                 }
