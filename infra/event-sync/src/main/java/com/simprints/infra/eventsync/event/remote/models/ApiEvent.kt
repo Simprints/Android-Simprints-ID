@@ -9,6 +9,7 @@ import com.simprints.infra.events.event.domain.models.Event
 internal data class ApiEvent(
     val id: String,
     val type: ApiEventPayloadType,
+    val version: Int,
     val payload: ApiEventPayload,
     val tokenizedFields: List<String>,
 )
@@ -16,13 +17,14 @@ internal data class ApiEvent(
 internal fun Event.fromDomainToApi(): ApiEvent {
     val tokenizedKeyTypes =
         getTokenizedFields().filter { it.value is TokenizableString.Tokenized }.keys.toList()
-    val payload = payload.fromDomainToApi()
-    val tokenizedFields = tokenizedKeyTypes.mapNotNull(payload::getTokenizedFieldJsonPath)
+    val apiPayload = payload.fromDomainToApi()
+    val tokenizedFields = tokenizedKeyTypes.mapNotNull(apiPayload::getTokenizedFieldJsonPath)
 
     return ApiEvent(
         id = id,
         type = type.fromDomainToApi(),
-        payload = payload,
+        version = payload.eventVersion,
+        payload = apiPayload,
         tokenizedFields = tokenizedFields
     )
 }

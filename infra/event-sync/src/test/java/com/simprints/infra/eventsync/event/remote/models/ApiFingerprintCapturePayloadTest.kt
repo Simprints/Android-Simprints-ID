@@ -22,7 +22,6 @@ class ApiFingerprintCapturePayloadTest {
         val payload = ApiFingerprintCapturePayload(
             id = randomUUID(),
             startTime = ApiTimestamp(1),
-            version = 3,
             endTime = ApiTimestamp(1),
             qualityThreshold = 23,
             finger = IFingerIdentifier.LEFT_3RD_FINGER,
@@ -33,7 +32,6 @@ class ApiFingerprintCapturePayloadTest {
         with(payload) {
             assertThat(id).isNotNull()
             assertThat(startTime).isEqualTo(ApiTimestamp(1),)
-            assertThat(version).isEqualTo(3)
             assertThat(endTime).isEqualTo(ApiTimestamp(1),)
             assertThat(qualityThreshold).isEqualTo(23)
             assertThat(finger).isEqualTo(IFingerIdentifier.LEFT_3RD_FINGER)

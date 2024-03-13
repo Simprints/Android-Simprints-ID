@@ -11,16 +11,14 @@ import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
 @JsonInclude(Include.NON_NULL)
 internal data class ApiScannerFirmwareUpdatePayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val chip: String,
     val targetAppVersion: String,
     val failureReason: String?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: ScannerFirmwareUpdatePayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.chip,
         domainPayload.targetAppVersion,

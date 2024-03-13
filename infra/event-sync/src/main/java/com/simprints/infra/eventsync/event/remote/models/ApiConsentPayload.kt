@@ -14,11 +14,10 @@ import com.simprints.infra.eventsync.event.remote.models.ApiConsentPayload.ApiTy
 @Keep
 internal data class ApiConsentPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     var endTime: ApiTimestamp?,
     val consentType: ApiType,
     var result: ApiResult,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     enum class ApiType {
@@ -34,7 +33,6 @@ internal data class ApiConsentPayload(
 
     constructor(domainPayload: ConsentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.consentType.fromDomainToApi(),
         domainPayload.result.fromDomainToApi()
