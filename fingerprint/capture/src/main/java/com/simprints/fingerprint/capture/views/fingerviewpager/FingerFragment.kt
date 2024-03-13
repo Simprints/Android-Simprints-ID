@@ -22,7 +22,7 @@ import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
-import com.simprints.fingerprint.capture.views.timeoutbar.ScanningTimeoutBar
+import com.simprints.fingerprint.capture.views.timeoutbar.ScanCountdownBar
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,7 +34,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
     private lateinit var fingerId: IFingerIdentifier
 
-    private lateinit var timeoutBars: List<ScanningTimeoutBar>
+    private lateinit var timeoutBars: List<ScanCountdownBar>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,7 +68,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
             }
         }.map { progressBar ->
             binding.progressBarContainer.addView(progressBar)
-            ScanningTimeoutBar(progressBar, vm.progressBarTimeout())
+            ScanCountdownBar(progressBar, vm.progressBarTimeout())
         }
     }
 
@@ -159,6 +159,12 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                         progressBar.progressDrawable = ContextCompat.getDrawable(
                             requireContext(),
                             R.drawable.timer_progress_good
+                        )
+                    } else {
+                        handleCancelled()
+                        progressBar.progressDrawable = ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.timer_progress_bad
                         )
                     }
                 }
