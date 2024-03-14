@@ -2,7 +2,6 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
@@ -27,10 +26,9 @@ internal class FingerprintCaptureWrapperV2(
     private val ioDispatcher: CoroutineDispatcher,
 ) : FingerprintCaptureWrapper {
 
-    override suspend fun acquireImageDistortionMatrixConfiguration(): AcquireImageDistortionMatrixConfigurationResponse =
+    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray =
         withContext(ioDispatcher) {
             scannerV2.acquireImageDistortionConfigurationMatrix()
-                .map { AcquireImageDistortionMatrixConfigurationResponse(it) }
                 .switchIfEmpty(Single.error(NoImageDistortionConfigurationMatrixException()))
                 .wrapErrorsFromScanner().await()
         }

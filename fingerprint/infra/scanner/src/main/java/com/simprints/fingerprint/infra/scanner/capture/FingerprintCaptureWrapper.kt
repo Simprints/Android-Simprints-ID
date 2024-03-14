@@ -2,7 +2,6 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 
@@ -20,5 +19,5 @@ interface FingerprintCaptureWrapper {
     val templateFormat: String
         get() = "ISO_19794_2" // This is the only template format Veros support
 
-    suspend fun acquireImageDistortionMatrixConfiguration(): AcquireImageDistortionMatrixConfigurationResponse
+    suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray
 }

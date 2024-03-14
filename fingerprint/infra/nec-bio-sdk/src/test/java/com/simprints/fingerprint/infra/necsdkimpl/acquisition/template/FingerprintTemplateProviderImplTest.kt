@@ -9,8 +9,10 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import com.simprints.sgimagecorrection.SecugenImageCorrection
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -27,7 +29,10 @@ class FingerprintTemplateProviderImplTest {
     @RelaxedMockK
     private lateinit var secugenImageCorrection: SecugenImageCorrection
 
-    @RelaxedMockK
+    @MockK
+    private lateinit var acquireImageDistortionConfigurationUseCase: AcquireImageDistortionConfigurationUseCase
+
+    @MockK
     private lateinit var fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
 
     @RelaxedMockK
@@ -53,11 +58,13 @@ class FingerprintTemplateProviderImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
         every { fingerprintCaptureWrapperFactory.captureWrapper } returns captureWrapper
+        coEvery { acquireImageDistortionConfigurationUseCase.invoke() } returns byteArrayOf(1, 2, 3)
 
         fingerprintTemplateProviderImpl = FingerprintTemplateProviderImpl(
             fingerprintCaptureWrapperFactory = fingerprintCaptureWrapperFactory,
             decodeWSQImageUseCase = decodeWsqImageUseCase,
             secugenImageCorrection = secugenImageCorrection,
+            acquireImageDistortionConfigurationUseCase = acquireImageDistortionConfigurationUseCase,
             calculateNecImageQualityUseCase = calculateNecImageQualityUseCase,
             captureProcessedImageCache = processedImageCache,
             extractNecTemplateUseCase = extractNecTemplateUseCase,

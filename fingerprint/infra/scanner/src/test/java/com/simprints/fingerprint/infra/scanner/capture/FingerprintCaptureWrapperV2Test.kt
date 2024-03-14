@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.scanner.capture
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
@@ -45,12 +44,12 @@ class FingerprintCaptureWrapperV2Test {
 
     @Test
     fun `test acquireImageDistortionMatrixConfiguration success`() = runTest {
-        val expectedResp = AcquireImageDistortionMatrixConfigurationResponse(byteArrayOf(1, 2, 3))
+        val expectedResp = byteArrayOf(1, 2, 3)
         every { scannerV2.acquireImageDistortionConfigurationMatrix() } returns Maybe.just(
-            expectedResp.configurationBytes
+            expectedResp
         )
         val actualResponse = scannerWrapper.acquireImageDistortionMatrixConfiguration()
-        assertThat(actualResponse.configurationBytes).isEqualTo(expectedResp.configurationBytes)
+        assertThat(actualResponse).isEqualTo(expectedResp)
     }
 
     @Test

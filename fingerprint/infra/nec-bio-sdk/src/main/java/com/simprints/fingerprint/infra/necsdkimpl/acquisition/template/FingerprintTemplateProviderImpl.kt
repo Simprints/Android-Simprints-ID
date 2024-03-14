@@ -16,6 +16,7 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
     private val decodeWSQImageUseCase: DecodeWSQImageUseCase,
     private val secugenImageCorrection: SecugenImageCorrection,
+    private val acquireImageDistortionConfigurationUseCase: AcquireImageDistortionConfigurationUseCase,
     private val calculateNecImageQualityUseCase: CalculateNecImageQualityUseCase,
     private val captureProcessedImageCache: ProcessedImageCache,
     private val extractNecTemplateUseCase: ExtractNecTemplateUseCase,
@@ -23,12 +24,10 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
 ) :
     FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
 
-    private lateinit var imageDistortionConfiguration: ByteArray
 
     override suspend fun acquireFingerprintTemplate(settings: FingerprintTemplateAcquisitionSettings?) =
         withContext(ioDispatcher) {
             require(settings != null) { "Settings cannot be null" }
-            readImageDistortionConfiguration()
 
             // 1- Acquire unprocessed image from the scanner
             // 2- Use secugen image processing to convert it to wsq format
@@ -64,23 +63,13 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
         Simber.tag("NEC_SDK").d(message)
     }
 
-    private suspend fun readImageDistortionConfiguration() {
-        // if imageDistortionConfiguration not initialized read it from the scanner
-        if (!::imageDistortionConfiguration.isInitialized) {
-            log("Reading image distortion configuration from the scanner")
-            imageDistortionConfiguration =
-                fingerprintCaptureWrapperFactory.captureWrapper.acquireImageDistortionMatrixConfiguration()
-                    .configurationBytes
-            //Todo save the configuration in the datastore for later use to avoid reading it from the scanner every time
-        }
-    }
 
-    private fun processImage(
+    private suspend fun processImage(
         settings: FingerprintTemplateAcquisitionSettings,
         rawImage: FingerprintRawImage
     ): FingerprintImage {
         val scannerConfig = SecugenImageCorrection.ScannerConfig(
-            imageDistortionConfiguration,
+            acquireImageDistortionConfigurationUseCase(),
             settings.processingResolution?.value ?: DEFAULT_RESOLUTION,
             rawImage.un20SerialNumber,
             rawImage.brightness
