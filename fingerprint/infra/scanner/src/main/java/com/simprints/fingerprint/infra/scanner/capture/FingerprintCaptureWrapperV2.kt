@@ -74,7 +74,8 @@ internal class FingerprintCaptureWrapperV2(
     override suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
         timeOutMs: Int,
-        qualityThreshold: Int
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse = withContext(ioDispatcher) {
         require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
@@ -85,10 +86,18 @@ internal class FingerprintCaptureWrapperV2(
             .andThen(scannerV2.getImageQualityScore())
             .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image quality score")))
             .setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold)
-            .acquireTemplateAndAssembleResponse()
-            .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire template")))
-            .ifNoFingerDetectedThenSetBadScanLedState()
-            .wrapErrorsFromScanner()
+            .flatMap { qualityScore ->
+                // If the quality score is below the threshold and we don't allow low quality extraction, return an empty template
+                if (qualityScore < qualityThreshold && !allowLowQualityExtraction) {
+                    Single.just(AcquireFingerprintTemplateResponse(ByteArray(0), templateFormat, qualityScore))
+                } else {
+                    Single.just(qualityScore)
+                        .acquireTemplateAndAssembleResponse()
+                        .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire template")))
+                        .ifNoFingerDetectedThenSetBadScanLedState()
+                        .wrapErrorsFromScanner()
+                }
+            }
             .await()
     }
 

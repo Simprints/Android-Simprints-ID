@@ -13,7 +13,8 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
         val response = fingerprintCaptureWrapperFactory.captureWrapper.acquireFingerprintTemplate(
             settings.captureFingerprintDpi,
             settings.timeOutMs,
-            settings.qualityThreshold
+            settings.qualityThreshold,
+            settings.allowLowQualityExtraction
         )
         return TemplateResponse(
             response.template,

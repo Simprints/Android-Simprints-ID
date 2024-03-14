@@ -23,7 +23,8 @@ interface BioSdkWrapper {
     suspend fun acquireFingerprintTemplate(
         capturingResolution: Int?,
         timeOutMs: Int,
-        qualityThreshold: Int
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse
 
     suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse
