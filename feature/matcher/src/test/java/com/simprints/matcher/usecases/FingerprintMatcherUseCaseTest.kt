@@ -66,6 +66,14 @@ internal class FingerprintMatcherUseCaseTest {
     }
 
     @Test
+    fun `Correctly get the matcher name`() = runTest {
+        coEvery { configRepository.getProjectConfiguration().fingerprint?.allowedSDKs } returns listOf(
+            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+        )
+        assertThat(useCase.matcherName()).isEqualTo("SIM_AFIS")
+    }
+
+    @Test
     fun `Skips matching if there are no probes`() = runTest {
         useCase.invoke(
             MatchParams(
@@ -104,7 +112,12 @@ internal class FingerprintMatcherUseCaseTest {
     fun `Correctly calls SDK matcher`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFingerprintIdentities(any(), any()) } returns listOf(
+        coEvery {
+            enrolmentRecordRepository.loadFingerprintIdentities(
+                any(),
+                any()
+            )
+        } returns listOf(
             FingerprintIdentity(
                 "personId",
                 listOf(
