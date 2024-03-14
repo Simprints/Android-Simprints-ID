@@ -14,12 +14,11 @@ import com.simprints.infra.eventsync.event.remote.models.ApiCandidateReadPayload
 @JsonInclude(Include.NON_NULL)
 internal data class ApiCandidateReadPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val candidateId: String,
     val localResult: ApiLocalResult,
     val remoteResult: ApiRemoteResult?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     enum class ApiLocalResult {
@@ -35,7 +34,6 @@ internal data class ApiCandidateReadPayload(
 
     constructor(domainPayload: CandidateReadPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.candidateId,
         domainPayload.localResult.fromDomainToApi(),

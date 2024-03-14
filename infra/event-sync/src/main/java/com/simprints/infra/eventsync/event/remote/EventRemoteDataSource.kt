@@ -50,7 +50,7 @@ internal class EventRemoteDataSource @Inject constructor(
             throw t
     }
 
-    private fun getEventCountFromHeader(response: Response<ResponseBody>): EventCount {
+    private fun getEventCountFromHeader(response: Response<*>): EventCount {
         val totalCount = response.headers()[COUNT_HEADER]?.toIntOrNull() ?: 0
         val isTotalLowerBound = response
             .headers()[IS_COUNT_HEADER_LOWER_BOUND]

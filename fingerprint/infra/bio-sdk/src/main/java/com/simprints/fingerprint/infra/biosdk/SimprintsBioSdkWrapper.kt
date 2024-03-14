@@ -16,6 +16,11 @@ class SimprintsBioSdkWrapper @Inject constructor(
     private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings>
 ) : BioSdkWrapper {
 
+    override val scanningTimeoutMs
+        get() = 3000L
+    override val imageTransferTimeoutMs
+        get() = 3000L
+
     override suspend fun initialize() {
         bioSdk.initialize()
     }

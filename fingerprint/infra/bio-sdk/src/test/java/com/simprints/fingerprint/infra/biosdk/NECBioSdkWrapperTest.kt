@@ -38,6 +38,21 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
+    fun `test scanningTimeoutMs and imageTransferTimeoutMs`() {
+        // Given
+        val expectedScanningTimeoutMs = 8000L
+        val expectedImageTransferTimeoutMs = 0L
+
+        // When
+        val actualScanningTimeoutMs = necBioSdkWrapper.scanningTimeoutMs
+        val actualImageTransferTimeoutMs = necBioSdkWrapper.imageTransferTimeoutMs
+
+        // Then
+        Truth.assertThat(actualScanningTimeoutMs).isEqualTo(expectedScanningTimeoutMs)
+        Truth.assertThat(actualImageTransferTimeoutMs).isEqualTo(expectedImageTransferTimeoutMs)
+    }
+
+    @Test
     fun `initializes bio sdk`() = runTest {
         //When
         necBioSdkWrapper.initialize()

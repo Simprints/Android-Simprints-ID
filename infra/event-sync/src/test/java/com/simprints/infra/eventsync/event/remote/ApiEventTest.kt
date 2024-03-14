@@ -110,7 +110,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -119,7 +119,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -137,7 +137,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 3)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -155,7 +155,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -164,7 +164,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test

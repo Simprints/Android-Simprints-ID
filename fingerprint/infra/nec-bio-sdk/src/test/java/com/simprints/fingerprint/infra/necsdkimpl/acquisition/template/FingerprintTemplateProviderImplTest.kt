@@ -1,11 +1,13 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.sgimagecorrection.SecugenImageCorrection
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,6 +16,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class FingerprintTemplateProviderImplTest {
@@ -44,6 +47,12 @@ class FingerprintTemplateProviderImplTest {
     @RelaxedMockK
     private lateinit var captureWrapper: FingerprintCaptureWrapper
 
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
 
     @Before
     fun setUp() {
@@ -57,8 +66,9 @@ class FingerprintTemplateProviderImplTest {
             secugenImageCorrection = secugenImageCorrection,
             acquireImageDistortionConfigurationUseCase = acquireImageDistortionConfigurationUseCase,
             calculateNecImageQualityUseCase = calculateNecImageQualityUseCase,
+            captureProcessedImageCache = processedImageCache,
             extractNecTemplateUseCase = extractNecTemplateUseCase,
-            captureProcessedImageCache = processedImageCache
+            ioDispatcher = testCoroutineRule.testCoroutineDispatcher
         )
 
     }

@@ -14,9 +14,8 @@ import com.simprints.infra.eventsync.event.remote.models.ApiScannerConnectionPay
 @JsonInclude(Include.NON_NULL)
 internal data class ApiScannerConnectionPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val scannerInfo: ApiScannerInfo,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     @JsonInclude(Include.NON_NULL)
@@ -29,7 +28,6 @@ internal data class ApiScannerConnectionPayload(
 
     constructor(domainPayload: ScannerConnectionPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         ApiScannerInfo(
             domainPayload.scannerInfo.scannerId,
             domainPayload.scannerInfo.macAddress,

@@ -81,7 +81,7 @@ class EventRemoteDataSourceTest {
         coEvery {
             eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any())
         } returns Response.success(
-            "".toResponseBody(null),
+            null,
             mapOf("x-event-count" to "6", "x-event-count-is-lower-bound" to "true").toHeaders()
         )
 

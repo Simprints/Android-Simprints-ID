@@ -18,7 +18,7 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_subjectId") subjectId: String?,
         @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?
-    ): Response<ResponseBody>
+    ): Response<Void>
 
     @Headers(
         "Content-Encoding: gzip",
