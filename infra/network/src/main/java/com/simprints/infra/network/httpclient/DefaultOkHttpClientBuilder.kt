@@ -58,16 +58,16 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
                     addInterceptor(buildAuthenticationInterceptor(authToken))
                 }
             }
-            .apply {
-                if (BuildConfig.DEBUG_MODE) {
-                    addInterceptor(buildSimberLoggingInterceptor())
-                }
-            }
             .addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
             .addInterceptor(buildRequestIdInterceptor())
             .addInterceptor(buildDeviceIdInterceptor(deviceId))
             .addInterceptor(buildVersionInterceptor(versionName))
             .addInterceptor(buildGZipInterceptor())
+            .apply {
+                if (BuildConfig.DEBUG_MODE) {
+                    addInterceptor(buildSimberLoggingInterceptor())
+                }
+            }
 
     private fun buildRequestIdInterceptor() = Interceptor { chain ->
         val newRequest = chain.request().newBuilder()
