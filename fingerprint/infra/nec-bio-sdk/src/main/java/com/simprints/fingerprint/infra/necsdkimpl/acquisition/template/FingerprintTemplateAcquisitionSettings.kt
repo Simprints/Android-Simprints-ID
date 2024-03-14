@@ -7,5 +7,5 @@ data class FingerprintTemplateAcquisitionSettings(
     val processingResolution: Dpi?,
     val timeOutMs: Int,
     val qualityThreshold: Int,
-    val allowLowQualityExtraction: Boolean=false
+    val allowLowQualityExtraction: Boolean
 )

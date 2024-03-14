@@ -278,8 +278,28 @@ class FingerprintCaptureWrapperV2Test {
             )
 
             verify(exactly = 1) { scannerUiHelper.badScanLedState() }
+            verify(exactly = 0) {scannerV2.acquireTemplate(any())  }
         }
+    @Test
+    fun `should extract template when captured fingerprint's image quality score is less than specified image quality_threshold and allowLowQualityExtraction is true`() =
+        runTest {
+            val qualityThreshold = 50
+            every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold - 10)
+            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+            every { scannerV2.captureFingerprint(any()) } answers {
+                (Single.just(CaptureFingerprintResult.OK))
+            }
+            every { scannerV2.acquireTemplate(any()) } returns Maybe.just(TemplateData(byteArrayOf()))
 
+            scannerWrapper.acquireFingerprintTemplate(
+                Dpi(1300),
+                1000,
+                qualityThreshold,
+                true
+            )
+
+            verify(exactly = 1) {scannerV2.acquireTemplate(any())  }
+        }
     @Test
     fun `should trigger good_scan LED when captured fingerprint's image quality score is greater or equal to specified image quality_threshold`() =
         runTest {
