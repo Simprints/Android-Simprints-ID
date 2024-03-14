@@ -45,6 +45,6 @@ data class EnrolmentCallbackEvent(
 
     companion object {
 
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }
