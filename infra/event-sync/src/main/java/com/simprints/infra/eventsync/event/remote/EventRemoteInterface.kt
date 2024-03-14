@@ -9,7 +9,6 @@ import retrofit2.http.*
 @JvmSuppressWildcards
 internal interface EventRemoteInterface : SimRemoteInterface {
 
-    @Headers("X-Force-Version: 2024.1.1")
     @HEAD("projects/{projectId}/events")
     suspend fun countEvents(
         @Path("projectId") projectId: String,
@@ -20,10 +19,7 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("lastEventId") lastEventId: String?
     ): Response<Void>
 
-    @Headers(
-        "Content-Encoding: gzip",
-        "X-Force-Version: 2024.1.1"
-    )
+    @Headers("Content-Encoding: gzip")
     @POST("projects/{projectId}/events")
     suspend fun uploadEvents(
         @Path("projectId") projectId: String,
@@ -32,7 +28,6 @@ internal interface EventRemoteInterface : SimRemoteInterface {
     ): Response<ResponseBody>
 
     @Streaming
-    @Headers("X-Force-Version: 2024.1.1")
     @GET("projects/{projectId}/events")
     suspend fun downloadEvents(
         @Path("projectId") projectId: String,
