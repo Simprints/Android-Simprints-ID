@@ -69,44 +69,6 @@ class SimAfisMatcherTest {
     }
 
     @Test
-    fun `test matching mixed template format fillter out candidates with different format`() =
-        runTest {
-            every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
-            val candidate1 = FingerprintIdentity(
-                "candidate1", listOf(
-                    Fingerprint(
-                        FingerIdentifier.RIGHT_THUMB,
-                        IsoFingerprintTemplateGenerator.generate(1),
-                        SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT
-                    )
-                )
-            )
-            val candidate2 = FingerprintIdentity(
-                "candidate2", listOf(
-                    Fingerprint(
-                        FingerIdentifier.RIGHT_3RD_FINGER,
-                        IsoFingerprintTemplateGenerator.generate(1),
-                        "NEC_1"
-                    )
-                )
-            )
-            val probe = FingerprintIdentity(
-                "probe", listOf(
-                    Fingerprint(
-                        FingerIdentifier.RIGHT_THUMB,
-                        IsoFingerprintTemplateGenerator.generate(1),
-                        SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT
-                    )
-                )
-            )
-            //When
-            val result = simAfisMatcher.match(probe, listOf(candidate1, candidate2), false)
-            //Then
-            assertThat(result).hasSize(1)
-            assertThat(result[0].id).isEqualTo("candidate1")
-        }
-
-    @Test
     fun `test cross finger match`() = runTest {
         mockkStatic("com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherKt")
         val template1 = mockk<ByteBuffer>()

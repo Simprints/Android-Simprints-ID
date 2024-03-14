@@ -134,30 +134,6 @@ class FingerprintMatcherImplTest {
         Truth.assertThat(result.size).isEqualTo(0)
     }
 
-    @Test
-    fun `test match FingerprintIdentities filter out candidates with different template format`() =
-        runTest {
-            // Given
-            val probe =
-                generatePersonIdentity(
-                    FingerIdentifier.LEFT_INDEX_FINGER,
-                    FingerIdentifier.RIGHT_INDEX_FINGER
-                )
-            val candidate1 =
-                generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
-            val candidate2 =
-                generatePersonIdentity(
-                    FingerIdentifier.LEFT_THUMB,
-                    FingerIdentifier.RIGHT_THUMB,
-                    format = "Unsupported"
-                )
-            // When
-            val result =
-                matcher.match(probe, listOf(candidate1, candidate2), NecMatchingSettings(false))
-            // Then
-            Truth.assertThat(result.size).isEqualTo(1)
-        }
-
     private fun generatePersonIdentity(
         vararg fingers: FingerIdentifier,
         format: String = "NEC_1"

@@ -23,14 +23,10 @@ internal class FingerprintMatcherImpl @Inject constructor(
         if (probe.templateFormatNotSupportedByNecMatcher()) {
             return emptyList()
         }
-        // if any candidate template format is not supported by NEC matcher, ignore those candidates
-        val supportedCandidates =
-            candidates.filterNot { it.templateFormatNotSupportedByNecMatcher() }
-
         return if (settings?.crossFingerComparison == true) {
-            crossFingerMatching(probe, supportedCandidates)
+            crossFingerMatching(probe, candidates)
         } else {
-            sameFingerMatching(probe, supportedCandidates)
+            sameFingerMatching(probe, candidates)
         }
     }
 
@@ -57,11 +53,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
     ): MatchResult {
         var fingers = 0 // the number of fingers used in matching
         val total = probe.fingerprints.sumOf { fingerprint ->
-            // we should ignore probe fingers that doesn't have matching candidate fingers
-
-            require(fingerprint.format == NEC_TEMPLATE_FORMAT)
             candidate.templateForFinger(fingerprint.fingerId)?.let { candidateTemplate ->
-                require(candidateTemplate.format == NEC_TEMPLATE_FORMAT)
                 fingers++
                 verify(fingerprint, candidateTemplate)
             } ?: 0.toDouble()

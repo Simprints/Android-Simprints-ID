@@ -8,7 +8,8 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
@@ -30,7 +31,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 ) : MatcherUseCase {
 
     override val crashReportTag = LoggingConstants.CrashReportTag.MATCHING.name
-    override val matcherName = MATCHER_NAME
+    override suspend fun matcherName() =
+        if (simMatcherIsEnabled()) SIM_AFIS_MATCHER_NAME else NEC_MATCHER_NAME
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
@@ -40,7 +42,10 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             return@coroutineScope Pair(emptyList(), 0)
         }
         val samples = mapSamples(matchParams.probeFingerprintSamples)
-        val totalCandidates = enrolmentRecordRepository.count(matchParams.queryForCandidates)
+        // Only candidates with supported template format are considered
+        val queryWithSupportedFormat =
+            matchParams.queryForCandidates.copy(fingerprintSampleFormat = supportedTemplateFormat())
+        val totalCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat)
         if (totalCandidates == 0) {
             return@coroutineScope Pair(emptyList(), 0)
         }
@@ -49,7 +54,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
-                    val batchCandidates = getCandidates(matchParams.queryForCandidates, range)
+                    val batchCandidates = getCandidates(queryWithSupportedFormat, range)
                     match(samples, batchCandidates, matchParams.flowType)
                         .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
                             acc.add(FingerprintMatchResult.Item(item.id, item.score))
@@ -94,7 +99,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         ?.getProjectConfiguration()
         ?.fingerprint
         ?.bioSdkConfiguration
-        ?.comparisonStrategyForVerification == FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+        ?.comparisonStrategyForVerification == CROSS_FINGER_USING_MEAN_OF_MAX
 
     private fun IFingerIdentifier.toMatcherDomain() = when (this) {
         IFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
@@ -109,8 +114,18 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
     }
 
-    companion object {
+    private suspend fun simMatcherIsEnabled() =
+        configRepository.getProjectConfiguration().fingerprint?.allowedSDKs?.first() == SECUGEN_SIM_MATCHER
 
-        private const val MATCHER_NAME = "SIM_AFIS"
+    private suspend fun supportedTemplateFormat() =
+        if (simMatcherIsEnabled()) SIM_AFIS_TEMPLATE_FORMAT else NEC_TEMPLATE_FORMAT
+
+    companion object {
+        private const val SIM_AFIS_MATCHER_NAME = "SIM_AFIS"
+        private const val SIM_AFIS_TEMPLATE_FORMAT = "ISO_19794_2"
+
+        private const val NEC_MATCHER_NAME = "NEC"
+        private const val NEC_TEMPLATE_FORMAT = "NEC_1"
+
     }
 }

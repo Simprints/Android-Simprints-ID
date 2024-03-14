@@ -55,8 +55,8 @@ internal class MatchViewModelTest {
         cb1 = slot()
 
         every { timeHelper.now() } returns Timestamp(0L)
-        every { faceMatcherUseCase.matcherName } returns MATCHER_NAME
-        every { fingerprintMatcherUseCase.matcherName } returns MATCHER_NAME
+        coEvery { faceMatcherUseCase.matcherName() } returns MATCHER_NAME
+        coEvery { fingerprintMatcherUseCase.matcherName() } returns MATCHER_NAME
 
         viewModel = MatchViewModel(
             faceMatcherUseCase,

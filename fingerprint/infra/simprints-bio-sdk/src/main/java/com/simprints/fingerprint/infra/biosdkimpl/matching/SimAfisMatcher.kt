@@ -32,7 +32,6 @@ import javax.inject.Inject
  * when all matching is completed.
  */
 internal class SimAfisMatcher @Inject constructor(private val jniLibAfis: JNILibAfisInterface) {
-
     fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
@@ -42,14 +41,10 @@ internal class SimAfisMatcher @Inject constructor(private val jniLibAfis: JNILib
         if (probe.templateFormatNotSupportedBySimAfisMatcher()) {
             return emptyList()
         }
-        // if any candidate template format is not supported by SimAfisMatcher, ignore those candidates
-        val supportedCandidates =
-            candidates.filterNot { it.templateFormatNotSupportedBySimAfisMatcher() }
-
         return if (crossFingerComparison) {
-            crossFingerMatch(probe, supportedCandidates)
+            crossFingerMatch(probe, candidates)
         } else {
-            match(probe, supportedCandidates)
+            match(probe, candidates)
         }
     }
 
@@ -76,10 +71,7 @@ internal class SimAfisMatcher @Inject constructor(private val jniLibAfis: JNILib
         SimAfisPerson(id, fingerprints.map { it.toSimAfisFingerprint() })
 
     private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint {
-        require(format == SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT) {
-            "Attempting to use $format template format for SimAfisMatcher which only accepts $SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT"
-        }
-        return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
+         return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
     }
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
