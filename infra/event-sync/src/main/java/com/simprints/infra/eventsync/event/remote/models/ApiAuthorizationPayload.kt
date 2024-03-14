@@ -15,10 +15,9 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAuthorizationPayload
 @JsonInclude(Include.NON_NULL)
 internal data class ApiAuthorizationPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val result: ApiResult,
     val userInfo: ApiUserInfo?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {
@@ -35,7 +34,6 @@ internal data class ApiAuthorizationPayload(
 
     constructor(domainPayload: AuthorizationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.result.fromDomainToApi(),
         domainPayload.userInfo?.let { ApiUserInfo(it) }
     )

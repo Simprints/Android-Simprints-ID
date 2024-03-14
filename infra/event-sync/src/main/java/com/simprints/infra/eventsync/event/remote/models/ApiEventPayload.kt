@@ -131,7 +131,6 @@ import com.simprints.infra.eventsync.event.remote.models.upsync.ApiEventUpSyncRe
 )
 @Keep
 internal abstract class ApiEventPayload(
-    open val version: Int,
     open val startTime: ApiTimestamp,
 ) {
 

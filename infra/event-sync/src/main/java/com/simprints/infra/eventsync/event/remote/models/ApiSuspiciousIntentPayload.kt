@@ -10,13 +10,11 @@ import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.Susp
 @JsonInclude(Include.NON_NULL)
 internal data class ApiSuspiciousIntentPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val unexpectedExtras: Map<String, Any?>,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: SuspiciousIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.unexpectedExtras,
     )
 

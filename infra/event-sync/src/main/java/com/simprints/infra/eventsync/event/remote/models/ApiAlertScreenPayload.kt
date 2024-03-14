@@ -11,13 +11,11 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.A
 @Keep
 internal data class ApiAlertScreenPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val alertType: ApiAlertScreenEventType,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: AlertScreenPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.alertType.fromDomainToApi(),
     )
 

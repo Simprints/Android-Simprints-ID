@@ -17,19 +17,17 @@ internal data class ApiFaceCapturePayload(
     val id: String,
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
-    override val version: Int,
     val attemptNb: Int,
     val qualityThreshold: Float,
     val result: ApiResult,
     val isFallback: Boolean,
     val face: ApiFace?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.attemptNb,
         domainPayload.qualityThreshold,
         domainPayload.result.fromDomainToApi(),

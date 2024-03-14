@@ -33,6 +33,21 @@ class SimprintsBioSdkWrapperTest {
     }
 
     @Test
+    fun `test scanningTimeoutMs and imageTransferTimeoutMs`() {
+        // Given
+        val expectedScanningTimeoutMs = 3000L
+        val expectedImageTransferTimeoutMs = 3000L
+
+        // When
+        val actualScanningTimeoutMs = simprintsBioSdkWrapper.scanningTimeoutMs
+        val actualImageTransferTimeoutMs = simprintsBioSdkWrapper.imageTransferTimeoutMs
+
+        // Then
+        assertThat(actualScanningTimeoutMs).isEqualTo(expectedScanningTimeoutMs)
+        assertThat(actualImageTransferTimeoutMs).isEqualTo(expectedImageTransferTimeoutMs)
+    }
+
+    @Test
     fun `Initializes bio sdk`() = runTest {
         //When
         simprintsBioSdkWrapper.initialize()
@@ -65,8 +80,8 @@ class SimprintsBioSdkWrapperTest {
 
         val bioSdkResponse = TemplateResponse(
             byteArrayOf(1, 2, 3), FingerprintTemplateMetadata(
-            "TemplateFormat", 100
-        )
+                "TemplateFormat", 100
+            )
         )
         val settingsSlot = slot<FingerprintTemplateAcquisitionSettings>()
         coEvery { bioSdk.acquireFingerprintTemplate(capture(settingsSlot)) } returns bioSdkResponse
@@ -90,7 +105,13 @@ class SimprintsBioSdkWrapperTest {
 
     @Test
     fun `Fails if template does not have meta data`() = runTest {
-        coEvery { bioSdk.acquireFingerprintTemplate(any()) } returns TemplateResponse(byteArrayOf(1, 2, 3), null)
+        coEvery { bioSdk.acquireFingerprintTemplate(any()) } returns TemplateResponse(
+            byteArrayOf(
+                1,
+                2,
+                3
+            ), null
+        )
 
         assertThrows<IllegalArgumentException> {
             simprintsBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1)
