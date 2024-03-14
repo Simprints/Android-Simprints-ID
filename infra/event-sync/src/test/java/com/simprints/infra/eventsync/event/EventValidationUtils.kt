@@ -34,11 +34,11 @@ fun validateTimestamp(jsonObject: JSONObject) {
     assertThat(jsonObject.getBoolean("isUnixMsTrustworthy")).isNotNull()
 }
 
-fun validateCallbackV1EventApiModel(json: JSONObject, expectedVersion: Int) {
-    validateCommonParams(json, "Callback", expectedVersion)
+fun validateCallbackV1EventApiModel(json: JSONObject) {
+    validateCommonParams(json, "Callback", 3)
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
-        verifyCallbackPayloadContent(expectedVersion)
+        verifyCallbackPayloadContent(3)
     }
 }
 
