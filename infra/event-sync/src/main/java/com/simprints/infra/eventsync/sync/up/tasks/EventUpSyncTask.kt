@@ -176,20 +176,20 @@ internal class EventUpSyncTask @Inject constructor(
             .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty()) }
         val uploadedScopes = mutableListOf<String>()
 
-        scopesToUpload.chunked(batchSize).forEach { scope ->
+        scopesToUpload.chunked(batchSize).forEach { scopes ->
             val requestStartTime = timeHelper.now()
             try {
                 val result = eventRemoteDataSource.post(
                     projectId,
-                    ApiUploadEventsBody(sessions = scope)
+                    scopes.asApiUploadEventsBody(eventScopeTypeToUpload)
                 )
                 addRequestEvent(
                     eventScope = eventScope,
                     startTime = requestStartTime,
                     result = result,
-                    content = createUpSyncContentContent(scope.size),
+                    content = createUpSyncContentContent(scopes.size),
                 )
-                uploadedScopes.addAll(scope.map { it.id })
+                uploadedScopes.addAll(scopes.map { it.id })
             } catch (ex: Exception) {
                 handleFailedRequest(ex, eventScope, requestStartTime)
             }
@@ -197,6 +197,12 @@ internal class EventUpSyncTask @Inject constructor(
 
         Simber.d("[EVENT_REPO] Deleting ${uploadedScopes.size} session scopes")
         eventRepository.deleteEventScopes(uploadedScopes)
+    }
+
+    private fun List<ApiEventScope>.asApiUploadEventsBody(eventScopeTypeToUpload: EventScopeType) = when(eventScopeTypeToUpload) {
+        EventScopeType.SESSION -> ApiUploadEventsBody(sessions = this)
+        EventScopeType.DOWN_SYNC -> ApiUploadEventsBody(eventDownSyncs = this)
+        EventScopeType.UP_SYNC -> ApiUploadEventsBody(eventUpSyncs = this)
     }
 
     private fun Map<EventScope, List<Event>?>.getCorruptedScopes() =

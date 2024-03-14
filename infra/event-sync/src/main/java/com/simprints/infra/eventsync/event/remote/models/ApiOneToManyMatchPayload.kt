@@ -8,12 +8,11 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToM
 @Keep
 internal data class ApiOneToManyMatchPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val pool: ApiMatchPool,
     val matcher: String,
     val result: List<ApiMatchEntry>?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload( startTime) {
 
     @Keep
     data class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
@@ -32,7 +31,6 @@ internal data class ApiOneToManyMatchPayload(
 
     constructor(domainPayload: OneToManyMatchPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.endedAt?.fromDomainToApi(),
         ApiMatchPool(domainPayload.pool),
         domainPayload.matcher,

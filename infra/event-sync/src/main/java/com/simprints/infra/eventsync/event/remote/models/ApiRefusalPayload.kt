@@ -16,11 +16,10 @@ import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload.ApiAn
 @Keep
 internal data class ApiRefusalPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val reason: ApiAnswer,
     val otherText: String,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     enum class ApiAnswer {
@@ -37,7 +36,6 @@ internal data class ApiRefusalPayload(
 
     constructor(domainPayload: RefusalPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.reason.toApiRefusalEventAnswer(),
         domainPayload.otherText,

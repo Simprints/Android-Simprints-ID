@@ -14,13 +14,12 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 internal data class ApiFingerprintCapturePayload(
     val id: String,
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val qualityThreshold: Int,
     val finger: IFingerIdentifier,
     val result: ApiResult,
     val fingerprint: ApiFingerprint?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class ApiFingerprint(
@@ -36,15 +35,15 @@ internal data class ApiFingerprintCapturePayload(
         )
     }
 
-    constructor(domainPayload: FingerprintCapturePayload) :
-        this(domainPayload.id,
-            domainPayload.createdAt.fromDomainToApi(),
-            domainPayload.eventVersion,
-            domainPayload.endedAt?.fromDomainToApi(),
-            domainPayload.qualityThreshold,
-            domainPayload.finger,
-            domainPayload.result.fromDomainToApi(),
-            domainPayload.fingerprint?.let { ApiFingerprint(it) })
+    constructor(domainPayload: FingerprintCapturePayload) : this(
+        domainPayload.id,
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.qualityThreshold,
+        domainPayload.finger,
+        domainPayload.result.fromDomainToApi(),
+        domainPayload.fingerprint?.let { ApiFingerprint(it) },
+    )
 
     @Keep
     enum class ApiResult {

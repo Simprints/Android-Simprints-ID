@@ -17,14 +17,12 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 internal data class ApiFaceCaptureConfirmationPayload(
     override val startTime: ApiTimestamp, //Not added on API yet
     val endTime: ApiTimestamp?,
-    override val version: Int,
     val result: ApiResult,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: FaceCaptureConfirmationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.result.fromDomainToApi()
     )
 
