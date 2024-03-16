@@ -21,6 +21,10 @@ class SimprintsBioSdkWrapper @Inject constructor(
     override val imageTransferTimeoutMs
         get() = 3000L
 
+    override val matcherName: String
+        get()= bioSdk.matcherName
+    override val supportedTemplateFormat: String
+        get() = bioSdk.supportedTemplateFormat
     override suspend fun initialize() {
         bioSdk.initialize()
     }

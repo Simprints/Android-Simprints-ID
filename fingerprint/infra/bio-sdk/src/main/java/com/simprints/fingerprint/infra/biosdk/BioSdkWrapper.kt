@@ -13,6 +13,10 @@ interface BioSdkWrapper {
     // Maximum time to wait for the bio sdk to transfer the fingerprint image
     val imageTransferTimeoutMs: Long
 
+    val matcherName: String
+
+    val supportedTemplateFormat: String
+
     suspend fun initialize()
 
     suspend fun match(

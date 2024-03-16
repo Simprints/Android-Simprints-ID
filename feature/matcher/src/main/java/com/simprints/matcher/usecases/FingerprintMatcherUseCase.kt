@@ -8,7 +8,6 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -24,15 +23,14 @@ import javax.inject.Inject
 
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
+    private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
     private val configRepository: ConfigRepository,
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
 
     override val crashReportTag = LoggingConstants.CrashReportTag.MATCHING.name
-    override suspend fun matcherName() =
-        if (simMatcherIsEnabled()) SIM_AFIS_MATCHER_NAME else NEC_MATCHER_NAME
+    override suspend fun matcherName() = resolveBioSdkWrapper().matcherName
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
@@ -44,7 +42,9 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         val samples = mapSamples(matchParams.probeFingerprintSamples)
         // Only candidates with supported template format are considered
         val queryWithSupportedFormat =
-            matchParams.queryForCandidates.copy(fingerprintSampleFormat = supportedTemplateFormat())
+            matchParams.queryForCandidates.copy(
+                fingerprintSampleFormat = resolveBioSdkWrapper().supportedTemplateFormat
+            )
         val totalCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat)
         if (totalCandidates == 0) {
             return@coroutineScope Pair(emptyList(), 0)
@@ -88,7 +88,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         probes: List<Fingerprint>,
         candidates: List<FingerprintIdentity>,
         flowType: FlowType,
-    ) = resolveBioSdkWrapperUseCase().match(
+    ) = resolveBioSdkWrapper().match(
         FingerprintIdentity("", probes),
         candidates,
         isCrossFingerMatchingEnabled(flowType),
@@ -114,18 +114,5 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
     }
 
-    private suspend fun simMatcherIsEnabled() =
-        configRepository.getProjectConfiguration().fingerprint?.allowedSDKs?.first() == SECUGEN_SIM_MATCHER
 
-    private suspend fun supportedTemplateFormat() =
-        if (simMatcherIsEnabled()) SIM_AFIS_TEMPLATE_FORMAT else NEC_TEMPLATE_FORMAT
-
-    companion object {
-        private const val SIM_AFIS_MATCHER_NAME = "SIM_AFIS"
-        private const val SIM_AFIS_TEMPLATE_FORMAT = "ISO_19794_2"
-
-        private const val NEC_MATCHER_NAME = "NEC"
-        private const val NEC_TEMPLATE_FORMAT = "NEC_1"
-
-    }
 }

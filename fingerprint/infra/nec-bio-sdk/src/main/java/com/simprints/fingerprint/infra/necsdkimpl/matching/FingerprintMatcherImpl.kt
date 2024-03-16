@@ -14,6 +14,10 @@ import javax.inject.Inject
 internal class FingerprintMatcherImpl @Inject constructor(
     private val nec: NEC
 ) : FingerprintMatcher<NecMatchingSettings> {
+
+    override val supportedTemplateFormat: String = NEC_TEMPLATE_FORMAT
+    override val matcherName: String = "NEC"
+
     override suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,

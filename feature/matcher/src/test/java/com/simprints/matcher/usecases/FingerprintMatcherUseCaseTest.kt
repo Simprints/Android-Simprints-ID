@@ -67,6 +67,7 @@ internal class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Correctly get the matcher name`() = runTest {
+        coEvery { bioSdkWrapper.matcherName } returns "SIM_AFIS"
         coEvery { configRepository.getProjectConfiguration().fingerprint?.allowedSDKs } returns listOf(
             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         )
