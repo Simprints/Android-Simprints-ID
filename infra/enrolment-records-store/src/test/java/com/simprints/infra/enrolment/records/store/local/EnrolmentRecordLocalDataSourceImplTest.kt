@@ -17,6 +17,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
@@ -25,6 +26,8 @@ import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 import kotlin.random.Random
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FORMAT_FIELD
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FINGERPRINT_SAMPLES_FIELD
 
 class EnrolmentRecordLocalDataSourceImplTest {
 
@@ -114,6 +117,18 @@ class EnrolmentRecordLocalDataSourceImplTest {
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.patientId)
         }
+    }
+
+    @Test
+    fun `correctly query supported fingerprint format`() = runTest {
+        val format = "SupportedFormat"
+
+         enrolmentRecordLocalDataSource
+            .loadFingerprintIdentities(SubjectQuery(fingerprintSampleFormat = format), IntRange(0, 20))
+            .toList()
+
+        verify { realmQuery.query(
+            "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",format) }
     }
 
     @Test

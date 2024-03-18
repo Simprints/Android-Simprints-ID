@@ -20,6 +20,10 @@ class NECBioSdkWrapper @Inject constructor(
     override val imageTransferTimeoutMs: Long
         get() = 0 // 0 seconds as the image is already captured and stored in the memory from the scanning step
 
+    override val matcherName: String = bioSdk.matcherName
+
+    override val supportedTemplateFormat: String = bioSdk.supportedTemplateFormat
+
     override suspend fun initialize() = bioSdk.initialize()
 
 
@@ -57,4 +61,5 @@ fun TemplateResponse<FingerprintTemplateMetadata>.toDomain(): AcquireFingerprint
         templateMetadata!!.templateFormat,
         templateMetadata!!.imageQualityScore
     )
+
 }

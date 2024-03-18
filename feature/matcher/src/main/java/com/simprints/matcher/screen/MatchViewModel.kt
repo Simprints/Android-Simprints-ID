@@ -62,7 +62,7 @@ internal class MatchViewModel @Inject constructor(
             endTime,
             params,
             totalCandidates,
-            matcherUseCase.matcherName,
+            matcherUseCase.matcherName(),
             sortedResults
         )
 
