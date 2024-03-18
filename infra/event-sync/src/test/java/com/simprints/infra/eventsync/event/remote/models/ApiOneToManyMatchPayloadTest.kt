@@ -12,7 +12,6 @@ class ApiOneToManyMatchPayloadTest {
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
         val payload = ApiOneToManyMatchPayload(
             startTime = ApiTimestamp(0L, false, 0L),
-            version = 0,
             endTime = ApiTimestamp(0L, false, 0L),
             pool = mockk(),
             matcher = "",

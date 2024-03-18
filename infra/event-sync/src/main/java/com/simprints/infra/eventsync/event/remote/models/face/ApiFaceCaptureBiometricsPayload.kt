@@ -9,11 +9,10 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 internal class ApiFaceCaptureBiometricsPayload(
-    override val version: Int,
     override val startTime: ApiTimestamp,
     val id: String,
     val face: Face?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class Face(
@@ -34,7 +33,6 @@ internal class ApiFaceCaptureBiometricsPayload(
     }
 
     constructor(domainPayload: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload) : this(
-        domainPayload.eventVersion,
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.id,
         Face(domainPayload.face)

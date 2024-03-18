@@ -2,7 +2,6 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
@@ -33,7 +32,7 @@ internal class FingerprintCaptureWrapperV1(
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
     }
 
-    override suspend fun acquireImageDistortionMatrixConfiguration(): AcquireImageDistortionMatrixConfigurationResponse {
+    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray {
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
     }
 

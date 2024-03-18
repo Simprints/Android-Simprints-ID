@@ -17,13 +17,11 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 @JsonInclude(Include.NON_NULL)
 internal data class ApiCalloutPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val callout: ApiCallout,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         ApiEnrolmentCallout(
             domainPayload.projectId,
             domainPayload.userId.value,
@@ -32,7 +30,6 @@ internal data class ApiCalloutPayload(
 
     constructor(domainPayload: IdentificationCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         ApiIdentificationCallout(
             domainPayload.projectId,
             domainPayload.userId.value,
@@ -41,7 +38,6 @@ internal data class ApiCalloutPayload(
 
     constructor(domainPayload: VerificationCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         ApiVerificationCallout(
             domainPayload.projectId,
             domainPayload.userId.value,
@@ -51,14 +47,12 @@ internal data class ApiCalloutPayload(
 
     constructor(domainPayload: ConfirmationCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         ApiConfirmationCallout(
             domainPayload.selectedGuid,
             domainPayload.sessionId))
 
     constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         ApiEnrolmentLastBiometricsCallout(
             domainPayload.projectId,
             domainPayload.userId.value,

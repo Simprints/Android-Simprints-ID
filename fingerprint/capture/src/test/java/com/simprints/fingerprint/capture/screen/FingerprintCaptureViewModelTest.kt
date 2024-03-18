@@ -125,6 +125,8 @@ class FingerprintCaptureViewModelTest {
         every { scannerManager.isScannerConnected } returns true
 
         coJustRun { bioSdkWrapper.initialize() }
+        every { bioSdkWrapper.scanningTimeoutMs } returns 1000
+        every { bioSdkWrapper.imageTransferTimeoutMs } returns 1000
 
         vm = FingerprintCaptureViewModel(
             scannerManager,
@@ -184,19 +186,19 @@ class FingerprintCaptureViewModelTest {
     }
 
     @Test
-    fun `test scanner supports image transfer then isImageTransferRequired should be true`() = runTest {
+    fun `test scanner supports image transfer then isImageTransferRequired should be equal to scanningTimeoutMs + imageTransferTimeoutMs`() = runTest {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns true
         vm.handleOnViewCreated(TWO_FINGERS_IDS)
-        assertThat(vm.isImageTransferRequired()).isTrue()
+        assertThat(vm.progressBarTimeout()).isEqualTo(bioSdkWrapper.scanningTimeoutMs + bioSdkWrapper.imageTransferTimeoutMs)
     }
 
     @Test
-    fun `test scanner doesn't support imageTransfer then isImageTransferRequired should be false`() = runTest {
+    fun `test scanner doesn't support imageTransfer then progressBarTimeout should be equal to scanningTimeoutMs`() = runTest {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns false
         vm.handleOnViewCreated(TWO_FINGERS_IDS)
-        assertThat(vm.isImageTransferRequired()).isFalse()
+        assertThat(vm.progressBarTimeout()).isEqualTo(bioSdkWrapper.scanningTimeoutMs)
     }
 
     @Test

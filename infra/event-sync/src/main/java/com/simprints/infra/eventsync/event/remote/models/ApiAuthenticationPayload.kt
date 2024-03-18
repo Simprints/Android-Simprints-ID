@@ -17,11 +17,10 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayloa
 @Keep
 internal data class ApiAuthenticationPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val userInfo: ApiUserInfo,
     val result: ApiResult,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {
@@ -45,7 +44,6 @@ internal data class ApiAuthenticationPayload(
 
     constructor(domainPayload: AuthenticationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.endedAt?.fromDomainToApi(),
         ApiUserInfo(domainPayload.userInfo),
         domainPayload.result.fromDomainToApi()

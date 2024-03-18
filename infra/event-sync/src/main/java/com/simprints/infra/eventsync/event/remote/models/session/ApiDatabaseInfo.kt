@@ -10,10 +10,6 @@ import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 internal data class ApiDatabaseInfo(
     var recordCount: Int?,
     var sessionCount: Int = 0,
-) {
-
-    constructor(databaseInfo: DatabaseInfo) :
-        this(databaseInfo.recordCount, databaseInfo.sessionCount)
-}
+)
 
 internal fun DatabaseInfo.fromDomainToApi() = ApiDatabaseInfo(recordCount, sessionCount)

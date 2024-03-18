@@ -7,13 +7,11 @@ import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.Compl
 @Keep
 internal data class ApiCompletionCheckPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val completed: Boolean,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: CompletionCheckPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.completed,
     )
 

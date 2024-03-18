@@ -145,6 +145,33 @@ internal class EventUpSyncTaskTest {
     }
 
     @Test
+    fun `upload out-of-session events in correct fields`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+        every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
+            2, 2, 2
+        )
+
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.DOWN_SYNC) } returns listOf(
+            createSessionScope(GUID1)
+        )
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.UP_SYNC) } returns listOf(
+            createSessionScope(GUID2),
+            createSessionScope(GUID3)
+        )
+        coEvery {
+            eventRepo.getEventsFromScope(any())
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        coVerify {
+            eventRemoteDataSource.post(any(), match { it.eventDownSyncs.size == 1})
+            eventRemoteDataSource.post(any(), match { it.eventUpSyncs.size == 2})
+        }
+    }
+
+    @Test
     fun `upload should not filter any session events on upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
