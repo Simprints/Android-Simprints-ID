@@ -87,7 +87,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult<AlertResult>(AlertContract.DESTINATION) { alertResult ->
             clientApiVm.handleErrorResponse(
                 args.requestAction,
-                AppErrorResponse(AlertConfigurationMapper.reasonFromPayload(alertResult.payload))
+                AppErrorResponse(alertResult.appErrorReason())
             )
         }
 

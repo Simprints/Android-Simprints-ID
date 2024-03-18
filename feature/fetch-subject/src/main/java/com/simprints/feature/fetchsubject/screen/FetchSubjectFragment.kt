@@ -45,7 +45,9 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
 
     private fun handleAlertResult(alertResult: AlertResult) {
         when (alertResult.buttonKey) {
-            FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false, FetchSubjectAlerts.wasOnline(alertResult.payload))
+            FetchSubjectAlerts.ACTION_CLOSE -> {
+                findNavController().finishWithResult(this, alertResult)
+            }
             FetchSubjectAlerts.ACTION_RETRY -> tryFetchSubject()
             AlertContract.ALERT_BUTTON_PRESSED_BACK -> viewModel.startExitForm()
         }
@@ -98,4 +100,5 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
     private fun handleExitFormResult(exiFormResult: ExitFormResult) {
         findNavController().finishWithResult(this, exiFormResult)
     }
+
 }

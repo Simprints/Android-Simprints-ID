@@ -61,12 +61,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
             viewLifecycleOwner,
             R.id.setupFragment,
             AlertContract.DESTINATION,
-        ) { result ->
-            findNavController().finishWithResult(
-                this,
-                SetupResult(false, ErrorType.reasonFromPayload(result.payload))
-            )
-        }
+        ) { result -> findNavController().finishWithResult(this, result) }
         // Request location permission
         viewModel.requestLocationPermission.observe(viewLifecycleOwner) {
             if (requireActivity().hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.config.AlertConfiguration
@@ -22,6 +23,7 @@ data class AlertConfigurationBuilder(
     var leftButton: AlertButtonConfig = AlertButtonConfig.Close,
     var rightButton: AlertButtonConfig? = null,
     var eventType: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType? = null,
+    var appErrorReason: AppErrorReason = AppErrorReason.UNEXPECTED_ERROR,
     var payload: Bundle = Bundle(),
 )
 
@@ -38,6 +40,7 @@ data class AlertConfigurationBuilder(
  * messageIcon - Optional icon to show next to the message, default - view is not visible
  * leftButton - Left/main button configuration, default - basic "Close" button
  * rightButton - Optional right button configuration, default - view is not visible
+ * appErrorReason - Error code that will be returned in app result if the alert is considered terminal, default - UNEXPECTED_ERROR
  * eventType - Event type to be logged on alert opening, default - nothing
  * payload - Custom bundle that will be provided in result callback
  * ```
@@ -65,7 +68,7 @@ fun AlertConfigurationBuilder.toArgs() = AlertFragmentArgs(AlertConfiguration(
     leftButton = this.leftButton,
     rightButton = this.rightButton,
     eventType = this.eventType,
-    payload = this.payload,
+    payload = this.payload.also { it.putString(AlertContract.ALERT_REASON_PAYLOAD, this.appErrorReason.name) },
 )).toBundle()
 
 data class AlertButtonBuilder(

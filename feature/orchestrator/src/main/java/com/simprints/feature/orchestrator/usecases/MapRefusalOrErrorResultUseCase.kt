@@ -30,7 +30,7 @@ internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
         is FingerprintConnectResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR) }
 
-        is AlertResult -> AppErrorResponse(AlertConfigurationMapper.reasonFromPayload(result.payload))
+        is AlertResult -> AppErrorResponse(result.appErrorReason())
 
         else -> null
     }

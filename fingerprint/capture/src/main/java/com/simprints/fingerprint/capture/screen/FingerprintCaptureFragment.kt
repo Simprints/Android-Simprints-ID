@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -122,7 +121,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     messageRes = IDR.string.configuration_licence_invalid_message
                     image = IDR.drawable.ic_exclamation
                     leftButton = AlertButtonConfig.Close
-                    payload = bundleOf(PAYLOAD_TYPE_KEY to AppErrorReason.FACE_LICENSE_INVALID)
+                    appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
                     eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.FACE_LICENSE_INVALID
                 }.toArgs()
             )
@@ -282,8 +281,5 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     override fun onDestroyView() {
         confirmDialog?.dismiss()
         super.onDestroyView()
-    }
-    companion object {
-        private const val PAYLOAD_TYPE_KEY = "error_type"
     }
 }

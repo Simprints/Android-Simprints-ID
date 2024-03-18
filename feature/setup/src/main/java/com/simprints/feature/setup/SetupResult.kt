@@ -7,5 +7,4 @@ import java.io.Serializable
 @Keep
 data class SetupResult(
     val isSuccess: Boolean,
-    val error: AppErrorReason? = null,
 ) : Serializable
