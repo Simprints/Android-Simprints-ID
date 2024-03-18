@@ -2,8 +2,6 @@ package com.simprints.matcher.screen
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -46,11 +44,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
 
     private fun observeViewModel() {
         viewModel.matchResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            // wait a bit for the user to see the results
-            Handler(Looper.getMainLooper()).postDelayed(
-                { findNavController().finishWithResult(this, it) },
-                MatchViewModel.matchingEndWaitTimeInMillis
-            )
+             findNavController().finishWithResult(this, it)
         })
         viewModel.matchState.observe(viewLifecycleOwner) { matchState ->
             when (matchState) {

@@ -17,6 +17,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -90,6 +91,7 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
@@ -130,6 +132,7 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
