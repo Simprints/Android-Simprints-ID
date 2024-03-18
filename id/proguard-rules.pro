@@ -21,58 +21,6 @@
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
 
--keep @com.simprints.core.annotations.Unobfuscate public class * {*;}
-
-# Platform calls Class.forName on types which do not exist on Android to determine platform.
--dontnote retrofit2.Platform
-# Platform used when running on Java 8 VMs. Will not be used at runtime.
--dontwarn retrofit2.Platform$Java8
-# Retain generic type information for use by reflection by converters and adapters.
--keepattributes Signature
-# Retain declared checked exceptions for use by a Proxy instance.
--keepattributes Exceptions
-
-#okhttp3
--dontwarn okhttp3.**
--dontwarn okio.**
--dontwarn javax.annotation.**
--dontwarn org.conscrypt.**
-# A resource is loaded with a relative path so the package of this class must be preserved.
--keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
-
-# Gson uses generic type information stored in a class file when working with fields. Proguard
-# removes such information by default, so configure it to keep all of it.
--keepattributes Signature
-
--keepclassmembers enum * { *; }
-
-# These contain serialised models - TODO: should be more selective?
--keep class com.simprints.libsimprints.** { *; }
--keep class com.simprints.infra.eventsync.event.remote.models.** { *; }
--keep class com.simprints.infra.events.event.domain.models.** { *; }
--keep class com.simprints.infra.events.event.local.** { *; }
-
-# Deobfuscations for Crashlytics:
-# https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
--keepattributes SourceFile,LineNumberTable,*Annotation*
--keep public class * extends java.lang.Exception
--keep public class * extends java.lang.RuntimeException
--keep public class * extends java.lang.Throwable
--keep class com.crashlytics.** { *; }
--dontwarn com.crashlytics.**
-
-# Keep firebase classes. more details at https://github.com/firebase/firebase-android-sdk/issues/2124#issuecomment-1091962221
--keep public class com.google.firebase.** {*;}
--keep class com.google.android.gms.internal.** {*;}
--keepclasseswithmembers class com.google.firebase.FirebaseException
-
-
-# Dagger
--dontwarn com.google.errorprone.annotations.**
-
-# RxJava https://github.com/ReactiveX/RxJava
--dontwarn java.util.concurrent.Flow*
-
 # Kotlin Coroutines
 # ServiceLoader support
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
@@ -89,20 +37,6 @@
 -keepclassmembernames class kotlin.coroutines.SafeContinuation {
     volatile <fields>;
 }
-# https://github.com/Kotlin/kotlinx.coroutines/issues/1270
--dontwarn kotlinx.coroutines.flow.**
--dontwarn com.simprints.id.services.scheduledSync.people.up.workers.**
--dontwarn com.simprints.id.tools.extensions.**
--dontwarn com.simprints.id.activities.settings.syncinformation.**
--dontwarn com.simprints.id.activities.consent.**
--dontwarn com.simprints.infra.events.session.**
-
-# https://github.com/Kotlin/kotlinx.coroutines/issues/2046
--dontwarn java.lang.instrument.ClassFileTransformer
--dontwarn sun.misc.SignalHandler
--dontwarn java.lang.instrument.Instrumentation
--dontwarn sun.misc.Signal
-
 
 # Jackson
 # Proguard configuration for Jackson 2.x (fasterxml package instead of codehaus package)
@@ -124,3 +58,8 @@
 #net.zetetic:android-database-sqlcipher
 -keep class net.sqlcipher.** { *; }
 
+# Do not obfuscate names in out packages`
+-keepnames class com.simprints.** { *; }
+# Keep all marshallable classes as-is
+-keep class com.simprints.** extends java.io.Serializable { *; }
+-keep class com.simprints.** extends android.os.Parcelable { *; }
