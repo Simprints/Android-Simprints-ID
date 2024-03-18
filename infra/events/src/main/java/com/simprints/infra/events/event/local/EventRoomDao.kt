@@ -11,50 +11,26 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 internal interface EventRoomDao {
 
-    @Query("select * from DbEvent order by createdAt desc")
+    @Query("select * from DbEvent order by createdAt_unixMs desc")
     suspend fun loadAll(): List<DbEvent>
 
-    @Query("select * from DbEvent where sessionId = :sessionId order by createdAt desc")
-    suspend fun loadFromSession(sessionId: String): List<DbEvent>
+    @Query("select * from DbEvent where scopeId = :scopeId order by createdAt_unixMs desc")
+    suspend fun loadFromScope(scopeId: String): List<DbEvent>
 
-    @Query("select eventJson from DbEvent where sessionId = :sessionId order by createdAt desc")
-    suspend fun loadEventJsonFromSession(sessionId: String): List<String>
+    @Query("select eventJson from DbEvent where scopeId = :scopeId order by createdAt_unixMs desc")
+    suspend fun loadEventJsonFromScope(scopeId: String): List<String>
 
-    @Query("select * from DbEvent where projectId = :projectId order by createdAt desc")
-    suspend fun loadFromProject(projectId: String): List<DbEvent>
-
-    @Query("select * from DbEvent where sessionIsClosed = 0 and type = :type order by createdAt desc")
-    suspend fun loadOpenedSessions(
-        type: EventType = EventType.SESSION_CAPTURE
-    ): List<DbEvent>
-
-    @Query("select sessionId from DbEvent where projectId = :projectId and sessionIsClosed = :isClosed and type = :type")
-    suspend fun loadAllClosedSessionIds(
-        projectId: String,
-        isClosed: Boolean = true,
-        type: EventType = EventType.SESSION_CAPTURE
-    ): List<String>
-
-    @Query("select count(*) from DbEvent where projectId = :projectId")
-    suspend fun countFromProject(projectId: String): Int
-
-    @Query("select count(*) from DbEvent where type = :type AND projectId = :projectId")
-    suspend fun countFromProjectByType(type: EventType, projectId: String): Int
+    @Query("select count(*) from DbEvent")
+    fun observeCount(): Flow<Int>
 
     @Query("select count(*) from DbEvent where type = :type")
-    suspend fun countFromType(type: EventType): Int
+    fun observeCountFromType(type: EventType): Flow<Int>
 
-    @Query("select count(*) from DbEvent where projectId = :projectId")
-    fun observeCount(projectId: String): Flow<Int>
+    @Query("delete from DbEvent where scopeId = :scopeId")
+    suspend fun deleteAllFromScope(scopeId: String)
 
-    @Query("select count(*) from DbEvent where projectId = :projectId and type = :type")
-    fun observeCountFromType(projectId: String, type: EventType): Flow<Int>
-
-    @Query("delete from DbEvent where id in (:ids)")
-    suspend fun delete(ids: List<String>)
-
-    @Query("delete from DbEvent where sessionId = :sessionId")
-    suspend fun deleteAllFromSession(sessionId: String)
+    @Query("delete from DbEvent where scopeId in (:scopeIds)")
+    suspend fun deleteAllFromScopes(scopeIds: List<String>)
 
     @Query("delete from DbEvent")
     suspend fun deleteAll()

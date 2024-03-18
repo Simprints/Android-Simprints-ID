@@ -8,20 +8,21 @@ import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.
 
 @Keep
 internal data class ApiConnectivitySnapshotPayload(
-    override val startTime: Long,
-    override val version: Int,
-    val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.ConnectivitySnapshot, version, startTime) {
+    override val startTime: ApiTimestamp,
+    val connections: List<ApiConnection>,
+) : ApiEventPayload(startTime) {
 
     @Keep
     class ApiConnection(val type: String, val state: String) {
+
         constructor(connection: SimNetworkUtils.Connection)
             : this(connection.type.toString(), connection.state.toString())
     }
 
-    constructor(domainPayload: ConnectivitySnapshotPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.connections.map { ApiConnection(it) })
+    constructor(domainPayload: ConnectivitySnapshotPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.connections.map { ApiConnection(it) },
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

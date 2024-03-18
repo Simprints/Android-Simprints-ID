@@ -11,23 +11,12 @@ import com.simprints.infra.config.store.local.models.ProtoIdentificationConfigur
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.local.models.toProto
-import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.store.models.IdentificationConfiguration
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.models.*
+import com.simprints.infra.config.store.remote.models.*
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
@@ -212,11 +201,13 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
     ApiSynchronizationConfiguration.Frequency.PERIODICALLY,
     ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiSimprintsUpSynchronizationConfiguration(
-            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL
+            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiUpSyncBatchSizes(1, 2, 3),
+            false,
         ),
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
             ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE
-        )
+        ),
     ),
     ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration.PartitionType.PROJECT,
@@ -225,15 +216,19 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
     )
 )
 
+internal val simprintsUpSyncConfigurationConfiguration = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+    UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+    UpSynchronizationConfiguration.UpSyncBatchSizes(1, 2, 3),
+    false
+)
+
 internal val synchronizationConfiguration = SynchronizationConfiguration(
     SynchronizationConfiguration.Frequency.PERIODICALLY,
     UpSynchronizationConfiguration(
-        UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-        ),
+        simprintsUpSyncConfigurationConfiguration,
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-        )
+        ),
     ),
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
@@ -249,6 +244,13 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .setSimprints(
                 ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                     .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                    .setBatchSizes(
+                        ProtoUpSyncBatchSizes.newBuilder()
+                            .setSessions(1)
+                            .setUpSyncs(2)
+                            .setDownSyncs(3)
+                            .build()
+                    )
                     .build()
             )
             .setCoSync(
@@ -269,6 +271,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
 
 internal val apiProjectConfiguration = ApiProjectConfiguration(
     "projectId",
+    "updatedAt",
     apiGeneralConfiguration,
     apiFaceConfiguration,
     apiFingerprintConfiguration,
@@ -279,6 +282,7 @@ internal val apiProjectConfiguration = ApiProjectConfiguration(
 
 internal val projectConfiguration = ProjectConfiguration(
     "projectId",
+    "updatedAt",
     generalConfiguration,
     faceConfiguration,
     fingerprintConfiguration,
@@ -289,6 +293,7 @@ internal val projectConfiguration = ProjectConfiguration(
 
 internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setProjectId("projectId")
+    .setUpdatedAt("updatedAt")
     .setGeneral(protoGeneralConfiguration)
     .setFace(protoFaceConfiguration)
     .setFingerprint(protoFingerprintConfiguration)
@@ -309,16 +314,19 @@ internal val tokenizationKeysLocal = tokenizationKeysDomain.mapKeys {
 internal val apiProject = ApiProject(
     id = "id",
     name = "name",
+    state = ApiProjectState.RUNNING,
     description = "description",
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
+    configuration = apiProjectConfiguration,
     tokenizationKeys = tokenizationKeysLocal
 )
 internal val project = Project(
     id = "id",
     name = "name",
     description = "description",
+    state = ProjectState.RUNNING,
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
@@ -328,6 +336,7 @@ internal val protoProject = ProtoProject.newBuilder()
     .setId("id")
     .setName("name")
     .setDescription("description")
+    .setState("RUNNING")
     .setCreator("creator")
     .setImageBucket("url")
     .setBaseUrl("baseUrl")
@@ -348,3 +357,14 @@ internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
     .addAllModuleSelected(listOf("module1", "module2"))
     .setLastInstructionId("instruction")
     .build()
+
+internal val apiDeviceState = ApiDeviceState(
+    "deviceId",
+    false,
+    null
+)
+internal val deviceState = DeviceState(
+    "deviceId",
+   false,
+    null
+)

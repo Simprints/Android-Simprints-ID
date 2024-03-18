@@ -399,6 +399,19 @@ class Scanner(
             ))
             .mapToMaybeEmptyIfNull { it.imageData }
 
+    fun acquireUnprocessedImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): Maybe<ImageData> =
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
+            sendMainModeCommandAndReceiveResponse<GetImageResponse>(
+                GetUnprocessedImageCommand(imageFormatData)
+            ))
+            .mapToMaybeEmptyIfNull { it.imageData }
+    fun acquireImageDistortionConfigurationMatrix(): Maybe<ByteArray> =
+        assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
+            sendMainModeCommandAndReceiveResponse<GetImageDistortionConfigurationMatrixResponse>(
+                GetImageDistortionConfigurationMatrixCommand()
+            ))
+            .mapToMaybeEmptyIfNull { it.imageConfigurationMatrix }
+
     /** No value emitted if an image has not been captured */
     fun getImageQualityScore(): Maybe<Int> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(

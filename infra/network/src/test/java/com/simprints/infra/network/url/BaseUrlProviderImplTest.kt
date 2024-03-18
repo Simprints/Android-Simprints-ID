@@ -14,7 +14,10 @@ import org.junit.Test
 class BaseUrlProviderImplTest {
 
     companion object {
+        private const val URL_SUFFIX = "/androidapi/v2/"
+
         private const val URL = "https://test"
+        private const val URL_WITH_SUFFIX = "https://test$URL_SUFFIX"
     }
 
     @RelaxedMockK
@@ -48,6 +51,15 @@ class BaseUrlProviderImplTest {
     }
 
     @Test
+    fun `get api base url prefix should return the actual url`() {
+        every { sharedPreferences.getString(any(), any()) } returns URL_WITH_SUFFIX
+
+        val url = baseUrlProviderImpl.getApiBaseUrlPrefix()
+
+        assertThat(url).isEqualTo(URL)
+    }
+
+    @Test
     fun `set api base url should set the url to the default one when the one passed is null`() {
         baseUrlProviderImpl.setApiBaseUrl(null)
 
@@ -59,7 +71,7 @@ class BaseUrlProviderImplTest {
         val url = "https://url.com"
         baseUrlProviderImpl.setApiBaseUrl(url)
 
-        verify(exactly = 1) { editor.putString(any(), "$url/androidapi/v2/") }
+        verify(exactly = 1) { editor.putString(any(), "$url$URL_SUFFIX") }
     }
 
     @Test
@@ -67,7 +79,7 @@ class BaseUrlProviderImplTest {
         val url = "url.com"
         baseUrlProviderImpl.setApiBaseUrl(url)
 
-        verify(exactly = 1) { editor.putString(any(), "https://$url/androidapi/v2/") }
+        verify(exactly = 1) { editor.putString(any(), "https://$url$URL_SUFFIX") }
     }
 
     @Test

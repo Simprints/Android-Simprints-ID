@@ -2,8 +2,7 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +10,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class SimpleEventReporter @Inject constructor(
-    private val coreEventRepository: EventRepository,
+    private val coreEventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
     @ExternalScope private val externalScope: CoroutineScope
 ) {

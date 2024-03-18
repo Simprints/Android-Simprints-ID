@@ -6,7 +6,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import io.mockk.MockKAnnotations
@@ -15,7 +15,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -23,7 +22,7 @@ import org.junit.Test
 class EnrolSubjectUseCaseTest {
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: SessionEventRepository
 
     @MockK
     private lateinit var timeHelper: TimeHelper
@@ -37,7 +36,7 @@ class EnrolSubjectUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns "sessionId"
         }
 
@@ -50,7 +49,7 @@ class EnrolSubjectUseCaseTest {
 
     @Test
     fun `Adds enrolment V2 event when called`() = runTest {
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<PersonCreationEvent> { every { id } returns "personCreationId" }
         )
 
@@ -72,7 +71,7 @@ class EnrolSubjectUseCaseTest {
 
     @Test
     fun `Saves enrolment record when called`() = runTest {
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<PersonCreationEvent> { every { id } returns "personCreationId" }
         )
 

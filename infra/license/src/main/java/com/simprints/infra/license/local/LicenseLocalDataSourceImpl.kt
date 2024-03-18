@@ -59,9 +59,9 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
             directory.mkdirs()
     }
 
-    override suspend fun deleteCachedLicense(): Unit = withContext(dispatcherIo) {
+    override suspend fun deleteCachedLicense(vendor: Vendor): Unit = withContext(dispatcherIo) {
         try {
-            val deleted = File(licenseDirectoryPath).delete()
+            val deleted = File("$licenseDirectoryPath/$vendor").delete()
             Simber.d("Deleted cached licenses successfully = $deleted")
         } catch (t: Throwable) {
             Simber.e(t)

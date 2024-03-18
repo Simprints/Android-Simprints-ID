@@ -2,7 +2,7 @@ package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -22,7 +22,7 @@ class SimpleEventReporterTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var coreEventRepository: EventRepository
+    private lateinit var coreEventRepository: SessionEventRepository
 
     @MockK
     private lateinit var timeHelper: TimeHelper
@@ -33,7 +33,7 @@ class SimpleEventReporterTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { coreEventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { coreEventRepository.getCurrentSessionScope() } returns mockk {
             coEvery { id } returns SESSION_ID
         }
 

@@ -7,21 +7,20 @@ import com.simprints.infra.events.event.domain.models.PersonCreationEvent.Person
 
 @Keep
 internal data class ApiPersonCreationPayload(
-    override val startTime: Long,
-    override val version: Int,
+    override val startTime: ApiTimestamp,
     val fingerprintCaptureIds: List<String>?,
     val fingerprintReferenceId: String?,
     val faceCaptureIds: List<String>?,
     val faceReferenceId: String?,
-) : ApiEventPayload(ApiEventPayloadType.PersonCreation, version, startTime) {
+) : ApiEventPayload(startTime) {
 
-    constructor(domainPayload: PersonCreationPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.fingerprintCaptureIds,
-            domainPayload.fingerprintReferenceId,
-            domainPayload.faceCaptureIds,
-            domainPayload.faceReferenceId)
+    constructor(domainPayload: PersonCreationPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.fingerprintCaptureIds,
+        domainPayload.fingerprintReferenceId,
+        domainPayload.faceCaptureIds,
+        domainPayload.faceReferenceId
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

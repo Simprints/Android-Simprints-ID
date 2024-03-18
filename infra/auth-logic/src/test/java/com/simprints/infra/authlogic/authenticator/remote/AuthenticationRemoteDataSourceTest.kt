@@ -29,7 +29,6 @@ class AuthenticationRemoteDataSourceTest {
         private const val PROJECT_ID = "projectId"
         private const val DEVICE_ID = "deviceId"
         private const val NONCE = "nonce_from_server"
-        private const val PUBLIC_KEY = "public_key_from_server"
         private val AUTH_REQUEST = AuthRequest("secret", "integrityToken")
         private val API_AUTH_REQUEST_BODY = ApiAuthRequestBody("secret", "integrityToken")
     }
@@ -59,14 +58,14 @@ class AuthenticationRemoteDataSourceTest {
                     PROJECT_ID,
                     DEVICE_ID
                 )
-            } returns ApiAuthenticationData(PUBLIC_KEY, NONCE)
+            } returns ApiAuthenticationData( NONCE)
 
             val actualAuthenticationData =
                 authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
                     DEVICE_ID
                 )
-            val expectedAuthenticationData = AuthenticationData(PUBLIC_KEY, NONCE)
+            val expectedAuthenticationData = AuthenticationData( NONCE)
             assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
         }
 

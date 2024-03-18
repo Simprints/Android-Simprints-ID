@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration =
     ProtoProjectConfiguration.newBuilder()
         .setProjectId(projectId)
+        .setUpdatedAt(updatedAt)
         .setConsent(consent.toProto())
         .setGeneral(general.toProto())
         .setIdentification(identification.toProto())
@@ -18,6 +19,7 @@ internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration =
 internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration =
     ProjectConfiguration(
         projectId,
+        updatedAt,
         general.toDomain(),
         hasFace().let { if (it) face.toDomain() else null },
         hasFingerprint().let { if (it) fingerprint.toDomain() else null },

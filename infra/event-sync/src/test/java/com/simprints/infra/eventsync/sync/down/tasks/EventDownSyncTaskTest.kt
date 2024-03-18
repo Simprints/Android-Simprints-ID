@@ -9,6 +9,10 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -23,6 +27,7 @@ import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -30,16 +35,19 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mock
 
 class EventDownSyncTaskTest {
 
     companion object {
+
         val ENROLMENT_RECORD_DELETION = EnrolmentRecordDeletionEvent(
             "subjectId",
             "projectId",
@@ -92,8 +100,13 @@ class EventDownSyncTaskTest {
     @MockK
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
 
-    private lateinit var subjectFactory: SubjectFactory
+    @MockK
+    private lateinit var eventRepository: EventRepository
 
+    @MockK
+    private lateinit var eventScope: EventScope
+
+    private lateinit var subjectFactory: SubjectFactory
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -113,6 +126,7 @@ class EventDownSyncTaskTest {
             configManager,
             timeHelper,
             eventRemoteDataSource,
+            eventRepository,
         )
     }
 
@@ -122,7 +136,8 @@ class EventDownSyncTaskTest {
         repeat(2 * EVENTS_BATCH_SIZE) { eventsToDownload += ENROLMENT_RECORD_DELETION }
         mockProgressEmission(eventsToDownload)
 
-        val progress = eventDownSyncTask.downSync(this, projectOp).toList()
+        val progress = eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
         assertThat(progress.first().progress).isEqualTo(1)
         assertThat(progress.first().operation.state).isEqualTo(RUNNING)
         //Shifted by 1 since the first batch is immediately emitted with only 1 element
@@ -135,10 +150,42 @@ class EventDownSyncTaskTest {
     }
 
     @Test
+    fun downSync_shouldAddEventToProvidedScope() = runTest {
+        val eventsToDownload = mutableListOf<EnrolmentRecordEvent>()
+        repeat(2 * EVENTS_BATCH_SIZE) { eventsToDownload += ENROLMENT_RECORD_DELETION }
+        mockProgressEmission(eventsToDownload)
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                match {
+                    it is EventDownSyncRequestEvent &&
+                        it.payload.requestId == "requestId" &&
+                        it.payload.eventsRead == eventsToDownload.size &&
+                        it.payload.responseStatus == 200
+                }
+            )
+        }
+    }
+
+    @Test
+    fun downSync_shouldNotAddEventToProvidedScopeIfNoEvents() = runTest {
+        mockProgressEmission(emptyList())
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
+        coVerify(exactly = 0) {
+            eventRepository.addOrUpdateEvent(any(), any())
+        }
+    }
+
+    @Test
     fun downSync_shouldEmitAFailureIfDownloadFails() = runTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws Throwable("IO Exception")
 
-        val progress = eventDownSyncTask.downSync(this, projectOp).toList()
+        val progress = eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
 
         assertThat(progress.last().operation.state).isEqualTo(FAILED)
         coVerify(exactly = 2) { eventDownSyncScopeRepository.insertOrUpdate(any()) }
@@ -148,7 +195,22 @@ class EventDownSyncTaskTest {
     fun downSync_shouldThrowUpIfRemoteDbNotSignedInExceptionOccurs() = runTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws RemoteDbNotSignedInException()
 
-        eventDownSyncTask.downSync(this, projectOp).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+    }
+
+    @Test
+    fun downSync_shouldAddEventWithErrorIfDownloadFails() = runTest {
+        coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws Throwable("IO Exception")
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                match {
+                    it is EventDownSyncRequestEvent && !it.payload.errorType.isNullOrEmpty()
+                }
+            )
+        }
     }
 
     @Test
@@ -156,7 +218,7 @@ class EventDownSyncTaskTest {
         val event = ENROLMENT_RECORD_CREATION
         mockProgressEmission(listOf(event))
 
-        eventDownSyncTask.downSync(this, projectOp).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -176,7 +238,7 @@ class EventDownSyncTaskTest {
         val event = ENROLMENT_RECORD_DELETION
         mockProgressEmission(listOf(event))
 
-        eventDownSyncTask.downSync(this, projectOp).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
 
         coVerify { enrolmentRecordRepository.performActions(listOf(Deletion(event.payload.subjectId))) }
     }
@@ -191,7 +253,7 @@ class EventDownSyncTaskTest {
             ""
         )
 
-        eventDownSyncTask.downSync(this, moduleOp).toList()
+        eventDownSyncTask.downSync(this, moduleOp, eventScope).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(emptyList())
@@ -211,10 +273,10 @@ class EventDownSyncTaskTest {
 
             val syncByModule2 = moduleOp.copy(
                 queryEvent = moduleOp.queryEvent.copy(
-                    moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
+                    moduleId = DEFAULT_MODULE_ID_2.value
                 )
             )
-            eventDownSyncTask.downSync(this, syncByModule2).toList()
+            eventDownSyncTask.downSync(this, syncByModule2, eventScope).toList()
 
             coVerify {
                 enrolmentRecordRepository.performActions(
@@ -235,7 +297,7 @@ class EventDownSyncTaskTest {
             lastInstructionId = ""
         )
 
-        eventDownSyncTask.downSync(this, moduleOp).toList()
+        eventDownSyncTask.downSync(this, moduleOp, eventScope).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -258,10 +320,10 @@ class EventDownSyncTaskTest {
 
         val syncByModule2 = moduleOp.copy(
             queryEvent = moduleOp.queryEvent.copy(
-                moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
+                moduleId = DEFAULT_MODULE_ID_2.value
             )
         )
-        eventDownSyncTask.downSync(this, syncByModule2).toList()
+        eventDownSyncTask.downSync(this, syncByModule2, eventScope).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -274,7 +336,12 @@ class EventDownSyncTaskTest {
 
     private suspend fun mockProgressEmission(progressEvents: List<EnrolmentRecordEvent>) {
         downloadEventsChannel = Channel(capacity = Channel.UNLIMITED)
-        coEvery { eventRemoteDataSource.getEvents(any(), any()) } returns downloadEventsChannel
+        coEvery { eventRemoteDataSource.getEvents(any(), any()) } returns EventDownSyncResult(
+            0,
+            requestId = "requestId",
+            status = 200,
+            downloadEventsChannel
+        )
 
         progressEvents.forEach {
             downloadEventsChannel.send(it)

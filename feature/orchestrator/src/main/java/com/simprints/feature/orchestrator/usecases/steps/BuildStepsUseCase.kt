@@ -1,11 +1,9 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
 import androidx.core.os.bundleOf
-import com.simprints.core.DeviceID
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowType
 import com.simprints.face.capture.FaceCaptureContract
-import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
@@ -29,7 +27,6 @@ import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mapping code for steps")
 internal class BuildStepsUseCase @Inject constructor(
-    @DeviceID private val deviceId: String,
     private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase,
     private val cache: OrchestratorCache,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
@@ -38,7 +35,6 @@ internal class BuildStepsUseCase @Inject constructor(
     fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
-            buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildConsentStep(ConsentType.ENROL),
             buildModalityCaptureSteps(
                 projectConfiguration,
@@ -55,7 +51,6 @@ internal class BuildStepsUseCase @Inject constructor(
 
         is ActionRequest.IdentifyActionRequest -> listOf(
             buildSetupStep(),
-            buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildConsentStep(ConsentType.IDENTIFY),
             buildModalityCaptureSteps(
                 projectConfiguration,
@@ -70,7 +65,6 @@ internal class BuildStepsUseCase @Inject constructor(
 
         is ActionRequest.VerifyActionRequest -> listOf(
             buildSetupStep(),
-            buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildFetchGuidStep(action.projectId, action.verifyGuid),
             buildConsentStep(ConsentType.VERIFY),
             buildModalityCaptureSteps(
@@ -99,23 +93,6 @@ internal class BuildStepsUseCase @Inject constructor(
         destinationId = SetupContract.DESTINATION,
         payload = bundleOf(),
     ))
-
-    private fun buildModalityConfigurationSteps(
-        projectConfiguration: ProjectConfiguration,
-        projectId: String,
-        deviceId: String,
-    ): List<Step> = projectConfiguration.general.modalities.mapNotNull {
-        when (it) {
-            Modality.FINGERPRINT -> null
-
-            Modality.FACE -> Step(
-                id = StepId.FACE_CONFIGURATION,
-                navigationActionId = R.id.action_orchestratorFragment_to_faceConfiguration,
-                destinationId = FaceConfigurationContract.DESTINATION,
-                payload = FaceConfigurationContract.getArgs(projectId, deviceId),
-            )
-        }
-    }
 
     private fun buildFetchGuidStep(projectId: String, subjectId: String) = listOf(Step(
         id = StepId.FETCH_GUID,

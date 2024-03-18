@@ -2,8 +2,6 @@ package com.simprints.feature.dashboard.settings.syncinfo
 
 import android.os.Bundle
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -29,6 +27,7 @@ import com.simprints.infra.resources.R as IDR
 internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     companion object {
+
         private const val TOTAL_RECORDS_INDEX = 0
     }
 
@@ -66,7 +65,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             viewModel.forceSync()
             updateSyncButton(isSyncInProgress = true)
         }
-        binding.reloginRequiredLoginButton.setOnClickListener {
+        binding.syncReloginRequiredLoginButton.setOnClickListener {
             viewModel.login()
         }
     }
@@ -92,13 +91,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
 
         viewModel.recordsToDownSync.observe(viewLifecycleOwner) {
-            binding.recordsToDownloadCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
-        }
-
-        viewModel.recordsToDelete.observe(viewLifecycleOwner) {
-            binding.recordsToDeleteCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
+            binding.recordsToDownloadCount.text = it?.let {
+                if (it.isLowerBound) "${it.count}+" else "${it.count}"
+            } ?: ""
+            setProgressBar(it?.count, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
         }
 
         viewModel.moduleCounts.observe(viewLifecycleOwner) {
@@ -114,11 +110,11 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
         viewModel.isReloginRequired.observe(viewLifecycleOwner) { reloginRequired ->
             if (reloginRequired) {
-                binding.reloginRequiredSection.visibility = VISIBLE
-                binding.syncButton.visibility = GONE
+                binding.syncReloginRequiredSection.visibility = View.VISIBLE
+                binding.syncButton.visibility = View.GONE
             } else {
-                binding.reloginRequiredSection.visibility = GONE
-                binding.syncButton.visibility = VISIBLE
+                binding.syncReloginRequiredSection.visibility = View.GONE
+                binding.syncButton.visibility = View.VISIBLE
             }
         }
         viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
@@ -138,33 +134,32 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
         if (viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
-            binding.moduleSelectionButton.visibility = VISIBLE
-            binding.modulesTabHost.visibility = VISIBLE
+            binding.moduleSelectionButton.visibility = View.VISIBLE
+            binding.modulesTabHost.visibility = View.VISIBLE
         } else {
-            binding.moduleSelectionButton.visibility = GONE
-            binding.modulesTabHost.visibility = GONE
+            binding.moduleSelectionButton.visibility = View.GONE
+            binding.modulesTabHost.visibility = View.GONE
         }
     }
 
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
         if (!configuration.isEventDownSyncAllowed()) {
-            binding.recordsToDownloadCardView.visibility = GONE
-            binding.recordsToDeleteCardView.visibility = GONE
+            binding.recordsToDownloadCardView.visibility = View.GONE
         }
 
         if (!configuration.canSyncDataToSimprints()) {
-            binding.recordsToUploadCardView.visibility = GONE
-            binding.imagesToUploadCardView.visibility = GONE
+            binding.recordsToUploadCardView.visibility = View.GONE
+            binding.imagesToUploadCardView.visibility = View.GONE
         }
     }
 
     private fun setProgressBar(value: Int?, tv: TextView, pb: ProgressBar) {
         if (value == null) {
-            pb.visibility = VISIBLE
-            tv.visibility = GONE
+            pb.visibility = View.VISIBLE
+            tv.visibility = View.GONE
         } else {
-            pb.visibility = GONE
-            tv.visibility = VISIBLE
+            pb.visibility = View.GONE
+            tv.visibility = View.VISIBLE
         }
     }
 

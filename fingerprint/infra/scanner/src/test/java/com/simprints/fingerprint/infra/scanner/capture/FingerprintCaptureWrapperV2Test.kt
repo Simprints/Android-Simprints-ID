@@ -3,6 +3,7 @@ package com.simprints.fingerprint.infra.scanner.capture
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
@@ -42,6 +43,52 @@ class FingerprintCaptureWrapperV2Test {
     }
 
     @Test
+    fun `test acquireImageDistortionMatrixConfiguration success`() = runTest {
+        val expectedResp = byteArrayOf(1, 2, 3)
+        every { scannerV2.acquireImageDistortionConfigurationMatrix() } returns Maybe.just(
+            expectedResp
+        )
+        val actualResponse = scannerWrapper.acquireImageDistortionMatrixConfiguration()
+        assertThat(actualResponse).isEqualTo(expectedResp)
+    }
+
+    @Test
+    fun `test acquireUnprocessedImage success`() = runTest {
+        // Given
+        val imageData = ImageData(
+            byteArrayOf(
+                0x05, 0x06, 0x07, 0x08, 0x05, 0x06, 0x07, 0x08,
+                0x05, 0x06, 0x07, 0x08, 0x05, 0x06, 0x07, 0x08,
+                0x05, 0x06, 0x07, 0x08, 0x05, 0x06, 0x07, 0x08
+            ), 1
+        )
+        every { scannerV2.captureFingerprint(any()) } returns Single.just(CaptureFingerprintResult.OK)
+        every { scannerV2.acquireUnprocessedImage(any()) } returns Maybe.just(imageData)
+        // When
+        val actualResponse = scannerWrapper.acquireUnprocessedImage(Dpi(500))
+        // Then
+        assertThat(actualResponse.rawUnprocessedImage.imageData).isEqualTo(
+            RawUnprocessedImage(
+                imageData.image
+            ).imageData
+        )
+    }
+
+    @Test(expected = NoFingerDetectedException::class)
+    fun `test acquireUnprocessedImage throws NoFingerDetectedException when scanner returns empty`() =
+        runTest {
+            // Given
+            every { scannerV2.acquireUnprocessedImage(any()) } returns Maybe.empty()
+            every { scannerV2.captureFingerprint(any()) } returns Single.just(
+                CaptureFingerprintResult.OK
+            )
+            // When
+            scannerWrapper.acquireUnprocessedImage(Dpi(500))
+            // Then throw NoFingerDetectedException
+
+        }
+
+    @Test
     fun `should throw illegal argument exception when capture DPI is null`() = runTest {
         assertThrows<IllegalArgumentException> {
             scannerWrapper.acquireFingerprintTemplate(
@@ -64,15 +111,16 @@ class FingerprintCaptureWrapperV2Test {
     }
 
     @Test
-    fun `should throw illegal argument exception when capture DPI is greater than 1700`() = runTest {
-        assertThrows<IllegalArgumentException> {
-            scannerWrapper.acquireFingerprintTemplate(
-                Dpi(1701),
-                1000,
-                50
-            )
+    fun `should throw illegal argument exception when capture DPI is greater than 1700`() =
+        runTest {
+            assertThrows<IllegalArgumentException> {
+                scannerWrapper.acquireFingerprintTemplate(
+                    Dpi(1701),
+                    1000,
+                    50
+                )
+            }
         }
-    }
 
     @Test
     fun `should throw corresponding errors when capture fingerprint result is not OK`() = runTest {

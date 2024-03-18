@@ -2,9 +2,10 @@ package com.simprints.face.capture.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
@@ -18,15 +19,15 @@ import javax.inject.Inject
 
 internal class SimpleCaptureEventReporter @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val encodingUtils: EncodingUtils,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
-    fun addOnboardingCompleteEvent(startTime: Long) = externalScope.launch {
+    fun addOnboardingCompleteEvent(startTime: Timestamp) = externalScope.launch {
         eventRepository.addOrUpdateEvent(FaceOnboardingCompleteEvent(startTime, timeHelper.now()))
     }
 
-    fun addCaptureConfirmationEvent(startTime: Long, isContinue: Boolean) = externalScope.launch {
+    fun addCaptureConfirmationEvent(startTime: Timestamp, isContinue: Boolean) = externalScope.launch {
         eventRepository.addOrUpdateEvent(FaceCaptureConfirmationEvent(
             startTime,
             timeHelper.now(),
@@ -34,7 +35,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
         ))
     }
 
-    fun addFallbackCaptureEvent(startTime: Long, endTime: Long) = externalScope.launch {
+    fun addFallbackCaptureEvent(startTime: Timestamp, endTime: Timestamp) = externalScope.launch {
         eventRepository.addOrUpdateEvent(FaceFallbackCaptureEvent(startTime, endTime))
     }
 

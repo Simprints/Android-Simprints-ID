@@ -1,12 +1,11 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
@@ -16,16 +15,10 @@ import org.junit.Test
 class StartBackgroundSyncUseCaseTest {
 
     @MockK
-    lateinit var eventSyncManager: EventSyncManager
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
-    lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
-
-    @MockK
-    lateinit var configManager: ConfigManager
-
-    @MockK
-    lateinit var authManager: AuthManager
+    lateinit var configRepository: ConfigRepository
 
     private lateinit var useCase: StartBackgroundSyncUseCase
 
@@ -34,43 +27,38 @@ class StartBackgroundSyncUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = StartBackgroundSyncUseCase(
-            eventSyncManager,
-            imageUpSyncScheduler,
-            configManager,
-            authManager,
+            syncOrchestrator,
+            configRepository,
         )
     }
 
     @Test
     fun `Schedules all syncs when called`() = runTest {
-        coEvery { configManager.getProjectConfiguration().synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
+        coEvery { configRepository.getProjectConfiguration().synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
 
         useCase.invoke()
 
-        verify {
-            eventSyncManager.scheduleSync()
-            imageUpSyncScheduler.scheduleImageUpSync()
-            configManager.scheduleSyncConfiguration()
-            authManager.scheduleSecurityStateCheck()
+        coVerify {
+            syncOrchestrator.scheduleBackgroundWork()
         }
     }
 
     @Test
     fun `Starts event sync on start if required`() = runTest {
-        coEvery { configManager.getProjectConfiguration().synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
+        coEvery { configRepository.getProjectConfiguration().synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
 
         useCase.invoke()
 
-        verify { eventSyncManager.sync() }
+        verify { syncOrchestrator.startEventSync() }
     }
 
     @Test
     fun `Does not start event sync on start if not required`() = runTest {
-        coEvery { configManager.getProjectConfiguration().synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
+        coEvery { configRepository.getProjectConfiguration().synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
 
         useCase.invoke()
 
-        verify(exactly = 0) { eventSyncManager.sync() }
+        verify(exactly = 0) { syncOrchestrator.startEventSync() }
     }
 
 }

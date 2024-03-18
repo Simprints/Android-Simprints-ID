@@ -5,7 +5,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +15,7 @@ import javax.inject.Inject
 internal class SaveScannerConnectionEventsUseCase @Inject constructor(
     private val scannerManager: ScannerManager,
     private val timeHelper: TimeHelper,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 

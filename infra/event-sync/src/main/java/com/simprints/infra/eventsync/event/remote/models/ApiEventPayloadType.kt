@@ -17,9 +17,6 @@ internal enum class ApiEventPayloadType {
     /* key added: CALLBACK_KEY */
     Callback,
 
-    /* key added: ARTIFICIAL_TERMINATION_KEY */
-    ArtificialTermination,
-
     /* key added: AUTHENTICATION_KEY */
     Authentication,
 
@@ -83,9 +80,6 @@ internal enum class ApiEventPayloadType {
     /* key added: COMPLETION_CHECK_KEY */
     CompletionCheck,
 
-    /* key added: SESSION_CAPTURE_KEY */
-    SessionCapture,
-
     /* key added: FACE_ONBOARDING_COMPLETE_KEY */
     FaceOnboardingComplete,
 
@@ -99,12 +93,19 @@ internal enum class ApiEventPayloadType {
     FaceCaptureBiometrics,
 
     /* key added: FACE_CAPTURE_CONFIRMATION_KEY */
-    FaceCaptureConfirmation;
+    FaceCaptureConfirmation,
+
+    /* key added: EVENT_DOWN_SYNC_REQUEST_KEY */
+    EventDownSyncRequest,
+
+    /* key added: EVENT_UP_SYNC_REQUEST_KEY */
+    EventUpSyncRequest,
+    ;
 
     companion object {
+
         const val CALLOUT_KEY = "Callout"
         const val CALLBACK_KEY = "Callback"
-        const val ARTIFICIAL_TERMINATION_KEY = "ArtificialTermination"
         const val AUTHENTICATION_KEY = "Authentication"
         const val CONSENT_KEY = "Consent"
         const val ENROLMENT_KEY = "Enrolment"
@@ -125,25 +126,24 @@ internal enum class ApiEventPayloadType {
         const val SUSPICIOUS_INTENT_KEY = "SuspiciousIntent"
         const val INTENT_PARSING_KEY = "IntentParsing"
         const val COMPLETION_CHECK_KEY = "CompletionCheck"
-        const val SESSION_CAPTURE_KEY = "SessionCapture"
         const val FACE_ONBOARDING_COMPLETE_KEY = "FaceOnboardingComplete"
         const val FACE_FALLBACK_CAPTURE_KEY = "FaceFallbackCapture"
         const val FACE_CAPTURE_KEY = "FaceCapture"
         const val FACE_CAPTURE_CONFIRMATION_KEY = "FaceCaptureConfirmation"
         const val FACE_CAPTURE_BIOMETRICS_KEY = "FaceCaptureBiometrics"
         const val FINGERPRINT_CAPTURE_BIOMETRICS_KEY = "FingerprintCaptureBiometrics"
+        const val EVENT_DOWN_SYNC_REQUEST_KEY = "EventDownSyncRequest"
+        const val EVENT_UP_SYNC_REQUEST_KEY = "EventUpSyncRequest"
     }
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
-    ARTIFICIAL_TERMINATION -> ApiEventPayloadType.ArtificialTermination
     AUTHENTICATION -> ApiEventPayloadType.Authentication
     CONSENT -> ApiEventPayloadType.Consent
-    ENROLMENT_V1 -> ApiEventPayloadType.Enrolment
-    ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
+    ENROLMENT_V1, ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
     FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
-    ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToManyMatch
+    ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToOneMatch
     ONE_TO_MANY_MATCH -> ApiEventPayloadType.OneToManyMatch
     PERSON_CREATION -> ApiEventPayloadType.PersonCreation
     ALERT_SCREEN -> ApiEventPayloadType.AlertScreen
@@ -159,28 +159,32 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     CALLOUT_IDENTIFICATION,
     CALLOUT_ENROLMENT,
     CALLOUT_VERIFICATION,
-    CALLOUT_LAST_BIOMETRICS -> ApiEventPayloadType.Callout
+    CALLOUT_LAST_BIOMETRICS,
+    -> ApiEventPayloadType.Callout
+
     CALLBACK_IDENTIFICATION,
     CALLBACK_ENROLMENT,
     CALLBACK_REFUSAL,
     CALLBACK_VERIFICATION,
     CALLBACK_CONFIRMATION,
-    CALLBACK_ERROR -> ApiEventPayloadType.Callback
+    CALLBACK_ERROR,
+    -> ApiEventPayloadType.Callback
+
     SUSPICIOUS_INTENT -> ApiEventPayloadType.SuspiciousIntent
     INTENT_PARSING -> ApiEventPayloadType.IntentParsing
     COMPLETION_CHECK -> ApiEventPayloadType.CompletionCheck
-    SESSION_CAPTURE -> ApiEventPayloadType.SessionCapture
     FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FaceOnboardingComplete
     FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
     FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
     FACE_CAPTURE_CONFIRMATION -> ApiEventPayloadType.FaceCaptureConfirmation
     FINGERPRINT_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FingerprintCaptureBiometrics
     FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
+    EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
+    EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
 }
 
 
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
-    ApiEventPayloadType.ArtificialTermination -> ARTIFICIAL_TERMINATION
     ApiEventPayloadType.Authentication -> AUTHENTICATION
     ApiEventPayloadType.Consent -> CONSENT
     ApiEventPayloadType.Enrolment -> ENROLMENT_V2
@@ -201,13 +205,14 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.SuspiciousIntent -> SUSPICIOUS_INTENT
     ApiEventPayloadType.IntentParsing -> INTENT_PARSING
     ApiEventPayloadType.CompletionCheck -> COMPLETION_CHECK
-    ApiEventPayloadType.SessionCapture -> SESSION_CAPTURE
     ApiEventPayloadType.FaceOnboardingComplete -> FACE_ONBOARDING_COMPLETE
     ApiEventPayloadType.FaceFallbackCapture -> FACE_FALLBACK_CAPTURE
     ApiEventPayloadType.FaceCapture -> FACE_CAPTURE
     ApiEventPayloadType.FaceCaptureConfirmation -> FACE_CAPTURE_CONFIRMATION
     ApiEventPayloadType.FingerprintCaptureBiometrics -> FINGERPRINT_CAPTURE_BIOMETRICS
     ApiEventPayloadType.FaceCaptureBiometrics -> FACE_CAPTURE_BIOMETRICS
+    ApiEventPayloadType.EventDownSyncRequest -> EVENT_DOWN_SYNC_REQUEST
+    ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }

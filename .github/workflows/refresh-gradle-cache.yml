@@ -9,6 +9,7 @@ on:
 jobs:
     refresh-caches:
         runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         env:
             GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
@@ -17,7 +18,7 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v4
             -   name: Cache Gradle global directory
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: |
                         ~/.gradle/

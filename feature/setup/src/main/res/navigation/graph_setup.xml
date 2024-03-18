@@ -11,4 +11,11 @@
         android:label="SetupFragment"
         tools:layout="@layout/fragment_setup" />
 
+    <include app:graph="@navigation/graph_alert" />
+    <action
+        android:id="@+id/action_global_errorFragment"
+        app:destination="@id/graph_alert"
+        app:popUpTo="@id/graph_setup"
+        app:popUpToInclusive="true" />
+
 </navigation>

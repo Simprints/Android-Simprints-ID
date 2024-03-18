@@ -9,19 +9,15 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
-import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
-import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
-import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
-import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
-import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
-import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
+import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
+import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
+import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -39,13 +35,18 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val syncCache: EventSyncCache,
     private val jsonHelper: JsonHelper,
+    private val eventRepository: EventRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
+
         const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
+        const val INPUT_EVENT_DOWN_SYNC_SCOPE_ID = "INPUT_EVENT_DOWN_SYNC_SCOPE_ID"
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
+        const val PROGRESS_DOWN_MAX_SYNC = "PROGRESS_DOWN_MAX_SYNC"
         const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
+        const val OUTPUT_DOWN_MAX_SYNC = "OUTPUT_DOWN_MAX_SYNC"
     }
 
     override val tag: String = EventDownSyncDownloaderWorker::class.java.simpleName
@@ -58,28 +59,40 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
         )
     }
 
+    private suspend fun getEventScope() = inputData
+        .getString(INPUT_EVENT_DOWN_SYNC_SCOPE_ID)
+        ?.let { eventRepository.getEventScope(it) }
+        ?: throw IllegalArgumentException("input required")
+
     private suspend fun getDownSyncOperation() =
         eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
             Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
+            showProgressNotification()
 
             val workerId = this@EventDownSyncDownloaderWorker.id.toString()
             var count = syncCache.readProgress(workerId)
+            var max: Int? = syncCache.readMax(workerId)
 
             crashlyticsLog("Start")
 
-            downSyncTask.downSync(this, getDownSyncOperation()).collect {
+            downSyncTask.downSync(this, getDownSyncOperation(), getEventScope()).collect {
                 count = it.progress
+                max = it.maxProgress
                 syncCache.saveProgress(workerId, count)
-                reportCount(count)
+                syncCache.saveMax(workerId, max)
+                reportCount(count, max)
             }
 
             Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
             success(
-                workDataOf(OUTPUT_DOWN_SYNC to count),
-                "Total downloaded: $0"
+                workDataOf(
+                    OUTPUT_DOWN_SYNC to count,
+                    OUTPUT_DOWN_MAX_SYNC to max
+                ),
+                "Total downloaded: $count / $max"
             )
         } catch (t: Throwable) {
             Simber.d(t)
@@ -89,6 +102,8 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     }
 
     private fun handleSyncException(t: Throwable) = when (t) {
+        is IllegalArgumentException -> fail(t, t.message)
+
         is BackendMaintenanceException -> fail(
             t,
             t.message,
@@ -97,17 +112,13 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
             )
         )
+
         is SyncCloudIntegrationException -> fail(
-            t,
-            t.message,
-            workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
+            t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
         )
+
         is TooManyRequestsException -> fail(
-            t,
-            t.message,
-            workDataOf(
-                OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
-            )
+            t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true)
         )
         is RemoteDbNotSignedInException -> {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
@@ -115,8 +126,13 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
         else -> retry(t)
     }
 
-    override suspend fun reportCount(count: Int) {
-        setProgress(workDataOf(PROGRESS_DOWN_SYNC to count))
+    override suspend fun reportCount(count: Int, maxCount: Int?) {
+        setProgress(
+            workDataOf(
+                PROGRESS_DOWN_SYNC to count,
+                PROGRESS_DOWN_MAX_SYNC to maxCount,
+            )
+        )
     }
 }
 
@@ -126,5 +142,14 @@ internal suspend fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncC
 
     //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
     val cached = eventSyncCache.readProgress(id.toString())
+    return maxOf(progress, output, cached)
+}
+
+internal suspend fun WorkInfo.extractDownSyncMaxCount(eventSyncCache: EventSyncCache): Int {
+    val progress = this.progress.getInt(PROGRESS_DOWN_MAX_SYNC, -1)
+    val output = this.outputData.getInt(OUTPUT_DOWN_MAX_SYNC, -1)
+
+    //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
+    val cached = eventSyncCache.readMax(id.toString())
     return maxOf(progress, output, cached)
 }

@@ -6,7 +6,6 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
@@ -29,14 +28,25 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(value = FingerprintCaptureResult.Item::class, name = "FingerprintCaptureResult.Item"),
-    JsonSubTypes.Type(value = FingerprintCaptureResult.Sample::class, name = "FingerprintCaptureResult.Sample"),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureResult.Item::class,
+        name = "FingerprintCaptureResult.Item"
+    ),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureResult.Sample::class,
+        name = "FingerprintCaptureResult.Sample"
+    ),
+
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
-    JsonSubTypes.Type(value = FingerprintMatchResult.Item::class, name = "FingerprintMatchResult.Item"),
-    JsonSubTypes.Type(value = FaceConfigurationResult::class, name = "FaceConfigurationResult"),
+    JsonSubTypes.Type(
+        value = FingerprintMatchResult.Item::class,
+        name = "FingerprintMatchResult.Item"
+    ),
+
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
     JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
+
     JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
     JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
@@ -56,14 +66,17 @@ internal data class Step(
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: Serializable? = null,
 ) : Serializable {
+
     // Do not remove.
     // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
-    val type
+    @Suppress("unused")
+    val type: String
         get() = this::class.java.simpleName
 }
 
 @Keep
 enum class StepStatus {
+
     NOT_STARTED,
     IN_PROGRESS,
     COMPLETED,

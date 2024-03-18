@@ -9,16 +9,14 @@ import java.util.Date
 
 interface EventSyncManager {
 
+    fun getPeriodicWorkTags(): List<String>
+    fun getOneTimeWorkTags(): List<String>
+    fun getAllWorkerTag(): String
+
     suspend fun getLastSyncTime(): Date?
     fun getLastSyncState(): LiveData<EventSyncState>
 
-    fun sync()
-    fun stop()
-
-    fun scheduleSync()
-    fun cancelScheduledSync()
-
-    suspend fun countEventsToUpload(projectId: String, type: EventType?): Flow<Int>
+    suspend fun countEventsToUpload(type: EventType?): Flow<Int>
     suspend fun countEventsToDownload(): DownSyncCounts
 
     suspend fun downSyncSubject(projectId: String, subjectId: String)

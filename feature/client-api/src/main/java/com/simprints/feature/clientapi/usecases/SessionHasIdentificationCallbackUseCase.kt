@@ -2,7 +2,6 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
-import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 
 internal class SessionHasIdentificationCallbackUseCase @Inject constructor(
@@ -10,8 +9,7 @@ internal class SessionHasIdentificationCallbackUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(sessionId: String): Boolean = eventRepository
-        .observeEventsFromSession(sessionId)
-        .toList()
+        .getEventsFromScope(sessionId)
         .any { it is IdentificationCallbackEvent }
 
 }

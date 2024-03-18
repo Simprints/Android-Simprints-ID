@@ -6,22 +6,23 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
-import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
-import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
+import okhttp3.ResponseBody
+import retrofit2.Response
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -30,18 +31,32 @@ internal class EventRemoteDataSource @Inject constructor(
     private val jsonHelper: JsonHelper,
 ) {
 
-    suspend fun count(query: ApiRemoteEventQuery): List<EventCount> =
-        executeCall { eventsRemoteInterface ->
+    suspend fun count(query: ApiRemoteEventQuery) = try {
+        val response = executeCall { eventsRemoteInterface ->
             eventsRemoteInterface.countEvents(
                 projectId = query.projectId,
-                moduleIds = query.moduleIds,
+                moduleId = query.moduleId,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
                 modes = query.modes,
                 lastEventId = query.lastEventId
-            ).map { it.fromApiToDomain() }
+            )
         }
+        getEventCountFromHeader(response)
+    } catch (t: Throwable) {
+        if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS)
+            throw TooManyRequestsException()
+        else
+            throw t
+    }
 
+    private fun getEventCountFromHeader(response: Response<*>): EventCount {
+        val totalCount = response.headers()[COUNT_HEADER]?.toIntOrNull() ?: 0
+        val isTotalLowerBound = response
+            .headers()[IS_COUNT_HEADER_LOWER_BOUND]
+            ?.toBoolean() ?: false // If not present, assume it's not lower bound
+        return EventCount(totalCount, isTotalLowerBound)
+    }
 
     suspend fun dumpInvalidEvents(projectId: String, events: List<String>) {
         executeCall { remoteInterface ->
@@ -51,15 +66,23 @@ internal class EventRemoteDataSource @Inject constructor(
 
     suspend fun getEvents(
         query: ApiRemoteEventQuery,
-        scope: CoroutineScope
-    ): ReceiveChannel<EnrolmentRecordEvent> {
+        scope: CoroutineScope,
+    ): EventDownSyncResult {
         return try {
-            val streaming = takeStreaming(query)
+            val response = takeStreaming(query)
+            val eventCount = getEventCountFromHeader(response)
+
+            val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
             Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
 
-            scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
-                parseStreamAndEmitEvents(streaming, this)
-            }
+            EventDownSyncResult(
+                totalCount = eventCount.exactCount,
+                requestId = getRequestId(response),
+                status = response.code(),
+                eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
+                    parseStreamAndEmitEvents(streaming, this)
+                }
+            )
         } catch (t: Throwable) {
             if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS)
                 throw TooManyRequestsException()
@@ -70,7 +93,10 @@ internal class EventRemoteDataSource @Inject constructor(
     }
 
     @VisibleForTesting
-    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<EnrolmentRecordEvent>) {
+    suspend fun parseStreamAndEmitEvents(
+        streaming: InputStream,
+        channel: ProducerScope<EnrolmentRecordEvent>,
+    ) {
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
@@ -78,13 +104,13 @@ internal class EventRemoteDataSource @Inject constructor(
 
         try {
             while (parser.nextToken() == START_OBJECT) {
-                val event = jsonHelper.jackson.readValue(parser, ApiEnrolmentRecordEvent::class.java)
+                val event =
+                    jsonHelper.jackson.readValue(parser, ApiEnrolmentRecordEvent::class.java)
                 channel.send(event.fromApiToDomain())
             }
 
             parser.close()
             channel.close()
-
         } catch (t: Throwable) {
             Simber.d(t)
             parser.close()
@@ -96,29 +122,30 @@ internal class EventRemoteDataSource @Inject constructor(
         executeCall { eventsRemoteInterface ->
             eventsRemoteInterface.downloadEvents(
                 projectId = query.projectId,
-                moduleIds = query.moduleIds,
+                moduleId = query.moduleId,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
                 modes = query.modes,
                 lastEventId = query.lastEventId
             )
-        }.byteStream()
+        }
 
     suspend fun post(
         projectId: String,
-        events: List<Event>,
-        acceptInvalidEvents: Boolean = true
-    ) {
-        executeCall { remoteInterface ->
-            remoteInterface.uploadEvents(
-                projectId,
-                acceptInvalidEvents,
-                ApiUploadEventsBody(events.map {
-                    it.fromDomainToApi()
-                })
-            )
+        body: ApiUploadEventsBody,
+        acceptInvalidEvents: Boolean = true,
+    ): EventUpSyncResult {
+        val response = executeCall { remoteInterface ->
+            remoteInterface.uploadEvents(projectId, acceptInvalidEvents, body)
         }
+
+        return EventUpSyncResult(
+            requestId = getRequestId(response),
+            status = response.code(),
+        )
     }
+
+    fun getRequestId(response: Response<*>) = response.headers()[REQUEST_ID_HEADER].orEmpty()
 
     private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
         getEventsApiClient().executeCall { block(it) }
@@ -127,7 +154,12 @@ internal class EventRemoteDataSource @Inject constructor(
         authStore.buildClient(EventRemoteInterface::class)
 
     companion object {
+
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000
         private const val TOO_MANY_REQUEST_STATUS = 429
+
+        private const val COUNT_HEADER = "x-event-count"
+        internal const val REQUEST_ID_HEADER = "x-request-id"
+        private const val IS_COUNT_HEADER_LOWER_BOUND = "x-event-count-is-lower-bound"
     }
 }

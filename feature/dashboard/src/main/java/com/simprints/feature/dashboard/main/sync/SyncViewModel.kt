@@ -11,13 +11,14 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailed
-import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedReloginRequired
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedBackendMaintenance
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedReloginRequired
 import com.simprints.feature.dashboard.views.SyncCardState.SyncHasNoModules
 import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
 import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
@@ -26,10 +27,10 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
-import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
@@ -37,9 +38,8 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.projectsecuritystore.SecurityStateRepository
-import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -51,17 +51,18 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SyncViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
+    private val syncOrchestrator: SyncOrchestrator,
     private val connectivityTracker: ConnectivityTracker,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
-    private val authManager: AuthManager,
-    private val securityStateRepository: SecurityStateRepository,
+    private val logoutUseCase: LogoutUseCase,
     private val recentUserActivityManager: RecentUserActivityManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     companion object {
+
         private const val ONE_MINUTE = 1000 * 60L
         private const val MAX_TIME_BEFORE_SYNC_AGAIN = 5 * ONE_MINUTE
     }
@@ -76,6 +77,7 @@ internal class SyncViewModel @Inject constructor(
     val signOutEventLiveData: LiveData<LiveDataEvent>
         get() = _signOutEventLiveData
     private val _signOutEventLiveData = MediatorLiveData<LiveDataEvent>()
+
     val loginRequestedEventLiveData: LiveData<LiveDataEventWithContent<Bundle>>
         get() = _loginRequestedEventLiveData
     private val _loginRequestedEventLiveData = MutableLiveData<LiveDataEventWithContent<Bundle>>()
@@ -98,13 +100,16 @@ internal class SyncViewModel @Inject constructor(
         // CORE-2638
         // When project is in ENDING state and all data is synchronized, the user must be logged out
         _signOutEventLiveData.addSource(_syncCardLiveData) { cardState ->
-            val isSyncComplete = cardState is SyncComplete
-            val isProjectEnding =
-                securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_ENDING
-            if (isSyncComplete && isProjectEnding) {
-                externalScope.launch {
-                    authManager.signOut()
-                    _signOutEventLiveData.postValue(LiveDataEvent())
+            viewModelScope.launch {
+                val isSyncComplete = cardState is SyncComplete
+                val isProjectEnding =
+                    configRepository.getProject(authStore.signedInProjectId).state == ProjectState.PROJECT_ENDING
+
+                if (isSyncComplete && isProjectEnding) {
+                    externalScope.launch {
+                        logoutUseCase()
+                        _signOutEventLiveData.postValue(LiveDataEvent())
+                    }
                 }
             }
         }
@@ -115,14 +120,15 @@ internal class SyncViewModel @Inject constructor(
 
     fun sync() {
         _syncCardLiveData.postValue(SyncConnecting(null, 0, null))
-        eventSyncManager.sync()
+        syncOrchestrator.startEventSync()
     }
 
     fun login() {
         viewModelScope.launch {
             val loginArgs = LoginContract.toArgs(
                 authStore.signedInProjectId,
-                authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed
+                authStore.signedInUserId
+                    ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed
             )
             _loginRequestedEventLiveData.send(loginArgs)
         }
@@ -136,7 +142,7 @@ internal class SyncViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val lastUpdate = lastTimeSyncRun ?:  eventSyncManager.getLastSyncTime()
+            val lastUpdate = lastTimeSyncRun ?: eventSyncManager.getLastSyncTime()
 
             val isRunning = syncStateLiveData.value?.isSyncRunning() ?: false
 
@@ -178,11 +184,11 @@ internal class SyncViewModel @Inject constructor(
                     )
                 }
             }
-            configManager.getProjectConfiguration().also { configuration ->
+            configRepository.getProjectConfiguration().also { configuration ->
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
             eventSyncManager
-                .countEventsToUpload(authStore.signedInProjectId, EventType.ENROLMENT_V2)
+                .countEventsToUpload(EventType.ENROLMENT_V2)
                 .collect { upSyncCountLiveData.postValue(it) }
         }
 
@@ -212,7 +218,10 @@ internal class SyncViewModel @Inject constructor(
         }
     }
 
-    private suspend fun processRecentSyncState(syncState: EventSyncState, itemsToUpSync: Int): SyncCardState {
+    private suspend fun processRecentSyncState(
+        syncState: EventSyncState,
+        itemsToUpSync: Int,
+    ): SyncCardState {
 
         return when {
             syncState.isThereNotSyncHistory() -> SyncDefault(lastTimeSyncSucceed())
@@ -220,27 +229,33 @@ internal class SyncViewModel @Inject constructor(
                 if (itemsToUpSync == 0) SyncComplete(lastTimeSyncSucceed())
                 else SyncPendingUpload(lastTimeSyncSucceed(), itemsToUpSync)
             }
+
             syncState.isSyncInProgress() -> SyncProgress(
                 lastTimeSyncSucceed(),
                 syncState.progress,
                 syncState.total
             )
+
             syncState.isSyncConnecting() -> SyncConnecting(
                 lastTimeSyncSucceed(),
                 syncState.progress,
                 syncState.total
             )
+
             syncState.isSyncFailedBecauseReloginRequired() -> SyncFailedReloginRequired(
                 lastTimeSyncSucceed()
             )
+
             syncState.isSyncFailedBecauseTooManyRequests() -> SyncTooManyRequests(
                 lastTimeSyncSucceed()
             )
+
             syncState.isSyncFailedBecauseCloudIntegration() -> SyncFailed(lastTimeSyncSucceed())
             syncState.isSyncFailedBecauseBackendMaintenance() -> SyncFailedBackendMaintenance(
                 lastTimeSyncSucceed(),
                 syncState.getEstimatedBackendMaintenanceOutage()
             )
+
             syncState.isSyncFailed() -> SyncTryAgain(lastTimeSyncSucceed())
             else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
         }
@@ -251,13 +266,13 @@ internal class SyncViewModel @Inject constructor(
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
     private suspend fun isDownSyncAllowed() =
-        configManager.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+        configRepository.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 
     private suspend fun isSelectedModulesEmpty() =
-        configManager.getDeviceConfiguration().selectedModules.isEmpty()
+        configRepository.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() =
-        configManager.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        configRepository.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 

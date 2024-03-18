@@ -3,9 +3,9 @@ package com.simprints.infra.events.event.domain.models.callback
 import androidx.annotation.Keep
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
@@ -14,18 +14,17 @@ import java.util.UUID
 @Keep
 data class ErrorCallbackEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: ErrorCallbackPayload,
     override val type: EventType,
+    override var scopeId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         reason: ErrorCallbackPayload.Reason,
-        labels: EventLabels = EventLabels(),
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         ErrorCallbackPayload(createdAt, EVENT_VERSION, reason),
         CALLBACK_ERROR
     )
@@ -37,11 +36,11 @@ data class ErrorCallbackEvent(
 
     @Keep
     data class ErrorCallbackPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val reason: Reason,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_ERROR,
-        override val endedAt: Long = 0,
     ) : EventPayload() {
 
         @Keep
@@ -92,6 +91,6 @@ data class ErrorCallbackEvent(
 
     companion object {
 
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 3
     }
 }

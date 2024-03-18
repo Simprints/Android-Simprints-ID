@@ -13,7 +13,7 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,7 @@ import javax.inject.Inject
 internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val frameProcessor: FrameProcessor,
     private val faceDetector: FaceDetector,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
@@ -85,7 +85,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         samplesToCapture: Int,
         attemptNumber: Int,
         cropRect: RectF,
-        previewSize: Size
+        previewSize: Size,
     ) {
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
@@ -101,7 +101,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun finishCapture(attemptNumber: Int) {
         viewModelScope.launch {
-            val projectConfiguration = configManager.getProjectConfiguration()
+            val projectConfiguration = configRepository.getProjectConfiguration()
             sortedQualifyingCaptures = userCaptures
                 .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
                 .sortedByDescending { it.face?.quality }
@@ -115,11 +115,17 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private fun getFaceDetectionFromPotentialFace(
         bitmap: Bitmap,
-        potentialFace: Face?
+        potentialFace: Face?,
     ): FaceDetection {
         return if (potentialFace == null) {
             bitmap.recycle()
-            FaceDetection(bitmap, null, FaceDetection.Status.NOFACE)
+            FaceDetection(
+                bitmap = bitmap,
+                face = null,
+                status = FaceDetection.Status.NOFACE,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now()
+            )
         } else {
             getFaceDetection(bitmap, potentialFace)
         }
@@ -129,29 +135,39 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         val areaOccupied = potentialFace.relativeBoundingBox.area()
         return when {
             areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                bitmap,
-                potentialFace,
-                FaceDetection.Status.TOOFAR
+                bitmap = bitmap,
+                face = potentialFace,
+                status = FaceDetection.Status.TOOFAR,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.TOOCLOSE
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.TOOCLOSE,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.OFFYAW
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.OFFYAW,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.OFFROLL
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.OFFROLL,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             else -> FaceDetection(
-                bitmap, potentialFace,
-                if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
+                bitmap = bitmap, face = potentialFace,
+                status = if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
         }
     }
@@ -172,7 +188,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun createFirstFallbackCaptureEvent(faceDetection: FaceDetection) {
         if (shouldSendFallbackCaptureEvent.getAndSet(false)) {
-            eventReporter.addFallbackCaptureEvent(fallbackCaptureEventStartTime, faceDetection.detectionEndTime)
+            eventReporter.addFallbackCaptureEvent(
+                fallbackCaptureEventStartTime,
+                faceDetection.detectionEndTime
+            )
         }
     }
 
@@ -187,13 +206,15 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     private suspend fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
-        val qualityThreshold = configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
+        val qualityThreshold =
+            configRepository.getProjectConfiguration().face!!.qualityThreshold.toFloat()
         eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
 
     companion object {
+
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
     }

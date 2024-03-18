@@ -6,19 +6,16 @@ import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScre
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.*
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AlertScreen
 
 
 @Keep
 internal data class ApiAlertScreenPayload(
-    override val startTime: Long,
-    override val version: Int,
+    override val startTime: ApiTimestamp,
     val alertType: ApiAlertScreenEventType,
-) : ApiEventPayload(AlertScreen, version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: AlertScreenPayload) : this(
-        domainPayload.createdAt,
-        domainPayload.eventVersion,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.alertType.fromDomainToApi(),
     )
 

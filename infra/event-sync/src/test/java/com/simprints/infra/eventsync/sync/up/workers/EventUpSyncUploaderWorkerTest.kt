@@ -12,6 +12,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
@@ -21,32 +23,27 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INT
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
+import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkObject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EventUpSyncUploaderWorkerTest {
-
-    companion object {
-        private const val PROJECT_ID = "projectId"
-    }
+internal class EventUpSyncUploaderWorkerTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -54,30 +51,36 @@ class EventUpSyncUploaderWorkerTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
+    @MockK
+    lateinit var authStore: AuthStore
+
+    @MockK
+    lateinit var eventSyncCache: EventSyncCache
+
+    @MockK
+    lateinit var upSyncTask: EventUpSyncTask
+
+    @MockK
+    lateinit var eventRepository: EventRepository
+
+    @MockK
+    lateinit var eventScope: EventScope
+
     private val projectScope = JsonHelper.toJson(EventUpSyncScope.ProjectScope(PROJECT_ID))
-    private val authStore = mockk<AuthStore> {
-        every { signedInProjectId } returns PROJECT_ID
-    }
-    private val upSyncTask = mockk<EventUpSyncTask>()
 
     @Before
     fun setUp() {
-        mockkObject(Simber)
-        every { Simber.i(ofType<String>()) } answers {}
-    }
+        MockKAnnotations.init(this, relaxed = true)
 
-    @After
-    fun cleanUp() {
-        unmockkObject(Simber)
+        coEvery { eventSyncCache.readProgress(any()) } returns 0
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { eventRepository.observeEventCount(any()) } returns flowOf(12)
     }
 
     @Test
     fun worker_shouldExecuteTheTask() = runTest {
-        val eventUpSyncUploaderWorker = init(projectScope)
-
-        coEvery {
-            upSyncTask.upSync(any())
-        } returns flowOf(
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
+        coEvery { upSyncTask.upSync(any(), any()) } returns flowOf(
             EventUpSyncProgress(
                 EventUpSyncOperation(
                     projectId = "",
@@ -87,26 +90,36 @@ class EventUpSyncUploaderWorkerTest {
             )
         )
 
+        val eventUpSyncUploaderWorker = init(projectScope)
         val result = eventUpSyncUploaderWorker.doWork()
 
         assertThat(result).isEqualTo(
             ListenableWorker.Result.success(
                 workDataOf(
-                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 12
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 12,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12
                 )
             )
         )
     }
 
     @Test
-    fun worker_shouldSetFailCorrectlyIfBackendError() = runTest {
-        val eventUpSyncUploaderWorker = init(projectScope)
+    fun worker_shouldFailCorrectlyIfNoEventScope() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns null
 
+        val result = init(projectScope).doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+    }
+
+    @Test
+    fun worker_shouldSetFailCorrectlyIfBackendError() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            upSyncTask.upSync(any())
+            upSyncTask.upSync(any(), eventScope)
         } throws BackendMaintenanceException(estimatedOutage = null)
 
-        val result = eventUpSyncUploaderWorker.doWork()
+        val result = init(projectScope).doWork()
 
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
@@ -120,13 +133,12 @@ class EventUpSyncUploaderWorkerTest {
 
     @Test
     fun worker_shouldSetFailCorrectlyIfTimedBackendError() = runTest {
-        val eventUpSyncUploaderWorker = init(projectScope)
-
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            upSyncTask.upSync(any())
+            upSyncTask.upSync(any(), eventScope)
         } throws BackendMaintenanceException(estimatedOutage = 600)
 
-        val result = eventUpSyncUploaderWorker.doWork()
+        val result = init(projectScope).doWork()
 
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
@@ -140,13 +152,12 @@ class EventUpSyncUploaderWorkerTest {
 
     @Test
     fun worker_shouldSetFailCorrectlyIfCloudIntegrationError() = runTest {
-        val eventUpSyncUploaderWorker = init(projectScope)
-
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            upSyncTask.upSync(any())
+            upSyncTask.upSync(any(), eventScope)
         } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
-        val result = eventUpSyncUploaderWorker.doWork()
+        val result = init(projectScope).doWork()
 
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
@@ -162,7 +173,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncTask.upSync(any())
+            upSyncTask.upSync(any(), any())
         } throws RemoteDbNotSignedInException()
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -178,65 +189,20 @@ class EventUpSyncUploaderWorkerTest {
 
     @Test
     fun worker_shouldRetryIfNotBackendMaintenanceOrSyncIssue() = runTest {
-        val eventUpSyncUploaderWorker = init(projectScope)
-
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            upSyncTask.upSync(any())
+            upSyncTask.upSync(any(), eventScope)
         } throws Throwable()
 
-        val result = eventUpSyncUploaderWorker.doWork()
+        val result = init(projectScope).doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.retry())
     }
 
     @Test
-    fun eventUpSyncScope_canDeserializeOldFormat() {
-        val jsonInput = """
-        {
-            "type": "EventUpSyncScope${'$'}ProjectScope",
-            "projectId": "pcmqBbcaB4xWvfRHRELG",
-            "operation": {
-                "queryEvent": {
-                    "projectId": "pcmqBbcaB4xWvfRHRELG"
-                },
-                "lastState": "FAILED",
-                "lastSyncTime": 1620103325620
-            }
-        }    
-        """.trimIndent()
-
-        val expectedScope = EventUpSyncScope.ProjectScope("pcmqBbcaB4xWvfRHRELG")
-        expectedScope.operation.lastState = EventUpSyncOperation.UpSyncState.FAILED
-        expectedScope.operation.lastSyncTime = 1620103325620
-
-        val scope = EventUpSyncUploaderWorker.parseUpSyncInput(jsonInput)
-        assertThat(scope).isEqualTo(expectedScope)
-    }
-
-    @Test
-    fun eventUpSyncScope_canDeserializeNewFormat() {
-        val jsonInput = """
-        {
-            "type": "EventUpSyncScope${'$'}ProjectScope",
-            "projectId": "pcmqBbcaB4xWvfRHRELG",
-            "operation": {
-                "projectId": "pcmqBbcaB4xWvfRHRELG",
-                "lastState": "FAILED",
-                "lastSyncTime": 1620103325620
-            }
-        }
-        """.trimIndent()
-
-        val expectedScope = EventUpSyncScope.ProjectScope("pcmqBbcaB4xWvfRHRELG")
-        expectedScope.operation.lastState = EventUpSyncOperation.UpSyncState.FAILED
-        expectedScope.operation.lastSyncTime = 1620103325620
-
-        val scope = EventUpSyncUploaderWorker.parseUpSyncInput(jsonInput)
-        assertThat(scope).isEqualTo(expectedScope)
-    }
-
-    @Test
     fun `should create a new scope if the current one throws JsonParseException`() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
+
         val jsonInput = """
         {
             "type": "EventUpSyncScope${'$'}ProjectScope",
@@ -248,29 +214,28 @@ class EventUpSyncUploaderWorkerTest {
             }
         }
         """.trimIndent()
-        val eventUpSyncUploaderWorker = init(jsonInput)
 
-        eventUpSyncUploaderWorker.doWork()
+        init(jsonInput).doWork()
 
         val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
 
-        coVerify(exactly = 1) { upSyncTask.upSync(expectedScope.operation) }
+        coVerify(exactly = 1) { upSyncTask.upSync(expectedScope.operation, eventScope) }
     }
 
     @Test
     fun `should create a new scope if the current one throws JsonMappingException`() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
+
         val jsonInput = """
         {
             "type": "EventUpSyncScope${'$'}ProjectScope"
         }
         """.trimIndent()
-        val eventUpSyncUploaderWorker = init(jsonInput)
-
-        eventUpSyncUploaderWorker.doWork()
+        init(jsonInput).doWork()
 
         val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
 
-        coVerify(exactly = 1) { upSyncTask.upSync(expectedScope.operation) }
+        coVerify(exactly = 1) { upSyncTask.upSync(expectedScope.operation, eventScope) }
     }
 
     @Test
@@ -284,37 +249,50 @@ class EventUpSyncUploaderWorkerTest {
 
     // We are using the TestListenableWorkerBuilder and not the constructor directly to have a test worker
     // that will finish when calling setProgress
-    private fun init(scope: String?): EventUpSyncUploaderWorker =
+    private fun init(scope: String?, eventScopeId: String? = "scopeId"): EventUpSyncUploaderWorker =
         TestListenableWorkerBuilder<EventUpSyncUploaderWorker>(
             mockk(),
-            workDataOf(INPUT_UP_SYNC to scope)
+            workDataOf(
+                INPUT_UP_SYNC to scope,
+                INPUT_EVENT_UP_SYNC_SCOPE_ID to eventScopeId
+            )
         ).setWorkerFactory(
             TestWorkerFactory(
                 upSyncTask,
                 mockk(relaxed = true),
                 authStore,
+                eventRepository,
                 testCoroutineRule.testCoroutineDispatcher
             )
         ).build()
-}
 
-private class TestWorkerFactory(
-    private val upSyncTask: EventUpSyncTask,
-    private val eventSyncCache: EventSyncCache,
-    private val authStore: AuthStore,
-    private val dispatcher: CoroutineDispatcher,
-) : WorkerFactory() {
-    override fun createWorker(
-        appContext: Context,
-        workerClassName: String,
-        workerParameters: WorkerParameters
-    ): ListenableWorker = EventUpSyncUploaderWorker(
-        appContext,
-        workerParameters,
-        upSyncTask,
-        eventSyncCache,
-        authStore,
-        JsonHelper,
-        dispatcher
-    )
+
+    private class TestWorkerFactory(
+        private val upSyncTask: EventUpSyncTask,
+        private val eventSyncCache: EventSyncCache,
+        private val authStore: AuthStore,
+        private val eventRepository: EventRepository,
+        private val dispatcher: CoroutineDispatcher,
+    ) : WorkerFactory() {
+
+        override fun createWorker(
+            appContext: Context,
+            workerClassName: String,
+            workerParameters: WorkerParameters,
+        ): ListenableWorker = EventUpSyncUploaderWorker(
+            appContext,
+            workerParameters,
+            upSyncTask,
+            eventSyncCache,
+            authStore,
+            JsonHelper,
+            eventRepository,
+            dispatcher
+        )
+    }
+
+    companion object {
+
+        private const val PROJECT_ID = "projectId"
+    }
 }

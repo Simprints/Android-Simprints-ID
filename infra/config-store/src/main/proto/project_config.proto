@@ -11,6 +11,7 @@ message ProtoProjectConfiguration {
     ProtoConsentConfiguration consent = 5;
     ProtoIdentificationConfiguration identification = 6;
     ProtoSynchronizationConfiguration synchronization = 7;
+    string updated_at = 8;
 }
 
 message ProtoGeneralConfiguration {
@@ -173,6 +174,8 @@ message ProtoUpSynchronizationConfiguration {
 
     message SimprintsUpSynchronizationConfiguration {
         UpSynchronizationKind kind = 1;
+        ProtoUpSyncBatchSizes batchSizes = 2;
+        bool imagesRequireUnmeteredConnection = 3;
     }
 
     message CoSyncUpSynchronizationConfiguration {
@@ -187,6 +190,11 @@ message ProtoUpSynchronizationConfiguration {
     }
 }
 
+message ProtoUpSyncBatchSizes {
+    int32 sessions = 1;
+    int32 upSyncs = 2;
+    int32 downSyncs = 3;
+}
 
 message ProtoDecisionPolicy {
     int32 low = 1;

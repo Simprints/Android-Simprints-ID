@@ -11,9 +11,11 @@ on:
 jobs:
     deploy-to-firebase:
         runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         concurrency:
             group: firebase-${{ inputs.buildType }}-workflow #only one instance of this workflow can run at a time
+            cancel-in-progress: true
 
         environment: ${{ inputs.buildType }}   # Dynamically set the job environment based on the input
 

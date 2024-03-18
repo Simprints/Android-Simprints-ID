@@ -6,13 +6,14 @@ import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 
 @Keep
 internal data class ApiEnrolmentPayloadV1(
-    override val startTime: Long,
-    override val version: Int,
+    override val startTime: ApiTimestamp,
     val personId: String,
-) : ApiEventPayload(ApiEventPayloadType.Enrolment, version, startTime) {
+) : ApiEventPayload(startTime) {
 
-    constructor(domainPayload: EnrolmentEventV1.EnrolmentPayload) :
-        this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.personId)
+    constructor(domainPayload: EnrolmentEventV1.EnrolmentPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.personId
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

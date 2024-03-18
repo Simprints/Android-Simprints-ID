@@ -11,11 +11,11 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -24,9 +24,9 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ModuleSelectionViewModel @Inject constructor(
     private val authStore: AuthStore,
-    private val repository: ModuleRepository,
-    private val eventSyncManager: EventSyncManager,
-    private val configManager: ConfigManager,
+    private val moduleRepository: ModuleRepository,
+    private val syncOrchestrator: SyncOrchestrator,
+    private val configRepository: ConfigRepository,
     private val tokenizationProcessor: TokenizationProcessor,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
@@ -47,15 +47,15 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     init {
         postUpdateModules {
-            maxNumberOfModules = repository.getMaxNumberOfModules()
+            maxNumberOfModules = moduleRepository.getMaxNumberOfModules()
             initialModules =
-                repository.getModules().map { module ->
+                moduleRepository.getModules().map { module ->
                     val decryptedName = when (val name = module.name) {
                         is TokenizableString.Raw -> name
                         is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                             encrypted = name,
                             tokenKeyType = TokenKeyType.ModuleId,
-                            project = configManager.getProject(authStore.signedInProjectId)
+                            project = configRepository.getProject(authStore.signedInProjectId)
                         )
                     }
                     module.copy(name = decryptedName)
@@ -66,7 +66,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun loadPasswordSettings() {
         viewModelScope.launch {
-            configManager.getProjectConfiguration()
+            configRepository.getProjectConfiguration()
                 .general
                 .settingsPassword
                 .let { _screenLocked.postValue(it) }
@@ -100,16 +100,16 @@ internal class ModuleSelectionViewModel @Inject constructor(
                     is TokenizableString.Raw -> tokenizationProcessor.encrypt(
                         decrypted = name,
                         tokenKeyType = TokenKeyType.ModuleId,
-                        project = configManager.getProject(authStore.signedInProjectId)
+                        project = configRepository.getProject(authStore.signedInProjectId)
                     )
 
                     is TokenizableString.Tokenized -> name
                 }
                 module.copy(name = encryptedName)
             }
-            repository.saveModules(modules)
-            eventSyncManager.stop()
-            eventSyncManager.sync()
+            moduleRepository.saveModules(modules)
+            syncOrchestrator.stopEventSync()
+            syncOrchestrator.startEventSync()
         }
     }
 

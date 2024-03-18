@@ -52,6 +52,7 @@ internal data class OldProjectConfig(
     fun toDomain(projectId: String): ProjectConfiguration =
         ProjectConfiguration(
             projectId = projectId,
+            updatedAt = "",
             general = generalConfiguration(),
             face = faceConfiguration(),
             fingerprint = fingerprintConfiguration(),
@@ -196,7 +197,13 @@ internal data class OldProjectConfig(
                         UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(
                             simprintsSync
                         )
-                    }
+                    },
+                    batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+                        sessions = 1,
+                        upSyncs = 1,
+                        downSyncs = 1,
+                    ),
+                    imagesRequireUnmeteredConnection = false,
                 ),
                 coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                     kind = if (coSync == null) {
@@ -210,7 +217,7 @@ internal data class OldProjectConfig(
                             coSync
                         )
                     }
-                )
+                ),
             ),
             down = DownSynchronizationConfiguration(
                 partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(

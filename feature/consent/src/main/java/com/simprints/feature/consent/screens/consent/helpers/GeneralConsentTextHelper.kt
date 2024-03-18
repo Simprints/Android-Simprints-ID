@@ -42,18 +42,18 @@ internal class GeneralConsentTextHelper @Inject constructor(
         programName: String,
         modalityUseCase: String,
     ) = when (config?.enrolmentVariant) {
-        ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY -> append(
+        ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY -> appendSentence(
             context.getString(R.string.consent_enrol_only).format(programName, modalityUseCase)
         )
 
-        ConsentConfiguration.ConsentEnrolmentVariant.STANDARD -> append(
+        ConsentConfiguration.ConsentEnrolmentVariant.STANDARD -> appendSentence(
             context.getString(R.string.consent_enrol).format(programName, modalityUseCase)
         )
 
         else -> this
     }
 
-    private fun StringBuilder.appendTextForConsentVerifyOrIdentify(programName: String, modalityUseCase: String) = append(
+    private fun StringBuilder.appendTextForConsentVerifyOrIdentify(programName: String, modalityUseCase: String) = appendSentence(
         context.getString(R.string.consent_id_verify).format(programName, modalityUseCase)
     )
 
@@ -63,24 +63,24 @@ internal class GeneralConsentTextHelper @Inject constructor(
         modalityAccess: String,
     ) {
         if (config.generalPrompt?.dataSharedWithPartner == true) {
-            append(
+            appendSentence(
                 context.getString(R.string.consent_share_data_yes)
                     .format(config.organizationName, modalityAccess)
             )
         } else {
-            append(
+            appendSentence(
                 context.getString(R.string.consent_share_data_no)
                     .format(modalityAccess)
             )
         }
         if (config.generalPrompt?.dataUsedForRAndD == true) {
-            append(context.getString(R.string.consent_collect_yes))
+            appendSentence(context.getString(R.string.consent_collect_yes))
         }
         if (config.generalPrompt?.privacyRights == true) {
-            append(context.getString(R.string.consent_privacy_rights))
+            appendSentence(context.getString(R.string.consent_privacy_rights))
         }
         if (config.generalPrompt?.confirmation == true) {
-            append(
+            appendSentence(
                 context.getString(R.string.consent_confirmation).format(modalityUseCase)
             )
         }
@@ -115,5 +115,4 @@ internal class GeneralConsentTextHelper @Inject constructor(
         GeneralConfiguration.Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
         GeneralConfiguration.Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
     }
-
 }

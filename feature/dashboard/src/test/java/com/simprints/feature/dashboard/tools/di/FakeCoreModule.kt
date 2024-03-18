@@ -1,6 +1,12 @@
 package com.simprints.feature.dashboard.tools.di
 
-import com.simprints.core.*
+import com.simprints.core.AppScope
+import com.simprints.core.CoreModule
+import com.simprints.core.DeviceID
+import com.simprints.core.DispatcherBG
+import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
+import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -47,22 +53,26 @@ object FakeCoreModule {
 
     @DispatcherIO
     @Provides
-    fun provideCoroutineDispatcher(): CoroutineDispatcher = StandardTestDispatcher()
+    fun provideCoroutineDispatcherIo(): CoroutineDispatcher = StandardTestDispatcher()
 
     @DispatcherBG
     @Provides
-    fun provideCoroutineDispatcher2(): CoroutineDispatcher = StandardTestDispatcher()
+    fun provideCoroutineDispatcherBg(): CoroutineDispatcher = StandardTestDispatcher()
 
     @ExternalScope
     @Provides
     fun provideExternalScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
+    @AppScope
+    @Provides
+    fun provideAppScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
+
     @Provides
     @Singleton
     fun provideStringTokenizer(): StringTokenizer = mockk()
 
-
     @Provides
     @Singleton
     fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImplForTests
+
 }

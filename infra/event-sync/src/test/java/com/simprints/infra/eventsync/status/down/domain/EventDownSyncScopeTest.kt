@@ -21,7 +21,7 @@ class EventDownSyncScopeTest {
 
             assertThat(query.subjectId).isNull()
             assertThat(query.attendantId).isNull()
-            assertThat(query.moduleIds).isNull()
+            assertThat(query.moduleId).isNull()
             assertThat(query.lastEventId).isNull()
         }
     }
@@ -36,7 +36,7 @@ class EventDownSyncScopeTest {
             assertThat(query.attendantId).isEqualTo(DEFAULT_USER_ID.value)
 
             assertThat(query.subjectId).isNull()
-            assertThat(query.moduleIds).isNull()
+            assertThat(query.moduleId).isNull()
             assertThat(query.lastEventId).isNull()
         }
     }
@@ -57,7 +57,7 @@ class EventDownSyncScopeTest {
     private fun checkModuleScope(op: RemoteEventQuery, moduleId: String) {
         assertThat(op.projectId).isEqualTo(projectDownSyncScope.projectId)
         assertThat(op.modes).isEqualTo(projectDownSyncScope.modes)
-        assertThat(op.moduleIds).isEqualTo(listOf(moduleId))
+        assertThat(op.moduleId).isEqualTo(moduleId)
 
         assertThat(op.subjectId).isNull()
         assertThat(op.attendantId).isNull()

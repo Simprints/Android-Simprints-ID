@@ -2,9 +2,9 @@ package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
@@ -13,35 +13,36 @@ import java.util.UUID
 @Keep
 data class FaceFallbackCaptureEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: FaceFallbackCapturePayload,
-    override val type: EventType
+    override val type: EventType,
+    override var scopeId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        startTime: Long,
-        endTime: Long,
-        labels: EventLabels = EventLabels()
+        startTime: Timestamp,
+        endTime: Timestamp,
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         FaceFallbackCapturePayload(startTime, endTime, EVENT_VERSION),
         FACE_FALLBACK_CAPTURE
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
+        this // No tokenized fields
 
     @Keep
     data class FaceFallbackCapturePayload(
-        override val createdAt: Long,
-        override var endedAt: Long,
+        override val createdAt: Timestamp,
+        override var endedAt: Timestamp?,
         override val eventVersion: Int,
-        override val type: EventType = FACE_FALLBACK_CAPTURE
+        override val type: EventType = FACE_FALLBACK_CAPTURE,
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+
+        const val EVENT_VERSION = 2
     }
 }

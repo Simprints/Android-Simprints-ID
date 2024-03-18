@@ -1,22 +1,22 @@
 package com.simprints.infra.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 import javax.inject.Inject
 
 internal class ImageRemoteDataSourceImpl @Inject constructor(
-    private val imageUrlProvider: ConfigManager,
-    private val authStore: AuthStore
+    private val imageUrlProvider: ConfigRepository,
+    private val authStore: AuthStore,
 ) : ImageRemoteDataSource {
 
     override suspend fun uploadImage(
         imageStream: FileInputStream,
-        imageRef: SecuredImageRef
+        imageRef: SecuredImageRef,
     ): UploadResult {
 
         val firebaseProjectName = authStore.getLegacyAppFallback().options.projectId

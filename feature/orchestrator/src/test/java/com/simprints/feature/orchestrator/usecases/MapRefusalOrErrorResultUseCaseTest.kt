@@ -2,7 +2,6 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
@@ -27,8 +26,7 @@ class MapRefusalOrErrorResultUseCaseTest {
         mapOf(
             ExitFormResult(true) to AppRefusalResponse::class.java,
             FetchSubjectResult(found = false) to AppErrorResponse::class.java,
-            SetupResult(permissionGranted = false) to AppErrorResponse::class.java,
-            FaceConfigurationResult(isSuccess = false) to AppErrorResponse::class.java,
+            SetupResult(isSuccess  = false) to AppErrorResponse::class.java,
             FingerprintConnectResult(isSuccess = false) to AppErrorResponse::class.java,
         ).forEach { (result, responseClass) -> assertThat(useCase(result)).isInstanceOf(responseClass) }
     }
@@ -37,8 +35,7 @@ class MapRefusalOrErrorResultUseCaseTest {
     fun `Maps successful step results to null`() {
         listOf(
             FetchSubjectResult(found = true),
-            SetupResult(permissionGranted = true),
-            FaceConfigurationResult(isSuccess = true),
+            SetupResult(isSuccess = true),
             FaceCaptureResult(emptyList())
         ).forEach { result -> assertThat(useCase(result)).isNull() }
     }

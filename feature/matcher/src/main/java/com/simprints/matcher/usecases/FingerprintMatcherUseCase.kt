@@ -6,11 +6,11 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
-import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val bioSdkWrapper: BioSdkWrapper,
-    private val configManager: ConfigManager,
+    private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
+    private val configRepository: ConfigRepository,
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
@@ -83,13 +83,13 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         probes: List<Fingerprint>,
         candidates: List<FingerprintIdentity>,
         flowType: FlowType,
-    ) = bioSdkWrapper.match(
+    ) = resolveBioSdkWrapperUseCase().match(
         FingerprintIdentity("", probes),
         candidates,
         isCrossFingerMatchingEnabled(flowType),
     )
 
-    private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configManager
+    private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configRepository
         .takeIf { flowType == FlowType.VERIFY }
         ?.getProjectConfiguration()
         ?.fingerprint

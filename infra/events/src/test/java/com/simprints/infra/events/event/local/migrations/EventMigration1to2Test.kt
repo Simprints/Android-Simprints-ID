@@ -1,30 +1,21 @@
 package com.simprints.infra.events.event.local.migrations
 
 import android.content.ContentValues
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase.CONFLICT_NONE
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
-import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import dagger.hilt.android.testing.HiltTestApplication
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,10 +27,9 @@ import java.io.IOException
 class EventMigration1to2Test {
 
     @get:Rule
-    val helper: MigrationTestHelper = MigrationTestHelper(
+    val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        EventRoomDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        EventRoomDatabase::class.java,
     )
 
     @Test
@@ -49,16 +39,15 @@ class EventMigration1to2Test {
         val openSessionCaptureEventId = randomUUID()
         val closedSessionCaptureEventId = randomUUID()
 
+        val enrolmentEvent = createEnrolmentEvent(enrolmentEventId)
+        val openSessionCaptureEvent = createSessionCaptureEvent(openSessionCaptureEventId, 0)
+        val closedSessionCaptureEvent = createSessionCaptureEvent(closedSessionCaptureEventId, 2)
+
         @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
         var db = helper.createDatabase(TEST_DB, 1).apply {
-            val enrolmentEvent = createEnrolmentEvent(enrolmentEventId)
-            val openSessionCaptureEvent = createSessionCaptureEvent(openSessionCaptureEventId, 0)
-            val closedSessionCaptureEvent =
-                createSessionCaptureEvent(closedSessionCaptureEventId, 16115)
-
-            this.insert("DbEvent", CONFLICT_NONE, enrolmentEvent)
-            this.insert("DbEvent", CONFLICT_NONE, openSessionCaptureEvent)
-            this.insert("DbEvent", CONFLICT_NONE, closedSessionCaptureEvent)
+            insert("DbEvent", CONFLICT_NONE, enrolmentEvent)
+            insert("DbEvent", CONFLICT_NONE, openSessionCaptureEvent)
+            insert("DbEvent", CONFLICT_NONE, closedSessionCaptureEvent)
             close()
         }
 
@@ -66,14 +55,15 @@ class EventMigration1to2Test {
 
         validateEnrolmentMigration(db, enrolmentEventId)
         validateSessionCaptureMigration(db, openSessionCaptureEventId, closedSessionCaptureEventId)
-        db.close()
+
+        helper.closeWhenFinished(db)
     }
 
     private fun createEnrolmentEvent(id: String) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "ENROLMENT")
         val unversionedEnrolmentEvent =
-            "{\"id\":\"$id\",\"labels\":{\"projectId\":\"TEST6Oai41ps1pBNrzBL\",\"sessionId\":\"e35c39f9-b81e-48f2-97e7-46ecc8399bb4\",\"deviceId\":\"f2fd8393c0a0be67\"},\"payload\":{\"createdAt\":1611584017198,\"eventVersion\":1,\"personId\":\"61881de4-22f2-4e13-861a-21a209db8581\",\"type\":\"ENROLMENT_V1\",\"endedAt\":0},\"type\":\"ENROLMENT_V1\"}"
+            """{"id":"$id","labels":{"projectId":"TEST6Oai41ps1pBNrzBL","sessionId":"e35c39f9-b81e-48f2-97e7-46ecc8399bb4","deviceId":"f2fd8393c0a0be67"},"payload":{"createdAt":1611584017198,"eventVersion":1,"personId":"61881de4-22f2-4e13-861a-21a209db8581","type":"ENROLMENT_V1","endedAt":0},"type":"ENROLMENT_V1"}"""
         this.put("eventJson", unversionedEnrolmentEvent)
         this.put("createdAt", 0)
         this.put("endedAt", 0)
@@ -82,23 +72,33 @@ class EventMigration1to2Test {
     private fun createSessionCaptureEvent(id: String, endedAt: Long) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "SESSION_CAPTURE")
-        val session = SessionCaptureEvent(
-            id = id,
-            projectId = "TEST6Oai41ps1pBNrzBL",
-            createdAt = 1611584017198,
-            modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
-            appVersionName = "appVersionName",
-            libVersionName = "libSimprintsVersionName",
-            language = "en",
-            device = Device(
-                "30",
-                "Google_Pixel 4a",
-                "deviceId"
-            ),
-            databaseInfo = DatabaseInfo(1)
+        this.put(
+            "eventJson", """
+            {
+                "id": "$id",
+                "labels": {
+                    "projectId": "TEST6Oai41ps1pBNrzBL",
+                    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+                    "deviceId": "f2fd8393c0a0be67"
+                },
+                "payload": {
+                    "id": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+                    "createdAt": 1611584017198,
+                    "modalities": ["FINGERPRINT"],
+                    "appVersionName": "appVersionName",
+                    "libVersionName": "libSimprintsVersionName",
+                    "language": "en",
+                    "device": {
+                        "sdkVersion": "30",
+                        "model": "Google_Pixel 4a",
+                        "deviceId": "deviceId"
+                    },
+                    "databaseInfo": {"version": 1}
+                },
+                "type": "SESSION_CAPTURE"
+            }
+        """.trimIndent()
         )
-
-        this.put("eventJson", JsonHelper.toJson(session))
         this.put("createdAt", 1611584017198)
         this.put("endedAt", endedAt)
     }
@@ -106,33 +106,33 @@ class EventMigration1to2Test {
     private fun validateEnrolmentMigration(db: SupportSQLiteDatabase, id: String) {
         val cursor = retrieveCursorWithEventById(db, id)
         assertThat(cursor.getStringWithColumnName("type")).isEqualTo(ENROLMENT_V1.toString())
-        val eventJson = cursor.getStringWithColumnName("eventJson")!!
-        val enrolmentEventV2 = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
-        assertThat(enrolmentEventV2).isInstanceOf(EnrolmentEventV1::class.java)
+
+        val eventJson = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
+        assertThat(eventJson.getString("type")).isEqualTo("ENROLMENT_V1")
     }
 
     private fun validateSessionCaptureMigration(
         db: SupportSQLiteDatabase,
         openId: String,
-        closedId: String
+        closedId: String,
     ) {
-        val openCursor = retrieveCursorWithEventById(db, openId)
-        val closedCursor = retrieveCursorWithEventById(db, closedId)
-        assertThat(openCursor.getStringWithColumnName("type")).isEqualTo(EventType.SESSION_CAPTURE.toString())
+        retrieveCursorWithEventById(db, openId).use {
+            assertThat(it.getStringWithColumnName("type")).isEqualTo("SESSION_CAPTURE")
 
-        val openEvent = getEventFromJson(openCursor) as SessionCaptureEvent
-        assertThat(openEvent.payload.sessionIsClosed).isFalse()
+            val eventJson = JSONObject(it.getStringWithColumnName("eventJson")!!)
+            assertThat(eventJson.getJSONObject("payload").optBoolean("sessionIsClosed")).isFalse()
+        }
 
-        val closedEvent = getEventFromJson(closedCursor) as SessionCaptureEvent
-        assertThat(closedEvent.payload.sessionIsClosed).isTrue()
+        retrieveCursorWithEventById(db, closedId).use {
+            assertThat(it.getStringWithColumnName("type")).isEqualTo("SESSION_CAPTURE")
+
+            val eventJson = JSONObject(it.getStringWithColumnName("eventJson")!!)
+            assertThat(eventJson.getJSONObject("payload").optBoolean("sessionIsClosed")).isTrue()
+        }
     }
 
-    private fun getEventFromJson(cursor: Cursor): Event = JsonHelper.fromJson(
-        cursor.getStringWithColumnName("eventJson")!!,
-        object : TypeReference<Event>() {}
-    )
-
     companion object {
+
         private const val TEST_DB = "test"
     }
 }

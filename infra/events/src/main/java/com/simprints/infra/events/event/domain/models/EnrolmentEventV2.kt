@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import java.util.UUID
@@ -9,22 +10,21 @@ import java.util.UUID
 @Keep
 data class EnrolmentEventV2(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: EnrolmentPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var scopeId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         subjectId: String,
         projectId: String,
         moduleId: TokenizableString,
         attendantId: TokenizableString,
         personCreationEventId: String,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         EnrolmentPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
@@ -49,21 +49,21 @@ data class EnrolmentEventV2(
         )
     )
 
-
     @Keep
     data class EnrolmentPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val subjectId: String,
         val projectId: String,
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
         val personCreationEventId: String,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = ENROLMENT_V2,
-        override val endedAt: Long = 0
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 2
+
+        const val EVENT_VERSION = 3
     }
 }

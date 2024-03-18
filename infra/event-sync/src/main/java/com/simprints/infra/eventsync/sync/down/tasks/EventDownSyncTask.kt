@@ -3,12 +3,16 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -22,11 +26,13 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -38,62 +44,112 @@ internal class EventDownSyncTask @Inject constructor(
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val eventRemoteDataSource: EventRemoteDataSource,
+    private val eventRepository: EventRepository,
 ) {
 
     suspend fun downSync(
         scope: CoroutineScope,
-        operation: EventDownSyncOperation
+        operation: EventDownSyncOperation,
+        eventScope: EventScope,
     ): Flow<EventDownSyncProgress> = flow {
         var lastOperation = operation.copy()
         var count = 0
         val batchOfEventsToProcess = mutableListOf<EnrolmentRecordEvent>()
+        val requestStartTime = timeHelper.now()
+
+        var firstEventTimestamp: Timestamp? = null
+        var result: EventDownSyncResult? = null
+        var errorType: String? = null
 
         try {
-            eventRemoteDataSource.getEvents(operation.queryEvent.fromDomainToApi(), scope)
+            result = eventRemoteDataSource.getEvents(
+                operation.queryEvent.fromDomainToApi(),
+                scope
+            )
+
+            result.eventStream
                 .consumeAsFlow()
+                .catch {
+                    // Track a case when event stream is closed due to a parser error,
+                    // but the exception is handled gracefully and channel is closed correctly.
+                    errorType = it.toString()
+                }
                 .collect {
                     batchOfEventsToProcess.add(it)
                     count++
                     //We immediately process the first event to initialise a progress
                     if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
-                        lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-                        emitProgress(lastOperation, count)
+                        if (count == 1) {
+                            // Track the moment when the first event is received
+                            firstEventTimestamp = timeHelper.now()
+                        }
+
+                        lastOperation =
+                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                        emitProgress(lastOperation, count, result.totalCount)
                         batchOfEventsToProcess.clear()
                     }
                 }
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, result.totalCount)
 
-            lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
-            emitProgress(lastOperation, count)
+            lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
+            emitProgress(lastOperation, count, result.totalCount)
         } catch (t: Throwable) {
             if (t is RemoteDbNotSignedInException) {
                 throw t
             }
 
-            Simber.e(t)
+            Simber.d(t)
+            errorType = t.toString()
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, count)
 
-            lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
-            emitProgress(lastOperation, count)
+            lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now().ms)
+            emitProgress(lastOperation, count, count)
+        }
+
+        if (count > 0 || errorType != null) {
+            // Track only events that have any useful data
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                EventDownSyncRequestEvent(
+                    createdAt = requestStartTime,
+                    endedAt = timeHelper.now(),
+                    requestId = result?.requestId.orEmpty(),
+                    query = operation.queryEvent.let { query ->
+                        EventDownSyncRequestEvent.QueryParameters(
+                            query.moduleId,
+                            query.attendantId,
+                            query.subjectId,
+                            query.modes.map { it.name },
+                            query.lastEventId
+                        )
+                    },
+                    msToFirstResponseByte = firstEventTimestamp?.let { it.ms - requestStartTime.ms },
+                    eventRead = count,
+                    errorType = errorType,
+                    responseStatus = result?.status,
+                )
+            )
         }
     }
 
     private suspend fun FlowCollector<EventDownSyncProgress>.emitProgress(
         lastOperation: EventDownSyncOperation,
-        count: Int
+        count: Int,
+        max: Int?,
     ) {
         eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
-        this.emit(EventDownSyncProgress(lastOperation, count))
+        this.emit(EventDownSyncProgress(lastOperation, count, max))
     }
 
     private suspend fun processBatchedEvents(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
-        lastOperation: EventDownSyncOperation
+        lastOperation: EventDownSyncOperation,
     ): EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
@@ -101,9 +157,11 @@ internal class EventDownSyncTask @Inject constructor(
                 EnrolmentRecordEventType.EnrolmentRecordCreation -> {
                     handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)
                 }
+
                 EnrolmentRecordEventType.EnrolmentRecordDeletion -> {
                     handleSubjectDeletionEvent(event as EnrolmentRecordDeletionEvent)
                 }
+
                 EnrolmentRecordEventType.EnrolmentRecordMove -> {
                     handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
                 }
@@ -118,10 +176,10 @@ internal class EventDownSyncTask @Inject constructor(
             lastOperation.copy(
                 state = RUNNING,
                 lastEventId = batchOfEventsToProcess.last().id,
-                lastSyncTime = timeHelper.now()
+                lastSyncTime = timeHelper.now().ms,
             )
         } else {
-            lastOperation.copy(state = RUNNING, lastSyncTime = timeHelper.now())
+            lastOperation.copy(state = RUNNING, lastSyncTime = timeHelper.now().ms)
         }
     }
 
@@ -137,9 +195,9 @@ internal class EventDownSyncTask @Inject constructor(
 
     private suspend fun handleSubjectMoveEvent(
         operation: EventDownSyncOperation,
-        event: EnrolmentRecordMoveEvent
+        event: EnrolmentRecordMoveEvent,
     ): List<SubjectAction> {
-        val modulesIdsUnderSyncing = operation.queryEvent.moduleIds
+        val modulesIdsUnderSyncing = operation.queryEvent.moduleId
         val attendantUnderSyncing = operation.queryEvent.attendantId
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
         val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
@@ -178,6 +236,7 @@ internal class EventDownSyncTask @Inject constructor(
                     }
                 }
             }
+
             attendantUnderSyncing != null -> {
                 if (attendantUnderSyncing == enrolmentRecordDeletion.attendantId.value) {
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
@@ -191,6 +250,7 @@ internal class EventDownSyncTask @Inject constructor(
                     }
                 }
             }
+
             else -> {
                 actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
@@ -216,10 +276,10 @@ internal class EventDownSyncTask @Inject constructor(
 
 
     private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
+        op.queryEvent.moduleId == moduleId.value
 
     private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
+        op.queryEvent.moduleId == moduleId.value
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
         moduleId.value.partOf(configRepository.getDeviceConfiguration().selectedModules.values())
@@ -230,6 +290,7 @@ internal class EventDownSyncTask @Inject constructor(
         listOf(Deletion(event.payload.subjectId))
 
     companion object {
+
         const val EVENTS_BATCH_SIZE = 200
     }
 }

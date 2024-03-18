@@ -33,15 +33,6 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_artificialTerminationEventApiModel() {
-        val event = createArtificialTerminationEvent()
-        val apiEvent = event.fromDomainToApi()
-        val json = JSONObject(jackson.writeValueAsString(apiEvent))
-
-        validateArtificialTerminationEventApiModel(json)
-    }
-
-    @Test
     fun validate_IntentParsingEventApiModel() {
         val event = createIntentParsingEvent()
         val apiEvent = event.fromDomainToApi()
@@ -132,17 +123,8 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_callbackEventForIdentificationApiV1Model() {
-        val event = createIdentificationCallbackEventV1()
-        val apiEvent = event.fromDomainToApi()
-        val json = JSONObject(jackson.writeValueAsString(apiEvent))
-
-        validateCallbackV1EventApiModel(json)
-    }
-
-    @Test
     fun validate_callbackEventForIdentificationApiV2Model() {
-        val event = createIdentificationCallbackEventV2()
+        val event = createIdentificationCallbackEvent()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
@@ -294,15 +276,6 @@ class ApiEventTest {
     }
 
     @Test
-    fun validate_sessionCaptureEventApiModel() {
-        val event = createSessionCaptureEvent()
-        val apiEvent = event.fromDomainToApi()
-        val json = JSONObject(jackson.writeValueAsString(apiEvent))
-
-        validateSessionCaptureApiModel(json)
-    }
-
-    @Test
     fun validate_suspiciousIntentEventApiModel() {
         val event = createSuspiciousIntentEvent()
         val apiEvent = event.fromDomainToApi()
@@ -402,6 +375,24 @@ class ApiEventTest {
     }
 
     @Test
+    fun validate_DownSyncRequestEventApiModel() {
+        val event = createEventDownSyncRequestEvent()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateDownSyncRequestEventApiModel(json)
+    }
+
+    @Test
+    fun validate_UpSyncRequestEventApiModel() {
+        val event = createEventUpSyncRequestEvent()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateUpSyncRequestEventApiModel(json)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -456,7 +447,6 @@ class ApiEventTest {
         when (type) {
             Callout -> Throwable("Callout has multiple version - there is a version for each")
             Callback -> Throwable("Callback has multiple version - there is a version for each")
-            ArtificialTermination -> validate_artificialTerminationEventApiModel()
             Authentication -> validate_authenticationEventApiModel()
             Consent -> validate_consentEventApiModel()
             Enrolment -> validateEnrolmentV2_enrolmentEventApiModel()
@@ -477,13 +467,14 @@ class ApiEventTest {
             SuspiciousIntent -> validate_suspiciousIntentEventApiModel()
             IntentParsing -> validate_IntentParsingEventApiModel()
             CompletionCheck -> validate_completionCheckEventApiModel()
-            SessionCapture -> validate_sessionCaptureEventApiModel()
             FaceOnboardingComplete -> validate_FaceOnboardingCompleteEventApiModel()
             FaceFallbackCapture -> validate_FaceFallbackCaptureEventApiModel()
             FaceCapture -> validate_FaceCaptureEventApiModel()
             FaceCaptureConfirmation -> validate_FaceCaptureConfirmationEventApiModel()
             FingerprintCaptureBiometrics -> validate_FingerprintCaptureBiometricsEventApiModel()
             FaceCaptureBiometrics -> validate_FaceCaptureBiometricsEventApiModel()
+            EventDownSyncRequest -> validate_DownSyncRequestEventApiModel()
+            EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

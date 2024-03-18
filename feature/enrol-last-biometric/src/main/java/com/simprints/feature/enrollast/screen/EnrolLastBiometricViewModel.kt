@@ -13,26 +13,24 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class EnrolLastBiometricViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
-    private val eventRepository: EventRepository,
+    private val configRepository: ConfigRepository,
+    private val eventRepository: SessionEventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val hasDuplicateEnrolments: HasDuplicateEnrolmentsUseCase,
     private val buildSubject: BuildSubjectUseCase,
@@ -53,7 +51,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     fun enrolBiometric(params: EnrolLastBiometricParams) = viewModelScope.launch {
         enrolWasAttempted = true
 
-        val projectConfig = configManager.getProjectConfiguration()
+        val projectConfig = configRepository.getProjectConfiguration()
         val modalities = projectConfig.general.modalities
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)
@@ -92,9 +90,9 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private suspend fun registerEvent(subject: Subject) {
         Simber.tag(ENROLMENT.name).d("Register events for enrolments")
 
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
-        val personCreationEvent = eventRepository.observeEventsFromSession(currentSession)
-            .filterIsInstance<PersonCreationEvent>().first()
+        val personCreationEvent = eventRepository.getEventsInCurrentSession()
+            .filterIsInstance<PersonCreationEvent>()
+            .first()
 
         eventRepository.addOrUpdateEvent(EnrolmentEventV2(
             timeHelper.now(),

@@ -1,10 +1,10 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import io.mockk.mockk
 import org.junit.Test
 
@@ -21,9 +21,8 @@ class ApiFingerprintCapturePayloadTest {
         )
         val payload = ApiFingerprintCapturePayload(
             id = randomUUID(),
-            startTime = 1,
-            version = 3,
-            endTime = 1,
+            startTime = ApiTimestamp(1),
+            endTime = ApiTimestamp(1),
             qualityThreshold = 23,
             finger = IFingerIdentifier.LEFT_3RD_FINGER,
             result = ApiFingerprintCapturePayload.ApiResult.GOOD_SCAN,
@@ -32,9 +31,8 @@ class ApiFingerprintCapturePayloadTest {
 
         with(payload) {
             assertThat(id).isNotNull()
-            assertThat(startTime).isEqualTo(1)
-            assertThat(version).isEqualTo(3)
-            assertThat(endTime).isEqualTo(1)
+            assertThat(startTime).isEqualTo(ApiTimestamp(1),)
+            assertThat(endTime).isEqualTo(ApiTimestamp(1),)
             assertThat(qualityThreshold).isEqualTo(23)
             assertThat(finger).isEqualTo(IFingerIdentifier.LEFT_3RD_FINGER)
             assertThat(result).isEqualTo(ApiFingerprintCapturePayload.ApiResult.GOOD_SCAN)

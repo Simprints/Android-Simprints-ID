@@ -14,13 +14,11 @@ class OneToManyMatchEventTest {
 
     @Test
     fun create_OneToManyMatchEvent() {
-        val labels = EventLabels(sessionId = GUID1)
         val poolArg = MatchPool(PROJECT, 100)
         val resultArg = listOf(MatchEntry(GUID1, 0F))
-        val event = OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, "MATCHER_NAME", resultArg, labels)
+        val event = OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, "MATCHER_NAME", resultArg)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(ONE_TO_MANY_MATCH)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

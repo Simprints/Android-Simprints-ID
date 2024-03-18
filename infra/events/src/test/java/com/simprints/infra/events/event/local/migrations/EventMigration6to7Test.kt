@@ -5,36 +5,29 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQuery
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.fasterxml.jackson.core.type.TypeReference
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.local.migrations.EventMigration6to7
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.spyk
 import io.mockk.verify
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration6to7Test {
 
     @get:Rule
-    val helper: MigrationTestHelper = MigrationTestHelper(
+    val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        EventRoomDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        EventRoomDatabase::class.java,
     )
 
     @Test
@@ -45,15 +38,12 @@ class EventMigration6to7Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, EventMigration6to7())
 
-        val eventJson =
-            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-                .getStringWithColumnName("eventJson")!!
-        val event = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
-
-        Truth.assertThat(event).isInstanceOf(OneToOneMatchEvent::class.java)
-        val oneMatchEvent = event as OneToOneMatchEvent
-        Truth.assertThat(oneMatchEvent.payload.eventVersion).isEqualTo(2)
-        Truth.assertThat(oneMatchEvent.payload.fingerComparisonStrategy).isEqualTo( FingerComparisonStrategy.SAME_FINGER)
+        val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .getStringWithColumnName("eventJson")!!
+        val payload = JSONObject(eventJson).getJSONObject("payload")
+        assertThat(payload.getString("type")).isEqualTo("ONE_TO_ONE_MATCH")
+        assertThat(payload.getInt("eventVersion")).isEqualTo(2)
+        assertThat(payload.getString("fingerComparisonStrategy")).isEqualTo("SAME_FINGER")
     }
 
     @Test
@@ -67,12 +57,11 @@ class EventMigration6to7Test {
         val eventJson =
             MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
                 .getStringWithColumnName("eventJson")!!
-        val event = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
 
-        Truth.assertThat(event).isInstanceOf(OneToOneMatchEvent::class.java)
-        val oneMatchEvent = event as OneToOneMatchEvent
-        Truth.assertThat(oneMatchEvent.payload.eventVersion).isEqualTo(2)
-        Truth.assertThat(oneMatchEvent.payload.fingerComparisonStrategy).isEqualTo(null)
+        val payload = JSONObject(eventJson).getJSONObject("payload")
+        assertThat(payload.getString("type")).isEqualTo("ONE_TO_ONE_MATCH")
+        assertThat(payload.getInt("eventVersion")).isEqualTo(2)
+        assertThat(payload.optString("fingerComparisonStrategy")).isEmpty()
     }
 
     @Test
@@ -84,7 +73,6 @@ class EventMigration6to7Test {
 
         verify(exactly = 1) { migrationSpy.migrate(any()) }
     }
-
 
     @Test
     fun `validate migration query is called`() {
@@ -100,7 +88,6 @@ class EventMigration6to7Test {
         ContentValues().apply {
             this.put("id", id)
             this.put("type", "ONE_TO_ONE_MATCH")
-
 
             val eventJson = """      
                     {
@@ -134,7 +121,7 @@ class EventMigration6to7Test {
 
     private fun setupV6DbWithEvent(
         eventContent: ContentValues,
-        close: Boolean = true
+        close: Boolean = true,
     ): SupportSQLiteDatabase =
         helper.createDatabase(TEST_DB, 6).apply {
             this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, eventContent)
@@ -143,6 +130,7 @@ class EventMigration6to7Test {
         }
 
     companion object {
+
         private const val TEST_DB = "test"
     }
 

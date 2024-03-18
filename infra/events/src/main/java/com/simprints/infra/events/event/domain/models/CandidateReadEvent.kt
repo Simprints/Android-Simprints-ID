@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import java.util.UUID
@@ -9,21 +10,20 @@ import java.util.UUID
 @Keep
 data class CandidateReadEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: CandidateReadPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var scopeId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
-        endTime: Long,
+        createdAt: Timestamp,
+        endTime: Timestamp,
         candidateId: String,
         localResult: CandidateReadPayload.LocalResult,
         remoteResult: CandidateReadPayload.RemoteResult?,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         CandidateReadPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
@@ -41,12 +41,12 @@ data class CandidateReadEvent(
 
     @Keep
     data class CandidateReadPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Long,
         val candidateId: String,
         val localResult: LocalResult,
         val remoteResult: RemoteResult?,
+        override val endedAt: Timestamp?,
         override val type: EventType = CANDIDATE_READ
     ) : EventPayload() {
 
@@ -62,6 +62,6 @@ data class CandidateReadEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

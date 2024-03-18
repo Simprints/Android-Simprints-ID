@@ -9,11 +9,11 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -40,13 +40,13 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var projectConfig: ProjectConfiguration
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: SessionEventRepository
 
     @MockK
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -67,19 +67,19 @@ internal class EnrolLastBiometricViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         every { projectConfig.general.modalities } returns emptyList()
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns SESSION_ID
         }
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<PersonCreationEvent> { every { id } returns SESSION_ID }
         )
 
         viewModel = EnrolLastBiometricViewModel(
             timeHelper,
-            configManager,
+            configRepository,
             eventRepository,
             enrolmentRecordRepository,
             hasDuplicateEnrolments,
@@ -96,7 +96,7 @@ internal class EnrolLastBiometricViewModelTest {
             EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
         )))
 
-        coVerify(exactly = 1) { configManager.getProjectConfiguration() }
+        coVerify(exactly = 1) { configRepository.getProjectConfiguration() }
     }
 
     @Test

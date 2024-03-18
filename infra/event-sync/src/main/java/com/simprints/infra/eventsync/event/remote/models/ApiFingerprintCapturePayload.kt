@@ -13,20 +13,19 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 @JsonInclude(Include.NON_NULL)
 internal data class ApiFingerprintCapturePayload(
     val id: String,
-    override val startTime: Long,
-    override val version: Int,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val qualityThreshold: Int,
     val finger: IFingerIdentifier,
     val result: ApiResult,
-    val fingerprint: ApiFingerprint?
-) : ApiEventPayload(ApiEventPayloadType.FingerprintCapture, version, startTime) {
+    val fingerprint: ApiFingerprint?,
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class ApiFingerprint(
         val finger: IFingerIdentifier,
         val quality: Int,
-        val format: String
+        val format: String,
     ) {
 
         constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
@@ -36,18 +35,19 @@ internal data class ApiFingerprintCapturePayload(
         )
     }
 
-    constructor(domainPayload: FingerprintCapturePayload) :
-        this(domainPayload.id,
-            domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.endedAt,
-            domainPayload.qualityThreshold,
-            domainPayload.finger,
-            domainPayload.result.fromDomainToApi(),
-            domainPayload.fingerprint?.let { ApiFingerprint(it) })
+    constructor(domainPayload: FingerprintCapturePayload) : this(
+        domainPayload.id,
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.qualityThreshold,
+        domainPayload.finger,
+        domainPayload.result.fromDomainToApi(),
+        domainPayload.fingerprint?.let { ApiFingerprint(it) },
+    )
 
     @Keep
     enum class ApiResult {
+
         GOOD_SCAN,
         BAD_QUALITY,
         NO_FINGER_DETECTED,

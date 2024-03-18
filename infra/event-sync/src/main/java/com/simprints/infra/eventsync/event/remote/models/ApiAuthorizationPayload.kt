@@ -14,11 +14,10 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAuthorizationPayload
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiAuthorizationPayload(
-    override val startTime: Long,
-    override val version: Int,
+    override val startTime: ApiTimestamp,
     val result: ApiResult,
     val userInfo: ApiUserInfo?,
-) : ApiEventPayload(ApiEventPayloadType.Authorization, version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {
@@ -29,19 +28,21 @@ internal data class ApiAuthorizationPayload(
 
     @Keep
     enum class ApiResult {
+
         AUTHORIZED, NOT_AUTHORIZED
     }
 
-    constructor(domainPayload: AuthorizationPayload):
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.result.fromDomainToApi(),
-            domainPayload.userInfo?.let { ApiUserInfo(it) })
+    constructor(domainPayload: AuthorizationPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.result.fromDomainToApi(),
+        domainPayload.userInfo?.let { ApiUserInfo(it) }
+    )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
-        TokenKeyType.AttendantId -> "userInfo.userId"
-        else -> null
-    }
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        when (tokenKeyType) {
+            TokenKeyType.AttendantId -> "userInfo.userId"
+            else -> null
+        }
 }
 
 

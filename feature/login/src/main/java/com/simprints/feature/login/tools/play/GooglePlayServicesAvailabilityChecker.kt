@@ -1,6 +1,8 @@
 package com.simprints.feature.login.tools.play
 
 import android.app.Activity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import com.google.android.gms.common.ConnectionResult.SUCCESS
 import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.feature.login.LoginError
@@ -18,6 +20,7 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
      */
     fun check(
         activity: Activity,
+        activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
         errorCallback: (LoginError) -> Unit,
     ) {
         val statusCode = googleApiAvailability.isGooglePlayServicesAvailable(activity)
@@ -27,7 +30,7 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
             }
 
             googleApiAvailability.isUserResolvableError(statusCode) -> {
-                showErrorDialog(activity, statusCode, errorCallback)
+                showErrorDialog(activity, statusCode, activityResultLauncher, errorCallback)
             }
 
             else -> {
@@ -46,12 +49,13 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
     private inline fun showErrorDialog(
         activity: Activity,
         statusCode: Int,
+        activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
         crossinline errorCallback: (LoginError) -> Unit,
     ) {
         googleApiAvailability.showErrorDialogFragment(
             activity,
             statusCode,
-            GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
+            activityResultLauncher,
         ) {
             // Throw exception when user cancels the dialog
             handleCancellation(statusCode, errorCallback)
@@ -82,10 +86,5 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
         Simber.e(OutdatedGooglePlayServices(
             "Error with GooglePlayServices version. Error code=$statusCode"
         ))
-    }
-
-    // Should be any number we user to check if the user updated
-    companion object {
-        const val GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE: Int = 123
     }
 }

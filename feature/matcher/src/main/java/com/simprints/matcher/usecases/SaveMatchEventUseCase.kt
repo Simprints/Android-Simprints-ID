@@ -2,9 +2,10 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.FlowType
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -17,14 +18,14 @@ import javax.inject.Inject
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy as ConfigFingerComparisonStrategy
 
 internal class SaveMatchEventUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
-    private val configManager: ConfigManager,
+    private val eventRepository: SessionEventRepository,
+    private val configRepository: ConfigRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
     operator fun invoke(
-        startTime: Long,
-        endTime: Long,
+        startTime: Timestamp,
+        endTime: Timestamp,
         matchParams: MatchParams,
         candidatesCount: Int,
         matcherName: String,
@@ -53,7 +54,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getFingerprintComparisonStrategy() = configManager.getProjectConfiguration()
+    private suspend fun getFingerprintComparisonStrategy() = configRepository.getProjectConfiguration()
         .fingerprint
         ?.bioSdkConfiguration
         ?.comparisonStrategyForVerification
@@ -65,8 +66,8 @@ internal class SaveMatchEventUseCase @Inject constructor(
         }
 
     private fun getOneToOneEvent(
-        startTime: Long,
-        endTime: Long,
+        startTime: Timestamp,
+        endTime: Timestamp,
         matcherName: String,
         queryForCandidates: SubjectQuery,
         matchEntry: MatchEntry?,
@@ -81,8 +82,8 @@ internal class SaveMatchEventUseCase @Inject constructor(
     )
 
     private fun getOneToManyEvent(
-        startTime: Long,
-        endTime: Long,
+        startTime: Timestamp,
+        endTime: Timestamp,
         matcherName: String,
         queryForCandidates: SubjectQuery,
         candidatesCount: Int,

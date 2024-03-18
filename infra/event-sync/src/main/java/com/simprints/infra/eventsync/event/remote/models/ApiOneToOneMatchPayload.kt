@@ -9,25 +9,22 @@ import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOn
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiOneToOneMatchPayload(
-    override val startTime: Long,
-    override val version: Int,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val candidateId: String,
-    val matcher:String,
+    val matcher: String,
     val result: ApiMatchEntry?,
-    val fingerComparisonStrategy: ApiFingerComparisonStrategy?
-) : ApiEventPayload(ApiEventPayloadType.OneToOneMatch, version, startTime) {
+    val fingerComparisonStrategy: ApiFingerComparisonStrategy?,
+) : ApiEventPayload(startTime) {
 
-    constructor(domainPayload: OneToOneMatchPayload) :
-        this(
-            domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.endedAt,
-            domainPayload.candidateId,
-            domainPayload.matcher,
-            domainPayload.result?.let { ApiMatchEntry(it) },
-            domainPayload.fingerComparisonStrategy?.fromDomainToApi()
-        )
+    constructor(domainPayload: OneToOneMatchPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.candidateId,
+        domainPayload.matcher,
+        domainPayload.result?.let { ApiMatchEntry(it) },
+        domainPayload.fingerComparisonStrategy?.fromDomainToApi()
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

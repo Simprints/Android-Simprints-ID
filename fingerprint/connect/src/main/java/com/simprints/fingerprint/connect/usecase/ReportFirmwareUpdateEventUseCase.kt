@@ -2,8 +2,9 @@ package com.simprints.fingerprint.connect.usecase
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -11,12 +12,12 @@ import javax.inject.Inject
 
 internal class ReportFirmwareUpdateEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
     operator fun invoke(
-        startTime: Long,
+        startTime: Timestamp,
         availableOta: AvailableOta,
         targetVersions: String,
         e: Throwable? = null,
@@ -29,13 +30,15 @@ internal class ReportFirmwareUpdateEventUseCase @Inject constructor(
             }
             val failureReason = e?.let { "${it::class.java.simpleName} : ${it.message}" }
 
-            eventRepository.addOrUpdateEvent(ScannerFirmwareUpdateEvent(
-                startTime,
-                timeHelper.now(),
-                chipName,
-                targetVersions,
-                failureReason,
-            ))
+            eventRepository.addOrUpdateEvent(
+                ScannerFirmwareUpdateEvent(
+                    startTime,
+                    timeHelper.now(),
+                    chipName,
+                    targetVersions,
+                    failureReason,
+                )
+            )
         }
     }
 }

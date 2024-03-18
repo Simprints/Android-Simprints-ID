@@ -2,8 +2,8 @@ package com.simprints.infra.events.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload
@@ -33,6 +33,7 @@ import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEv
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent.EventDownSyncRequestPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
@@ -40,7 +41,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
+import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent.EventUpSyncRequestPayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
@@ -60,9 +61,7 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
     JsonSubTypes.Type(value = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload::class, name = EventType.FACE_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = FaceFallbackCapturePayload::class, name = EventType.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceOnboardingCompletePayload::class, name = EventType.FACE_ONBOARDING_COMPLETE_KEY),
-    JsonSubTypes.Type(value = SessionCapturePayload::class, name = EventType.SESSION_CAPTURE_KEY),
     JsonSubTypes.Type(value = AlertScreenPayload::class, name = EventType.ALERT_SCREEN_KEY),
-    JsonSubTypes.Type(value = ArtificialTerminationPayload::class, name = EventType.ARTIFICIAL_TERMINATION_KEY),
     JsonSubTypes.Type(value = AuthenticationPayload::class, name = EventType.AUTHENTICATION_KEY),
     JsonSubTypes.Type(value = AuthorizationPayload::class, name = EventType.AUTHORIZATION_KEY),
     JsonSubTypes.Type(value = CandidateReadPayload::class, name = EventType.CANDIDATE_READ_KEY),
@@ -83,11 +82,13 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
     JsonSubTypes.Type(value = ScannerConnectionPayload::class, name = EventType.SCANNER_CONNECTION_KEY),
     JsonSubTypes.Type(value = ScannerFirmwareUpdatePayload::class, name = Companion.SCANNER_FIRMWARE_UPDATE_KEY),
     JsonSubTypes.Type(value = Vero2InfoSnapshotPayload::class, name = EventType.VERO_2_INFO_SNAPSHOT_KEY),
-    JsonSubTypes.Type(value = SuspiciousIntentPayload::class, name = EventType.SUSPICIOUS_INTENT_KEY)
+    JsonSubTypes.Type(value = SuspiciousIntentPayload::class, name = EventType.SUSPICIOUS_INTENT_KEY),
+    JsonSubTypes.Type(value = EventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
+    JsonSubTypes.Type(value = EventUpSyncRequestPayload::class, name = Companion.EVENT_UP_SYNC_REQUEST_KEY),
 )
 abstract class EventPayload {
     abstract val type: EventType
     abstract val eventVersion: Int
-    abstract val createdAt: Long
-    abstract val endedAt: Long
+    abstract val createdAt: Timestamp
+    abstract val endedAt: Timestamp?
 }

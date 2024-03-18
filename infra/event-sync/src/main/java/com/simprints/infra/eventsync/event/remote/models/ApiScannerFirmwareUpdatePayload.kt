@@ -10,21 +10,20 @@ import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiScannerFirmwareUpdatePayload(
-    override val startTime: Long,
-    override val version: Int,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val chip: String,
     val targetAppVersion: String,
     val failureReason: String?,
-) : ApiEventPayload(ApiEventPayloadType.ScannerFirmwareUpdate, version, startTime) {
+) : ApiEventPayload(startTime) {
 
-    constructor(domainPayload: ScannerFirmwareUpdatePayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.endedAt,
-            domainPayload.chip,
-            domainPayload.targetAppVersion,
-            domainPayload.failureReason)
+    constructor(domainPayload: ScannerFirmwareUpdatePayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.chip,
+        domainPayload.targetAppVersion,
+        domainPayload.failureReason,
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

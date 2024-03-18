@@ -31,6 +31,9 @@ data class FingerprintConfiguration(
         CROSS_FINGER_USING_MEAN_OF_MAX;
     }
 
+    // Todo we didn't yet implement the logic to select the SDK based on the configuration
+    // so we are just using  secugenSimMatcher if it is not null or nec otherwise
+    // See ticket SIM-81 for more details
     val bioSdkConfiguration: FingerprintSdkConfiguration
         get() = when {
             secugenSimMatcher != null -> secugenSimMatcher

@@ -7,8 +7,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
 import com.simprints.core.DispatcherMain
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.session.Location
+import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val locationManager: LocationManager,
     @DispatcherMain private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
@@ -34,6 +34,7 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
+            showProgressNotification()
             createLocationFlow()
                 .filterNotNull()
                 .collect { location ->
@@ -47,21 +48,27 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     }
 
     private fun createLocationFlow(): Flow<android.location.Location?> {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DEFAULT_INTERVAL).build()
+        val locationRequest =
+            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DEFAULT_INTERVAL).build()
         return locationManager.requestLocation(locationRequest).take(1)
     }
 
     private suspend fun saveUserLocation(lastLocation: android.location.Location) {
         if (!isStopped) {
             // Only store location if SID didn't yet sent the response to the calling app
-            val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-            currentSession.payload.location = Location(lastLocation.latitude, lastLocation.longitude)
-            eventRepository.addOrUpdateEvent(currentSession)
+            val sessionScope = eventRepository.getCurrentSessionScope()
+            val updatesSessionScope = sessionScope.copy(
+                payload = sessionScope.payload.copy(
+                    location = Location(lastLocation.latitude, lastLocation.longitude)
+                )
+            )
+            eventRepository.saveSessionScope(updatesSessionScope)
             Simber.d("Saving user's location into the current session")
         }
     }
 
     companion object {
+
         // Based on the default value of minUpdateIntervalMillis in LocationRequest
         private const val DEFAULT_INTERVAL = 10 * 60 * 1000L
     }

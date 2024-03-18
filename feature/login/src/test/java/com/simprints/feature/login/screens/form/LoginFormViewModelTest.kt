@@ -136,7 +136,7 @@ internal class LoginFormViewModelTest {
             QrScannerError.CameraNotAvailable to SignInState.QrCameraUnavailable::class.java,
             QrScannerError.UnknownError to SignInState.QrGenericError::class.java,
         ).forEach { (error, expected) ->
-            viewModel.handleQrResult(QrScannerResult(null, error))
+            viewModel.handleQrResult(PROJECT_ID, QrScannerResult(null, error))
             val result = viewModel.signInState.getOrAwaitValue()
 
             assertThat(result.getContentIfNotHandled()).isInstanceOf(expected)
@@ -145,7 +145,7 @@ internal class LoginFormViewModelTest {
 
     @Test
     fun `returns correct SignInState when empty QR result`() {
-        viewModel.handleQrResult(QrScannerResult(null, null))
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(null, null))
         val result = viewModel.signInState.getOrAwaitValue()
 
         assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrInvalidCode::class.java)
@@ -155,17 +155,27 @@ internal class LoginFormViewModelTest {
     fun `returns correct SignInState when QR code parsing fails`() {
         every { jsonHelper.fromJson<QrCodeContent>(any()) } throws RuntimeException("parsing fail")
 
-        viewModel.handleQrResult(QrScannerResult(QR_CONTENT, null))
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
         val result = viewModel.signInState.getOrAwaitValue()
 
         assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrInvalidCode::class.java)
     }
 
     @Test
+    fun `returns correct SignInState when QR contains wrong project ID`() {
+        every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent("differentProjectId", PROJECT_SECRET)
+
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
+        val result = viewModel.signInState.getOrAwaitValue()
+
+        assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.ProjectIdMismatch::class.java)
+    }
+
+    @Test
     fun `returns correct SignInState when QR code parsing success`() {
         every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent(PROJECT_ID, PROJECT_SECRET)
 
-        viewModel.handleQrResult(QrScannerResult(QR_CONTENT, null))
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
         val result = viewModel.signInState.getOrAwaitValue()
 
         assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrCodeValid::class.java)
@@ -177,9 +187,31 @@ internal class LoginFormViewModelTest {
     fun `updates base API url when QR code parsing success`() {
         every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent(PROJECT_ID, PROJECT_SECRET, URL)
 
-        viewModel.handleQrResult(QrScannerResult(QR_CONTENT, null))
+        viewModel.handleQrResult(PROJECT_ID, QrScannerResult(QR_CONTENT, null))
 
         verify { simNetwork.setApiBaseUrl(eq(URL)) }
+    }
+
+    @Test
+    fun `updates UI state when change URL clicked`() {
+        viewModel.changeUrlClicked()
+
+        val result = viewModel.signInState.getOrAwaitValue()
+        assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.ShowUrlChangeDialog::class.java)
+    }
+
+    @Test
+    fun `saves provided base URL`() {
+        viewModel.saveNewUrl(URL)
+
+        verify { simNetwork.setApiBaseUrl(URL) }
+    }
+
+    @Test
+    fun `resets provided base URL`() {
+        viewModel.saveNewUrl(null)
+
+        verify { simNetwork.resetApiBaseUrl() }
     }
 
     companion object {

@@ -8,8 +8,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -35,7 +33,7 @@ class SessionHasIdentificationCallbackUseCaseTest {
     @Test
     fun `sessionHasIdentificationCallback return true if session has IdentificationCallbackEvent`() = runTest {
         // Given
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsFromScope(any()) } returns listOf(
             mockk(), mockk(), mockk<IdentificationCallbackEvent>()
         )
         //Then
@@ -45,7 +43,7 @@ class SessionHasIdentificationCallbackUseCaseTest {
     @Test
     fun `sessionHasIdentificationCallback return false if session doesn't have IdentificationCallbackEvent`() = runTest {
         // Given
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
+        coEvery { eventRepository.getEventsFromScope(any()) } returns listOf(
             mockk(), mockk(), mockk()
         )
         //Then
@@ -55,7 +53,7 @@ class SessionHasIdentificationCallbackUseCaseTest {
     @Test
     fun `sessionHasIdentificationCallback return false if session events is empty`() = runTest {
         // Given
-        coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
+        coEvery { eventRepository.getEventsFromScope(any()) } returns emptyList()
         //Then
         assertThat(useCase("sessionId")).isFalse()
     }

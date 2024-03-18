@@ -28,7 +28,6 @@ dependencies {
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
 
-    implementation(libs.retrofit.adapter)
     implementation(libs.retrofit.converterScalars)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.jackson)

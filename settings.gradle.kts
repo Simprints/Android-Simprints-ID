@@ -47,6 +47,26 @@ dependencyResolutionManagement {
             }
         }
 
+        maven {
+            name = "NECWrapperGitHubPackages"
+            url = uri("https://maven.pkg.github.com/simprints/NEC-wrapper")
+            credentials {
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
+            }
+        }
+
+        maven {
+            name = "SecugenWrapperGitHubPackages"
+            url = uri("https://maven.pkg.github.com/simprints/secugen-wrapper")
+            credentials {
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
+            }
+        }
+
     }
 }
 
@@ -64,12 +84,12 @@ include(
     ":fingerprint:infra:base-bio-sdk",
     ":fingerprint:infra:bio-sdk",
     ":fingerprint:infra:simprints-bio-sdk",
+    ":fingerprint:infra:nec-bio-sdk",
     ":fingerprint:infra:simafis-wrapper",
 )
 
 // Face modality modules
 include(
-    ":face:configuration",
     ":face:capture",
     ":face:infra:face-bio-sdk",
     ":face:infra:roc-wrapper",
@@ -97,17 +117,13 @@ include(
     ":infra:core",
     ":infra:test-tools",
     ":infra:events",
-    ":infra:event-sync",
     ":infra:config-store",
-    ":infra:config-sync",
-    ":infra:enrolment-records-sync",
     ":infra:enrolment-records-store",
     ":infra:images",
     ":infra:license",
     ":infra:logging",
     ":infra:auth-store",
     ":infra:auth-logic",
-    ":infra:project-security-store",
     ":infra:network",
     ":infra:realm",
     ":infra:recent-user-activity",
@@ -115,4 +131,6 @@ include(
     ":infra:security",
     ":infra:orchestrator-data",
     ":infra:ui-base",
+    ":infra:sync",
+    ":infra:event-sync",
 )

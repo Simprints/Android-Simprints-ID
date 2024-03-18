@@ -125,6 +125,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         val defaultProjectConfiguration: ProtoProjectConfiguration =
             ProjectConfiguration(
                 projectId = "",
+                updatedAt = "",
                 general = GeneralConfiguration(
                     modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
                     languageOptions = listOf(),
@@ -178,11 +179,13 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     frequency = SynchronizationConfiguration.Frequency.PERIODICALLY,
                     up = UpSynchronizationConfiguration(
                         simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-                            kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                            kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                            imagesRequireUnmeteredConnection = false,
                         ),
                         coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                             kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                        )
+                        ),
                     ),
                     down = DownSynchronizationConfiguration(
                         partitionType = DownSynchronizationConfiguration.PartitionType.USER,

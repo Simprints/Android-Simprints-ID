@@ -15,15 +15,15 @@ import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload.ApiAn
 
 @Keep
 internal data class ApiRefusalPayload(
-    override val startTime: Long,
-    override val version: Int,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val reason: ApiAnswer,
     val otherText: String,
-) : ApiEventPayload(ApiEventPayloadType.Refusal, version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     enum class ApiAnswer {
+
         REFUSED_RELIGION,
         REFUSED_DATA_CONCERNS,
         REFUSED_PERMISSION,
@@ -35,25 +35,24 @@ internal data class ApiRefusalPayload(
     }
 
     constructor(domainPayload: RefusalPayload) : this(
-        domainPayload.createdAt,
-        domainPayload.eventVersion,
-        domainPayload.endedAt,
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.reason.toApiRefusalEventAnswer(),
-        domainPayload.otherText)
+        domainPayload.otherText,
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields
 }
 
 
-internal fun RefusalPayload.Answer.toApiRefusalEventAnswer() =
-    when (this) {
-        REFUSED_RELIGION -> ApiAnswer.REFUSED_RELIGION
-        REFUSED_DATA_CONCERNS -> ApiAnswer.REFUSED_DATA_CONCERNS
-        REFUSED_PERMISSION -> ApiAnswer.REFUSED_PERMISSION
-        SCANNER_NOT_WORKING -> ApiAnswer.SCANNER_NOT_WORKING
-        APP_NOT_WORKING -> ApiAnswer.APP_NOT_WORKING
-        REFUSED_NOT_PRESENT -> ApiAnswer.REFUSED_NOT_PRESENT
-        REFUSED_YOUNG -> ApiAnswer.REFUSED_YOUNG
-        OTHER -> ApiAnswer.OTHER
-    }
+internal fun RefusalPayload.Answer.toApiRefusalEventAnswer() = when (this) {
+    REFUSED_RELIGION -> ApiAnswer.REFUSED_RELIGION
+    REFUSED_DATA_CONCERNS -> ApiAnswer.REFUSED_DATA_CONCERNS
+    REFUSED_PERMISSION -> ApiAnswer.REFUSED_PERMISSION
+    SCANNER_NOT_WORKING -> ApiAnswer.SCANNER_NOT_WORKING
+    APP_NOT_WORKING -> ApiAnswer.APP_NOT_WORKING
+    REFUSED_NOT_PRESENT -> ApiAnswer.REFUSED_NOT_PRESENT
+    REFUSED_YOUNG -> ApiAnswer.REFUSED_YOUNG
+    OTHER -> ApiAnswer.OTHER
+}

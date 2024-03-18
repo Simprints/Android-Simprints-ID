@@ -13,6 +13,7 @@ internal class LicenseRepositoryImpl @Inject constructor(
     private val licenseRemoteDataSource: LicenseRemoteDataSource,
 ) : LicenseRepository {
 
+
     override fun getLicenseStates(
         projectId: String,
         deviceId: String,
@@ -42,6 +43,17 @@ internal class LicenseRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Get cached license
+     * @throws IllegalStateException if no cached license found
+     * @param licenseVendor
+     * @return cached license as [String]
+     */
+    override suspend fun getCachedLicense(licenseVendor: Vendor): String =
+        licenseLocalDataSource.getLicense(licenseVendor)
+            ?: throw IllegalStateException("No cached license found")
+
+
     private suspend fun FlowCollector<LicenseState>.handleLicenseResultSuccess(
         licenseVendor: Vendor,
         apiLicenseResult: ApiLicenseResult.Success
@@ -60,6 +72,6 @@ internal class LicenseRepositoryImpl @Inject constructor(
         emit(LicenseState.FinishedWithBackendMaintenanceError(apiLicenseResult.estimatedOutage))
     }
 
-    override suspend fun deleteCachedLicense() = licenseLocalDataSource.deleteCachedLicense()
+    override suspend fun deleteCachedLicense(licenseVendor: Vendor) = licenseLocalDataSource.deleteCachedLicense(licenseVendor)
 
 }

@@ -9,12 +9,6 @@ enum class EventType {
     // events correctly with Jackson (see annotation in Event).
     // Add a key in the companion object for each enum value
 
-    /* key added: SESSION_CAPTURE_KEY */
-    SESSION_CAPTURE,
-
-    /* key added: ARTIFICIAL_TERMINATION_KEY */
-    ARTIFICIAL_TERMINATION,
-
     /* key added: AUTHENTICATION_KEY */
     AUTHENTICATION,
 
@@ -127,7 +121,14 @@ enum class EventType {
     FACE_CAPTURE_CONFIRMATION,
 
     /* key added: PERSON_CREATION_KEY */
-    PERSON_CREATION;
+    PERSON_CREATION,
+
+    /* key added: EVENT_DOWN_SYNC_REQUEST_KEY */
+    EVENT_DOWN_SYNC_REQUEST,
+
+    /* key added: EVENT_UP_SYNC_REQUEST_KEY */
+    EVENT_UP_SYNC_REQUEST,
+    ;
 
     companion object {
         const val CALLBACK_ENROLMENT_KEY = "CALLBACK_ENROLMENT"
@@ -146,8 +147,6 @@ enum class EventType {
         const val FACE_CAPTURE_KEY = "FACE_CAPTURE"
         const val FACE_CAPTURE_BIOMETRICS_KEY = "FACE_CAPTURE_BIOMETRICS"
         const val FACE_CAPTURE_CONFIRMATION_KEY = "FACE_CAPTURE_CONFIRMATION"
-        const val SESSION_CAPTURE_KEY = "SESSION_CAPTURE"
-        const val ARTIFICIAL_TERMINATION_KEY = "ARTIFICIAL_TERMINATION"
         const val AUTHENTICATION_KEY = "AUTHENTICATION"
         const val CONSENT_KEY = "CONSENT"
         const val ENROLMENT_V1_KEY = "ENROLMENT_V1"
@@ -170,5 +169,7 @@ enum class EventType {
         const val COMPLETION_CHECK_KEY = "COMPLETION_CHECK"
         const val SUSPICIOUS_INTENT_KEY = "SUSPICIOUS_INTENT"
         const val VERO_2_INFO_SNAPSHOT_KEY = "VERO_2_INFO_SNAPSHOT"
+        const val EVENT_DOWN_SYNC_REQUEST_KEY = "EVENT_DOWN_SYNC_REQUEST"
+        const val EVENT_UP_SYNC_REQUEST_KEY = "EVENT_UP_SYNC_REQUEST"
     }
 }

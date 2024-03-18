@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import org.junit.Test
 
 class ApiFaceCapturePayloadTest {
@@ -18,9 +19,8 @@ class ApiFaceCapturePayloadTest {
         )
         val payload = ApiFaceCapturePayload(
             id = randomUUID(),
-            startTime = 1,
-            endTime = 2,
-            version = 3,
+            startTime = ApiTimestamp(1),
+            endTime = ApiTimestamp(2),
             attemptNb = 2,
             qualityThreshold = 1.2f,
             result = ApiFaceCapturePayload.ApiResult.VALID,
@@ -29,9 +29,8 @@ class ApiFaceCapturePayloadTest {
         )
         with(payload) {
             assertThat(id).isNotNull()
-            assertThat(startTime).isEqualTo(1)
-            assertThat(endTime).isEqualTo(2)
-            assertThat(version).isEqualTo(3)
+            assertThat(startTime).isEqualTo(ApiTimestamp(1),)
+            assertThat(endTime).isEqualTo(ApiTimestamp(2),)
             assertThat(attemptNb).isEqualTo(2)
             assertThat(qualityThreshold).isEqualTo(1.2f)
             assertThat(result).isEqualTo(ApiFaceCapturePayload.ApiResult.VALID)

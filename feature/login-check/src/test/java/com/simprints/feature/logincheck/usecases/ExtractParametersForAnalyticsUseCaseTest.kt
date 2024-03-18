@@ -1,6 +1,6 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.logging.Simber
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -18,7 +18,7 @@ import org.junit.Test
 internal class ExtractParametersForAnalyticsUseCaseTest {
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: SessionEventRepository
 
     private lateinit var useCase: ExtractParametersForAnalyticsUseCase
 
@@ -26,7 +26,7 @@ internal class ExtractParametersForAnalyticsUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns "sessionId"
         }
 

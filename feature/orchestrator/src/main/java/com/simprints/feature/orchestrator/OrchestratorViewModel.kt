@@ -22,8 +22,8 @@ import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUs
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.matcher.MatchParams
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class OrchestratorViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val cache: OrchestratorCache,
     private val locationStore: LocationStore,
     private val stepsBuilder: BuildStepsUseCase,
@@ -61,7 +61,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val _appResponse = MutableLiveData<LiveDataEventWithContent<OrchestratorResult>>()
 
     fun handleAction(action: ActionRequest) = viewModelScope.launch {
-        val projectConfiguration = configManager.getProjectConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
 
         modalities = projectConfiguration.general.modalities.toSet()
         steps = stepsBuilder.build(action, projectConfiguration)
@@ -116,7 +116,7 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     private fun buildAppResponse() = viewModelScope.launch {
-        val projectConfiguration = configManager.getProjectConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
         val cachedActionRequest = actionRequest
         val appResponse = appResponseBuilder(
             projectConfiguration,
@@ -136,7 +136,6 @@ internal class OrchestratorViewModel @Inject constructor(
             if (matchingStep != null) {
                 val faceSamples = result.results.mapNotNull { it.sample }
                     .map { MatchParams.FaceSample(it.faceId, it.template) }
-                //TODO: check
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFaceStepArgs(faceSamples)
@@ -152,7 +151,6 @@ internal class OrchestratorViewModel @Inject constructor(
             if (matchingStep != null) {
                 val fingerprintSamples = result.results.mapNotNull { it.sample }
                     .map { MatchParams.FingerprintSample(it.fingerIdentifier, it.format, it.template) }
-                //TODO: check
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFingerprintStepArgs(fingerprintSamples)

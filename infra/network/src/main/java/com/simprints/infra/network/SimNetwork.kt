@@ -1,6 +1,5 @@
 package com.simprints.infra.network
 
-import android.content.Context
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlin.reflect.KClass
@@ -21,14 +20,13 @@ interface SimNetwork {
 
     fun <T : SimRemoteInterface> getSimApiClient(
         remoteInterface: KClass<T>,
-        ctx: Context,
-        url: String,
         deviceId: String,
         versionName: String,
         authToken: String?
     ): SimApiClient<T>
 
     fun getApiBaseUrl(): String
+    fun getApiBaseUrlPrefix(): String
     fun setApiBaseUrl(apiBaseUrl: String?)
     fun resetApiBaseUrl()
 

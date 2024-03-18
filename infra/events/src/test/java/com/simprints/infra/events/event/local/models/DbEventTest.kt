@@ -32,7 +32,7 @@ class DbEventTest {
 
     @Test
     fun convert_IdentificationCallbackEvent() {
-        val original = createIdentificationCallbackEventV2()
+        val original = createIdentificationCallbackEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
@@ -127,24 +127,8 @@ class DbEventTest {
     }
 
     @Test
-    fun convert_SessionCaptureEvent() {
-        val original = createSessionCaptureEvent()
-        val transformed = (original.fromDomainToDb().fromDbToDomain())
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
     fun convert_AlertScreenEvent() {
         val original = createAlertScreenEvent()
-        val transformed = original.fromDomainToDb().fromDbToDomain()
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
-    fun convert_ArtificialTerminationEvent() {
-        val original = createArtificialTerminationEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
@@ -158,7 +142,6 @@ class DbEventTest {
         with(original) {
             assertThat(id).isEqualTo(transformed.id)
             assertThat(type).isEqualTo(transformed.type)
-            assertThat(labels).isEqualTo(transformed.labels)
         }
 
         with(transformed) {
@@ -307,6 +290,22 @@ class DbEventTest {
     @Test
     fun convert_Vero2InfoSnapshotEvent() {
         val original = createVero2InfoSnapshotEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
+
+    @Test
+    fun convert_EventDownSyncRequestEvent() {
+        val original = createEventDownSyncRequestEvent()
+        val transformed = original.fromDomainToDb().fromDbToDomain()
+
+        assertThat(original).isEqualTo(transformed)
+    }
+
+    @Test
+    fun convert_EventUpSyncRequestEvent() {
+        val original = createEventUpSyncRequestEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)

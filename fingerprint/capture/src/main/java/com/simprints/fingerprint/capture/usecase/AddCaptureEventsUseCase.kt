@@ -1,12 +1,13 @@
 package com.simprints.fingerprint.capture.usecase
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
@@ -16,11 +17,11 @@ import javax.inject.Inject
 internal class AddCaptureEventsUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val encoder: EncodingUtils,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
 ) {
 
     suspend operator fun invoke(
-        lastCaptureStartedAt: Long,
+        lastCaptureStartedAt: Timestamp,
         fingerState: FingerState,
         qualityThreshold: Int,
         tooManyBadScans: Boolean,
@@ -42,7 +43,10 @@ internal class AddCaptureEventsUseCase @Inject constructor(
             if (captureState is CaptureState.Collected && (captureEvent.payload.result == Result.GOOD_SCAN || tooManyBadScans))
                 FingerprintCaptureBiometricsEvent(
                     createdAt = lastCaptureStartedAt,
-                    fingerprint = mapCaptureToBiometricFingerprint(fingerState, captureState.scanResult),
+                    fingerprint = mapCaptureToBiometricFingerprint(
+                        fingerState,
+                        captureState.scanResult
+                    ),
                     payloadId = payloadId
                 )
             else null
@@ -67,16 +71,17 @@ internal class AddCaptureEventsUseCase @Inject constructor(
         else -> Result.FAILURE_TO_ACQUIRE
     }
 
-    private fun mapCaptureStateToFingerprint(captureState: CaptureState, fingerState: FingerState) = captureState
-        .let { it as? CaptureState.Collected }
-        ?.scanResult
-        ?.let {
-            FingerprintCapturePayload.Fingerprint(
-                fingerState.id,
-                it.qualityScore,
-                it.templateFormat
-            )
-        }
+    private fun mapCaptureStateToFingerprint(captureState: CaptureState, fingerState: FingerState) =
+        captureState
+            .let { it as? CaptureState.Collected }
+            ?.scanResult
+            ?.let {
+                FingerprintCapturePayload.Fingerprint(
+                    fingerState.id,
+                    it.qualityScore,
+                    it.templateFormat
+                )
+            }
 
     private fun mapCaptureToBiometricFingerprint(fingerState: FingerState, it: ScanResult) =
         FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(

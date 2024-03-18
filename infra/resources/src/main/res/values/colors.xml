@@ -18,6 +18,7 @@
     <color name="simprints_off_white">#FFEEEEEE</color>
     <color name="simprints_grey">#FF888888</color>
     <color name="simprints_grey_light">#FFC0C0C0</color>
+    <color name="simprints_grey_disabled">#22000000</color>
     <color name="simprints_black">#000000</color>
     <color name="simprints_blue_grey_light">#A9B5C2</color>
     <color name="simprints_blue_grey">#384553</color>

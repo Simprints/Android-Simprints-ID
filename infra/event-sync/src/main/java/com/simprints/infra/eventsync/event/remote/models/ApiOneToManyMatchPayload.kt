@@ -7,34 +7,35 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToM
 
 @Keep
 internal data class ApiOneToManyMatchPayload(
-    override val startTime: Long,
-    override val version: Int,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val pool: ApiMatchPool,
     val matcher: String,
     val result: List<ApiMatchEntry>?,
-) : ApiEventPayload(ApiEventPayloadType.OneToManyMatch, version, startTime) {
+) : ApiEventPayload( startTime) {
 
     @Keep
     data class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
+
         constructor(matchPool: MatchPool) :
             this(ApiMatchPoolType.valueOf(matchPool.type.toString()), matchPool.count)
     }
 
     @Keep
     enum class ApiMatchPoolType {
+
         USER,
         MODULE,
         PROJECT;
     }
 
-    constructor(domainPayload: OneToManyMatchPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.endedAt,
-            ApiMatchPool(domainPayload.pool),
-            domainPayload.matcher,
-            domainPayload.result?.map { ApiMatchEntry(it) })
+    constructor(domainPayload: OneToManyMatchPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
+        ApiMatchPool(domainPayload.pool),
+        domainPayload.matcher,
+        domainPayload.result?.map { ApiMatchEntry(it) }
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

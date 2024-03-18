@@ -1,7 +1,7 @@
 package com.simprints.face.capture.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -21,7 +21,7 @@ class SaveFaceImageUseCaseTest {
     lateinit var imageRepo: ImageRepository
 
     @MockK
-    lateinit var eventRepo: EventRepository
+    lateinit var eventRepo: SessionEventRepository
 
     private lateinit var useCase: SaveFaceImageUseCase
 
@@ -34,8 +34,8 @@ class SaveFaceImageUseCaseTest {
 
     @Test
     fun `save image should call the event and image repos`() = runTest {
-        coEvery { eventRepo.getCurrentCaptureSessionEvent() } returns mockk {
-            every { payload.projectId } returns "projectId"
+        coEvery { eventRepo.getCurrentSessionScope() } returns mockk {
+            every { projectId } returns "projectId"
             every { id } returns "sessionId"
         }
 
@@ -68,7 +68,7 @@ class SaveFaceImageUseCaseTest {
 
     @Test
     fun `returns null when no current session event`() = runTest {
-        coEvery { eventRepo.getCurrentCaptureSessionEvent() } throws Exception("no session")
+        coEvery { eventRepo.getCurrentSessionScope() } throws Exception("no session")
 
         val imageBytes = byteArrayOf()
         val captureEventId = "captureEventId"
@@ -78,8 +78,8 @@ class SaveFaceImageUseCaseTest {
 
     @Test
     fun `returns null when image is not saved`() = runTest {
-        coEvery { eventRepo.getCurrentCaptureSessionEvent() } returns mockk {
-            every { payload.projectId } returns "projectId"
+        coEvery { eventRepo.getCurrentSessionScope() } returns mockk {
+            every { projectId } returns "projectId"
             every { id } returns "sessionId"
         }
         coEvery {

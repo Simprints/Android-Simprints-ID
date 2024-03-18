@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -19,7 +19,7 @@ import java.io.Serializable
 class CreateIdentifyResponseUseCaseTest {
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: SessionEventRepository
 
     private lateinit var useCase: CreateIdentifyResponseUseCase
 
@@ -27,7 +27,7 @@ class CreateIdentifyResponseUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent().id } returns "sessionId"
+        coEvery { eventRepository.getCurrentSessionScope().id } returns "sessionId"
 
         useCase = CreateIdentifyResponseUseCase(eventRepository)
     }

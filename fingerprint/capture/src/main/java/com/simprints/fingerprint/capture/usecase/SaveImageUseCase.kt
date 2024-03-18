@@ -4,7 +4,7 @@ import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedExcepti
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.infra.config.store.models.Vero2Configuration
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 internal class SaveImageUseCase @Inject constructor(
     private val coreImageRepository: ImageRepository,
-    private val coreEventRepository: EventRepository,
+    private val coreEventRepository: SessionEventRepository,
 ) {
 
     suspend operator fun invoke(
@@ -37,8 +37,8 @@ internal class SaveImageUseCase @Inject constructor(
         fileExtension: String,
     ): SecuredImageRef? = determinePath(captureEventId, fileExtension)?.let { path ->
         Simber.d("Saving fingerprint image ${path}")
-        val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-        val projectId = currentSession.payload.projectId
+        val currentSession = coreEventRepository.getCurrentSessionScope()
+        val projectId = currentSession.projectId
 
         val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, projectId, Path(path.parts))
 
@@ -52,8 +52,7 @@ internal class SaveImageUseCase @Inject constructor(
 
     private suspend fun determinePath(captureEventId: String, fileExtension: String): Path? =
         try {
-            val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-            val sessionId = currentSession.id
+            val sessionId = coreEventRepository.getCurrentSessionScope().id
             Path(
                 arrayOf(
                     SESSIONS_PATH,

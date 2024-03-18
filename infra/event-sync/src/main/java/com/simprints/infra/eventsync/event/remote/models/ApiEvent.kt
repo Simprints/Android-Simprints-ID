@@ -8,25 +8,23 @@ import com.simprints.infra.events.event.domain.models.Event
 @Keep
 internal data class ApiEvent(
     val id: String,
-    val labels: ApiEventLabels,
+    val type: ApiEventPayloadType,
+    val version: Int,
     val payload: ApiEventPayload,
-    val tokenizedFields: List<String>
+    val tokenizedFields: List<String>,
 )
 
 internal fun Event.fromDomainToApi(): ApiEvent {
     val tokenizedKeyTypes =
         getTokenizedFields().filter { it.value is TokenizableString.Tokenized }.keys.toList()
-    val payload = payload.fromDomainToApi()
-    val tokenizedFields = tokenizedKeyTypes.mapNotNull(payload::getTokenizedFieldJsonPath)
+    val apiPayload = payload.fromDomainToApi()
+    val tokenizedFields = tokenizedKeyTypes.mapNotNull(apiPayload::getTokenizedFieldJsonPath)
+
     return ApiEvent(
         id = id,
-        labels = labels.fromDomainToApi(),
-        payload = payload,
+        type = type.fromDomainToApi(),
+        version = payload.eventVersion,
+        payload = apiPayload,
         tokenizedFields = tokenizedFields
     )
 }
-
-private fun findTokenizedFieldJsonPath(
-    key: TokenKeyType,
-    jsonPaths: Map<TokenKeyType, String>
-): String? = jsonPaths[key]

@@ -11,18 +11,18 @@ import com.simprints.infra.eventsync.event.remote.models.ApiIntentParsingPayload
 
 @Keep
 internal data class ApiIntentParsingPayload(
-    override val startTime: Long,
-    override val version: Int,
+    override val startTime: ApiTimestamp,
     val integration: ApiIntegrationInfo,
-) : ApiEventPayload(ApiEventPayloadType.IntentParsing, version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: IntentParsingPayload) : this(
-        domainPayload.createdAt,
-        domainPayload.eventVersion,
-        domainPayload.integration.fromDomainToApi())
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.integration.fromDomainToApi(),
+    )
 
     @Keep
     enum class ApiIntegrationInfo {
+
         ODK,
         STANDARD,
         COMMCARE;
@@ -33,9 +33,8 @@ internal data class ApiIntentParsingPayload(
 }
 
 
-internal fun IntegrationInfo.fromDomainToApi() =
-    when (this) {
-        ODK -> ApiIntegrationInfo.ODK
-        STANDARD -> ApiIntegrationInfo.STANDARD
-        COMMCARE -> ApiIntegrationInfo.COMMCARE
-    }
+internal fun IntegrationInfo.fromDomainToApi() = when (this) {
+    ODK -> ApiIntegrationInfo.ODK
+    STANDARD -> ApiIntegrationInfo.STANDARD
+    COMMCARE -> ApiIntegrationInfo.COMMCARE
+}

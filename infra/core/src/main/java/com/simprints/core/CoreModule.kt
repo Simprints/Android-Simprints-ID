@@ -101,6 +101,14 @@ object CoreModule {
     ): CoroutineScope = CoroutineScope(
         SupervisorJob() + dispatcherIO + AppCoroutineExceptionHandler()
     )
+
+    @AppScope
+    @Provides
+    fun provideAppScope(
+        @DispatcherMain dispatcherMain: CoroutineDispatcher
+    ): CoroutineScope = CoroutineScope(
+        SupervisorJob() + dispatcherMain + AppCoroutineExceptionHandler()
+    )
 }
 
 @Qualifier
@@ -130,6 +138,10 @@ annotation class DispatcherMain
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class NonCancellableIO
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AppScope
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

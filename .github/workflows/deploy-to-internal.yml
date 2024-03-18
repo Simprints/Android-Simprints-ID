@@ -15,12 +15,11 @@ jobs:
     deploy-to-internal:
 
         runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         concurrency:
             group: release-internal-workflow #only one instance of this workflow can run at a time
-
-        permissions:
-            contents: write # A write permission For Auto tagging the releases
+            cancel-in-progress: true
 
         environment: internal
 
@@ -68,6 +67,3 @@ jobs:
 
             -   name: Publish Release bundle
                 run: ./gradlew id:publishReleaseBundle
-
-            -   name: Set release tag
-                run: bash ci/deployment/release_tag_setup

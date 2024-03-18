@@ -10,6 +10,7 @@ jobs:
             GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
 
         runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
@@ -22,7 +23,7 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Restore gradle global directory
-                uses: actions/cache/restore@v3
+                uses: actions/cache/restore@v4
                 id: cache
                 with:
                     path: |

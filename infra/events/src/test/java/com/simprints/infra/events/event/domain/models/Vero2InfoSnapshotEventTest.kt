@@ -6,35 +6,29 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Companion.NEW_EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_ENDED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.Vero2InfoSnapshotEventSample
 import org.junit.Test
 
 class Vero2InfoSnapshotEventTest {
 
     @Test
     fun create_Vero2InfoSnapshotEvent() {
-        val labels = EventLabels(sessionId = GUID1)
         val versionArg =
             Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
-                "E-1", "cypressApp", "stmApp", "un20App")
+                "E-1", "cypressApp", "stmApp", "un20App"
+            )
         val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
-        val event = Vero2InfoSnapshotEventSample.getEvent(labels)
+        val event = Vero2InfoSnapshotEventSample.getEvent()
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(VERO_2_INFO_SNAPSHOT)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(NEW_EVENT_VERSION)
             assertThat(type).isEqualTo(VERO_2_INFO_SNAPSHOT)
             assertThat(version).isEqualTo(versionArg)
             assertThat(battery).isEqualTo(batteryArg)
         }
     }
-
 
     @Test
     fun shouldParseEvent_vero2Event_usingNewApi_successfully() {
@@ -45,22 +39,22 @@ class Vero2InfoSnapshotEventTest {
             un20App = "1.2",
         )
         val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
-        val labels = EventLabels(sessionId = "af4eca90-c599-4323-97c7-c70e490c5568")
-        val payload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi(
-            CREATED_AT,
-            Vero2InfoSnapshotEvent.NEW_EVENT_VERSION,
-            batteryArg,
-            versionArg
-        )
+        val payload =
+            Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi(
+                CREATED_AT,
+                NEW_EVENT_VERSION,
+                batteryArg,
+                versionArg
+            )
         val expectedEvent = Vero2InfoSnapshotEvent(
             id = "5bc59283-a448-4911-a21a-5d39b0e346a7",
-            labels = labels,
+            scopeId = "af4eca90-c599-4323-97c7-c70e490c5568",
             payload = payload,
             type = VERO_2_INFO_SNAPSHOT
         )
 
         val eventAsString = Vero2InfoSnapshotEventSample.newApiJsonEventString
-        val actualEvent = JsonHelper.fromJson(eventAsString, object: TypeReference<Event>() {})
+        val actualEvent = JsonHelper.fromJson(eventAsString, object : TypeReference<Event>() {})
 
 
         assertThat(expectedEvent).isEqualTo(actualEvent)
@@ -77,7 +71,6 @@ class Vero2InfoSnapshotEventTest {
             un20App = "1.2",
             master = 10129
         )
-        val labels = EventLabels(sessionId = "6dcb3810-4789-4149-8fea-473ffb520958")
         val batteryArg = Vero2InfoSnapshotEvent.BatteryInfo(0, 1, 2, 3)
         val payload = Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi(
             CREATED_AT,
@@ -87,13 +80,13 @@ class Vero2InfoSnapshotEventTest {
         )
         val expectedEvent = Vero2InfoSnapshotEvent(
             id = "3afb1b9e-b263-4073-b773-6e1dac20d72f",
-            labels = labels,
+            scopeId = "6dcb3810-4789-4149-8fea-473ffb520958",
             payload = payload,
             type = VERO_2_INFO_SNAPSHOT
         )
 
         val eventAsString = Vero2InfoSnapshotEventSample.oldApiJsonEventString
-        val actualEvent = JsonHelper.fromJson(eventAsString, object: TypeReference<Event>() {})
+        val actualEvent = JsonHelper.fromJson(eventAsString, object : TypeReference<Event>() {})
 
 
         assertThat(expectedEvent).isEqualTo(actualEvent)

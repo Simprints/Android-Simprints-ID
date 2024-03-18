@@ -11,16 +11,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
-import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.toList
@@ -35,13 +35,13 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
+
+    @Inject
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @Inject
     lateinit var authStore: AuthStore
-
-    @Inject
-    lateinit var authManager: AuthManager
 
     @Inject
     lateinit var eventRepository: EventRepository
@@ -79,15 +79,15 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncStart.setOnClickListener {
-            eventSyncManager.sync()
+            syncOrchestrator.startEventSync()
         }
 
         binding.syncStop.setOnClickListener {
-            eventSyncManager.stop()
+            syncOrchestrator.stopEventSync()
         }
 
         binding.syncSchedule.setOnClickListener {
-            eventSyncManager.scheduleSync()
+            syncOrchestrator.rescheduleEventSync()
         }
 
         binding.clearFirebaseToken.setOnClickListener {
@@ -99,7 +99,9 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             binding.logs.append("\nGetting Configs from BFSID")
             lifecycleScope.launch {
                 try {
-                    configManager.refreshProjectConfiguration(authStore.signedInProjectId)
+                    configRepository.refreshProject(authStore.signedInProjectId).also { (project, _) ->
+                        enrolmentRecordRepository.tokenizeExistingRecords(project)
+                    }
                     binding.logs.append("\nGot Configs from BFSID")
                 } catch (e: Exception) {
                     binding.logs.append("\nFailed to refresh the project configuration")
@@ -108,7 +110,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncDevice.setOnClickListener {
-            authManager.startSecurityStateCheck()
+            syncOrchestrator.startDeviceSync()
         }
 
         binding.printRoomDb.setOnClickListener {
@@ -117,7 +119,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 val logStringBuilder = StringBuilder()
                 logStringBuilder.append("\nSubjects ${enrolmentRecordRepository.count()}")
 
-                val events = eventRepository.loadAll().toList().groupBy { it.type }
+                val events = eventRepository.getAllEvents().toList().groupBy { it.type }
                 events.forEach {
                     logStringBuilder.append("\n${it.key} ${it.value.size}")
                 }
@@ -128,8 +130,9 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
         binding.cleanAll.setOnClickListener {
             lifecycleScope.launch(dispatcher) {
-                eventSyncManager.cancelScheduledSync()
-                eventSyncManager.stop()
+                syncOrchestrator.stopEventSync()
+                syncOrchestrator.cancelEventSync()
+
                 eventRepository.deleteAll()
                 eventSyncManager.resetDownSyncInfo()
                 enrolmentRecordRepository.deleteAll()

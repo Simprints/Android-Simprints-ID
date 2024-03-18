@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
 import java.util.UUID
@@ -10,18 +11,17 @@ import java.util.UUID
 @Keep
 data class AlertScreenEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: AlertScreenPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var scopeId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         alertType: AlertScreenPayload.AlertScreenEventType,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         AlertScreenPayload(createdAt, EVENT_VERSION, alertType),
         ALERT_SCREEN
     )
@@ -32,11 +32,11 @@ data class AlertScreenEvent(
 
     @Keep
     data class AlertScreenPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val alertType: AlertScreenEventType,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = ALERT_SCREEN,
-        override val endedAt: Long = 0
     ) : EventPayload() {
 
         enum class AlertScreenEventType {
@@ -70,8 +70,8 @@ data class AlertScreenEvent(
             INTEGRITY_SERVICE_ERROR,
             ENROLMENT_LAST_BIOMETRICS_FAILED,
             INVALID_STATE_FOR_INTENT_ACTION,
-            FACE_LICENSE_INVALID,
-            FACE_LICENSE_MISSING,
+            FACE_LICENSE_INVALID,// Todo rename to LICENSE_INVALID CORE-3206
+            FACE_LICENSE_MISSING,// Todo rename to LICENSE_MISSING CORE-3206
             GOOGLE_PLAY_SERVICES_OUTDATED,
             MISSING_GOOGLE_PLAY_SERVICES,
             MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
@@ -81,6 +81,6 @@ data class AlertScreenEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

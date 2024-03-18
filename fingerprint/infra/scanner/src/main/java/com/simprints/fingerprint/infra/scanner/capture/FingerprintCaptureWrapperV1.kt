@@ -2,6 +2,7 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
@@ -27,6 +28,14 @@ internal class FingerprintCaptureWrapperV1(
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
     }
 
+    override suspend fun acquireUnprocessedImage(captureDpi: Dpi?): AcquireUnprocessedImageResponse {
+        throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
+    }
+
+    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray {
+        throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
+    }
+
     override suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
         timeOutMs: Int,
@@ -44,6 +53,7 @@ internal class FingerprintCaptureWrapperV1(
             }
         }
     }
+
 
     private fun continuousCaptureCallback(
         qualityThreshold: Int,
@@ -87,7 +97,7 @@ internal class FingerprintCaptureWrapperV1(
         cont: Continuation<AcquireFingerprintTemplateResponse>
     ) {
         when (error) {
-            SCANNER_ERROR.UN20_SDK_ERROR -> cont.resumeWithException(NoFingerDetectedException()) // If no finger is detected on the sensor
+            SCANNER_ERROR.UN20_SDK_ERROR -> cont.resumeWithException(NoFingerDetectedException("No finger detected on the sensor"))
             SCANNER_ERROR.INVALID_STATE, SCANNER_ERROR.SCANNER_UNREACHABLE, SCANNER_ERROR.UN20_INVALID_STATE, SCANNER_ERROR.OUTDATED_SCANNER_INFO, SCANNER_ERROR.IO_ERROR -> cont.resumeWithException(
                 ScannerDisconnectedException()
             )

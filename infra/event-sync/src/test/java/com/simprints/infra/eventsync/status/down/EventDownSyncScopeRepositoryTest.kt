@@ -263,7 +263,7 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(lastSyncTime).isEqualTo(LAST_SYNC_TIME)
         assertThat(state).isEqualTo(LAST_STATE)
         assertThat(queryEvent.projectId).isNotNull()
-        assertThat(queryEvent.moduleIds).isNull()
+        assertThat(queryEvent.moduleId).isNull()
         assertThat(queryEvent.modes).isEqualTo(DEFAULT_MODES)
     }
 }

@@ -8,6 +8,8 @@ import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
@@ -15,6 +17,7 @@ import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
+import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -47,38 +50,50 @@ internal class EventDownSyncDownloaderWorkerTest {
     @MockK
     lateinit var syncCache: EventSyncCache
 
+    @MockK
+    lateinit var eventRepository: EventRepository
+
+    @MockK
+    lateinit var eventScope: EventScope
+
     private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
+
         eventDownSyncDownloaderWorker = EventDownSyncDownloaderWorker(
             mockk(relaxed = true),
             mockk(relaxed = true) {
                 every { inputData } returns workDataOf(
-                    INPUT_DOWN_SYNC_OPS to JsonHelper.toJson(projectDownSyncScope.operations.first())
+                    INPUT_DOWN_SYNC_OPS to JsonHelper.toJson(projectDownSyncScope.operations.first()),
+                    INPUT_EVENT_DOWN_SYNC_SCOPE_ID to "eventScopeId",
                 )
             },
             downSyncTask,
             eventDownSyncScopeRepository,
             syncCache,
             JsonHelper,
+            eventRepository,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
     @Test
-    fun worker_shouldCallDownSync() = runTest {
+    fun worker_noEventScope_shouldFail() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns null
+
         val result = eventDownSyncDownloaderWorker.doWork()
 
-        assertThat(result).isEqualTo(ListenableWorker.Result.success(workDataOf(OUTPUT_DOWN_SYNC to 0)))
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 
     @Test
     fun worker_failForCloudIntegration_shouldFail() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            downSyncTask.downSync(any(), any())
+            downSyncTask.downSync(any(), any(), any())
         } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -94,8 +109,9 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_failForBackendMaintenanceError_shouldFail() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            downSyncTask.downSync(any(), any())
+            downSyncTask.downSync(any(), any(), any())
         } throws BackendMaintenanceException(estimatedOutage = null)
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -112,8 +128,9 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_failForTimedBackendMaintenanceError_shouldFail() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            downSyncTask.downSync(any(), any())
+            downSyncTask.downSync(any(), any(), any())
         } throws BackendMaintenanceException(estimatedOutage = 600)
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -130,8 +147,9 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_failForTooManyRequestsError_shouldFail() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            downSyncTask.downSync(any(), any())
+            downSyncTask.downSync(any(), any(), any())
         } throws TooManyRequestsException()
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -147,8 +165,9 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_failForRemoteDbNotSignedInException_shouldFail() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            downSyncTask.downSync(any(), any())
+            downSyncTask.downSync(any(), any(), any())
         } throws RemoteDbNotSignedInException()
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -164,8 +183,9 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_failForNetworkIssue_shouldRetry() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         coEvery {
-            downSyncTask.downSync(any(), any())
+            downSyncTask.downSync(any(), any(), any())
         } throws Throwable("Network Exception")
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -175,6 +195,7 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_progressCountInProgressData_shouldExtractTheProgressCountCorrectly() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         val progress = 2
         val syncCacheMock = mockk<EventSyncCache>()
         coEvery { syncCacheMock.readProgress(any()) } returns 1
@@ -182,8 +203,8 @@ internal class EventDownSyncDownloaderWorkerTest {
         val workInfo = WorkInfo(
             UUID.randomUUID(),
             RUNNING,
+            setOf(),
             workDataOf(),
-            listOf(),
             workDataOf(PROGRESS_DOWN_SYNC to progress),
             2,
             0
@@ -193,6 +214,7 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun worker_SyncDown_shouldExtractTheFinalProgressCountCorrectly() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         val progress = 2
         val syncCacheMock = mockk<EventSyncCache>()
         coEvery { syncCacheMock.readProgress(any()) } returns 1
@@ -200,8 +222,8 @@ internal class EventDownSyncDownloaderWorkerTest {
         val workInfo = WorkInfo(
             UUID.randomUUID(),
             SUCCEEDED,
+            setOf(),
             workDataOf(OUTPUT_DOWN_SYNC to progress),
-            listOf(),
             workDataOf(),
             2,
             1
@@ -211,6 +233,7 @@ internal class EventDownSyncDownloaderWorkerTest {
 
     @Test
     fun workerResumed_progressCountInCache_shouldExtractTheProgressCountCorrectly() = runTest {
+        coEvery { eventRepository.getEventScope(any()) } returns eventScope
         val progress = 2
         val syncCacheMock = mockk<EventSyncCache>()
         coEvery { syncCacheMock.readProgress(any()) } returns progress
@@ -218,8 +241,8 @@ internal class EventDownSyncDownloaderWorkerTest {
         val workInfo = WorkInfo(
             UUID.randomUUID(),
             RUNNING,
+            setOf(),
             workDataOf(),
-            listOf(),
             workDataOf(),
             2,
             1

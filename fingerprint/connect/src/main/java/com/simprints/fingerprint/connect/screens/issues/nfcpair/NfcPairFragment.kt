@@ -12,7 +12,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentNfcPairBinding
@@ -192,10 +191,6 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
     private fun retryConnectAndFinishFragment() {
         determineWhetherPairingWasSuccessfulJob?.cancel()
         connectViewModel.connect()
-        findNavController().navigate(
-            NfcPairFragmentDirections.actionNfcPairFragmentToSerialEntryPairFragment(),
-            navOptions { popUpTo(R.id.connectProgressFragment) }
-        )
     }
 
     private fun goToSerialEntryPair() {
@@ -203,6 +198,7 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
     }
 
     companion object {
+
         private const val PAIRING_WAIT_TIMEOUT = 6000L
     }
 }

@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -12,14 +12,14 @@ import java.io.Serializable
 import javax.inject.Inject
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
 ) {
 
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ): AppResponse {
-        val currentSessionId = eventRepository.getCurrentCaptureSessionEvent().id
+        val currentSessionId = eventRepository.getCurrentSessionScope().id
 
         val faceDecisionPolicy = projectConfiguration.face?.decisionPolicy
         val faceResults = getFaceMatchResults(faceDecisionPolicy, results, projectConfiguration)

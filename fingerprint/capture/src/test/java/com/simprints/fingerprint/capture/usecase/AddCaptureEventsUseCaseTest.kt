@@ -1,14 +1,15 @@
 package com.simprints.fingerprint.capture.usecase
 
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -26,7 +27,7 @@ internal class AddCaptureEventsUseCaseTest {
     lateinit var encoder: EncodingUtils
 
     @MockK
-    lateinit var eventRepo: EventRepository
+    lateinit var eventRepo: SessionEventRepository
 
     private lateinit var useCase: AddCaptureEventsUseCase
 
@@ -42,7 +43,7 @@ internal class AddCaptureEventsUseCaseTest {
     @Test
     fun `Saves only capture event when not collected state`() = runTest {
         useCase.invoke(
-            1L,
+            Timestamp(1L),
             FingerState(IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.NotCollected)),
             10,
             false
@@ -55,7 +56,7 @@ internal class AddCaptureEventsUseCaseTest {
     @Test
     fun `Saves only capture event when not a good scan and not too many bad scans`() = runTest {
         useCase.invoke(
-            1L,
+            Timestamp(1L),
             FingerState(
               IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
                 ScanResult(0, byteArrayOf(), "", null, 10)))
@@ -71,7 +72,7 @@ internal class AddCaptureEventsUseCaseTest {
     @Test
     fun `Saves biometric event when good scan`() = runTest {
         useCase.invoke(
-            1L,
+            Timestamp(1L),
             FingerState(
               IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
                 ScanResult(100, byteArrayOf(), "", null, 10)))
@@ -90,7 +91,7 @@ internal class AddCaptureEventsUseCaseTest {
     @Test
     fun `Saves biometric event when too many bad scans`() = runTest {
         useCase.invoke(
-            1L,
+            Timestamp(1L),
             FingerState(
               IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
                 ScanResult(0, byteArrayOf(), "", null, 10)))

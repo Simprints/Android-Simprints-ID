@@ -9,12 +9,12 @@ class ApiAuthRequestBodyTest {
     @Test
     fun `should map the model correctly`() {
         val apiAuthRequestBody = ApiAuthRequestBody(
-            encryptedProjectSecret = "encryptedProjectSecret",
+            projectSecret = "projectSecret",
             integrityToken = "integrityToken",
         )
 
         val authRequestBody = AuthRequest(
-            encryptedProjectSecret = "encryptedProjectSecret",
+            projectSecret = "projectSecret",
             integrityToken = "integrityToken",
         )
         assertThat(ApiAuthRequestBody.fromDomain(authRequestBody)).isEqualTo(apiAuthRequestBody)

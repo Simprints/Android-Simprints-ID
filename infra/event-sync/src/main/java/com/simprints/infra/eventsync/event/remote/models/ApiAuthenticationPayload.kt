@@ -16,21 +16,22 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayloa
 
 @Keep
 internal data class ApiAuthenticationPayload(
-    override val startTime: Long,
-    override val version: Int,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val userInfo: ApiUserInfo,
     val result: ApiResult,
-) : ApiEventPayload(ApiEventPayloadType.Authentication, version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {
+
         constructor(userInfoDomain: AuthenticationPayload.UserInfo) :
             this(userInfoDomain.projectId, userInfoDomain.userId.value)
     }
 
     @Keep
     enum class ApiResult {
+
         AUTHENTICATED,
         BAD_CREDENTIALS,
         OFFLINE,
@@ -41,17 +42,18 @@ internal data class ApiAuthenticationPayload(
         MISSING_OR_OUTDATED_PLAY_STORE_ERROR
     }
 
-    constructor(domainPayload: AuthenticationPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.endedAt,
-            ApiUserInfo(domainPayload.userInfo),
-            domainPayload.result.fromDomainToApi())
+    constructor(domainPayload: AuthenticationPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
+        ApiUserInfo(domainPayload.userInfo),
+        domainPayload.result.fromDomainToApi()
+    )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
-        TokenKeyType.AttendantId -> "userInfo.userId"
-        else -> null
-    }
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        when (tokenKeyType) {
+            TokenKeyType.AttendantId -> "userInfo.userId"
+            else -> null
+        }
 }
 
 

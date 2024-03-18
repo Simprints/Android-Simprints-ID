@@ -16,6 +16,7 @@ import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
@@ -67,6 +68,9 @@ internal class MatchViewModel @Inject constructor(
 
         setMatchState(totalCandidates, sortedResults)
 
+        // wait a bit for the user to see the results
+        delay(matchingEndWaitTimeInMillis)
+
         _matchResponse.send(when {
             isFaceMatch -> FaceMatchResult(sortedResults)
             else -> FingerprintMatchResult(sortedResults)
@@ -105,9 +109,9 @@ internal class MatchViewModel @Inject constructor(
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
-        const val veryGoodMatchThreshold = 50.0
-        const val goodMatchThreshold = 35.0
-        const val fairMatchThreshold = 20.0
-        const val matchingEndWaitTimeInMillis = 1000L
+        private const val veryGoodMatchThreshold = 50.0
+        private const val goodMatchThreshold = 35.0
+        private const val fairMatchThreshold = 20.0
+        private const val matchingEndWaitTimeInMillis = 1000L
     }
 }

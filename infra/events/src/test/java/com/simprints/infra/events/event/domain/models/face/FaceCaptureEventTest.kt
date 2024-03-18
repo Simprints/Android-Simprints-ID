@@ -2,7 +2,6 @@ package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults
@@ -10,17 +9,17 @@ import org.junit.Test
 
 @Keep
 class FaceCaptureEventTest {
+
     @Test
     fun create_FaceCaptureEvent() {
-        val labels = EventLabels(sessionId = SampleDefaults.GUID1)
         val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT)
         val event = FaceCaptureEvent(
             SampleDefaults.CREATED_AT,
             SampleDefaults.ENDED_AT, 0, 1F,
-            FaceCaptureEvent.FaceCapturePayload.Result.VALID, true, faceArg, labels
+            FaceCaptureEvent.FaceCapturePayload.Result.VALID, true, faceArg,
         )
+
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(EventType.FACE_CAPTURE)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(SampleDefaults.CREATED_AT)

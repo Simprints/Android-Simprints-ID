@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.feature.alert.AlertContract
-import com.simprints.feature.alert.screen.AlertFragment
 import kotlinx.parcelize.Parcelize
 import com.simprints.infra.resources.R as IDR
 

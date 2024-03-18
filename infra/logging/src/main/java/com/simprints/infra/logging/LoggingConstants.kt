@@ -37,12 +37,10 @@ object LoggingConstants {
         FACE_CAPTURE,
         MATCHING,
         FACE_MATCHING,
-        FACE_LICENSE,
+        LICENSE,
         SETTINGS,
         ALERT,
-        REFUSAL,
         REALM_DB,
-        ROOM_DB,
         DB_CORRUPTION,
         ENROLMENT,
     }

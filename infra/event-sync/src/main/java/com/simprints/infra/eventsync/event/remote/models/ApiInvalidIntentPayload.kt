@@ -9,17 +9,16 @@ import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.Invalid
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiInvalidIntentPayload(
-    override val startTime: Long,
-    override val version: Int,
+    override val startTime: ApiTimestamp,
     val action: String,
     val extras: Map<String, Any?>,
-) : ApiEventPayload(ApiEventPayloadType.InvalidIntent, version, startTime) {
+) : ApiEventPayload(startTime) {
 
-    constructor(domainPayload: InvalidIntentPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.action,
-            domainPayload.extras)
+    constructor(domainPayload: InvalidIntentPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.action,
+        domainPayload.extras,
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

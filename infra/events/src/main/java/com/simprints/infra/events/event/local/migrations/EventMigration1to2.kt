@@ -4,7 +4,6 @@ import android.database.Cursor
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.logging.Simber
 import org.json.JSONObject
@@ -83,7 +82,7 @@ internal class EventMigration1to2 : Migration(1, 2) {
     private fun migrateSessionClosedInformation(database: SupportSQLiteDatabase) {
         val sessionCaptureEventsQuery = database.query(
             "SELECT * FROM DbEvent WHERE type = ? AND endedAt > 0",
-            arrayOf(EventType.SESSION_CAPTURE.toString())
+            arrayOf("SESSION_CAPTURE")
         )
 
         sessionCaptureEventsQuery.use {

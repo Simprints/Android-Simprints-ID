@@ -7,12 +7,10 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 fun interface FingerprintMatcher<MatcherSettings> {
 
     /**
-     * Matches a [probe] against the given flow of [candidates] using the given [matchingAlgorithm],
-     * producing a flow of [MatchResult]. If the [matchingAlgorithm] supports it, designed to act
-     * as a pipeline which can be fed candidates and produces match results.
+     * Matches a [probe] against the given flow of [candidates]
+     * producing a flow of [MatchResult].
      *
-     * @throws IllegalArgumentException if the TemplateFormats of the supplied [probe] or
-     * [candidates] is not compatible with the desired [matchingAlgorithm].
+     * @throws IllegalArgumentException if the TemplateFormats of the supplied [probe]
      */
     suspend fun match(
         probe: FingerprintIdentity,

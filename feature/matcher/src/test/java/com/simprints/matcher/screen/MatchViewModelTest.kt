@@ -6,6 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -16,6 +17,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -53,7 +55,7 @@ internal class MatchViewModelTest {
 
         cb1 = slot()
 
-        every { timeHelper.now() } returns 0
+        every { timeHelper.now() } returns Timestamp(0L)
         every { faceMatcherUseCase.matcherName } returns MATCHER_NAME
         every { fingerprintMatcherUseCase.matcherName } returns MATCHER_NAME
 
@@ -89,6 +91,7 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
@@ -129,6 +132,7 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(

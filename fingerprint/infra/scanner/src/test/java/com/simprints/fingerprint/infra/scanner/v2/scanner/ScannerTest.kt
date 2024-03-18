@@ -9,12 +9,15 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.Mode
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20Response
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageDistortionConfigurationMatrixCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetTemplateCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetUnprocessedImageCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageData
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormat
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.TemplateData
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageDistortionConfigurationMatrixResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetTemplateResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroEvent
@@ -711,6 +714,101 @@ class ScannerTest {
         testObserver.awaitAndAssertSuccess()
         testObserver.assertValueCount(1)
         assertThat(testObserver.values().first().image).isEqualTo(image)
+    }
+
+    @Test
+    fun scanner_acquireUnprocessedImageWithUn20On_receivesImage() {
+        val image = byteArrayOf(0x10, 0x20, 0x30, 0x40)
+        val crcCheck = -42
+
+        val responseSubject = PublishSubject.create<Un20Response>()
+
+        val messageInputStreamSpyk =
+            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
+                every { connect(any()) } just Runs
+                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+                veroEvents = Flowable.empty()
+            }
+        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
+            every { sendMessage(any<GetUnprocessedImageCommand>()) } answers {
+                Completable.complete().doAfterTerminate {
+                    responseSubject.onNext(
+                        GetImageResponse(
+                            ImageFormat.RAW,
+                            ImageData(image, crcCheck)
+                        )
+                    )
+                }
+            }
+        }
+        val scanner = Scanner(
+            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
+            setupRootMessageChannelMockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            responseErrorHandler
+        ).apply {
+            connect(mockk(), mockk()).blockingAwait()
+            enterMainMode().blockingAwait()
+            state.un20On = true
+        }
+        val testObserver = scanner.acquireUnprocessedImage().testSubscribe()
+        testObserver.awaitAndAssertSuccess()
+        testObserver.assertValueCount(1)
+        assertThat(testObserver.values().first().image).isEqualTo(image)
+
+    }
+
+    @Test
+    fun scanner_acquireImageDistortionConfigurationMatrix_receivesConfigData() {
+        val imageDistortionConfigurationMatrix = kotlin.byteArrayOf(0x10, 0x20, 0x30, 0x40)
+        val expectedResponseData = byteArrayOf(imageDistortionConfigurationMatrix)
+
+        val responseSubject = PublishSubject.create<Un20Response>()
+
+        val messageInputStreamSpyk =
+            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
+                every { connect(any()) } just Runs
+                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+                veroEvents = Flowable.empty()
+            }
+        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
+            every { sendMessage(any<GetImageDistortionConfigurationMatrixCommand>()) } answers {
+                Completable.complete().doAfterTerminate {
+                    responseSubject.onNext(
+                        GetImageDistortionConfigurationMatrixResponse(
+                            imageDistortionConfigurationMatrix
+                        )
+                    )
+                }
+            }
+        }
+        val scanner = Scanner(
+            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
+            setupRootMessageChannelMockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            responseErrorHandler
+        ).apply {
+            connect(mockk(), mockk()).blockingAwait()
+            enterMainMode().blockingAwait()
+            state.un20On = true
+        }
+        val testObserver = scanner.acquireImageDistortionConfigurationMatrix().testSubscribe()
+        testObserver.awaitAndAssertSuccess()
+        testObserver.assertValueCount(1)
+        testObserver.values().first().let {
+            assertThat(byteArrayOf(it)).isEqualTo(expectedResponseData)
+        }
+
     }
 
     @Test

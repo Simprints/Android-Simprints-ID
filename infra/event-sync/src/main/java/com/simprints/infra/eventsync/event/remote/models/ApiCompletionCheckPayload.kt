@@ -6,13 +6,14 @@ import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.Compl
 
 @Keep
 internal data class ApiCompletionCheckPayload(
-    override val startTime: Long,
-    override val version: Int,
+    override val startTime: ApiTimestamp,
     val completed: Boolean,
-) : ApiEventPayload(ApiEventPayloadType.CompletionCheck, version, startTime) {
+) : ApiEventPayload(startTime) {
 
-    constructor(domainPayload: CompletionCheckPayload) :
-        this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.completed)
+    constructor(domainPayload: CompletionCheckPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.completed,
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields
