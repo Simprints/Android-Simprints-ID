@@ -66,6 +66,7 @@ internal data class Step(
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: Serializable? = null,
 ) : Serializable {
+
     // Do not remove.
     // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
     @Suppress("unused")
@@ -75,6 +76,7 @@ internal data class Step(
 
 @Keep
 enum class StepStatus {
+
     NOT_STARTED,
     IN_PROGRESS,
     COMPLETED,

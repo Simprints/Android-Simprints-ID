@@ -51,11 +51,13 @@ class MainFragmentTest {
     @JvmField
     internal val syncViewModel = mockk<SyncViewModel>(relaxed = true)
 
+    private val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
+
     @Test
     fun `should hide the privacy notice menu if the consent is not required`() {
         mockConsentRequired(false)
 
-        launchFragmentInHiltContainer<MainFragment>()
+        launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
         onView(withText("Privacy Notice")).check(doesNotExist())
@@ -65,7 +67,7 @@ class MainFragmentTest {
     fun `should display the privacy notice menu if the consent is required`() {
         mockConsentRequired(true)
 
-        launchFragmentInHiltContainer<MainFragment>()
+        launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
         onView(withText("Privacy Notice")).check(matches(isDisplayed()))
@@ -74,8 +76,6 @@ class MainFragmentTest {
     @Test
     fun `should redirect to the settings fragment when clicking on settings`() {
         mockConsentRequired(true)
-
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
@@ -88,8 +88,6 @@ class MainFragmentTest {
     fun `should redirect to the privacy notices fragment when clicking on privacy notices`() {
         mockConsentRequired(true)
 
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
-
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
@@ -100,8 +98,6 @@ class MainFragmentTest {
     @Test
     fun `should redirect to the debug fragment when clicking on debug`() {
         mockConsentRequired(true)
-
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
