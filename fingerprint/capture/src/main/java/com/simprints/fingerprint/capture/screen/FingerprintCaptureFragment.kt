@@ -34,7 +34,7 @@ import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerManager
-import com.simprints.fingerprint.capture.views.tryagainsplash.FullScreenSplashDialog
+import com.simprints.fingerprint.capture.views.tryagainsplash.TryAnotherFingerSplashDialogFragment
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
@@ -271,7 +271,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private fun updateSplashScreen(state: CollectFingerprintsState) {
         if (state.isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             if (!hasSplashScreenBeenTriggered) {
-                FullScreenSplashDialog().show(childFragmentManager, "splash")
+                TryAnotherFingerSplashDialogFragment().show(childFragmentManager, "splash")
                 hasSplashScreenBeenTriggered = true
             }
         } else {

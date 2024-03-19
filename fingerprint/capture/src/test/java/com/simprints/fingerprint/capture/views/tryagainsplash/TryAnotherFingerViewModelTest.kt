@@ -12,17 +12,17 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class FullScreenSplashViewModelTest {
+class TryAnotherFingerViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private lateinit var viewModel: FullScreenSplashViewModel
+    private lateinit var viewModel: TryAnotherFingerViewModel
 
     @Before
     fun setUp() {
 
-        viewModel = FullScreenSplashViewModel()
+        viewModel = TryAnotherFingerViewModel()
     }
 
     @Test

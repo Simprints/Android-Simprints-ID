@@ -9,9 +9,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-internal class FullScreenSplashDialog : DialogFragment(R.layout.activity_splash_screen) {
+internal class TryAnotherFingerSplashDialogFragment : DialogFragment(R.layout.activity_splash_screen) {
 
-    private val vm: FullScreenSplashViewModel by viewModels()
+    private val vm: TryAnotherFingerViewModel by viewModels()
 
     override fun getTheme() = IDR.style.Theme_Simprints_Dialog_FullScreen
 
