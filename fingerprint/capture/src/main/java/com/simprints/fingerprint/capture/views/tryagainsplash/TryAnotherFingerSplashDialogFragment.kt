@@ -3,23 +3,25 @@ package com.simprints.fingerprint.capture.views.tryagainsplash
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import com.simprints.fingerprint.capture.R
-import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
-internal class FullScreenSplashDialog : DialogFragment(R.layout.activity_splash_screen) {
+@AndroidEntryPoint
+internal class TryAnotherFingerSplashDialogFragment : DialogFragment(R.layout.activity_splash_screen) {
+
+    private val vm: TryAnotherFingerViewModel by viewModels()
 
     override fun getTheme() = IDR.style.Theme_Simprints_Dialog_FullScreen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch {
-            delay(TRY_DIFFERENT_FINGER_SPLASH_DELAY)
-            dismiss()
+        vm.dismiss.observe(viewLifecycleOwner) {
+            if (it) dismissAllowingStateLoss()
         }
     }
+
 }
+
