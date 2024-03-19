@@ -330,7 +330,7 @@ class FingerprintCaptureViewModelTest {
     fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() = runTest {
         mockScannerSetUiIdle()
         coEvery {
-            bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any())
+            bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(),any())
         } throws ScannerDisconnectedException()
         withImageTransfer()
 
@@ -398,6 +398,8 @@ class FingerprintCaptureViewModelTest {
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isFalse()
         assertThat(vm.stateLiveData.value?.currentFingerIndex).isEqualTo(1)
 
+        coVerify(exactly = 2) { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(), false) }
+        coVerify(exactly = 1) { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(), true) }
         coVerify(exactly = 1) { bioSdkWrapper.acquireFingerprintImage() }
         coVerify(exactly = 3) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
     }
@@ -1243,7 +1245,7 @@ class FingerprintCaptureViewModelTest {
 
     @ExperimentalTime
     private fun setupCaptureFingerprintResponses(vararg mockResponses: MockCaptureFingerprintResponse) {
-        val initialMock = coEvery { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any()) }
+        val initialMock = coEvery { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(),any()) }
         val fingerprintResponses = mockResponses.map { it.toCaptureFingerprintResponse() }
 
         // capture the first response in the list

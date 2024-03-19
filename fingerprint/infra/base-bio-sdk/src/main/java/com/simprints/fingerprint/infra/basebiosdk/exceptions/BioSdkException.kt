@@ -14,9 +14,6 @@ sealed class BioSdkException(
     class ImageQualityCheckingException(override val cause: Throwable?) :
         BioSdkException("Cannot check image quality")
 
-    class ImageQualityBelowThresholdException(val imageQualityScore: Int) :
-        BioSdkException("Image quality below threshold")
-
     class TemplateExtractionException(override val cause: Throwable?) :
         BioSdkException("Cannot extract template")
 

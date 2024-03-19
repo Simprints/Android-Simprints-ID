@@ -77,6 +77,7 @@ class SimprintsBioSdkWrapperTest {
         val captureFingerprintStrategy = 1000
         val captureTimeOutMs = 1000
         val captureQualityThreshold = 100
+        val captureAllowLowQualityExtraction = true
 
         val bioSdkResponse = TemplateResponse(
             byteArrayOf(1, 2, 3), FingerprintTemplateMetadata(
@@ -88,7 +89,7 @@ class SimprintsBioSdkWrapperTest {
 
         //When
         val response = simprintsBioSdkWrapper.acquireFingerprintTemplate(
-            captureFingerprintStrategy, captureTimeOutMs, captureQualityThreshold
+            captureFingerprintStrategy, captureTimeOutMs, captureQualityThreshold, captureAllowLowQualityExtraction
         )
 
         //Then
@@ -97,6 +98,7 @@ class SimprintsBioSdkWrapperTest {
             assertThat(captureFingerprintDpi?.value).isEqualTo(captureFingerprintStrategy.toShort())
             assertThat(timeOutMs).isEqualTo(captureTimeOutMs)
             assertThat(qualityThreshold).isEqualTo(captureQualityThreshold)
+            assertThat(allowLowQualityExtraction).isEqualTo(captureAllowLowQualityExtraction)
         }
         assertThat(bioSdkResponse.template).isEqualTo(response.template)
         assertThat(bioSdkResponse.templateMetadata?.templateFormat).isEqualTo(response.templateFormat)
@@ -114,7 +116,7 @@ class SimprintsBioSdkWrapperTest {
         )
 
         assertThrows<IllegalArgumentException> {
-            simprintsBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1)
+            simprintsBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1, true)
         }
     }
 

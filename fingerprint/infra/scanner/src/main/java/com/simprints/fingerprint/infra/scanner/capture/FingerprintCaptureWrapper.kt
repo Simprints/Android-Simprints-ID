@@ -13,7 +13,8 @@ interface FingerprintCaptureWrapper {
     suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
         timeOutMs: Int,
-        qualityThreshold: Int
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse
 
     val templateFormat: String
