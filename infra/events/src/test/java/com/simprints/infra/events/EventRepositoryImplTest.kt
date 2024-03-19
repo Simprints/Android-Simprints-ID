@@ -19,6 +19,7 @@ import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import io.mockk.MockKAnnotations
@@ -166,22 +167,38 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
-    fun `should close event scope by id`() = runTest {
+    fun `add event to current session should add event related to current session into DB`() =
+        runTest {
+            val scope = createSessionScope("scopeId", isClosed = false)
+            val event = createAlertScreenEvent()
+
+            coEvery { eventLocalDataSource.loadEventScope(any()) } returns scope
+            coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
+                event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+            )
+            eventRepo.closeEventScope("scopeId", null)
+
+            coVerify {
+                eventLocalDataSource.saveEventScope(match {
+                    assertThat(it.endedAt).isEqualTo(Timestamp(5L))
+                    true
+                })
+            }
+        }
+
+    @Test
+    fun `adding event to should not override existing session id in the event`() = runTest {
         val scope = createSessionScope("scopeId", isClosed = false)
-        val event = createAlertScreenEvent()
+        val event = createAlertScreenEvent().copy(
+            scopeId = GUID2
+        )
 
         coEvery { eventLocalDataSource.loadEventScope(any()) } returns scope
-        coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
-            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
-        )
-        eventRepo.closeEventScope("scopeId", null)
+        coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(event)
 
-        coVerify {
-            eventLocalDataSource.saveEventScope(match {
-                assertThat(it.endedAt).isEqualTo(Timestamp(5L))
-                true
-            })
-        }
+        eventRepo.addOrUpdateEvent(scope, event)
+
+        coVerify { eventLocalDataSource.saveEvent(event.copy(scopeId = GUID2)) }
     }
 
     @Test
