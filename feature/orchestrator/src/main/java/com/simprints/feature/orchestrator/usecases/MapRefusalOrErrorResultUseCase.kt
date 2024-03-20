@@ -4,7 +4,6 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
-import com.simprints.feature.orchestrator.AlertConfigurationMapper
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -30,7 +29,7 @@ internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
         is FingerprintConnectResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR) }
 
-        is AlertResult -> AppErrorResponse(result.appErrorReason())
+        is AlertResult -> AppErrorResponse(result.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR)
 
         else -> null
     }

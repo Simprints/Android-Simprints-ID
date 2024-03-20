@@ -9,7 +9,6 @@ import com.simprints.feature.orchestrator.steps.SerializableMixin
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.infra.security.SecurityManager
 import java.io.Serializable
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
