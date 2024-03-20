@@ -8,6 +8,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.*
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.infra.uibase.navigation.handleResultDirectly
@@ -142,55 +143,61 @@ class AlertFragmentTest {
     }
 
     @Test
-    fun `passed back the custom payload on back press`() {
-        var payload = 0
+    fun `passed back the custom appErrorReason on back press`() {
+        var payload: AppErrorReason? = null
 
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
-            fragmentArgs = alertConfiguration {}.withPayload("testKey" to 42).toArgs()
+            fragmentArgs = alertConfiguration {
+                appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
+            }.toArgs()
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
-                payload = result.payload.getInt("testKey")
+                payload = result.appErrorReason
             }
         }
         pressBack()
-        Truth.assertThat(payload).isEqualTo(42)
+        Truth.assertThat(payload).isEqualTo(AppErrorReason.FACE_LICENSE_INVALID)
     }
 
     @Test
     fun `passed back the custom payload on left button press`() {
-        var payload = 0
+        var payload: AppErrorReason? = null
 
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
-            fragmentArgs = alertConfiguration {}.withPayload("testKey" to 42).toArgs()
+            fragmentArgs = alertConfiguration {
+                appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
+            }.toArgs()
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
-                payload = result.payload.getInt("testKey")
+                payload = result.appErrorReason
             }
         }
         onView(withId(R.id.alertLeftButton)).perform(click())
-        Truth.assertThat(payload).isEqualTo(42)
+        Truth.assertThat(payload).isEqualTo(AppErrorReason.FACE_LICENSE_INVALID)
     }
 
     @Test
     fun `passed back the custom payload on right button press`() {
-        var payload = 0
+        var payload: AppErrorReason? = null
+
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
             fragmentArgs = alertConfiguration {
+                appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
                 rightButton = alertButton {
                     text = "Right"
                     resultKey = "test"
                 }
-            }.withPayload("testKey" to 42).toArgs()
+            }.toArgs()
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
-                payload = result.payload.getInt("testKey")
+                payload = result.appErrorReason
             }
         }
         onView(withId(R.id.alertRightButton)).perform(click())
-        Truth.assertThat(payload).isEqualTo(42)
+        Truth.assertThat(payload).isEqualTo(AppErrorReason.FACE_LICENSE_INVALID)
     }
 
     @Test
@@ -234,7 +241,6 @@ class AlertFragmentTest {
         onView(withId(R.id.alertRightButton)).perform(click())
         Truth.assertThat(resultKey).isEqualTo("test")
     }
-
 
     @Test
     fun `button does not close screen if not configured`() {

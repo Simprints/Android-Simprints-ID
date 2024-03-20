@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import java.util.concurrent.atomic.AtomicBoolean
@@ -27,14 +28,9 @@ internal class AlertActivityHelper {
         retry: () -> Unit,
         finishWithError: () -> Unit,
     ) {
-        val alertError = result.payload
-            .getString(AlertError.PAYLOAD_KEY)
-            ?.let { AlertError.valueOf(it) }
-            ?: AlertError.UNEXPECTED_ERROR
-
         when (result.buttonKey) {
             AlertContract.ALERT_BUTTON_PRESSED_BACK -> {
-                if (alertError == AlertError.UNEXPECTED_ERROR) {
+                if (AppErrorReason.UNEXPECTED_ERROR == result.appErrorReason) {
                     finishWithError()
                 } else {
                     showRefusal()

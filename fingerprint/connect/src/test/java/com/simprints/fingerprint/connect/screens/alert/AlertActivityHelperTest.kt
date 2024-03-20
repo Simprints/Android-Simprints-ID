@@ -1,16 +1,15 @@
 package com.simprints.fingerprint.connect.screens.alert
 
 import android.app.Activity
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Assert.*
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,10 +33,7 @@ class AlertActivityHelperTest {
         var refuseCalled = false
         helper.handleAlertResult(
             activity,
-            result = AlertResult(
-                AlertContract.ALERT_BUTTON_PRESSED_BACK,
-                bundleOf(AlertError.PAYLOAD_KEY to AlertError.LOW_BATTERY.name)
-            ),
+            result = AlertResult(AlertContract.ALERT_BUTTON_PRESSED_BACK),
             showRefusal = { refuseCalled = true },
             retry = {},
             finishWithError = {},
@@ -50,23 +46,7 @@ class AlertActivityHelperTest {
         var finished = false
         helper.handleAlertResult(
             activity,
-            result = AlertResult(
-                AlertContract.ALERT_BUTTON_PRESSED_BACK,
-                bundleOf(AlertError.PAYLOAD_KEY to AlertError.UNEXPECTED_ERROR.name)
-            ),
-            showRefusal = {},
-            retry = {},
-            finishWithError = { finished = true },
-        )
-        assertThat(finished).isTrue()
-    }
-
-    @Test
-    fun finishes_whenHandlingBackFromMalformedError() {
-        var finished = false
-        helper.handleAlertResult(
-            activity,
-            result = AlertResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, Bundle()),
+            result = AlertResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, AppErrorReason.UNEXPECTED_ERROR),
             showRefusal = {},
             retry = {},
             finishWithError = { finished = true },
@@ -79,7 +59,7 @@ class AlertActivityHelperTest {
         helper.handleResume { fail("Should not be called") }
         helper.handleAlertResult(
             mockk(relaxed = true),
-            result = AlertResult(AlertError.ACTION_PAIR, Bundle()),
+            result = AlertResult(AlertError.ACTION_PAIR),
             showRefusal = {},
             retry = {},
             finishWithError = {},
@@ -94,7 +74,7 @@ class AlertActivityHelperTest {
         helper.handleResume { fail("Should not be called") }
         helper.handleAlertResult(
             mockk(relaxed = true),
-            result = AlertResult(AlertError.ACTION_CLOSE, Bundle()),
+            result = AlertResult(AlertError.ACTION_CLOSE),
             showRefusal = {},
             retry = {},
             finishWithError = {},
@@ -107,7 +87,7 @@ class AlertActivityHelperTest {
         var finished = false
         helper.handleAlertResult(
             activity,
-            result = AlertResult(AlertError.ACTION_CLOSE, Bundle()),
+            result = AlertResult(AlertError.ACTION_CLOSE),
             showRefusal = {},
             retry = {},
             finishWithError = { finished = true },
@@ -120,7 +100,7 @@ class AlertActivityHelperTest {
         var refuseCalled = false
         helper.handleAlertResult(
             activity,
-            result = AlertResult(AlertError.ACTION_REFUSAL, Bundle()),
+            result = AlertResult(AlertError.ACTION_REFUSAL),
             showRefusal = { refuseCalled = true },
             retry = {},
             finishWithError = {},
@@ -133,7 +113,7 @@ class AlertActivityHelperTest {
         var retryCalled = false
         helper.handleAlertResult(
             activity,
-            result = AlertResult(AlertError.ACTION_RETRY, Bundle()),
+            result = AlertResult(AlertError.ACTION_RETRY),
             showRefusal = {},
             retry = { retryCalled = true },
             finishWithError = {},
@@ -145,7 +125,7 @@ class AlertActivityHelperTest {
     fun opensSettings_whenHandlingSettingsAction() {
         helper.handleAlertResult(
             activity,
-            result = AlertResult(AlertError.ACTION_BT_SETTINGS, Bundle()),
+            result = AlertResult(AlertError.ACTION_BT_SETTINGS),
             showRefusal = {},
             retry = {},
             finishWithError = {},
@@ -157,7 +137,7 @@ class AlertActivityHelperTest {
     fun opensSettings_whenOpensAppSettings() {
         helper.handleAlertResult(
             activity,
-            result = AlertResult(AlertError.ACTION_APP_SETTINGS, Bundle()),
+            result = AlertResult(AlertError.ACTION_APP_SETTINGS),
             showRefusal = {},
             retry = {},
             finishWithError = {},
