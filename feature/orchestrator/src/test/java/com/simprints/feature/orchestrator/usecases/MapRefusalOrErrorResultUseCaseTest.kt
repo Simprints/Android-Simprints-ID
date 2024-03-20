@@ -1,13 +1,16 @@
 package com.simprints.feature.orchestrator.usecases
 
+import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
+import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
@@ -23,12 +26,18 @@ class MapRefusalOrErrorResultUseCaseTest {
 
     @Test
     fun `Maps terminal step results to appropriate response`() {
+        val bundle = mockk<Bundle> {
+            every { getString(any()) } returns null
+        }
         mapOf(
             ExitFormResult(true) to AppRefusalResponse::class.java,
             FetchSubjectResult(found = false) to AppErrorResponse::class.java,
-            SetupResult(isSuccess  = false) to AppErrorResponse::class.java,
+            SetupResult(isSuccess = false) to AppErrorResponse::class.java,
             FingerprintConnectResult(isSuccess = false) to AppErrorResponse::class.java,
-        ).forEach { (result, responseClass) -> assertThat(useCase(result)).isInstanceOf(responseClass) }
+            AlertResult(buttonKey = "buttonKey", payload = bundle) to AppErrorResponse::class.java,
+        ).forEach { (result, responseClass) ->
+            assertThat(useCase(result)).isInstanceOf(responseClass)
+        }
     }
 
     @Test
