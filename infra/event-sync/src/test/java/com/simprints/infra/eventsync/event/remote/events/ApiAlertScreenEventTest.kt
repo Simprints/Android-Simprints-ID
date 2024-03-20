@@ -2,9 +2,44 @@ package com.simprints.infra.eventsync.event.remote.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.BACKEND_MAINTENANCE_ERROR
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.BLUETOOTH_NOT_ENABLED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.BLUETOOTH_NOT_SUPPORTED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.BLUETOOTH_NO_PERMISSION
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.DIFFERENT_PROJECT_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.DIFFERENT_USER_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.DISCONNECTED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.GUID_NOT_FOUND_OFFLINE
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.GUID_NOT_FOUND_ONLINE
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INTEGRITY_SERVICE_ERROR
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_INTENT_ACTION
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_METADATA
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_MODULE_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_PROJECT_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_SELECTED_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_SESSION_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_USER_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.INVALID_VERIFY_ID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.LICENSE_INVALID
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.LICENSE_MISSING
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.LOW_BATTERY
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.MULTIPLE_PAIRED_SCANNERS
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.NFC_NOT_ENABLED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.NFC_PAIR
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.NOT_PAIRED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.OTA
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.OTA_FAILED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.OTA_RECOVERY
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.PROJECT_ENDING
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.PROJECT_PAUSED
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.SERIAL_ENTRY_PAIR
+import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.UNEXPECTED_ERROR
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
-import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.*
 import org.junit.Test
 
 class ApiAlertScreenEventTest {
@@ -41,8 +76,8 @@ class ApiAlertScreenEventTest {
             AlertScreenEventType.INTEGRITY_SERVICE_ERROR to INTEGRITY_SERVICE_ERROR,
             AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED to ENROLMENT_LAST_BIOMETRICS_FAILED,
             AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION to INVALID_STATE_FOR_INTENT_ACTION,
-            AlertScreenEventType.FACE_LICENSE_INVALID to FACE_LICENSE_INVALID,
-            AlertScreenEventType.FACE_LICENSE_MISSING to FACE_LICENSE_MISSING,
+            AlertScreenEventType.LICENSE_INVALID to LICENSE_INVALID,
+            AlertScreenEventType.LICENSE_MISSING to LICENSE_MISSING,
             AlertScreenEventType.BACKEND_MAINTENANCE_ERROR to BACKEND_MAINTENANCE_ERROR,
             AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED to GOOGLE_PLAY_SERVICES_OUTDATED,
             AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES to MISSING_GOOGLE_PLAY_SERVICES,

@@ -29,7 +29,10 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     ): ApiLicenseResult = try {
         getProjectApiClient().executeCall {
             val apiLicense = it.getLicense(projectId, deviceId, vendor).parseApiLicense()
-            ApiLicenseResult.Success(licenseJson = apiLicense.getLicenseBasedOnVendor(vendor))
+            ApiLicenseResult.Success(
+                licenseJson = apiLicense.getLicenseBasedOnVendor(vendor),
+                expiration = apiLicense.getExpirationBasedOnVendor(vendor)
+            )
         }
     } catch (t: Throwable) {
         when (t) {
