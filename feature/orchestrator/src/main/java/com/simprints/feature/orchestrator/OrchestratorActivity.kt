@@ -21,7 +21,6 @@ internal class OrchestratorActivity : BaseActivity() {
     @Inject
     lateinit var activityTracker: ExecutionTracker
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycle.addObserver(activityTracker)
@@ -33,8 +32,6 @@ internal class OrchestratorActivity : BaseActivity() {
             R.id.orchestratorRootFragment
         ) { result ->
             setResult(result.resultCode, Intent().putExtras(result.extras))
-
-            activityTracker.isExecuting.set(false)
             finish()
         }
     }
@@ -42,7 +39,7 @@ internal class OrchestratorActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
 
-        if (activityTracker.isExecuting.compareAndSet(false, true)) {
+        if (activityTracker.isMain(activity = this)) {
             val action = intent.action.orEmpty()
             val extras = intent.extras ?: bundleOf()
 
