@@ -62,9 +62,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
-    private var isActivityRestored = false
-    private var requestProcessed = false
-
     @Inject
     lateinit var alertConfigurationMapper: AlertConfigurationMapper
 
@@ -80,7 +77,9 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        if (savedInstanceState != null) {
+            orchestratorVm.requestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
+        }
         observeLoginCheckVm()
         observeClientApiVm()
         observeOrchestratorVm()
@@ -88,7 +87,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult<AlertResult>(AlertContract.DESTINATION) { alertResult ->
             clientApiVm.handleErrorResponse(
                 args.requestAction,
-                AppErrorResponse(AlertConfigurationMapper.reasonFromPayload(alertResult.payload))
+                AppErrorResponse(alertResult.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR)
             )
         }
 
@@ -178,14 +177,20 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         })
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_REQUEST_PROCESSED, orchestratorVm.requestProcessed)
+    }
+
     override fun onResume() {
         super.onResume()
 
-        if (!isActivityRestored && !requestProcessed) {
+        if (!orchestratorVm.requestProcessed) {
             if (loginCheckVm.isDeviceSafe()) {
-                requestProcessed = true
+                orchestratorVm.requestProcessed = true
                 lifecycleScope.launch {
-                    val actionRequest = clientApiVm.handleIntent(args.requestAction, args.requestParams)
+                    val actionRequest =
+                        clientApiVm.handleIntent(args.requestAction, args.requestParams)
                     if (actionRequest != null) {
                         loginCheckVm.validateSignInAndProceed(actionRequest)
                     }
@@ -194,4 +199,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         }
     }
 
+    companion object {
+        private const val KEY_REQUEST_PROCESSED = "requestProcessed"
+    }
 }

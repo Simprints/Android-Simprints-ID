@@ -2,7 +2,7 @@ package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
 import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
-import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
+import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
@@ -35,7 +35,6 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
             // 4- Use nec sdk to check image quality
             // 5- Use nec sdk to convert it to template
             // 6- Return the template and cache the image for later use
-
             val captureWrapper = fingerprintCaptureWrapperFactory.captureWrapper
 
             // Always require a new image from the scanner using the minimum resolution as we will
@@ -53,10 +52,18 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
             log("quality checking image using nec sdk")
             val qualityScore = calculateNecImageQualityUseCase(secugenProcessedImage)
             log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
-            if (qualityScore < settings.qualityThreshold)
-                throw BioSdkException.ImageQualityBelowThresholdException(qualityScore)
-            log("extracting template using nec sdk")
-            extractNecTemplateUseCase(secugenProcessedImage, qualityScore)
+            if (qualityScore < settings.qualityThreshold && !settings.allowLowQualityExtraction)
+            // if the quality score is less than the threshold return an empty template
+                TemplateResponse(
+                    byteArrayOf(),
+                    FingerprintTemplateMetadata(
+                        templateFormat = NEC_TEMPLATE_FORMAT,
+                        imageQualityScore = qualityScore
+                    )
+                ) else {
+                log("extracting template using nec sdk")
+                extractNecTemplateUseCase(secugenProcessedImage, qualityScore)
+            }
         }
 
     private fun log(message: String) {

@@ -2,7 +2,7 @@ package com.simprints.fingerprint.connect.screens.alert
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.core.os.bundleOf
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.alertButton
 import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
@@ -16,6 +16,7 @@ import com.simprints.fingerprint.connect.screens.alert.AlertError.MULTIPLE_PAIRE
 import com.simprints.fingerprint.connect.screens.alert.AlertError.NOT_PAIRED
 import com.simprints.fingerprint.connect.screens.alert.AlertError.UNEXPECTED_ERROR
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.resources.R as IDR
 
 /**
@@ -38,6 +39,7 @@ import com.simprints.infra.resources.R as IDR
  * @property leftButton  the specific action to be triggered when the left button is clicked
  * @property rightButton  the specific action to be triggered when the right button is clicked
  */
+@ExcludedFromGeneratedTestCoverageReports("Error config code")
 internal enum class AlertError(
     @StringRes val title: Int,
     @StringRes val message: Int,
@@ -45,6 +47,7 @@ internal enum class AlertError(
     @DrawableRes val mainDrawable: Int,
     @DrawableRes val hintDrawable: Int? = null,
     val eventType: AlertScreenEventType,
+    val appErrorReason: AppErrorReason? = null,
     val leftButton: AlertButtonConfig,
     val rightButton: AlertButtonConfig? = null,
 ) {
@@ -56,6 +59,7 @@ internal enum class AlertError(
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         eventType = AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED,
+        appErrorReason = AppErrorReason.BLUETOOTH_NOT_SUPPORTED,
         leftButton = Buttons.closeButton(),
     ),
 
@@ -65,6 +69,7 @@ internal enum class AlertError(
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         eventType = AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED,
+        appErrorReason = AppErrorReason.BLUETOOTH_NOT_SUPPORTED,
         leftButton = Buttons.tryAgainButton(),
         rightButton = Buttons.bluetoothSettingsButton(),
     ),
@@ -75,6 +80,7 @@ internal enum class AlertError(
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         eventType = AlertScreenEventType.BLUETOOTH_NO_PERMISSION,
+        appErrorReason = AppErrorReason.BLUETOOTH_NO_PERMISSION,
         leftButton = Buttons.appSettingsButton(),
     ),
 
@@ -124,6 +130,7 @@ internal enum class AlertError(
         backgroundColor = AlertColor.Red,
         mainDrawable = IDR.drawable.ic_alert_default,
         eventType = AlertScreenEventType.UNEXPECTED_ERROR,
+        appErrorReason = AppErrorReason.UNEXPECTED_ERROR,
         leftButton = Buttons.closeButton(),
     );
 
@@ -173,16 +180,13 @@ internal enum class AlertError(
         messageRes = this@AlertError.message
         messageIcon = this@AlertError.hintDrawable
         eventType = this@AlertError.eventType
+        appErrorReason = this@AlertError.appErrorReason
 
         leftButton = this@AlertError.leftButton
         rightButton = this@AlertError.rightButton
-
-        payload = bundleOf(PAYLOAD_KEY to this@AlertError.name)
     }
 
     companion object {
-
-        internal const val PAYLOAD_KEY = "alert_payload"
 
         internal const val ACTION_CLOSE = "action_close"
         internal const val ACTION_RETRY = "action_retry"

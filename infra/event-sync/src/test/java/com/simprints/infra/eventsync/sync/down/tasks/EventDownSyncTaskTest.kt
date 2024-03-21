@@ -3,13 +3,13 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
@@ -34,14 +34,12 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 
 class EventDownSyncTaskTest {
 
@@ -188,6 +186,13 @@ class EventDownSyncTaskTest {
 
         assertThat(progress.last().operation.state).isEqualTo(FAILED)
         coVerify(exactly = 2) { eventDownSyncScopeRepository.insertOrUpdate(any()) }
+    }
+
+    @Test(expected = RemoteDbNotSignedInException::class)
+    fun downSync_shouldThrowUpIfRemoteDbNotSignedInExceptionOccurs() = runTest {
+        coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws RemoteDbNotSignedInException()
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
     }
 
     @Test

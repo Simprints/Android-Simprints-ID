@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -24,6 +25,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -76,6 +78,9 @@ class SyncInfoViewModelTest {
     private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
     private lateinit var project: Project
 
     @MockK(relaxed = true)
@@ -106,7 +111,8 @@ class SyncInfoViewModelTest {
             imageRepository = imageRepository,
             eventSyncManager = eventSyncManager,
             syncOrchestrator = syncOrchestrator,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
+            recentUserActivityManager = recentUserActivityManager
         )
     }
 
@@ -435,6 +441,57 @@ class SyncInfoViewModelTest {
         stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
 
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
+    }
+
+    @Test
+    fun `emit ReloginRequired = false when lastSyncState updates with different status`() =
+        runTest {
+            stateLiveData.value = EventSyncState(
+                "", 0, 0, listOf(), listOf(
+                    EventSyncState.SyncWorkerInfo(
+                        EventSyncWorkerType.DOWNLOADER,
+                        EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
+                    )
+                )
+            )
+
+            assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isFalse()
+        }
+
+    @Test
+    fun `emit ReloginRequired = true when lastSyncState updates with such status`() = runTest {
+        stateLiveData.value = EventSyncState(
+            "", 0, 0, listOf(), listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
+                )
+            )
+        )
+
+        assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isTrue()
+    }
+
+    @Test
+    fun `calling login() sends respective event to the view`() {
+        viewModel.login()
+
+        val loginRequestedEvent = viewModel.loginRequestedEventLiveData.getOrAwaitValue()
+        assertThat(loginRequestedEvent).isNotNull()
+    }
+
+    @Test
+    fun `calling handleLoginResult() triggers sync if result is success`() {
+        viewModel.handleLoginResult(LoginResult(true))
+
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
+    }
+
+    @Test
+    fun `calling handleLoginResult() does not trigger sync if result is not success`() {
+        viewModel.handleLoginResult(LoginResult(false))
+
+        verify(exactly = 0) { syncOrchestrator.startEventSync() }
     }
 
     private fun createMockDownSyncConfig(

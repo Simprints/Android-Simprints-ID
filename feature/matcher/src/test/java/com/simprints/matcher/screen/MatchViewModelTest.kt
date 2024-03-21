@@ -15,8 +15,16 @@ import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.*
+import io.mockk.CapturingSlot
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -55,8 +63,8 @@ internal class MatchViewModelTest {
         cb1 = slot()
 
         every { timeHelper.now() } returns Timestamp(0L)
-        every { faceMatcherUseCase.matcherName } returns MATCHER_NAME
-        every { fingerprintMatcherUseCase.matcherName } returns MATCHER_NAME
+        coEvery { faceMatcherUseCase.matcherName() } returns MATCHER_NAME
+        coEvery { fingerprintMatcherUseCase.matcherName() } returns MATCHER_NAME
 
         viewModel = MatchViewModel(
             faceMatcherUseCase,
@@ -90,6 +98,7 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
@@ -130,6 +139,7 @@ internal class MatchViewModelTest {
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
+        advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
             listOf(

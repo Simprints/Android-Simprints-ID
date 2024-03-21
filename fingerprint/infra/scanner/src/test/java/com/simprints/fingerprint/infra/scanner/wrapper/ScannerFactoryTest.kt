@@ -86,7 +86,6 @@ class ScannerFactoryTest {
             // Given
             val macAddress = "F0:AC:D7:C0:01:00"
             val serialNumber = "serialNumber"
-            val scannerGeneration = "scannerGeneration"
             every { serialNumberConverter.convertMacAddressToSerialNumber(macAddress) } returns serialNumber
             every {
                 scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(serialNumber)

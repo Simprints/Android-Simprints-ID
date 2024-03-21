@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -34,7 +33,7 @@ import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerManager
-import com.simprints.fingerprint.capture.views.tryagainsplash.FullScreenSplashDialog
+import com.simprints.fingerprint.capture.views.tryagainsplash.TryAnotherFingerSplashDialogFragment
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
@@ -124,7 +123,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     messageRes = IDR.string.configuration_licence_invalid_message
                     image = IDR.drawable.ic_exclamation
                     leftButton = AlertButtonConfig.Close
-                    payload = bundleOf(PAYLOAD_TYPE_KEY to AppErrorReason.FACE_LICENSE_INVALID)
+                    appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
                     eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.FACE_LICENSE_INVALID
                 }.toArgs()
             )
@@ -276,7 +275,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private fun updateSplashScreen(state: CollectFingerprintsState) {
         if (state.isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             if (!hasSplashScreenBeenTriggered) {
-                FullScreenSplashDialog().show(childFragmentManager, "splash")
+                TryAnotherFingerSplashDialogFragment().show(childFragmentManager, "splash")
                 hasSplashScreenBeenTriggered = true
             }
         } else {
@@ -287,8 +286,5 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     override fun onDestroyView() {
         confirmDialog?.dismiss()
         super.onDestroyView()
-    }
-    companion object {
-        private const val PAYLOAD_TYPE_KEY = "error_type"
     }
 }

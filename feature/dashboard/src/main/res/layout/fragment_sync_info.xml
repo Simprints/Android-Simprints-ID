@@ -186,7 +186,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@id/syncButton"
+        app:layout_constraintBottom_toTopOf="@id/syncActionSection"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/recordsToUploadCardView">
@@ -232,18 +232,52 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/syncButton"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/syncActionSection"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/dashboard_sync_info_sync_now_button"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
         app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
         app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView" />
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/syncButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_sync_info_sync_now_button"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/syncReloginRequiredSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/syncReloginRequiredMessage"
+                style="@style/Text.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/dashboard_sync_card_relogin_required" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sync_relogin_required_login_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login_log_in_button" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/modulesTabHost"
@@ -306,6 +340,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="recordsToUploadCardView,recordsToDownloadCardView,recordsToDownloadCardView,syncButton" />
+        app:constraint_referenced_ids="recordsToUploadCardView,recordsToDownloadCardView,recordsToDownloadCardView,syncActionSection" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

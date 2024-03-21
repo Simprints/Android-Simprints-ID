@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.core.DispatcherBG
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
@@ -24,7 +24,7 @@ internal class FaceMatcherUseCase @Inject constructor(
 ) : MatcherUseCase {
 
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING.name
-    override val matcherName = faceMatcher.matcherName
+    override suspend fun matcherName ()= faceMatcher.matcherName
 
     override suspend operator fun invoke(
         matchParams: MatchParams,

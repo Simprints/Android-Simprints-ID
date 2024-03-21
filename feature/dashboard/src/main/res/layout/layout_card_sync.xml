@@ -191,6 +191,32 @@
                 android:text="@string/dashboard_sync_card_try_again_button" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/sync_card_relogin_required"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/sync_card_relogin_required_message"
+                style="@style/Text.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dashboard_sync_card_relogin_required" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sync_card_relogin_required_login_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_marginBottom="@dimen/activity_dashboard_card_sync_space_above_last_sync"
+                android:text="@string/login_log_in_button" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/sync_card_last_sync"
             style="@style/Text.Body2.Accented"

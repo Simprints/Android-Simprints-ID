@@ -6,7 +6,7 @@ import com.simprints.matcher.MatchResultItem
 internal interface MatcherUseCase {
 
     val crashReportTag: String
-    val matcherName: String
+    suspend fun matcherName(): String
 
     /**
      * Returns a list of [MatchResultItem]s sorted by confidence score in descending order

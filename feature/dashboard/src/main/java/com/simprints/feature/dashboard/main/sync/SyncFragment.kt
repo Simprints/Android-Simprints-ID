@@ -7,10 +7,14 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDashboardCardSyncBinding
 import com.simprints.feature.dashboard.requestlogin.LogoutReason
 import com.simprints.feature.dashboard.requestlogin.RequestLoginFragmentArgs
+import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginResult
+import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +30,12 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
         observeLiveData()
+
+        findNavController().handleResult<LoginResult>(
+            viewLifecycleOwner,
+            R.id.mainFragment,
+            LoginContract.DESTINATION,
+        ) { result -> viewModel.handleLoginResult(result) }
     }
 
     private fun initViews() = with(binding.dashboardSyncCard) {
@@ -33,6 +43,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         onOfflineButtonClick = { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
         onSelectNoModulesButtonClick =
             { findNavController().navigateSafely(this@SyncFragment, R.id.action_mainFragment_to_moduleSelectionFragment) }
+        onLoginButtonClick = { viewModel.login() }
     }
 
     private fun observeLiveData() {
@@ -57,5 +68,12 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
                 RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle()
             )
         }
+        viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
+            findNavController().navigateSafely(
+                this,
+                R.id.action_mainFragment_to_login,
+                loginArgs
+            )
+        })
     }
 }

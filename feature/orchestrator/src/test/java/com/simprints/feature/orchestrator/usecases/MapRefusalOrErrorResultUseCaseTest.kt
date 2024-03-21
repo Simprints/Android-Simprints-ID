@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
@@ -26,9 +27,12 @@ class MapRefusalOrErrorResultUseCaseTest {
         mapOf(
             ExitFormResult(true) to AppRefusalResponse::class.java,
             FetchSubjectResult(found = false) to AppErrorResponse::class.java,
-            SetupResult(isSuccess  = false) to AppErrorResponse::class.java,
+            SetupResult(isSuccess = false) to AppErrorResponse::class.java,
             FingerprintConnectResult(isSuccess = false) to AppErrorResponse::class.java,
-        ).forEach { (result, responseClass) -> assertThat(useCase(result)).isInstanceOf(responseClass) }
+            AlertResult(buttonKey = "buttonKey") to AppErrorResponse::class.java,
+        ).forEach { (result, responseClass) ->
+            assertThat(useCase(result)).isInstanceOf(responseClass)
+        }
     }
 
     @Test

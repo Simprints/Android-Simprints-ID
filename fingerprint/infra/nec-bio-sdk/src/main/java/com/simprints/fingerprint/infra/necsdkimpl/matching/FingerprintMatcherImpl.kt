@@ -14,11 +14,19 @@ import javax.inject.Inject
 internal class FingerprintMatcherImpl @Inject constructor(
     private val nec: NEC
 ) : FingerprintMatcher<NecMatchingSettings> {
+
+    override val supportedTemplateFormat: String = NEC_TEMPLATE_FORMAT
+    override val matcherName: String = "NEC"
+
     override suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
         settings: NecMatchingSettings?
     ): List<MatchResult> {
+        // if probe template format is not supported by NEC matcher, return empty list
+        if (probe.templateFormatNotSupportedByNecMatcher()) {
+            return emptyList()
+        }
         return if (settings?.crossFingerComparison == true) {
             crossFingerMatching(probe, candidates)
         } else {
@@ -49,11 +57,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
     ): MatchResult {
         var fingers = 0 // the number of fingers used in matching
         val total = probe.fingerprints.sumOf { fingerprint ->
-            // we should ignore probe fingers that doesn't have matching candidate fingers
-
-            require(fingerprint.format == NEC_TEMPLATE_FORMAT)
             candidate.templateForFinger(fingerprint.fingerId)?.let { candidateTemplate ->
-                require(candidateTemplate.format == NEC_TEMPLATE_FORMAT)
                 fingers++
                 verify(fingerprint, candidateTemplate)
             } ?: 0.toDouble()
@@ -102,3 +106,6 @@ internal class FingerprintMatcherImpl @Inject constructor(
             (total / fingers).toFloat()
         }
 }
+
+private fun FingerprintIdentity.templateFormatNotSupportedByNecMatcher(): Boolean =
+    fingerprints.any { it.format != NEC_TEMPLATE_FORMAT }

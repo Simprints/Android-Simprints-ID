@@ -40,7 +40,10 @@ internal class FingerprintCaptureWrapperV1(
         captureDpi: Dpi?,
         timeOutMs: Int,
         qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean,
     ): AcquireFingerprintTemplateResponse = withContext(ioDispatcher) {
+        // V1 scanner does not have a separate method to extract fingerprint template so we should
+        // ignore the allowLowQualityExtraction parameter
         suspendCancellableCoroutine { cont ->
             scannerV1.startContinuousCapture(
                 qualityThreshold,
