@@ -9,12 +9,13 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncBinding
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
-import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.main.sync.SyncViewModel
+import com.simprints.feature.dashboard.views.SyncCardState
+import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,16 +36,16 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         logoutSyncCard.onOfflineButtonClick =
             { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
         logoutSyncCard.onSelectNoModulesButtonClick =
-            { findNavController().navigate(R.id.action_logoutSyncFragment_to_moduleSelectionFragment) }
+            { findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_moduleSelectionFragment) }
         logoutSyncToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
         logoutWithoutSyncButton.setOnClickListener {
-            findNavController().navigate(R.id.action_logoutSyncFragment_to_logoutSyncDeclineFragment)
+            findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_logoutSyncDeclineFragment)
         }
         logoutButton.setOnClickListener {
             logoutSyncViewModel.logout()
-            findNavController().navigate(R.id.action_logoutSyncFragment_to_requestLoginFragment)
+            findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_requestLoginFragment)
         }
     }
 

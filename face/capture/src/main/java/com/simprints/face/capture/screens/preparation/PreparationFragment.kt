@@ -9,8 +9,9 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentPreparationBinding
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -33,7 +34,7 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
 
         binding.detectionOnboardingFrame.setOnClickListener {
             mainVm.addOnboardingComplete(startTime)
-            findNavController().navigate(R.id.action_facePreparationFragment_to_faceLiveFeedbackFragment)
+            findNavController().navigateSafely(this, R.id.action_facePreparationFragment_to_faceLiveFeedbackFragment)
         }
     }
 }

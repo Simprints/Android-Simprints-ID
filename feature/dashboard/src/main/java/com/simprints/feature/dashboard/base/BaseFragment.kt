@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.simprints.feature.dashboard.R
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.uibase.navigation.navigateSafely
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -16,9 +17,9 @@ internal class BaseFragment : Fragment(R.layout.fragment_base) {
     override fun onResume() {
         super.onResume()
         if (authStore.signedInProjectId.isNotEmpty()) {
-            findNavController().navigate(R.id.action_baseFragment_to_mainFragment)
+            findNavController().navigateSafely(this, R.id.action_baseFragment_to_mainFragment)
         } else {
-            findNavController().navigate(R.id.action_baseFragment_to_requestLoginFragment)
+            findNavController().navigateSafely(this, R.id.action_baseFragment_to_requestLoginFragment)
         }
     }
 }

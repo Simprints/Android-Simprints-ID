@@ -18,6 +18,7 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Clipboard
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -87,7 +88,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                     LogoutDestination.LogoutDataSyncScreen -> R.id.action_aboutFragment_to_logout_navigation
                     LogoutDestination.LoginScreen -> R.id.action_aboutFragment_to_requestLoginFragment
                 }
-                findNavController().navigate(destination)
+                findNavController().navigateSafely(this, destination)
             })
     }
 

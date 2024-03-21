@@ -1,5 +1,6 @@
 package com.simprints.infra.uibase.navigation
 
+import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -11,6 +12,10 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavDirections
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.FragmentNavigator
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import java.io.Serializable
 
@@ -96,6 +101,86 @@ private fun <T : Serializable> handleResultFromChild(
             remove<T>(expectedResultKey)
         }
     }
+}
+
+/**
+ * Executes the [NavController] navigation request in a safely manner. Executes the navigation
+ * request only if no other transaction is scheduled for the [currentFragment]
+ *
+ *  @param currentFragment - currently displayed fragment in the [NavController]
+ *  @param directions - [directions that describe this navigation operation
+ *  @param navOptions - special options for this navigation operation
+ */
+fun NavController.navigateSafely(
+    currentFragment: Fragment?,
+    directions: NavDirections,
+    navOptions: NavOptions? = null
+) = navigateIfPossible(
+    currentFragment = currentFragment,
+    navigation = { navigate(directions, navOptions) }
+)
+
+/**
+ * Executes the [NavController] navigation request in a safely manner. Executes the navigation
+ * request only if no other transaction is scheduled for the [currentFragment]
+ *
+ *  @param currentFragment - currently displayed fragment in the [NavController]
+ *  @param actionId - an action id or a destination id to navigate to
+ *  @param args - arguments to pass to the destination, null by default
+ */
+fun NavController.navigateSafely(
+    currentFragment: Fragment?,
+    @IdRes actionId: Int,
+    args: Bundle? = null
+) = navigateIfPossible(currentFragment = currentFragment, navigation = { navigate(actionId, args) })
+
+/**
+ * Executes the [NavController] navigation request in a safely manner. Executes the navigation
+ * request only if no other transaction is scheduled for the [currentFragment]
+ *
+ *  @param currentFragment - currently displayed fragment in the [NavController]
+ *  @param navigation - navigation execution block that is called if the [NavController] can navigate
+ *  from the [currentFragment]
+ */
+private fun NavController.navigateIfPossible(
+    currentFragment: Fragment?,
+    navigation: () -> Unit
+) {
+    if (canNavigate(currentFragment)) {
+        navigation()
+    } else {
+        val fragmentName = currentFragment.toString().takeWhile { it != ' ' }
+        val target = (currentDestination as? FragmentNavigator.Destination)?.className
+        Simber.e("Unable to navigate from $fragmentName to destination $target ")
+    }
+}
+
+/**
+ * Only one navigation request needs to be processed from the fragment. This method checks if the
+ * no other navigation is scheduled in the [NavController]. It does so by checking whether the
+ * class name in the [NavController.currentDestination] is null or equals to the current fragment
+ * name.
+ *
+ *  - On the app startup, the [NavController.currentDestination] is null, since there were no
+ *  navigation requests.
+ *  - When the first navigation request to the target 'A' happens, then the field 'className' in the
+ *  [NavController.currentDestination] becomes 'A'.
+ *  - When the [currentFragment] 'A' wants to navigate to the destination 'B', this method checks if
+ *  the current value of the [NavController.currentDestination] is still 'A' (it was set to 'A'
+ *  during the previous navigation request).
+ *  - If the name of the [currentFragment] is different to the 'className' in the
+ *  [NavController.currentDestination], it means that the the current fragment has a navigation
+ *  request scheduled already, and the navigation cannot be executed.
+ *
+ *  @param currentFragment - currently displayed fragment in the [NavController]
+ *  @return true if the class name of the [currentFragment] is equal to the 'className' field in the
+ *  [NavController.currentDestination], or if the [NavController.currentDestination] is null. false
+ *  otherwise.
+ */
+private fun NavController.canNavigate(currentFragment: Fragment?): Boolean {
+    val fragmentName = currentFragment?.let { it::class.java.name }
+    val targetClassName = (currentDestination as? FragmentNavigator.Destination)?.className
+    return currentFragment != null && (targetClassName == null || targetClassName == fragmentName)
 }
 
 /**

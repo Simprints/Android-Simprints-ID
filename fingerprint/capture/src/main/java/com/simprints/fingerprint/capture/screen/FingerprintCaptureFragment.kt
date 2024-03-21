@@ -43,6 +43,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -114,7 +115,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private fun observeBioSdkInit() {
         vm.invalidLicense.observe(viewLifecycleOwner) {
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_fingerprintCaptureFragment_to_graphAlert,
                 alertConfiguration {
                     color = AlertColor.Gray
@@ -130,7 +132,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     private fun openRefusal() {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
             exitFormConfiguration {
                 titleRes = com.simprints.infra.resources.R.string.exit_form_title_fingerprinting
@@ -200,7 +203,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         })
 
         vm.launchAlert.observe(viewLifecycleOwner, LiveDataEventObserver {
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_fingerprintCaptureFragment_to_graphAlert,
                 alertConfiguration {
                     titleRes = IDR.string.fingerprint_capture_error_title
@@ -222,7 +226,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         //to a crash because a second navigation to ConnectScanner is attempted but by the time it's
         // executed we are already on the exit screen.
         try {
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
                 FingerprintConnectContract.getArgs(true)
             )

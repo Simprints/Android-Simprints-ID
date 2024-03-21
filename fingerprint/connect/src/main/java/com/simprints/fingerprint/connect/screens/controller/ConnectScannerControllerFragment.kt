@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -38,6 +39,7 @@ import com.simprints.fingerprint.connect.screens.ota.OtaFragmentParams
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -78,9 +80,15 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         }
     }
 
-    private fun internalNavController() = childFragmentManager
-        .findFragmentById(R.id.connect_scanner_host_fragment)
-        ?.findNavController()
+    private val hostFragment: Fragment?
+        get() = childFragmentManager
+            .findFragmentById(R.id.connect_scanner_host_fragment)
+
+    private val internalNavController: NavController?
+        get() = hostFragment?.findNavController()
+
+    private val currentlyDisplayedInternalFragment: Fragment?
+        get() = hostFragment?.childFragmentManager?.fragments?.first()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -98,19 +106,36 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
                 ConnectScannerIssueScreen.ExitForm -> showExitForm()
 
-                ConnectScannerIssueScreen.BluetoothOff -> internalNavController()?.navigate(R.id.issueBluetoothOffFragment)
-                ConnectScannerIssueScreen.NfcOff -> internalNavController()?.navigate(R.id.issueNfcOffFragment)
-                ConnectScannerIssueScreen.NfcPair -> internalNavController()?.navigate(R.id.issueNfcPairFragment)
-                ConnectScannerIssueScreen.SerialEntryPair -> internalNavController()?.navigate(R.id.issueSerialEntryPairFragment)
+                ConnectScannerIssueScreen.BluetoothOff -> internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    R.id.issueBluetoothOffFragment
+                )
 
-                is ConnectScannerIssueScreen.ScannerOff -> internalNavController()?.navigate(
+                ConnectScannerIssueScreen.NfcOff -> internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    R.id.issueNfcOffFragment
+                )
+
+                ConnectScannerIssueScreen.NfcPair -> internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    R.id.issueNfcPairFragment
+                )
+
+                ConnectScannerIssueScreen.SerialEntryPair -> internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    R.id.issueSerialEntryPairFragment
+                )
+
+                is ConnectScannerIssueScreen.ScannerOff -> internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
                     R.id.issueScannerOffFragment,
                     ScannerOffFragmentArgs(screen.currentScannerId).toBundle()
                 )
 
                 is ConnectScannerIssueScreen.ScannerError -> screen.currentScannerId?.let { showKnownScannerDialog(it) }
 
-                is ConnectScannerIssueScreen.Ota -> internalNavController()?.navigate(
+                is ConnectScannerIssueScreen.Ota -> internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
                     R.id.otaFragment,
                     OtaFragmentArgs(OtaFragmentParams(screen.availableOtas)).toBundle()
                 )
@@ -131,7 +156,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
             viewModel.handleBackPress()
         }
 
-        internalNavController()?.setGraph(R.navigation.graph_connect_internal)
+        internalNavController?.setGraph(R.navigation.graph_connect_internal)
 
         if (shouldRequestPermissions) {
             shouldRequestPermissions = false
@@ -155,7 +180,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         }
         //Update scannerId in case it has changed
         knownScannedDialog?.setTitle(getString(IDR.string.fingerprint_connect_scanner_id_confirmation_message, scannerId))
-        if (internalNavController()?.currentDestination?.id == R.id.connectProgressFragment) {
+        if (internalNavController?.currentDestination?.id == R.id.connectProgressFragment) {
             knownScannedDialog?.takeUnless { it.isShowing }?.show()
         }
     }
@@ -187,7 +212,11 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     }
 
     private fun showAlert(error: AlertError) {
-        findNavController().navigate(R.id.action_global_to_alertFragment, error.toAlertConfig().toArgs())
+        findNavController().navigateSafely(
+            this,
+            R.id.action_global_to_alertFragment,
+            error.toAlertConfig().toArgs()
+        )
     }
 
     private fun handleResult(result: AlertResult) {
@@ -201,7 +230,8 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     }
 
     private fun showExitForm() {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_global_to_exitFormFragment,
             exitFormConfiguration {
                 titleRes = IDR.string.exit_form_title_fingerprinting

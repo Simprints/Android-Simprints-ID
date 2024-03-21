@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
@@ -16,6 +15,8 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -42,7 +43,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun setupClickListeners() {
         binding.moduleSelectionButton.setOnClickListener {
-            findNavController().navigate(R.id.action_syncInfoFragment_to_moduleSelectionFragment)
+            findNavController().navigateSafely(this, R.id.action_syncInfoFragment_to_moduleSelectionFragment)
         }
         binding.syncInfoToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()

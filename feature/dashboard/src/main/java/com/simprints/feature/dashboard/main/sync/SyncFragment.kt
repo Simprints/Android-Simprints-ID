@@ -7,13 +7,14 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDashboardCardSyncBinding
 import com.simprints.feature.dashboard.requestlogin.LogoutReason
 import com.simprints.feature.dashboard.requestlogin.RequestLoginFragmentArgs
-import com.simprints.infra.resources.R as IDR
+import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
@@ -31,7 +32,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         onSyncButtonClick = { viewModel.sync() }
         onOfflineButtonClick = { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
         onSelectNoModulesButtonClick =
-            { findNavController().navigate(R.id.action_mainFragment_to_moduleSelectionFragment) }
+            { findNavController().navigateSafely(this@SyncFragment, R.id.action_mainFragment_to_moduleSelectionFragment) }
     }
 
     private fun observeLiveData() {
@@ -50,7 +51,8 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
                 title = getString(IDR.string.dashboard_sync_project_ending_alert_title),
                 body = getString(IDR.string.dashboard_sync_project_ending_message)
             )
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_mainFragment_to_requestLoginFragment,
                 RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle()
             )

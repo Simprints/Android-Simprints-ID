@@ -24,6 +24,7 @@ import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcTag
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -194,7 +195,7 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
     }
 
     private fun goToSerialEntryPair() {
-        findNavController().navigate(NfcPairFragmentDirections.actionNfcPairFragmentToSerialEntryPairFragment())
+        findNavController().navigateSafely(this, NfcPairFragmentDirections.actionNfcPairFragmentToSerialEntryPairFragment())
     }
 
     companion object {
