@@ -111,6 +111,7 @@ private fun <T : Serializable> handleResultFromChild(
  *  @param directions - [directions that describe this navigation operation
  *  @param navOptions - special options for this navigation operation
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 fun NavController.navigateSafely(
     currentFragment: Fragment?,
     directions: NavDirections,
@@ -128,6 +129,7 @@ fun NavController.navigateSafely(
  *  @param actionId - an action id or a destination id to navigate to
  *  @param args - arguments to pass to the destination, null by default
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 fun NavController.navigateSafely(
     currentFragment: Fragment?,
     @IdRes actionId: Int,
@@ -142,6 +144,7 @@ fun NavController.navigateSafely(
  *  @param navigation - navigation execution block that is called if the [NavController] can navigate
  *  from the [currentFragment]
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 private fun NavController.navigateIfPossible(
     currentFragment: Fragment?,
     navigation: () -> Unit
@@ -177,6 +180,7 @@ private fun NavController.navigateIfPossible(
  *  [NavController.currentDestination], or if the [NavController.currentDestination] is null. false
  *  otherwise.
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 private fun NavController.canNavigate(currentFragment: Fragment?): Boolean {
     val fragmentName = currentFragment?.let { it::class.java.name }
     val targetClassName = (currentDestination as? FragmentNavigator.Destination)?.className
