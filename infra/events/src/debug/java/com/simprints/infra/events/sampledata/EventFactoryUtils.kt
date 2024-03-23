@@ -412,3 +412,9 @@ fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
     responseStatus = 200,
     errorType = "OK",
 )
+fun createLicenseCheckEvent() = LicenseCheckEvent(
+    createdAt = CREATED_AT,
+    status = LicenseCheckEvent.LicenseStatus.VALID,
+    vendor = "NEC_FINGERPRINT",
+
+)

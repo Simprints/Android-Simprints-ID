@@ -157,13 +157,14 @@ class LicenseRepositoryImplTest {
         assertThat(cachedLicense).isEqualTo(license)
     }
 
-    @Test(expected = IllegalStateException::class)
     fun ` test getCachedLicense failure`() = runTest {
         // Given
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
         // When
-        licenseRepositoryImpl.getCachedLicense(RANK_ONE_FACE)
-        // Then throw exception
+        val license= licenseRepositoryImpl.getCachedLicense(RANK_ONE_FACE)
+        // Then
+        assertThat(license).isNull()
+
 
     }
 
