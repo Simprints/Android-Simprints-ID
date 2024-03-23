@@ -21,7 +21,6 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
 
     private val licenseDirectoryPath = "${context.filesDir}/${LICENSES_FOLDER}"
 
-
     override suspend fun getLicense(vendor: Vendor): License? = withContext(dispatcherIo) {
         renameOldRocLicense()// TODO: remove this after a few releases when all users have migrated to the 2023.3.0 version
         val expirationDate = getExpirationDate(vendor)
@@ -32,6 +31,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     private fun getExpirationDate(vendor: Vendor): String {
         // if the vendor.expiration file exists, read the expiration date from it else return an empty string
         // expiration date is stored in a file with the vendor name and .expiration extension
+        // no need to encrypt the expiration date as it is not sensitive information
         val expirationFile = File("$licenseDirectoryPath/${vendor}.expiration")
         return if (expirationFile.exists()) {
             expirationFile.readText()
