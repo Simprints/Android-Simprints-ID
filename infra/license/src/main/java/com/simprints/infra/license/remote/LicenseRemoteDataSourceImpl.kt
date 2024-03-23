@@ -13,8 +13,7 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 internal class LicenseRemoteDataSourceImpl @Inject constructor(
-    private val authStore: AuthStore,
-    private val jsonHelper: JsonHelper
+    private val authStore: AuthStore, private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {
 
     companion object {
@@ -23,31 +22,31 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getLicense(
-        projectId: String,
-        deviceId: String,
-        vendor: Vendor
+        projectId: String, deviceId: String, vendor: Vendor
     ): ApiLicenseResult = try {
         getProjectApiClient().executeCall {
-            val apiLicense = it.getLicense(projectId, deviceId, vendor).parseApiLicense()
-            ApiLicenseResult.Success(
-                licenseJson = apiLicense.getLicenseBasedOnVendor(vendor),
-                expiration = apiLicense.getExpirationBasedOnVendor(vendor)
-            )
-        }
+            it.getLicense(projectId, deviceId, vendor).parseApiLicense()
+                .getLicenseBasedOnVendor(vendor)?.let { apiLicense ->
+                    ApiLicenseResult.Success(apiLicense)
+                }
+        } ?: ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
     } catch (t: Throwable) {
         when (t) {
             is NetworkConnectionException -> {
                 Simber.i(t)
                 ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
             }
+
             is BackendMaintenanceException -> {
                 Simber.i(t)
                 ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
             }
+
             is SyncCloudIntegrationException -> {
                 Simber.e(t)
                 handleCloudException(t)
             }
+
             else -> {
                 Simber.e(t)
                 ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
@@ -61,10 +60,10 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
      * Anything else we can't really recover.
      */
     private fun handleCloudException(exception: SyncCloudIntegrationException): ApiLicenseResult {
-        return if (exception.httpStatusCode() == AUTHORIZATION_ERROR)
-            handleRetrofitException(exception.cause as HttpException)
-        else
-            ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+        return if (exception.httpStatusCode() == AUTHORIZATION_ERROR) handleRetrofitException(
+            exception.cause as HttpException
+        )
+        else ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
     }
 
     private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {

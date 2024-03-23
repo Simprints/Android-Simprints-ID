@@ -32,9 +32,9 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
-import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
@@ -46,6 +46,7 @@ import com.simprints.infra.events.event.domain.models.EventType.FINGERPRINT_CAPT
 import com.simprints.infra.events.event.domain.models.EventType.GUID_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.INTENT_PARSING
 import com.simprints.infra.events.event.domain.models.EventType.INVALID_INTENT
+import com.simprints.infra.events.event.domain.models.EventType.LICENSE_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATCH
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_ONE_MATCH
 import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
@@ -57,6 +58,7 @@ import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAP
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
+import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
@@ -180,4 +182,5 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload =
         FACE_CAPTURE_BIOMETRICS -> ApiFaceCaptureBiometricsPayload(this as FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload)
         EVENT_DOWN_SYNC_REQUEST -> ApiEventDownSyncRequestPayload(this as EventDownSyncRequestEvent.EventDownSyncRequestPayload)
         EVENT_UP_SYNC_REQUEST -> ApiEventUpSyncRequestPayload(this as EventUpSyncRequestEvent.EventUpSyncRequestPayload)
+        LICENSE_CHECK -> ApiLicenseCheckEventPayload(this as LicenseCheckEvent.LicenseCheckEventPayload)
     }

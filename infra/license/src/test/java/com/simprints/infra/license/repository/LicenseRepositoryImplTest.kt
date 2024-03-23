@@ -6,6 +6,7 @@ import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.local.LicenseLocalDataSource
 import com.simprints.infra.license.remote.ApiLicenseResult
+import com.simprints.infra.license.remote.License
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -16,7 +17,7 @@ import org.junit.Test
 import java.util.UUID
 
 class LicenseRepositoryImplTest {
-    private val license = UUID.randomUUID().toString()
+    private val license = License( "2023.12.31", UUID.randomUUID().toString())
     private val licenseLocalDataSource: LicenseLocalDataSource = mockk(relaxUnitFun = true)
     private val licenseRemoteDataSource: LicenseRemoteDataSource = mockk()
 

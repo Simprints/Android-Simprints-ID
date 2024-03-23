@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
+import com.simprints.infra.license.remote.License
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,9 +22,22 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     private val licenseDirectoryPath = "${context.filesDir}/${LICENSES_FOLDER}"
 
 
-    override suspend fun getLicense(vendor: Vendor): String? = withContext(dispatcherIo) {
+    override suspend fun getLicense(vendor: Vendor): License? = withContext(dispatcherIo) {
         renameOldRocLicense()// TODO: remove this after a few releases when all users have migrated to the 2023.3.0 version
-        getFileFromStorage(vendor)
+        val expirationDate = getExpirationDate(vendor)
+        val licenseData = getFileFromStorage(vendor)
+        licenseData?.let { License(expirationDate, it) }
+    }
+
+    private fun getExpirationDate(vendor: Vendor): String {
+        // if the vendor.expiration file exists, read the expiration date from it else return an empty string
+        // expiration date is stored in a file with the vendor name and .expiration extension
+        val expirationFile = File("$licenseDirectoryPath/${vendor}.expiration")
+        return if (expirationFile.exists()) {
+            expirationFile.readText()
+        } else {
+            ""
+        }
     }
 
     private fun renameOldRocLicense() {
@@ -39,20 +53,30 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
 
     }
 
-    override suspend fun saveLicense(vendor: Vendor, license: String): Unit =
+    override suspend fun saveLicense(vendor: Vendor, license: License): Unit =
         withContext(dispatcherIo) {
             createDirectoryIfNonExistent(licenseDirectoryPath)
-
-            val file = File("$licenseDirectoryPath/${vendor}")
-
-            try {
-                keyHelper.getEncryptedFileBuilder(file, context).openFileOutput()
-                    .use { it.write(license.toByteArray()) }
-            } catch (t: Throwable) {
-                Simber.e(t)
-            }
+            saveLicenseData(vendor, license.data)
+            saveExpirationDate(vendor, license.expiration)
         }
 
+    private fun saveLicenseData(vendor: Vendor, licenseData: String) {
+        val file = File("$licenseDirectoryPath/${vendor}")
+        try {
+            keyHelper.getEncryptedFileBuilder(file, context).openFileOutput()
+                .use { it.write(licenseData.toByteArray()) }
+        } catch (t: Throwable) {
+            Simber.e(t)
+        }
+    }
+    private fun saveExpirationDate(vendor: Vendor, expirationDate: String) {
+        val expirationFile = File("$licenseDirectoryPath/${vendor}.expiration")
+        try {
+            expirationFile.writeText(expirationDate)
+        } catch (t: Throwable) {
+            Simber.e(t)
+        }
+    }
     private fun createDirectoryIfNonExistent(path: String) {
         val directory = File(path)
         if (!directory.exists())

@@ -42,7 +42,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceOnboardingComplet
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent.EventUpSyncRequestPayload
-import com.simprints.infra.events.event.domain.models.LicenseCheckingEvent.LicenseCheckingEventPayload
+import com.simprints.infra.events.event.domain.models.LicenseCheckEvent.LicenseCheckEventPayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
@@ -86,7 +86,7 @@ import com.simprints.infra.events.event.domain.models.LicenseCheckingEvent.Licen
     JsonSubTypes.Type(value = SuspiciousIntentPayload::class, name = EventType.SUSPICIOUS_INTENT_KEY),
     JsonSubTypes.Type(value = EventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = EventUpSyncRequestPayload::class, name = Companion.EVENT_UP_SYNC_REQUEST_KEY),
-    JsonSubTypes.Type(value = LicenseCheckingEventPayload::class, name = Companion.LICENSE_CHECKING_KEY),
+    JsonSubTypes.Type(value = LicenseCheckEventPayload::class, name = Companion.LICENSE_CHECK_KEY),
 )
 abstract class EventPayload {
     abstract val type: EventType

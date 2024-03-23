@@ -9,17 +9,11 @@ import com.simprints.infra.license.Vendor
  */
 @Keep
 internal data class ApiLicense(val licenses: Map<Vendor, License> = emptyMap()) {
-
-    /**
-     * This method gets the correct license data based on which vendor is passed to it.
-     * If the license doesn't contain data for that vendor, returns an empty string.
-     */
-    fun getLicenseBasedOnVendor(vendor: Vendor) = licenses[vendor]?.data ?: ""
-
+    fun getLicenseBasedOnVendor(vendor: Vendor) = licenses[vendor]
 }
 
 @Keep
-internal data class License(val vendor: String, val expiration: String, val data: String)
+data class License(val expiration: String, val data: String)
 
 /**
  * BFSID returns an error in the following format:
