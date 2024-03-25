@@ -3,36 +3,71 @@ package com.simprints.feature.orchestrator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.logging.Simber
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class ExecutionTracker @Inject constructor() : LifecycleEventObserver {
+internal class ExecutionTracker @Inject constructor(
+    private val timeHelper: TimeHelper,
+    @ExecutorLockTimeoutSec private val executionTimeLimitSec: Int,
+) : LifecycleEventObserver {
 
     /**
-     * There have been a number of cases when calling app makes several requests tens of ms apart, while it
-     * is not exactly clear why this is happening, it is clear that it is not the intended behavior.
+     * Timestamp representing when the [currentLifecycleOwnerId] was set. This is a safeguard
+     * measure for cases when [Lifecycle.Event.ON_DESTROY] is not called by the system. Should it
+     * ever happen, the [ExecutionTracker] has a check for whether enough time has passed, and if
+     * the [currentLifecycleOwnerId] can be released.
      *
-     * This in-memory flag is used to prevent the orchestrator from starting multiple times.
-     * It will cause any consecutive requests to return `Activity.RESULT_CANCELED` and it is callers
-     * responsibility to handle this case.
+     * Limit for execution is set by the [executionTimeLimitSec] (in seconds).
      */
-    val isExecuting = AtomicBoolean(false)
+    private var timestamp: Long = 0
 
-    private var activityCount = 0
+    /**
+     * ID of the [LifecycleOwner] that is considered the main executor.
+     */
+    private var currentLifecycleOwnerId: Int? = null
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        val ownerId = source.id()
         if (event == Lifecycle.Event.ON_CREATE) {
-            activityCount++
+            if (currentLifecycleOwnerId == null || enoughTimePassedSinceLastLock()) {
+                currentLifecycleOwnerId = ownerId
+                timestamp = timeHelper.now().ms
+                Simber.i("Lifecycle owner [$ownerId] is set as main executor")
+            } else {
+                Simber.i("Main executor already set, ignoring Lifecycle owner [$ownerId]")
+            }
         } else if (event == Lifecycle.Event.ON_DESTROY) {
-            activityCount = (activityCount - 1).coerceAtLeast(0)
-            if (activityCount == 0) {
-                isExecuting.set(false)
-                Simber.i("All activities have been closed.")
+            if (currentLifecycleOwnerId == ownerId) {
+                currentLifecycleOwnerId = null
+                timestamp = 0
+                Simber.i("Lifecycle owner [$ownerId] removed from main executor")
             }
         }
+    }
 
+    /**
+     * Check for whether enough time has passed since the last set of the [currentLifecycleOwnerId].
+     *
+     * @return true when the difference between current time and the [timestamp] is greater than
+     * amount of seconds specified in the [executionTimeLimitSec]. False otherwise.
+     */
+    private fun enoughTimePassedSinceLastLock() =
+        timeHelper.msBetweenNowAndTime(timestamp) > 1000 * executionTimeLimitSec
+
+    fun LifecycleOwner.id(): Int = hashCode()
+
+    /**
+     * Checks whether the current activity (more technically, its [LifecycleOwner]) has rights to be
+     * executed at this moment.
+     *
+     * @param activity reference to the corresponding [LifecycleOwner]
+     * @return true if there are no other instances of this lifecycle owner running. False
+     * otherwise.
+     */
+    fun isMain(activity: LifecycleOwner): Boolean {
+        return currentLifecycleOwnerId == activity.hashCode()
     }
 }
