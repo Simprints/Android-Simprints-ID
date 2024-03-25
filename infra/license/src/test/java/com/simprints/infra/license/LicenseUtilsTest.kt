@@ -23,5 +23,11 @@ class LicenseUtilsTest {
 
         val validLicenseWithEmptyExpiration = License("", "data")
         assertThat(validLicenseWithEmptyExpiration.determineLicenseStatus()).isEqualTo(LicenseStatus.VALID)
+
+        val validLicenseWithBadExpirationDate = License("bad date", "data")
+        assertThat(validLicenseWithBadExpirationDate.determineLicenseStatus()).isEqualTo(
+            LicenseStatus.VALID
+        )
+
     }
 }

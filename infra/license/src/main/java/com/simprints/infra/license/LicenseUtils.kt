@@ -1,6 +1,7 @@
 package com.simprints.infra.license
 
 import com.simprints.infra.license.remote.License
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -12,8 +13,13 @@ private fun License.isExpired(): Boolean {
 
     val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
     format.timeZone = TimeZone.getTimeZone("UTC")
-    val expiryDate = format.parse(expiration)
-
+    val expiryDate = try {
+        format.parse(expiration)
+    } catch (e: ParseException) {
+        null
+    }
+    // if expiry date is null, consider it as not expired to avoid blocking the app and let the bio sdk handle it
+    // if expiry date is before current date, consider it as expired
     return expiryDate?.before(Date()) ?: false
 }
 
