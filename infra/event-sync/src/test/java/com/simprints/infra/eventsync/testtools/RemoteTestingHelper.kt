@@ -18,7 +18,6 @@ internal class RemoteTestingHelper {
             null, -> {
                 // ADD TEST FOR NEW EVENT IN THIS CLASS
             }
-
         }
     }
 }
