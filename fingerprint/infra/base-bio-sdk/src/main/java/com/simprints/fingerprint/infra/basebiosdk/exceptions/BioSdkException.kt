@@ -4,7 +4,10 @@ sealed class BioSdkException(
     message: String,
     cause: Throwable? = null
 ) : RuntimeException(message, cause) {
-    class BioSdkInitializationException(override val cause: Throwable?) :
+    class BioSdkInitializationException(
+        override val cause: Throwable? = null,
+        override val message: String? = null
+    ) :
         BioSdkException("Bio SDK initialization failed")
 
     class CannotAcquireFingerprintImageException(override val message: String?) :

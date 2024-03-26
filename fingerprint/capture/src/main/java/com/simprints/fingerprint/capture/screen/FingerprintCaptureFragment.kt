@@ -36,7 +36,7 @@ import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerMa
 import com.simprints.fingerprint.capture.views.tryagainsplash.TryAnotherFingerSplashDialogFragment
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
@@ -121,8 +121,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     messageRes = IDR.string.configuration_licence_invalid_message
                     image = IDR.drawable.ic_exclamation
                     leftButton = AlertButtonConfig.Close
-                    appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
-                    eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.FACE_LICENSE_INVALID
+                    appErrorReason = AppErrorReason.LICENSE_INVALID
+                    eventType = AlertScreenEventType.LICENSE_INVALID
                 }.toArgs()
             )
         }
@@ -206,7 +206,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     messageRes = IDR.string.fingerprint_capture_unexpected_error_message
                     color = AlertColor.Red
                     image = IDR.drawable.ic_alert_default
-                    eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+                    eventType = AlertScreenEventType.UNEXPECTED_ERROR
                     leftButton = AlertButtonConfig.Close
                 }.toArgs()
             )

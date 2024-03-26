@@ -30,7 +30,7 @@ internal enum class ErrorType(
     CONFIGURATION_ERROR(
         null,
         IDR.string.configuration_generic_error_message,
-        alertType = AlertScreenEventType.FACE_LICENSE_MISSING,
+        alertType = AlertScreenEventType.LICENSE_MISSING,
         errorReason = AppErrorReason.FACE_CONFIGURATION_ERROR,
     ),
     ;

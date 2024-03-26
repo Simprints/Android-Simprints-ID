@@ -54,8 +54,8 @@ data class ErrorCallbackEvent(
             BLUETOOTH_NOT_SUPPORTED,
             LOGIN_NOT_COMPLETE,
             ENROLMENT_LAST_BIOMETRICS_FAILED,
-            FACE_LICENSE_MISSING,
-            FACE_LICENSE_INVALID,
+            LICENSE_MISSING,
+            LICENSE_INVALID,
             FINGERPRINT_CONFIGURATION_ERROR,
             BACKEND_MAINTENANCE_ERROR,
             PROJECT_ENDING,
@@ -75,8 +75,8 @@ data class ErrorCallbackEvent(
                         AppErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                         AppErrorReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                         AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
-                        AppErrorReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
-                        AppErrorReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+                        AppErrorReason.LICENSE_MISSING -> LICENSE_MISSING
+                        AppErrorReason.LICENSE_INVALID -> LICENSE_INVALID
                         AppErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
                         AppErrorReason.FACE_CONFIGURATION_ERROR -> FACE_CONFIGURATION_ERROR
                         AppErrorReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR

@@ -24,8 +24,8 @@ internal class IsFlowCompletedWithErrorUseCase @Inject constructor() {
         AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED,
         AppErrorReason.LOGIN_NOT_COMPLETE,
         AppErrorReason.FINGERPRINT_CONFIGURATION_ERROR,
-        AppErrorReason.FACE_LICENSE_MISSING,
-        AppErrorReason.FACE_LICENSE_INVALID,
+        AppErrorReason.LICENSE_MISSING,
+        AppErrorReason.LICENSE_INVALID,
         AppErrorReason.FACE_CONFIGURATION_ERROR,
         AppErrorReason.BACKEND_MAINTENANCE_ERROR,
         -> false

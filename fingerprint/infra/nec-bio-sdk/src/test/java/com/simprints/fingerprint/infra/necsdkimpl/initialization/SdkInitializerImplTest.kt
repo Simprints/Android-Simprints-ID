@@ -2,10 +2,14 @@ package com.simprints.fingerprint.infra.necsdkimpl.initialization
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.infra.license.LicenseRepository
+import com.simprints.infra.license.LicenseStatus
+import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.remote.License
 import com.simprints.necwrapper.nec.NEC
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -14,6 +18,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
+import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -33,30 +38,37 @@ class SdkInitializerImplTest {
     @MockK
     lateinit var licenseRepository: LicenseRepository
 
+    @MockK
+    lateinit var saveLicenseCheck: SaveLicenseCheckEventUseCase
 
     private lateinit var sdkInitializer: SdkInitializer<Unit>
+
+
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         justRun { nec.init(any(), context) }
-        coJustRun { licenseRepository.deleteCachedLicense(Vendor.NEC) }
+        coEvery {
+            licenseRepository.getCachedLicense(Vendor.NEC)
+        } returns License("2133-12-30T17:32:28Z", "license")
 
+        coJustRun { licenseRepository.deleteCachedLicense(Vendor.NEC) }
         sdkInitializer =
-            SdkInitializerImpl(context,  nec, licenseRepository)
+            SdkInitializerImpl(context, nec, licenseRepository, saveLicenseCheck)
     }
 
     @Test
     fun `test initialize success`() = runTest {
         //Given
-        coEvery {
-            licenseRepository.getCachedLicense(Vendor.NEC)
-        } returns "license"
+        val licenseStatusSlot = slot<LicenseStatus>()
+        coJustRun { saveLicenseCheck(Vendor.NEC, capture(licenseStatusSlot)) }
 
         // When
         sdkInitializer.initialize(null)
         // Then
         verify { nec.init(any(), context) }
+        assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.VALID)
     }
 
     @Test(expected = BioSdkException.BioSdkInitializationException::class)
@@ -64,14 +76,28 @@ class SdkInitializerImplTest {
         //Given
         coEvery {
             licenseRepository.getCachedLicense(Vendor.NEC)
-        } returns  "license"
-
-        every { nec.init(any(),context) } throws Exception()
+        } returns License("2011-12-30T17:32:28Z", "license")
+        val licenseStatusSlot = slot<LicenseStatus>()
+        coJustRun { saveLicenseCheck(Vendor.NEC, capture(licenseStatusSlot)) }
 
         // When
         sdkInitializer.initialize(null)
         // Then
         coVerify { licenseRepository.deleteCachedLicense(Vendor.NEC) }
+        assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.EXPIRED)
     }
 
+    @Test(expected = BioSdkException.BioSdkInitializationException::class)
+    fun `test error during initialization`() = runTest {
+        //Given
+        every { nec.init(any(),context) } throws Exception()
+        val licenseStatusSlot = slot<LicenseStatus>()
+        coJustRun { saveLicenseCheck(Vendor.NEC, capture(licenseStatusSlot)) }
+
+        // When
+        sdkInitializer.initialize(null)
+        // Then
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.NEC) }
+        assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.ERROR)
+    }
 }

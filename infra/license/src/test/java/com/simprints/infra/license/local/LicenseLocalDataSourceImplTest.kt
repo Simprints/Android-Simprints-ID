@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.security.crypto.EncryptedFile
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.remote.License
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -57,10 +58,10 @@ class LicenseLocalDataSourceImplTest {
     @Test
     fun `check saving the file opens a file output`() = runTest {
         val fileName = "testfile"
-        localSource.saveLicense(licenseVendor, fileName)
+        val expirationDate = "2023-01-01"
+        localSource.saveLicense(licenseVendor, License(expirationDate,fileName))
 
         assert(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}").exists())
-
         verify(exactly = 1) { encryptedFile.openFileOutput() }
     }
 

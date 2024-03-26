@@ -10,6 +10,7 @@ android {
 dependencies {
 
     implementation(project(":infra:auth-store"))
+    implementation(project(":infra:events"))
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
     implementation(libs.androidX.security)

@@ -37,6 +37,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.FINGER
 import com.simprints.infra.events.event.domain.models.EventType.Companion.GUID_SELECTION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.INTENT_PARSING_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.INVALID_INTENT_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.LICENSE_CHECK_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ONE_TO_MANY_MATCH_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ONE_TO_ONE_MATCH_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.PERSON_CREATION_KEY
@@ -135,6 +136,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = EventDownSyncRequestEvent::class, name = EVENT_DOWN_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = EventUpSyncRequestEvent::class, name = EVENT_UP_SYNC_REQUEST_KEY),
+    JsonSubTypes.Type(value = LicenseCheckEvent::class, name = LICENSE_CHECK_KEY),
 )
 abstract class Event {
 
