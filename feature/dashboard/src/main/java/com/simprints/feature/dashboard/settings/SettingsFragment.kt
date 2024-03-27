@@ -12,13 +12,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -78,17 +79,17 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getFingerSelectionPreference()?.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.action_settingsFragment_to_fingerSelectionFragment)
+            findNavController().navigateSafely(this, R.id.action_settingsFragment_to_fingerSelectionFragment)
             true
         }
 
         getSyncInfoPreference()?.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.action_settingsFragment_to_syncInfoFragment)
+            findNavController().navigateSafely(this, R.id.action_settingsFragment_to_syncInfoFragment)
             true
         }
 
         getAboutPreference()?.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.action_settingsFragment_to_aboutFragment)
+            findNavController().navigateSafely(this, R.id.action_settingsFragment_to_aboutFragment)
             true
         }
     }

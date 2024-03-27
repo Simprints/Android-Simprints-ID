@@ -20,6 +20,7 @@ import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -104,18 +105,19 @@ internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) 
 
         lifecycleScope.launch {
             delay(FINISHED_TIME_DELAY_MS)
-            retryConnectAndFinishFragment()
+            finishFragmentAndRetryConnect()
         }
     }
 
-    private fun retryConnectAndFinishFragment() {
-        connectScannerViewModel.connect()
-        findNavController().navigate(
+    private fun finishFragmentAndRetryConnect() {
+        // Order of execution is important here. It's necessary to navigate first and attempt to
+        // reconnect afterwards.
+        findNavController().navigateSafely(
+            this,
             BluetoothOffFragmentDirections.actionIssueBluetoothOffFragmentToConnectProgressFragment(),
             navOptions { popUpTo(R.id.connectProgressFragment) }
         )
-
-        findNavController().popBackStack()
+        connectScannerViewModel.connect()
     }
 
     companion object {

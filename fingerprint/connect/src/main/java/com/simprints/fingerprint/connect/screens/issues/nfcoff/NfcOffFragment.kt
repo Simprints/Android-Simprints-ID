@@ -12,6 +12,7 @@ import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentNfcOffBinding
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.NfcManager
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -75,11 +76,11 @@ internal class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
     }
 
     private fun continueToNfcPair() {
-        findNavController().navigate(NfcOffFragmentDirections.actionNfcOffFragmentToNfcPairFragment())
+        findNavController().navigateSafely(this, NfcOffFragmentDirections.actionNfcOffFragmentToNfcPairFragment())
     }
 
     private fun continueToSerialEntryPair() {
-        findNavController().navigate(NfcOffFragmentDirections.actionNfcOffFragmentToSerialEntryPairFragment())
+        findNavController().navigateSafely(this, NfcOffFragmentDirections.actionNfcOffFragmentToSerialEntryPairFragment())
     }
 
     companion object {

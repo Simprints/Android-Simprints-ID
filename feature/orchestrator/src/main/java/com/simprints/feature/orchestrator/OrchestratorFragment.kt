@@ -36,6 +36,7 @@ import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.matcher.MatchContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -113,14 +114,16 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     private fun observeLoginCheckVm() {
         loginCheckVm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_orchestratorFragment_to_alert,
                 alertConfigurationMapper.buildAlertConfig(error).toArgs()
             )
         })
 
         loginCheckVm.showLoginFlow.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { request ->
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_orchestratorFragment_to_login,
                 LoginContract.toArgs(request.projectId, request.userId),
             )
@@ -140,7 +143,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             orchestratorCache.clearSteps()
         })
         clientApiVm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_orchestratorFragment_to_alert,
                 alertConfigurationMapper.buildAlertConfig(error).toArgs()
             )
@@ -154,7 +158,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     private fun observeOrchestratorVm() {
         orchestratorVm.currentStep.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { step ->
             if (step != null) {
-                findNavController().navigate(step.navigationActionId, step.payload)
+                findNavController().navigateSafely(this, step.navigationActionId, step.payload)
             }
         })
         orchestratorVm.appResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { response ->

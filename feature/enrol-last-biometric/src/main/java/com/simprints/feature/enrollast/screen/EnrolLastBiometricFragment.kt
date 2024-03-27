@@ -24,6 +24,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -55,7 +56,8 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
     }
 
     private fun showError(errorType: ErrorType, modalities: List<Modality>) {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_enrolLastBiometricFragment_to_errorFragment,
             createAlertConfiguration(errorType, modalities).toArgs()
         )

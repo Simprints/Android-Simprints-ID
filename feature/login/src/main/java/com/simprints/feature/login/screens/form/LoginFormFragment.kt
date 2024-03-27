@@ -43,6 +43,7 @@ import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -101,7 +102,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
         binding.loginButtonScanQr.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Scan QR button clicked")
-            findNavController().navigate(R.id.action_loginFormFragment_to_loginQrScanner)
+            findNavController().navigateSafely(this, R.id.action_loginFormFragment_to_loginQrScanner)
         }
         binding.loginButtonSignIn.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Login button clicked")

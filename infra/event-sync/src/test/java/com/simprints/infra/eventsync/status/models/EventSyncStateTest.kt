@@ -2,7 +2,12 @@ package com.simprints.infra.eventsync.status.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.eventsync.status.models.EventSyncState.SyncWorkerInfo
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.*
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Blocked
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Cancelled
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Enqueued
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Failed
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Running
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Succeeded
 import org.junit.Test
 
 class EventSyncStateTest {

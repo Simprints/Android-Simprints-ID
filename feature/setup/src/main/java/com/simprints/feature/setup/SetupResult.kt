@@ -1,7 +1,6 @@
 package com.simprints.feature.setup
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.response.AppErrorReason
 import java.io.Serializable
 
 @Keep
