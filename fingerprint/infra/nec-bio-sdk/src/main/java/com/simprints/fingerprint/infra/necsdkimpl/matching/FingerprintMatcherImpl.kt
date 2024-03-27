@@ -62,7 +62,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
                 verify(fingerprint, candidateTemplate)
             } ?: 0.toDouble()
         }
-        return MatchResult(candidate.id, getOverallScore(total, fingers))
+        return MatchResult(candidate.subjectId, getOverallScore(total, fingers))
     }
 
     private fun verify(probe: Fingerprint, candidate: Fingerprint) = try {
@@ -92,7 +92,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
             }
         }
         // Matching score  = total/number of fingers
-        return MatchResult(candidate.id, getOverallScore(total, fingers))
+        return MatchResult(candidate.subjectId, getOverallScore(total, fingers))
     }
 
     private fun FingerprintIdentity.templateForFinger(fingerId: FingerIdentifier) =

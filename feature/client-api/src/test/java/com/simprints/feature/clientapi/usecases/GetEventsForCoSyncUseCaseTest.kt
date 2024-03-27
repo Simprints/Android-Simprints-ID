@@ -2,7 +2,7 @@ package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.feature.clientapi.models.CoSyncEvents
+import com.simprints.infra.events.event.cosync.CoSyncEvents
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor

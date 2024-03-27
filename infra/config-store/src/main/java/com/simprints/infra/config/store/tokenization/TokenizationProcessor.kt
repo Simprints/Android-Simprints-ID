@@ -20,7 +20,7 @@ class TokenizationProcessor @Inject constructor(
      * @param tokenKeyType corresponding key type of the provided string
      * @param project current project configuration containing tokenization keys
      *
-     * @return [TokenizableString.Tokenized] is case of successful tokenization, [TokenizableString.Raw]
+     * @return [TokenizableString.Tokenized] in case of successful tokenization, [TokenizableString.Raw]
      * with the [decrypted] value otherwise
      */
     fun encrypt(
@@ -40,12 +40,12 @@ class TokenizationProcessor @Inject constructor(
     /**
      * Tries to decrypt [encrypted] value in safely manner.
      *
-     * @param encrypted raw string value for encryption
+     * @param encrypted tokenized string value for decryption
      * @param tokenKeyType corresponding key type of the provided string
      * @param project current project configuration containing tokenization keys
      *
-     * @return [TokenizableString.Tokenized] is case of successful tokenization, [TokenizableString.Raw]
-     * with the [encrypted] value otherwise
+     * @return [TokenizableString.Raw] in case of successful decryption, [TokenizableString.Tokenized]
+     * with the original [encrypted] value otherwise
      */
     fun decrypt(
         encrypted: TokenizableString.Tokenized,

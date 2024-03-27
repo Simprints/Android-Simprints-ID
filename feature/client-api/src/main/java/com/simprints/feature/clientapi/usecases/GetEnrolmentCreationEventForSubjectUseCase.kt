@@ -2,7 +2,7 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.feature.clientapi.models.CoSyncEnrolmentRecordEvents
+import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData

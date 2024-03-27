@@ -25,6 +25,7 @@ import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -183,7 +184,10 @@ internal class OrchestratorViewModelTest {
     fun `Updates face matcher step payload when receiving face capture`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.FACE_CAPTURE),
-            createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(FlowType.VERIFY, SubjectQuery())),
+            createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(
+                FlowType.VERIFY,
+                SubjectQuery(),
+                BiometricDataSource.SIMPRINTS)),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
@@ -200,7 +204,10 @@ internal class OrchestratorViewModelTest {
     fun `Updates fingerprint matcher step payload when receiving fingerprint capture`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.FINGERPRINT_CAPTURE),
-            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(FlowType.VERIFY, SubjectQuery())),
+            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(
+                FlowType.VERIFY,
+                SubjectQuery(),
+                BiometricDataSource.SIMPRINTS)),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
