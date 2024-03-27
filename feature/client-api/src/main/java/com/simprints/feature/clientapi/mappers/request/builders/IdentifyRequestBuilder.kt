@@ -43,6 +43,7 @@ internal class IdentifyRequestBuilder(
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId().asTokenizableRaw(),
         moduleId = extractor.getModuleId().asTokenizableRaw(),
+        biometricDataSource = extractor.getBiometricDataSource(),
         metadata = extractor.getMetadata(),
         unknownExtras = extractor.getUnknownExtras()
     )

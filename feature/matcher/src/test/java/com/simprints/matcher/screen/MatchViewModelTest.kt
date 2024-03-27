@@ -6,6 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -96,7 +97,8 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(MatchParams(
             probeFaceSamples = listOf(getFaceSample()),
             flowType = FlowType.ENROL,
-            queryForCandidates = mockk {}
+            queryForCandidates = mockk {},
+            biometricDataSource = BiometricDataSource.SIMPRINTS,
         ))
         advanceUntilIdle()
 
@@ -137,7 +139,8 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(MatchParams(
             probeFingerprintSamples = listOf(getFingerprintSample()),
             flowType = FlowType.ENROL,
-            queryForCandidates = mockk {}
+            queryForCandidates = mockk {},
+            biometricDataSource = BiometricDataSource.SIMPRINTS,
         ))
         advanceUntilIdle()
 

@@ -59,8 +59,8 @@ internal class CommCareResponseMapper @Inject constructor() {
     }
 
     private fun Bundle.appendCoSyncData(events: String?, actions: String? = null) = apply {
-        events?.let { putString(CommCareConstants.SIMPRINTS_EVENTS, it) }
-        actions?.let { putString(CommCareConstants.SIMPRINTS_SUBJECT_ACTIONS, it) }
+        events?.let { putString(Constants.SIMPRINTS_COSYNC_EVENT, it) }
+        actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 
     // Based on the documentation, we are supposed to send either [CommCareConstants.COMMCARE_BUNDLE_KEY] (for key-values result)

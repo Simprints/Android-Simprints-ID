@@ -10,6 +10,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.remote.License
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -148,7 +149,7 @@ class SetupViewModelTest {
         }
         every {
             licenseRepository.getLicenseStates(any(), any(), any())
-        } returns listOf(LicenseState.FinishedWithSuccess("license")).asFlow()
+        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate","license"))).asFlow()
 
         // When
         viewModel.downloadRequiredLicenses()
@@ -190,7 +191,7 @@ class SetupViewModelTest {
         }
         every {
             licenseRepository.getLicenseStates(any(), any(), Vendor.NEC)
-        } returns listOf(LicenseState.FinishedWithSuccess("")).asFlow()
+        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate",""))).asFlow()
         every {
             licenseRepository.getLicenseStates(any(), any(), Vendor.RANK_ONE)
         } returns listOf(LicenseState.FinishedWithError("123")).asFlow()

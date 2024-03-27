@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
@@ -57,7 +58,8 @@ internal class FaceMatcherUseCaseTest {
         useCase.invoke(
             MatchParams(
                 flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery()
+                queryForCandidates = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
         )
 
@@ -74,7 +76,8 @@ internal class FaceMatcherUseCaseTest {
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
                 ),
                 flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery()
+                queryForCandidates = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
         )
 
@@ -84,9 +87,9 @@ internal class FaceMatcherUseCaseTest {
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordRepository.count(any()) } returns 100
+        coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any()) } returns listOf(
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
@@ -102,7 +105,8 @@ internal class FaceMatcherUseCaseTest {
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
                 ),
                 flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery()
+                queryForCandidates = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             onLoadingCandidates = { onLoadingCalled = true },
         )

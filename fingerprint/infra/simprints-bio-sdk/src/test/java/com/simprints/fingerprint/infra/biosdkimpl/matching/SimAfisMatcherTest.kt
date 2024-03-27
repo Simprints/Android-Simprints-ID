@@ -80,12 +80,12 @@ class SimAfisMatcherTest {
             every { fingerprintsTemplates } returns listOf(template1, template2)
         }
         val candidate1 = mockk<FingerprintIdentity> {
-            every { id } returns "candidate1"
+            every { subjectId } returns "candidate1"
             every { templateFormatNotSupportedBySimAfisMatcher() } returns false
             every { fingerprintsTemplates } returns listOf(template2, template1)
         }
         val candidate2 = mockk<FingerprintIdentity> {
-            every { id } returns "candidate2"
+            every { subjectId } returns "candidate2"
             every { templateFormatNotSupportedBySimAfisMatcher() } returns false
             every { fingerprintsTemplates } returns listOf(template3, template1)
         }

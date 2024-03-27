@@ -6,6 +6,9 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
+import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
@@ -21,22 +24,25 @@ internal class EnrolmentRecordRepositoryImpl(
     context: Context,
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
     private val localDataSource: EnrolmentRecordLocalDataSource,
+    private val commCareDataSource: IdentityDataSource,
     private val tokenizationProcessor: TokenizationProcessor,
     private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
-) : EnrolmentRecordRepository, EnrolmentRecordLocalDataSource by localDataSource {
+) : EnrolmentRecordRepository, EnrolmentRecordLocalDataSource by localDataSource  {
 
     @Inject
     constructor(
         @ApplicationContext context: Context,
         remoteDataSource: EnrolmentRecordRemoteDataSource,
         localDataSource: EnrolmentRecordLocalDataSource,
+        @CommCareDataSource commCareDataSource: IdentityDataSource,
         tokenizationProcessor: TokenizationProcessor,
         @DispatcherIO dispatcher: CoroutineDispatcher,
     ) : this(
         context = context,
         remoteDataSource = remoteDataSource,
         localDataSource = localDataSource,
+        commCareDataSource = commCareDataSource,
         tokenizationProcessor = tokenizationProcessor,
         dispatcher = dispatcher,
         batchSize = BATCH_SIZE
@@ -108,5 +114,27 @@ internal class EnrolmentRecordRepositoryImpl(
             tokenKeyType = tokenKeyType,
             project = project
         )
+    }
+
+    override suspend fun count(query: SubjectQuery, dataSource: BiometricDataSource): Int =
+        fromIdentityDataSource(dataSource).count(query)
+
+    override suspend fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+        dataSource: BiometricDataSource
+    ): List<FingerprintIdentity> =
+        fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range)
+
+    override suspend fun loadFaceIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+        dataSource: BiometricDataSource
+    ): List<FaceIdentity> =
+        fromIdentityDataSource(dataSource).loadFaceIdentities(query, range)
+
+    private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
+        BiometricDataSource.SIMPRINTS -> localDataSource
+        BiometricDataSource.COMMCARE -> commCareDataSource
     }
 }

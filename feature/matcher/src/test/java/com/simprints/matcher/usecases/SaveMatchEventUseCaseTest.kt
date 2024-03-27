@@ -6,6 +6,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -64,6 +65,7 @@ class SaveMatchEventUseCaseTest {
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             2,
             "faceMatcherName",
@@ -102,6 +104,7 @@ class SaveMatchEventUseCaseTest {
                         byteArrayOf(1, 2, 3)
                     )
                 ),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             2,
             "faceMatcherName",
@@ -135,6 +138,7 @@ class SaveMatchEventUseCaseTest {
                 emptyList(),
                 FlowType.IDENTIFY,
                 SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             2,
             "faceMatcherName",
@@ -165,6 +169,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(attendantId = "userId"),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             0,
             "faceMatcherName",
@@ -187,6 +192,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId"),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             0,
             "faceMatcherName",
@@ -209,7 +215,8 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 emptyList(),
                 flowType = FlowType.IDENTIFY,
-                queryForCandidates = SubjectQuery()
+                queryForCandidates = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             0,
             "faceMatcherName",

@@ -68,7 +68,7 @@ internal class SimAfisMatcher @Inject constructor(private val jniLibAfis: JNILib
     }
 
     private fun FingerprintIdentity.toSimAfisPerson(): SimAfisPerson =
-        SimAfisPerson(id, fingerprints.map { it.toSimAfisFingerprint() })
+        SimAfisPerson(subjectId, fingerprints.map { it.toSimAfisFingerprint() })
 
     private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint {
          return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
@@ -123,7 +123,7 @@ internal class SimAfisMatcher @Inject constructor(private val jniLibAfis: JNILib
                     }.toDouble()
             }
         // Matching score  = total/number of fingers
-        return MatchResult(candidate.id, getOverallScore(total, fingers))
+        return MatchResult(candidate.subjectId, getOverallScore(total, fingers))
     }
 
     private fun getOverallScore(total: Double, fingers: Int) =

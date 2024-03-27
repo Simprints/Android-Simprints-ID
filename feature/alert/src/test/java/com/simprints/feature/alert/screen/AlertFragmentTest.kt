@@ -152,7 +152,7 @@ class AlertFragmentTest {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
             fragmentArgs = alertConfiguration {
-                appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
+                appErrorReason = AppErrorReason.LICENSE_INVALID
             }.toArgs()
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
@@ -160,7 +160,7 @@ class AlertFragmentTest {
             }
         }
         pressBack()
-        Truth.assertThat(payload).isEqualTo(AppErrorReason.FACE_LICENSE_INVALID)
+        Truth.assertThat(payload).isEqualTo(AppErrorReason.LICENSE_INVALID)
     }
 
     @Test
@@ -170,7 +170,7 @@ class AlertFragmentTest {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
             fragmentArgs = alertConfiguration {
-                appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
+                appErrorReason = AppErrorReason.LICENSE_INVALID
             }.toArgs()
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
@@ -178,7 +178,7 @@ class AlertFragmentTest {
             }
         }
         onView(withId(R.id.alertLeftButton)).perform(click())
-        Truth.assertThat(payload).isEqualTo(AppErrorReason.FACE_LICENSE_INVALID)
+        Truth.assertThat(payload).isEqualTo(AppErrorReason.LICENSE_INVALID)
     }
 
     @Test
@@ -188,7 +188,7 @@ class AlertFragmentTest {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
             fragmentArgs = alertConfiguration {
-                appErrorReason = AppErrorReason.FACE_LICENSE_INVALID
+                appErrorReason = AppErrorReason.LICENSE_INVALID
                 rightButton = alertButton {
                     text = "Right"
                     resultKey = "test"
@@ -200,7 +200,7 @@ class AlertFragmentTest {
             }
         }
         onView(withId(R.id.alertRightButton)).perform(click())
-        Truth.assertThat(payload).isEqualTo(AppErrorReason.FACE_LICENSE_INVALID)
+        Truth.assertThat(payload).isEqualTo(AppErrorReason.LICENSE_INVALID)
     }
 
     @Test

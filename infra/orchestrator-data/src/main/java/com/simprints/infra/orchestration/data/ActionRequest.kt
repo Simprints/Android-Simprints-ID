@@ -18,6 +18,7 @@ sealed class ActionRequest(
         override val projectId: String,
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
+        val biometricDataSource: String,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
@@ -28,6 +29,7 @@ sealed class ActionRequest(
         override val projectId: String,
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
+        val biometricDataSource: String,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
@@ -38,6 +40,7 @@ sealed class ActionRequest(
         override val projectId: String,
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
+        val biometricDataSource: String,
         val metadata: String,
         val verifyGuid: String,
         override val unknownExtras: Map<String, Any?>,

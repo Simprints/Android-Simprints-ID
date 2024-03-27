@@ -115,7 +115,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
-            assertThat(subject.subjectId).isEqualTo(identity.patientId)
+            assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }
     }
 
@@ -141,7 +141,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
-            assertThat(subject.subjectId).isEqualTo(identity.personId)
+            assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }
     }
 

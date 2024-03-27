@@ -100,6 +100,9 @@ internal enum class ApiEventPayloadType {
 
     /* key added: EVENT_UP_SYNC_REQUEST_KEY */
     EventUpSyncRequest,
+
+    /* key added: LICENSE_CHECK_KEY */
+    LicenseCheck,
     ;
 
     companion object {
@@ -181,6 +184,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
     EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
     EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
+    LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
 }
 
 
@@ -213,6 +217,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.FaceCaptureBiometrics -> FACE_CAPTURE_BIOMETRICS
     ApiEventPayloadType.EventDownSyncRequest -> EVENT_DOWN_SYNC_REQUEST
     ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
+    ApiEventPayloadType.LicenseCheck -> LICENSE_CHECK
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }

@@ -71,14 +71,14 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
-    fun handleResult(result: Serializable) {
+    fun handleResult(result: Serializable) = viewModelScope.launch {
         Simber.d(result.toString())
         val errorResponse = mapRefusalOrErrorResult(result)
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found
             addCallbackEvent(errorResponse)
             _appResponse.send(OrchestratorResult(actionRequest, errorResponse))
-            return
+            return@launch
         }
 
         steps.firstOrNull { it.status == StepStatus.IN_PROGRESS }?.let {
@@ -89,7 +89,7 @@ internal class OrchestratorViewModel @Inject constructor(
         }
 
         if (shouldCreatePerson(actionRequest, modalities, steps)) {
-            viewModelScope.launch { createPersonEvent(steps.mapNotNull { it.result }) }
+            createPersonEvent(steps.mapNotNull { it.result })
         }
 
         doNextStep()
