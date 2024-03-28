@@ -64,6 +64,12 @@ jobs:
 
             -   name: Build the Release bundle
                 run: ./gradlew id:bundleRelease
+            -   name: Upload Release bundle
+                uses: actions/upload-artifact@v4
+                with:
+                    name: release-bundle
+                    path: id/build/outputs/bundle/release/*.aab
 
             -   name: Publish Release bundle
                 run: ./gradlew id:publishReleaseBundle
+                continue-on-error: true
