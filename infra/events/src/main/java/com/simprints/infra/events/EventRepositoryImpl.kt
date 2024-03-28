@@ -86,6 +86,12 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.loadEventScope(downSyncEventScopeId)
 
     override suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?) {
+        if (eventScope.projectId == PROJECT_ID_FOR_NOT_SIGNED_IN) {
+            eventLocalDataSource.deleteEventScope(scopeId = eventScope.id)
+            eventLocalDataSource.deleteEventsInScope(scopeId = eventScope.id)
+            return
+        }
+
         val events = eventLocalDataSource.loadEventsInScope(eventScope.id)
         if (events.isEmpty()) {
             eventLocalDataSource.deleteEventScope(scopeId = eventScope.id)
