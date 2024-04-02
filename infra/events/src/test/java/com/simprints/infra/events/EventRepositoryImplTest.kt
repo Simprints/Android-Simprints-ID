@@ -167,6 +167,18 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `should delete scope and events if project not signed in`() = runTest {
+        val scope = createSessionScope("scopeId", isClosed = false, projectId = PROJECT_ID_FOR_NOT_SIGNED_IN)
+
+        eventRepo.closeEventScope(scope, null)
+
+        coVerify {
+            eventLocalDataSource.deleteEventScope("scopeId")
+            eventLocalDataSource.deleteEventsInScope("scopeId")
+        }
+    }
+
+    @Test
     fun `add event to current session should add event related to current session into DB`() =
         runTest {
             val scope = createSessionScope("scopeId", isClosed = false)
