@@ -24,12 +24,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
 
     private val viewModel by viewModels<SyncViewModel>()
     private val binding by viewBinding(FragmentDashboardCardSyncBinding::bind)
-    private val hostFragment: Fragment?
-        get() = childFragmentManager
-            .findFragmentById(R.id.mainFragment)
 
-    private val currentlyDisplayedInternalFragment: Fragment?
-        get() = hostFragment?.childFragmentManager?.fragments?.first()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
