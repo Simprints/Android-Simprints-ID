@@ -3,8 +3,11 @@ package com.simprints.infra.eventsync.status.down
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -58,6 +61,12 @@ internal class EventDownSyncScopeRepositoryTest {
     @MockK
     lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
 
+    @MockK
+    lateinit var configRepository: ConfigRepository
+
+    @MockK
+    lateinit var tokenizationProcessor: TokenizationProcessor
+
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     @get:Rule
@@ -71,6 +80,8 @@ internal class EventDownSyncScopeRepositoryTest {
                 authStore,
                 recentUserActivityManager,
                 downSyncOperationOperationDao,
+                configRepository,
+                tokenizationProcessor,
             )
 
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
@@ -94,6 +105,7 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun buildUserDownSyncScope() = runTest(UnconfinedTestDispatcher()) {
         every { authStore.signedInUserId } returns DEFAULT_USER_ID
+        every { tokenizationProcessor.encrypt(any(), any(), any()) } returns TokenizableString.Tokenized(DEFAULT_USER_ID.value)
 
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
             listOf(Modes.FINGERPRINT),
@@ -107,6 +119,20 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun buildUserDownSyncScopeWhenNoSaved() = runTest(UnconfinedTestDispatcher()) {
         every { authStore.signedInUserId } returns null
+        every { tokenizationProcessor.encrypt(any(), any(), any()) } returns TokenizableString.Tokenized(DEFAULT_USER_ID.value)
+
+        val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+            listOf(Modes.FINGERPRINT),
+            DEFAULT_MODULES.toList(),
+            Partitioning.USER
+        )
+
+        assertUserSyncScope(syncScope)
+    }
+
+    @Test
+    fun buildUserDownSyncScopeWhenUserTokenised() = runTest(UnconfinedTestDispatcher()) {
+        every { authStore.signedInUserId } returns TokenizableString.Tokenized(DEFAULT_USER_ID.value)
 
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
             listOf(Modes.FINGERPRINT),
