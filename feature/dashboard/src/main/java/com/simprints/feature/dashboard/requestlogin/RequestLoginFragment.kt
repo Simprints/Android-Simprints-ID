@@ -11,7 +11,6 @@ import com.simprints.core.PackageVersionName
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentRequestLoginBinding
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -53,7 +52,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
     override fun onResume() {
         super.onResume()
         if (authStore.signedInProjectId.isNotEmpty())
-            findNavController().navigateSafely(this, R.id.action_requestLoginFragment_to_mainFragment)
+            findNavController().navigate(R.id.action_requestLoginFragment_to_mainFragment)
     }
 
     private fun displayLogoutReasonDialog(logoutReason: LogoutReason) {

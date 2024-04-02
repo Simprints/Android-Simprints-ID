@@ -15,7 +15,6 @@ import com.simprints.feature.dashboard.requestlogin.RequestLoginFragmentArgs
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.uibase.navigation.handleResult
-import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -25,7 +24,12 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
 
     private val viewModel by viewModels<SyncViewModel>()
     private val binding by viewBinding(FragmentDashboardCardSyncBinding::bind)
+    private val hostFragment: Fragment?
+        get() = childFragmentManager
+            .findFragmentById(R.id.mainFragment)
 
+    private val currentlyDisplayedInternalFragment: Fragment?
+        get() = hostFragment?.childFragmentManager?.fragments?.first()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
@@ -42,7 +46,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         onSyncButtonClick = { viewModel.sync() }
         onOfflineButtonClick = { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
         onSelectNoModulesButtonClick =
-            { findNavController().navigateSafely(this@SyncFragment, R.id.action_mainFragment_to_moduleSelectionFragment) }
+            { findNavController().navigate(R.id.action_mainFragment_to_moduleSelectionFragment) }
         onLoginButtonClick = { viewModel.login() }
     }
 
@@ -62,15 +66,13 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
                 title = getString(IDR.string.dashboard_sync_project_ending_alert_title),
                 body = getString(IDR.string.dashboard_sync_project_ending_message)
             )
-            findNavController().navigateSafely(
-                this,
+            findNavController().navigate(
                 R.id.action_mainFragment_to_requestLoginFragment,
                 RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle()
             )
         }
         viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
-            findNavController().navigateSafely(
-                this,
+            findNavController().navigate(
                 R.id.action_mainFragment_to_login,
                 loginArgs
             )
