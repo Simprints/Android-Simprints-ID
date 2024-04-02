@@ -13,6 +13,8 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
+import com.simprints.infra.license.LicenseStatus
+import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.Vendor.Companion.NEC
 import com.simprints.infra.license.Vendor.Companion.RANK_ONE
@@ -28,6 +30,7 @@ internal class SetupViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
     @DeviceID private val deviceID: String,
     private val authStore: AuthStore,
+    private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
 ) : ViewModel() {
 
     val requestLocationPermission: LiveData<Unit>
@@ -79,6 +82,8 @@ internal class SetupViewModel @Inject constructor(
                         if (licenceState is LicenseState.FinishedWithError
                             || licenceState is LicenseState.FinishedWithBackendMaintenanceError
                         ) {
+                            // Save the license state event
+                            saveLicenseCheckEvent(licenseVendor,LicenseStatus.MISSING)
                             _overallSetupResult.postValue(false)
                         }
                         // if this is the last license to download, then update the overall setup result
