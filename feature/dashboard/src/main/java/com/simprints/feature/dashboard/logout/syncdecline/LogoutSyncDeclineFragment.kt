@@ -12,7 +12,6 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncDeclineBinding
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
-import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -64,6 +63,6 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
 
     private fun processLogoutConfirmation() {
         viewModel.logout()
-        findNavController().navigateSafely(this, R.id.action_logoutSyncDeclineFragment_to_requestLoginFragment)
+        findNavController().navigate(R.id.action_logoutSyncDeclineFragment_to_requestLoginFragment)
     }
 }
