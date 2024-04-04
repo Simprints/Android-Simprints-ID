@@ -59,12 +59,12 @@ class RealmWrapperImpl @Inject constructor(
         } catch (ex: Exception) {
             if (isFileCorruptException(ex)) {
                 //DB corruption detected; either DB file or key is corrupt
-                //1. Delete DB file in order to create a new one at next init
-                Realm.deleteRealm(config)
-                //2. Recreate the DB key
-                recreateLocalDbKey()
-                //3. Log exception after recreating the key so we get extra info
+                //1. Log exception after recreating the key so we get extra info
                 Simber.tag(DB_CORRUPTION.name).e(ex)
+                //2. Delete DB file in order to create a new one at next init
+                Realm.deleteRealm(config)
+                //3. Recreate the DB key
+                recreateLocalDbKey()
                 //4. Update Realm config with the new key
                 config = createAndSaveRealmConfig()
                 //5. Delete "last sync" info and start new sync

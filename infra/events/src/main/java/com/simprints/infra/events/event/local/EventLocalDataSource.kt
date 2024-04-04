@@ -81,12 +81,12 @@ internal open class EventLocalDataSource @Inject constructor(
 
     private suspend fun rebuildDatabase(ex: Throwable) = mutex.withLock {
         //DB corruption detected; either DB file or key is corrupt
-        //1. Delete DB file in order to create a new one at next init
-        eventDatabaseFactory.deleteDatabase()
-        //2. Recreate the DB key
-        eventDatabaseFactory.recreateDatabaseKey()
-        //3. Log exception after recreating the key so we get extra info
+        //1. Log exception after recreating the key so we get extra info
         Simber.tag(DB_CORRUPTION.name).e(ex)
+        //2. Delete DB file in order to create a new one at next init
+        eventDatabaseFactory.deleteDatabase()
+        //3. Recreate the DB key
+        eventDatabaseFactory.recreateDatabaseKey()
         //4. Rebuild database
         eventDao = eventDatabaseFactory.build().eventDao
         scopeDao = eventDatabaseFactory.build().scopeDao
