@@ -195,8 +195,8 @@
     <!-- Fingerprint connect -->
     <string name="fingerprint_connect_error_title">Une erreur est survenue</string>
     <string name="fingerprint_connect_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système</string>
-    <string name="fingerprint_connect_error_close_button">Fermez</string>
-    <string name="fingerprint_connect_try_again_button">Réessayez</string>
+    <string name="fingerprint_connect_error_close_button">Fermer</string>
+    <string name="fingerprint_connect_try_again_button">Réessayer</string>
     <string name="fingerprint_connect_phone_settings_button">Réglages du téléphone</string>
     <string name="fingerprint_connect_pair_scanner_button">Réglages</string>
     <string name="fingerprint_connect_scanner_id_confirmation_message">Est ce que %1$s est votre scanner?</string>
