@@ -42,7 +42,7 @@
     <!-- Enrol last -->
     <string name="enrol_last_biometrics_success">Inscription réussie</string>
     <string name="enrol_last_biometrics_alert_title">Impossible d\'enregistrer</string>
-    <string name="enrol_last_biometrics_alert_message">1. La sauvegarde de l\'enregistrement %1$s a echoué \\n 2. Cliquez fermer</string>
+    <string name="enrol_last_biometrics_alert_message">1. La sauvegarde de l\'enregistrement %1$s a echoué \n 2. Cliquez fermer</string>
     <string name="enrol_last_biometrics_alert_message_duplicate_records">1. Echec lors de la sauvegarde de l\'enregistrement %1$s puisqu\'il créerait un doublon d\'un enregistrement existant \n 2. Touchez pour fermer</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Reconnaissance faciale</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Empreinte digitale</string>
