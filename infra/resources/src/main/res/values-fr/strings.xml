@@ -149,7 +149,7 @@
     <string name="orchestrator_invalid_user_id_error_message">Une erreur de configuration s\'est produite (le champ user ID est invalide), veuillez contacter votre administrateur système.</string>
     <string name="orchestrator_invalid_module_id_error_message">Une erreur de configuration s\'est produite (le champ module ID est invalide), veuillez contacter votre administrateur système.</string>
     <string name="orchestrator_invalid_verify_id_error_message">Une erreur de configuration s\'est produite (le champ verify GUID est invalide), veuillez contacter votre administrateur système.</string>
-    <string name="orchestrator_rooted_device_error_title">Appareil rooter détecté</string>
+    <string name="orchestrator_rooted_device_error_title">Appareil rooté détecté</string>
     <string name="orcehstrator_rooted_device_error_message">\"1. Contactez votre superviseur - appareil rooté détecté  2. Tapez sur Fermer\"</string>
 
     <!-- Select subject -->
