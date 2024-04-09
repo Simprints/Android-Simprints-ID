@@ -339,7 +339,7 @@
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">Activité : %1$s</string>
     <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">%d Inscription</item>
+        <item quantity="one">Inscription</item>
         <item quantity="many">Inscriptions</item>
         <item quantity="other">Inscriptions</item>
     </plurals>
