@@ -3,6 +3,8 @@
 
     <!-- Alert -->
     <string name="alert_title_fallback">Alerte</string>
+    <string name="alert_button_close">Fermer</string>
+
     <!-- Consent -->
     <string name="consent_general_title">Consentement général</string>
     <string name="consent_enrol_only">Je voudrais %2$s pour vous inscrire à %1$s.</string>
@@ -41,6 +43,7 @@
     <string name="enrol_last_biometrics_success">Inscription réussie</string>
     <string name="enrol_last_biometrics_alert_title">Impossible d\'enregistrer</string>
     <string name="enrol_last_biometrics_alert_message">1. La sauvegarde de l\'enregistrement %1$s a echoué \\n 2. Cliquez fermer</string>
+    <string name="enrol_last_biometrics_alert_message_duplicate_records">1. Echec lors de la sauvegarde de l\'enregistrement %1$s puisqu\'il créerait un doublon d\'un enregistrement existant \n 2. Touchez pour fermer</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Reconnaissance faciale</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Empreinte digitale</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Reconnaissance faciale/Empreinte digitale</string>
@@ -60,6 +63,7 @@
     <string name="exit_form_reason_data_concerns">Ne veut pas donner de données</string>
     <string name="exit_form_reason_does_not_have_permission">N\'a pas la permission</string>
     <string name="exit_form_reason_app_not_working">L\'application ne fonctionne pas</string>
+    <string name="exit_form_reason_scanner_not_working">Le scanner ne fonctionne pas</string>
     <string name="exit_form_reason_person_not_present">Personne non présente</string>
     <string name="exit_form_reason_too_young">Trop jeune</string>
     <string name="exit_form_reason_other">Autre</string>
@@ -69,6 +73,8 @@
     <string name="fetch_subject_guid_not_found_alert_title">Personne non trouvée</string>
     <string name="fetch_subject_guid_not_found_online_message">La personne sélectionnée pour la vérification n\'est pas dans la base de données.</string>
     <string name="fetch_subject_guid_not_found_offline_message">Personne non trouvée, veuillez vous assurer que vous êtes connecté à l\'internet et réessayer</string>
+    <string name="fetch_subject_try_again_button">Réessayez</string>
+
     <!-- Login -->
     <string name="login_id_hint">ID du projet</string>
     <string name="login_secret_hint">Clé du projet</string>
@@ -76,12 +82,19 @@
     <string name="login_scan_qr_button">Scanner QRCode</string>
     <string name="login_log_in_button">Connexion</string>
     <string name="login_qr_code_scanning_problem_error">Un problème est survenu lors du scan du code QR</string>
+    <string name="login_qr_code_scanning_camera_permission_error">Impossible de scanner le QR Code sans la permission d\'accéder à l\'appareil photo</string>
+    <string name="login_qr_code_scanning_camera_unavailable_error">Une erreur s\'est produite lors de l\'accès à l\'appareil photo, veuillez contacter votre administrateur système.</string>
     <string name="login_invalid_qr_code_error">Le QRCode scanné n\'est pas valide.</string>
     <string name="login_missing_credentials_error">Informations d\'identification manquantes. Veuillez vérifier l\'ID utilisateur, l\'ID projet et la clé, et réessayer.</string>
     <string name="login_invalid_credentials_error">Informations d\'identification invalides. Veuillez vérifier l\'ID et la clé du projet</string>
     <string name="login_project_id_intent_mismatch_error">L\'ID du projet est différent de celui fourni dans l\'intention. Veuillez contacter votre administrateur système.</string>
     <string name="login_no_network_error">Actuellement hors ligne. Veuillez vérifier votre connexion Internet.</string>
+    <string name="login_integrity_service_down_error">Une erreur s\'est produite en essayant de contacter le Service d\'Intégrité. Veuillez réessayer plus tard.</string>
     <string name="login_server_error">Un problème est survenu en essayant de contacter le serveur. Veuillez réessayer plus tard.</string>
+    <string name="login_change_url">Changez l\'URL du serveur backend.</string>
+    <string name="login_change_url_save">Enregistrer</string>
+    <string name="login_change_url_reset">Utiliser les valeurs par défaut</string>
+    <string name="login_change_url_cancel">Annuler</string>
 
     <!-- Matcher -->
     <string name="matcher_please_wait">Veuillez attendre pendant que nous procédons à l\'identification</string>
@@ -113,12 +126,19 @@
         <item quantity="other">%d correspondances</item>
     </plurals>
 
+    <!-- Orchestrator -->
+    <string name="orchestrator_generic_error_title">Une erreur est survenue</string>
     <string name="orchestrator_configuration_error_title">Erreur de configuration</string>
     <string name="orchestrator_project_id_error_message">Une erreur de configuration s\'est produite (Id de projet différent), veuillez vous déconnecter de l\'écran d\'accueil ou contacter votre administrateur système.</string>
+    <string name="orchestrator_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système</string>
     <string name="orchestrator_outdated_google_play_services_alert_title">Services Google Play obsolètes</string>
     <string name="orchestrator_outdated_google_play_services_alert_message">La version de Services Google Play installé sur cette appareil est plus ancienne de celle nécessaire pour démarrer SID</string>
     <string name="orchestrator_missing_google_play_services_alert_title">Services Google Play manquants</string>
-    <string name="orchestrator_missing_google_play_services_alert_message">Services Google Play ne sont pas installés sur cette appareil</string>
+    <string name="orchestrator_missing_google_play_services_alert_message">Les Services Google Play ne sont pas installés sur cette appareil</string>
+    <string name="orchestrator_missing_or_outdated_google_play_store_app_alert_title">Application \"Google Play Store\" manquante ou trop ancienne</string>
+    <string name="orchestrator_missing_or_outdated_google_play_store_app_alert_message">L\'application \"Google Play Store\" n\'est pas installée ou n\'est pas à jour.</string>
+    <string name="orchestrator_project_ending_title">Le projet se termine actuellement</string>
+    <string name="orchestrator_project_ending_body">Impossible de lancer la session car le projet se termine actuellement. Veuillez contacter votre superviseur pour plus d\'informations</string>
     <string name="orchestrator_project_paused_title">Le projet est actuellement en pause</string>
     <string name="orchestrator_project_paused_body">Impossible de lancer la session car le projet est actuellement en pause. Veuillez contacter votre superviseur pour plus d\'informations</string>
     <string name="orchestrator_invalid_project_id_error_message">Une erreur de configuration s\'est produite (le champ project ID est invalide), veuillez contacter votre administrateur système.</string>
@@ -136,13 +156,16 @@
     <string name="select_subject_confirmation_sent">Confirmation envoyée</string>
     <string name="select_subject_redirecting_back">Vous allez être redirigé</string>
 
-    <!-- Face config -->
-    <string name="face_configuration_started">Configuration de la modalité de reconnaissance faciale</string>
-    <string name="face_configuration_downloading">Téléchargement des fichiers nécessaires</string>
-    <string name="face_configuration_licence_invalid_title">Licence invalide</string>
-    <string name="face_configuration_licence_invalid_message">La licence pour la reconnaissance faciale n\'est pas valide, veuillez contacter votre administrateur système</string>
-    <string name="face_configuration_generic_error_title">Erreur de configuration</string>
-    <string name="face_configuration_generic_error_message">Une erreur s\'est produite lors de la configuration de la modalité de visage, veuillez contacter votre administrateur système.</string>
+    <!-- Setup module -->
+    <string name="configuration_started">Configuration des modalités</string>
+    <string name="configuration_downloading">Téléchargement des fichiers nécessaires</string>
+    <string name="configuration_backend_maintenance_title">Mode de maintenance</string>
+    <string name="configuration_backend_maintenance_message">Le système est hors ligne pour maintenance. Réessayez plus tard.</string>
+    <string name="configuration_licence_invalid_title">Licence invalide</string>
+    <string name="configuration_licence_invalid_message">La licence n\'est pas valide, veuillez contacter votre administrateur système</string>
+    <string name="configuration_generic_error_title">Erreur de configuration %1$s</string>
+    <string name="configuration_generic_error_message">Une erreur s\'est produite lors de la récupération de la licence, veuillez contacter votre administrateur système</string>
+
 
     <!-- Face capture -->
     <string name="face_capture_onboarding_light">Trouvez un endroit bien éclairé.</string>
@@ -160,7 +183,9 @@
     <string name="face_capture_error_too_close">Reculez</string>
     <string name="face_capture_title_look_straight">La personne ne regarde pas droit devant elle</string>
     <string name="face_capture_error_look_straight">Assurez-vous que la personne regarde droit vers la caméra.</string>
+    <string name="face_capture_begin_button">Touchez pour capturer</string>
     <string name="face_capture_prep_begin_button_capturing">Capture en cours...</string>
+    <string name="face_capturing_permission_denied">Veuillez autoriser les permissions de l\'appareil photo</string>
     <string name="face_capture_hold">Maintenez la position...</string>
     <string name="face_capture_successfully_title">Le visage a été capturé avec succès.</string>
     <string name="face_capture_confirmation_title">Confirmation</string>
@@ -169,6 +194,7 @@
 
     <!-- Fingerprint connect -->
     <string name="fingerprint_connect_error_title">Erreur survenue</string>
+    <string name="fingerprint_connect_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système</string>
     <string name="fingerprint_connect_error_close_button">Fermez</string>
     <string name="fingerprint_connect_try_again_button">Réessayez</string>
     <string name="fingerprint_connect_phone_settings_button">Réglages du téléphone</string>
@@ -196,6 +222,7 @@
     <string name="fingerprint_connect_nfc_cannot_connect_devices">Impossible de connecter les appareils</string>
     <string name="fingerprint_connect_nfc_pairing_in_progress">Scanner %1$s trouvé</string>
     <string name="fingerprint_connect_nfc_pairing_try_again_instruction">Veuillez vous assurer que le scanner %1$s est allumé et réessayez.</string>
+    <string name="fingerprint_connect_nfc_pairing_rejected_instruction">Connexion annulée, veuillez réessayer et accepter la requête de connexion lorsqu\'elle sera demandée. </string>
     <string name="fingerprint_connect_nfc_pair_toast_try_again">Impossible de lire la puce NFC, veuillez réessayer</string>
     <string name="fingerprint_connect_nfc_pair_toast_invalid">La puce NFC détectée est invalid</string>
     <string name="fingerprint_connect_serial_entry_ok">OK</string>
@@ -203,6 +230,7 @@
     <string name="fingerprint_connect_enter_scanner_number">Entrez le numéro du scanner dans la boite ci-dessous</string>
     <string name="fingerprint_connect_enter_scanner_number_detail">Ceci se trouve sous le bas du scanner</string>
     <string name="fingerprint_connect_serial_entry_pair_failed">Veuillez vous assurer que le scanner %1$s est allumé et réessayez.</string>
+    <string name="fingerprint_connect_serial_entry_pair_rejected">Connexion annulée, veuillez réessayer et accepter la requête de connexion lorsqu\'elle sera demandée. </string>
     <string name="fingerprint_connect_serial_entry_pair_toast_invalid">Veuillez entrer les 6 chiffres du numéro de série</string>
     <string name="fingerprint_connect_ota_title">Le scanner doit être mis à jour</string>
     <string name="fingerprint_connect_ota_instructions">Laissez le scanner allumé pendant la mise à jour</string>
@@ -222,11 +250,14 @@
     <string name="fingerprint_connect_pair_scanner_and_device_error_message">1. Vérifiez que le scanner est allumé \\n 2. Cliquez sur réglages \\n 3. Déjumelez tous les scanners jumelés \\n 4. Jumelez votre scanner au téléphone \\n 5. Cliquez sur retour pour repartir à Simprints.</string>
     <string name="fingerprint_connect_turn_scanner_on_error_title">Allumez le scanner</string>
     <string name="fingerprint_connect_turn_scanner_on_error_message">1. Allumez le scanner \\n 2. Cliquez Réessayez</string>
+    <string name="fingerprint_connect_no_permission_error_title">Pas de permission</string>
+    <string name="fingerprint_connect_no_permission_error_message">Veuillez activer les permissions Bluetooth dans les réglages du téléphone.</string>
     <string name="fingerprint_connect_bluetooth_not_supported_error_message">Le bluetooth n\'est pas supporté sur ce téléphone, veuillez contacter votre administrateur système.</string>
     <string name="fingerprint_connect_bluetooth_not_enabled_error_message">Le bluetooth n\'est pas activé, assurez-vous qu\'il soit activé dans les réglages puis réessayez</string>
     <string name="fingerprint_connect_multiple_scanners_found_error_message">Plus d\'un scanner est jumelé au téléphone, veuillez déjumeler les scanners non nécessaire</string>
 
     <!-- Fingerprint capture -->
+    <string name="fingerprint_bio_configuration_started">Configuration de la modalité de reconnaissance par empreintes digitales</string>
     <string name="fingerprint_capture_enrol_title">Inscription</string>
     <string name="fingerprint_capture_identify_title">Identification</string>
     <string name="fingerprint_capture_verify_title">Vérification</string>
@@ -240,6 +271,8 @@
     <string name="fingerprint_capture_finger_r_3">Majeur droit</string>
     <string name="fingerprint_capture_finger_r_4">Annulaire droit</string>
     <string name="fingerprint_capture_finger_r_5">Auriculaire droit</string>
+    <string name="fingerprint_capture_cancel_button" tools:ignore="ButtonCase">Annuler</string>
+    <string name="fingerprint_capture_error_title">Une erreur est survenue</string>
     <string name="fingerprint_capture_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système.</string>
     <string name="fingerprint_capture_please_scan">Veuillez scanner</string>
     <string name="fingerprint_capture_good_scan_direction">Glissez à gauche pour passer au doigt suivant</string>
@@ -272,6 +305,9 @@
     <string name="dashboard_sync_project_ending_message">Impossible de lancer la session car le projet se termine actuellement. Veuillez contacter votre superviseur pour plus d\'informations</string>
 
     <string name="dashboard_request_login_message">Vous devez vous connecter. Veuillez utiliser votre application client pour ouvrir Simprints ID et vous connecter.</string>
+    <string name="dashboard_request_login_device_id">ID de l\'appareil DeviceID : %s</string>
+    <string name="dashboard_request_login_close_reason_dialog">Fermer</string>
+
     <!-- Dashboard - Project card -->
     <string name="dashboard_project_card_scanner_used">Scanner utilisé %1$s</string>
     <string name="dashboard_project_card_current_user">Utilisateur actuel: %1$s</string>
@@ -288,26 +324,32 @@
     <string name="dashboard_sync_card_no_modules_button">Modules</string>
     <string name="dashboard_sync_card_offline_message">Veuillez activer la connexion Internet dans les réglages</string>
     <string name="dashboard_sync_card_offline_button">Réglages</string>
+    <string name="dashboard_sync_card_too_many_modules_message">Trop de modules ont été téléchargés.</string>
+    <string name="dashboard_sync_card_relogin_required">Vous devez vous connecter pour synchroniser.</string>
+
     <string name="dashboard_sync_card_last_sync">Dernière synchronisation : %1$s</string>
     <string name="dashboard_sync_card_records_uploaded">Tous enregistrements téléchargés</string>
+    <plurals name="dashboard_sync_card_records_to_upload">
+        <item quantity="one">%1$d enregistrement à envoyer</item>
+        <item quantity="many">%1$d enregistrements à envoyer</item>
+        <item quantity="other">%1$d enregistrements à envoyer</item>
+    </plurals>
     <string name="dashboard_sync_card_try_again_button">Réessayez</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">Activité : %1$s</string>
-
-    <!--Dashboard always excplicitly displays the number of activities, thus ignoring the ImpliedQuantity-->
-    <plurals name="dashboard_activity_card_enrolments" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Inscription</item>
+    <plurals name="dashboard_activity_card_enrolments">
+        <item quantity="one">%d Inscription</item>
         <item quantity="many">Inscriptions</item>
         <item quantity="other">Inscriptions</item>
     </plurals>
-    <plurals name="dashboard_activity_card_identifications" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Identification</item>
+    <plurals name="dashboard_activity_card_identifications">
+        <item quantity="one">%d Identification</item>
         <item quantity="many">Identifications</item>
         <item quantity="other">Identifications</item>
     </plurals>
-    <plurals name="dashboard_activity_card_verifications" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Vérification</item>
+    <plurals name="dashboard_activity_card_verifications">
+        <item quantity="one">%d Vérification</item>
         <item quantity="many">Vérifications</item>
         <item quantity="other">Vérifications</item>
     </plurals>
@@ -329,12 +371,14 @@
     <string name="dashboard_preference_device_id_title">ID de l\'appareil</string>
     <string name="dashboard_preference_summary_settings_fingers">Sélectionnez les doigts que vous souhaitez scanner</string>
     <string name="dashboard_preference_summary_sync_information">Plus de détails sur la synchronisation</string>
+    <string name="dashboard_preference_copied_to_clipboard">Copié dans le presse-papier</string>
+
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Informations sur la synchronisation</string>
     <string name="dashboard_sync_info_select_modules_button">Sélectionner les modules</string>
     <string name="dashboard_sync_info_records_to_upload">Enregistrements à envoyer</string>
-    <string name="dashboard_sync_info_records_to_download">Enregistrements à télécharger</string>
+    <string name="dashboard_sync_info_records_to_download">Enregistrements à télécharger ou à supprimer</string>
     <string name="dashboard_sync_info_records_to_delete">Enregistrements à supprimer</string>
     <string name="dashboard_sync_info_total_records_on_device">Nombre total d\'enregistrements sur l\'appareil</string>
     <string name="dashboard_sync_info_selected_modules">Modules sélectionnés</string>
@@ -343,6 +387,8 @@
     <string name="dashboard_sync_info_images_to_upload">Images à envoyer</string>
     <string name="dashboard_sync_info_sync_now_button">Synchroniser maintenant</string>
     <string name="dashboard_sync_info_sync_in_progress">Synchronisation…</string>
+    <string name="dashboard_sync_info_re_fetch_button">Re-récupération des informations de synchronisation</string>
+
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">Sélection invalide. Veuillez sélectionner au moins un module.</string>
     <string name="dashboard_select_modules_too_many_modules">Sélection invalide. Veuillez ne pas sélectionner plus de %1$d modules.</string>
@@ -363,6 +409,7 @@
     <string name="dashboard_password_lock_title_default">écrire le mot de passe pour déverrouiller</string>
     <string name="dashboard_password_lock_title_logout">écrire le mot de passe pour déconnecter</string>
     <string name="dashboard_password_lock_hint">Mot de passe</string>
+    <string name="dashboard_password_lock_cancel">Annuler</string>
     <string name="dashboard_password_lock_wrong_pin">Mot de passe incorrect</string>
     <string name="dashboard_password_lock_overlay_title">Appuyez pour déverrouiller</string>
 
@@ -374,10 +421,14 @@
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">La synchronisation des données est essentielle pour garantir que votre projet dispose d\'enregistrements à jour. Ne pas synchroniser vos données sans raison valable aura un impact sur l\'accès de vos collègues aux enregistrements importants et sur la capacité du projet à générer des rapports précis.\n\nNe pas synchroniser les données sans raison valable peut également constituer une violation du protocole de collecte de données et peut entraîner des conséquences indésirables pour vous et le projet.</string>
     <string name="dashboard_logout_confirmation_title">Déconnexion</string>
     <string name="dashboard_logout_confirmation_message">Voulez-vous vous déconnecter ?</string>
+    <string name="dashboard_logout_confirmation_log_out_button">Déconnexion</string>
     <string name="dashboard_logout_confirmation_cancel_button">Annuler</string>
 
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">Le système est hors ligne pour maintenance. Réessayez plus tard.</string>
     <string name="error_backend_maintenance_with_time_message">Le système est hors ligne pour maintenance. Réessayez dans %s</string>
+
+    <!-- Notifications -->
+    <string name="notification_sync_description">Synchronisation en cours</string>
 
 </resources>
