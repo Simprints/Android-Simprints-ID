@@ -135,7 +135,7 @@
     <string name="orchestrator_outdated_google_play_services_alert_message">La version de Services Google Play installé sur cette appareil est plus ancienne de celle nécessaire pour démarrer SID</string>
     <string name="orchestrator_missing_google_play_services_alert_title">Services Google Play manquants</string>
     <string name="orchestrator_missing_google_play_services_alert_message">Les Services Google Play ne sont pas installés sur cette appareil</string>
-    <string name="orchestrator_missing_or_outdated_google_play_store_app_alert_title">Application \"Google Play Store\" manquante ou trop ancienne</string>
+    <string name="orchestrator_missing_or_outdated_google_play_store_app_alert_title">Application \"Google Play Store\" manquante ou obsolète</string>
     <string name="orchestrator_missing_or_outdated_google_play_store_app_alert_message">L\'application \"Google Play Store\" n\'est pas installée ou n\'est pas à jour.</string>
     <string name="orchestrator_project_ending_title">Le projet se termine actuellement</string>
     <string name="orchestrator_project_ending_body">Impossible de lancer la session car le projet se termine actuellement. Veuillez contacter votre superviseur pour plus d\'informations</string>
