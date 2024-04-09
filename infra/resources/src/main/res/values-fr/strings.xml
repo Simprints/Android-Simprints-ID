@@ -51,7 +51,7 @@
     <!-- Exit form -->
     <string name="exit_form_title_fingerprinting">Pourquoi avez-vous passé le scan d\'empreinte digitale ?</string>
     <string name="exit_form_title_biometrics">Pourquoi avez-vous passé la capture biométrique ?</string>
-    <string name="exit_form_title_face">Pourquoi avez-vous ignoré la capture du visage ?</string>
+    <string name="exit_form_title_face">Pourquoi avez-vous passé la capture du visage ?</string>
     <string name="exit_form_other_reason_hint">Informations supplémentaires</string>
     <string name="exit_form_continue_default_button">Retourner à Simprints</string>
     <string name="exit_form_continue_fingerprints_button">Scannez les empreintes digitales</string>
