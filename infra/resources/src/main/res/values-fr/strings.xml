@@ -344,12 +344,12 @@
         <item quantity="other">Inscriptions</item>
     </plurals>
     <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">%d Identification</item>
+        <item quantity="one">Identification</item>
         <item quantity="many">Identifications</item>
         <item quantity="other">Identifications</item>
     </plurals>
     <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">%d Vérification</item>
+        <item quantity="one">Vérification</item>
         <item quantity="many">Vérifications</item>
         <item quantity="other">Vérifications</item>
     </plurals>
