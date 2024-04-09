@@ -70,11 +70,9 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelableArray(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
-            arrayOf(
-                Identification("guid-1", 100, Tier.TIER_5),
-                Identification("guid-2", 75, Tier.TIER_3),
-            )
+        assertThat(extras.getParcelableArrayList<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
+            Identification("guid-1", 100, Tier.TIER_5),
+            Identification("guid-2", 75, Tier.TIER_3),
         )
     }
 
