@@ -249,7 +249,7 @@
     <string name="fingerprint_connect_pair_scanner_and_device_error_title">Jumelez le scanner au téléphone</string>
     <string name="fingerprint_connect_pair_scanner_and_device_error_message">1. Vérifiez que le scanner est allumé \n 2. Cliquez sur réglages \n 3. Déjumelez tous les scanners jumelés \n 4. Jumelez votre scanner au téléphone \n 5. Cliquez sur retour pour repartir à Simprints.</string>
     <string name="fingerprint_connect_turn_scanner_on_error_title">Allumez le scanner</string>
-    <string name="fingerprint_connect_turn_scanner_on_error_message">1. Allumez le scanner \\n 2. Cliquez Réessayez</string>
+    <string name="fingerprint_connect_turn_scanner_on_error_message">1. Allumez le scanner \n 2. Cliquez Réessayez</string>
     <string name="fingerprint_connect_no_permission_error_title">Pas de permission</string>
     <string name="fingerprint_connect_no_permission_error_message">Veuillez activer les permissions Bluetooth dans les réglages du téléphone.</string>
     <string name="fingerprint_connect_bluetooth_not_supported_error_message">Le bluetooth n\'est pas supporté sur ce téléphone, veuillez contacter votre administrateur système.</string>
