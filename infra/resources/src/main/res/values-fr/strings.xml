@@ -278,7 +278,7 @@
     <string name="fingerprint_capture_good_scan_direction">Glissez à gauche pour passer au doigt suivant</string>
     <string name="fingerprint_capture_poor_scan_direction">Veuillez rescanner</string>
     <string name="fingerprint_capture_scanning">En cours de scan...</string>
-    <string name="fingerprint_capture_transfering_data">En cours de transfert de données</string>
+    <string name="fingerprint_capture_transfering_data">En cours de transfert de données...</string>
     <string name="fingerprint_capture_good_scan_message">Scan correct</string>
     <string name="fingerprint_capture_poor_scan_message">Mauvais scan</string>
     <string name="fingerprint_capture_no_finger_detected_message">Pas de doigt détecté</string>
