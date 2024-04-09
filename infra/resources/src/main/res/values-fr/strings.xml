@@ -227,7 +227,7 @@
     <string name="fingerprint_connect_nfc_pair_toast_invalid">La puce NFC détectée est invalid</string>
     <string name="fingerprint_connect_serial_entry_ok">OK</string>
     <string name="fingerprint_connect_serial_entry_pair_title">Scanner déconnecté</string>
-    <string name="fingerprint_connect_enter_scanner_number">Entrez le numéro du scanner dans la boite ci-dessous</string>
+    <string name="fingerprint_connect_enter_scanner_number">Entrez le numéro du scanner</string>
     <string name="fingerprint_connect_enter_scanner_number_detail">Ceci se trouve sous le bas du scanner</string>
     <string name="fingerprint_connect_serial_entry_pair_failed">Veuillez vous assurer que le scanner %1$s est allumé et réessayez.</string>
     <string name="fingerprint_connect_serial_entry_pair_rejected">Connexion annulée, veuillez réessayer et accepter la requête de connexion lorsqu\'elle sera demandée. </string>
