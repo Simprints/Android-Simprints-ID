@@ -160,7 +160,7 @@
     <string name="configuration_started">Configuration des modalités</string>
     <string name="configuration_downloading">Téléchargement des fichiers nécessaires</string>
     <string name="configuration_backend_maintenance_title">Mode de maintenance</string>
-    <string name="configuration_backend_maintenance_message">Le système est hors ligne pour maintenance. Réessayez plus tard.</string>
+    <string name="configuration_backend_maintenance_message">Le système est hors ligne pour maintenance. Veuillez réessayer plus tard.</string>
     <string name="configuration_licence_invalid_title">Licence invalide</string>
     <string name="configuration_licence_invalid_message">La licence n\'est pas valide, veuillez contacter votre administrateur système</string>
     <string name="configuration_generic_error_title">Erreur de configuration %1$s</string>
