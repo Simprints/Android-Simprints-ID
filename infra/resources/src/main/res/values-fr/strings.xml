@@ -54,7 +54,7 @@
     <string name="exit_form_title_face">Pourquoi avez-vous passé la capture du visage ?</string>
     <string name="exit_form_other_reason_hint">Informations supplémentaires</string>
     <string name="exit_form_continue_default_button">Retourner à Simprints</string>
-    <string name="exit_form_continue_fingerprints_button">Scannez les empreintes digitales</string>
+    <string name="exit_form_continue_fingerprints_button">Scanner les empreintes digitales</string>
     <string name="exit_form_continue_face_button">Capturer le visage</string>
     <string name="exit_form_submit_button">Soumettre</string>
     <string name="exit_form_select_option_submit_warning">Veuillez sélectionner une option et soumettre</string>
