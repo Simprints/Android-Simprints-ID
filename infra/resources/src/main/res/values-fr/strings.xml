@@ -193,7 +193,7 @@
     <string name="face_capture_finish_button">Touchez pour continuer</string>
 
     <!-- Fingerprint connect -->
-    <string name="fingerprint_connect_error_title">Erreur survenue</string>
+    <string name="fingerprint_connect_error_title">Une erreur est survenue</string>
     <string name="fingerprint_connect_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système</string>
     <string name="fingerprint_connect_error_close_button">Fermez</string>
     <string name="fingerprint_connect_try_again_button">Réessayez</string>
