@@ -36,7 +36,7 @@
     <string name="consent_privacy_notice_button">Politique de confidentialité</string>
     <string name="consent_privacy_notice_title">Politique de confidentialité</string>
     <string name="consent_privacy_notice_download_button">Téléchargez la politique de confidentialité</string>
-    <string name="consent_privacy_notice_downloading">Téléchargement de l\'avis de confidentialité</string>
+    <string name="consent_privacy_notice_downloading">Téléchargement de la politique de confidentialité</string>
     <string name="consent_privacy_notice_failed_to_download">Le téléchargement de la politique de confidentialité a échoué.</string>
 
     <!-- Enrol last -->
