@@ -25,9 +25,11 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-            Constants.SIMPRINTS_IDENTIFICATIONS to response.identifications
-                .map { Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name)) }
-                .toTypedArray(),
+            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<Identification>(
+                response.identifications.map {
+                    Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
+                }
+            ),
         ).appendCoSyncData(response.eventsJson)
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
@@ -97,6 +99,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
     }
 
     companion object {
+
         internal const val RESULT_CODE_OVERRIDE = "result_code_override"
     }
 }
