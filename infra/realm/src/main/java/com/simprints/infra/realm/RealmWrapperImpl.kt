@@ -102,10 +102,16 @@ class RealmWrapperImpl @Inject constructor(
     private fun getLocalDbKey(): LocalDbKey =
         authStore.signedInProjectId.let {
             return if (it.isNotEmpty()) {
-                securityManager.getLocalDbKeyOrThrow(it)
-            } else {
-                throw RealmUninitialisedException("No signed in project id found")
-            }
+                try {
+                    securityManager.getLocalDbKeyOrThrow(it)
+                } catch (ex: Exception) {
+                    Simber.e(ex)
+                    securityManager.recreateLocalDatabaseKey(it)
+                    securityManager.getLocalDbKeyOrThrow(it)
+                }
+              } else {
+                  throw RealmUninitialisedException("No signed in project id found")
+              }
         }
 
     private fun recreateLocalDbKey() =
