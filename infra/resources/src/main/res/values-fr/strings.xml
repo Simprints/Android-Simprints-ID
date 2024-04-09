@@ -87,7 +87,7 @@
     <string name="login_invalid_qr_code_error">Le QRCode scanné n\'est pas valide.</string>
     <string name="login_missing_credentials_error">Informations d\'identification manquantes. Veuillez vérifier l\'ID utilisateur, l\'ID projet et la clé, et réessayer.</string>
     <string name="login_invalid_credentials_error">Informations d\'identification invalides. Veuillez vérifier l\'ID et la clé du projet</string>
-    <string name="login_project_id_intent_mismatch_error">L\'ID du projet est différent de celui fourni dans l\'intention. Veuillez contacter votre administrateur système.</string>
+    <string name="login_project_id_intent_mismatch_error">L\'ID du projet est différent de celui fourni dans l\'appel depuis l\'autre application. Veuillez contacter votre administrateur système.</string>
     <string name="login_no_network_error">Actuellement hors ligne. Veuillez vérifier votre connexion Internet.</string>
     <string name="login_integrity_service_down_error">Une erreur s\'est produite en essayant de contacter le Service d\'Intégrité. Veuillez réessayer plus tard.</string>
     <string name="login_server_error">Un problème est survenu en essayant de contacter le serveur. Veuillez réessayer plus tard.</string>
