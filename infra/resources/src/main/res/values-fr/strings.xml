@@ -106,7 +106,7 @@
         <item quantity="other">Comparé à %d candidats.</item>
     </plurals>
     <plurals name="matcher_returned_results">
-        <item quantity="one">A retourné %d résultats.</item>
+        <item quantity="one">A retourné %d résultat.</item>
         <item quantity="many">A retourné %d résultats.</item>
         <item quantity="other">A retourné %d résultats.</item>
     </plurals>
