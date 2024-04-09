@@ -144,7 +144,7 @@
     <string name="orchestrator_invalid_project_id_error_message">Une erreur de configuration s\'est produite (le champ project ID est invalide), veuillez contacter votre administrateur système.</string>
     <string name="orchestrator_invalid_selected_id_error_message">Une erreur de configuration s\'est produite (le champ selected Id est invalide), veuillez contacter votre administrateur système.</string>
     <string name="orchestrator_invalid_session_id_error_message">Une erreur de configuration s\'est produite (le champ session ID est invalide), veuillez contacter votre administrateur système.</string>
-    <string name="orcehstrator_invalid_action_error_message">Une erreur de configuration s\'est produite (action intentionnelle invalide), veuillez contacter votre administrateur système.</string>
+    <string name="orcehstrator_invalid_action_error_message">Une erreur de configuration s\'est produite (action d\'appel depuis l\'autre application est invalide), veuillez contacter votre administrateur système.</string>
     <string name="orchestrator_invalid_metadata_error_message">Une erreur de configuration s\'est produite (le champ metadata est invalide), veuillez contacter votre administrateur système.</string>
     <string name="orchestrator_invalid_user_id_error_message">Une erreur de configuration s\'est produite (le champ user ID est invalide), veuillez contacter votre administrateur système.</string>
     <string name="orchestrator_invalid_module_id_error_message">Une erreur de configuration s\'est produite (le champ module ID est invalide), veuillez contacter votre administrateur système.</string>
