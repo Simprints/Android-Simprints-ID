@@ -401,7 +401,7 @@
     <string name="dashboard_select_modules_confirm_no">Annuler</string>
 
     <!-- Dashboard - Finger selection -->
-    <string name="dashboard_select_fingers_title">Choississez les doigts</string>
+    <string name="dashboard_select_fingers_title">Voir les doigts</string>
     <string name="dashboard_select_fingers_finger_label">Doigt</string>
     <string name="dashboard_select_fingers_quantity_label">Quantité</string>
 
