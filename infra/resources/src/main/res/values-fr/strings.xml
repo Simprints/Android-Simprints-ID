@@ -406,8 +406,8 @@
     <string name="dashboard_select_fingers_quantity_label">Quantité</string>
 
     <!-- Dashboard - Settings lock dialog-->
-    <string name="dashboard_password_lock_title_default">écrire le mot de passe pour déverrouiller</string>
-    <string name="dashboard_password_lock_title_logout">écrire le mot de passe pour déconnecter</string>
+    <string name="dashboard_password_lock_title_default">Entrer le mot de passe pour déverrouiller</string>
+    <string name="dashboard_password_lock_title_logout">Entrer le mot de passe pour déconnecter</string>
     <string name="dashboard_password_lock_hint">Mot de passe</string>
     <string name="dashboard_password_lock_cancel">Annuler</string>
     <string name="dashboard_password_lock_wrong_pin">Mot de passe incorrect</string>
