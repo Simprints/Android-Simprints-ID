@@ -397,7 +397,7 @@
     <string name="dashboard_select_modules_no_results">Aucun résultat</string>
     <string name="dashboard_select_modules_selected">Modules sélectionnés</string>
     <string name="dashboard_select_modules_confirm_title">Modules sélectionnés</string>
-    <string name="dashboard_select_modules_confirm_yes">Validez</string>
+    <string name="dashboard_select_modules_confirm_yes">Valider</string>
     <string name="dashboard_select_modules_confirm_no">Annuler</string>
 
     <!-- Dashboard - Finger selection -->
