@@ -357,7 +357,7 @@
     <!-- Dashboard - Settings -->
     <string name="dashboard_settings_title">Réglages</string>
     <string name="dashboard_settings_about_title">À propos</string>
-    <string name="dashboard_preferences_general_category_title">GÉNÉRALITÉS</string>
+    <string name="dashboard_preferences_general_category_title">GÉNÉRAL</string>
     <string name="dashboard_preference_app_details_category_title">DÉTAILS DE L\'APPLICATION</string>
     <string name="dashboard_preference_app_details_title">À propos</string>
     <string name="dashboard_preference_sync_and_search_title">Configuration de la synchronisation et de la recherche</string>
