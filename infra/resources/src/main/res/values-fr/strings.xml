@@ -28,7 +28,7 @@
     <string name="consent_biometrics_access_fingerprint">empreintes digitales</string>
     <string name="consent_biometrics_access_face">photos</string>
     <string name="consent_biometrics_access_fingerprint_face">empreintes digitales, photos</string>
-    <string name="consent_biometrics_parental_fingerprint">scanner les empreintes digitales de votre enfant</string>
+    <string name="consent_biometrics_parental_fingerprint">utiliser les empreintes digitales de votre enfant</string>
     <string name="consent_biometrics_parental_face">prendre des photos du visage de votre enfant</string>
     <string name="consent_biometric_concat_modalities">et</string>
     <string name="consent_decline_button">Refuser</string>
