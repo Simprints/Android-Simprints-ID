@@ -411,7 +411,7 @@
     <string name="dashboard_password_lock_hint">Mot de passe</string>
     <string name="dashboard_password_lock_cancel">Annuler</string>
     <string name="dashboard_password_lock_wrong_pin">Mot de passe incorrect</string>
-    <string name="dashboard_password_lock_overlay_title">Tappez pour déverrouiller</string>
+    <string name="dashboard_password_lock_overlay_title">Tapez pour déverrouiller</string>
 
     <!-- Dashboard - Logout request -->
     <string name="dashboard_logout_title">Déconnexion</string>
