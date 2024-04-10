@@ -285,7 +285,7 @@
     <string name="fingerprint_capture_finger_skipped_message">Doigt ignoré</string>
     <string name="fingerprint_capture_no_fingers_scanned">Veuillez scanner au moins 1 doigt requis</string>
     <string name="fingerprint_capture_confirm_fingers_dialog_title">Doigts scannés</string>
-    <string name="fingerprint_capture_confirm_fingers_dialog_yes">Validez</string>
+    <string name="fingerprint_capture_confirm_fingers_dialog_yes">Valider</string>
     <string name="fingerprint_capture_confirm_fingers_dialog_no">Recommencer</string>
     <string name="fingerprint_capture_capture_number_text">Scan %1$s sur %2$s</string>
     <string name="fingerprint_capture_please_scan_again">Veuillez scanner à nouveau</string>
