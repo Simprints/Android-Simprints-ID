@@ -369,7 +369,7 @@
     <string name="dashboard_preference_sync_information_title">Informations sur la synchronisation</string>
     <string name="dashboard_preference_scanner_version_title">Version du scanner</string>
     <string name="dashboard_preference_device_id_title">ID de l\'appareil</string>
-    <string name="dashboard_preference_summary_settings_fingers">Sélectionnez les doigts que vous souhaitez scanner</string>
+    <string name="dashboard_preference_summary_settings_fingers">Voir les doigts qui vont être scannés</string>
     <string name="dashboard_preference_summary_sync_information">Plus de détails sur la synchronisation</string>
     <string name="dashboard_preference_copied_to_clipboard">Copié dans le presse-papier</string>
 
