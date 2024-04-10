@@ -294,7 +294,7 @@
     <string name="fingerprint_capture_scan">Scanner</string>
     <string name="fingerprint_capture_please_wait">Veuillez attendre</string>
     <string name="fingerprint_capture_missing_finger_button"><u>Doigt manquant</u></string>
-    <string name="fingerprint_capture_try_another_title">Soyez prêt</string>
+    <string name="fingerprint_capture_try_another_title">Préparez vous</string>
     <string name="fingerprint_capture_try_another_finger">Veuillez essayer un autre doigt</string>
 
     <!-- Dashboard -->
