@@ -13,7 +13,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +42,6 @@ internal class LogoutSyncViewModelTest {
         val viewModel = LogoutSyncViewModel(
             configRepository = configRepository,
             logoutUseCase = logoutUseCase,
-            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
 
         viewModel.logout()
@@ -62,7 +60,6 @@ internal class LogoutSyncViewModelTest {
         val viewModel = LogoutSyncViewModel(
             configRepository = configRepository,
             logoutUseCase = logoutUseCase,
-            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
         val resultConfig = viewModel.settingsLocked.getOrAwaitValue()
         assertThat(resultConfig.peekContent()).isEqualTo(config)

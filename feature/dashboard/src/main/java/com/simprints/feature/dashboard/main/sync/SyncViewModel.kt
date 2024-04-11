@@ -58,7 +58,6 @@ internal class SyncViewModel @Inject constructor(
     private val authStore: AuthStore,
     private val logoutUseCase: LogoutUseCase,
     private val recentUserActivityManager: RecentUserActivityManager,
-    @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     companion object {
@@ -106,7 +105,7 @@ internal class SyncViewModel @Inject constructor(
                     configRepository.getProject(authStore.signedInProjectId).state == ProjectState.PROJECT_ENDING
 
                 if (isSyncComplete && isProjectEnding) {
-                    externalScope.launch {
+                    viewModelScope.launch {
                         logoutUseCase()
                         _signOutEventLiveData.postValue(LiveDataEvent())
                     }

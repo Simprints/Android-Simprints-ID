@@ -44,7 +44,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
@@ -446,6 +445,5 @@ internal class SyncViewModelTest {
         authStore = authStore,
         logoutUseCase = logoutUseCase,
         recentUserActivityManager = recentUserActivityManager,
-        externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
     )
 }
