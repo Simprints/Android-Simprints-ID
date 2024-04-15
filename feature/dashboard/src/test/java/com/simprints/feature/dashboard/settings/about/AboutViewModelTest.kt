@@ -20,7 +20,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -67,7 +66,6 @@ class AboutViewModelTest {
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
-            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
@@ -186,7 +184,6 @@ class AboutViewModelTest {
             configRepository = configRepository,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
             logoutUseCase = logoutUseCase,
         )
     }
