@@ -27,6 +27,7 @@ import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
+import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -79,6 +80,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState != null) {
             orchestratorVm.requestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
+            savedInstanceState.getString(KEY_ACTION_REQUEST)
+                ?.run(orchestratorVm::setActionRequestFromJson)
         }
         observeLoginCheckVm()
         observeClientApiVm()
@@ -180,6 +183,10 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(KEY_REQUEST_PROCESSED, orchestratorVm.requestProcessed)
+        // [MS-405] Saving the action request in the bundle, since ViewModels don't survive the
+        // process death. ActionRequest is important in mapping the correct SID response, hence it
+        // is important for it to be able to survive both configuration changes and process death.
+        outState.putString(KEY_ACTION_REQUEST, orchestratorVm.getActionRequestJson())
     }
 
     override fun onResume() {
@@ -201,5 +208,6 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     companion object {
         private const val KEY_REQUEST_PROCESSED = "requestProcessed"
+        private const val KEY_ACTION_REQUEST = "actionRequest"
     }
 }

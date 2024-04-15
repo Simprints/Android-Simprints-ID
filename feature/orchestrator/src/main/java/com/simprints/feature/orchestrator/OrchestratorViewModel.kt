@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -161,4 +162,14 @@ internal class OrchestratorViewModel @Inject constructor(
             }
         }
     }
+
+    fun setActionRequestFromJson(json: String) {
+        try {
+            actionRequest = JsonHelper.fromJson<ActionRequest>(json)
+        } catch (e: Exception) {
+            Simber.e(e)
+        }
+    }
+
+    fun getActionRequestJson() = actionRequest?.run(JsonHelper::toJson)
 }
