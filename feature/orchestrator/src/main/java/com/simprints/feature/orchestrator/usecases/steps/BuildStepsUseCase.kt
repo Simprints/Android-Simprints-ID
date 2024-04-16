@@ -82,6 +82,19 @@ internal class BuildStepsUseCase @Inject constructor(
             )
         )
 
+        // TODO PoC
+        is ActionRequest.VerifyIdentityRequest -> listOf(
+            buildSetupStep(),
+            // TODO add a step to extract subject image from URI and save with provided subject ID GUID
+            buildModalityCaptureSteps(projectConfiguration, FlowType.VERIFY),
+            buildModalityMatcherSteps(
+                projectConfiguration,
+                FlowType.VERIFY,
+                SubjectQuery(subjectId = action.subjectGuid),
+                BiometricDataSource.fromString(action.biometricDataSource),
+            ),
+        )
+
         is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
             buildEnrolLastBiometricStep(action),
         )
