@@ -5,7 +5,6 @@ import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.sync.SyncOrchestrator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class LogoutUseCase @Inject constructor(
@@ -14,13 +13,12 @@ internal class LogoutUseCase @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
-    suspend operator fun invoke() {
-        authManager.signOut()
-
+    suspend operator fun invoke() = externalScope.launch {
         // Cancel all background sync
-        externalScope.launch {
-            syncOrchestrator.cancelBackgroundWork()
-            syncOrchestrator.deleteEventSyncInfo()
-        }
+        syncOrchestrator.cancelBackgroundWork()
+        syncOrchestrator.deleteEventSyncInfo()
+        // sign out the user
+        authManager.signOut()
     }
+
 }
