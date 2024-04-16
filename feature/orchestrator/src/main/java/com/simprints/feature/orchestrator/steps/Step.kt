@@ -11,6 +11,7 @@ import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
+import com.simprints.feature.importsubject.ImportSubjectResult
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectsubject.SelectSubjectResult
@@ -53,6 +54,8 @@ import java.io.Serializable
     JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
     JsonSubTypes.Type(value = FetchSubjectResult::class, name = "FetchSubjectResult"),
+    // TODO Poc
+    JsonSubTypes.Type(value = ImportSubjectResult::class, name = "ImportSubjectResult"),
     JsonSubTypes.Type(value = SelectSubjectResult::class, name = "SelectSubjectResult"),
     JsonSubTypes.Type(value = AlertResult::class, name = "AlertResult"),
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),

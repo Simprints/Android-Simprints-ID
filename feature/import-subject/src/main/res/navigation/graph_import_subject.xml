@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_import_subject"
+    app:startDestination="@id/importSubjectFragment">
+
+    <fragment
+        android:id="@+id/importSubjectFragment"
+        android:name="com.simprints.feature.importsubject.screen.ImportSubjectFragment"
+        android:label="ImportSubjectFragment"
+        tools:layout="@layout/fragment_subject_import">
+
+        <argument
+            android:name="projectId"
+            app:argType="string" />
+
+        <argument
+            android:name="subjectId"
+            app:argType="string" />
+
+        <argument
+            android:name="image"
+            app:argType="string" />
+    </fragment>
+
+    <include app:graph="@navigation/graph_alert" />
+
+    <action
+        android:id="@+id/action_fetchSubjectFragment_to_errorFragment"
+        app:destination="@id/graph_alert"
+        app:popUpTo="@id/importSubjectFragment" />
+
+</navigation>

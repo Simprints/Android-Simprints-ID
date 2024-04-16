@@ -32,6 +32,10 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         is ActionRequest.VerifyActionRequest -> handleVerify(projectConfiguration, results)
         is ActionRequest.ConfirmIdentityActionRequest -> handleConfirmIdentity(results)
         is ActionRequest.EnrolLastBiometricActionRequest -> handleEnrolLastBiometric(results)
+
+        // TODO PoC
+        is ActionRequest.VerifyIdentityRequest -> handleVerify(projectConfiguration, results)
+
         null -> AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
     }
 }

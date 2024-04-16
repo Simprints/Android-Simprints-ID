@@ -18,6 +18,9 @@ internal object StepId {
     const val VALIDATE_ID_POOL = STEP_BASE_CORE + 6
     const val SELECT_SUBJECT_AGE = STEP_BASE_CORE + 7
 
+    // TODO PoC
+    const val IMPORT_SUBJECT = STEP_BASE_CORE + 42
+
     // Face step ids
     private const val STEP_BASE_FINGERPRINT = 300
     const val FINGERPRINT_CAPTURE = STEP_BASE_FINGERPRINT + 2

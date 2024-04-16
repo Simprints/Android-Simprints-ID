@@ -20,6 +20,8 @@ import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
+import com.simprints.feature.importsubject.ImportSubjectContract
+import com.simprints.feature.importsubject.ImportSubjectResult
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.logincheck.LoginCheckViewModel
@@ -109,6 +111,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(SetupContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(ConsentContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(SelectSubjectContract.DESTINATION, orchestratorVm::handleResult)
+        // TODO PoC
+        handleResult(ImportSubjectContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(EnrolLastBiometricContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(ExitFormContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(MatchContract.DESTINATION, orchestratorVm::handleResult)

@@ -18,6 +18,8 @@ dependencies {
     implementation(project(":feature:enrol-last-biometric"))
     implementation(project(":feature:fetch-subject"))
     implementation(project(":feature:select-subject"))
+    // TODO PoC
+    implementation(project(":feature:import-subject"))
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:matcher"))
     implementation(project(":feature:validate-subject-pool"))

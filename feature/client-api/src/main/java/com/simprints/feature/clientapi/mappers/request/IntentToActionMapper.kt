@@ -5,11 +5,13 @@ import com.simprints.feature.clientapi.mappers.request.builders.ConfirmIdentifyR
 import com.simprints.feature.clientapi.mappers.request.builders.EnrolLastBiometricsRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.builders.EnrolRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.builders.IdentifyRequestBuilder
+import com.simprints.feature.clientapi.mappers.request.builders.VerifyIdentityRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.builders.VerifyRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiometricsRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.IdentifyRequestExtractor
+import com.simprints.feature.clientapi.mappers.request.extractors.VerifyIdentityRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.odk.OdkEnrolRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.odk.OdkIdentifyRequestExtractor
@@ -18,6 +20,7 @@ import com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentit
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiometricsValidator
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolValidator
 import com.simprints.feature.clientapi.mappers.request.validators.IdentifyValidator
+import com.simprints.feature.clientapi.mappers.request.validators.VerifyIdentityValidator
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.models.CommCareConstants
@@ -185,6 +188,13 @@ internal class IntentToActionMapper @Inject constructor(
             project = project
         )
 
+        // TODO PoC
+        ActionConstants.ACTION_VERIFY_IDENTITY -> verifyIdentityBuilder(
+            actionIdentifier = actionIdentifier,
+            extractor = VerifyIdentityRequestExtractor(extras),
+            project = project
+        )
+
         else -> throw InvalidRequestException(
             "Invalid LibSimprints action", ClientApiError.INVALID_STATE_FOR_INTENT_ACTION
         )
@@ -224,6 +234,19 @@ internal class IntentToActionMapper @Inject constructor(
         project = project,
         tokenizationProcessor = tokenizationProcessor,
         validator = IdentifyValidator(extractor)
+    )
+
+    // TODO PoC
+    private fun verifyIdentityBuilder(
+        actionIdentifier: ActionRequestIdentifier,
+        extractor: VerifyIdentityRequestExtractor,
+        project: Project?
+    ) = VerifyIdentityRequestBuilder(
+        actionIdentifier = actionIdentifier,
+        extractor = extractor,
+        project = project,
+        tokenizationProcessor = tokenizationProcessor,
+        validator = VerifyIdentityValidator(extractor)
     )
 
     private suspend fun enrolLastBiometricsBuilder(

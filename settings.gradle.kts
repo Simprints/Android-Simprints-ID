@@ -105,6 +105,7 @@ include(
     ":feature:login",
     ":feature:fetch-subject",
     ":feature:select-subject",
+    ":feature:import-subject", // TODO PoC
     ":feature:enrol-last-biometric",
     ":feature:dashboard",
     ":feature:alert",

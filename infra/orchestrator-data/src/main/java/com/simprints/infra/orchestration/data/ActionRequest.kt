@@ -76,6 +76,20 @@ sealed class ActionRequest(
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras), FlowAction
 
+    // TODO PoC
+    @Keep
+    data class VerifyIdentityRequest(
+        override val actionIdentifier: ActionRequestIdentifier,
+        override val projectId: String,
+        override val userId: TokenizableString,
+        override val moduleId: TokenizableString,
+        val biometricDataSource: String,
+        val image: String,
+        val subjectGuid: String,
+        override val metadata: String,
+        override val unknownExtras: Map<String, Any?>,
+    ) : ActionRequest(actionIdentifier, projectId, userId, metadata, unknownExtras), FlowAction
+
     @Keep
     data class ConfirmIdentityActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,

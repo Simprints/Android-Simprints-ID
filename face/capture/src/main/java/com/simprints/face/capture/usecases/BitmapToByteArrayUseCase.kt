@@ -36,7 +36,11 @@ internal class BitmapToByteArrayUseCase @Inject constructor(@ApplicationContext 
         val newHeight = (bitmap.height / scaleFactor).toInt()
 
         // Resize the bitmap
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-
+        return Bitmap.createScaledBitmap(
+            bitmap.copy(Bitmap.Config.ARGB_8888, true),
+            newWidth,
+            newHeight,
+            true
+        )
     }
 }

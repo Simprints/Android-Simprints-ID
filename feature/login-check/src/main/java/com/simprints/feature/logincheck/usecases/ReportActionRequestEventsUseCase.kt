@@ -58,6 +58,9 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                 is ActionRequest.VerifyActionRequest -> VerificationCalloutEvent(startTime, projectId, userId, moduleId, verifyGuid, metadata)
                 is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEvent(startTime, projectId, selectedGuid, sessionId)
                 is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEvent(startTime, projectId, userId, moduleId, metadata, sessionId)
+
+                // TODO PoC (events do not matter for this PoC)
+                is ActionRequest.VerifyIdentityRequest -> EnrolmentCalloutEvent(startTime, projectId, userId, moduleId, metadata)
             }
         }
         sessionEventRepository.addOrUpdateEvent(event)

@@ -79,4 +79,10 @@
         android:id="@+id/action_orchestratorFragment_to_validateSubjectPool"
         app:destination="@id/graph_validate_subject_pool"
         />
+
+    <!--  TODO PoC  -->
+    <include app:graph="@navigation/graph_import_subject" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_importSubject"
+        app:destination="@id/graph_import_subject" />
 </navigation>

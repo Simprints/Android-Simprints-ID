@@ -7,6 +7,7 @@ import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
+import com.simprints.feature.importsubject.ImportSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
@@ -81,6 +82,23 @@ internal class BuildStepsUseCase @Inject constructor(
             ),
             buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
             buildCaptureAndMatchStepsForVerify(action, projectConfiguration)
+        )
+
+       is ActionRequest.VerifyIdentityRequest -> listOf(
+            buildSetupStep(),
+            // TODO add a step to extract subject image from URI and save with provided subject ID GUID
+            buildImportSubjectStep(action), // TODO PoC
+            buildCaptureSteps(projectConfiguration, FlowType.VERIFY, null),
+            buildMatcherSteps(
+                projectConfiguration,
+                FlowType.VERIFY,
+                null,
+                SubjectQuery(subjectId = action.subjectGuid),
+                BiometricDataSource.fromString(
+                    action.biometricDataSource,
+                    action.actionIdentifier.packageName
+                ),
+            ),
         )
 
         is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
@@ -507,4 +525,16 @@ internal class BuildStepsUseCase @Inject constructor(
             FlowType.VERIFY -> projectConfiguration.general.matchingModalities
         }
     }
+
+    // TODO PoC
+    private fun buildImportSubjectStep(action: ActionRequest.VerifyIdentityRequest) = listOf(Step(
+        id = StepId.IMPORT_SUBJECT,
+        navigationActionId = R.id.action_orchestratorFragment_to_importSubject,
+        destinationId = ImportSubjectContract.DESTINATION,
+        payload = ImportSubjectContract.getArgs(
+            projectId = action.projectId,
+            subjectId = action.subjectGuid,
+            image64 = action.image,
+        ),
+    ))
 }

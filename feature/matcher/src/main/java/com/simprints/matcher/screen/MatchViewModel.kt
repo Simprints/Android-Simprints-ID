@@ -128,9 +128,10 @@ internal class MatchViewModel @Inject constructor(
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
 
-        private const val veryGoodMatchThreshold = 50.0
-        private const val goodMatchThreshold = 35.0
-        private const val fairMatchThreshold = 20.0
+         // TODO PoC - reduced to allow any match
+        private const val veryGoodMatchThreshold = 50.0 // 50.0
+        private const val goodMatchThreshold = 5.0 // 35.0
+        private const val fairMatchThreshold = 1.0 // 20.0
         private const val matchingEndWaitTimeInMillis = 1000L
     }
 }
