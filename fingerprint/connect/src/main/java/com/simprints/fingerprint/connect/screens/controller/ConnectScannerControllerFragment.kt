@@ -81,8 +81,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     }
 
     private val hostFragment: Fragment?
-        get() = childFragmentManager
-            .findFragmentById(R.id.connect_scanner_host_fragment)
+        get() = childFragmentManager.findFragmentById(R.id.connect_scanner_host_fragment)
 
     private val internalNavController: NavController?
         get() = hostFragment?.findNavController()
@@ -157,13 +156,6 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         }
 
         internalNavController?.setGraph(R.navigation.graph_connect_internal)
-
-        if (shouldRequestPermissions) {
-            shouldRequestPermissions = false
-            checkBluetoothPermissions()
-        } else {
-            alertHelper.handleResume { shouldRequestPermissions = true }
-        }
     }
 
     private fun showKnownScannerDialog(scannerId: String) {
@@ -187,7 +179,13 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
     override fun onResume() {
         super.onResume()
-        alertHelper.handleResume { shouldRequestPermissions = true }
+
+        if (shouldRequestPermissions) {
+            shouldRequestPermissions = false
+            checkBluetoothPermissions()
+        } else {
+            alertHelper.handleResume { shouldRequestPermissions = true }
+        }
     }
 
     override fun onPause() {
