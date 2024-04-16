@@ -414,6 +414,7 @@ internal class SyncViewModelTest {
         assertThat(syncCardLiveData).isEqualTo(SyncTryAgain(DATE))
     }
 
+    @Suppress("DeferredResultUnused")
     @Test
     fun `should logout when project is ending and sync is complete`() {
         coEvery { configRepository.getDeviceConfiguration() } returns deviceConfiguration
@@ -443,7 +444,7 @@ internal class SyncViewModelTest {
         configRepository = configRepository,
         timeHelper = timeHelper,
         authStore = authStore,
-        logoutUseCase = logoutUseCase,
+        logout = logoutUseCase,
         recentUserActivityManager = recentUserActivityManager,
     )
 }

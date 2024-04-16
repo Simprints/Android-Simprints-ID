@@ -8,6 +8,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
@@ -20,6 +21,7 @@ import com.simprints.feature.login.LoginResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
@@ -54,8 +56,10 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
             findNavController().navigate(R.id.action_logoutSyncFragment_to_logoutSyncDeclineFragment)
         }
         logoutButton.setOnClickListener {
-            logoutSyncViewModel.logout()
-            findNavController().navigate(R.id.action_logoutSyncFragment_to_requestLoginFragment)
+            lifecycleScope.launch {
+                logoutSyncViewModel.logout().await()
+                findNavController().navigate(R.id.action_logoutSyncFragment_to_requestLoginFragment)
+            }
         }
     }
 

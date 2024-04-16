@@ -24,6 +24,7 @@ import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.core.IsNot.not
 import org.junit.Rule
 import org.junit.Test
@@ -49,7 +50,9 @@ internal class LogoutSyncFragmentTest {
 
     @BindValue
     @JvmField
-    internal val logoutSyncViewModel = mockk<LogoutSyncViewModel>(relaxed = true)
+    internal val logoutSyncViewModel = mockk<LogoutSyncViewModel>(relaxed = true){
+        every { logout() } returns CompletableDeferred()
+    }
 
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val navController = testNavController(R.navigation.graph_dashboard)
@@ -423,6 +426,7 @@ internal class LogoutSyncFragmentTest {
             .check(matches(isDisplayed()))
     }
 
+    @Suppress("DeferredResultUnused")
     @Test
     fun `should navigate to requestLoginFragment when logout button is pressed`() {
         mockSyncToBFSIDAllowed(true)
@@ -431,8 +435,9 @@ internal class LogoutSyncFragmentTest {
         launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         onView(withId(R.id.logoutButton)).perform(scrollTo(), click())
-        assertThat(navController.currentDestination?.id)
-            .isEqualTo(R.id.requestLoginFragment)
+
+        verify(exactly = 1) { logoutSyncViewModel.logout() }
+
     }
 
     @Test

@@ -13,6 +13,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,8 +38,9 @@ internal class LogoutSyncViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
     }
 
+    @Suppress("DeferredResultUnused")
     @Test
-    fun `should logout correctly`() {
+    fun `should logout correctly`()= runTest {
         val viewModel = LogoutSyncViewModel(
             configRepository = configRepository,
             logoutUseCase = logoutUseCase,

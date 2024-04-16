@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val logoutUseCase: LogoutUseCase,
+    private val logout: LogoutUseCase,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
@@ -58,7 +58,7 @@ internal class AboutViewModel @Inject constructor(
                 when (canSyncDataToSimprints() && hasEventsToUpload()) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
-                        logout()
+                        logout().await()
                         LogoutDestination.LoginScreen
                     }
                 }
@@ -72,9 +72,6 @@ internal class AboutViewModel @Inject constructor(
     private suspend fun canSyncDataToSimprints(): Boolean =
         configRepository.getProjectConfiguration().canSyncDataToSimprints()
 
-    private fun logout() {
-        viewModelScope.launch { logoutUseCase() }
-    }
 
     private fun load() = viewModelScope.launch {
         val configuration = configRepository.getProjectConfiguration()

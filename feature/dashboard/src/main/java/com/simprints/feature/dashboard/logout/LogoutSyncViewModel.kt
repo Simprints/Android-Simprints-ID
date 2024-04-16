@@ -9,7 +9,6 @@ import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,7 +23,6 @@ internal class LogoutSyncViewModel @Inject constructor(
         }
 
 
-    fun logout() {
-        viewModelScope.launch { logoutUseCase() }
-    }
+    fun logout() = logoutUseCase()
 }
+

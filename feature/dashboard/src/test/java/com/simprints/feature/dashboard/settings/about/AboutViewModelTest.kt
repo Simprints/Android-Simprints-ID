@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
+@Suppress("DeferredResultUnused")
 class AboutViewModelTest {
 
     companion object {
@@ -65,7 +66,7 @@ class AboutViewModelTest {
             configRepository = configRepository,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            logoutUseCase = logoutUseCase,
+            logout = logoutUseCase,
         )
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
@@ -184,7 +185,7 @@ class AboutViewModelTest {
             configRepository = configRepository,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            logoutUseCase = logoutUseCase,
+            logout = logoutUseCase,
         )
     }
 }
