@@ -7,7 +7,6 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -36,7 +35,6 @@ class LogoutUseCaseTest {
         useCase = LogoutUseCase(
             syncOrchestrator = syncOrchestrator,
             authManager = authManager,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
