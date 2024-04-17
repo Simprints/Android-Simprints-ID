@@ -37,7 +37,7 @@ import com.simprints.infra.resources.R as IDR
 
 
 /**
- * This is the class presented as the user is capturing theface, they are presented with this fragment, which displays
+ * As the user is capturing subject's face, they are presented with this fragment, which displays
  * live information about distance and whether the face is ready to be captured or not.
  * It also displays the capture process of the face and then sends this result to
  * [com.simprints.face.capture.screens.confirmation.ConfirmationFragment]
@@ -66,18 +66,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 IDR.string.face_capturing_permission_denied,
                 Toast.LENGTH_LONG
             ).show()
+        } else {
+            setUpCamera()
         }
-        // init fragment anyway
-        initFragment()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
-            initFragment()
-        } else {
-            launchPermissionRequest.launch(Manifest.permission.CAMERA)
-        }
+        initFragment()
     }
 
     private fun initFragment() {
@@ -96,13 +92,15 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     binding.captureOverlay.rectInCanvas,
                     Size(binding.captureOverlay.width, binding.captureOverlay.height),
                 )
-                setUpCamera()
             }
         }
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = lifecycleScope.launch {
+        if (::cameraExecutor.isInitialized) {
+            return@launch
+        }
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
         // ImageAnalysis
@@ -119,6 +117,18 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         )
         // Attach the view's surface provider to preview use case
         preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // Check permission in onStart() so that if user left the app to go to Settings
+        // and give the permission, it's reflected when they come back to SID
+        if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
+            setUpCamera()
+        } else {
+            launchPermissionRequest.launch(Manifest.permission.CAMERA)
+        }
     }
 
     override fun onStop() {
