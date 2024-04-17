@@ -443,7 +443,7 @@ internal class SyncViewModelTest {
         configRepository = configRepository,
         timeHelper = timeHelper,
         authStore = authStore,
-        logoutUseCase = logoutUseCase,
+        logout = logoutUseCase,
         recentUserActivityManager = recentUserActivityManager,
     )
 }
