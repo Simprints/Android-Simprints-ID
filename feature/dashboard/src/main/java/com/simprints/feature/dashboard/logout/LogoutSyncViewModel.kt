@@ -23,6 +23,8 @@ internal class LogoutSyncViewModel @Inject constructor(
         }
 
 
-    fun logout() = logoutUseCase()
+    fun logout() {
+        logoutUseCase()
+    }
 }
 

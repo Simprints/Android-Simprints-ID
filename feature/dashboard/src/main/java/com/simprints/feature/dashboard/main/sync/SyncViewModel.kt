@@ -105,7 +105,7 @@ internal class SyncViewModel @Inject constructor(
 
                 if (isSyncComplete && isProjectEnding) {
                     viewModelScope.launch {
-                        logout().await()
+                        logout()
                         _signOutEventLiveData.postValue(LiveDataEvent())
                     }
                 }

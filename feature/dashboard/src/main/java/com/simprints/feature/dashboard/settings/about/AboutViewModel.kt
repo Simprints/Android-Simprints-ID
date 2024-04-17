@@ -58,7 +58,7 @@ internal class AboutViewModel @Inject constructor(
                 when (canSyncDataToSimprints() && hasEventsToUpload()) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
-                        logout().await()
+                        logout()
                         LogoutDestination.LoginScreen
                     }
                 }
