@@ -4,6 +4,7 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
+import com.simprints.feature.importsubject.ImportSubjectResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -22,6 +23,9 @@ internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
                 else AppErrorReason.GUID_NOT_FOUND_OFFLINE
             )
         }
+        // TODO PoC
+        is ImportSubjectResult -> result.takeUnless { it.isSuccess }
+            ?.let { AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR) }
 
         is SetupResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR) }

@@ -16,6 +16,9 @@ internal object StepId {
     const val ENROL_LAST_BIOMETRIC = STEP_BASE_CORE + 4
     const val CONFIRM_IDENTITY = STEP_BASE_CORE + 5
 
+    // TODO PoC
+    const val IMPORT_SUBJECT = STEP_BASE_CORE + 42
+
     // Face step ids
     private const val STEP_BASE_FINGERPRINT = 300
     const val FINGERPRINT_CAPTURE = STEP_BASE_FINGERPRINT + 2

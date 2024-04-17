@@ -8,6 +8,7 @@ import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
+import com.simprints.feature.importsubject.ImportSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
@@ -85,7 +86,7 @@ internal class BuildStepsUseCase @Inject constructor(
         // TODO PoC
         is ActionRequest.VerifyIdentityRequest -> listOf(
             buildSetupStep(),
-            // TODO add a step to extract subject image from URI and save with provided subject ID GUID
+            buildImportSubjectStep(action),
             buildModalityCaptureSteps(projectConfiguration, FlowType.VERIFY),
             buildModalityMatcherSteps(
                 projectConfiguration,
@@ -192,6 +193,18 @@ internal class BuildStepsUseCase @Inject constructor(
         payload = SelectSubjectContract.getArgs(
             projectId = action.projectId,
             subjectId = action.selectedGuid,
+        ),
+    ))
+
+    // TODO PoC
+    private fun buildImportSubjectStep(action: ActionRequest.VerifyIdentityRequest) = listOf(Step(
+        id = StepId.IMPORT_SUBJECT,
+        navigationActionId = R.id.action_orchestratorFragment_to_importSubject,
+        destinationId = ImportSubjectContract.DESTINATION,
+        payload = ImportSubjectContract.getArgs(
+            projectId = action.projectId,
+            subjectId = action.subjectGuid,
+            uri = action.uri,
         ),
     ))
 }

@@ -69,4 +69,10 @@
     <action
         android:id="@+id/action_orchestratorFragment_to_matcher"
         app:destination="@id/graph_matcher" />
+
+    <!--  TODO PoC  -->
+    <include app:graph="@navigation/graph_import_subject" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_importSubject"
+        app:destination="@id/graph_import_subject" />
 </navigation>
