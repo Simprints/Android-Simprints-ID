@@ -15,14 +15,17 @@ import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.importsubject.ImportSubjectResult
 import com.simprints.feature.importsubject.R
+import com.simprints.feature.importsubject.databinding.FragmentSubjectImportBinding
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class ImportSubjectFragment : Fragment(R.layout.fragment_subject_import) {
 
+    private val binding by viewBinding(FragmentSubjectImportBinding::bind)
     private val viewModel: ImportSubjectViewModel by viewModels()
     private val args: ImportSubjectFragmentArgs by navArgs()
 
@@ -39,21 +42,26 @@ internal class ImportSubjectFragment : Fragment(R.layout.fragment_subject_import
             handleImportState(it)
         })
 
-        viewModel.onViewCreated(args.projectId, args.subjectId)
+        viewModel.onViewCreated(requireActivity(), args.projectId, args.subjectId, args.uri)
     }
 
     private fun handleImportState(state: ImportSubjectState) = when (state) {
-        is ImportSubjectState.Imported -> finishWithResult(true)
-        is ImportSubjectState.Error -> openAlert()
+        is ImportSubjectState.Imported -> {
+            binding.importImage.setImageBitmap(state.bitmap)
+        }
+
+        is ImportSubjectState.Error -> openAlert(state.reason)
+        is ImportSubjectState.Complete -> finishWithResult(true)
     }
 
-    private fun openAlert() {
+    private fun openAlert(errorMessage: String) {
         findNavController().navigateSafely(
             this,
             R.id.action_fetchSubjectFragment_to_errorFragment,
             alertConfiguration {
                 color = AlertColor.Gray
-                title = "Failed to import subject"
+                title = "Error!"
+                message = errorMessage
                 appErrorReason = AppErrorReason.UNEXPECTED_ERROR
             }.toArgs()
         )

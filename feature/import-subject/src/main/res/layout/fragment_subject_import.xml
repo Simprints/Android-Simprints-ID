@@ -5,6 +5,17 @@
     android:layout_height="match_parent"
     android:background="@color/simprints_blue">
 
+    <ImageView
+        android:id="@+id/importImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
+
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/importProgress"
         android:layout_width="wrap_content"

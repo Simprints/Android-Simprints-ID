@@ -11,8 +11,9 @@ dependencies {
 
     implementation(project(":feature:alert"))
 
+    implementation(project(":face:infra:face-bio-sdk"))
+
     implementation(project(":infra:enrolment-records-store"))
-    implementation(project(":infra:events"))
-    implementation(project(":infra:config-store"))
+    implementation(project(":infra:license"))
 
 }
