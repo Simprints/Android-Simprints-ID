@@ -7,11 +7,11 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
 import com.simprints.infra.config.store.models.canSyncAnalyticsDataToSimprints
 import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.Event
@@ -47,7 +47,7 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val jsonHelper: JsonHelper,
 ) {
 
@@ -61,7 +61,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val config = configRepository.getProjectConfiguration()
+        val config = configManager.getProjectConfiguration()
         var lastOperation = operation.copy()
         var count = 0
         var isUsefulUpload = false

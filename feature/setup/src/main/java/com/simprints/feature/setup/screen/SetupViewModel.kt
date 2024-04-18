@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SetupViewModel @Inject constructor(
     private val locationStore: LocationStore,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val licenseRepository: LicenseRepository,
     @DeviceID private val deviceID: String,
     private val authStore: AuthStore,
@@ -65,7 +65,7 @@ internal class SetupViewModel @Inject constructor(
 
     fun downloadRequiredLicenses() {
         viewModelScope.launch {
-            requiredLicenses = configRepository.getProjectConfiguration().requiredLicenses
+            requiredLicenses = configManager.getProjectConfiguration().requiredLicenses
             // if there are no required licenses, then the setup is complete
             if (requiredLicenses.isEmpty()) {
                 _overallSetupResult.postValue(true)
@@ -106,7 +106,7 @@ internal class SetupViewModel @Inject constructor(
     }
 
     private suspend fun shouldCollectLocation() =
-        configRepository.getProjectConfiguration().general.collectLocation
+        configManager.getProjectConfiguration().general.collectLocation
 
 
 }

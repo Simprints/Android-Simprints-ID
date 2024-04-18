@@ -2,7 +2,7 @@ package com.simprints.infra.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
@@ -10,7 +10,7 @@ import java.io.FileInputStream
 import javax.inject.Inject
 
 internal class ImageRemoteDataSourceImpl @Inject constructor(
-    private val imageUrlProvider: ConfigRepository,
+    private val configManager: ConfigManager,
     private val authStore: AuthStore,
 ) : ImageRemoteDataSource {
 
@@ -29,7 +29,7 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
                 return UploadResult(imageRef, UploadResult.Status.FAILED)
             }
 
-            val bucketUrl = imageUrlProvider.getProject(projectId).imageBucket
+            val bucketUrl = configManager.getProject(projectId).imageBucket
 
             val rootRef = FirebaseStorage.getInstance(
                 authStore.getLegacyAppFallback(),

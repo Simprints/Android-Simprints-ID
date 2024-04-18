@@ -118,6 +118,7 @@ include(
     ":infra:test-tools",
     ":infra:events",
     ":infra:config-store",
+    ":infra:config-sync",
     ":infra:enrolment-records-store",
     ":infra:images",
     ":infra:license",

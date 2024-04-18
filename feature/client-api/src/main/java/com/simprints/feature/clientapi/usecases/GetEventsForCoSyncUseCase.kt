@@ -4,15 +4,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationAsStringSerializer
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.events.event.cosync.CoSyncEvents
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncAnalyticsData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.config.store.models.canCoSyncData
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.cosync.CoSyncEvents
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
@@ -21,14 +21,14 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import javax.inject.Inject
 
 internal class GetEventsForCoSyncUseCase @Inject constructor(
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val eventRepository: EventRepository,
     private val jsonHelper: JsonHelper,
     private val tokenizationProcessor: TokenizationProcessor,
 ) {
 
     suspend operator fun invoke(sessionId: String, project: Project?): String? {
-        val config = configRepository.getProjectConfiguration()
+        val config = configManager.getProjectConfiguration()
 
         if (!config.canCoSyncData()) {
             return null

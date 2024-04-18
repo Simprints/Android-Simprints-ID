@@ -21,7 +21,7 @@ import com.simprints.feature.clientapi.usecases.GetEventsForCoSyncUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
@@ -48,7 +48,7 @@ class ClientApiViewModel @Inject internal constructor(
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
     private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
     private val authStore: AuthStore,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
 ) : ViewModel() {
 
     val returnResponse: LiveData<LiveDataEventWithContent<Bundle>>
@@ -64,7 +64,7 @@ class ClientApiViewModel @Inject internal constructor(
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
 
     private suspend fun getProject() =
-        runCatching { configRepository.getProject(authStore.signedInProjectId) }.getOrNull()
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     suspend fun handleIntent(action: String, extras: Bundle): ActionRequest? {
         val extrasMap = extras.toMap()

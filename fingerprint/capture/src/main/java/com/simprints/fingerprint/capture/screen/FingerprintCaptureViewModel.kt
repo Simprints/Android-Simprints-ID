@@ -40,8 +40,8 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedE
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
@@ -59,7 +59,7 @@ import kotlin.math.min
 @HiltViewModel
 internal class FingerprintCaptureViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
     private val saveImage: SaveImageUseCase,
@@ -164,7 +164,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 initBioSdk()
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
-                configuration = configRepository.getProjectConfiguration().fingerprint!!
+                configuration = configManager.getProjectConfiguration().fingerprint!!
                 bioSdkConfiguration = configuration.bioSdkConfiguration
             }
 

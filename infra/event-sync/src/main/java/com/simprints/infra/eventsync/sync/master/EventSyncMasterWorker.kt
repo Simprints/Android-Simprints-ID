@@ -2,19 +2,27 @@ package com.simprints.infra.eventsync.sync.master
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.sync.common.getAllSubjectsSyncWorkersInfo
+import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
+import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.logging.Simber
@@ -23,7 +31,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.UUID
 
 @HiltWorker
 class EventSyncMasterWorker @AssistedInject internal constructor(
@@ -31,7 +39,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     @Assisted params: WorkerParameters,
     private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val eventSyncCache: EventSyncCache,
     private val eventRepository: EventRepository,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
@@ -67,7 +75,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                 securityManager.checkIfDeviceIsRooted()
                 crashlyticsLog("Start")
                 showProgressNotification()
-                val configuration = configRepository.getProjectConfiguration()
+                val configuration = configManager.getProjectConfiguration()
 
                 if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed(configuration)) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
@@ -140,7 +148,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
 
     private suspend fun isEventDownSyncAllowed(configuration: ProjectConfiguration): Boolean {
         val isProjectPaused =
-            configRepository.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
+            configManager.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
 
         val isDownSyncConfigEnabled =
             configuration.synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC

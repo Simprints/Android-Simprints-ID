@@ -9,8 +9,8 @@ import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.infra.scanner.tools.BatteryLevelChecker
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
@@ -22,7 +22,7 @@ import javax.inject.Inject
 internal class ScannerInitialSetupHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
 ) {
 
@@ -91,7 +91,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         batteryInfo: BatteryInfo,
     ) {
         val availableVersions =
-            configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.get(
+            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.get(
                 hardwareVersion
             )
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
