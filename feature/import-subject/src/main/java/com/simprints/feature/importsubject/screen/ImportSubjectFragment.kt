@@ -47,7 +47,7 @@ internal class ImportSubjectFragment : Fragment(R.layout.fragment_subject_import
 
     private fun handleImportState(state: ImportSubjectState) = when (state) {
         is ImportSubjectState.Imported -> {
-            binding.importImage.setImageBitmap(state.bitmap)
+            // binding.importImage.setImageBitmap(state.bitmap)
         }
 
         is ImportSubjectState.Error -> openAlert(state.reason)

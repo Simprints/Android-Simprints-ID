@@ -70,7 +70,7 @@ internal class ImportSubjectViewModel @Inject constructor(
             return
         }
         _subjectState.send(ImportSubjectState.Imported(image))
-        delay(3000) // To be able to see the image before it is processed
+        delay(1000) // To be able to see the image before it is processed
 
         val face = faceDetector.analyze(image)
         Simber.tag("POC").d("face detection: $face")
