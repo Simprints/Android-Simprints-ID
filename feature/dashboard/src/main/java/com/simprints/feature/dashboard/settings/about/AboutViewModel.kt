@@ -23,6 +23,7 @@ import javax.inject.Inject
 internal class AboutViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val logoutUseCase: LogoutUseCase,
+    private val logout: LogoutUseCase,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
@@ -72,9 +73,6 @@ internal class AboutViewModel @Inject constructor(
     private suspend fun canSyncDataToSimprints(): Boolean =
         configManager.getProjectConfiguration().canSyncDataToSimprints()
 
-    private fun logout() {
-        viewModelScope.launch { logoutUseCase() }
-    }
 
     private fun load() = viewModelScope.launch {
         val configuration = configManager.getProjectConfiguration()

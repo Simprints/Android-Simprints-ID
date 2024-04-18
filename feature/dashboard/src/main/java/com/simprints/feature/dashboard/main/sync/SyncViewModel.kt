@@ -55,7 +55,7 @@ internal class SyncViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
-    private val logoutUseCase: LogoutUseCase,
+    private val logout: LogoutUseCase,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
 
@@ -105,7 +105,7 @@ internal class SyncViewModel @Inject constructor(
 
                 if (isSyncComplete && isProjectEnding) {
                     viewModelScope.launch {
-                        logoutUseCase()
+                        logout()
                         _signOutEventLiveData.postValue(LiveDataEvent())
                     }
                 }

@@ -120,9 +120,7 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     fun handleBackPress() {
         when (backButtonBehaviour.value) {
-            BackButtonBehaviour.DISABLED, null -> { /* Do nothing */
-            }
-
+            BackButtonBehaviour.DISABLED, null -> { /* Do nothing */ }
             BackButtonBehaviour.EXIT_WITH_ERROR -> _finish.send(false)
             BackButtonBehaviour.EXIT_FORM -> {
                 _scannerConnected.send(false)
