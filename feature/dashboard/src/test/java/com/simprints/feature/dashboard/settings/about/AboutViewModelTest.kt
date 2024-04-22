@@ -65,7 +65,7 @@ class AboutViewModelTest {
             configManager = configManager,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            logout = logoutUseCase,
+            logoutUseCase = logoutUseCase,
         )
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
@@ -184,7 +184,7 @@ class AboutViewModelTest {
             configManager = configManager,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            logout = logoutUseCase,
+            logoutUseCase = logoutUseCase,
         )
     }
 }
