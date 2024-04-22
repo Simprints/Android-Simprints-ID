@@ -59,7 +59,7 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
                 }
             }
             .addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
-            .addInterceptor(buildRequestIdInterceptor())
+            .addNetworkInterceptor(buildRequestIdInterceptor())
             .addInterceptor(buildDeviceIdInterceptor(deviceId))
             .addInterceptor(buildVersionInterceptor(versionName))
             .addInterceptor(buildGZipInterceptor())
@@ -70,10 +70,12 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
             }
 
     private fun buildRequestIdInterceptor() = Interceptor { chain ->
-        val newRequest = chain.request().newBuilder()
-            .addHeader(REQUEST_ID_HEADER, UUID.randomUUID().toString())
-            .build()
-        return@Interceptor chain.proceed(newRequest)
+        val requestId = UUID.randomUUID().toString()
+
+        // Adding same header to both request and response to
+        // track the request across network logs and analytics events.
+        val newRequest = chain.request().newBuilder().addHeader(REQUEST_ID_HEADER, requestId).build()
+        return@Interceptor chain.proceed(newRequest).newBuilder().addHeader(REQUEST_ID_HEADER, requestId).build()
     }
 
     private fun buildAuthenticationInterceptor(authToken: String) = Interceptor { chain ->
