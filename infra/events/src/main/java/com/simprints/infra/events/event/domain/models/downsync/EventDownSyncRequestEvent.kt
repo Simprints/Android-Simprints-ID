@@ -43,7 +43,10 @@ data class EventDownSyncRequestEvent(
         EventType.EVENT_DOWN_SYNC_REQUEST
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = listOf(
+        payload.queryParameters.attendantId?.let { TokenKeyType.AttendantId to TokenizableString.Tokenized(it) },
+        payload.queryParameters.moduleId?.let { TokenKeyType.ModuleId to TokenizableString.Tokenized(it) }
+    ).mapNotNull { it }.toMap()
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
     @Keep
