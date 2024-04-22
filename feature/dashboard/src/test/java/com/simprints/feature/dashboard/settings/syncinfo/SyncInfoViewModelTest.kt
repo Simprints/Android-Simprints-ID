@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
@@ -56,7 +57,7 @@ class SyncInfoViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configRepo: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -101,9 +102,9 @@ class SyncInfoViewModelTest {
 
         stateLiveData = MutableLiveData<EventSyncState>()
         every { eventSyncManager.getLastSyncState() } returns stateLiveData
-        coEvery { configRepo.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
         viewModel = SyncInfoViewModel(
-            configManager = configRepo,
+            configManager = configManager,
             connectivityTracker = connectivityTracker,
             enrolmentRecordRepository = enrolmentRecordRepository,
             authStore = authStore,
@@ -118,7 +119,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the configuration live data correctly`() = runTest {
         val configuration = mockk<ProjectConfiguration>(relaxed = true)
-        coEvery { configRepo.getProjectConfiguration() } returns configuration
+        coEvery { configManager.getProjectConfiguration() } returns configuration
 
         viewModel.refreshInformation()
 
@@ -163,7 +164,7 @@ class SyncInfoViewModelTest {
         val module2 = "module2".asTokenizableEncrypted()
         val numberForModule1 = 10
         val numberForModule2 = 20
-        coEvery { configRepo.getDeviceConfiguration() } returns mockk {
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(module1, module2)
         }
         coEvery {
@@ -206,7 +207,7 @@ class SyncInfoViewModelTest {
     fun `should initialize the recordsToDownSync live data to the count otherwise`() =
         runTest {
             val module1 = "module1".asTokenizableEncrypted()
-            coEvery { configRepo.getDeviceConfiguration() } returns mockk {
+            coEvery { configManager.getDeviceConfiguration() } returns mockk {
                 every { selectedModules } returns listOf(module1)
             }
             coEvery {
@@ -222,7 +223,7 @@ class SyncInfoViewModelTest {
     fun `should initialize the recordsToDownSync live data to the default count value if fetch fails`() =
         runTest {
             val module1 = "module1".asTokenizableEncrypted()
-            coEvery { configRepo.getDeviceConfiguration() } returns mockk {
+            coEvery { configManager.getDeviceConfiguration() } returns mockk {
                 every { selectedModules } returns listOf(module1)
             }
             coEvery {
@@ -354,7 +355,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `emit correct sync availability when connection status changes`() = runTest {
-        coEvery { configRepo.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns createMockDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                 modules = listOf("module")
@@ -372,7 +373,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `emit correct sync availability when sync status changes`() = runTest {
-        coEvery { configRepo.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns createMockDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                 modules = listOf("module")
@@ -415,7 +416,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `emit correct sync availability when non-module config`() = runTest {
-        coEvery { configRepo.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns createMockDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.USER,
             )
@@ -429,7 +430,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `emit correct sync availability when module config without modules`() = runTest {
-        coEvery { configRepo.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns createMockDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                 modules = emptyList()
