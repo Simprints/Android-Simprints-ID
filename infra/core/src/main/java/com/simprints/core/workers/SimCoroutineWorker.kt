@@ -95,7 +95,7 @@ abstract class SimCoroutineWorker(
             .setOnlyAlertOnce(true)
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFERRED
+                    foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
                 }
             }
             .build()
