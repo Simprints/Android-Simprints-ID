@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -17,11 +17,16 @@ import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -61,7 +66,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var eventScope: EventScope
@@ -73,7 +78,7 @@ internal class EventSyncManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns Timestamp(1)
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every { synchronization.down.partitionType.toDomain() } returns Partitioning.MODULE
         }
@@ -87,7 +92,7 @@ internal class EventSyncManagerTest {
             eventSyncCache = eventSyncCache,
             downSyncTask = downSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
-            configManager = configManager,
+            configRepository = configRepository,
             dispatcher = testCoroutineRule.testCoroutineDispatcher
         )
     }
@@ -121,7 +126,7 @@ internal class EventSyncManagerTest {
             EventCount(8, false),
             EventCount(18, true),
         )
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 

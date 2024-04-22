@@ -7,6 +7,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
@@ -47,7 +48,7 @@ class SyncOrchestratorImplTest {
     private lateinit var authStore: AuthStore
 
     @MockK
-    private lateinit var configRepo: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var eventSyncManager: EventSyncManager
@@ -98,7 +99,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with any connection if not specified`() = runTest {
         coEvery {
-            configRepo.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
+            configManager.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns false
         every { authStore.signedInProjectId } returns "projectId"
 
@@ -116,7 +117,7 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with unmetered constraint if requested`() = runTest {
         coEvery {
-            configRepo.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
+            configManager.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns true
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
@@ -315,7 +316,7 @@ class SyncOrchestratorImplTest {
     private fun createSyncOrchestrator() = SyncOrchestratorImpl(
         workManager,
         authStore,
-        configRepo,
+        configManager,
         eventSyncManager,
         shouldScheduleFirmwareUpdate,
         cleanupDeprecatedWorkers,
