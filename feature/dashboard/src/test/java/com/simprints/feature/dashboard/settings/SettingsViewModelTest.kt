@@ -2,10 +2,10 @@ package com.simprints.feature.dashboard.settings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -34,7 +34,7 @@ class SettingsViewModelTest {
     )
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     private lateinit var viewModel: SettingsViewModel
 
@@ -42,10 +42,10 @@ class SettingsViewModelTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configRepository.getProjectConfiguration().general } returns generalConfiguration
-        coEvery { configRepository.getDeviceConfiguration().language } returns LANGUAGE
+        coEvery { configManager.getProjectConfiguration().general } returns generalConfiguration
+        coEvery { configManager.getDeviceConfiguration().language } returns LANGUAGE
 
-        viewModel = SettingsViewModel(configRepository)
+        viewModel = SettingsViewModel(configManager)
     }
 
     @Test
@@ -59,7 +59,7 @@ class SettingsViewModelTest {
     fun `updateLanguagePreference should update the language`() = runTest {
         val updatedLanguage = "en"
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
-        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        coEvery { configManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
 
         viewModel.updateLanguagePreference(updatedLanguage)
 

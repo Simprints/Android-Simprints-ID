@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -61,7 +61,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var eventScope: EventScope
@@ -73,7 +73,7 @@ internal class EventSyncManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns Timestamp(1)
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every { synchronization.down.partitionType.toDomain() } returns Partitioning.MODULE
         }
@@ -87,7 +87,7 @@ internal class EventSyncManagerTest {
             eventSyncCache = eventSyncCache,
             downSyncTask = downSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
-            configRepository = configRepository,
+            configManager = configManager,
             dispatcher = testCoroutineRule.testCoroutineDispatcher
         )
     }
@@ -121,7 +121,7 @@ internal class EventSyncManagerTest {
             EventCount(8, false),
             EventCount(18, true),
         )
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 

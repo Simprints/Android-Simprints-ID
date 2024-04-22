@@ -3,8 +3,8 @@ package com.simprints.feature.dashboard.logout
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -24,7 +24,7 @@ internal class LogoutSyncViewModelTest {
     lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -40,7 +40,7 @@ internal class LogoutSyncViewModelTest {
     @Test
     fun `should logout correctly`() {
         val viewModel = LogoutSyncViewModel(
-            configRepository = configRepository,
+            configManager = configManager,
             logoutUseCase = logoutUseCase,
         )
 
@@ -52,13 +52,13 @@ internal class LogoutSyncViewModelTest {
     @Test
     fun `password config should be fetched after initialization`() {
         val config = SettingsPasswordConfig.Locked(password = "123")
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { settingsPassword } returns config
             }
         }
         val viewModel = LogoutSyncViewModel(
-            configRepository = configRepository,
+            configManager = configManager,
             logoutUseCase = logoutUseCase,
         )
         val resultConfig = viewModel.settingsLocked.getOrAwaitValue()

@@ -3,11 +3,11 @@ package com.simprints.infra.authlogic.authenticator
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.ProjectWithConfig
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -30,7 +30,7 @@ import org.junit.Test
 internal class SignerManagerTest {
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var mockAuthStore: AuthStore
@@ -67,7 +67,7 @@ internal class SignerManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         signerManager = SignerManager(
-            configRepository,
+            configManager,
             mockAuthStore,
             mockRecentUserActivityManager,
             mockSimNetwork,
@@ -123,7 +123,7 @@ internal class SignerManagerTest {
 
         signIn()
 
-        coVerify { configRepository.refreshProject(DEFAULT_PROJECT_ID) }
+        coVerify { configManager.refreshProject(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -135,7 +135,7 @@ internal class SignerManagerTest {
         assertThrows<Throwable> { signIn() }
 
         verify { mockAuthStore.clearFirebaseToken() }
-        coVerify { configRepository.clearData() }
+        coVerify { configManager.clearData() }
         verify { mockAuthStore.cleanCredentials() }
     }
 
@@ -154,7 +154,7 @@ internal class SignerManagerTest {
 
         verify { mockAuthStore.cleanCredentials() }
         verify { mockAuthStore.clearFirebaseToken() }
-        coVerify(exactly = 1) { configRepository.clearData() }
+        coVerify(exactly = 1) { configManager.clearData() }
     }
 
     @Test
@@ -175,7 +175,7 @@ internal class SignerManagerTest {
     fun signOut_clearConfiguration() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        coVerify { configRepository.clearData() }
+        coVerify { configManager.clearData() }
     }
 
     @Test
@@ -210,7 +210,7 @@ internal class SignerManagerTest {
         }
 
     private fun mockFetchingProjectInfo(error: Boolean = false) =
-        coEvery { configRepository.refreshProject(any()) }.apply {
+        coEvery { configManager.refreshProject(any()) }.apply {
             if (!error) {
                 this.returns(
                     ProjectWithConfig(

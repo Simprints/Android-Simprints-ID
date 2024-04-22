@@ -1,7 +1,6 @@
 package com.simprints.infra.config.store
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.ConfigRepositoryImpl.Companion.PRIVACY_NOTICE_FILE
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
@@ -16,6 +15,7 @@ import com.simprints.infra.config.store.testtools.deviceConfiguration
 import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.sync.ConfigManagerImpl.Companion.PRIVACY_NOTICE_FILE
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.syntax.assertThrows

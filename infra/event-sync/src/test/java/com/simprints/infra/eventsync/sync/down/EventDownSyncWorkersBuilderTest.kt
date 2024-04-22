@@ -8,10 +8,10 @@ import com.simprints.core.domain.modality.Modes
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
@@ -47,7 +47,7 @@ class EventDownSyncWorkersBuilderTest {
     private lateinit var downSyncConfiguration: DownSynchronizationConfiguration
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -58,12 +58,12 @@ class EventDownSyncWorkersBuilderTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             SELECTED_MODULE,
             ""
         )
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { synchronization } returns mockk {
                 every { down } returns downSyncConfiguration
@@ -73,7 +73,7 @@ class EventDownSyncWorkersBuilderTest {
         eventDownSyncWorkersBuilder = EventDownSyncWorkersBuilder(
             eventDownSyncScopeRepository,
             JsonHelper,
-            configRepository
+            configManager
         )
     }
 

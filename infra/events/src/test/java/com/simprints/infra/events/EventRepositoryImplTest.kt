@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
@@ -55,7 +55,7 @@ internal class EventRepositoryImplTest {
     lateinit var eventValidator: EventValidator
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @Before
     fun setup() {
@@ -64,12 +64,12 @@ internal class EventRepositoryImplTest {
         every { timeHelper.now() } returns NOW
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }
         }
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { language } returns LANGUAGE
         }
 
@@ -81,7 +81,7 @@ internal class EventRepositoryImplTest {
             eventLocalDataSource = eventLocalDataSource,
             timeHelper = timeHelper,
             validatorsFactory = sessionEventValidatorsFactory,
-            configRepository = configRepository,
+            configManager = configManager,
         )
     }
 

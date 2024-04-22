@@ -8,7 +8,6 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -104,7 +103,7 @@ class SyncInfoViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns stateLiveData
         coEvery { configRepo.getProject(PROJECT_ID) } returns project
         viewModel = SyncInfoViewModel(
-            configRepository = configRepo,
+            configManager = configRepo,
             connectivityTracker = connectivityTracker,
             enrolmentRecordRepository = enrolmentRecordRepository,
             authStore = authStore,

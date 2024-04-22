@@ -24,7 +24,7 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -53,7 +53,7 @@ internal class OrchestratorViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var cache: OrchestratorCache
@@ -90,7 +90,7 @@ internal class OrchestratorViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         viewModel = OrchestratorViewModel(
-            configRepository,
+            configManager,
             cache,
             locationStore,
             stepsBuilder,

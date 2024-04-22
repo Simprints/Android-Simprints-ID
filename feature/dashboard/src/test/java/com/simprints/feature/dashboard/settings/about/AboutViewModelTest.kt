@@ -4,13 +4,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -50,7 +50,7 @@ class AboutViewModelTest {
     )
     private val eventSyncManager = mockk<EventSyncManager>()
 
-    private val configRepository = mockk<ConfigRepository> {
+    private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns buildProjectConfigurationMock()
     }
 
@@ -62,7 +62,7 @@ class AboutViewModelTest {
     @Test
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
-            configRepository = configRepository,
+            configManager = configManager,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             logout = logoutUseCase,
@@ -177,11 +177,11 @@ class AboutViewModelTest {
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(
             countEventsToUpload
         )
-        coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
+        coEvery { configManager.getProjectConfiguration() } returns buildProjectConfigurationMock(
             upSyncKind
         )
         return AboutViewModel(
-            configRepository = configRepository,
+            configManager = configManager,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             logout = logoutUseCase,

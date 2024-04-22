@@ -3,11 +3,11 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import io.mockk.MockKAnnotations
@@ -29,7 +29,7 @@ class ModuleRepositoryImplTest {
     lateinit var projectConfiguration: ProjectConfiguration
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -46,16 +46,16 @@ class ModuleRepositoryImplTest {
 
         every { projectConfiguration.general.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
         every { projectConfiguration.synchronization.down } returns downSynchronizationConfiguration
-        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
+        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
         every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d").map(String::asTokenizableRaw)
         coEvery {
-            configRepository.getDeviceConfiguration()
+            configManager.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c").map(TokenizableString::Tokenized), "")
 
 
         repository = ModuleRepositoryImpl(
-            configRepository,
+            configManager,
             enrolmentRecordRepository,
             eventSyncManager
         )
@@ -64,7 +64,7 @@ class ModuleRepositoryImplTest {
     @Test
     fun saveModules_shouldSaveSelectedModules() = runTest {
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
-        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        coEvery { configManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
         val modules = listOf(
             Module("1".asTokenizableRaw(), true),
             Module("2".asTokenizableRaw(), true),
