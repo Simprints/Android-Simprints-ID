@@ -43,12 +43,12 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
             val unprocessedImage = captureWrapper.acquireUnprocessedImage(
                 Dpi(MIN_CAPTURE_DPI)
             ).rawUnprocessedImage
-            captureProcessedImageCache.recentlyCapturedImage = unprocessedImage.imageData
             log("Unprocessed image acquired, processing it")
             val decodedImage = decodeWSQImageUseCase(unprocessedImage)
             log("Image decoded successfully ${decodedImage.resolution}")
             log("processing image using secugen image correction")
             val secugenProcessedImage = processImage(settings, decodedImage)
+            captureProcessedImageCache.recentlyCapturedImage = secugenProcessedImage.imageBytes
             log("quality checking image using nec sdk")
             val qualityScore = calculateNecImageQualityUseCase(secugenProcessedImage)
             log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
