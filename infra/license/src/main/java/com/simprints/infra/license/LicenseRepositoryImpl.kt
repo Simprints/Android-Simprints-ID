@@ -74,4 +74,5 @@ internal class LicenseRepositoryImpl @Inject constructor(
 
     override suspend fun deleteCachedLicense(licenseVendor: Vendor) = licenseLocalDataSource.deleteCachedLicense(licenseVendor)
 
+    override suspend fun deleteCachedLicenses() = licenseLocalDataSource.deleteCachedLicenses()
 }
