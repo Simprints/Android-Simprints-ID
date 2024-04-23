@@ -92,6 +92,15 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteCachedLicenses(): Unit = withContext(dispatcherIo) {
+        try {
+            val deleted = File(licenseDirectoryPath).deleteRecursively()
+            Simber.d("Deleted all licenses successfully = $deleted")
+        } catch (t: Throwable) {
+            Simber.e(t)
+        }
+    }
+
     private fun getFileFromStorage(vendor: Vendor): String? = try {
         val file = File("$licenseDirectoryPath/$vendor")
         val encryptedFile = keyHelper.getEncryptedFileBuilder(file, context)
