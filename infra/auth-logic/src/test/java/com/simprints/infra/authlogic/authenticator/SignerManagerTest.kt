@@ -12,6 +12,7 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -48,6 +49,9 @@ internal class SignerManagerTest {
     lateinit var mockImageRepository: ImageRepository
 
     @MockK
+    lateinit var mockLicenseRepository: LicenseRepository
+
+    @MockK
     lateinit var mockEnrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
@@ -74,6 +78,7 @@ internal class SignerManagerTest {
             mockImageRepository,
             mockEventRepository,
             mockEnrolmentRecordRepository,
+            mockLicenseRepository,
             scannerManager,
             UnconfinedTestDispatcher(),
         )
@@ -186,6 +191,7 @@ internal class SignerManagerTest {
         coVerify { mockEventRepository.deleteAll() }
         coVerify { mockEnrolmentRecordRepository.deleteAll() }
         coVerify { scannerManager.deleteFirmwareFiles() }
+        coVerify { mockLicenseRepository.deleteCachedLicenses() }
     }
 
     @Test
