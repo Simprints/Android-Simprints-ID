@@ -45,5 +45,10 @@ internal data class ApiEventDownSyncRequestPayload(
         val lastEventId: String?,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        when (tokenKeyType) {
+            TokenKeyType.AttendantId -> "queryParameters.attendantId"
+            TokenKeyType.ModuleId -> "queryParameters.moduleId"
+            else -> null
+        }
 }
