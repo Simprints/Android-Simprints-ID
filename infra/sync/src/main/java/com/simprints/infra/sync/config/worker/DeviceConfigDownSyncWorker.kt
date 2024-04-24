@@ -27,8 +27,8 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result =
         withContext(dispatcher) {
-            crashlyticsLog("Fetching device config state")
             showProgressNotification()
+            crashlyticsLog("Fetching device config state")
 
             try {
                 val state = configRepository.getDeviceState()

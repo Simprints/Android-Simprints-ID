@@ -32,9 +32,9 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     override suspend fun doWork(): Result =
         withContext(dispatcher) {
             try {
+                showProgressNotification()
                 val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
                 crashlyticsLog("Start - Params: $syncId")
-                showProgressNotification()
 
                 inputData.getString(EVENT_DOWN_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
                     eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)

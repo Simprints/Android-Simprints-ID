@@ -74,8 +74,8 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
             showProgressNotification()
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
