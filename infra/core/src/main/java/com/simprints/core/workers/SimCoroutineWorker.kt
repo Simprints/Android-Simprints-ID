@@ -58,10 +58,10 @@ abstract class SimCoroutineWorker(
     }
 
     protected suspend fun showProgressNotification() {
-        if (BatteryOptimizationUtils.isFollowingBatteryOptimizations(context)) {
-            return
-        }
         try {
+            if (BatteryOptimizationUtils.isFollowingBatteryOptimizations(context)) {
+                return
+            }
             setForeground(getForegroundInfo())
         } catch (setForegroundException: Throwable) {
             // Setting foreground (showing the notification) may be restricted by the system
