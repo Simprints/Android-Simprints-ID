@@ -16,7 +16,12 @@ class ImageRepositoryImpl @Inject internal constructor(
         imageBytes: ByteArray,
         projectId: String,
         relativePath: Path,
-    ): SecuredImageRef? = localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
+        metadata: Map<String, String>,
+    ): SecuredImageRef? {
+        // TODO store metadata
+
+        return localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
+    }
 
     override suspend fun getNumberOfImagesToUpload(projectId: String): Int =
         localDataSource.listImages(projectId).count()
@@ -29,7 +34,9 @@ class ImageRepositoryImpl @Inject internal constructor(
         images.forEach { imageRef ->
             try {
                 localDataSource.decryptImage(imageRef)?.let { stream ->
-                    val uploadResult = remoteDataSource.uploadImage(stream, imageRef)
+                    val metadata = emptyMap<String, String>() // TODO fetch metadata
+
+                    val uploadResult = remoteDataSource.uploadImage(stream, imageRef, metadata)
                     if (uploadResult.isUploadSuccessful()) {
                         localDataSource.deleteImage(imageRef)
                     } else {

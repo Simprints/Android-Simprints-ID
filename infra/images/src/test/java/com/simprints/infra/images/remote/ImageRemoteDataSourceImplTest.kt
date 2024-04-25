@@ -69,7 +69,22 @@ class ImageRemoteDataSourceImplTest {
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
-        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef)
+        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, emptyMap())
+
+        assertThat(result.isUploadSuccessful()).isTrue()
+    }
+
+    @Test
+    fun `test image with metadata upload flow`() = runTest {
+        coEvery { configManager.getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
+        every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
+        every { authStore.signedInProjectId } returns "projectId"
+
+        val storageMock = setupStorageMock()
+
+        every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
+
+        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, mapOf("key" to "value"))
 
         assertThat(result.isUploadSuccessful()).isTrue()
     }
@@ -78,7 +93,7 @@ class ImageRemoteDataSourceImplTest {
     fun `null project returns failed upload`() = runTest {
         every { authStore.getLegacyAppFallback().options.projectId } returns null
 
-        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef)
+        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, emptyMap())
 
         assertThat(result.isUploadSuccessful()).isFalse()
     }
@@ -88,7 +103,7 @@ class ImageRemoteDataSourceImplTest {
         coEvery { configManager.getProject(any()).imageBucket } returns ""
         every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
 
-        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef)
+        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, emptyMap())
 
         assertThat(result.isUploadSuccessful()).isFalse()
     }
@@ -97,6 +112,13 @@ class ImageRemoteDataSourceImplTest {
         every { reference.child(any()) } returns mockk {
             every { path } returns "testPath"
             every { putStream(any()) } returns mockk {
+                coEvery { await() } returns mockk {
+                    every { task } returns mockk {
+                        every { isSuccessful } returns true
+                    }
+                }
+            }
+            every { putStream(any(), any()) } returns mockk {
                 coEvery { await() } returns mockk {
                     every { task } returns mockk {
                         every { isSuccessful } returns true

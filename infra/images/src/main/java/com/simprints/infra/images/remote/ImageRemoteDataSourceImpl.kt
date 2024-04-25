@@ -1,6 +1,7 @@
 package com.simprints.infra.images.remote
 
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
@@ -17,6 +18,7 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
     override suspend fun uploadImage(
         imageStream: FileInputStream,
         imageRef: SecuredImageRef,
+        metadata: Map<String, String>,
     ): UploadResult {
 
         val firebaseProjectName = authStore.getLegacyAppFallback().options.projectId
@@ -43,7 +45,14 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
 
             Simber.d("Uploading ${fileRef.path}")
 
-            val uploadTask = fileRef.putStream(imageStream).await()
+            val uploadTask = if (metadata.isEmpty()) {
+                fileRef.putStream(imageStream).await()
+            } else {
+                val storeMetadata = StorageMetadata.Builder()
+                    .also { metadata.forEach { (key, value) -> it.setCustomMetadata(key, value) } }
+                    .build()
+                fileRef.putStream(imageStream, storeMetadata).await()
+            }
 
             val status = if (uploadTask.task.isSuccessful) {
                 UploadResult.Status.SUCCESSFUL
@@ -57,6 +66,5 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
             UploadResult(imageRef, UploadResult.Status.FAILED)
         }
     }
-
 
 }

@@ -132,7 +132,7 @@ internal class ImageRepositoryImplTest {
         } returns mockStream
 
         coEvery {
-            remoteDataSource.uploadImage(mockStream, validImage)
+            remoteDataSource.uploadImage(mockStream, validImage, emptyMap())
         } returns UploadResult(
             validImage,
             UploadResult.Status.SUCCESSFUL
@@ -148,7 +148,7 @@ internal class ImageRepositoryImplTest {
         } returns mockStream
 
         coEvery {
-            remoteDataSource.uploadImage(mockStream, invalidImage)
+            remoteDataSource.uploadImage(mockStream, invalidImage, emptyMap())
         } returns UploadResult(
             invalidImage,
             UploadResult.Status.FAILED
