@@ -12,6 +12,7 @@ data class FingerprintCaptureResult(
 
     @Keep
     data class Item(
+        val captureEventId: String?,
         val identifier: IFingerIdentifier,
         val sample: Sample?,
     ) : Serializable

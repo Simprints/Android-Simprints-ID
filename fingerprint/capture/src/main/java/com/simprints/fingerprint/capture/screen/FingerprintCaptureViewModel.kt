@@ -53,6 +53,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -600,6 +601,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         val resultItems = collectedFingers.map { (captureId, collectedFinger) ->
             FingerprintCaptureResult.Item(
                 identifier = captureId.finger,
+                captureEventId = captureEventIds[captureId],
                 sample = FingerprintCaptureResult.Sample(
                     fingerIdentifier = captureId.finger,
                     template = collectedFinger.scanResult.template,
