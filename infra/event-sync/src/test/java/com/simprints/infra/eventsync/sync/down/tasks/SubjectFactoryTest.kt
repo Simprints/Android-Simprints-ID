@@ -16,6 +16,7 @@ import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -153,6 +154,7 @@ class SubjectFactoryTest {
             moduleId = expected.moduleId,
             fingerprintResponse = FingerprintCaptureResult(listOf(
                 FingerprintCaptureResult.Item(
+                    captureEventId = GUID1,
                     identifier = IDENTIFIER,
                     sample = FingerprintCaptureResult.Sample(
                         template = BASE_64_BYTES,
@@ -165,6 +167,7 @@ class SubjectFactoryTest {
             )),
             faceResponse = FaceCaptureResult(listOf(
                 FaceCaptureResult.Item(
+                    captureEventId = GUID1,
                     index = 0,
                     sample = FaceCaptureResult.Sample(
                         template = BASE_64_BYTES,
