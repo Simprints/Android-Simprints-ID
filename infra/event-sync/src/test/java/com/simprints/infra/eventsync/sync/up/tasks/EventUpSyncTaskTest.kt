@@ -16,18 +16,11 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
+import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID3
-import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.events.sampledata.createAuthenticationEvent
-import com.simprints.infra.events.sampledata.createEnrolmentEventV2
-import com.simprints.infra.events.sampledata.createEventWithSessionId
-import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
-import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
-import com.simprints.infra.events.sampledata.createPersonCreationEvent
-import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
@@ -148,7 +141,7 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
-        coVerify(exactly = 2) { eventRemoteDataSource.post(any(), any()) }
+        coVerify(exactly = 2) { eventRemoteDataSource.post(any(), any(), any()) }
     }
 
     @Test
@@ -173,8 +166,8 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify {
-            eventRemoteDataSource.post(any(), match { it.eventDownSyncs.size == 1})
-            eventRemoteDataSource.post(any(), match { it.eventUpSyncs.size == 2})
+            eventRemoteDataSource.post(any(), any(), match { it.eventDownSyncs.size == 1 })
+            eventRemoteDataSource.post(any(), any(), match { it.eventUpSyncs.size == 2 })
         }
     }
 
@@ -195,6 +188,7 @@ internal class EventUpSyncTaskTest {
 
         coVerify {
             eventRemoteDataSource.post(
+                any(),
                 any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
@@ -228,6 +222,7 @@ internal class EventUpSyncTaskTest {
         coVerify {
             eventRemoteDataSource.post(
                 any(),
+                any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
                     assertThat(it.sessions.first().events).hasSize(4)
@@ -258,6 +253,7 @@ internal class EventUpSyncTaskTest {
 
         coVerify {
             eventRemoteDataSource.post(
+                any(),
                 any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
@@ -330,7 +326,7 @@ internal class EventUpSyncTaskTest {
             eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
-        coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("")
+        coEvery { eventRemoteDataSource.post(any(), any(), any()) } throws Throwable("")
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
@@ -349,7 +345,9 @@ internal class EventUpSyncTaskTest {
             eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
-        coEvery { eventRemoteDataSource.post(any(), any()) } throws NetworkConnectionException(
+        coEvery {
+            eventRemoteDataSource.post(any(), any(), any())
+        } throws NetworkConnectionException(
             cause = Exception()
         )
 
@@ -368,7 +366,7 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 0) {
-            eventRemoteDataSource.post(any(), any())
+            eventRemoteDataSource.post(any(), any(), any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
             eventRepo.deleteEventScope(GUID1)
         }
@@ -387,7 +385,7 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
-        coVerify(exactly = 0) { eventRemoteDataSource.post(any(), any()) }
+        coVerify(exactly = 0) { eventRemoteDataSource.post(any(), any(), any()) }
         coVerify {
             eventRepo.getEventsJsonFromScope(any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
@@ -411,7 +409,7 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 0) {
-            eventRemoteDataSource.post(any(), any())
+            eventRemoteDataSource.post(any(), any(), any())
             eventRepo.deleteEventScope(GUID1)
         }
 
@@ -438,7 +436,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
             createSessionScope(GUID1),
         )
-        coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
+        coEvery { eventRemoteDataSource.post(any(), any(), any()) } throws HttpException(
             Response.error<ResponseBody>(427, "".toResponseBody(null))
         )
 
