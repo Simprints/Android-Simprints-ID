@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
+import java.util.UUID
 import javax.inject.Inject
 
 internal class EventUpSyncTask @Inject constructor(
@@ -167,7 +168,8 @@ internal class EventUpSyncTask @Inject constructor(
         eventFilter: (Map<EventScope, List<Event>?>) -> Map<EventScope, List<Event>?> = { it },
         createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
-        Simber.tag(SYNC_LOG_TAG).d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
+        Simber.tag(SYNC_LOG_TAG)
+            .d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
         val sessionScopes = getClosedScopesForType(eventScopeTypeToUpload)
 
         // Re-emitting the number of uploaded corrupted events
@@ -183,13 +185,17 @@ internal class EventUpSyncTask @Inject constructor(
         val uploadedScopes = mutableListOf<String>()
 
         scopesToUpload.chunked(batchSize.coerceAtLeast(1)).forEach { scopes ->
+            val requestId = UUID.randomUUID().toString()
+
             val requestStartTime = timeHelper.now()
             try {
                 val result = eventRemoteDataSource.post(
+                    requestId,
                     projectId,
                     scopes.asApiUploadEventsBody(eventScopeTypeToUpload)
                 )
                 addRequestEvent(
+                    requestId = requestId,
                     eventScope = eventScope,
                     startTime = requestStartTime,
                     result = result,
@@ -197,7 +203,7 @@ internal class EventUpSyncTask @Inject constructor(
                 )
                 uploadedScopes.addAll(scopes.map { it.id })
             } catch (ex: Exception) {
-                handleFailedRequest(ex, eventScope, requestStartTime)
+                handleFailedRequest(requestId, ex, eventScope, requestStartTime)
             }
         }
 
@@ -205,7 +211,9 @@ internal class EventUpSyncTask @Inject constructor(
         eventRepository.deleteEventScopes(uploadedScopes)
     }
 
-    private fun List<ApiEventScope>.asApiUploadEventsBody(eventScopeTypeToUpload: EventScopeType) = when(eventScopeTypeToUpload) {
+    private fun List<ApiEventScope>.asApiUploadEventsBody(
+        eventScopeTypeToUpload: EventScopeType,
+    ) = when (eventScopeTypeToUpload) {
         EventScopeType.SESSION -> ApiUploadEventsBody(sessions = this)
         EventScopeType.DOWN_SYNC -> ApiUploadEventsBody(eventDownSyncs = this)
         EventScopeType.UP_SYNC -> ApiUploadEventsBody(eventUpSyncs = this)
@@ -238,6 +246,7 @@ internal class EventUpSyncTask @Inject constructor(
         }
 
     private suspend fun addRequestEvent(
+        requestId: String,
         eventScope: EventScope,
         startTime: Timestamp,
         result: EventUpSyncResult,
@@ -249,7 +258,7 @@ internal class EventUpSyncTask @Inject constructor(
                 EventUpSyncRequestEvent(
                     createdAt = startTime,
                     endedAt = timeHelper.now(),
-                    requestId = result.requestId,
+                    requestId = requestId,
                     content = content,
                     responseStatus = result.status,
                 )
@@ -258,6 +267,7 @@ internal class EventUpSyncTask @Inject constructor(
     }
 
     private suspend fun handleFailedRequest(
+        requestId: String,
         ex: Exception,
         eventScope: EventScope,
         requestStartTime: Timestamp,
@@ -267,13 +277,9 @@ internal class EventUpSyncTask @Inject constructor(
             is NetworkConnectionException -> Simber.i(ex)
             is HttpException -> {
                 Simber.i(ex)
-                result = ex.response()?.let {
-                    EventUpSyncResult(
-                        eventRemoteDataSource.getRequestId(it),
-                        it.code()
-                    )
-                }
+                result = ex.response()?.let { EventUpSyncResult(it.code()) }
             }
+
             is RemoteDbNotSignedInException -> throw ex
 
             else -> {
@@ -287,7 +293,7 @@ internal class EventUpSyncTask @Inject constructor(
             EventUpSyncRequestEvent(
                 createdAt = requestStartTime,
                 endedAt = timeHelper.now(),
-                requestId = result?.requestId.orEmpty(),
+                requestId = requestId,
                 responseStatus = result?.status,
                 errorType = ex.toString(),
             )
