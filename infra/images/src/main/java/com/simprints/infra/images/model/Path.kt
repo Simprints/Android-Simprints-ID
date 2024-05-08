@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import java.io.File
+import java.io.Serializable
 
 /**
  * An abstraction of a file path
@@ -15,8 +16,7 @@ import java.io.File
  */
 @Keep
 @Parcelize
-data class Path(val parts: Array<String>) : Parcelable {
-
+data class Path(val parts: Array<String>) : Parcelable, Serializable {
     /**
      * Constructor with a string path
      * @param pathString the path as a string
