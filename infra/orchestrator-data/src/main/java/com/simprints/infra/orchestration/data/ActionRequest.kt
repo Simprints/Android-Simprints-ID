@@ -1,10 +1,23 @@
 package com.simprints.infra.orchestration.data
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.tokenization.TokenizableString
 import java.io.Serializable
 
-
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = ActionRequest.EnrolActionRequest::class, name = "EnrolActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.IdentifyActionRequest::class, name = "IdentifyActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.VerifyActionRequest::class, name = "VerifyActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.ConfirmIdentityActionRequest::class, name = "ConfirmIdentityActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.EnrolLastBiometricActionRequest::class, name = "EnrolLastBiometricActionRequest")
+)
 sealed class ActionRequest(
     open val actionIdentifier: ActionRequestIdentifier,
     open val projectId: String,
