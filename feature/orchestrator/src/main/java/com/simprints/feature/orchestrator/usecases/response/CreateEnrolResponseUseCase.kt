@@ -7,6 +7,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
@@ -32,7 +33,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
 
             AppEnrolResponse(subject.subjectId)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Simber.e(e)
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
         }
     }

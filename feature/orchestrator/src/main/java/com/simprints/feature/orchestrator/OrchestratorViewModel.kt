@@ -101,6 +101,22 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
+    fun restoreStepsIfNeeded() {
+        if (steps.isEmpty()) {
+            // Restore the steps from cache
+            steps = cache.steps
+        }
+    }
+
+    fun restoreModalitiesIfNeeded() {
+        viewModelScope.launch {
+            if (modalities.isEmpty()) {
+                val projectConfiguration = configRepository.getProjectConfiguration()
+                modalities = projectConfiguration.general.modalities.toSet()
+            }
+        }
+    }
+
     override fun onCleared() {
         cache.steps = steps
         super.onCleared()
