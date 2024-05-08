@@ -81,6 +81,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             orchestratorVm.requestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
             savedInstanceState.getString(KEY_ACTION_REQUEST)
                 ?.run(orchestratorVm::setActionRequestFromJson)
+            orchestratorVm.restoreStepsIfNeeded()
+            orchestratorVm.restoreModalitiesIfNeeded()
         }
         observeLoginCheckVm()
         observeClientApiVm()
