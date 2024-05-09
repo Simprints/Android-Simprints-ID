@@ -1,6 +1,8 @@
 package com.simprints.infra.eventsync.event.remote.models.session
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
@@ -22,6 +24,7 @@ internal data class ApiEventScope(
     val device: ApiDevice,
     val databaseInfo: ApiDatabaseInfo,
     val location: ApiLocation?,
+    @JsonInclude(Include.NON_EMPTY)
     val projectConfigurationUpdatedAt: String,
     val events: List<ApiEvent>,
 ) {

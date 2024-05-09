@@ -74,14 +74,20 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     private val clientApiVm by viewModels<ClientApiViewModel>()
     private val orchestratorVm by viewModels<OrchestratorViewModel>()
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
             orchestratorVm.requestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
             savedInstanceState.getString(KEY_ACTION_REQUEST)
                 ?.run(orchestratorVm::setActionRequestFromJson)
+            orchestratorVm.restoreStepsIfNeeded()
+            orchestratorVm.restoreModalitiesIfNeeded()
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         observeLoginCheckVm()
         observeClientApiVm()
         observeOrchestratorVm()

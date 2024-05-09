@@ -50,8 +50,6 @@ internal class SignerManager @Inject constructor(
     }
 
     suspend fun signOut() = withContext(dispatcher) {
-        authStore.cleanCredentials()
-        authStore.clearFirebaseToken()
 
         simNetwork.resetApiBaseUrl()
         configManager.clearData()
@@ -61,6 +59,9 @@ internal class SignerManager @Inject constructor(
         eventRepository.deleteAll()
         enrolmentRecordRepository.deleteAll()
         scannerManager.deleteFirmwareFiles()
+
+        authStore.cleanCredentials()
+        authStore.clearFirebaseToken()
 
         Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
     }

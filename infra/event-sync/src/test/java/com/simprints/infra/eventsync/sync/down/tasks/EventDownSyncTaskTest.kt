@@ -40,6 +40,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.UUID
 
 class EventDownSyncTaskTest {
 
@@ -159,7 +160,7 @@ class EventDownSyncTaskTest {
                 eventScope,
                 match {
                     it is EventDownSyncRequestEvent &&
-                        it.payload.requestId == "requestId" &&
+                        UUID.fromString(it.payload.requestId) != null &&
                         it.payload.eventsRead == eventsToDownload.size &&
                         it.payload.responseStatus == 200
                 }
@@ -180,7 +181,7 @@ class EventDownSyncTaskTest {
 
     @Test
     fun downSync_shouldEmitAFailureIfDownloadFails() = runTest {
-        coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws Throwable("IO Exception")
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws Throwable("IO Exception")
 
         val progress = eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
 
@@ -190,14 +191,14 @@ class EventDownSyncTaskTest {
 
     @Test(expected = RemoteDbNotSignedInException::class)
     fun downSync_shouldThrowUpIfRemoteDbNotSignedInExceptionOccurs() = runTest {
-        coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws RemoteDbNotSignedInException()
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws RemoteDbNotSignedInException()
 
         eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
     }
 
     @Test
     fun downSync_shouldAddEventWithErrorIfDownloadFails() = runTest {
-        coEvery { eventRemoteDataSource.getEvents(any(), any()) } throws Throwable("IO Exception")
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws Throwable("IO Exception")
         eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
 
         coVerify(exactly = 1) {
@@ -333,9 +334,8 @@ class EventDownSyncTaskTest {
 
     private suspend fun mockProgressEmission(progressEvents: List<EnrolmentRecordEvent>) {
         downloadEventsChannel = Channel(capacity = Channel.UNLIMITED)
-        coEvery { eventRemoteDataSource.getEvents(any(), any()) } returns EventDownSyncResult(
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } returns EventDownSyncResult(
             0,
-            requestId = "requestId",
             status = 200,
             downloadEventsChannel
         )

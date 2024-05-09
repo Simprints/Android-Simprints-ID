@@ -16,26 +16,28 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
         @Query("l_mode") modes: List<ApiModes>,
-        @Query("lastEventId") lastEventId: String?
+        @Query("lastEventId") lastEventId: String?,
     ): Response<Void>
 
     @Headers("Content-Encoding: gzip")
     @POST("projects/{projectId}/events")
     suspend fun uploadEvents(
+        @Header("X-Request-ID") requestId: String,
         @Path("projectId") projectId: String,
         @Query("acceptInvalidEvents") acceptInvalidEvents: Boolean = true,
-        @Body body: ApiUploadEventsBody
+        @Body body: ApiUploadEventsBody,
     ): Response<ResponseBody>
 
     @Streaming
     @GET("projects/{projectId}/events")
     suspend fun downloadEvents(
+        @Header("X-Request-ID") requestId: String,
         @Path("projectId") projectId: String,
         @Query("l_moduleId") moduleId: String?,
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
         @Query("l_mode") modes: List<ApiModes>,
-        @Query("lastEventId") lastEventId: String?
+        @Query("lastEventId") lastEventId: String?,
     ): Response<ResponseBody>
 
     @Headers("Content-Encoding: gzip")
