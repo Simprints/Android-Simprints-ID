@@ -75,7 +75,6 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                 // check if device is rooted before starting the sync
                 securityManager.checkIfDeviceIsRooted()
                 crashlyticsLog("Start")
-                showProgressNotification()
                 val configuration = configManager.getProjectConfiguration()
 
                 if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed(configuration)) return@withContext success(

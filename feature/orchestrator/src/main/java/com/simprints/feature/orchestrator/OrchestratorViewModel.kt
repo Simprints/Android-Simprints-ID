@@ -111,7 +111,7 @@ internal class OrchestratorViewModel @Inject constructor(
     fun restoreModalitiesIfNeeded() {
         viewModelScope.launch {
             if (modalities.isEmpty()) {
-                val projectConfiguration = configRepository.getProjectConfiguration()
+                val projectConfiguration = configManager.getProjectConfiguration()
                 modalities = projectConfiguration.general.modalities.toSet()
             }
         }

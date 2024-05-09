@@ -261,14 +261,14 @@ internal class OrchestratorViewModelTest {
             mockk(),
             mockk(),
         )
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns emptyList() andThen projectModalities
         }
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
 
-        coVerify(exactly = 3) { configRepository.getProjectConfiguration() }
+        coVerify(exactly = 3) { configManager.getProjectConfiguration() }
     }
 
     @Test
@@ -277,14 +277,14 @@ internal class OrchestratorViewModelTest {
             mockk(),
             mockk(),
         )
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns projectModalities
         }
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
 
-        coVerify(exactly = 2) { configRepository.getProjectConfiguration() }
+        coVerify(exactly = 2) { configManager.getProjectConfiguration() }
     }
 
     private fun createMockStep(stepId: Int, payload: Bundle = Bundle()) = Step(
