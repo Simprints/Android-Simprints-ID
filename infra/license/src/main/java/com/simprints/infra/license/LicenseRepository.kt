@@ -13,5 +13,5 @@ interface LicenseRepository {
 
     suspend fun getCachedLicense(licenseVendor: Vendor): License?
     suspend fun deleteCachedLicense(licenseVendor: Vendor)
-
+    suspend fun deleteCachedLicenses()
 }

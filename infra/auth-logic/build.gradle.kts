@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:images"))
     implementation(project(":infra:recent-user-activity"))
+    implementation(project(":infra:license"))
 
     implementation(project(":fingerprint:infra:scanner"))
 

@@ -81,6 +81,13 @@ class LicenseLocalDataSourceImplTest {
     }
 
     @Test
+    fun `check delete all deletes the dir`() = runTest {
+        localSource.deleteCachedLicenses()
+
+        assertThat(File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists()).isFalse()
+    }
+
+    @Test
     fun `check getting the file renames old Roc license file to RANK_ONE_FACE `() = runTest {
         // Create the license folder and the old ROC.lic file
         val licenceFolderPath = "${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}"

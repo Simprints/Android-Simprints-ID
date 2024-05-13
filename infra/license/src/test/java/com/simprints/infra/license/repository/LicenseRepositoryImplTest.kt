@@ -9,6 +9,7 @@ import com.simprints.infra.license.remote.ApiLicenseResult
 import com.simprints.infra.license.remote.License
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.test.runTest
@@ -148,7 +149,7 @@ class LicenseRepositoryImplTest {
     }
 
     @Test
-    fun ` test getCachedLicense success`() = runTest {
+    fun `test getCachedLicense success`() = runTest {
         // Given
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns license
         // When
@@ -157,15 +158,28 @@ class LicenseRepositoryImplTest {
         assertThat(cachedLicense).isEqualTo(license)
     }
 
-    fun ` test getCachedLicense failure`() = runTest {
+    @Test
+    fun `test getCachedLicense failure`() = runTest {
         // Given
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
         // When
         val license= licenseRepositoryImpl.getCachedLicense(RANK_ONE_FACE)
         // Then
         assertThat(license).isNull()
+    }
 
+    @Test
+    fun `deletes cached licence`() = runTest {
+        licenseRepositoryImpl.deleteCachedLicense(RANK_ONE_FACE)
 
+        coVerify { licenseLocalDataSource.deleteCachedLicense(RANK_ONE_FACE) }
+    }
+
+    @Test
+    fun `deletes all cached licence`() = runTest {
+        licenseRepositoryImpl.deleteCachedLicenses()
+
+        coVerify { licenseLocalDataSource.deleteCachedLicenses() }
     }
 
     companion object {

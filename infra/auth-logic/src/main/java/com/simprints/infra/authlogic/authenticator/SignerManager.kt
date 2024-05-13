@@ -8,6 +8,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
@@ -24,6 +25,7 @@ internal class SignerManager @Inject constructor(
     private val imageRepository: ImageRepository,
     private val eventRepository: EventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val licenseRepository: LicenseRepository,
     private val scannerManager: ScannerManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
@@ -59,6 +61,7 @@ internal class SignerManager @Inject constructor(
         eventRepository.deleteAll()
         enrolmentRecordRepository.deleteAll()
         scannerManager.deleteFirmwareFiles()
+        licenseRepository.deleteCachedLicenses()
 
         authStore.cleanCredentials()
         authStore.clearFirebaseToken()
