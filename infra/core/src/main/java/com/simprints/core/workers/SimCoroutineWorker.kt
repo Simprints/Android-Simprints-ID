@@ -13,6 +13,7 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.tools.utils.BatteryOptimizationUtils
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -58,6 +59,9 @@ abstract class SimCoroutineWorker(
 
     protected suspend fun showProgressNotification() {
         try {
+            if (BatteryOptimizationUtils.isFollowingBatteryOptimizations(context)) {
+                return
+            }
             setForeground(getForegroundInfo())
         } catch (setForegroundException: Throwable) {
             // Setting foreground (showing the notification) may be restricted by the system

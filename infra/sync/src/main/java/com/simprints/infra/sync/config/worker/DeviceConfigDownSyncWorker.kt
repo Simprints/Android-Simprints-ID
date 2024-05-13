@@ -1,6 +1,7 @@
 package com.simprints.infra.sync.config.worker
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
@@ -12,6 +13,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
+@HiltWorker
 internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
@@ -25,8 +27,8 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result =
         withContext(dispatcher) {
-            crashlyticsLog("Fetching device config state")
             showProgressNotification()
+            crashlyticsLog("Fetching device config state")
 
             try {
                 val state = configRepository.getDeviceState()

@@ -4,8 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -95,6 +101,22 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
+    fun restoreStepsIfNeeded() {
+        if (steps.isEmpty()) {
+            // Restore the steps from cache
+            steps = cache.steps
+        }
+    }
+
+    fun restoreModalitiesIfNeeded() {
+        viewModelScope.launch {
+            if (modalities.isEmpty()) {
+                val projectConfiguration = configRepository.getProjectConfiguration()
+                modalities = projectConfiguration.general.modalities.toSet()
+            }
+        }
+    }
+
     override fun onCleared() {
         cache.steps = steps
         super.onCleared()
@@ -150,7 +172,13 @@ internal class OrchestratorViewModel @Inject constructor(
 
             if (matchingStep != null) {
                 val fingerprintSamples = result.results.mapNotNull { it.sample }
-                    .map { MatchParams.FingerprintSample(it.fingerIdentifier, it.format, it.template) }
+                    .map {
+                        MatchParams.FingerprintSample(
+                            it.fingerIdentifier,
+                            it.format,
+                            it.template
+                        )
+                    }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFingerprintStepArgs(fingerprintSamples)
@@ -159,6 +187,35 @@ internal class OrchestratorViewModel @Inject constructor(
                     matchingStep.payload = newPayload
                 }
             }
+        }
+    }
+
+    fun setActionRequestFromJson(json: String) {
+        try {
+            actionRequest = JsonHelper.fromJson(
+                json = json,
+                module = dbSerializationModule,
+                type = object : TypeReference<ActionRequest>() {})
+        } catch (e: Exception) {
+            Simber.e(e)
+        }
+    }
+
+    fun getActionRequestJson(): String? {
+        return try {
+            actionRequest?.let {
+                JsonHelper.toJson(it, dbSerializationModule)
+            }
+        } catch (e: Exception) {
+            Simber.e(e)
+            null
+        }
+    }
+
+    companion object {
+        val dbSerializationModule = SimpleModule().apply {
+            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
+            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
         }
     }
 }

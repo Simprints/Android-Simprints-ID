@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Parcelable
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest

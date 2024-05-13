@@ -6,7 +6,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -56,9 +55,8 @@ internal class SyncViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
-    private val logoutUseCase: LogoutUseCase,
+    private val logout: LogoutUseCase,
     private val recentUserActivityManager: RecentUserActivityManager,
-    @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     companion object {
@@ -106,8 +104,8 @@ internal class SyncViewModel @Inject constructor(
                     configRepository.getProject(authStore.signedInProjectId).state == ProjectState.PROJECT_ENDING
 
                 if (isSyncComplete && isProjectEnding) {
-                    externalScope.launch {
-                        logoutUseCase()
+                    viewModelScope.launch {
+                        logout()
                         _signOutEventLiveData.postValue(LiveDataEvent())
                     }
                 }

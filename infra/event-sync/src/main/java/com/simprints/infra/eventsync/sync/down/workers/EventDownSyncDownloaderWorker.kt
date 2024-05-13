@@ -76,8 +76,8 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
             showProgressNotification()
+            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
             val workerId = this@EventDownSyncDownloaderWorker.id.toString()
             var count = syncCache.readProgress(workerId)
