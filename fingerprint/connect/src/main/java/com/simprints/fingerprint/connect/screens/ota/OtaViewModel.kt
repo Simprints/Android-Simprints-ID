@@ -14,9 +14,11 @@ import com.simprints.fingerprint.connect.usecase.ReportFirmwareUpdateEventUseCas
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
-import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.*
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.HARD_RESET
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaStep
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -35,7 +37,7 @@ internal class OtaViewModel @Inject constructor(
     private val reportFirmwareUpdate: ReportFirmwareUpdateEventUseCase,
     private val timeHelper: TimeHelper,
     private val recentUserActivityManager: RecentUserActivityManager,
-    private val configRepository: ConfigRepository
+    private val configManager: ConfigManager
 ) : ViewModel() {
 
     val progress: LiveData<Float>
@@ -93,7 +95,7 @@ internal class OtaViewModel @Inject constructor(
     private suspend fun targetVersions(availableOta: AvailableOta): String {
         val scannerVersion = recentUserActivityManager.getRecentUserActivity().lastScannerVersion
         val availableFirmwareVersions =
-            configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions
+            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions
         return when (availableOta) {
             AvailableOta.CYPRESS -> availableFirmwareVersions?.get(scannerVersion)?.cypress ?: ""
             AvailableOta.STM -> availableFirmwareVersions?.get(scannerVersion)?.stm ?: ""

@@ -7,8 +7,8 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
@@ -42,7 +42,7 @@ internal class FingerprintMatcherUseCaseTest {
     lateinit var resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
@@ -54,13 +54,13 @@ internal class FingerprintMatcherUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         coEvery { resolveBioSdkWrapperUseCase() } returns bioSdkWrapper
         coEvery {
-            configRepository.getProjectConfiguration().fingerprint?.allowedSDKs
+            configManager.getProjectConfiguration().fingerprint?.allowedSDKs
         } returns listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
 
         useCase = FingerprintMatcherUseCase(
             enrolmentRecordRepository,
             resolveBioSdkWrapperUseCase,
-            configRepository,
+            configManager,
             createRangesUseCase,
             testCoroutineRule.testCoroutineDispatcher,
         )
@@ -69,7 +69,7 @@ internal class FingerprintMatcherUseCaseTest {
     @Test
     fun `Correctly get the matcher name`() = runTest {
         coEvery { bioSdkWrapper.matcherName } returns "SIM_AFIS"
-        coEvery { configRepository.getProjectConfiguration().fingerprint?.allowedSDKs } returns listOf(
+        coEvery { configManager.getProjectConfiguration().fingerprint?.allowedSDKs } returns listOf(
             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
         )
         assertThat(useCase.matcherName()).isEqualTo("SIM_AFIS")

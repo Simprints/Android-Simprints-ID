@@ -5,11 +5,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -35,7 +35,7 @@ class ProjectDetailsViewModelTest {
     private lateinit var authStore: AuthStore
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -55,7 +55,7 @@ class ProjectDetailsViewModelTest {
 
     @Test
     fun `should initialize the live data correctly`() = runTest {
-        coEvery { configRepository.getProject(PROJECT_ID) } returns PROJECT
+        coEvery { configManager.getProject(PROJECT_ID) } returns PROJECT
         every {
             tokenizationProcessor.decrypt(
                 RECENT_USER_ACTIVITY.lastUserUsed as TokenizableString.Tokenized,
@@ -65,7 +65,7 @@ class ProjectDetailsViewModelTest {
         } returns RECENT_USER_ACTIVITY.lastUserUsed
 
         viewModel = ProjectDetailsViewModel(
-            configRepository = configRepository,
+            configManager = configManager,
             authStore = authStore,
             recentUserActivityManager = recentUserActivityManager,
             tokenizationProcessor = tokenizationProcessor
@@ -77,10 +77,10 @@ class ProjectDetailsViewModelTest {
 
     @Test
     fun `Should handle exception by producing correct state`() = runTest {
-        coEvery { configRepository.getProject(PROJECT_ID) } throws Exception()
+        coEvery { configManager.getProject(PROJECT_ID) } throws Exception()
 
         viewModel = ProjectDetailsViewModel(
-            configRepository = configRepository,
+            configManager = configManager,
             authStore = authStore,
             recentUserActivityManager = recentUserActivityManager,
             tokenizationProcessor = tokenizationProcessor

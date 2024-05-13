@@ -15,7 +15,7 @@ import com.simprints.feature.clientapi.usecases.GetEventsForCoSyncUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
@@ -73,7 +73,7 @@ internal class ClientApiViewModelTest {
     lateinit var authStore: AuthStore
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     private lateinit var viewModel: ClientApiViewModel
 
@@ -100,7 +100,7 @@ internal class ClientApiViewModelTest {
             deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
             isFlowCompletedWithError = isFlowCompletedWithError,
             authStore = authStore,
-            configRepository = configRepository
+            configManager = configManager
         )
     }
 

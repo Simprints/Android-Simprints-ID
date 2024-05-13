@@ -7,9 +7,9 @@ import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTok
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -28,7 +28,7 @@ import java.io.IOException
 class ProjectAuthenticatorTest {
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var secureDataManager: SecurityManager
@@ -51,7 +51,7 @@ class ProjectAuthenticatorTest {
 
         authenticator = ProjectAuthenticator(
             secureDataManager,
-            configRepository,
+            configManager,
             signerManager,
             authenticationRemoteDataSource,
             integrityTokenRequester,
@@ -133,8 +133,8 @@ class ProjectAuthenticatorTest {
         runTest(StandardTestDispatcher()) {
             authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
 
-            coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
-            coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
+            coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
+            coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
         }
 
     @Test
@@ -157,7 +157,7 @@ class ProjectAuthenticatorTest {
             authenticationRemoteDataSource.requestAuthToken(PROJECT_ID, DEVICE_ID, any())
         } returns Token("", "", "", "")
 
-        coEvery { configRepository.getProjectConfiguration() } returns ProjectConfiguration(
+        coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
             PROJECT_ID,
             "",
             general = GeneralConfiguration(
@@ -174,7 +174,7 @@ class ProjectAuthenticatorTest {
             mockk(),
             mockk(),
         )
-        coEvery { configRepository.getPrivacyNotice(any(), any()) } returns emptyFlow()
+        coEvery { configManager.getPrivacyNotice(any(), any()) } returns emptyFlow()
 
         coEvery { integrityTokenRequester.getToken(any()) } returns "token"
     }

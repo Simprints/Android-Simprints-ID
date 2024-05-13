@@ -2,7 +2,6 @@ package com.simprints.feature.dashboard.settings.fingerselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Finger.LEFT_3RD_FINGER
 import com.simprints.infra.config.store.models.Finger.LEFT_4TH_FINGER
 import com.simprints.infra.config.store.models.Finger.LEFT_5TH_FINGER
@@ -14,6 +13,7 @@ import com.simprints.infra.config.store.models.Finger.RIGHT_5TH_FINGER
 import com.simprints.infra.config.store.models.Finger.RIGHT_INDEX_FINGER
 import com.simprints.infra.config.store.models.Finger.RIGHT_THUMB
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
@@ -34,11 +34,11 @@ class FingerSelectionViewModelTest {
     private val fingerprintConfiguration = mockk<FingerprintConfiguration> {
         every { bioSdkConfiguration } returns bioSdkConfigurationMock
     }
-    private val configRepository = mockk<ConfigRepository>(relaxed = true) {
+    private val configManager = mockk<ConfigManager>(relaxed = true) {
         coEvery { getProjectConfiguration().fingerprint } returns fingerprintConfiguration
     }
     private val viewModel = FingerSelectionViewModel(
-        configRepository,
+        configManager,
     )
 
     @Test

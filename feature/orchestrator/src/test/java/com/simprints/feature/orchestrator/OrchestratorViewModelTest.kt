@@ -24,7 +24,7 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -55,7 +55,7 @@ internal class OrchestratorViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var cache: OrchestratorCache
@@ -92,7 +92,7 @@ internal class OrchestratorViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         viewModel = OrchestratorViewModel(
-            configRepository,
+            configManager,
             cache,
             locationStore,
             stepsBuilder,
@@ -261,14 +261,14 @@ internal class OrchestratorViewModelTest {
             mockk(),
             mockk(),
         )
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns emptyList() andThen projectModalities
         }
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
 
-        coVerify(exactly = 3) { configRepository.getProjectConfiguration() }
+        coVerify(exactly = 3) { configManager.getProjectConfiguration() }
     }
 
     @Test
@@ -277,14 +277,14 @@ internal class OrchestratorViewModelTest {
             mockk(),
             mockk(),
         )
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns projectModalities
         }
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
 
-        coVerify(exactly = 2) { configRepository.getProjectConfiguration() }
+        coVerify(exactly = 2) { configManager.getProjectConfiguration() }
     }
 
     private fun createMockStep(stepId: Int, payload: Bundle = Bundle()) = Step(

@@ -6,20 +6,20 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 internal class LogoutSyncViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
 
     val settingsLocked: LiveData<LiveDataEventWithContent<SettingsPasswordConfig>>
         get() = liveData(context = viewModelScope.coroutineContext) {
-            emit(LiveDataEventWithContent(configRepository.getProjectConfiguration().general.settingsPassword))
+            emit(LiveDataEventWithContent(configManager.getProjectConfiguration().general.settingsPassword))
         }
 
 
