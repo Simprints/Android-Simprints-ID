@@ -10,6 +10,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"
         tools:remove="android:maxSdkVersion" />
 
+    <!-- Allows picking files directly from national ID app -->
+    <queries>
+        <provider android:authorities="com.simprints.national.id.provider" />
+    </queries>
 
     <!-- usesCleartextTraffic ensures that it is also disabled on version that do not support security config -->
     <application
