@@ -772,7 +772,7 @@ class FingerprintCaptureViewModelTest {
             GOOD_SCAN
         )
         acquireImageResponses(OK)
-        withImageTransfer(isEager = true)
+        withImageTransfer(strategy = ImageSavingStrategy.EAGER)
 
         vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
@@ -854,6 +854,101 @@ class FingerprintCaptureViewModelTest {
                 IFingerIdentifier.LEFT_THUMB,
                 IFingerIdentifier.RIGHT_THUMB,
                 IFingerIdentifier.RIGHT_INDEX_FINGER
+            )
+            actualFingerprints?.results?.forEach {
+                assertThat(it.sample?.template).isEqualTo(TEMPLATE)
+                assertThat(it.sample?.imageRef).isNotNull()
+            }
+        }
+    }
+
+
+    @Test
+    @ExperimentalTime
+    fun receivesMixOfScanResults_withGoodScansOnlyTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() = runTest {
+        mockScannerSetUiIdle()
+        setupCaptureFingerprintResponses(
+            BAD_SCAN,
+            BAD_SCAN,
+            BAD_SCAN,
+
+            BAD_SCAN,
+            GOOD_SCAN,
+
+            GOOD_SCAN,
+        )
+        acquireImageResponses(OK)
+        withImageTransfer(strategy = ImageSavingStrategy.ONLY_GOOD_SCAN)
+
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
+
+        // Finger 1
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+       // vm.handleScanButtonPressed()
+        advanceTimeBy(TIME_SKIP_MS)
+
+        // Finger 3
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        advanceTimeBy(TIME_SKIP_MS)
+
+        // Finger 4
+       // vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        advanceTimeBy(TIME_SKIP_MS)
+
+        assertThat(vm.stateLiveData.value).isEqualTo(
+            CollectFingerprintsState(
+                fingerStates = listOf(
+                    FingerState(
+                        FOUR_FINGERS_IDS[0],
+                        listOf(
+                            CaptureState.Collected(
+                                ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60),
+                                numberOfBadScans = 3
+                            )
+                        )
+                    ),
+                    FingerState(
+                        FOUR_FINGERS_IDS[1],
+                        listOf(
+                            CaptureState.Collected(
+                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                                numberOfBadScans = 1
+                            )
+                        )
+                    ),
+                    FingerState(
+                        FOUR_FINGERS_IDS[2],
+                        listOf(
+                            CaptureState.Collected(
+                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                                numberOfBadScans = 0
+                            )
+                        )
+                    )
+                ),
+                currentFingerIndex = 2,
+                isAskingRescan = false,
+                isShowingConfirmDialog = true,
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
+            )
+        )
+        coVerify(exactly = 6) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
+
+        vm.handleConfirmFingerprintsAndContinue()
+        // Save image is called even if scanResult.image == null
+        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any()) }
+
+        vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
+            assertThat(actualFingerprints?.results).hasSize(3)
+            assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
+                IFingerIdentifier.LEFT_THUMB,
+                IFingerIdentifier.LEFT_INDEX_FINGER,
+                IFingerIdentifier.RIGHT_THUMB
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -1232,8 +1327,8 @@ class FingerprintCaptureViewModelTest {
         every { vero2Configuration.imageSavingStrategy } returns ImageSavingStrategy.NEVER
     }
 
-    private fun withImageTransfer(isEager: Boolean = false) {
-        every { vero2Configuration.imageSavingStrategy } returns if (isEager) ImageSavingStrategy.EAGER else ImageSavingStrategy.ONLY_USED_IN_REFERENCE
+    private fun withImageTransfer(strategy: ImageSavingStrategy = ImageSavingStrategy.ONLY_USED_IN_REFERENCE) {
+        every { vero2Configuration.imageSavingStrategy } returns strategy
         coEvery { saveImageUseCase.invoke(any(), any(), any()) } returns mockk {
             every { relativePath } returns Path(emptyArray())
         }

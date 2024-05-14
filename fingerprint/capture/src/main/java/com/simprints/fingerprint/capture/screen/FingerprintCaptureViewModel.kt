@@ -42,6 +42,10 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationI
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.EAGER
+import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.NEVER
+import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
@@ -176,13 +180,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private suspend fun initBioSdk() {
         try {
-            bioSdkWrapper= resolveBioSdkWrapperUseCase()
+            bioSdkWrapper = resolveBioSdkWrapperUseCase()
             bioSdkWrapper.initialize()
         } catch (e: BioSdkException.BioSdkInitializationException) {
             Simber.e(e)
             _invalidLicense.send()
         }
     }
+
     private fun launchReconnect() {
         if (!state.isShowingConnectionScreen) {
             updateState {
@@ -201,12 +206,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
             when (it.currentCaptureState()) {
                 is CaptureState.Scanning,
-                is CaptureState.TransferringImage -> pauseLiveFeedback()
+                is CaptureState.TransferringImage,
+                -> pauseLiveFeedback()
 
                 CaptureState.NotCollected,
                 CaptureState.Skipped,
                 is CaptureState.NotDetected,
-                is CaptureState.Collected -> {
+                is CaptureState.Collected,
+                -> {
                     if (it.isShowingConfirmDialog) stopLiveFeedback()
                     else startLiveFeedback(scannerManager.scanner)
                 }
@@ -265,7 +272,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         bioSdkWrapper.scanningTimeoutMs +
             if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
 
-   private fun isImageTransferRequired(): Boolean =
+    private fun isImageTransferRequired(): Boolean =
         bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
             scannerManager.scanner.isImageTransferSupported()
 
@@ -372,10 +379,18 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun shouldProceedToImageTransfer(quality: Int) = isImageTransferRequired() &&
-        (quality >= qualityThreshold() ||
-            tooManyBadScans(state.currentCaptureState(), plusBadScan = true) ||
-            bioSdkConfiguration.vero2?.imageSavingStrategy?.isEager() ?: false)
+    private fun shouldProceedToImageTransfer(quality: Int): Boolean {
+        val isGoodScan = quality >= qualityThreshold()
+        val isTooManyBadScans = tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
+
+        val shouldUploadImage = when (bioSdkConfiguration.vero2?.imageSavingStrategy) {
+            NEVER, null -> false
+            EAGER -> true
+            ONLY_GOOD_SCAN -> isGoodScan
+            ONLY_USED_IN_REFERENCE -> isGoodScan || isTooManyBadScans
+        }
+        return isImageTransferRequired() && shouldUploadImage
+    }
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.cancel()
@@ -504,6 +519,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 Simber.e(e)
                 handleNoFingerDetected()
             }
+
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)
