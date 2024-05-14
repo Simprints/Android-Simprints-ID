@@ -13,6 +13,7 @@ data class Vero2Configuration(
     enum class ImageSavingStrategy {
         NEVER,
         ONLY_GOOD_SCAN,
+        ONLY_USED_IN_REFERENCE,
         EAGER;
     }
 

@@ -1233,7 +1233,7 @@ class FingerprintCaptureViewModelTest {
     }
 
     private fun withImageTransfer(isEager: Boolean = false) {
-        every { vero2Configuration.imageSavingStrategy } returns if (isEager) ImageSavingStrategy.EAGER else ImageSavingStrategy.ONLY_GOOD_SCAN
+        every { vero2Configuration.imageSavingStrategy } returns if (isEager) ImageSavingStrategy.EAGER else ImageSavingStrategy.ONLY_USED_IN_REFERENCE
         coEvery { saveImageUseCase.invoke(any(), any(), any()) } returns mockk {
             every { relativePath } returns Path(emptyArray())
         }

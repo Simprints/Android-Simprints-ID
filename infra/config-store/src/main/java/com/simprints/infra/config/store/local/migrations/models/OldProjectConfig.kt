@@ -139,7 +139,7 @@ internal data class OldProjectConfig(
                 displayLiveFeedback = fingerprintLiveFeedbackOn.toBoolean(),
                 imageSavingStrategy = when (saveFingerprintImagesStrategy) {
                     "NEVER" -> Vero2Configuration.ImageSavingStrategy.NEVER
-                    "WSQ_15" -> Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+                    "WSQ_15" -> Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
                     "WSQ_15_EAGER" -> Vero2Configuration.ImageSavingStrategy.EAGER
                     else -> Vero2Configuration.ImageSavingStrategy.NEVER
                 },
