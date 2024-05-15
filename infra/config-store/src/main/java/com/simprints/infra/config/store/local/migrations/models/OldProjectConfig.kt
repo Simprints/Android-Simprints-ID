@@ -85,7 +85,7 @@ internal data class OldProjectConfig(
                     ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
                 qualityThreshold = faceQualityThreshold.toInt(),
                 imageSavingStrategy = if (saveFaceImages.toBoolean()) {
-                    FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
+                    FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
                 } else {
                     FaceConfiguration.ImageSavingStrategy.NEVER
                 },

@@ -100,7 +100,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun flowFinished() {
         viewModelScope.launch {
             val projectConfiguration = configRepository.getProjectConfiguration()
-            if (projectConfiguration.face?.imageSavingStrategy == FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN) {
+            if (projectConfiguration.face?.imageSavingStrategy?.shouldSaveImage() == true) {
                 saveFaceDetections()
             }
 

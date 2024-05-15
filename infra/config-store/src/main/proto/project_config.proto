@@ -37,6 +37,7 @@ message ProtoFaceConfiguration {
     enum ImageSavingStrategy {
         NEVER = 0;
         ONLY_GOOD_SCAN = 1;
+        ONLY_USED_IN_REFERENCE = 2;
     }
 }
 

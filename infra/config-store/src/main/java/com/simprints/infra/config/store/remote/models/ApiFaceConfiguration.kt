@@ -22,11 +22,13 @@ internal data class ApiFaceConfiguration(
     @Keep
     enum class ImageSavingStrategy {
         NEVER,
+        ONLY_USED_IN_REFERENCE,
         ONLY_GOOD_SCAN;
 
         fun toDomain(): FaceConfiguration.ImageSavingStrategy =
             when (this) {
                 NEVER -> FaceConfiguration.ImageSavingStrategy.NEVER
+                ONLY_USED_IN_REFERENCE -> FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
                 ONLY_GOOD_SCAN -> FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
             }
     }

@@ -98,7 +98,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Save face detections should be called when image saving strategy set to ONLY_GOO_SCAN`() {
-        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_GOOD_SCAN
+        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_USED_IN_REFERENCE
 
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
