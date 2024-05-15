@@ -4,7 +4,10 @@ sealed class BioSdkException(
     message: String,
     cause: Throwable? = null
 ) : RuntimeException(message, cause) {
-    class BioSdkInitializationException(override val cause: Throwable?) :
+    class BioSdkInitializationException(
+        override val cause: Throwable? = null,
+        override val message: String? = null
+    ) :
         BioSdkException("Bio SDK initialization failed")
 
     class CannotAcquireFingerprintImageException(override val message: String?) :
@@ -13,9 +16,6 @@ sealed class BioSdkException(
     class ImageDecodingException : BioSdkException("Cannot decode WSQ image")
     class ImageQualityCheckingException(override val cause: Throwable?) :
         BioSdkException("Cannot check image quality")
-
-    class ImageQualityBelowThresholdException(val imageQualityScore: Int) :
-        BioSdkException("Image quality below threshold")
 
     class TemplateExtractionException(override val cause: Throwable?) :
         BioSdkException("Cannot extract template")

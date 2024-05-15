@@ -11,13 +11,14 @@ dependencies {
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:config-store"))
-    implementation(project(":infra:config-sync"))
+    implementation(project(":infra:sync"))
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:images"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:recent-user-activity"))
     implementation(project(":feature:consent"))
+    implementation(project(":feature:login"))
 
     implementation(libs.fuzzywuzzy.core)
 

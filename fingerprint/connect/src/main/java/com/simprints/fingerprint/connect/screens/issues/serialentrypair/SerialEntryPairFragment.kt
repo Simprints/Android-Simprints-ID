@@ -25,6 +25,7 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -152,7 +153,7 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
                 recentUserActivityManager.updateRecentUserActivity {
                     it.copy(lastScannerUsed = serialNumberConverter.convertMacAddressToSerialNumber(macAddress))
                 }
-                retryConnectAndFinishFragment()
+                finishFragmentAndRetryConnect()
             } else {
                 handlePairingAttemptFailed(false)
             }
@@ -176,13 +177,16 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
         }
     }
 
-    private fun retryConnectAndFinishFragment() {
+    private fun finishFragmentAndRetryConnect() {
         determineWhetherPairingWasSuccessfulJob?.cancel()
-        connectScannerViewModel.connect()
-        findNavController().navigate(
+        // Order of execution is important here. It's necessary to navigate first and attempt to
+        // reconnect afterwards.
+        findNavController().navigateSafely(
+            this,
             SerialEntryPairFragmentDirections.actionSerialEntryPairFragmentToConnectProgressFragment(),
             navOptions { popUpTo(R.id.connectProgressFragment) }
         )
+        connectScannerViewModel.connect()
     }
 
     companion object {

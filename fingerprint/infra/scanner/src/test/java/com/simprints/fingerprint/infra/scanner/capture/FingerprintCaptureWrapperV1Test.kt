@@ -91,7 +91,8 @@ class FingerprintCaptureWrapperV1Test {
     private suspend fun startCapturing() = scannerWrapper.acquireFingerprintTemplate(
         Dpi(1000),
         3000,
-        60
+        60,
+        false
     )
 
 }

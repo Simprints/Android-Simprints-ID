@@ -7,15 +7,19 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
+import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -23,6 +27,7 @@ import com.simprints.infra.resources.R as IDR
 internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     companion object {
+
         private const val TOTAL_RECORDS_INDEX = 0
     }
 
@@ -37,6 +42,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         setupClickListeners()
         observeUI()
         viewModel.refreshInformation()
+
+        findNavController().handleResult<LoginResult>(
+            viewLifecycleOwner,
+            R.id.syncInfoFragment,
+            LoginContract.DESTINATION,
+        ) { result -> viewModel.handleLoginResult(result) }
     }
 
     private fun setupClickListeners() {
@@ -53,6 +64,9 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.syncButton.setOnClickListener {
             viewModel.forceSync()
             updateSyncButton(isSyncInProgress = true)
+        }
+        binding.syncReloginRequiredLoginButton.setOnClickListener {
+            viewModel.login()
         }
     }
 
@@ -77,13 +91,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
 
         viewModel.recordsToDownSync.observe(viewLifecycleOwner) {
-            binding.recordsToDownloadCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
-        }
-
-        viewModel.recordsToDelete.observe(viewLifecycleOwner) {
-            binding.recordsToDeleteCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToDeleteCount, binding.recordsToDeleteProgress)
+            binding.recordsToDownloadCount.text = it?.let {
+                if (it.isLowerBound) "${it.count}+" else "${it.count}"
+            } ?: ""
+            setProgressBar(it?.count, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
         }
 
         viewModel.moduleCounts.observe(viewLifecycleOwner) {
@@ -97,6 +108,21 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
             binding.syncButton.isEnabled = it
         }
+        viewModel.isReloginRequired.observe(viewLifecycleOwner) { reloginRequired ->
+            if (reloginRequired) {
+                binding.syncReloginRequiredSection.visibility = View.VISIBLE
+                binding.syncButton.visibility = View.GONE
+            } else {
+                binding.syncReloginRequiredSection.visibility = View.GONE
+                binding.syncButton.visibility = View.VISIBLE
+            }
+        }
+        viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
+            findNavController().navigate(
+                R.id.action_syncInfoFragment_to_login,
+                loginArgs
+            )
+        })
     }
 
     private fun updateSyncButton(isSyncInProgress: Boolean) {
@@ -119,7 +145,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
         if (!configuration.isEventDownSyncAllowed()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
-            binding.recordsToDeleteCardView.visibility = View.GONE
         }
 
         if (!configuration.canSyncDataToSimprints()) {

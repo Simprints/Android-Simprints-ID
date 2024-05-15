@@ -3,6 +3,8 @@
 
     <!-- Alert -->
     <string name="alert_title_fallback">अलर्ट</string>
+    <string name="alert_button_close">बंद करें</string>
+
     <!-- Consent -->
     <string name="consent_general_title">सामान्य सहमति</string>
     <string name="consent_enrol_only">आपको %2$s में पंजीकृत करने के लिए हम आपको %1$s करना चाहेंगे</string>
@@ -21,8 +23,12 @@
     <string name="consent_parental_share_data_yes">उनके %2$s व वर्तमान स्थान की जानकारी पर %1$s व सिंप्रिंट्स की पहुँच होगी जोकि एक ब्रिटेन आधारित स्वयं-सेवी संस्था है।</string>
     <string name="consent_parental_privacy_rights">यदि आप अभी सहमति देते हैं, तो भी बाद में किसी भी समय अपनी  सहमति वापस ले सकते हैं और अपने बच्चे का डाटा मिटाने के लिए कह सकते हैं।</string>
     <string name="consent_parental_confirmation">क्या हम आपके बच्चे के %1$s का उपयोग कर सकते हैं ? कृपया कहें \"मैं सहमत हूँ \", \"मैं सहमत नहीं हूँ \", or \"मेरे कुछ सवाल हैं.\"</string>
+    <string name="consent_biometrics_general_fingerprint">अपनी उंगलियों के निशान का उपयोग करें</string>
     <string name="consent_biometric_general_face">अपने चेहरे की फ़ोटो लें</string>
+    <string name="consent_biometrics_access_fingerprint">फ़िंगरप्रिंट जानकारी</string>
     <string name="consent_biometrics_access_face">चित्र</string>
+    <string name="consent_biometrics_access_fingerprint_face">फिंगरप्रिंट जानकारी, तस्वीरें</string>
+    <string name="consent_biometrics_parental_fingerprint">अपने बच्चे की उंगलियों के निशान का उपयोग करें</string>
     <string name="consent_biometrics_parental_face">अपने बच्चे के चेहरे की फ़ोटो लें</string>
     <string name="consent_biometric_concat_modalities">और</string>
     <string name="consent_decline_button">असहमत</string>
@@ -37,13 +43,18 @@
     <string name="enrol_last_biometrics_success">पुष्टिकरण भेजा गया</string>
     <string name="enrol_last_biometrics_alert_title">सेव नहीं किया जा सकता</string>
     <string name="enrol_last_biometrics_alert_message">1. %1$s रिकॉर्ड सहेजने में विफल \n2. बंद करें टैप करें</string>
+    <string name="enrol_last_biometrics_alert_message_duplicate_records">1. %1$s रिकॉर्ड को सहेजने में विफल रहा क्योंकि यह मौजूदा रिकॉर्ड की नकल करता है \n 2. बंद करें पर टैप करें</string>
     <string name="enrol_last_biometrics_alert_message_face_param">चेहरा</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">फ़िंगरप्रिंट</string>
     <string name="enrol_last_biometrics_alert_message_all_param">चेहरा/फ़िंगरप्रिंट</string>
 
+    <!-- Exit form -->
+    <string name="exit_form_title_fingerprinting">आपने फ़िंगरप्रिंट कैप्चर करना क्यों छोड़ दिया?</string>
     <string name="exit_form_title_biometrics">आपने बायोमैट्रिक्स जानकारी क्यों नहीं ली?</string>
     <string name="exit_form_title_face">आपने चेहरे की पहचान क्यों नहीं ली?</string>
     <string name="exit_form_other_reason_hint">अतिरिक्त जानकारी</string>
     <string name="exit_form_continue_default_button">चेहरे की फ़ोटो लें</string>
+    <string name="exit_form_continue_fingerprints_button">फ़िंगरप्रिंट स्कैन करें</string>
     <string name="exit_form_continue_face_button">चेहरे की फ़ोटो लें</string>
     <string name="exit_form_submit_button">सबमिट करें</string>
     <string name="exit_form_select_option_submit_warning">कृपया किसी एक विकल्प का चयन करें और सबमिट करें</string>
@@ -52,6 +63,7 @@
     <string name="exit_form_reason_data_concerns">डाटा नहीं देना चाहते</string>
     <string name="exit_form_reason_does_not_have_permission">अनुमति नहीं है</string>
     <string name="exit_form_reason_app_not_working">एप काम नहीं कर रहा</string>
+    <string name="exit_form_reason_scanner_not_working">स्कैनर काम नहीं कर रहा</string>
     <string name="exit_form_reason_person_not_present">व्यक्ति उपस्थित नहीं है</string>
     <string name="exit_form_reason_too_young">आयु बहुत कम है</string>
     <string name="exit_form_reason_other">अन्य</string>
@@ -61,6 +73,8 @@
     <string name="fetch_subject_guid_not_found_alert_title">व्यक्ति नहीं मिला।</string>
     <string name="fetch_subject_guid_not_found_online_message">सत्यापन के लिए चुना गया व्यक्ति डेटाबेस में नहीं हैं।</string>
     <string name="fetch_subject_guid_not_found_offline_message">व्यक्ति नहीं मिला, कृपया इंटरनेट की कनेक्टीवीटी सुनिश्चित करें और पुनः प्रयास करें</string>
+    <string name="fetch_subject_try_again_button">पुनः प्रयास करें</string>
+
     <!-- Login -->
     <string name="login_id_hint">प्रोजेक्ट आईडी</string>
     <string name="login_secret_hint">प्रोजेक्ट कुंजी</string>
@@ -68,13 +82,23 @@
     <string name="login_scan_qr_button">क्यूआर कोड को स्कैन करें</string>
     <string name="login_log_in_button">लॉग-इन</string>
     <string name="login_qr_code_scanning_problem_error">क्यूआर कोड स्कैन करने में त्रुटि आ रही है</string>
+    <string name="login_qr_code_scanning_camera_permission_error">कैमरे का उपयोग करने की अनुमति के बिना क्यूआर कोड को स्कैन नहीं किया जा सकता</string>
+    <string name="login_qr_code_scanning_camera_unavailable_error">फेस के प्रकार को कॉन्फ़िगर करते समय त्रुटि हुई, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
     <string name="login_invalid_qr_code_error">स्कैन किया गया क्यूआर कोड अमान्य है</string>
     <string name="login_missing_credentials_error">कोई प्रविष्टि छूट रही है। कृपया यूज़र ID, प्रोजेक्ट ID व कुंजी को जाँच लें व पुनः प्रयास करें।</string>
     <string name="login_invalid_credentials_error">अमान्य प्रविष्टि। कृपया प्रोजेक्ट आईडी व कुंजी की जाँच करें।</string>
     <string name="login_project_id_intent_mismatch_error">प्रोजेक्ट आईडी भिन्न डाला गया है। कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें।</string>
     <string name="login_no_network_error">वर्तमान में ऑफ़-लाइन। कृपया अपने इंटरनेट कनेक्शन को जाँच लें।</string>
+    <string name="login_integrity_service_down_error">सर्वर से जोड़ने में समस्या आ रही है। कृपया पुनः प्रयास करें।</string>
     <string name="login_server_error">सर्वर से जोड़ने में समस्या आ रही है। कृपया पुनः प्रयास करें।</string>
+    <string name="login_change_url">बैकएंड यूआरएल बदलें</string>
+    <string name="login_change_url_save">सेव</string>
+    <string name="login_change_url_reset">डिफ़ॉल्ट उपयोग करें</string>
+    <string name="login_change_url_cancel">रद्द करें</string>
 
+    <!-- Matcher -->
+    <string name="matcher_please_wait">जब तक हम पहचान के लिए आगे बढ़ें, कृपया प्रतीक्षा करें</string>
+    <string name="matcher_loading_candidates">उम्मीदवार में से मिलान हो रहा हैं</string>
     <string name="matcher_matching_candidates">उम्मीदवार में से मिलान हो रहा हैं</string>
     <plurals name="matcher_matched_candidates">
         <item quantity="one">%d  उम्मीदवार से तुलना की गई</item>
@@ -97,12 +121,19 @@
         <item quantity="other">%d मेल खाते हैं</item>
     </plurals>
 
+    <!-- Orchestrator -->
+    <string name="orchestrator_generic_error_title">त्रुटि</string>
     <string name="orchestrator_configuration_error_title">कॉन्फ़िगरेशन त्रुटि</string>
     <string name="orchestrator_project_id_error_message">कॉन्फ़िगरेशन त्रुटि हो रही है (भिन्न प्रोजेक्ट ID), कृपया होम स्क्रीन से लॉग-आउट करें या अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="orchestrator_unexpected_error_message">कृपया पुनः प्रयास करें, और यदि सिंप्रिंट्स फिर भी काम न करे तो कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
     <string name="orchestrator_outdated_google_play_services_alert_title">पुरानी Google Play सेवाएं</string>
     <string name="orchestrator_outdated_google_play_services_alert_message">इस डिवाइस पर इंस्टॉल किया गया google play services संस्करण SID द्वारा आवश्यक संस्करण से पुराना है</string>
     <string name="orchestrator_missing_google_play_services_alert_title">गूगल प्ले सेवाएं अनुपलब्ध</string>
     <string name="orchestrator_missing_google_play_services_alert_message">इस डिवाइस पर google play सेवाएं इंस्टॉल नहीं हैं।</string>
+    <string name="orchestrator_missing_or_outdated_google_play_store_app_alert_title">उपलब्ध नहीं है या पुराना हो गया है \"Google Play Store ऐप\"</string>
+    <string name="orchestrator_missing_or_outdated_google_play_store_app_alert_message">उपलब्ध नहीं है या पुराना हो गया है \"Google Play Store ऐप\"</string>
+    <string name="orchestrator_project_ending_title">प्रोजेक्ट फिलहाल ख़त्म हो रहा है</string>
+    <string name="orchestrator_project_ending_body">सत्र लॉन्च करने में असमर्थ क्योंकि प्रोजेक्ट फिलहाल रुका हुआ है। अधिक जानकारी के लिए कृपया अपने पर्यवेक्षक से संपर्क करें</string>
     <string name="orchestrator_project_paused_title">प्रोजेक्ट फिलहाल रुका हुआ है</string>
     <string name="orchestrator_project_paused_body">सत्र लॉन्च करने में असमर्थ क्योंकि प्रोजेक्ट फिलहाल रुका हुआ है। अधिक जानकारी के लिए कृपया अपने पर्यवेक्षक से संपर्क करें</string>
     <string name="orchestrator_invalid_project_id_error_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य प्रोजेक्ट आईडी), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
@@ -120,13 +151,16 @@
     <string name="select_subject_confirmation_sent">पुष्टिकरण भेजा गया</string>
     <string name="select_subject_redirecting_back">आपको वापस रीडायरेक्ट कर रहा है</string>
 
-    <!-- Face config -->
-    <string name="face_configuration_started">चेहरे की प्रारूप को कॉन्फ़िगर करना</string>
-    <string name="face_configuration_downloading">आवश्यक फ़ाइलें डाउनलोड हो रही हैं</string>
-    <string name="face_configuration_licence_invalid_title">लाइसेंस अमान्य है</string>
-    <string name="face_configuration_licence_invalid_message">बायोमेट्रिक लाइसेंस अमान्य है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
-    <string name="face_configuration_generic_error_title">कॉन्फ़िगरेशन त्रुटि</string>
-    <string name="face_configuration_generic_error_message">फेस के प्रकार को कॉन्फ़िगर करते समय त्रुटि हुई, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
+    <!-- Setup module -->
+    <string name="configuration_started">बायोमेट्रिक प्रकार कॉन्फ़िगर करना</string>
+    <string name="configuration_downloading">आवश्यक फ़ाइलें डाउनलोड हो रही हैं</string>
+    <string name="configuration_backend_maintenance_title">रखरखाव मोड</string>
+    <string name="configuration_backend_maintenance_message">सिस्टम फिलहाल रखरखाव के लिए ऑफ़लाइन है। कृपया बाद में पुन: प्रयास करें।</string>
+    <string name="configuration_licence_invalid_title">लाइसेंस अमान्य है</string>
+    <string name="configuration_licence_invalid_message">बायोमेट्रिक लाइसेंस अमान्य है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
+    <string name="configuration_generic_error_title">कॉन्फ़िगरेशन त्रुटि %1$s</string>
+    <string name="configuration_generic_error_message">बायोमेट्रिक लाइसेंस अमान्य है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
+
 
     <!-- Face capture -->
     <string name="face_capture_onboarding_light">अच्छी रोशनी वाली जगह पर जायें।</string>
@@ -146,6 +180,7 @@
     <string name="face_capture_error_look_straight">सुनिश्चित करें कि व्यक्ति सीधे कैमरे में देख रहा है</string>
     <string name="face_capture_begin_button">कैप्चर करने के लिए टैप करें</string>
     <string name="face_capture_prep_begin_button_capturing">कैप्चर हो रहा है.......</string>
+    <string name="face_capturing_permission_denied">कृपया कैमरे की अनुमति दें</string>
     <string name="face_capture_hold">अपनी जगह पर रहें</string>
     <string name="face_capture_successfully_title">चेहरे को सफलतापूर्वक कैप्चर कर लिया गया है।</string>
     <string name="face_capture_confirmation_title">पुष्टीकरण</string>
@@ -154,12 +189,109 @@
 
     <!-- Fingerprint connect -->
     <string name="fingerprint_connect_error_title">त्रुटि</string>
+    <string name="fingerprint_connect_unexpected_error_message">कृपया पुनः प्रयास करें, और यदि सिंप्रिंट्स फिर भी काम न करे तो कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
     <string name="fingerprint_connect_error_close_button">बंद करें</string>
     <string name="fingerprint_connect_try_again_button">पुनः प्रयास करें</string>
     <string name="fingerprint_connect_phone_settings_button">फोन सेटिंग</string>
     <string name="fingerprint_connect_pair_scanner_button">सेटिंग</string>
+    <string name="fingerprint_connect_scanner_id_confirmation_message">क्या %1$s आपका स्कैनर है?</string>
+    <string name="fingerprint_connect_scanner_confirmation_yes">हाँ</string>
+    <string name="fingerprint_connect_scanner_confirmation_no">नहीं</string>
+    <string name="fingerprint_connect_scanner_bt_connect">वेरो से कनेक्ट हो रहा है...</string>
+    <string name="fingerprint_connect_scanner_wake_un20">जाग रहा है UN20...</string>
+    <string name="fingerprint_connect_scanner_setup">वेरो स्थापित किया जा रहा है...</string>
+    <string name="fingerprint_connect_scanner_finished">कनेक्ट है</string>
+    <string name="fingerprint_connect_bluetooth_off_title">ब्लूटूथ बंद</string>
+    <string name="fingerprint_connect_turn_on_bluetooth">ब्लूटूथ चालू करें</string>
+    <string name="fingerprint_connect_bluetooth_on">✓ ब्लूटूथ चालू</string>
+    <string name="fingerprint_connect_bluetooth_off_error">ब्लूटूथ चालू नहीं किया जा सका. कृपया डिवाइस सेटिंग में ब्लूटूथ चालू करें।</string>
+    <string name="fingerprint_connect_nfc_off_title">एनएफसी बंद</string>
+    <string name="fingerprint_connect_turn_on_nfc">एनएफसी चालू करें</string>
+    <string name="fingerprint_connect_nfc_on">✓ एनएफसी चालू</string>
+    <string name="fingerprint_connect_scanner_off_title">स्कैनर बंद</string>
+    <string name="fingerprint_connect_scanner_off_instructions">स्कैनर पावर बटन दबाएँ</string>
+    <string name="fingerprint_connect_scanner_on">✓ स्कैनर चालू</string>
+    <string name="fingerprint_connect_not_my_scanner">%1$s मेरा स्कैनर नहीं है</string>
+    <string name="fingerprint_connect_nfc_pair_title">स्कैनर काम नहीं कर रहा</string>
+    <string name="fingerprint_connect_nfc_pair_instructions">स्कैनर के पीछे से फोन के पीछे तक टैप करें</string>
+    <string name="fingerprint_connect_nfc_cannot_connect_devices">डिवाइस कनेक्ट नहीं कर सकते</string>
+    <string name="fingerprint_connect_nfc_pairing_in_progress">%1$s स्कैनर मिला</string>
+    <string name="fingerprint_connect_nfc_pairing_try_again_instruction">कृपया सुनिश्चित करें कि %1$s स्कैनर चालू है और पुनः प्रयास करें।</string>
+    <string name="fingerprint_connect_nfc_pairing_rejected_instruction">युग्मन रद्द कर दिया गया, कृपया पुनः प्रयास करें और संकेत मिलने पर युग्मन अनुरोध स्वीकार करें।</string>
+    <string name="fingerprint_connect_nfc_pair_toast_try_again">एनएफसी चिप नहीं पढ़ सका, कृपया पुनः प्रयास करें</string>
+    <string name="fingerprint_connect_nfc_pair_toast_invalid">अमान्य एनएफसी चिप का पता चला</string>
     <string name="fingerprint_connect_serial_entry_ok">ठीक</string>
+    <string name="fingerprint_connect_serial_entry_pair_title">स्कैनर कनेक्ट नहीं है</string>
+    <string name="fingerprint_connect_enter_scanner_number">स्कैनर नंबर दर्ज करें</string>
+    <string name="fingerprint_connect_enter_scanner_number_detail">यह स्कैनर के नीचे पाया जाता है</string>
+    <string name="fingerprint_connect_serial_entry_pair_failed">कृपया सुनिश्चित करें कि %1$s स्कैनर चालू है और पुनः प्रयास करें।</string>
+    <string name="fingerprint_connect_serial_entry_pair_rejected">युग्मन रद्द कर दिया गया, कृपया पुनः प्रयास करें और संकेत मिलने पर युग्मन अनुरोध स्वीकार करें।</string>
+    <string name="fingerprint_connect_serial_entry_pair_toast_invalid">कृपया क्रमांक के 6 अंक दर्ज करें</string>
+    <string name="fingerprint_connect_ota_title">स्कैनर को अद्यतन करने की आवश्यकता है</string>
+    <string name="fingerprint_connect_ota_instructions">अपडेट होते समय स्कैनर चालू रखें</string>
+    <string name="fingerprint_connect_ota_updating">अपडेट हो रहा है...</string>
+    <string name="fingerprint_connect_ota_updating_attempt">%2$s में से प्रयास क्रमांक %1$s अपडेट किया जा रहा है...</string>
+    <string name="fingerprint_connect_ota_update_complete">✓ अद्यतन पूर्ण</string>
+    <string name="fingerprint_connect_ota_start_update">अद्यतनीकरण शुरू करें</string>
+    <string name="fingerprint_connect_ota_recovery_title">स्कैनर अद्यतन विफल रहा</string>
+    <string name="fingerprint_connect_ota_recovery_soft_reset">स्कैनर को बार-बार बंद करें और चालू करें</string>
+    <string name="fingerprint_connect_ota_recovery_hard_reset">पावर बटन को 5 सेकंड तक दबाकर रखें</string>
+    <string name="fingerprint_connect_ota_failed_title">स्कैनर अद्यतन विफल रहा</string>
+    <string name="fingerprint_connect_ota_failed_instructions">सहायता के लिए कृपया अपने पर्यवेक्षक से संपर्क करें</string>
+    <string name="fingerprint_connect_ota_continue_button">जारी रखना</string>
+    <string name="fingerprint_connect_low_battery_error_title">लो बैटरी</string>
+    <string name="fingerprint_connect_low_battery_error_message">स्कैनर की बैटरी कम है, कृपया अपने स्कैनर को चार्ज करें</string>
+    <string name="fingerprint_connect_pair_scanner_and_device_error_title">स्कैनर और डिवाइस को युग्मित करें</string>
+    <string name="fingerprint_connect_pair_scanner_and_device_error_message">1. जांचें कि स्कैनर चालू है \n 2. सेटिंग्स टैप करें \n 3. किसी भी युग्मित स्कैनर को अनपेयर करें \n 4. अपने स्कैनर को डिवाइस से पेयर करें \n 5. सिमप्रिंट्स पर लौटने के लिए वापस टैप करें</string>
+    <string name="fingerprint_connect_turn_scanner_on_error_title">स्कैनर चालू करें</string>
+    <string name="fingerprint_connect_turn_scanner_on_error_message">1. स्कैनर चालू करें \n 2. पुनः प्रयास करें पर टैप करें</string>
+    <string name="fingerprint_connect_no_permission_error_title">अनुमति नहीं</string>
+    <string name="fingerprint_connect_no_permission_error_message">कृपया फ़ोन सेटिंग में ब्लूटूथ अनुमति सक्षम करें</string>
+    <string name="fingerprint_connect_bluetooth_not_supported_error_message">इस डिवाइस पर ब्लूटूथ समर्थित नहीं है, कृपया अपने सिस्टम व्यवस्थापक से संपर्क करें</string>
+    <string name="fingerprint_connect_bluetooth_not_enabled_error_message">ब्लूटूथ सक्षम नहीं है, कृपया सुनिश्चित करें कि यह सेटिंग्स में सक्षम है और पुनः प्रयास करें</string>
+    <string name="fingerprint_connect_multiple_scanners_found_error_message">फ़ोन में एक से अधिक स्कैनर जोड़े गए हैं, कृपया अनावश्यक स्कैनर हटा दें</string>
+
+    <!-- Fingerprint capture -->
+    <string name="fingerprint_bio_configuration_started">फ़िंगरप्रिंट मोडैलिटी कॉन्फ़िगर करना</string>
+    <string name="fingerprint_capture_enrol_title">पंजीकरण</string>
+    <string name="fingerprint_capture_identify_title">पहचान</string>
+    <string name="fingerprint_capture_verify_title">विभिन्न सत्यापन</string>
+    <string name="fingerprint_capture_finger_l_5">बायीं पांचवी उंगली</string>
+    <string name="fingerprint_capture_finger_l_4">बायीं चौथी उंगली</string>
+    <string name="fingerprint_capture_finger_l_3">बायीं तीसरी उंगली</string>
+    <string name="fingerprint_capture_finger_l_2">बायीं तर्जनी</string>
+    <string name="fingerprint_capture_finger_l_1">बायां अंगूठा</string>
+    <string name="fingerprint_capture_finger_r_1">दायां अंगूठा</string>
+    <string name="fingerprint_capture_finger_r_2">दाहिनी तर्जनी</string>
+    <string name="fingerprint_capture_finger_r_3">दाहिनी तीसरी उंगली</string>
+    <string name="fingerprint_capture_finger_r_4">दाहिनी चौथी उंगली</string>
+    <string name="fingerprint_capture_finger_r_5">दाहिनी पाँचवीं उंगली</string>
+    <string name="fingerprint_capture_cancel_button" tools:ignore="ButtonCase">रद्द करें</string>
+    <string name="fingerprint_capture_error_title">त्रुटि</string>
     <string name="fingerprint_capture_unexpected_error_message">कृपया पुनः प्रयास करें, और यदि सिंप्रिंट्स फिर भी काम न करे तो कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="fingerprint_capture_please_scan">कृपया स्कैन करें</string>
+    <string name="fingerprint_capture_good_scan_direction">बाईं ओर अगली उंगली पर स्वाइप करें</string>
+    <string name="fingerprint_capture_poor_scan_direction">कृपया पुनः स्कैन करें</string>
+    <string name="fingerprint_capture_scanning">स्कैन किया जा रहा है...</string>
+    <string name="fingerprint_capture_transfering_data">डेटा स्थानांतरित किया जा रहा है...</string>
+    <string name="fingerprint_capture_good_scan_message">अच्छा स्कैन</string>
+    <string name="fingerprint_capture_poor_scan_message">ख़राब स्कैन</string>
+    <string name="fingerprint_capture_no_finger_detected_message">कोई उंगली नहीं मिली</string>
+    <string name="fingerprint_capture_finger_skipped_message">उंगली छूट गई</string>
+    <string name="fingerprint_capture_no_fingers_scanned">कृपया कम से कम 1 आवश्यक उंगली स्कैन करें</string>
+    <string name="fingerprint_capture_confirm_fingers_dialog_title">उंगलियां स्कैन की गईं</string>
+    <string name="fingerprint_capture_confirm_fingers_dialog_yes">पुष्टि करना</string>
+    <string name="fingerprint_capture_confirm_fingers_dialog_no">पुनः आरंभ करें</string>
+    <string name="fingerprint_capture_capture_number_text">%2$s में से संख्या %1$s को स्कैन करें</string>
+    <string name="fingerprint_capture_please_scan_again">कृपया स्कैन करें</string>
+    <string name="fingerprint_capture_rescan">फिर से स्कैन</string>
+    <string name="fingerprint_capture_rescan_question">फिर से स्कैन ?</string>
+    <string name="fingerprint_capture_scan">स्कैन</string>
+    <string name="fingerprint_capture_please_wait">कृपया प्रतीक्षा करें</string>
+    <string name="fingerprint_capture_missing_finger_button"><u>उंगली गायब</u></string>
+    <string name="fingerprint_capture_try_another_title">तैयार हो जाओ</string>
+    <string name="fingerprint_capture_try_another_finger">आइए एक और उंगली आज़माएँ!</string>
+
     <!-- Dashboard -->
     <string name="dashboard_title">डैशबोर्ड</string>
     <string name="dashboard_menu_privacy_notice">गोपनीयता की सूचना</string>
@@ -168,6 +300,11 @@
     <string name="dashboard_sync_project_ending_message">सत्र लॉन्च करने में असमर्थ क्योंकि परियोजना वर्तमान में समाप्त हो रही है। अधिक जानकारी के लिए कृपया अपने पर्यवेक्षक से संपर्क करें</string>
 
     <string name="dashboard_request_login_message">कृपया लॉग-इन करें। सिंप्रिंट्स ID व लॉग-इन खोलने के लिए कृपया अपने क्लाइंट एप का उपयोग करें।</string>
+    <string name="dashboard_request_login_device_id">डिवाइस आईडी:%s</string>
+    <string name="dashboard_request_login_close_reason_dialog">बंद करना</string>
+
+    <!-- Dashboard - Project card -->
+    <string name="dashboard_project_card_scanner_used">स्कैनर का उपयोग किया गया:%1$s</string>
     <string name="dashboard_project_card_current_user">वर्तमान उपयोगकर्ता: %1$s</string>
 
     <!-- Dashboard - Sync card -->
@@ -182,23 +319,29 @@
     <string name="dashboard_sync_card_no_modules_button">मॉड्यूल्स</string>
     <string name="dashboard_sync_card_offline_message">कृपया सेटिंग में जाकर इंटरनेट को चालू करें</string>
     <string name="dashboard_sync_card_offline_button">सेटिंग</string>
+    <string name="dashboard_sync_card_too_many_modules_message">बहुत सारे मॉड्यूल डाउनलोड किए जा चुके हैं.</string>
+    <string name="dashboard_sync_card_relogin_required">सिंक करने के लिए आपको फिर से लॉग इन करना होगा</string>
+
     <string name="dashboard_sync_card_last_sync">अंतिम बार सिंक: %1$s</string>
     <string name="dashboard_sync_card_records_uploaded">सभी रिकॉर्ड अपलोड किए गए</string>
+    <plurals name="dashboard_sync_card_records_to_upload">
+        <item quantity="one">%1$d अपलोड करने हेतु रिकार्ड</item>
+        <item quantity="other">%1$dअपलोड करने हेतु रिकार्ड</item>
+    </plurals>
     <string name="dashboard_sync_card_try_again_button">पुनः प्रयास करें</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">गतिविधि: %1$s</string>
-    <!--Dashboard always excplicitly displays the number of activities, thus ignoring the ImpliedQuantity-->
-    <plurals name="dashboard_activity_card_enrolments" tools:ignore="ImpliedQuantity">
-        <item quantity="one">पंजीकरण</item>
+    <plurals name="dashboard_activity_card_enrolments">
+        <item quantity="one">%d पंजीकरण</item>
         <item quantity="other">पंजीकरण</item>
     </plurals>
-    <plurals name="dashboard_activity_card_identifications" tools:ignore="ImpliedQuantity">
-        <item quantity="one">विभिन्न पहचान</item>
+    <plurals name="dashboard_activity_card_identifications">
+        <item quantity="one">%d विभिन्न पहचान</item>
         <item quantity="other">विभिन्न पहचान</item>
     </plurals>
-    <plurals name="dashboard_activity_card_verifications" tools:ignore="ImpliedQuantity">
-        <item quantity="one">विभिन्न सत्यापन</item>
+    <plurals name="dashboard_activity_card_verifications">
+        <item quantity="one">%d विभिन्न सत्यापन</item>
         <item quantity="other">विभिन्न सत्यापन</item>
     </plurals>
 
@@ -217,13 +360,16 @@
     <string name="dashboard_preference_sync_information_title">सिंक सम्बंधित जानकारी</string>
     <string name="dashboard_preference_scanner_version_title">स्कैनर संस्करण</string>
     <string name="dashboard_preference_device_id_title">डिवाइस आईडी</string>
+    <string name="dashboard_preference_summary_settings_fingers">उन उंगलियों को देखें जिन्हें स्कैन किया जाएगा</string>
     <string name="dashboard_preference_summary_sync_information">सिंक के बारे में अन्य विवरण</string>
+    <string name="dashboard_preference_copied_to_clipboard">क्लिपबोर्ड पर नकल</string>
+
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">सिंक सम्बंधित जानकारी</string>
     <string name="dashboard_sync_info_select_modules_button">मॉड्यूल का चुनाव करें</string>
     <string name="dashboard_sync_info_records_to_upload">रिकोर्ड्स अपलोड किए जाने हैं</string>
-    <string name="dashboard_sync_info_records_to_download">रिकोर्ड्स डाउनलोड किए जाने हैं</string>
+    <string name="dashboard_sync_info_records_to_download">डाउनलोड करने या हटाने के लिए रिकॉर्ड</string>
     <string name="dashboard_sync_info_records_to_delete">रिकोर्ड्स डिलीट किए जाने हैं</string>
     <string name="dashboard_sync_info_total_records_on_device">डिवाइस में कुल रिकोर्ड्स</string>
     <string name="dashboard_sync_info_selected_modules">चुने गए मॉड्यूल</string>
@@ -232,6 +378,8 @@
     <string name="dashboard_sync_info_images_to_upload">अपलोड करने के लिए चित्र</string>
     <string name="dashboard_sync_info_sync_now_button">अभी सिंक करें</string>
     <string name="dashboard_sync_info_sync_in_progress">सिंक हो रहा है …</string>
+    <string name="dashboard_sync_info_re_fetch_button">सिंक जानकारी पुनः प्राप्त करें</string>
+
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">अमान्य चुनाव। कृपया कम से कम एक मॉड्यूल चुनें</string>
     <string name="dashboard_select_modules_too_many_modules">अमान्य चुनाव। कृपया %1$d से अधिक मॉड्यूल्स नहीं चुनें।</string>
@@ -240,14 +388,19 @@
     <string name="dashboard_select_modules_no_results">कोई परिणाम नहीं</string>
     <string name="dashboard_select_modules_selected">चुने गए मॉड्यूल</string>
     <string name="dashboard_select_modules_confirm_title">मॉड्यूल का चुनाव सफल हुआ</string>
+    <string name="dashboard_select_modules_confirm_yes">पुष्टि करना</string>
     <string name="dashboard_select_modules_confirm_no">रद्द करें</string>
 
     <!-- Dashboard - Finger selection -->
     <string name="dashboard_select_fingers_title">उंगलियां देखें</string>
+    <string name="dashboard_select_fingers_finger_label">उँगलिया</string>
+    <string name="dashboard_select_fingers_quantity_label">मात्रा</string>
+
     <!-- Dashboard - Settings lock dialog-->
     <string name="dashboard_password_lock_title_default">अनलॉक करने के लिए पासवर्ड दर्ज करें</string>
     <string name="dashboard_password_lock_title_logout">लॉग आउट करने के लिए पासवर्ड दर्ज करें</string>
     <string name="dashboard_password_lock_hint">पासवर्ड</string>
+    <string name="dashboard_password_lock_cancel">रद्द करें</string>
     <string name="dashboard_password_lock_wrong_pin">गलत पासवर्ड</string>
     <string name="dashboard_password_lock_overlay_title">अनलॉक करने के लिए टैप करें</string>
 
@@ -259,10 +412,14 @@
     <string name="dashboard_logout_confirmation_sync_decline_warning_body">यह सुनिश्चित करने के लिए कि आपके प्रोजेक्ट में अद्यतन रिकॉर्ड हैं, डेटा सिंक्रनाइज़ेशन आवश्यक है। बिना किसी वैध कारण के आपके डेटा को सिंक्रोनाइज़ करने में विफल रहने से आपके सहकर्मियों की महत्वपूर्ण रिकॉर्ड तक पहुंच और प्रोजेक्ट की सटीक रिपोर्ट करने की क्षमता प्रभावित होगी।\n\nबिना किसी वैध कारण के डेटा को सिंक्रोनाइज़ करने में विफल होना भी डेटा संग्रह प्रोटोकॉल का उल्लंघन हो सकता है और इसके परिणामस्वरूप आपके और प्रोजेक्ट के लिए अवांछित परिणाम हो सकते हैं।</string>
     <string name="dashboard_logout_confirmation_title">लॉग-आउट</string>
     <string name="dashboard_logout_confirmation_message">क्या आप लॉग-आउट करना चाहते हैं?</string>
+    <string name="dashboard_logout_confirmation_log_out_button">लॉग-आउट</string>
     <string name="dashboard_logout_confirmation_cancel_button">रद्द करें</string>
 
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">सिस्टम वर्तमान में रखरखाव के लिए ऑफ़लाइन है। कृपया बाद में पुन: प्रयास करें।</string>
     <string name="error_backend_maintenance_with_time_message">सिस्टम वर्तमान में रखरखाव के लिए ऑफ़लाइन है। कृपया %s के बाद पुन: प्रयास करें</string>
+
+    <!-- Notifications -->
+    <string name="notification_sync_description">समन्वयन प्रगति पर है</string>
 
 </resources>

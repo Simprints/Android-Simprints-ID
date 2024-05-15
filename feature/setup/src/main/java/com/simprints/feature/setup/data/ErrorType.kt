@@ -1,9 +1,7 @@
 package com.simprints.feature.setup.data
 
-import android.os.Bundle
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
-import androidx.core.os.bundleOf
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
@@ -32,8 +30,8 @@ internal enum class ErrorType(
     CONFIGURATION_ERROR(
         null,
         IDR.string.configuration_generic_error_message,
-        alertType = AlertScreenEventType.FACE_LICENSE_MISSING,
-        errorReason = AppErrorReason.FACE_CONFIGURATION_ERROR,
+        alertType = AlertScreenEventType.LICENSE_MISSING,
+        errorReason = AppErrorReason.LICENSE_MISSING,
     ),
     ;
 
@@ -45,16 +43,7 @@ internal enum class ErrorType(
         messageRes = this@ErrorType.message
         image = IDR.drawable.ic_exclamation
         leftButton = AlertButtonConfig.Close
-        payload = bundleOf(PAYLOAD_TYPE_KEY to this@ErrorType.errorReason)
+        appErrorReason = errorReason
         eventType = this@ErrorType.alertType
     }.toArgs()
-
-    @ExcludedFromGeneratedTestCoverageReports("Inner code of excluded file")
-    companion object {
-        private const val PAYLOAD_TYPE_KEY = "error_type"
-
-        fun reasonFromPayload(extras: Bundle): AppErrorReason = extras.getString(PAYLOAD_TYPE_KEY)
-            ?.let { AppErrorReason.valueOf(it) }
-            ?: AppErrorReason.UNEXPECTED_ERROR
-    }
 }

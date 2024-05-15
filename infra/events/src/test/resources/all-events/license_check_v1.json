@@ -1,0 +1,17 @@
+{
+  "id": "ab03f6c5-57ce-4518-9346-5b48e90953f0",
+  "type": "LICENSE_CHECK",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "8bc5f4a2-859e-4da7-80e5-a6d233d0a065",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "LICENSE_CHECK",
+    "eventVersion": 1,
+    "createdAt": 1345678901,
+    "endedAt": 0,
+    "status": "VALID",
+    "vendor": "NEC_FINGERPRINT"
+  }
+}

@@ -7,13 +7,11 @@ import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSel
 @Keep
 internal data class ApiGuidSelectionPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val selectedId: String,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: GuidSelectionPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.selectedId,
     )
 

@@ -50,7 +50,7 @@ internal class LoginInfoStore @Inject constructor(
                 putString(CORE_FIREBASE_APPLICATION_ID, prefs.getString(CORE_FIREBASE_APPLICATION_ID, ""))
                 putString(CORE_FIREBASE_API_KEY, prefs.getString(CORE_FIREBASE_API_KEY, ""))
             }
-            prefs.edit(commit = true) { clear() }
+            prefs.clearValues()
         }
         return securePrefs
     }
@@ -119,8 +119,8 @@ internal class LoginInfoStore @Inject constructor(
         signedInProjectId.isNotEmpty() && signedInProjectId == possibleProjectId
 
     fun cleanCredentials() {
-        securePrefs.edit { clear() }
-        prefs.edit { clear() }
+        securePrefs.clearValues()
+        prefs.clearValues()
     }
 
     fun clearCachedTokenClaims() {
@@ -130,5 +130,15 @@ internal class LoginInfoStore @Inject constructor(
             remove(CORE_FIREBASE_APPLICATION_ID)
             remove(CORE_FIREBASE_API_KEY)
         }
+    }
+
+    private fun SharedPreferences.clearValues() = edit(commit = true) {
+        remove(USER_ID_VALUE)
+        remove(USER_ID_TOKENIZED)
+        remove(PROJECT_ID)
+        remove(PROJECT_ID_CLAIM)
+        remove(CORE_FIREBASE_PROJECT_ID)
+        remove(CORE_FIREBASE_APPLICATION_ID)
+        remove(CORE_FIREBASE_API_KEY)
     }
 }

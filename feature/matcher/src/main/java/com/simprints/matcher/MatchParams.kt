@@ -3,18 +3,20 @@ package com.simprints.matcher
 import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
 data class MatchParams(
-  val probeFaceSamples: List<FaceSample> = emptyList(),
-  val probeFingerprintSamples: List<FingerprintSample> = emptyList(),
-  val flowType: FlowType,
-  val queryForCandidates: SubjectQuery,
+    val probeFaceSamples: List<FaceSample> = emptyList(),
+    val probeFingerprintSamples: List<FingerprintSample> = emptyList(),
+    val flowType: FlowType,
+    val queryForCandidates: SubjectQuery,
+    val biometricDataSource: BiometricDataSource,
 ) : Parcelable {
 
     fun isFaceMatch() = probeFaceSamples.isNotEmpty()

@@ -7,6 +7,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -63,8 +64,8 @@ internal class MatchViewModelTest {
         cb1 = slot()
 
         every { timeHelper.now() } returns Timestamp(0L)
-        every { faceMatcherUseCase.matcherName } returns MATCHER_NAME
-        every { fingerprintMatcherUseCase.matcherName } returns MATCHER_NAME
+        coEvery { faceMatcherUseCase.matcherName() } returns MATCHER_NAME
+        coEvery { fingerprintMatcherUseCase.matcherName() } returns MATCHER_NAME
 
         viewModel = MatchViewModel(
             faceMatcherUseCase,
@@ -73,6 +74,7 @@ internal class MatchViewModelTest {
             timeHelper
         )
     }
+
     @Test
     fun `when setup is called, then view model becomes initialized`() = runTest {
         val responseItems = listOf(
@@ -91,7 +93,8 @@ internal class MatchViewModelTest {
         viewModel.setupMatch(MatchParams(
             probeFaceSamples = listOf(getFaceSample()),
             flowType = FlowType.ENROL,
-            queryForCandidates = mockk {}
+            queryForCandidates = mockk {},
+            biometricDataSource = BiometricDataSource.SIMPRINTS,
         ))
 
         assertThat(viewModel.isInitialized).isTrue()
@@ -116,11 +119,14 @@ internal class MatchViewModelTest {
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
 
         val states = viewModel.matchState.test()
-        viewModel.setupMatch(MatchParams(
-            probeFaceSamples = listOf(getFaceSample()),
-            flowType = FlowType.ENROL,
-            queryForCandidates = mockk {}
-        ))
+        viewModel.setupMatch(
+            MatchParams(
+                probeFaceSamples = listOf(getFaceSample()),
+                flowType = FlowType.ENROL,
+                queryForCandidates = mockk {},
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
+            )
+        )
         // Waiting for the ::delay in viewModel::setupMatch
         advanceUntilIdle()
 
@@ -158,11 +164,14 @@ internal class MatchViewModelTest {
 
         val states = viewModel.matchState.test()
 
-        viewModel.setupMatch(MatchParams(
-            probeFingerprintSamples = listOf(getFingerprintSample()),
-            flowType = FlowType.ENROL,
-            queryForCandidates = mockk {}
-        ))
+        viewModel.setupMatch(
+            MatchParams(
+                probeFingerprintSamples = listOf(getFingerprintSample()),
+                flowType = FlowType.ENROL,
+                queryForCandidates = mockk {},
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
+            )
+        )
         // Waiting for the ::delay in viewModel::setupMatch
         advanceUntilIdle()
 

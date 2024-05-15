@@ -1,11 +1,17 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.*
+import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY
+import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
 import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test
 
@@ -116,8 +122,8 @@ class ProjectConfigurationTest {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
-                        simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            kind = it.key,
                         )
                     )
                 )
@@ -139,8 +145,8 @@ class ProjectConfigurationTest {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
-                        simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            kind = it.key,
                         )
                     )
                 )
@@ -163,7 +169,9 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                            kind = it.key,
+                            batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                            imagesRequireUnmeteredConnection = false
                         )
                     )
                 )
@@ -185,8 +193,8 @@ class ProjectConfigurationTest {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
-                        simprints = SimprintsUpSynchronizationConfiguration(
-                            kind = it.key
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            kind = it.key,
                         )
                     )
                 )
@@ -220,7 +228,11 @@ class ProjectConfigurationTest {
         values.forEach {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
-                    up = synchronizationConfiguration.up.copy(imagesRequireUnmeteredConnection = it)
+                    up = synchronizationConfiguration.up.copy(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            imagesRequireUnmeteredConnection = it
+                        ),
+                    )
                 )
             )
             assertThat(config.imagesUploadRequiresUnmeteredConnection()).isEqualTo(it)

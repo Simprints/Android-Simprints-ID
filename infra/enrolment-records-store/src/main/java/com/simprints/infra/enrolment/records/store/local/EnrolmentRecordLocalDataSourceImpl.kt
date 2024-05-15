@@ -32,6 +32,8 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         const val MODULE_ID_FIELD = "moduleId"
         const val IS_ATTENDANT_ID_TOKENIZED_FIELD = "isAttendantIdTokenized"
         const val IS_MODULE_ID_TOKENIZED_FIELD = "isModuleIdTokenized"
+        const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
+        const val FORMAT_FIELD = "format"
     }
 
     override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
@@ -147,6 +149,12 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         }
         if (query.moduleId != null) {
             realmQuery = realmQuery.query("$MODULE_ID_FIELD == $0", query.moduleId)
+        }
+        if (query.fingerprintSampleFormat != null) {
+            realmQuery = realmQuery.query(
+                "ANY $FINGERPRINT_SAMPLES_FIELD.$FORMAT_FIELD == $0",
+                query.fingerprintSampleFormat
+            )
         }
         if (query.afterSubjectId != null) {
             realmQuery = realmQuery.query(

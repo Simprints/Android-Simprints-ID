@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
@@ -16,7 +15,6 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,10 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val logoutUseCase: LogoutUseCase,
+    private val logout: LogoutUseCase,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
-    @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
@@ -75,9 +72,6 @@ internal class AboutViewModel @Inject constructor(
     private suspend fun canSyncDataToSimprints(): Boolean =
         configRepository.getProjectConfiguration().canSyncDataToSimprints()
 
-    private fun logout() {
-        externalScope.launch { logoutUseCase() }
-    }
 
     private fun load() = viewModelScope.launch {
         val configuration = configRepository.getProjectConfiguration()

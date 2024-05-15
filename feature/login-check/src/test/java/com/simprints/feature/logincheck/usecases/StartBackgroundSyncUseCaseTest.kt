@@ -2,9 +2,7 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.sync.ProjectConfigurationScheduler
-import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.images.ImageUpSyncScheduler
+import com.simprints.infra.sync.SyncOrchestrator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,13 +15,7 @@ import org.junit.Test
 class StartBackgroundSyncUseCaseTest {
 
     @MockK
-    lateinit var eventSyncManager: EventSyncManager
-
-    @MockK
-    lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
-
-    @MockK
-    lateinit var configScheduler: ProjectConfigurationScheduler
+    lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -35,9 +27,7 @@ class StartBackgroundSyncUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = StartBackgroundSyncUseCase(
-            eventSyncManager,
-            imageUpSyncScheduler,
-            configScheduler,
+            syncOrchestrator,
             configRepository,
         )
     }
@@ -48,13 +38,8 @@ class StartBackgroundSyncUseCaseTest {
 
         useCase.invoke()
 
-        verify {
-            eventSyncManager.scheduleSync()
-            configScheduler.scheduleProjectSync()
-            configScheduler.scheduleDeviceSync()
-        }
         coVerify {
-            imageUpSyncScheduler.scheduleImageUpSync()
+            syncOrchestrator.scheduleBackgroundWork()
         }
     }
 
@@ -64,7 +49,7 @@ class StartBackgroundSyncUseCaseTest {
 
         useCase.invoke()
 
-        verify { eventSyncManager.sync() }
+        verify { syncOrchestrator.startEventSync() }
     }
 
     @Test
@@ -73,7 +58,7 @@ class StartBackgroundSyncUseCaseTest {
 
         useCase.invoke()
 
-        verify(exactly = 0) { eventSyncManager.sync() }
+        verify(exactly = 0) { syncOrchestrator.startEventSync() }
     }
 
 }

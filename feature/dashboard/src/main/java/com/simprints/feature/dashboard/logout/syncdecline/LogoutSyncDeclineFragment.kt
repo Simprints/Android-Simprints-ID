@@ -8,11 +8,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncDeclineBinding
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 

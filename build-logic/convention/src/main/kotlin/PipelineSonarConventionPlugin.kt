@@ -38,6 +38,6 @@ class PipelineSonarConventionPlugin : Plugin<Project> {
         private val cacheDir = "${File.separator}build${File.separator}.sonar"
         private val jacocoDir = "${File.separator}build${File.separator}reports${File.separator}jacoco${File.separator}jacocoTestReport${File.separator}jacocoTestReport.xml"
         private val sourceDir = "${File.separator}src${File.separator}main${File.separator}java${File.separator}com${File.separator}simprints"
-        private val binariesDir = "${File.separator}build${File.separator}intermediates${File.separator}**"
+        private val binariesDir = "${File.separator}build${File.separator}"
     }
 }

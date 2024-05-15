@@ -7,17 +7,118 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.events.*
-import com.simprints.infra.events.sampledata.*
-import com.simprints.infra.eventsync.event.*
+import com.simprints.infra.events.sampledata.createAlertScreenEvent
+import com.simprints.infra.events.sampledata.createAuthenticationEvent
+import com.simprints.infra.events.sampledata.createAuthorizationEvent
+import com.simprints.infra.events.sampledata.createCandidateReadEvent
+import com.simprints.infra.events.sampledata.createCompletionCheckEvent
+import com.simprints.infra.events.sampledata.createConfirmationCallbackEvent
+import com.simprints.infra.events.sampledata.createConfirmationCalloutEvent
+import com.simprints.infra.events.sampledata.createConnectivitySnapshotEvent
+import com.simprints.infra.events.sampledata.createConsentEvent
+import com.simprints.infra.events.sampledata.createEnrolmentCallbackEvent
+import com.simprints.infra.events.sampledata.createEnrolmentCalloutEvent
+import com.simprints.infra.events.sampledata.createEnrolmentEventV1
+import com.simprints.infra.events.sampledata.createEnrolmentEventV2
+import com.simprints.infra.events.sampledata.createEventDownSyncRequestEvent
+import com.simprints.infra.events.sampledata.createEventUpSyncRequestEvent
+import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createFaceCaptureConfirmationEvent
+import com.simprints.infra.events.sampledata.createFaceCaptureEvent
+import com.simprints.infra.events.sampledata.createFaceFallbackCaptureEvent
+import com.simprints.infra.events.sampledata.createFaceOnboardingCompleteEvent
+import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createFingerprintCaptureEvent
+import com.simprints.infra.events.sampledata.createGuidSelectionEvent
+import com.simprints.infra.events.sampledata.createIdentificationCallbackEvent
+import com.simprints.infra.events.sampledata.createIdentificationCalloutEvent
+import com.simprints.infra.events.sampledata.createIntentParsingEvent
+import com.simprints.infra.events.sampledata.createInvalidIntentEvent
+import com.simprints.infra.events.sampledata.createLastBiometricsEnrolmentCalloutEvent
+import com.simprints.infra.events.sampledata.createLicenseCheckEvent
+import com.simprints.infra.events.sampledata.createOneToManyMatchEvent
+import com.simprints.infra.events.sampledata.createOneToOneMatchEvent
+import com.simprints.infra.events.sampledata.createPersonCreationEvent
+import com.simprints.infra.events.sampledata.createRefusalCallbackEvent
+import com.simprints.infra.events.sampledata.createRefusalEvent
+import com.simprints.infra.events.sampledata.createScannerConnectionEvent
+import com.simprints.infra.events.sampledata.createScannerFirmwareUpdateEvent
+import com.simprints.infra.events.sampledata.createSuspiciousIntentEvent
+import com.simprints.infra.events.sampledata.createVerificationCallbackEventV1
+import com.simprints.infra.events.sampledata.createVerificationCallbackEventV2
+import com.simprints.infra.events.sampledata.createVerificationCalloutEvent
+import com.simprints.infra.events.sampledata.createVero2InfoSnapshotEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AlertScreen
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authentication
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authorization
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callback
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callout
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.CandidateRead
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.CompletionCheck
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ConnectivitySnapshot
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Consent
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Enrolment
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EventDownSyncRequest
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.EventUpSyncRequest
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCapture
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureBiometrics
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureConfirmation
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceFallbackCapture
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceOnboardingComplete
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FingerprintCapture
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FingerprintCaptureBiometrics
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.GuidSelection
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.IntentParsing
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.InvalidIntent
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.LicenseCheck
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.OneToManyMatch
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.OneToOneMatch
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.PersonCreation
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Refusal
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ScannerConnection
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ScannerFirmwareUpdate
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.SuspiciousIntent
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Vero2InfoSnapshot
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
+import com.simprints.infra.eventsync.event.validateAlertScreenEventApiModel
+import com.simprints.infra.eventsync.event.validateAuthenticationEventApiModel
+import com.simprints.infra.eventsync.event.validateAuthorizationEventApiModel
+import com.simprints.infra.eventsync.event.validateCallbackV1EventApiModel
+import com.simprints.infra.eventsync.event.validateCallbackV2EventApiModel
+import com.simprints.infra.eventsync.event.validateCalloutEventApiModel
+import com.simprints.infra.eventsync.event.validateCandidateReadEventApiModel
+import com.simprints.infra.eventsync.event.validateCommonParams
+import com.simprints.infra.eventsync.event.validateCompletionCheckEventApiModel
+import com.simprints.infra.eventsync.event.validateConnectivitySnapshotEventApiModel
+import com.simprints.infra.eventsync.event.validateConsentEventApiModel
+import com.simprints.infra.eventsync.event.validateDownSyncRequestEventApiModel
+import com.simprints.infra.eventsync.event.validateEnrolmentEventV1ApiModel
+import com.simprints.infra.eventsync.event.validateEnrolmentEventV2ApiModel
+import com.simprints.infra.eventsync.event.validateFaceCaptureBiometricsEventApiModel
+import com.simprints.infra.eventsync.event.validateFaceCaptureConfirmationEventApiModel
+import com.simprints.infra.eventsync.event.validateFaceCaptureEventApiModel
+import com.simprints.infra.eventsync.event.validateFaceFallbackCaptureEventApiModel
+import com.simprints.infra.eventsync.event.validateFaceOnboardingCompleteEventApiModel
+import com.simprints.infra.eventsync.event.validateFingerprintCaptureBiometricsEventApiModel
+import com.simprints.infra.eventsync.event.validateFingerprintCaptureEventApiModel
+import com.simprints.infra.eventsync.event.validateGuidSelectionEventApiModel
+import com.simprints.infra.eventsync.event.validateIntentParsingEventApiModel
+import com.simprints.infra.eventsync.event.validateInvalidEventApiModel
+import com.simprints.infra.eventsync.event.validateOneToManyMatchEventApiModel
+import com.simprints.infra.eventsync.event.validateOneToOneMatchEventApiModel
+import com.simprints.infra.eventsync.event.validatePersonCreationEvent
+import com.simprints.infra.eventsync.event.validateRefusalEventApiModel
+import com.simprints.infra.eventsync.event.validateScannerConnectionEventApiModel
+import com.simprints.infra.eventsync.event.validateScannerFirmwareUpdateEventApiModel
+import com.simprints.infra.eventsync.event.validateSuspiciousIntentEventApiModel
+import com.simprints.infra.eventsync.event.validateUpSyncRequestEventApiModel
+import com.simprints.infra.eventsync.event.validateVero2InfoSnapshotEventApiModel
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@Suppress("IMPLICIT_CAST_TO_ANY")
+@Suppress("IMPLICIT_CAST_TO_ANY", "KotlinConstantConditions")
 @RunWith(AndroidJUnit4::class)
 class ApiEventTest {
 
@@ -110,7 +211,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -119,7 +220,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -137,7 +238,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 3)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -155,7 +256,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -164,7 +265,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackV1EventApiModel(json, 2)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -411,7 +512,19 @@ class ApiEventTest {
     fun `when event contains raw module id, then tokenizedField in ApiEvent should be empty`() {
         validateModuleIdTokenization(moduleId = "moduleId".asTokenizableRaw())
     }
+    @Test
+    fun validate_licenseCheckEventApiModel() {
+        val event = createLicenseCheckEvent()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
+        validateLicenseCheckEventApiModel(json)
+    }
+
+    private fun validateLicenseCheckEventApiModel(json: JSONObject) {
+        validateCommonParams(json,"LicenseCheck",1)
+        assertThat(json.getJSONObject("payload").getString("status")).isEqualTo("VALID")
+    }
     private fun validateModuleIdTokenization(moduleId: TokenizableString) {
         val event = createEnrolmentEventV2().let {
             it.copy(payload = it.payload.copy(moduleId = moduleId))
@@ -475,6 +588,7 @@ class ApiEventTest {
             FaceCaptureBiometrics -> validate_FaceCaptureBiometricsEventApiModel()
             EventDownSyncRequest -> validate_DownSyncRequestEventApiModel()
             EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
+            LicenseCheck -> validate_licenseCheckEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

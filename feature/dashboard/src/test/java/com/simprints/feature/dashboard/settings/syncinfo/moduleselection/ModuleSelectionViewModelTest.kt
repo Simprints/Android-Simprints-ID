@@ -17,11 +17,16 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
@@ -37,19 +42,22 @@ class ModuleSelectionViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var repository: ModuleRepository
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var eventSyncManager: EventSyncManager
 
-    @MockK(relaxed = true)
+    @MockK
+    private lateinit var syncOrchestrator: SyncOrchestrator
+
+    @MockK
     private lateinit var configRepository: ConfigRepository
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var authStore: AuthStore
 
     @MockK
@@ -59,7 +67,7 @@ class ModuleSelectionViewModelTest {
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this)
+        MockKAnnotations.init(this, relaxed = true)
 
         val modulesDefault = listOf(
             Module("a".asTokenizableEncrypted(), false),
@@ -87,7 +95,7 @@ class ModuleSelectionViewModelTest {
         viewModel = ModuleSelectionViewModel(
             authStore = authStore,
             moduleRepository = repository,
-            eventSyncManager = eventSyncManager,
+            syncOrchestrator = syncOrchestrator,
             configRepository = configRepository,
             tokenizationProcessor = tokenizationProcessor,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
@@ -180,8 +188,8 @@ class ModuleSelectionViewModelTest {
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
-        coVerify(exactly = 1) { eventSyncManager.stop() }
-        coVerify(exactly = 1) { eventSyncManager.sync() }
+        coVerify(exactly = 1) { syncOrchestrator.stopEventSync() }
+        coVerify(exactly = 1) { syncOrchestrator.startEventSync() }
     }
 
     @Test

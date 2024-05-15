@@ -8,7 +8,12 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.Face
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiFace
-import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.INVALID
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_ROLL
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_YAW
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.TOO_CLOSE
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.TOO_FAR
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.VALID
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
@@ -17,19 +22,17 @@ internal data class ApiFaceCapturePayload(
     val id: String,
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
-    override val version: Int,
     val attemptNb: Int,
     val qualityThreshold: Float,
     val result: ApiResult,
     val isFallback: Boolean,
     val face: ApiFace?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.attemptNb,
         domainPayload.qualityThreshold,
         domainPayload.result.fromDomainToApi(),

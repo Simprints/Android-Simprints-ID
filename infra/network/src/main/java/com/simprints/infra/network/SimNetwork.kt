@@ -26,6 +26,7 @@ interface SimNetwork {
     ): SimApiClient<T>
 
     fun getApiBaseUrl(): String
+    fun getApiBaseUrlPrefix(): String
     fun setApiBaseUrl(apiBaseUrl: String?)
     fun resetApiBaseUrl()
 

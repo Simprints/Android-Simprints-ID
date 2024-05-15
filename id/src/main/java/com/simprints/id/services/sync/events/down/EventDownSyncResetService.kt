@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -14,6 +15,7 @@ import com.simprints.core.ExternalScope
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,6 +31,9 @@ class EventDownSyncResetService : Service() {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
+    lateinit var syncOrchestrator: SyncOrchestrator
+
+    @Inject
     @ExternalScope
     lateinit var externalScope: CoroutineScope
 
@@ -39,7 +44,7 @@ class EventDownSyncResetService : Service() {
             // Reset current downsync state
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
-            eventSyncManager.sync()
+            syncOrchestrator.startEventSync()
             stopSelf()
         }
 
@@ -64,7 +69,12 @@ class EventDownSyncResetService : Service() {
                 .setPriority(NotificationManager.IMPORTANCE_LOW)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build()
-            startForeground(1, notification)
+            // if runtime >= Q then use FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+            } else {
+                startForeground(1, notification)
+            }
         }
     }
 

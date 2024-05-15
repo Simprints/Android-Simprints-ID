@@ -18,7 +18,10 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
+import com.simprints.infra.license.LicenseStatus
+import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.determineLicenseStatus
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +36,8 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val eventReporter: SimpleCaptureEventReporter,
     private val bitmapToByteArray: BitmapToByteArrayUseCase,
     private val licenseRepository: LicenseRepository,
-    private val faceBioSdkInitializer: FaceBioSdkInitializer
+    private val faceBioSdkInitializer: FaceBioSdkInitializer,
+    private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
 ) : ViewModel() {
 
     // Updated in live feedback screen
@@ -73,11 +77,22 @@ internal class FaceCaptureViewModel @Inject constructor(
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
         val license = licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        if (!faceBioSdkInitializer.tryInitWithLicense(activity, license)) {
-            Simber.tag(CrashReportTag.LICENSE.name).i("License is invalid")
+        var licenseStatus = license.determineLicenseStatus()
+
+        if (licenseStatus == LicenseStatus.VALID) {
+            if (!faceBioSdkInitializer.tryInitWithLicense(activity, license!!.data)) {
+                // License is valid but the SDK failed to initialize
+                // This is should reported as an error
+                licenseStatus = LicenseStatus.ERROR
+            }
+        }
+        if (licenseStatus != LicenseStatus.VALID) {
+            Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus")
             licenseRepository.deleteCachedLicense(Vendor.RANK_ONE)
             _invalidLicense.send()
         }
+        saveLicenseCheckEvent(Vendor.RANK_ONE, licenseStatus)
+
     }
 
     fun getSampleDetection() = faceDetections.firstOrNull()

@@ -21,8 +21,8 @@ import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
-import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
@@ -125,6 +125,8 @@ class FingerprintCaptureViewModelTest {
         every { scannerManager.isScannerConnected } returns true
 
         coJustRun { bioSdkWrapper.initialize() }
+        every { bioSdkWrapper.scanningTimeoutMs } returns 1000
+        every { bioSdkWrapper.imageTransferTimeoutMs } returns 1000
 
         vm = FingerprintCaptureViewModel(
             scannerManager,
@@ -184,19 +186,19 @@ class FingerprintCaptureViewModelTest {
     }
 
     @Test
-    fun `test scanner supports image transfer then isImageTransferRequired should be true`() = runTest {
+    fun `test scanner supports image transfer then isImageTransferRequired should be equal to scanningTimeoutMs + imageTransferTimeoutMs`() = runTest {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns true
         vm.handleOnViewCreated(TWO_FINGERS_IDS)
-        assertThat(vm.isImageTransferRequired()).isTrue()
+        assertThat(vm.progressBarTimeout()).isEqualTo(bioSdkWrapper.scanningTimeoutMs + bioSdkWrapper.imageTransferTimeoutMs)
     }
 
     @Test
-    fun `test scanner doesn't support imageTransfer then isImageTransferRequired should be false`() = runTest {
+    fun `test scanner doesn't support imageTransfer then progressBarTimeout should be equal to scanningTimeoutMs`() = runTest {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns false
         vm.handleOnViewCreated(TWO_FINGERS_IDS)
-        assertThat(vm.isImageTransferRequired()).isFalse()
+        assertThat(vm.progressBarTimeout()).isEqualTo(bioSdkWrapper.scanningTimeoutMs)
     }
 
     @Test
@@ -328,7 +330,7 @@ class FingerprintCaptureViewModelTest {
     fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() = runTest {
         mockScannerSetUiIdle()
         coEvery {
-            bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any())
+            bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(),any())
         } throws ScannerDisconnectedException()
         withImageTransfer()
 
@@ -396,6 +398,8 @@ class FingerprintCaptureViewModelTest {
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isFalse()
         assertThat(vm.stateLiveData.value?.currentFingerIndex).isEqualTo(1)
 
+        coVerify(exactly = 2) { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(), false) }
+        coVerify(exactly = 1) { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(), true) }
         coVerify(exactly = 1) { bioSdkWrapper.acquireFingerprintImage() }
         coVerify(exactly = 3) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
     }
@@ -1241,7 +1245,7 @@ class FingerprintCaptureViewModelTest {
 
     @ExperimentalTime
     private fun setupCaptureFingerprintResponses(vararg mockResponses: MockCaptureFingerprintResponse) {
-        val initialMock = coEvery { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any()) }
+        val initialMock = coEvery { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(),any()) }
         val fingerprintResponses = mockResponses.map { it.toCaptureFingerprintResponse() }
 
         // capture the first response in the list

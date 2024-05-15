@@ -1,5 +1,6 @@
 package com.simprints.infra.license
 
+import com.simprints.infra.license.remote.License
 import kotlinx.coroutines.flow.Flow
 
 interface LicenseRepository {
@@ -10,7 +11,7 @@ interface LicenseRepository {
         licenseVendor: Vendor,
     ): Flow<LicenseState>
 
-    suspend fun getCachedLicense(licenseVendor: Vendor): String
+    suspend fun getCachedLicense(licenseVendor: Vendor): License?
     suspend fun deleteCachedLicense(licenseVendor: Vendor)
-
+    suspend fun deleteCachedLicenses()
 }

@@ -71,8 +71,15 @@
                 android:text="Schedule Event Sync"
                 tools:ignore="HardcodedText" />
 
-        </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/clearFirebaseToken"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:text="Clear Firebase Token"
+                tools:ignore="HardcodedText" />
 
+        </LinearLayout>
 
     </HorizontalScrollView>
 

@@ -12,6 +12,7 @@ import com.simprints.fingerprint.connect.databinding.FragmentOtaRecoveryBinding
 import com.simprints.fingerprint.connect.screens.ota.OtaFragmentParams
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -64,7 +65,8 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
     }
 
     private fun retryOta() {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFragment(OtaFragmentParams(
                 args.params.remainingOtas,
                 args.params.currentRetryAttempt + 1
@@ -73,7 +75,8 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
     }
 
     private fun goToOtaFailed() {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFailedFragment(null)
         )
     }

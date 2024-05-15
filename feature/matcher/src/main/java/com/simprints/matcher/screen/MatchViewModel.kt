@@ -65,7 +65,7 @@ internal class MatchViewModel @Inject constructor(
             endTime,
             params,
             totalCandidates,
-            matcherUseCase.matcherName,
+            matcherUseCase.matcherName(),
             sortedResults
         )
 
@@ -112,9 +112,9 @@ internal class MatchViewModel @Inject constructor(
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
-        const val veryGoodMatchThreshold = 50.0
-        const val goodMatchThreshold = 35.0
-        const val fairMatchThreshold = 20.0
-        const val matchingEndWaitTimeInMillis = 1000L
+        private const val veryGoodMatchThreshold = 50.0
+        private const val goodMatchThreshold = 35.0
+        private const val fairMatchThreshold = 20.0
+        private const val matchingEndWaitTimeInMillis = 1000L
     }
 }

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -39,12 +40,14 @@ import com.simprints.fingerprint.connect.screens.ota.OtaFragmentParams
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_connect_scanner_controller) {
+internal class ConnectScannerControllerFragment :
+    Fragment(R.layout.fragment_connect_scanner_controller) {
 
     private var shouldRequestPermissions = true
 
@@ -68,7 +71,12 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     ) { permissions: Map<String, Boolean> ->
         val permission = permissions
             .filterKeys(bluetoothPermissions::contains)
-            .map { (permission, isGranted) -> requireActivity().permissionFromResult(permission, isGranted) }
+            .map { (permission, isGranted) ->
+                requireActivity().permissionFromResult(
+                    permission,
+                    isGranted
+                )
+            }
             .worstPermissionStatus()
 
         Simber.i("Bluetooth permission: $permission")
@@ -80,9 +88,14 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         }
     }
 
-    private fun internalNavController() = childFragmentManager
-        .findFragmentById(R.id.connect_scanner_host_fragment)
-        ?.findNavController()
+    private val hostFragment: Fragment?
+        get() = childFragmentManager.findFragmentById(R.id.connect_scanner_host_fragment)
+
+    private val internalNavController: NavController?
+        get() = hostFragment?.findNavController()
+
+    private val currentlyDisplayedInternalFragment: Fragment?
+        get() = hostFragment?.childFragmentManager?.fragments?.first()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -94,52 +107,89 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
             fragmentViewModel.isInitialized = true
         }
 
-        findNavController().handleResult(this, R.id.connectScannerControllerFragment, ExitFormContract.DESTINATION, ::handleExitForm)
-        findNavController().handleResult(this, R.id.connectScannerControllerFragment, AlertContract.DESTINATION, ::handleResult)
+        findNavController().handleResult(
+            this,
+            R.id.connectScannerControllerFragment,
+            ExitFormContract.DESTINATION,
+            ::handleExitForm
+        )
+        findNavController().handleResult(
+            this,
+            R.id.connectScannerControllerFragment,
+            AlertContract.DESTINATION,
+            ::handleResult
+        )
 
-        activityViewModel.showScannerIssueScreen.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { screen ->
-            when (screen) {
-                ConnectScannerIssueScreen.BluetoothNoPermission -> showAlert(AlertError.BLUETOOTH_NO_PERMISSION)
-                ConnectScannerIssueScreen.BluetoothNotSupported -> showAlert(AlertError.BLUETOOTH_NOT_SUPPORTED)
-                ConnectScannerIssueScreen.LowBattery -> showAlert(AlertError.LOW_BATTERY)
-                ConnectScannerIssueScreen.UnexpectedError -> showAlert(AlertError.UNEXPECTED_ERROR)
+        activityViewModel.showScannerIssueScreen.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { screen ->
+                when (screen) {
+                    ConnectScannerIssueScreen.BluetoothNoPermission -> showAlert(AlertError.BLUETOOTH_NO_PERMISSION)
+                    ConnectScannerIssueScreen.BluetoothNotSupported -> showAlert(AlertError.BLUETOOTH_NOT_SUPPORTED)
+                    ConnectScannerIssueScreen.LowBattery -> showAlert(AlertError.LOW_BATTERY)
+                    ConnectScannerIssueScreen.UnexpectedError -> showAlert(AlertError.UNEXPECTED_ERROR)
 
-                ConnectScannerIssueScreen.ExitForm -> showExitForm()
+                    ConnectScannerIssueScreen.ExitForm -> showExitForm()
 
-                ConnectScannerIssueScreen.BluetoothOff -> internalNavController()?.navigate(R.id.issueBluetoothOffFragment)
-                ConnectScannerIssueScreen.NfcOff -> internalNavController()?.navigate(R.id.issueNfcOffFragment)
-                ConnectScannerIssueScreen.NfcPair -> internalNavController()?.navigate(R.id.issueNfcPairFragment)
-                ConnectScannerIssueScreen.SerialEntryPair -> internalNavController()?.navigate(R.id.issueSerialEntryPairFragment)
+                    ConnectScannerIssueScreen.BluetoothOff -> internalNavController?.navigateSafely(
+                        currentlyDisplayedInternalFragment,
+                        R.id.issueBluetoothOffFragment
+                    )
 
-                is ConnectScannerIssueScreen.ScannerOff -> internalNavController()?.navigate(
-                    R.id.issueScannerOffFragment,
-                    ScannerOffFragmentArgs(screen.currentScannerId).toBundle()
-                )
+                    ConnectScannerIssueScreen.NfcOff -> internalNavController?.navigateSafely(
+                        currentlyDisplayedInternalFragment,
+                        R.id.issueNfcOffFragment
+                    )
 
-                is ConnectScannerIssueScreen.ScannerError -> screen.currentScannerId?.let { showKnownScannerDialog(it) }
+                    ConnectScannerIssueScreen.NfcPair -> internalNavController?.navigateSafely(
+                        currentlyDisplayedInternalFragment,
+                        R.id.issueNfcPairFragment
+                    )
 
-                is ConnectScannerIssueScreen.Ota -> internalNavController()?.navigate(
-                    R.id.otaFragment,
-                    OtaFragmentArgs(OtaFragmentParams(screen.availableOtas)).toBundle()
-                )
-            }
-        })
-        activityViewModel.scannerConnected.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { isSuccess ->
-            if (isSuccess) {
-                Vibrate.vibrate(requireContext())
-                activityViewModel.finishConnectionFlow(true)
-            }
-        })
+                    ConnectScannerIssueScreen.SerialEntryPair -> internalNavController?.navigateSafely(
+                        currentlyDisplayedInternalFragment,
+                        R.id.issueSerialEntryPairFragment
+                    )
 
-        activityViewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { isSuccess ->
-            finishWithResult(isSuccess)
-        })
+                    is ConnectScannerIssueScreen.ScannerOff -> internalNavController?.navigateSafely(
+                        currentlyDisplayedInternalFragment,
+                        R.id.issueScannerOffFragment,
+                        ScannerOffFragmentArgs(screen.currentScannerId).toBundle()
+                    )
+
+                    is ConnectScannerIssueScreen.ScannerError -> screen.currentScannerId?.let {
+                        showKnownScannerDialog(
+                            it
+                        )
+                    }
+
+                    is ConnectScannerIssueScreen.Ota -> internalNavController?.navigateSafely(
+                        currentlyDisplayedInternalFragment,
+                        R.id.otaFragment,
+                        OtaFragmentArgs(OtaFragmentParams(screen.availableOtas)).toBundle()
+                    )
+                }
+            })
+        activityViewModel.scannerConnected.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { isSuccess ->
+                if (isSuccess) {
+                    Vibrate.vibrate(requireContext())
+                    activityViewModel.finishConnectionFlow(true)
+                }
+            })
+
+        activityViewModel.finish.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { isSuccess ->
+                finishWithResult(isSuccess)
+            })
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             activityViewModel.handleBackPress()
         }
 
-        internalNavController()?.setGraph(R.navigation.graph_connect_internal)
+        internalNavController?.setGraph(R.navigation.graph_connect_internal)
 
         if (shouldRequestPermissions) {
             shouldRequestPermissions = false
@@ -162,8 +212,13 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                 .create()
         }
         //Update scannerId in case it has changed
-        knownScannedDialog?.setTitle(getString(IDR.string.fingerprint_connect_scanner_id_confirmation_message, scannerId))
-        if (internalNavController()?.currentDestination?.id == R.id.connectProgressFragment) {
+        knownScannedDialog?.setTitle(
+            getString(
+                IDR.string.fingerprint_connect_scanner_id_confirmation_message,
+                scannerId
+            )
+        )
+        if (internalNavController?.currentDestination?.id == R.id.connectProgressFragment) {
             knownScannedDialog?.takeUnless { it.isShowing }?.show()
         }
     }
@@ -175,7 +230,13 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
     override fun onResume() {
         super.onResume()
-        alertHelper.handleResume { shouldRequestPermissions = true }
+
+        if (shouldRequestPermissions) {
+            shouldRequestPermissions = false
+            checkBluetoothPermissions()
+        } else {
+            alertHelper.handleResume { shouldRequestPermissions = true }
+        }
     }
 
     override fun onPause() {
@@ -200,7 +261,11 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     }
 
     private fun showAlert(error: AlertError) {
-        findNavController().navigate(R.id.action_global_to_alertFragment, error.toAlertConfig().toArgs())
+        findNavController().navigateSafely(
+            this,
+            R.id.action_global_to_alertFragment,
+            error.toAlertConfig().toArgs()
+        )
     }
 
     private fun handleResult(result: AlertResult) {
@@ -214,7 +279,8 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     }
 
     private fun showExitForm() {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_global_to_exitFormFragment,
             exitFormConfiguration {
                 titleRes = IDR.string.exit_form_title_fingerprinting

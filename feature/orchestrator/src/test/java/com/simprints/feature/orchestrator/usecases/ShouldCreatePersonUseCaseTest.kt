@@ -164,6 +164,7 @@ class ShouldCreatePersonUseCaseTest {
         projectId = "",
         userId = "".asTokenizableRaw(),
         moduleId = "".asTokenizableRaw(),
+        biometricDataSource = "",
         metadata = "",
         unknownExtras = emptyMap(),
     )

@@ -1,17 +1,16 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 
 @Keep
 internal data class ApiFingerprintCaptureBiometricsPayload(
-    override val version: Int,
     override val startTime: ApiTimestamp,
     val fingerprint: Fingerprint,
     val id: String,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class Fingerprint(
@@ -30,7 +29,6 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
     }
 
     constructor(domainPayload: FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload) : this(
-        domainPayload.eventVersion,
         domainPayload.createdAt.fromDomainToApi(),
         Fingerprint(domainPayload.fingerprint),
         domainPayload.id
