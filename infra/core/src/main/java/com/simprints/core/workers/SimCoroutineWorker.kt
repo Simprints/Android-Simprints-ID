@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
@@ -12,6 +13,7 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.tools.utils.BatteryOptimizationUtils
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -57,6 +59,9 @@ abstract class SimCoroutineWorker(
 
     protected suspend fun showProgressNotification() {
         try {
+            if (BatteryOptimizationUtils.isFollowingBatteryOptimizations(context)) {
+                return
+            }
             setForeground(getForegroundInfo())
         } catch (setForegroundException: Throwable) {
             // Setting foreground (showing the notification) may be restricted by the system
@@ -94,15 +99,19 @@ abstract class SimCoroutineWorker(
             .setOnlyAlertOnce(true)
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_DEFERRED
+                    foregroundServiceBehavior = Notification.FOREGROUND_SERVICE_IMMEDIATE
                 }
             }
             .build()
-        return ForegroundInfo(WORKER_FOREGROUND_NOTIFICATION_ID, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(WORKER_FOREGROUND_NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            ForegroundInfo(WORKER_FOREGROUND_NOTIFICATION_ID, notification)
+        }
     }
 
     protected fun crashlyticsLog(message: String) {
-        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message")
+        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message".take(99))
     }
 
     private fun logExceptionIfRequired(t: Throwable?) {

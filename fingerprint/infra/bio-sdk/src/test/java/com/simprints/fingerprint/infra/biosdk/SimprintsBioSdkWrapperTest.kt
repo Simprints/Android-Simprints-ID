@@ -33,6 +33,21 @@ class SimprintsBioSdkWrapperTest {
     }
 
     @Test
+    fun `test scanningTimeoutMs and imageTransferTimeoutMs`() {
+        // Given
+        val expectedScanningTimeoutMs = 3000L
+        val expectedImageTransferTimeoutMs = 3000L
+
+        // When
+        val actualScanningTimeoutMs = simprintsBioSdkWrapper.scanningTimeoutMs
+        val actualImageTransferTimeoutMs = simprintsBioSdkWrapper.imageTransferTimeoutMs
+
+        // Then
+        assertThat(actualScanningTimeoutMs).isEqualTo(expectedScanningTimeoutMs)
+        assertThat(actualImageTransferTimeoutMs).isEqualTo(expectedImageTransferTimeoutMs)
+    }
+
+    @Test
     fun `Initializes bio sdk`() = runTest {
         //When
         simprintsBioSdkWrapper.initialize()
@@ -62,18 +77,19 @@ class SimprintsBioSdkWrapperTest {
         val captureFingerprintStrategy = 1000
         val captureTimeOutMs = 1000
         val captureQualityThreshold = 100
+        val captureAllowLowQualityExtraction = true
 
         val bioSdkResponse = TemplateResponse(
             byteArrayOf(1, 2, 3), FingerprintTemplateMetadata(
-            "TemplateFormat", 100
-        )
+                "TemplateFormat", 100
+            )
         )
         val settingsSlot = slot<FingerprintTemplateAcquisitionSettings>()
         coEvery { bioSdk.acquireFingerprintTemplate(capture(settingsSlot)) } returns bioSdkResponse
 
         //When
         val response = simprintsBioSdkWrapper.acquireFingerprintTemplate(
-            captureFingerprintStrategy, captureTimeOutMs, captureQualityThreshold
+            captureFingerprintStrategy, captureTimeOutMs, captureQualityThreshold, captureAllowLowQualityExtraction
         )
 
         //Then
@@ -82,6 +98,7 @@ class SimprintsBioSdkWrapperTest {
             assertThat(captureFingerprintDpi?.value).isEqualTo(captureFingerprintStrategy.toShort())
             assertThat(timeOutMs).isEqualTo(captureTimeOutMs)
             assertThat(qualityThreshold).isEqualTo(captureQualityThreshold)
+            assertThat(allowLowQualityExtraction).isEqualTo(captureAllowLowQualityExtraction)
         }
         assertThat(bioSdkResponse.template).isEqualTo(response.template)
         assertThat(bioSdkResponse.templateMetadata?.templateFormat).isEqualTo(response.templateFormat)
@@ -90,10 +107,16 @@ class SimprintsBioSdkWrapperTest {
 
     @Test
     fun `Fails if template does not have meta data`() = runTest {
-        coEvery { bioSdk.acquireFingerprintTemplate(any()) } returns TemplateResponse(byteArrayOf(1, 2, 3), null)
+        coEvery { bioSdk.acquireFingerprintTemplate(any()) } returns TemplateResponse(
+            byteArrayOf(
+                1,
+                2,
+                3
+            ), null
+        )
 
         assertThrows<IllegalArgumentException> {
-            simprintsBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1)
+            simprintsBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1, true)
         }
     }
 

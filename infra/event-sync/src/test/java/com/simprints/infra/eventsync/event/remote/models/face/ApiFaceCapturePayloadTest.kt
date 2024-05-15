@@ -21,7 +21,6 @@ class ApiFaceCapturePayloadTest {
             id = randomUUID(),
             startTime = ApiTimestamp(1),
             endTime = ApiTimestamp(2),
-            version = 3,
             attemptNb = 2,
             qualityThreshold = 1.2f,
             result = ApiFaceCapturePayload.ApiResult.VALID,
@@ -32,7 +31,6 @@ class ApiFaceCapturePayloadTest {
             assertThat(id).isNotNull()
             assertThat(startTime).isEqualTo(ApiTimestamp(1),)
             assertThat(endTime).isEqualTo(ApiTimestamp(2),)
-            assertThat(version).isEqualTo(3)
             assertThat(attemptNb).isEqualTo(2)
             assertThat(qualityThreshold).isEqualTo(1.2f)
             assertThat(result).isEqualTo(ApiFaceCapturePayload.ApiResult.VALID)

@@ -19,8 +19,12 @@ on:
 jobs:
     promote-artifact:
         runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         environment: ${{inputs.deployment-track}}   # Dynamically set the job environment based on the input
+
+        permissions:
+            contents: write # A write permission For Auto tagging the releases
 
         concurrency:
             group: promote-release-workflow #only one instance of this workflow can run at a time
@@ -54,6 +58,10 @@ jobs:
             -   name: Promote to production 25%
                 if: ${{inputs.deployment-track == 'Prod-25-Percent-Rollout'}}
                 run: ./gradlew promoteArtifact --from-track alpha --promote-track production --release-status inProgress --user-fraction .25
+
+            -   name: Set release tag
+                if: ${{inputs.deployment-track == 'Prod-25-Percent-Rollout'}}
+                run: bash ci/deployment/release_tag_setup
 
             -   name: Promote to production 50%
                 if: ${{inputs.deployment-track == 'Prod-50-Percent-Rollout'}}

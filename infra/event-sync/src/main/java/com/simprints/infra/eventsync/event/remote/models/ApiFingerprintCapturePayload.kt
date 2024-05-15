@@ -3,24 +3,27 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.*
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.FAILURE_TO_ACQUIRE
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.NO_FINGER_DETECTED
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED
 import com.simprints.infra.eventsync.event.remote.models.ApiFingerprintCapturePayload.ApiResult
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiFingerprintCapturePayload(
     val id: String,
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val qualityThreshold: Int,
     val finger: IFingerIdentifier,
     val result: ApiResult,
     val fingerprint: ApiFingerprint?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     @Keep
     data class ApiFingerprint(
@@ -36,15 +39,15 @@ internal data class ApiFingerprintCapturePayload(
         )
     }
 
-    constructor(domainPayload: FingerprintCapturePayload) :
-        this(domainPayload.id,
-            domainPayload.createdAt.fromDomainToApi(),
-            domainPayload.eventVersion,
-            domainPayload.endedAt?.fromDomainToApi(),
-            domainPayload.qualityThreshold,
-            domainPayload.finger,
-            domainPayload.result.fromDomainToApi(),
-            domainPayload.fingerprint?.let { ApiFingerprint(it) })
+    constructor(domainPayload: FingerprintCapturePayload) : this(
+        domainPayload.id,
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.qualityThreshold,
+        domainPayload.finger,
+        domainPayload.result.fromDomainToApi(),
+        domainPayload.fingerprint?.let { ApiFingerprint(it) },
+    )
 
     @Keep
     enum class ApiResult {

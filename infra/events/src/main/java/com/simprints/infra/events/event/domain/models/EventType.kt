@@ -128,6 +128,9 @@ enum class EventType {
 
     /* key added: EVENT_UP_SYNC_REQUEST_KEY */
     EVENT_UP_SYNC_REQUEST,
+
+    /* key added: LICENSE_CHECK_KEY */
+    LICENSE_CHECK,
     ;
 
     companion object {
@@ -171,5 +174,6 @@ enum class EventType {
         const val VERO_2_INFO_SNAPSHOT_KEY = "VERO_2_INFO_SNAPSHOT"
         const val EVENT_DOWN_SYNC_REQUEST_KEY = "EVENT_DOWN_SYNC_REQUEST"
         const val EVENT_UP_SYNC_REQUEST_KEY = "EVENT_UP_SYNC_REQUEST"
+        const val LICENSE_CHECK_KEY = "LICENSE_CHECK"
     }
 }

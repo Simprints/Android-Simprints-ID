@@ -29,6 +29,10 @@ internal class SimNetworkImpl @Inject constructor(
         return baseUrlProvider.getApiBaseUrl()
     }
 
+    override fun getApiBaseUrlPrefix(): String {
+        return baseUrlProvider.getApiBaseUrlPrefix()
+    }
+
     override fun setApiBaseUrl(apiBaseUrl: String?) {
         baseUrlProvider.setApiBaseUrl(apiBaseUrl)
     }

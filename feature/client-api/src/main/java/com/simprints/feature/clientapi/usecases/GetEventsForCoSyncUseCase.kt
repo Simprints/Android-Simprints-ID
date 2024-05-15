@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationAsStringSerializer
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.feature.clientapi.models.CoSyncEvents
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.canCoSyncAllData
@@ -13,6 +12,7 @@ import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.config.store.models.canCoSyncData
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.cosync.CoSyncEvents
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent

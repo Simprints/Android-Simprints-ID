@@ -1,8 +1,7 @@
 package com.simprints.feature.orchestrator
 
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.AlertConfigurationBuilder
 import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
@@ -10,7 +9,6 @@ import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.logincheck.LoginCheckError
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
-import com.simprints.core.domain.response.AppErrorReason
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -23,12 +21,8 @@ internal class AlertConfigurationMapper @Inject constructor() {
         image = IDR.drawable.ic_alert_default
         messageRes = getMessage(clientApiError)
         eventType = getEventType(clientApiError)
+        appErrorReason = AppErrorReason.UNEXPECTED_ERROR
         leftButton = AlertButtonConfig.Close
-
-        payload = bundleOf(
-            PAYLOAD_TYPE_KEY to ClientApiError::name,
-            PAYLOAD_KEY to clientApiError.name,
-        )
     }
 
     private fun getMessage(clientApiError: ClientApiError) = when (clientApiError) {
@@ -49,13 +43,9 @@ internal class AlertConfigurationMapper @Inject constructor() {
         image = IDR.drawable.ic_alert_default
         messageRes = getMessage(loginCheckError)
         messageIcon = getMessageIcon(loginCheckError)
+        appErrorReason = getAppReason(loginCheckError)
         eventType = getEventType(loginCheckError)
         leftButton = AlertButtonConfig.Close
-
-        payload = bundleOf(
-            PAYLOAD_TYPE_KEY to LoginCheckError::name.name,
-            PAYLOAD_KEY to loginCheckError.name,
-        )
     }
 
     private fun getBackgroundColor(loginCheckError: LoginCheckError) = when (loginCheckError) {
@@ -110,7 +100,6 @@ internal class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.INVALID_VERIFY_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_VERIFY_ID
     }
 
-
     private fun getEventType(loginCheckError: LoginCheckError) = when (loginCheckError) {
         LoginCheckError.DIFFERENT_PROJECT_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.DIFFERENT_PROJECT_ID
         LoginCheckError.PROJECT_PAUSED -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.PROJECT_PAUSED
@@ -123,35 +112,18 @@ internal class AlertConfigurationMapper @Inject constructor() {
         LoginCheckError.ROOTED_DEVICE -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
     }
 
+    private fun getAppReason(loginCheckError: LoginCheckError) = when (loginCheckError) {
+        LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES,
+        LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED,
+        LoginCheckError.INTEGRITY_SERVICE_ERROR,
+        LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
+        LoginCheckError.UNEXPECTED_LOGIN_ERROR,
+        -> AppErrorReason.UNEXPECTED_ERROR
 
-    companion object {
-
-        fun reasonFromPayload(extras: Bundle): AppErrorReason {
-            val type = extras.getString(PAYLOAD_TYPE_KEY) ?: return AppErrorReason.UNEXPECTED_ERROR
-            val payload = extras.getString(PAYLOAD_KEY) ?: return AppErrorReason.UNEXPECTED_ERROR
-
-            return when (type) {
-                ClientApiError::name.name -> AppErrorReason.UNEXPECTED_ERROR
-                LoginCheckError::name.name -> when (LoginCheckError.valueOf(payload)) {
-                    LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES,
-                    LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED,
-                    LoginCheckError.INTEGRITY_SERVICE_ERROR,
-                    LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
-                    LoginCheckError.UNEXPECTED_LOGIN_ERROR,
-                    -> AppErrorReason.UNEXPECTED_ERROR
-
-                    LoginCheckError.DIFFERENT_PROJECT_ID -> AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
-                    LoginCheckError.PROJECT_PAUSED -> AppErrorReason.PROJECT_PAUSED
-                    LoginCheckError.PROJECT_ENDING -> AppErrorReason.PROJECT_ENDING
-                    LoginCheckError.ROOTED_DEVICE -> AppErrorReason.ROOTED_DEVICE
-                }
-
-                else -> AppErrorReason.UNEXPECTED_ERROR
-            }
-        }
-
-        private const val PAYLOAD_TYPE_KEY = "alert_payload_type"
-        private const val PAYLOAD_KEY = "alert_payload"
+        LoginCheckError.DIFFERENT_PROJECT_ID -> AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
+        LoginCheckError.PROJECT_PAUSED -> AppErrorReason.PROJECT_PAUSED
+        LoginCheckError.PROJECT_ENDING -> AppErrorReason.PROJECT_ENDING
+        LoginCheckError.ROOTED_DEVICE -> AppErrorReason.ROOTED_DEVICE
     }
 }
 

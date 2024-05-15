@@ -65,12 +65,6 @@ internal fun WorkRequest.Builder<*, *>.addTagForEndSyncReporter(): WorkRequest.B
 internal fun WorkRequest.Builder<*, *>.addTagForStartSyncReporter(): WorkRequest.Builder<*, *> =
     this.addTag(tagForType(START_SYNC_REPORTER))
 
-// Master Worker tags
-internal fun WorkRequest.Builder<*, *>.addTagForSyncMasterWorkers(): WorkRequest.Builder<*, *> = this.addTag(MASTER_SYNC_SCHEDULERS)
-
-internal fun WorkRequest.Builder<*, *>.addTagForOneTimeSyncMasterWorker(): WorkRequest.Builder<*, *> = this.addTag(MASTER_SYNC_SCHEDULER_ONE_TIME)
-internal fun WorkRequest.Builder<*, *>.addTagForBackgroundSyncMasterWorker(): WorkRequest.Builder<*, *> = this.addTag(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-
 /**
  * Use tags
  */
@@ -87,6 +81,5 @@ internal fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) =
     }
 
 internal fun WorkManager.getAllSubjectsSyncWorkersInfo() = getWorkInfosByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
-internal fun WorkManager.cancelAllSubjectsSyncWorkers() = cancelAllWorkByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
 internal fun MutableList<WorkInfo>.sortByScheduledTime() = sortBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }
 internal fun List<WorkInfo>.sortByScheduledTime() = sortedBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }

@@ -2,7 +2,9 @@ package com.simprints.infra.eventsync.status.down
 
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.exceptions.MissingArgumentForDownSyncScopeException
@@ -20,6 +22,8 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     private val authStore: AuthStore,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
+    private val configRepository: ConfigRepository,
+    private val tokenizationProcessor: TokenizationProcessor,
 ) {
 
     suspend fun getDownSyncScope(
@@ -31,7 +35,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
 
         val syncScope = when (syncPartitioning) {
             Partitioning.GLOBAL -> SubjectProjectScope(projectId, modes)
-            Partitioning.USER -> SubjectUserScope(projectId, getUserId(), modes)
+            Partitioning.USER -> SubjectUserScope(projectId, getUserId(projectId), modes)
             Partitioning.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
@@ -47,15 +51,22 @@ internal class EventDownSyncScopeRepository @Inject constructor(
         return projectId
     }
 
-    private suspend fun getUserId(): String {
+    private suspend fun getUserId(projectId: String): String {
         // After we are certain that all users have user IDs cached (no-one uses 2023.3 for a while), the fallback can be removed
-        val possibleUserId: String = authStore.signedInUserId?.value
-            ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed.value
+        val possibleUserId: TokenizableString = authStore.signedInUserId
+            ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed
 
-        if (possibleUserId.isBlank()) {
+        if (possibleUserId.value.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }
-        return possibleUserId
+        return when (possibleUserId) {
+            is TokenizableString.Raw -> tokenizationProcessor.encrypt(
+                decrypted = possibleUserId,
+                tokenKeyType = TokenKeyType.AttendantId,
+                project = configRepository.getProject(projectId)
+            ).value
+            is TokenizableString.Tokenized -> possibleUserId.value
+        }
     }
 
     suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {

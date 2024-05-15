@@ -11,19 +11,17 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 internal data class ApiEventDownSyncRequestPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
-    override val version: Int,
     val requestId: String,
     val queryParameters: ApiQueryParameters,
     val responseStatus: Int?,
     val errorType: String?,
     val msToFirstResponseByte: Long?,
     val eventsRead: Int?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: EventDownSyncRequestEvent.EventDownSyncRequestPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.requestId,
         ApiQueryParameters(
             domainPayload.queryParameters.moduleId,
@@ -47,5 +45,10 @@ internal data class ApiEventDownSyncRequestPayload(
         val lastEventId: String?,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        when (tokenKeyType) {
+            TokenKeyType.AttendantId -> "queryParameters.attendantId"
+            TokenKeyType.ModuleId -> "queryParameters.moduleId"
+            else -> null
+        }
 }

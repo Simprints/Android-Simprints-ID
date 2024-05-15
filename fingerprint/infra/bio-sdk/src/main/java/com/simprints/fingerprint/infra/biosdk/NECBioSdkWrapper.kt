@@ -15,6 +15,15 @@ import javax.inject.Inject
 class NECBioSdkWrapper @Inject constructor(
     private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, NecMatchingSettings>
 ) : BioSdkWrapper {
+    override val scanningTimeoutMs: Long
+        get() = 8000 // 8 seconds = maximum duration for scanning + image transfer + image processing + NEC template extraction
+    override val imageTransferTimeoutMs: Long
+        get() = 0 // 0 seconds as the image is already captured and stored in the memory from the scanning step
+
+    override val matcherName: String = bioSdk.matcherName
+
+    override val supportedTemplateFormat: String = bioSdk.supportedTemplateFormat
+
     override suspend fun initialize() = bioSdk.initialize()
 
 
@@ -29,12 +38,14 @@ class NECBioSdkWrapper @Inject constructor(
     override suspend fun acquireFingerprintTemplate(
         capturingResolution: Int?,
         timeOutMs: Int,
-        qualityThreshold: Int
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse {
         val settings = FingerprintTemplateAcquisitionSettings(
             capturingResolution?.let { Dpi(it.toShort()) },
             timeOutMs,
-            qualityThreshold
+            qualityThreshold,
+            allowLowQualityExtraction
         )
         return bioSdk.acquireFingerprintTemplate(settings).toDomain()
     }
@@ -52,4 +63,5 @@ fun TemplateResponse<FingerprintTemplateMetadata>.toDomain(): AcquireFingerprint
         templateMetadata!!.templateFormat,
         templateMetadata!!.imageQualityScore
     )
+
 }

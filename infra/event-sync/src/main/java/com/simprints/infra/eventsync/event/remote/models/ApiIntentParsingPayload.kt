@@ -12,13 +12,11 @@ import com.simprints.infra.eventsync.event.remote.models.ApiIntentParsingPayload
 @Keep
 internal data class ApiIntentParsingPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val integration: ApiIntegrationInfo,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: IntentParsingPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.integration.fromDomainToApi(),
     )
 

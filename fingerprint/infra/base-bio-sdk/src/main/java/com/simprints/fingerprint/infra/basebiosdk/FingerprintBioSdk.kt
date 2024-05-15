@@ -31,4 +31,9 @@ class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, 
         matchingSettings: MatcherSettings?
     ) = fingerprintMatcher.match(probe, candidates, matchingSettings)
 
+    val supportedTemplateFormat: String
+        get() = fingerprintMatcher.supportedTemplateFormat
+    val matcherName: String
+        get() = fingerprintMatcher.matcherName
+
 }

@@ -38,6 +38,21 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
+    fun `test scanningTimeoutMs and imageTransferTimeoutMs`() {
+        // Given
+        val expectedScanningTimeoutMs = 8000L
+        val expectedImageTransferTimeoutMs = 0L
+
+        // When
+        val actualScanningTimeoutMs = necBioSdkWrapper.scanningTimeoutMs
+        val actualImageTransferTimeoutMs = necBioSdkWrapper.imageTransferTimeoutMs
+
+        // Then
+        Truth.assertThat(actualScanningTimeoutMs).isEqualTo(expectedScanningTimeoutMs)
+        Truth.assertThat(actualImageTransferTimeoutMs).isEqualTo(expectedImageTransferTimeoutMs)
+    }
+
+    @Test
     fun `initializes bio sdk`() = runTest {
         //When
         necBioSdkWrapper.initialize()
@@ -67,6 +82,7 @@ class NECBioSdkWrapperTest {
         val captureFingerprintStrategy = 1000
         val captureTimeOutMs = 1000
         val captureQualityThreshold = 100
+        val captureAllowLowQualityExtraction = true
 
         val bioSdkResponse = TemplateResponse(
             byteArrayOf(1, 2, 3), FingerprintTemplateMetadata(
@@ -78,7 +94,7 @@ class NECBioSdkWrapperTest {
 
         //When
         val response = necBioSdkWrapper.acquireFingerprintTemplate(
-            captureFingerprintStrategy, captureTimeOutMs, captureQualityThreshold
+            captureFingerprintStrategy, captureTimeOutMs, captureQualityThreshold, captureAllowLowQualityExtraction
         )
 
         //Then
@@ -88,6 +104,7 @@ class NECBioSdkWrapperTest {
                 .isEqualTo(captureFingerprintStrategy.toShort())
             Truth.assertThat(timeOutMs).isEqualTo(captureTimeOutMs)
             Truth.assertThat(qualityThreshold).isEqualTo(captureQualityThreshold)
+            Truth.assertThat(allowLowQualityExtraction).isEqualTo(captureAllowLowQualityExtraction)
         }
         Truth.assertThat(bioSdkResponse.template).isEqualTo(response.template)
         Truth.assertThat(bioSdkResponse.templateMetadata?.templateFormat)
@@ -107,7 +124,7 @@ class NECBioSdkWrapperTest {
         )
 
         assertThrows<IllegalArgumentException> {
-            necBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1)
+            necBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1, true)
         }
     }
 

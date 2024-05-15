@@ -5,7 +5,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -16,22 +15,26 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
-import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
-import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.coVerifySequence
+import io.mockk.every
+import io.mockk.excludeRecords
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.test.runTest
-import okhttp3.Headers
-import okhttp3.Headers.Companion.headersOf
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
@@ -84,31 +87,15 @@ class EventRemoteDataSourceTest {
     @Test
     fun count_shouldMakeANetworkRequest() = runTest {
         coEvery {
-            eventRemoteInterface.countEvents(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
-            )
-        } returns listOf(
-            ApiEventCount(
-                ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation,
-                1
-            )
+            eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any())
+        } returns Response.success(
+            null,
+            mapOf("x-event-count" to "6", "x-event-count-is-lower-bound" to "true").toHeaders()
         )
 
         val count = eventRemoteDataSource.count(query)
 
-        assertThat(count).isEqualTo(
-            listOf(
-                EventCount(
-                    EnrolmentRecordEventType.EnrolmentRecordCreation,
-                    1
-                )
-            )
-        )
+        assertThat(count).isEqualTo(EventCount(6, true))
         coVerify(exactly = 1) {
             eventRemoteInterface.countEvents(
                 projectId = DEFAULT_PROJECT_ID,
@@ -189,12 +176,13 @@ class EventRemoteDataSourceTest {
                 any(),
                 any(),
                 any(),
+                any(),
                 any()
             )
         } throws exception
 
         val exceptionThrown = assertThrows<BackendMaintenanceException> {
-            eventRemoteDataSource.getEvents(query, this)
+            eventRemoteDataSource.getEvents(GUID1, query, this)
         }
         assertThat(exceptionThrown).isEqualTo(exception)
     }
@@ -217,12 +205,13 @@ class EventRemoteDataSourceTest {
                     any(),
                     any(),
                     any(),
+                    any(),
                     any()
                 )
             } throws exception
 
             assertThrows<TooManyRequestsException> {
-                eventRemoteDataSource.getEvents(query, this)
+                eventRemoteDataSource.getEvents(GUID1, query, this)
             }
 
         }
@@ -236,18 +225,19 @@ class EventRemoteDataSourceTest {
                 any(),
                 any(),
                 any(),
+                any(),
                 any()
             )
         } returns Response.success("".toResponseBody())
 
         val mockedScope: CoroutineScope = mockk()
         every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
-        eventRemoteDataSource.getEvents(query, mockedScope)
+        eventRemoteDataSource.getEvents(GUID1, query, mockedScope)
 
         with(query) {
             coVerify {
                 eventRemoteInterface.downloadEvents(
-                    projectId, moduleId, userId, subjectId, modes, lastEventId
+                    GUID1, projectId, moduleId, userId, subjectId, modes, lastEventId
                 )
             }
         }
@@ -256,7 +246,7 @@ class EventRemoteDataSourceTest {
     @Test
     fun getEvents_shouldReturnCorrectTotalHeader() = runTest {
         coEvery {
-            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any())
         } returns Response.success(
             "".toResponseBody(),
             mapOf("x-event-count" to "22").toHeaders()
@@ -265,45 +255,27 @@ class EventRemoteDataSourceTest {
         val mockedScope: CoroutineScope = mockk()
 
         every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
-        assertThat(eventRemoteDataSource.getEvents(query, mockedScope).totalCount).isEqualTo(22)
-    }
-
-    @Test
-    fun getEvents_shouldReturnCorrectRequestId() = runTest {
-        coEvery {
-            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
-        } returns Response.success(
-            "".toResponseBody(),
-            mapOf("x-request-id" to "requestId").toHeaders()
+        assertThat(eventRemoteDataSource.getEvents(GUID1, query, mockedScope).totalCount).isEqualTo(
+            22
         )
-
-        val mockedScope: CoroutineScope = mockk()
-
-        every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
-        assertThat(
-            eventRemoteDataSource.getEvents(
-                query,
-                mockedScope
-            ).requestId
-        ).isEqualTo("requestId")
     }
 
     @Test
     fun getEvents_shouldReturnCorrectStatus() = runTest {
         coEvery {
-            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any())
         } returns Response.success(205, "".toResponseBody())
 
         val mockedScope: CoroutineScope = mockk()
 
         every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
-        assertThat(eventRemoteDataSource.getEvents(query, mockedScope).status).isEqualTo(205)
+        assertThat(eventRemoteDataSource.getEvents(GUID1, query, mockedScope).status).isEqualTo(205)
     }
 
     @Test
     fun getEvents_shouldNotReturnTotalHeaderWhenLowerBound() = runTest {
         coEvery {
-            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any())
         } returns Response.success(
             "".toResponseBody(),
             mapOf("x-event-count" to "22", "x-event-count-is-lower-bound" to "true").toHeaders()
@@ -312,12 +284,19 @@ class EventRemoteDataSourceTest {
         val mockedScope: CoroutineScope = mockk()
 
         every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
-        assertThat(eventRemoteDataSource.getEvents(query, mockedScope).totalCount).isNull()
+        assertThat(eventRemoteDataSource.getEvents(GUID1, query, mockedScope).totalCount).isNull()
     }
 
     @Test
     fun postEvent_shouldUploadEvents() = runTest {
-        coEvery { eventRemoteInterface.uploadEvents(any(), any(), any()) } returns Response.success(
+        coEvery {
+            eventRemoteInterface.uploadEvents(
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        } returns Response.success(
             "".toResponseBody(),
             mapOf("x-request-id" to "requestId").toHeaders()
         )
@@ -325,6 +304,7 @@ class EventRemoteDataSourceTest {
         val events = listOf(createAlertScreenEvent())
         val scope = createSessionScope()
         eventRemoteDataSource.post(
+            GUID1,
             DEFAULT_PROJECT_ID,
             ApiUploadEventsBody(
                 sessions = listOf(ApiEventScope.fromDomain(scope, events))
@@ -333,6 +313,7 @@ class EventRemoteDataSourceTest {
 
         coVerify(exactly = 1) {
             eventRemoteInterface.uploadEvents(
+                GUID1,
                 DEFAULT_PROJECT_ID,
                 true,
                 match { body ->
@@ -352,12 +333,14 @@ class EventRemoteDataSourceTest {
                 eventRemoteInterface.uploadEvents(
                     any(),
                     any(),
+                    any(),
                     any()
                 )
             } throws Throwable("Request issue")
 
             assertThrows<Throwable> {
                 eventRemoteDataSource.post(
+                    GUID1,
                     DEFAULT_PROJECT_ID,
                     ApiUploadEventsBody()
                 )

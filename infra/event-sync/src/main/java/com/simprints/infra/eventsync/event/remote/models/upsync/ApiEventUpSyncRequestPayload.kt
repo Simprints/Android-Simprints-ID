@@ -11,17 +11,15 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 internal data class ApiEventUpSyncRequestPayload(
     override val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
-    override val version: Int,
     val requestId: String,
     val content: ApiUpSyncContent,
     val responseStatus: Int?,
     val errorType: String?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: EventUpSyncRequestEvent.EventUpSyncRequestPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.requestId,
         ApiUpSyncContent(
             domainPayload.content.sessionCount,

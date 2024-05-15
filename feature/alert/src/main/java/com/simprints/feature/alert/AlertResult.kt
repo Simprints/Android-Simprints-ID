@@ -1,11 +1,11 @@
 package com.simprints.feature.alert
 
-import android.os.Bundle
 import androidx.annotation.Keep
+import com.simprints.core.domain.response.AppErrorReason
 import java.io.Serializable
 
 @Keep
 data class AlertResult(
     val buttonKey: String,
-    val payload: Bundle,
+    val appErrorReason: AppErrorReason? = null,
 ) : Serializable

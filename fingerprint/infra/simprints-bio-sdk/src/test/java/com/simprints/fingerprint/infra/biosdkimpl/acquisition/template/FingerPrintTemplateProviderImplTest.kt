@@ -48,7 +48,8 @@ class FingerPrintTemplateProviderImplTest {
             fingerprintCaptureWrapperFactory.captureWrapper.acquireFingerprintTemplate(
                 settings.captureFingerprintDpi,
                 settings.timeOutMs,
-                settings.qualityThreshold
+                settings.qualityThreshold,
+                settings.allowLowQualityExtraction
             )
         } returns templateResponse
         //When

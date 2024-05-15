@@ -20,6 +20,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.matcher.MatchContract
@@ -45,6 +46,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     projectConfiguration,
                     FlowType.ENROL,
                     buildMatcherSubjectQuery(projectConfiguration, action),
+                    BiometricDataSource.fromString(action.biometricDataSource),
                 )
             } else emptyList(),
         )
@@ -60,6 +62,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.IDENTIFY,
                 buildMatcherSubjectQuery(projectConfiguration, action),
+                BiometricDataSource.fromString(action.biometricDataSource),
             )
         )
 
@@ -75,6 +78,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.VERIFY,
                 SubjectQuery(subjectId = action.verifyGuid),
+                BiometricDataSource.fromString(action.biometricDataSource),
             )
         )
 
@@ -143,6 +147,7 @@ internal class BuildStepsUseCase @Inject constructor(
       projectConfiguration: ProjectConfiguration,
       flowType: FlowType,
       subjectQuery: SubjectQuery,
+      biometricDataSource: BiometricDataSource,
     ) = projectConfiguration.general.modalities.map {
         Step(
             id = when (it) {
@@ -151,7 +156,7 @@ internal class BuildStepsUseCase @Inject constructor(
             },
             navigationActionId = R.id.action_orchestratorFragment_to_matcher,
             destinationId = MatchContract.DESTINATION,
-            payload = MatchStepStubPayload.asBundle(flowType, subjectQuery),
+            payload = MatchStepStubPayload.asBundle(flowType, subjectQuery, biometricDataSource),
         )
     }
 

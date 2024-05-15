@@ -2,7 +2,6 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
@@ -27,10 +26,9 @@ internal class FingerprintCaptureWrapperV2(
     private val ioDispatcher: CoroutineDispatcher,
 ) : FingerprintCaptureWrapper {
 
-    override suspend fun acquireImageDistortionMatrixConfiguration(): AcquireImageDistortionMatrixConfigurationResponse =
+    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray =
         withContext(ioDispatcher) {
             scannerV2.acquireImageDistortionConfigurationMatrix()
-                .map { AcquireImageDistortionMatrixConfigurationResponse(it) }
                 .switchIfEmpty(Single.error(NoImageDistortionConfigurationMatrixException()))
                 .wrapErrorsFromScanner().await()
         }
@@ -76,7 +74,8 @@ internal class FingerprintCaptureWrapperV2(
     override suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
         timeOutMs: Int,
-        qualityThreshold: Int
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse = withContext(ioDispatcher) {
         require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
@@ -87,10 +86,18 @@ internal class FingerprintCaptureWrapperV2(
             .andThen(scannerV2.getImageQualityScore())
             .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image quality score")))
             .setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold)
-            .acquireTemplateAndAssembleResponse()
-            .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire template")))
-            .ifNoFingerDetectedThenSetBadScanLedState()
-            .wrapErrorsFromScanner()
+            .flatMap { qualityScore ->
+                // If the quality score is below the threshold and we don't allow low quality extraction, return an empty template
+                if (qualityScore < qualityThreshold && !allowLowQualityExtraction) {
+                    Single.just(AcquireFingerprintTemplateResponse(ByteArray(0), templateFormat, qualityScore))
+                } else {
+                    Single.just(qualityScore)
+                        .acquireTemplateAndAssembleResponse()
+                        .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire template")))
+                        .ifNoFingerDetectedThenSetBadScanLedState()
+                        .wrapErrorsFromScanner()
+                }
+            }
             .await()
     }
 

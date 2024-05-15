@@ -70,11 +70,9 @@ class LibSimprintsResponseMapperTest {
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelableArray(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
-            arrayOf(
-                Identification("guid-1", 100, Tier.TIER_5),
-                Identification("guid-2", 75, Tier.TIER_3),
-            )
+        assertThat(extras.getParcelableArrayList<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
+            Identification("guid-1", 100, Tier.TIER_5),
+            Identification("guid-2", 75, Tier.TIER_3),
         )
     }
 
@@ -172,8 +170,8 @@ class LibSimprintsResponseMapperTest {
             AppErrorReason.BLUETOOTH_NO_PERMISSION to Constants.SIMPRINTS_BLUETOOTH_NO_PERMISSION,
             AppErrorReason.FINGERPRINT_CONFIGURATION_ERROR to Constants.SIMPRINTS_FINGERPRINT_CONFIGURATION_ERROR,
             AppErrorReason.FACE_CONFIGURATION_ERROR to Constants.SIMPRINTS_FACE_CONFIGURATION_ERROR,
-            AppErrorReason.FACE_LICENSE_MISSING to Constants.SIMPRINTS_FACE_LICENSE_MISSING,
-            AppErrorReason.FACE_LICENSE_INVALID to Constants.SIMPRINTS_FACE_LICENSE_INVALID,
+            AppErrorReason.LICENSE_MISSING to Constants.SIMPRINTS_LICENSE_MISSING,
+            AppErrorReason.LICENSE_INVALID to Constants.SIMPRINTS_LICENSE_INVALID,
             AppErrorReason.BACKEND_MAINTENANCE_ERROR to Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR,
             AppErrorReason.PROJECT_PAUSED to Constants.SIMPRINTS_PROJECT_PAUSED,
             AppErrorReason.PROJECT_ENDING to Constants.SIMPRINTS_PROJECT_ENDING,

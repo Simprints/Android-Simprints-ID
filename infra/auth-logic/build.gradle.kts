@@ -5,19 +5,6 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.authlogic"
-
-
-    buildTypes {
-        getByName("release") {
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
-        }
-        getByName("staging") {
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-        }
-        getByName("debug") {
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-        }
-    }
 }
 
 dependencies {
@@ -29,6 +16,7 @@ dependencies {
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:images"))
     implementation(project(":infra:recent-user-activity"))
+    implementation(project(":infra:license"))
 
     implementation(project(":fingerprint:infra:scanner"))
 

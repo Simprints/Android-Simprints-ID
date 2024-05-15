@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -34,15 +33,16 @@ import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerManager
-import com.simprints.fingerprint.capture.views.tryagainsplash.FullScreenSplashDialog
+import com.simprints.fingerprint.capture.views.tryagainsplash.TryAnotherFingerSplashDialogFragment
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -114,7 +114,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private fun observeBioSdkInit() {
         vm.invalidLicense.observe(viewLifecycleOwner) {
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_fingerprintCaptureFragment_to_graphAlert,
                 alertConfiguration {
                     color = AlertColor.Gray
@@ -122,15 +123,16 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     messageRes = IDR.string.configuration_licence_invalid_message
                     image = IDR.drawable.ic_exclamation
                     leftButton = AlertButtonConfig.Close
-                    payload = bundleOf(PAYLOAD_TYPE_KEY to AppErrorReason.FACE_LICENSE_INVALID)
-                    eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.FACE_LICENSE_INVALID
+                    appErrorReason = AppErrorReason.LICENSE_INVALID
+                    eventType = AlertScreenEventType.LICENSE_INVALID
                 }.toArgs()
             )
         }
     }
 
     private fun openRefusal() {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
             exitFormConfiguration {
                 titleRes = com.simprints.infra.resources.R.string.exit_form_title_fingerprinting
@@ -200,14 +202,15 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         })
 
         vm.launchAlert.observe(viewLifecycleOwner, LiveDataEventObserver {
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_fingerprintCaptureFragment_to_graphAlert,
                 alertConfiguration {
                     titleRes = IDR.string.fingerprint_capture_error_title
                     messageRes = IDR.string.fingerprint_capture_unexpected_error_message
                     color = AlertColor.Red
                     image = IDR.drawable.ic_alert_default
-                    eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+                    eventType = AlertScreenEventType.UNEXPECTED_ERROR
                     leftButton = AlertButtonConfig.Close
                 }.toArgs()
             )
@@ -222,7 +225,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         //to a crash because a second navigation to ConnectScanner is attempted but by the time it's
         // executed we are already on the exit screen.
         try {
-            findNavController().navigate(
+            findNavController().navigateSafely(
+                this,
                 R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
                 FingerprintConnectContract.getArgs(true)
             )
@@ -271,7 +275,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private fun updateSplashScreen(state: CollectFingerprintsState) {
         if (state.isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             if (!hasSplashScreenBeenTriggered) {
-                FullScreenSplashDialog().show(childFragmentManager, "splash")
+                TryAnotherFingerSplashDialogFragment().show(childFragmentManager, "splash")
                 hasSplashScreenBeenTriggered = true
             }
         } else {
@@ -282,8 +286,5 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     override fun onDestroyView() {
         confirmDialog?.dismiss()
         super.onDestroyView()
-    }
-    companion object {
-        private const val PAYLOAD_TYPE_KEY = "error_type"
     }
 }

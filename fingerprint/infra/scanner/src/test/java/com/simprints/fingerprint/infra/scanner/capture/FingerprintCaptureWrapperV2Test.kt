@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.scanner.capture
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
@@ -45,12 +44,12 @@ class FingerprintCaptureWrapperV2Test {
 
     @Test
     fun `test acquireImageDistortionMatrixConfiguration success`() = runTest {
-        val expectedResp = AcquireImageDistortionMatrixConfigurationResponse(byteArrayOf(1, 2, 3))
+        val expectedResp = byteArrayOf(1, 2, 3)
         every { scannerV2.acquireImageDistortionConfigurationMatrix() } returns Maybe.just(
-            expectedResp.configurationBytes
+            expectedResp
         )
         val actualResponse = scannerWrapper.acquireImageDistortionMatrixConfiguration()
-        assertThat(actualResponse.configurationBytes).isEqualTo(expectedResp.configurationBytes)
+        assertThat(actualResponse).isEqualTo(expectedResp)
     }
 
     @Test
@@ -95,7 +94,8 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 null,
                 1000,
-                50
+                50,
+                false
             )
         }
     }
@@ -106,7 +106,8 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 Dpi(499),
                 1000,
-                50
+                50,
+                false
             )
         }
     }
@@ -118,7 +119,8 @@ class FingerprintCaptureWrapperV2Test {
                 scannerWrapper.acquireFingerprintTemplate(
                     Dpi(1701),
                     1000,
-                    50
+                    50,
+                    false
                 )
             }
         }
@@ -141,7 +143,8 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 Dpi(1300),
                 1000,
-                50
+                50,
+                false
             )
         }
         // and then throws UnexpectedScannerException
@@ -149,7 +152,8 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 Dpi(1300),
                 1000,
-                50
+                50,
+                false
             )
         }
         // and then throws UnknownScannerIssueException
@@ -157,7 +161,8 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 Dpi(1300),
                 1000,
-                50
+                50,
+                false
             )
         }
     }
@@ -196,7 +201,8 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 Dpi(1300),
                 timeOutMs = 30000,
-                qualityThreshold = 7
+                qualityThreshold = 7,
+                false
             )
         }
 
@@ -224,7 +230,8 @@ class FingerprintCaptureWrapperV2Test {
             val actualResponse = scannerWrapper.acquireFingerprintTemplate(
                 Dpi(1300),
                 1000,
-                qualityThreshold
+                qualityThreshold,
+                false
             )
 
             assertThat(expectedCaptureResponse.template).isEqualTo(actualResponse.template)
@@ -246,7 +253,8 @@ class FingerprintCaptureWrapperV2Test {
                 scannerWrapper.acquireFingerprintTemplate(
                     Dpi(1300),
                     1000,
-                    qualityThreshold
+                    qualityThreshold,
+                    false
                 )
             }
         }
@@ -265,12 +273,33 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 Dpi(1300),
                 1000,
-                qualityThreshold
+                qualityThreshold,
+                false
             )
 
             verify(exactly = 1) { scannerUiHelper.badScanLedState() }
+            verify(exactly = 0) {scannerV2.acquireTemplate(any())  }
         }
+    @Test
+    fun `should extract template when captured fingerprint's image quality score is less than specified image quality_threshold and allowLowQualityExtraction is true`() =
+        runTest {
+            val qualityThreshold = 50
+            every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold - 10)
+            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+            every { scannerV2.captureFingerprint(any()) } answers {
+                (Single.just(CaptureFingerprintResult.OK))
+            }
+            every { scannerV2.acquireTemplate(any()) } returns Maybe.just(TemplateData(byteArrayOf()))
 
+            scannerWrapper.acquireFingerprintTemplate(
+                Dpi(1300),
+                1000,
+                qualityThreshold,
+                true
+            )
+
+            verify(exactly = 1) {scannerV2.acquireTemplate(any())  }
+        }
     @Test
     fun `should trigger good_scan LED when captured fingerprint's image quality score is greater or equal to specified image quality_threshold`() =
         runTest {
@@ -285,7 +314,8 @@ class FingerprintCaptureWrapperV2Test {
             scannerWrapper.acquireFingerprintTemplate(
                 Dpi(1300),
                 1000,
-                qualityThreshold
+                qualityThreshold,
+                false
             )
 
             verify(exactly = 1) { scannerUiHelper.goodScanLedState() }
@@ -304,7 +334,8 @@ class FingerprintCaptureWrapperV2Test {
                 scannerWrapper.acquireFingerprintTemplate(
                     Dpi(1300),
                     1000,
-                    50
+                    50,
+                    false
                 )
             }
         }

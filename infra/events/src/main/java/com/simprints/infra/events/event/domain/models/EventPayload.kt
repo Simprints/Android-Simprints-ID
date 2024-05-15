@@ -14,6 +14,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
+import com.simprints.infra.events.event.domain.models.LicenseCheckEvent.LicenseCheckEventPayload
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
@@ -85,6 +86,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = SuspiciousIntentPayload::class, name = EventType.SUSPICIOUS_INTENT_KEY),
     JsonSubTypes.Type(value = EventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = EventUpSyncRequestPayload::class, name = Companion.EVENT_UP_SYNC_REQUEST_KEY),
+    JsonSubTypes.Type(value = LicenseCheckEventPayload::class, name = Companion.LICENSE_CHECK_KEY),
 )
 abstract class EventPayload {
     abstract val type: EventType

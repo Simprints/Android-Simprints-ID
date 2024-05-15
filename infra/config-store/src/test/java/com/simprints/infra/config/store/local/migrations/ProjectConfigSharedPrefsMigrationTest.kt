@@ -9,10 +9,27 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.ALL_KEYS
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.store.local.migrations.models.OldProjectConfig
-import com.simprints.infra.config.store.local.models.*
+import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
+import com.simprints.infra.config.store.local.models.ProtoDecisionPolicy
+import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration
+import com.simprints.infra.config.store.local.models.ProtoFinger
+import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration
+import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
+import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
+import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
+import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
+import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.testtools.protoProjectConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -501,6 +518,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(
@@ -526,6 +544,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(
@@ -551,6 +570,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(
@@ -577,6 +597,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setSimprints(
                             ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+                                .setBatchSizes(ProtoUpSyncBatchSizes.newBuilder().setSessions(1).setUpSyncs(1).setDownSyncs(1).build())
                                 .build()
                         )
                         .setCoSync(

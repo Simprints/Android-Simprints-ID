@@ -10,17 +10,15 @@ import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOn
 @JsonInclude(Include.NON_NULL)
 internal data class ApiOneToOneMatchPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val endTime: ApiTimestamp?,
     val candidateId: String,
     val matcher: String,
     val result: ApiMatchEntry?,
     val fingerComparisonStrategy: ApiFingerComparisonStrategy?,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: OneToOneMatchPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.candidateId,
         domainPayload.matcher,

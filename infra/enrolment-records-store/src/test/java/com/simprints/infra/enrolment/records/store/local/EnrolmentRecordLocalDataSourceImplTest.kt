@@ -6,6 +6,8 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FINGERPRINT_SAMPLES_FIELD
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FORMAT_FIELD
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
 import com.simprints.infra.realm.RealmWrapper
@@ -17,6 +19,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
@@ -112,8 +115,20 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
-            assertThat(subject.subjectId).isEqualTo(identity.patientId)
+            assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }
+    }
+
+    @Test
+    fun `correctly query supported fingerprint format`() = runTest {
+        val format = "SupportedFormat"
+
+         enrolmentRecordLocalDataSource
+            .loadFingerprintIdentities(SubjectQuery(fingerprintSampleFormat = format), IntRange(0, 20))
+            .toList()
+
+        verify { realmQuery.query(
+            "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",format) }
     }
 
     @Test
@@ -126,7 +141,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
-            assertThat(subject.subjectId).isEqualTo(identity.personId)
+            assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }
     }
 

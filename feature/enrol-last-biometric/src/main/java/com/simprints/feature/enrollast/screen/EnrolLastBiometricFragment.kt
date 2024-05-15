@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
@@ -23,6 +24,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -54,7 +56,8 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
     }
 
     private fun showError(errorType: ErrorType, modalities: List<Modality>) {
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_enrolLastBiometricFragment_to_errorFragment,
             createAlertConfiguration(errorType, modalities).toArgs()
         )
@@ -68,8 +71,8 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         titleRes = IDR.string.enrol_last_biometrics_alert_title
         message = getString(getAlertMessage(errorType), getModalityName(modalities))
         leftButton = AlertButtonConfig.Close
-        eventType =
-            AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
+        appErrorReason = AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED
+        eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
     }
 
     private fun getAlertMessage(errorType: ErrorType) = when (errorType) {

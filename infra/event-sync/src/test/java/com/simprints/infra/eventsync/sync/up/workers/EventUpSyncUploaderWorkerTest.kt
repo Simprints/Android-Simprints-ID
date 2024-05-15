@@ -11,6 +11,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
@@ -19,11 +20,11 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_EVENT_UP_SYNC_SCOPE_ID
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -33,12 +34,9 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkObject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -165,6 +163,25 @@ internal class EventUpSyncUploaderWorkerTest {
             ListenableWorker.Result.failure(
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true
+                )
+            )
+        )
+    }
+
+    @Test
+    fun worker_shouldSetFailCorrectlyIfRemoteDbNotSignedInException() = runTest {
+        val eventUpSyncUploaderWorker = init(projectScope)
+
+        coEvery {
+            upSyncTask.upSync(any(), any())
+        } throws RemoteDbNotSignedInException()
+
+        val result = eventUpSyncUploaderWorker.doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.failure(
+                workDataOf(
+                    OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true
                 )
             )
         )

@@ -1,9 +1,8 @@
 package com.simprints.feature.alert
 
-import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.core.os.bundleOf
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.config.AlertConfiguration
@@ -22,7 +21,7 @@ data class AlertConfigurationBuilder(
     var leftButton: AlertButtonConfig = AlertButtonConfig.Close,
     var rightButton: AlertButtonConfig? = null,
     var eventType: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType? = null,
-    var payload: Bundle = Bundle(),
+    var appErrorReason: AppErrorReason? = null,
 )
 
 /**
@@ -38,21 +37,11 @@ data class AlertConfigurationBuilder(
  * messageIcon - Optional icon to show next to the message, default - view is not visible
  * leftButton - Left/main button configuration, default - basic "Close" button
  * rightButton - Optional right button configuration, default - view is not visible
+ * appErrorReason - Error code that will be returned in app result if the alert is terminal, default - null
  * eventType - Event type to be logged on alert opening, default - nothing
- * payload - Custom bundle that will be provided in result callback
  * ```
  */
 fun alertConfiguration(block: AlertConfigurationBuilder.() -> Unit) = AlertConfigurationBuilder().apply(block)
-
-/**
- * Convenience function to provide payload as pairs of values instead of bundle:
- *
- * ```
- * alertConfiguration { }.withPayload("key" to "value").toArgs()
- * ```
- */
-fun AlertConfigurationBuilder.withPayload(vararg pairs: Pair<String, Any?>) =
-    this.also { it.payload = bundleOf(*pairs) }
 
 fun AlertConfigurationBuilder.toArgs() = AlertFragmentArgs(AlertConfiguration(
     color = this.color,
@@ -65,7 +54,7 @@ fun AlertConfigurationBuilder.toArgs() = AlertFragmentArgs(AlertConfiguration(
     leftButton = this.leftButton,
     rightButton = this.rightButton,
     eventType = this.eventType,
-    payload = this.payload,
+    appErrorReason = this.appErrorReason,
 )).toBundle()
 
 data class AlertButtonBuilder(

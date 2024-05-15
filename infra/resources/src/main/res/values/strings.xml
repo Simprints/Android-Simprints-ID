@@ -91,6 +91,10 @@
     <string name="login_no_network_error">Currently offline. Please check your internet connection.</string>
     <string name="login_integrity_service_down_error">A problem occurred trying to contact the Integrity Service. Please try again later.</string>
     <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
+    <string name="login_change_url">Change backend URL</string>
+    <string name="login_change_url_save">Save</string>
+    <string name="login_change_url_reset">Use default</string>
+    <string name="login_change_url_cancel">Cancel</string>
 
     <!-- Matcher -->
     <string name="matcher_please_wait">Please wait while we proceed to identification</string>
@@ -318,6 +322,8 @@
     <string name="dashboard_sync_card_offline_message">Please turn on internet connection in settings</string>
     <string name="dashboard_sync_card_offline_button">Settings</string>
     <string name="dashboard_sync_card_too_many_modules_message">Too many modules have been downloaded.</string>
+    <string name="dashboard_sync_card_relogin_required">You need to log in again in order to sync</string>
+
     <string name="dashboard_sync_card_last_sync">Last sync: %1$s</string>
     <string name="dashboard_sync_card_records_uploaded">All records uploaded</string>
     <plurals name="dashboard_sync_card_records_to_upload">
@@ -365,7 +371,7 @@
     <string name="dashboard_sync_info_title">Sync Information</string>
     <string name="dashboard_sync_info_select_modules_button">Select modules</string>
     <string name="dashboard_sync_info_records_to_upload">Records to upload</string>
-    <string name="dashboard_sync_info_records_to_download">Records to download</string>
+    <string name="dashboard_sync_info_records_to_download">Records to download or delete</string>
     <string name="dashboard_sync_info_records_to_delete">Records to delete</string>
     <string name="dashboard_sync_info_total_records_on_device">Total records on device</string>
     <string name="dashboard_sync_info_selected_modules">Selected modules</string>

@@ -25,7 +25,6 @@ internal data class DbEvent(
 
     companion object {
 
-        const val DEFAULT_EVENT_VERSION = 0
         val dbSerializationModule = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
             addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())

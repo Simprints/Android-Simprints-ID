@@ -2,13 +2,13 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.feature.clientapi.models.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import javax.inject.Inject
 

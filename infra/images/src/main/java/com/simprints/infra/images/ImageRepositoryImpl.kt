@@ -34,11 +34,12 @@ class ImageRepositoryImpl @Inject internal constructor(
                         localDataSource.deleteImage(imageRef)
                     } else {
                         allImagesUploaded = false
+                        Simber.e("Failed to upload image without exception")
                     }
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
-                Simber.d(t)
+                Simber.e(t)
             }
         }
 

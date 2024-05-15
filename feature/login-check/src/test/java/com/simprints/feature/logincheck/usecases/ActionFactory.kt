@@ -18,6 +18,7 @@ internal object ActionFactory {
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
         unknownExtras = extras,
+        biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
         metadata = "",
     )
 
@@ -36,4 +37,5 @@ internal object ActionFactory {
     val MOCK_USER_ID = "userId".asTokenizableRaw()
     val MOCK_MODULE_ID = "moduleId".asTokenizableRaw()
     const val MOCK_PROJECT_ID = "projectId"
+    private const val MOCK_BIOMETRIC_DATA_SOURCE = ""
 }

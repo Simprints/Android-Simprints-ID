@@ -6,6 +6,17 @@ import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerp
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
 
 interface BioSdkWrapper {
+
+    // Maximum time to wait for the bio sdk to capture a fingerprint template
+    val scanningTimeoutMs: Long
+
+    // Maximum time to wait for the bio sdk to transfer the fingerprint image
+    val imageTransferTimeoutMs: Long
+
+    val matcherName: String
+
+    val supportedTemplateFormat: String
+
     suspend fun initialize()
 
     suspend fun match(
@@ -16,7 +27,8 @@ interface BioSdkWrapper {
     suspend fun acquireFingerprintTemplate(
         capturingResolution: Int?,
         timeOutMs: Int,
-        qualityThreshold: Int
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse
 
     suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse

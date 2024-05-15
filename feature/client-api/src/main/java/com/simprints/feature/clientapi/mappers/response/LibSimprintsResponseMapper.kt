@@ -2,6 +2,7 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
@@ -9,7 +10,6 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
-import com.simprints.core.domain.response.AppErrorReason
 import javax.inject.Inject
 
 internal class LibSimprintsResponseMapper @Inject constructor() {
@@ -25,9 +25,11 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-            Constants.SIMPRINTS_IDENTIFICATIONS to response.identifications
-                .map { Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name)) }
-                .toTypedArray(),
+            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<Identification>(
+                response.identifications.map {
+                    Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
+                }
+            ),
         ).appendCoSyncData(response.eventsJson)
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
@@ -76,8 +78,8 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         AppErrorReason.BLUETOOTH_NO_PERMISSION -> Constants.SIMPRINTS_BLUETOOTH_NO_PERMISSION
         AppErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> Constants.SIMPRINTS_FINGERPRINT_CONFIGURATION_ERROR
         AppErrorReason.FACE_CONFIGURATION_ERROR -> Constants.SIMPRINTS_FACE_CONFIGURATION_ERROR
-        AppErrorReason.FACE_LICENSE_MISSING -> Constants.SIMPRINTS_FACE_LICENSE_MISSING
-        AppErrorReason.FACE_LICENSE_INVALID -> Constants.SIMPRINTS_FACE_LICENSE_INVALID
+        AppErrorReason.LICENSE_MISSING -> Constants.SIMPRINTS_LICENSE_MISSING
+        AppErrorReason.LICENSE_INVALID -> Constants.SIMPRINTS_LICENSE_INVALID
         AppErrorReason.BACKEND_MAINTENANCE_ERROR -> Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR
         AppErrorReason.PROJECT_PAUSED -> Constants.SIMPRINTS_PROJECT_PAUSED
         AppErrorReason.PROJECT_ENDING -> Constants.SIMPRINTS_PROJECT_ENDING
@@ -97,6 +99,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
     }
 
     companion object {
+
         internal const val RESULT_CODE_OVERRIDE = "result_code_override"
     }
 }

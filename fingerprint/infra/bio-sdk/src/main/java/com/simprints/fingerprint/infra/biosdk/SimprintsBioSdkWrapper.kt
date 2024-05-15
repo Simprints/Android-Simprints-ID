@@ -16,6 +16,15 @@ class SimprintsBioSdkWrapper @Inject constructor(
     private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings>
 ) : BioSdkWrapper {
 
+    override val scanningTimeoutMs
+        get() = 3000L
+    override val imageTransferTimeoutMs
+        get() = 3000L
+
+    override val matcherName: String
+        get()= bioSdk.matcherName
+    override val supportedTemplateFormat: String
+        get() = bioSdk.supportedTemplateFormat
     override suspend fun initialize() {
         bioSdk.initialize()
     }
@@ -28,12 +37,14 @@ class SimprintsBioSdkWrapper @Inject constructor(
     override suspend fun acquireFingerprintTemplate(
         capturingResolution: Int?,
         timeOutMs: Int,
-        qualityThreshold: Int
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse {
         val settings = FingerprintTemplateAcquisitionSettings(
             capturingResolution?.let { Dpi(it.toShort()) },
             timeOutMs,
-            qualityThreshold
+            qualityThreshold,
+            allowLowQualityExtraction
         )
         return bioSdk.acquireFingerprintTemplate(settings).toDomain()
     }

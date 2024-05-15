@@ -2,7 +2,22 @@ package com.simprints.infra.eventsync.event.remote.models.callback
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.BACKEND_MAINTENANCE_ERROR
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.BLUETOOTH_NOT_SUPPORTED
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.BLUETOOTH_NO_PERMISSION
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_USER_ID_SIGNED_IN
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.FACE_CONFIGURATION_ERROR
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.FINGERPRINT_CONFIGURATION_ERROR
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.GUID_NOT_FOUND_OFFLINE
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.GUID_NOT_FOUND_ONLINE
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.LICENSE_INVALID
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.LICENSE_MISSING
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.LOGIN_NOT_COMPLETE
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.PROJECT_ENDING
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.PROJECT_PAUSED
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.UNEXPECTED_ERROR
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
 
@@ -25,8 +40,8 @@ internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCal
 
         LOGIN_NOT_COMPLETE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
-        FACE_LICENSE_MISSING,
-        FACE_LICENSE_INVALID,
+        LICENSE_MISSING,
+        LICENSE_INVALID,
         PROJECT_ENDING,
         PROJECT_PAUSED,
         BLUETOOTH_NO_PERMISSION
@@ -43,8 +58,8 @@ internal fun Reason.fromDomainToApi() =
         BLUETOOTH_NOT_SUPPORTED -> ApiReason.BLUETOOTH_NOT_SUPPORTED
         LOGIN_NOT_COMPLETE -> ApiReason.LOGIN_NOT_COMPLETE
         ENROLMENT_LAST_BIOMETRICS_FAILED -> ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED
-        FACE_LICENSE_MISSING -> ApiReason.FACE_LICENSE_MISSING
-        FACE_LICENSE_INVALID -> ApiReason.FACE_LICENSE_INVALID
+        LICENSE_MISSING -> ApiReason.LICENSE_MISSING
+        LICENSE_INVALID -> ApiReason.LICENSE_INVALID
         FINGERPRINT_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         FACE_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         BACKEND_MAINTENANCE_ERROR -> ApiReason.BACKEND_MAINTENANCE_ERROR
@@ -65,8 +80,8 @@ internal fun ApiReason.fromApiToDomain(): Reason =
         SCANNER_LOW_BATTERY -> UNEXPECTED_ERROR
         ApiReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
         ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
-        ApiReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
-        ApiReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
+        ApiReason.LICENSE_MISSING -> LICENSE_MISSING
+        ApiReason.LICENSE_INVALID -> LICENSE_INVALID
         ApiReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
         ApiReason.PROJECT_ENDING -> PROJECT_ENDING
         ApiReason.PROJECT_PAUSED -> PROJECT_PAUSED

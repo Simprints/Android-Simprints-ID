@@ -11,6 +11,7 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.exceptions.MalformedSyncOperationException
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
@@ -18,6 +19,7 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
@@ -72,8 +74,8 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
             showProgressNotification()
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
@@ -120,6 +122,10 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
 
         is SyncCloudIntegrationException -> {
             fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+        }
+
+        is RemoteDbNotSignedInException -> {
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
         }
 
         else -> {

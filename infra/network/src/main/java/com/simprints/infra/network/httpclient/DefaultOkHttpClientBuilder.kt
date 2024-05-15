@@ -15,7 +15,6 @@ import okio.BufferedSink
 import okio.GzipSink
 import okio.buffer
 import java.io.IOException
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -28,7 +27,6 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
     companion object {
 
         const val DEVICE_ID_HEADER = "X-Device-ID"
-        const val REQUEST_ID_HEADER = "X-Request-ID"
         const val AUTHORIZATION_HEADER = "Authorization"
         const val USER_AGENT_HEADER = "User-Agent"
 
@@ -58,23 +56,15 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
                     addInterceptor(buildAuthenticationInterceptor(authToken))
                 }
             }
+            .addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
+            .addInterceptor(buildDeviceIdInterceptor(deviceId))
+            .addInterceptor(buildVersionInterceptor(versionName))
+            .addInterceptor(buildGZipInterceptor())
             .apply {
                 if (BuildConfig.DEBUG_MODE) {
                     addInterceptor(buildSimberLoggingInterceptor())
                 }
             }
-            .addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
-            .addInterceptor(buildRequestIdInterceptor())
-            .addInterceptor(buildDeviceIdInterceptor(deviceId))
-            .addInterceptor(buildVersionInterceptor(versionName))
-            .addInterceptor(buildGZipInterceptor())
-
-    private fun buildRequestIdInterceptor() = Interceptor { chain ->
-        val newRequest = chain.request().newBuilder()
-            .addHeader(REQUEST_ID_HEADER, UUID.randomUUID().toString())
-            .build()
-        return@Interceptor chain.proceed(newRequest)
-    }
 
     private fun buildAuthenticationInterceptor(authToken: String) = Interceptor { chain ->
         val newRequest = chain.request().newBuilder()

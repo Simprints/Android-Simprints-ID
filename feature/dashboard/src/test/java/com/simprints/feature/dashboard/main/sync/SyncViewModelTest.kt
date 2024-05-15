@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
@@ -17,12 +18,14 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.eventsync.EventSyncManager
@@ -30,6 +33,8 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -39,7 +44,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
@@ -70,6 +74,9 @@ internal class SyncViewModelTest {
     lateinit var eventSyncManager: EventSyncManager
 
     @MockK
+    lateinit var syncOrchestrator: SyncOrchestrator
+
+    @MockK
     lateinit var connectivityTracker: ConnectivityTracker
 
     @MockK
@@ -84,6 +91,9 @@ internal class SyncViewModelTest {
     @MockK
     lateinit var logoutUseCase: LogoutUseCase
 
+    @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -91,7 +101,11 @@ internal class SyncViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns syncState
         every { connectivityTracker.observeIsConnected() } returns isConnected
         coEvery { configRepository.getProjectConfiguration().synchronization } returns mockk {
-            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL)
+            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(
+                kind = ALL,
+                batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                false,
+            )
             every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
             every { down.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }
@@ -117,7 +131,7 @@ internal class SyncViewModelTest {
 
         val viewModel = initViewModel()
 
-        verify(exactly = 1) { eventSyncManager.sync() }
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
         assertThat(viewModel.syncCardLiveData.value).isEqualTo(SyncConnecting(null, 0, null))
     }
 
@@ -129,7 +143,7 @@ internal class SyncViewModelTest {
 
         val viewModel = initViewModel()
 
-        verify(exactly = 1) { eventSyncManager.sync() }
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
         assertThat(viewModel.syncCardLiveData.value).isEqualTo(SyncConnecting(null, 0, null))
     }
 
@@ -147,7 +161,7 @@ internal class SyncViewModelTest {
 
         initViewModel()
 
-        verify(exactly = 0) { eventSyncManager.sync() }
+        verify(exactly = 0) { syncOrchestrator.startEventSync() }
     }
 
     @Test
@@ -300,6 +314,51 @@ internal class SyncViewModelTest {
     }
 
     @Test
+    fun `should post a ReloginRequired card state if the sync fails with such problem`() {
+        coEvery { configRepository.getDeviceConfiguration() } returns deviceConfiguration
+        isConnected.value = true
+        syncState.value = EventSyncState(
+            "", 10, 40, listOf(), listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
+                )
+            )
+        )
+        val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
+
+        assertThat(syncCardLiveData).isEqualTo(SyncCardState.SyncFailedReloginRequired(DATE))
+    }
+
+    @Test
+    fun `calling login() sends respective event to the view`() {
+        val viewModel = initViewModel()
+
+        viewModel.login()
+
+        val loginRequestedEvent = viewModel.loginRequestedEventLiveData.getOrAwaitValue()
+        assertThat(loginRequestedEvent).isNotNull()
+    }
+
+    @Test
+    fun `calling handleLoginResult() triggers sync if result is success`() {
+        val viewModel = initViewModel()
+
+        viewModel.handleLoginResult(LoginResult(true))
+
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
+    }
+
+    @Test
+    fun `calling handleLoginResult() does not trigger sync if result is not success`() {
+        val viewModel = initViewModel()
+
+        viewModel.handleLoginResult(LoginResult(false))
+
+        verify(exactly = 0) { syncOrchestrator.startEventSync() }
+    }
+
+    @Test
     fun `should post a SyncFailedBackendMaintenance card state if the sync fails because of cloud maintenance`() {
         coEvery { configRepository.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
@@ -379,11 +438,12 @@ internal class SyncViewModelTest {
 
     private fun initViewModel(): SyncViewModel = SyncViewModel(
         eventSyncManager = eventSyncManager,
+        syncOrchestrator = syncOrchestrator,
         connectivityTracker = connectivityTracker,
         configRepository = configRepository,
         timeHelper = timeHelper,
         authStore = authStore,
-        logoutUseCase = logoutUseCase,
-        externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+        logout = logoutUseCase,
+        recentUserActivityManager = recentUserActivityManager,
     )
 }

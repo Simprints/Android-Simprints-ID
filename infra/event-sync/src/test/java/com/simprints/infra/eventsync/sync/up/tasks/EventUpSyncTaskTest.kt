@@ -7,6 +7,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
@@ -15,11 +16,18 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
-import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID3
+import com.simprints.infra.events.sampledata.createAlertScreenEvent
+import com.simprints.infra.events.sampledata.createAuthenticationEvent
+import com.simprints.infra.events.sampledata.createEnrolmentEventV2
+import com.simprints.infra.events.sampledata.createEventWithSessionId
+import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createPersonCreationEvent
+import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
@@ -83,6 +91,9 @@ internal class EventUpSyncTaskTest {
         every { timeHelper.now() } returns NOW
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
+        every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
+            10, 10, 10
+        )
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
@@ -119,6 +130,55 @@ internal class EventUpSyncTaskTest {
     }
 
     @Test
+    fun `upload events in batches of provided size`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+        every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
+            2, 2, 2
+        )
+
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
+            createSessionScope(GUID1),
+            createSessionScope(GUID2),
+            createSessionScope(GUID3)
+        )
+        coEvery {
+            eventRepo.getEventsFromScope(any())
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        coVerify(exactly = 2) { eventRemoteDataSource.post(any(), any(), any()) }
+    }
+
+    @Test
+    fun `upload out-of-session events in correct fields`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+        every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
+            2, 2, 2
+        )
+
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.DOWN_SYNC) } returns listOf(
+            createSessionScope(GUID1)
+        )
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.UP_SYNC) } returns listOf(
+            createSessionScope(GUID2),
+            createSessionScope(GUID3)
+        )
+        coEvery {
+            eventRepo.getEventsFromScope(any())
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        coVerify {
+            eventRemoteDataSource.post(any(), any(), match { it.eventDownSyncs.size == 1 })
+            eventRemoteDataSource.post(any(), any(), match { it.eventUpSyncs.size == 2 })
+        }
+    }
+
+    @Test
     fun `upload should not filter any session events on upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
@@ -135,6 +195,7 @@ internal class EventUpSyncTaskTest {
 
         coVerify {
             eventRemoteDataSource.post(
+                any(),
                 any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
@@ -168,6 +229,7 @@ internal class EventUpSyncTaskTest {
         coVerify {
             eventRemoteDataSource.post(
                 any(),
+                any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
                     assertThat(it.sessions.first().events).hasSize(4)
@@ -199,6 +261,7 @@ internal class EventUpSyncTaskTest {
         coVerify {
             eventRemoteDataSource.post(
                 any(),
+                any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
                     assertThat(it.sessions.first().events).hasSize(3)
@@ -219,7 +282,7 @@ internal class EventUpSyncTaskTest {
     fun `when upload succeeds it should delete session events`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
-        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
             createSessionScope(GUID1),
             createSessionScope(GUID2)
         )
@@ -233,8 +296,7 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify {
-            eventRepo.deleteEventScope(GUID1)
-            eventRepo.deleteEventScope(GUID2)
+            eventRepo.deleteEventScopes(listOf(GUID1, GUID2))
         }
     }
 
@@ -271,7 +333,7 @@ internal class EventUpSyncTaskTest {
             eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
-        coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("")
+        coEvery { eventRemoteDataSource.post(any(), any(), any()) } throws Throwable("")
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
@@ -290,7 +352,9 @@ internal class EventUpSyncTaskTest {
             eventRepo.getEventsFromScope(GUID1)
         } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
-        coEvery { eventRemoteDataSource.post(any(), any()) } throws NetworkConnectionException(
+        coEvery {
+            eventRemoteDataSource.post(any(), any(), any())
+        } throws NetworkConnectionException(
             cause = Exception()
         )
 
@@ -309,7 +373,7 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 0) {
-            eventRemoteDataSource.post(any(), any())
+            eventRemoteDataSource.post(any(), any(), any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
             eventRepo.deleteEventScope(GUID1)
         }
@@ -328,7 +392,7 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
-        coVerify(exactly = 0) { eventRemoteDataSource.post(any(), any()) }
+        coVerify(exactly = 0) { eventRemoteDataSource.post(any(), any(), any()) }
         coVerify {
             eventRepo.getEventsJsonFromScope(any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
@@ -352,7 +416,7 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 0) {
-            eventRemoteDataSource.post(any(), any())
+            eventRemoteDataSource.post(any(), any(), any())
             eventRepo.deleteEventScope(GUID1)
         }
 
@@ -379,7 +443,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
             createSessionScope(GUID1),
         )
-        coEvery { eventRemoteDataSource.post(any(), any()) } throws HttpException(
+        coEvery { eventRemoteDataSource.post(any(), any(), any()) } throws HttpException(
             Response.error<ResponseBody>(427, "".toResponseBody(null))
         )
 
@@ -398,7 +462,7 @@ internal class EventUpSyncTaskTest {
     fun `upload should save request event for each upload request`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
-        coEvery { eventRepo.getClosedEventScopes(any()) } returns listOf(
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
             createSessionScope(GUID1),
             createSessionScope(GUID2)
         )
@@ -461,20 +525,24 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
+        coVerify(exactly = 3) { eventRepo.getClosedEventScopes(any()) }
+        coVerify(exactly = 3) { eventRepo.addOrUpdateEvent(any(), any()) }
+
         coVerify(exactly = 1) {
             eventRepo.addOrUpdateEvent(any(), match {
-                it is EventUpSyncRequestEvent &&
-                    it.payload.content == EventUpSyncRequestEvent.UpSyncContent(1, 0, 0)
+                it is EventUpSyncRequestEvent && it.payload.content.sessionCount == 1
             })
             eventRepo.addOrUpdateEvent(any(), match {
-                it is EventUpSyncRequestEvent &&
-                    it.payload.content == EventUpSyncRequestEvent.UpSyncContent(0, 1, 1)
+                it is EventUpSyncRequestEvent && it.payload.content.eventUpSyncCount == 1
+            })
+            eventRepo.addOrUpdateEvent(any(), match {
+                it is EventUpSyncRequestEvent && it.payload.content.eventDownSyncCount == 1
             })
         }
     }
 
     @Test
-    fun `upload does not reports events if no scopes to upload`() = runTest {
+    fun `upload does not reports events if only up-sync scopes are present to upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.UP_SYNC) } returns listOf(
@@ -490,13 +558,20 @@ internal class EventUpSyncTaskTest {
     }
 
     @Test
-    fun `upload does not reports events if only up-sync scopes are present to upload`() = runTest {
+    fun `upload does not reports events if  no scopes to upload`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 0) { eventRepo.addOrUpdateEvent(any(), any()) }
+    }
+
+    @Test(expected = RemoteDbNotSignedInException::class)
+    fun `upSync should throw up if RemoteDbNotSignedInException occurs`() = runTest {
+        coEvery { eventRepo.getClosedEventScopes(any()) } throws RemoteDbNotSignedInException()
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
     }
 
     private fun setUpSyncKind(kind: UpSynchronizationConfiguration.UpSynchronizationKind) {

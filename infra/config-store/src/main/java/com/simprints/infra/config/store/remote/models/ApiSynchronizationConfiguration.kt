@@ -22,6 +22,7 @@ internal data class ApiSynchronizationConfiguration(
 
     @Keep
     enum class Frequency {
+
         ONLY_PERIODICALLY_UP_SYNC,
         PERIODICALLY,
         PERIODICALLY_AND_ON_SESSION_START;
@@ -38,30 +39,40 @@ internal data class ApiSynchronizationConfiguration(
     data class ApiUpSynchronizationConfiguration(
         val simprints: ApiSimprintsUpSynchronizationConfiguration,
         val coSync: ApiCoSyncUpSynchronizationConfiguration,
-        val imagesRequireUnmeteredConnection: Boolean,
     ) {
 
         fun toDomain(): UpSynchronizationConfiguration =
             UpSynchronizationConfiguration(
                 simprints.toDomain(),
                 coSync.toDomain(),
-                imagesRequireUnmeteredConnection
             )
 
         @Keep
-        data class ApiSimprintsUpSynchronizationConfiguration(val kind: UpSynchronizationKind) {
+        data class ApiSimprintsUpSynchronizationConfiguration(
+            val kind: UpSynchronizationKind,
+            val batchSizes: ApiUpSyncBatchSizes?,
+            val imagesRequireUnmeteredConnection: Boolean?,
+        ) {
+
             fun toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
-                UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(kind.toDomain())
+                UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+                    kind = kind.toDomain(),
+                    batchSizes = batchSizes?.toDomain()
+                        ?: UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                    imagesRequireUnmeteredConnection = imagesRequireUnmeteredConnection ?: false,
+                )
         }
 
         @Keep
         data class ApiCoSyncUpSynchronizationConfiguration(val kind: UpSynchronizationKind) {
+
             fun toDomain(): UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration =
                 UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(kind.toDomain())
         }
 
         @Keep
         enum class UpSynchronizationKind {
+
             NONE,
             ONLY_ANALYTICS,
             ONLY_BIOMETRICS,
@@ -75,13 +86,24 @@ internal data class ApiSynchronizationConfiguration(
                     ALL -> UpSynchronizationConfiguration.UpSynchronizationKind.ALL
                 }
         }
+
+        @Keep
+        data class ApiUpSyncBatchSizes(
+            val sessions: Int,
+            val upSyncs: Int,
+            val downSyncs: Int,
+        ) {
+
+            fun toDomain(): UpSynchronizationConfiguration.UpSyncBatchSizes =
+                UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, upSyncs, downSyncs)
+        }
     }
 
     @Keep
     data class ApiDownSynchronizationConfiguration(
         val partitionType: PartitionType,
         val maxNbOfModules: Int,
-        val moduleOptions: List<String>?
+        val moduleOptions: List<String>?,
     ) {
 
         fun toDomain(): DownSynchronizationConfiguration =
@@ -93,6 +115,7 @@ internal data class ApiSynchronizationConfiguration(
 
         @Keep
         enum class PartitionType {
+
             PROJECT,
             MODULE,
             USER;

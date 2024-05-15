@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -24,6 +25,8 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
@@ -72,6 +75,12 @@ class SyncInfoViewModelTest {
     private lateinit var eventSyncManager: EventSyncManager
 
     @MockK
+    private lateinit var syncOrchestrator: SyncOrchestrator
+
+    @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
     private lateinit var project: Project
 
     @MockK(relaxed = true)
@@ -101,7 +110,9 @@ class SyncInfoViewModelTest {
             authStore = authStore,
             imageRepository = imageRepository,
             eventSyncManager = eventSyncManager,
-            tokenizationProcessor = tokenizationProcessor
+            syncOrchestrator = syncOrchestrator,
+            tokenizationProcessor = tokenizationProcessor,
+            recentUserActivityManager = recentUserActivityManager
         )
     }
 
@@ -193,22 +204,35 @@ class SyncInfoViewModelTest {
     }
 
     @Test
-    fun `should initialize the recordsToDownSync and recordsToDelete live data to the count otherwise`() =
+    fun `should initialize the recordsToDownSync live data to the count otherwise`() =
         runTest {
             val module1 = "module1".asTokenizableEncrypted()
-            val creationForModules = 10
-            val deletionForModules = 5
             coEvery { configRepo.getDeviceConfiguration() } returns mockk {
                 every { selectedModules } returns listOf(module1)
             }
             coEvery {
                 eventSyncManager.countEventsToDownload()
-            } returns DownSyncCounts(creationForModules, deletionForModules)
+            } returns DownSyncCounts(15, isLowerBound = false)
 
             viewModel.refreshInformation()
 
-            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(creationForModules)
-            assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(deletionForModules)
+            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(15)
+        }
+
+    @Test
+    fun `should initialize the recordsToDownSync live data to the default count value if fetch fails`() =
+        runTest {
+            val module1 = "module1".asTokenizableEncrypted()
+            coEvery { configRepo.getDeviceConfiguration() } returns mockk {
+                every { selectedModules } returns listOf(module1)
+            }
+            coEvery {
+                eventSyncManager.countEventsToDownload()
+            } throws Exception()
+
+            viewModel.refreshInformation()
+
+            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(0)
         }
 
     @Test
@@ -295,7 +319,7 @@ class SyncInfoViewModelTest {
     fun `should invoke sync manager when sync is requested`() = runTest {
         viewModel.forceSync()
 
-        verify(exactly = 1) { eventSyncManager.sync() }
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isEqualTo(false)
     }
 
@@ -417,6 +441,57 @@ class SyncInfoViewModelTest {
         stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
 
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
+    }
+
+    @Test
+    fun `emit ReloginRequired = false when lastSyncState updates with different status`() =
+        runTest {
+            stateLiveData.value = EventSyncState(
+                "", 0, 0, listOf(), listOf(
+                    EventSyncState.SyncWorkerInfo(
+                        EventSyncWorkerType.DOWNLOADER,
+                        EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
+                    )
+                )
+            )
+
+            assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isFalse()
+        }
+
+    @Test
+    fun `emit ReloginRequired = true when lastSyncState updates with such status`() = runTest {
+        stateLiveData.value = EventSyncState(
+            "", 0, 0, listOf(), listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
+                )
+            )
+        )
+
+        assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isTrue()
+    }
+
+    @Test
+    fun `calling login() sends respective event to the view`() {
+        viewModel.login()
+
+        val loginRequestedEvent = viewModel.loginRequestedEventLiveData.getOrAwaitValue()
+        assertThat(loginRequestedEvent).isNotNull()
+    }
+
+    @Test
+    fun `calling handleLoginResult() triggers sync if result is success`() {
+        viewModel.handleLoginResult(LoginResult(true))
+
+        verify(exactly = 1) { syncOrchestrator.startEventSync() }
+    }
+
+    @Test
+    fun `calling handleLoginResult() does not trigger sync if result is not success`() {
+        viewModel.handleLoginResult(LoginResult(false))
+
+        verify(exactly = 0) { syncOrchestrator.startEventSync() }
     }
 
     private fun createMockDownSyncConfig(

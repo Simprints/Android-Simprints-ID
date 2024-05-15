@@ -9,9 +9,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
-import com.simprints.feature.logincheck.usecases.*
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
-import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUseCase
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
@@ -22,12 +20,14 @@ import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCas
 import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
+import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -45,7 +45,7 @@ class LoginCheckViewModel @Inject internal constructor(
     private val isUserSignedIn: IsUserSignedInUseCase,
     private val configRepository: ConfigRepository,
     private val startBackgroundSync: StartBackgroundSyncUseCase,
-    private val cancelBackgroundSync: CancelBackgroundSyncUseCase,
+    private val syncOrchestrator: SyncOrchestrator,
     private val updateDatabaseCountsInCurrentSession: UpdateSessionScopePayloadUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
     private val updateStoredUserId: UpdateStoredUserIdUseCase,
@@ -101,7 +101,7 @@ class LoginCheckViewModel @Inject internal constructor(
         cachedRequest = actionRequest
         loginAlreadyTried.set(true)
 
-        cancelBackgroundSync.invoke()
+        syncOrchestrator.cancelBackgroundWork()
 
         _showLoginFlow.send(actionRequest)
     }

@@ -11,17 +11,22 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
+import com.simprints.infra.license.LicenseStatus
+import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.remote.License
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
@@ -53,6 +58,9 @@ class FaceCaptureViewModelTest {
     @MockK
     private lateinit var licenseRepository: LicenseRepository
 
+    @MockK
+    private lateinit var saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
+
     private lateinit var viewModel: FaceCaptureViewModel
 
     private val faceDetections = listOf<FaceDetection>(
@@ -75,6 +83,7 @@ class FaceCaptureViewModelTest {
             bitmapToByteArrayUseCase,
             licenseRepository,
             faceBioSdkInitializer,
+            saveLicenseCheckEvent
         )
     }
 
@@ -137,24 +146,53 @@ class FaceCaptureViewModelTest {
     fun `test initFaceBioSdk should initialize faceBioSdk`() {
         // Given
         val license = "license"
-        coEvery { licenseRepository.getCachedLicense(Vendor.RANK_ONE) } returns license
+        every  { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
+        coEvery {
+            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
+        } returns  License("2133-12-30T17:32:28Z", license)
+        val licenseStatusSlot = slot<LicenseStatus>()
+        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
 
         // When
         viewModel.initFaceBioSdk(mockk())
         // Then
         coVerify { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
+        assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.VALID)
     }
 
     @Test
     fun `test initFaceBioSdk should post invalid license when faceBioSdkInitializer returns false`() {
         // Given
         val license = "license"
-        coEvery { licenseRepository.getCachedLicense(Vendor.RANK_ONE) } returns license
+        coEvery {
+            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
+        } returns License("2133-12-30T17:32:28Z", license)
+        val licenseStatusSlot = slot<LicenseStatus>()
+        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+
         coEvery { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns false
         // When
         viewModel.initFaceBioSdk(mockk())
         // Then
         viewModel.invalidLicense.assertEventReceived()
         coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE) }
+        assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.ERROR)
+    }
+    @Test
+    fun `test initFaceBioSdk should post invalid license when license is expired`() {
+        // Given
+        val license = "license"
+        coEvery {
+            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
+        } returns License("2011-12-30T17:32:28Z", license)
+        val licenseStatusSlot = slot<LicenseStatus>()
+        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+
+        // When
+        viewModel.initFaceBioSdk(mockk())
+        // Then
+        viewModel.invalidLicense.assertEventReceived()
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE) }
+        assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.EXPIRED)
     }
 }

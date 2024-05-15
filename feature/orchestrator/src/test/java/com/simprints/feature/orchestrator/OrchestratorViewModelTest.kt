@@ -25,6 +25,8 @@ import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -36,6 +38,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -183,7 +186,10 @@ internal class OrchestratorViewModelTest {
     fun `Updates face matcher step payload when receiving face capture`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.FACE_CAPTURE),
-            createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(FlowType.VERIFY, SubjectQuery())),
+            createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(
+                FlowType.VERIFY,
+                SubjectQuery(),
+                BiometricDataSource.SIMPRINTS)),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
@@ -200,7 +206,10 @@ internal class OrchestratorViewModelTest {
     fun `Updates fingerprint matcher step payload when receiving fingerprint capture`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.FINGERPRINT_CAPTURE),
-            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(FlowType.VERIFY, SubjectQuery())),
+            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(
+                FlowType.VERIFY,
+                SubjectQuery(),
+                BiometricDataSource.SIMPRINTS)),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
@@ -211,6 +220,71 @@ internal class OrchestratorViewModelTest {
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
         }
+    }
+
+    @Test
+    fun `Restores steps if empty`() = runTest {
+        every { stepsBuilder.build(any(), any()) } returns emptyList()
+        val savedSteps = listOf(
+            createMockStep(StepId.SETUP),
+            createMockStep(StepId.CONSENT),
+        )
+        every { cache.steps } returns savedSteps
+
+        viewModel.handleAction(mockk())
+        viewModel.restoreStepsIfNeeded()
+
+        verify { cache.steps }
+    }
+
+    @Test
+    fun `Does not restore steps if not empty`() = runTest {
+        val originalSteps = listOf(
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+        )
+        every { stepsBuilder.build(any(), any()) } returns originalSteps
+        val savedSteps = listOf(
+            createMockStep(StepId.SETUP),
+            createMockStep(StepId.CONSENT),
+        )
+        every { cache.steps } returns savedSteps
+
+        viewModel.handleAction(mockk())
+        viewModel.restoreStepsIfNeeded()
+
+        verify(exactly = 0) { cache.steps }
+    }
+
+    @Test
+    fun `Restores modalities if empty`() = runTest {
+        val projectModalities = listOf<GeneralConfiguration.Modality>(
+            mockk(),
+            mockk(),
+        )
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns emptyList() andThen projectModalities
+        }
+
+        viewModel.handleAction(mockk())
+        viewModel.restoreModalitiesIfNeeded()
+
+        coVerify(exactly = 3) { configRepository.getProjectConfiguration() }
+    }
+
+    @Test
+    fun `Does not restore modalities if not empty`() = runTest {
+        val projectModalities = listOf<GeneralConfiguration.Modality>(
+            mockk(),
+            mockk(),
+        )
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns projectModalities
+        }
+
+        viewModel.handleAction(mockk())
+        viewModel.restoreModalitiesIfNeeded()
+
+        coVerify(exactly = 2) { configRepository.getProjectConfiguration() }
     }
 
     private fun createMockStep(stepId: Int, payload: Bundle = Bundle()) = Step(

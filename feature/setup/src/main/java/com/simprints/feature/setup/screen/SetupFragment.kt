@@ -25,6 +25,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -61,12 +62,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
             viewLifecycleOwner,
             R.id.setupFragment,
             AlertContract.DESTINATION,
-        ) { result ->
-            findNavController().finishWithResult(
-                this,
-                SetupResult(false, ErrorType.reasonFromPayload(result.payload))
-            )
-        }
+        ) { result -> findNavController().finishWithResult(this, result) }
         // Request location permission
         viewModel.requestLocationPermission.observe(viewLifecycleOwner) {
             if (requireActivity().hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -128,7 +124,8 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
             getString(IDR.string.configuration_generic_error_title, errorCode)
         Simber.tag(LICENSE.name)
             .i("Error with configuration download. Error = $errorTitle")
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_global_errorFragment,
             ErrorType.CONFIGURATION_ERROR.apply { this.customTitle = errorTitle }.toAlertArgs()
         )
@@ -146,7 +143,8 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
 
         Simber.tag(LICENSE.name)
             .i("Error with configuration download. The backend is under maintenance")
-        findNavController().navigate(
+        findNavController().navigateSafely(
+            this,
             R.id.action_global_errorFragment,
             ErrorType.BACKEND_MAINTENANCE_ERROR.apply { this.customMessage = errorMessage }
                 .toAlertArgs()

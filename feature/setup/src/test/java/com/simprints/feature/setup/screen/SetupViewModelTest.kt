@@ -9,10 +9,15 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
+import com.simprints.infra.license.LicenseStatus
+import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.remote.License
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
@@ -42,6 +47,9 @@ class SetupViewModelTest {
     @MockK
     private lateinit var locationStore: LocationStore
 
+    @MockK
+    private lateinit var saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
+
     private val configRepository = mockk<ConfigRepository>()
     private lateinit var viewModel: SetupViewModel
 
@@ -53,7 +61,14 @@ class SetupViewModelTest {
         MockKAnnotations.init(this)
         every { authStore.signedInProjectId } returns projectId
         viewModel =
-            SetupViewModel(locationStore, configRepository, licenseRepository, deviceID, authStore)
+            SetupViewModel(
+                locationStore,
+                configRepository,
+                licenseRepository,
+                deviceID,
+                authStore,
+                saveLicenseCheckEvent
+            )
     }
 
     @Test
@@ -148,7 +163,7 @@ class SetupViewModelTest {
         }
         every {
             licenseRepository.getLicenseStates(any(), any(), any())
-        } returns listOf(LicenseState.FinishedWithSuccess("license")).asFlow()
+        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate","license"))).asFlow()
 
         // When
         viewModel.downloadRequiredLicenses()
@@ -159,7 +174,7 @@ class SetupViewModelTest {
     }
 
 
-@Test
+    @Test
     fun `should not download required licenses if there are no required licenses`() = runTest {
         // Given
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
@@ -174,6 +189,7 @@ class SetupViewModelTest {
         // Then
         viewModel.overallSetupResult.test().assertValue(true)
     }
+
     @Test
     fun `should fail if any license fails`() = runTest {
         // Given
@@ -188,9 +204,10 @@ class SetupViewModelTest {
                 every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
             }
         }
+        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, LicenseStatus.MISSING)}
         every {
             licenseRepository.getLicenseStates(any(), any(), Vendor.NEC)
-        } returns listOf(LicenseState.FinishedWithSuccess("")).asFlow()
+        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate", ""))).asFlow()
         every {
             licenseRepository.getLicenseStates(any(), any(), Vendor.RANK_ONE)
         } returns listOf(LicenseState.FinishedWithError("123")).asFlow()
@@ -199,6 +216,7 @@ class SetupViewModelTest {
         viewModel.downloadRequiredLicenses()
 
         // Then
+        coVerify { saveLicenseCheckEvent(Vendor.RANK_ONE, LicenseStatus.MISSING)}
         viewModel.overallSetupResult.test().assertValue(false)
     }
 }

@@ -65,11 +65,11 @@ class LoginInfoStoreTest {
             secureEditor.putString(any(), any())
             secureEditor.putBoolean(any(), any())
         }
+        // Check that legacy prefs cleared
+        verify(exactly = 7) { legacyEditor.remove(any()) }
         verify(exactly = 1) {
-            secureEditor.commit()
-            // Check that legacy prefs cleared
-            legacyEditor.clear()
             legacyEditor.commit()
+            secureEditor.commit()
         }
     }
 
@@ -261,10 +261,8 @@ class LoginInfoStoreTest {
     fun `cleanCredentials should reset all the credentials`() {
         loginInfoStoreImpl.cleanCredentials()
 
-        verify(exactly = 1) {
-            secureEditor.clear()
-            secureEditor.apply()
-        }
+        verify(exactly = 7) { secureEditor.remove(any()) }
+        verify(exactly = 1) { secureEditor.commit() }
     }
 
     @Test

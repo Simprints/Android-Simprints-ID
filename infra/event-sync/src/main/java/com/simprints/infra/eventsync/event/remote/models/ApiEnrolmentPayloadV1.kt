@@ -7,13 +7,11 @@ import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 @Keep
 internal data class ApiEnrolmentPayloadV1(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val personId: String,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: EnrolmentEventV1.EnrolmentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.personId
     )
 

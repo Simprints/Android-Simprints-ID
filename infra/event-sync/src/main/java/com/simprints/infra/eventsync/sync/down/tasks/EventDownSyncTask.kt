@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
+import java.util.UUID
 import javax.inject.Inject
 
 internal class EventDownSyncTask @Inject constructor(
@@ -57,11 +59,13 @@ internal class EventDownSyncTask @Inject constructor(
         val requestStartTime = timeHelper.now()
 
         var firstEventTimestamp: Timestamp? = null
+        val requestId = UUID.randomUUID().toString()
         var result: EventDownSyncResult? = null
         var errorType: String? = null
 
         try {
             result = eventRemoteDataSource.getEvents(
+                requestId,
                 operation.queryEvent.fromDomainToApi(),
                 scope
             )
@@ -96,6 +100,10 @@ internal class EventDownSyncTask @Inject constructor(
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, result.totalCount)
         } catch (t: Throwable) {
+            if (t is RemoteDbNotSignedInException) {
+                throw t
+            }
+
             Simber.d(t)
             errorType = t.toString()
 
@@ -113,7 +121,7 @@ internal class EventDownSyncTask @Inject constructor(
                 EventDownSyncRequestEvent(
                     createdAt = requestStartTime,
                     endedAt = timeHelper.now(),
-                    requestId = result?.requestId.orEmpty(),
+                    requestId = requestId,
                     query = operation.queryEvent.let { query ->
                         EventDownSyncRequestEvent.QueryParameters(
                             query.moduleId,

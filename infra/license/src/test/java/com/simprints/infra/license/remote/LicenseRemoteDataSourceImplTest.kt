@@ -19,11 +19,12 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
-import java.util.*
+import java.util.UUID
 
 @ExperimentalCoroutinesApi
 class LicenseRemoteDataSourceImplTest {
     private val license = UUID.randomUUID().toString()
+    private val expirationDate = "2023.12.31"
 
     private val remoteInterface = mockk<LicenseRemoteInterface>()
     private val simApiClient = mockk<SimNetwork.SimApiClient<LicenseRemoteInterface>>()
@@ -48,7 +49,7 @@ class LicenseRemoteDataSourceImplTest {
         } returns """{
                 "RANK_ONE_FACE": {
                     "vendor": "RANK_ONE_FACE",
-                    "expiration": "2023.12.31",
+                    "expiration": "$expirationDate",
                     "data": "$license"
                 }
             }
@@ -139,7 +140,7 @@ class LicenseRemoteDataSourceImplTest {
                 RANK_ONE_FACE
             )
 
-        assertThat(newLicense).isEqualTo(ApiLicenseResult.Success(license))
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.Success(License(expirationDate, license)))
     }
 
     @Test

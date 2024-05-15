@@ -10,14 +10,12 @@ import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.Invalid
 @JsonInclude(Include.NON_NULL)
 internal data class ApiInvalidIntentPayload(
     override val startTime: ApiTimestamp,
-    override val version: Int,
     val action: String,
     val extras: Map<String, Any?>,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: InvalidIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.eventVersion,
         domainPayload.action,
         domainPayload.extras,
     )

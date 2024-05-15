@@ -257,7 +257,15 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         _stateLiveData.value = initialState
     }
 
-    fun isImageTransferRequired(): Boolean =
+    /**
+     * Every bio sdk has a different timeout for scanning and image transfer
+     * This function returns the timeout for scanning plus the timeout for image transfer if it is required
+     * */
+    fun progressBarTimeout() =
+        bioSdkWrapper.scanningTimeoutMs +
+            if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
+
+   private fun isImageTransferRequired(): Boolean =
         bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
             scannerManager.scanner.isImageTransferSupported()
 
@@ -330,19 +338,16 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 scannerManager.scanner.setUiIdle()
                 val capturedFingerprint = bioSdkWrapper.acquireFingerprintTemplate(
                     bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
-                    scanningTimeoutMs.toInt(),
-                    qualityThreshold()
+                    bioSdkWrapper.scanningTimeoutMs.toInt(),
+                    qualityThreshold(),
+                    // is this is the last bad scan, we allow low quality extraction
+                    tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
                 )
 
                 handleCaptureSuccess(capturedFingerprint)
             } catch (ex: CancellationException) {
                 // ignore cancellation exception, but log behaviour
                 Simber.d("Fingerprint scanning was cancelled")
-            } catch (ex: BioSdkException.ImageQualityBelowThresholdException) {
-                // this exception is thrown when the image quality is below the threshold
-                // and it is thrown from NEC SDK it should be handled as a no finger detected exception not
-                // as a low quality scan issue because there is no template extracted from the image
-                handleNoFingerDetected()
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
@@ -675,9 +680,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         const val targetNumberOfGoodScans = 2
         const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
-
-        const val scanningTimeoutMs = 3000L
-        const val imageTransferTimeoutMs = 3000L
 
         const val AUTO_SWIPE_DELAY: Long = 500
 

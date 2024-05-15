@@ -5,6 +5,7 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 
@@ -15,7 +16,12 @@ internal class ShouldCreatePersonUseCase @Inject constructor() {
         modalities: Set<GeneralConfiguration.Modality>,
         results: List<Step>
     ): Boolean {
-        if (actionRequest !is ActionRequest.FlowAction || modalities.isEmpty()) {
+        if (actionRequest !is ActionRequest.FlowAction) {
+            return false
+        }
+
+        if (modalities.isEmpty()) {
+            Simber.e("Modalities are empty")
             return false
         }
 

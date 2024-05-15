@@ -12,13 +12,11 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 internal data class ApiFaceFallbackCapturePayload(
     override val startTime: ApiTimestamp, //Not added on API yet
     val endTime: ApiTimestamp?,
-    override val version: Int,
-) : ApiEventPayload(version, startTime) {
+) : ApiEventPayload(startTime) {
 
     constructor(domainPayload: FaceFallbackCapturePayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
-        domainPayload.eventVersion
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =

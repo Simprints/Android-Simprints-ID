@@ -11,19 +11,36 @@ import com.simprints.infra.config.store.local.models.ProtoIdentificationConfigur
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.local.models.toProto
-import com.simprints.infra.config.store.models.*
-import com.simprints.infra.config.store.remote.models.*
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.DeviceState
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
+import com.simprints.infra.config.store.remote.models.ApiDeviceState
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFingerprintConfiguration
 import com.simprints.infra.config.store.remote.models.ApiGeneralConfiguration
 import com.simprints.infra.config.store.remote.models.ApiIdentificationConfiguration
 import com.simprints.infra.config.store.remote.models.ApiProject
 import com.simprints.infra.config.store.remote.models.ApiProjectConfiguration
+import com.simprints.infra.config.store.remote.models.ApiProjectState
 import com.simprints.infra.config.store.remote.models.ApiSynchronizationConfiguration
 import com.simprints.infra.config.store.remote.models.ApiVero1Configuration
 import com.simprints.infra.config.store.remote.models.ApiVero2Configuration
@@ -200,12 +217,13 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
     ApiSynchronizationConfiguration.Frequency.PERIODICALLY,
     ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiSimprintsUpSynchronizationConfiguration(
-            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL
+            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiUpSyncBatchSizes(1, 2, 3),
+            false,
         ),
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
             ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE
         ),
-        false,
     ),
     ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration.PartitionType.PROJECT,
@@ -214,16 +232,19 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
     )
 )
 
+internal val simprintsUpSyncConfigurationConfiguration = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+    UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+    UpSynchronizationConfiguration.UpSyncBatchSizes(1, 2, 3),
+    false
+)
+
 internal val synchronizationConfiguration = SynchronizationConfiguration(
     SynchronizationConfiguration.Frequency.PERIODICALLY,
     UpSynchronizationConfiguration(
-        UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-        ),
+        simprintsUpSyncConfigurationConfiguration,
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         ),
-        false,
     ),
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
@@ -239,6 +260,13 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .setSimprints(
                 ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
                     .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                    .setBatchSizes(
+                        ProtoUpSyncBatchSizes.newBuilder()
+                            .setSessions(1)
+                            .setUpSyncs(2)
+                            .setDownSyncs(3)
+                            .build()
+                    )
                     .build()
             )
             .setCoSync(

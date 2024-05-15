@@ -1,11 +1,13 @@
 package com.simprints.feature.dashboard.main
 
 import androidx.lifecycle.Observer
-import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
@@ -51,11 +53,13 @@ class MainFragmentTest {
     @JvmField
     internal val syncViewModel = mockk<SyncViewModel>(relaxed = true)
 
+    private val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
+
     @Test
     fun `should hide the privacy notice menu if the consent is not required`() {
         mockConsentRequired(false)
 
-        launchFragmentInHiltContainer<MainFragment>()
+        launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
         onView(withText("Privacy Notice")).check(doesNotExist())
@@ -65,7 +69,7 @@ class MainFragmentTest {
     fun `should display the privacy notice menu if the consent is required`() {
         mockConsentRequired(true)
 
-        launchFragmentInHiltContainer<MainFragment>()
+        launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
         onView(withText("Privacy Notice")).check(matches(isDisplayed()))
@@ -74,8 +78,6 @@ class MainFragmentTest {
     @Test
     fun `should redirect to the settings fragment when clicking on settings`() {
         mockConsentRequired(true)
-
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
@@ -88,8 +90,6 @@ class MainFragmentTest {
     fun `should redirect to the privacy notices fragment when clicking on privacy notices`() {
         mockConsentRequired(true)
 
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
-
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
@@ -100,8 +100,6 @@ class MainFragmentTest {
     @Test
     fun `should redirect to the debug fragment when clicking on debug`() {
         mockConsentRequired(true)
-
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
