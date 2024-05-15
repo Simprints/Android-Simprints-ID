@@ -117,4 +117,13 @@ internal class LoginFormViewModel @Inject constructor(
         QrScannerError.UnknownError -> SignInState.QrGenericError
     }
 
+    fun changeUrlClicked() {
+        _signInState.send(SignInState.ShowUrlChangeDialog(simNetwork.getApiBaseUrlPrefix()))
+    }
+
+    fun saveNewUrl(newUrl: String?) = if (newUrl.isNullOrEmpty()) {
+        simNetwork.resetApiBaseUrl()
+    } else {
+        simNetwork.setApiBaseUrl(newUrl)
+    }
 }
