@@ -19,6 +19,7 @@ class Vero2ConfigurationTest {
         val mapping = mapOf(
             ProtoVero2Configuration.ImageSavingStrategy.NEVER to Vero2Configuration.ImageSavingStrategy.NEVER,
             ProtoVero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN to Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+            ProtoVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE to Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE,
             ProtoVero2Configuration.ImageSavingStrategy.EAGER to Vero2Configuration.ImageSavingStrategy.EAGER,
         )
 

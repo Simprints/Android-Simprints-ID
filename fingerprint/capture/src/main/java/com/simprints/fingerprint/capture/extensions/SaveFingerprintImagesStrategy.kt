@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStr
 
 internal fun ImageSavingStrategy.deduceFileExtension(): String = when (this) {
     ImageSavingStrategy.NEVER -> ""
+    ImageSavingStrategy.ONLY_USED_IN_REFERENCE,
     ImageSavingStrategy.ONLY_GOOD_SCAN,
     ImageSavingStrategy.EAGER -> "wsq"
 }

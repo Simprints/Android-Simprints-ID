@@ -16,6 +16,7 @@ internal fun Vero2Configuration.ImageSavingStrategy.toProto(): ProtoVero2Configu
     when (this) {
         Vero2Configuration.ImageSavingStrategy.NEVER -> ProtoVero2Configuration.ImageSavingStrategy.NEVER
         Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN -> ProtoVero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+        Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE -> ProtoVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
         Vero2Configuration.ImageSavingStrategy.EAGER -> ProtoVero2Configuration.ImageSavingStrategy.EAGER
     }
 
@@ -47,6 +48,7 @@ internal fun ProtoVero2Configuration.ImageSavingStrategy.toDomain(): Vero2Config
     when (this) {
         ProtoVero2Configuration.ImageSavingStrategy.NEVER -> Vero2Configuration.ImageSavingStrategy.NEVER
         ProtoVero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN -> Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+        ProtoVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE -> Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
         ProtoVero2Configuration.ImageSavingStrategy.EAGER -> Vero2Configuration.ImageSavingStrategy.EAGER
         ProtoVero2Configuration.ImageSavingStrategy.UNRECOGNIZED -> throw InvalidProtobufEnumException(
             "invalid ImageSavingStrategy $name"

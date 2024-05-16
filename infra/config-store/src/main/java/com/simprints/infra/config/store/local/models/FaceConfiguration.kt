@@ -14,6 +14,7 @@ internal fun FaceConfiguration.toProto(): ProtoFaceConfiguration =
 internal fun FaceConfiguration.ImageSavingStrategy.toProto(): ProtoFaceConfiguration.ImageSavingStrategy =
     when (this) {
         FaceConfiguration.ImageSavingStrategy.NEVER -> ProtoFaceConfiguration.ImageSavingStrategy.NEVER
+        FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE -> ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
         FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN -> ProtoFaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
     }
 
@@ -28,6 +29,7 @@ internal fun ProtoFaceConfiguration.toDomain(): FaceConfiguration =
 internal fun ProtoFaceConfiguration.ImageSavingStrategy.toDomain(): FaceConfiguration.ImageSavingStrategy =
     when (this) {
         ProtoFaceConfiguration.ImageSavingStrategy.NEVER -> FaceConfiguration.ImageSavingStrategy.NEVER
+        ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE -> FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
         ProtoFaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN -> FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
         ProtoFaceConfiguration.ImageSavingStrategy.UNRECOGNIZED -> throw InvalidProtobufEnumException(
             "invalid image saving strategy $name"
