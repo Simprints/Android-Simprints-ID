@@ -14,15 +14,14 @@ import javax.inject.Inject
 
 internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
-    private val decodeWSQImageUseCase: DecodeWSQImageUseCase,
+    private val imageConverter: SecuGenWsqImageConverter,
     private val secugenImageCorrection: SecugenImageCorrection,
     private val acquireImageDistortionConfigurationUseCase: AcquireImageDistortionConfigurationUseCase,
     private val calculateNecImageQualityUseCase: CalculateNecImageQualityUseCase,
     private val captureProcessedImageCache: ProcessedImageCache,
     private val extractNecTemplateUseCase: ExtractNecTemplateUseCase,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
-) :
-    FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
+) : FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
 
 
     override suspend fun acquireFingerprintTemplate(settings: FingerprintTemplateAcquisitionSettings?) =
@@ -43,28 +42,38 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
             val unprocessedImage = captureWrapper.acquireUnprocessedImage(
                 Dpi(MIN_CAPTURE_DPI)
             ).rawUnprocessedImage
-            captureProcessedImageCache.recentlyCapturedImage = unprocessedImage.imageData
             log("Unprocessed image acquired, processing it")
-            val decodedImage = decodeWSQImageUseCase(unprocessedImage)
-            log("Image decoded successfully ${decodedImage.resolution}")
+            val decodedImage = imageConverter.toRaw(unprocessedImage.imageData)
             log("processing image using secugen image correction")
-            val secugenProcessedImage = processImage(settings, decodedImage)
+            val secugenProcessedImage = processImage(
+                settings,
+                decodedImage,
+                unprocessedImage.un20SerialNumber,
+                unprocessedImage.brightness
+            )
+            log("processed image, compress it to wsq and cache it for later upload to the server")
+            captureProcessedImageCache.recentlyCapturedImage = imageConverter.toWsq(
+                secugenProcessedImage.imageBytes,
+                secugenProcessedImage.width,
+                secugenProcessedImage.height,
+                secugenProcessedImage.resolution
+            )
+
             log("quality checking image using nec sdk")
             val qualityScore = calculateNecImageQualityUseCase(secugenProcessedImage)
             log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
             if (qualityScore < settings.qualityThreshold && !settings.allowLowQualityExtraction)
             // if the quality score is less than the threshold return an empty template
                 TemplateResponse(
-                    byteArrayOf(),
-                    FingerprintTemplateMetadata(
-                        templateFormat = NEC_TEMPLATE_FORMAT,
-                        imageQualityScore = qualityScore
+                    byteArrayOf(), FingerprintTemplateMetadata(
+                        templateFormat = NEC_TEMPLATE_FORMAT, imageQualityScore = qualityScore
                     )
                 ) else {
                 log("extracting template using nec sdk")
                 extractNecTemplateUseCase(secugenProcessedImage, qualityScore)
             }
         }
+
 
     private fun log(message: String) {
         Simber.tag("NEC_SDK").d(message)
@@ -73,16 +82,17 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
 
     private suspend fun processImage(
         settings: FingerprintTemplateAcquisitionSettings,
-        rawImage: FingerprintRawImage
+        rawImage: SecuGenWsqImageConverter.RawImage,
+        un20SerialNumber: ByteArray,
+        brightness: Byte
     ): FingerprintImage {
         val scannerConfig = SecugenImageCorrection.ScannerConfig(
             acquireImageDistortionConfigurationUseCase(),
             settings.processingResolution?.value ?: DEFAULT_RESOLUTION,
-            rawImage.un20SerialNumber,
-            rawImage.brightness
+            un20SerialNumber,
+            brightness
         )
-        val processedImage =
-            secugenImageCorrection.processRawImage(rawImage.imageBytes, scannerConfig)
+        val processedImage = secugenImageCorrection.processRawImage(rawImage.bytes, scannerConfig)
         return FingerprintImage(
             processedImage.imageBytes,
             processedImage.width,
@@ -99,3 +109,4 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
 }
 
 const val NEC_TEMPLATE_FORMAT = "NEC_1"
+
