@@ -12,6 +12,7 @@
         android:background="@color/simprints_blue">
 
         <LinearLayout
+            android:id="@+id/form_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -154,6 +155,7 @@
             android:alpha="0.5"
             android:text="@string/login_change_url"
             android:textAllCaps="false"
+            app:layout_constraintTop_toBottomOf="@+id/form_container"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
