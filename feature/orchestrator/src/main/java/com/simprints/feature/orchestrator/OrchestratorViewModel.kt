@@ -52,8 +52,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val updateDailyActivity: UpdateDailyActivityUseCase,
 ) : ViewModel() {
 
-    var isActivityRestored = false
-    var requestProcessed = false
+    var isRequestProcessed = false
     private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
