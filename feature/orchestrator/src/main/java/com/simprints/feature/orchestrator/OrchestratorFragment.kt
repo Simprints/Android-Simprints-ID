@@ -77,7 +77,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
-            orchestratorVm.requestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
+            orchestratorVm.isRequestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
             savedInstanceState.getString(KEY_ACTION_REQUEST)
                 ?.run(orchestratorVm::setActionRequestFromJson)
             orchestratorVm.restoreStepsIfNeeded()
@@ -87,7 +87,6 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        orchestratorVm.isActivityRestored = savedInstanceState != null
 
         observeLoginCheckVm()
         observeClientApiVm()
@@ -230,7 +229,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_REQUEST_PROCESSED, orchestratorVm.requestProcessed)
+        outState.putBoolean(KEY_REQUEST_PROCESSED, orchestratorVm.isRequestProcessed)
         // [MS-405] Saving the action request in the bundle, since ViewModels don't survive the
         // process death. ActionRequest is important in mapping the correct SID response, hence it
         // is important for it to be able to survive both configuration changes and process death.
@@ -240,15 +239,15 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     override fun onResume() {
         super.onResume()
 
-        if (!orchestratorVm.isActivityRestored && !orchestratorVm.requestProcessed) {
+        if (!orchestratorVm.isRequestProcessed) {
             if (loginCheckVm.isDeviceSafe()) {
-                orchestratorVm.requestProcessed = true
                 lifecycleScope.launch {
                     val actionRequest =
                         clientApiVm.handleIntent(args.requestAction, args.requestParams)
                     if (actionRequest != null) {
                         loginCheckVm.validateSignInAndProceed(actionRequest)
                     }
+                    orchestratorVm.isRequestProcessed = true
                 }
             }
         }
