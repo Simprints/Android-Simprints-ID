@@ -1,5 +1,6 @@
 plugins {
     id("simprints.infra")
+    id("simprints.library.room")
     id("kotlin-parcelize")
     id("simprints.testing.android")
 }

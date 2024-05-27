@@ -438,7 +438,7 @@ class FingerprintCaptureViewModelTest {
         )
         coVerify(exactly = 12) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 4) { saveImageUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 4) { saveImageUseCase.invoke(any(), any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(FOUR_FINGERS_IDS.size)
@@ -489,7 +489,7 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 2) { saveImageUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 2) { saveImageUseCase.invoke(any(), any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)
@@ -538,7 +538,7 @@ class FingerprintCaptureViewModelTest {
         )
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 0) { saveImageUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 0) { saveImageUseCase.invoke(any(), any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)
@@ -736,7 +736,7 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 14) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
@@ -844,7 +844,7 @@ class FingerprintCaptureViewModelTest {
 
         coVerify(exactly = 14) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
         // If eager, expect that images were saved before confirm was pressed, including bad scans
-        coVerify(exactly = 8) { saveImageUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 8) { saveImageUseCase.invoke(any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
 
@@ -1234,7 +1234,7 @@ class FingerprintCaptureViewModelTest {
 
     private fun withImageTransfer(isEager: Boolean = false) {
         every { vero2Configuration.imageSavingStrategy } returns if (isEager) ImageSavingStrategy.EAGER else ImageSavingStrategy.ONLY_GOOD_SCAN
-        coEvery { saveImageUseCase.invoke(any(), any(), any()) } returns mockk {
+        coEvery { saveImageUseCase.invoke(any(), any(), any(), any()) } returns mockk {
             every { relativePath } returns Path(emptyArray())
         }
     }

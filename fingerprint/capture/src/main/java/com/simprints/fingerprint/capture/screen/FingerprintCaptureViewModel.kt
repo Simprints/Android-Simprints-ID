@@ -176,13 +176,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private suspend fun initBioSdk() {
         try {
-            bioSdkWrapper= resolveBioSdkWrapperUseCase()
+            bioSdkWrapper = resolveBioSdkWrapperUseCase()
             bioSdkWrapper.initialize()
         } catch (e: BioSdkException.BioSdkInitializationException) {
             Simber.e(e)
             _invalidLicense.send()
         }
     }
+
     private fun launchReconnect() {
         if (!state.isShowingConnectionScreen) {
             updateState {
@@ -265,7 +266,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         bioSdkWrapper.scanningTimeoutMs +
             if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
 
-   private fun isImageTransferRequired(): Boolean =
+    private fun isImageTransferRequired(): Boolean =
         bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
             scannerManager.scanner.isImageTransferSupported()
 
@@ -504,6 +505,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 Simber.e(e)
                 handleNoFingerDetected()
             }
+
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)
@@ -614,7 +616,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected) {
         val captureEventId = captureEventIds[id]
-        val imageRef = saveImage(bioSdkConfiguration.vero2!!, captureEventId, collectedFinger)
+        val imageRef = saveImage(
+            vero2Configuration = bioSdkConfiguration.vero2!!,
+            finger = id.finger,
+            captureEventId = captureEventId,
+            collectedFinger = collectedFinger,
+        )
         imageRefs[id] = imageRef
     }
 
