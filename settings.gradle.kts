@@ -110,6 +110,7 @@ include(
     ":feature:consent",
     ":feature:setup",
     ":feature:matcher",
+    ":feature:validate-subject-pool"
 )
 
 // Infra modules

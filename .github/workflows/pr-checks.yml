@@ -76,6 +76,7 @@ jobs:
                 feature:setup
                 feature:enrol-last-biometric
                 feature:matcher
+                feature:validate-subject-pool
             reportsId: feature2
 
     feature-dashboard-unit-tests:
