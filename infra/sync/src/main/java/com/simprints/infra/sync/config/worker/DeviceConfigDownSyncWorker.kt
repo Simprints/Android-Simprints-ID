@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import dagger.assisted.Assisted
@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val logoutUseCase: LogoutUseCase,
     private val syncOrchestrator: SyncOrchestrator,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -31,7 +31,7 @@ internal class DeviceConfigDownSyncWorker @AssistedInject constructor(
             crashlyticsLog("Fetching device config state")
 
             try {
-                val state = configRepository.getDeviceState()
+                val state = configManager.getDeviceState()
 
                 if (state.isCompromised) {
                     logoutUseCase()

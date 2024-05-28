@@ -12,6 +12,7 @@ android {
 dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
 
     // Firebase
     implementation(libs.firebase.storage)

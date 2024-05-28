@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -21,8 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
-    private val logout: LogoutUseCase,
+    private val configManager: ConfigManager,
+    private val logoutUseCase: LogoutUseCase,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
@@ -58,7 +58,7 @@ internal class AboutViewModel @Inject constructor(
                 when (canSyncDataToSimprints() && hasEventsToUpload()) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
-                        logout()
+                        logoutUseCase()
                         LogoutDestination.LoginScreen
                     }
                 }
@@ -70,11 +70,11 @@ internal class AboutViewModel @Inject constructor(
         eventSyncManager.countEventsToUpload(type = null).first() > 0
 
     private suspend fun canSyncDataToSimprints(): Boolean =
-        configRepository.getProjectConfiguration().canSyncDataToSimprints()
+        configManager.getProjectConfiguration().canSyncDataToSimprints()
 
 
     private fun load() = viewModelScope.launch {
-        val configuration = configRepository.getProjectConfiguration()
+        val configuration = configManager.getProjectConfiguration()
         val syncAndSearchConfig = SyncAndSearchConfig(
             configuration.synchronization.down.partitionType.name,
             configuration.identification.poolType.name,

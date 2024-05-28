@@ -14,8 +14,7 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -31,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class FaceCaptureViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val saveFaceImage: SaveFaceImageUseCase,
     private val eventReporter: SimpleCaptureEventReporter,
     private val bitmapToByteArray: BitmapToByteArrayUseCase,
@@ -99,7 +98,7 @@ internal class FaceCaptureViewModel @Inject constructor(
 
     fun flowFinished() {
         viewModelScope.launch {
-            val projectConfiguration = configRepository.getProjectConfiguration()
+            val projectConfiguration = configManager.getProjectConfiguration()
             if (projectConfiguration.face?.imageSavingStrategy?.shouldSaveImage() == true) {
                 saveFaceDetections()
             }

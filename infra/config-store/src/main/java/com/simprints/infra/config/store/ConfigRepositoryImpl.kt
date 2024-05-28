@@ -2,7 +2,9 @@ package com.simprints.infra.config.store
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.DeviceID
+import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
@@ -10,8 +12,6 @@ import com.simprints.infra.config.store.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.local.ConfigLocalDataSource
-import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.remote.ConfigRemoteDataSource
 import com.simprints.infra.logging.Simber
@@ -35,11 +35,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
         const val PRIVACY_NOTICE_FILE = "privacy_notice"
     }
 
-    override suspend fun getProject(projectId: String): Project = try {
-        localDataSource.getProject()
-    } catch (e: NoSuchElementException) {
-        refreshProject(projectId).project
-    }
+    override suspend fun getProject(): Project = localDataSource.getProject()
 
     override suspend fun refreshProject(projectId: String): ProjectWithConfig =
         remoteDataSource
@@ -53,23 +49,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
                 }
             }
 
-    override suspend fun getProjectConfiguration(): ProjectConfiguration {
-        val localConfig = localDataSource.getProjectConfiguration()
-        // If projectId is empty, configuration hasn't been downloaded yet
-        return if (localConfig.projectId.isEmpty()) {
-            try {
-                // Try to refresh it with logged in projectId (if any)
-                refreshProject(localDataSource.getProject().id).configuration
-            } catch (e: Exception) {
-                // If not logged in the above will fail. However we still depend on the 'default'
-                // configuration to create the session when login is attempted. Possibly in other
-                // places, too.
-                localConfig
-            }
-        } else {
-            localConfig
-        }
-    }
+    override suspend fun getProjectConfiguration(): ProjectConfiguration = localDataSource.getProjectConfiguration()
 
     override suspend fun getDeviceState(): DeviceState {
         val projectId = localDataSource.getProject().id

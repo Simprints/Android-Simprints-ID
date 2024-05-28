@@ -4,9 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
@@ -50,7 +50,7 @@ class SetupViewModelTest {
     @MockK
     private lateinit var saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
 
-    private val configRepository = mockk<ConfigRepository>()
+    private val configManager = mockk<ConfigManager>()
     private lateinit var viewModel: SetupViewModel
 
     private val deviceID = "deviceID"
@@ -63,7 +63,7 @@ class SetupViewModelTest {
         viewModel =
             SetupViewModel(
                 locationStore,
-                configRepository,
+                configManager,
                 licenseRepository,
                 deviceID,
                 authStore,
@@ -74,7 +74,7 @@ class SetupViewModelTest {
     @Test
     fun `should request location permission if collectLocation is enabled`() = runTest {
         // Given
-        coEvery { configRepository.getProjectConfiguration().general.collectLocation } returns true
+        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns true
 
         // When
         viewModel.start()
@@ -87,7 +87,7 @@ class SetupViewModelTest {
     @Test
     fun `should not request location permission if collectLocation is disabled`() = runTest {
         // Given
-        coEvery { configRepository.getProjectConfiguration().general.collectLocation } returns false
+        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
 
         // when
         viewModel.start()
@@ -115,7 +115,7 @@ class SetupViewModelTest {
     @Test
     fun `should request notification permission if collectLocation is disabled`() = runTest {
         // Given
-        coEvery { configRepository.getProjectConfiguration().general.collectLocation } returns false
+        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
 
         // When
         viewModel.start()
@@ -128,7 +128,7 @@ class SetupViewModelTest {
     @Test
     fun `should not request notification permission yet if collectLocation is enabled`() = runTest {
         // Given
-        coEvery { configRepository.getProjectConfiguration().general.collectLocation } returns true
+        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns true
 
         // When
         viewModel.start()
@@ -150,7 +150,7 @@ class SetupViewModelTest {
     @Test
     fun `should download required licenses`() = runTest {
         // Given
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     GeneralConfiguration.Modality.FINGERPRINT,
@@ -177,7 +177,7 @@ class SetupViewModelTest {
     @Test
     fun `should not download required licenses if there are no required licenses`() = runTest {
         // Given
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns emptyList()
             }
@@ -193,7 +193,7 @@ class SetupViewModelTest {
     @Test
     fun `should fail if any license fails`() = runTest {
         // Given
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     GeneralConfiguration.Modality.FINGERPRINT,

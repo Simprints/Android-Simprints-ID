@@ -14,7 +14,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
@@ -35,7 +35,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
@@ -99,9 +99,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             binding.logs.append("\nGetting Configs from BFSID")
             lifecycleScope.launch {
                 try {
-                    configRepository.refreshProject(authStore.signedInProjectId).also { (project, _) ->
-                        enrolmentRecordRepository.tokenizeExistingRecords(project)
-                    }
+                    configManager.refreshProject(authStore.signedInProjectId)
                     binding.logs.append("\nGot Configs from BFSID")
                 } catch (e: Exception) {
                     binding.logs.append("\nFailed to refresh the project configuration")

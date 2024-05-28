@@ -1,7 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
 import com.simprints.core.domain.tokenization.values
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager
@@ -12,13 +12,13 @@ import javax.inject.Inject
 
 // TODO move into the event system infra module?
 internal class ModuleRepositoryImpl @Inject constructor(
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventSyncManager: EventSyncManager,
 ) : ModuleRepository {
 
     override suspend fun getModules(): List<Module> =
-        configRepository.getProjectConfiguration().synchronization.down.moduleOptions.map {
+        configManager.getProjectConfiguration().synchronization.down.moduleOptions.map {
             Module(it, isModuleSelected(it.value))
         }
 
@@ -28,15 +28,15 @@ internal class ModuleRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMaxNumberOfModules(): Int =
-        configRepository.getProjectConfiguration().synchronization.down.maxNbOfModules
+        configManager.getProjectConfiguration().synchronization.down.maxNbOfModules
 
     private suspend fun isModuleSelected(moduleName: String): Boolean {
-        return configRepository.getDeviceConfiguration().selectedModules.values()
+        return configManager.getDeviceConfiguration().selectedModules.values()
             .contains(moduleName)
     }
 
     private suspend fun setSelectedModules(selectedModules: List<Module>) {
-        configRepository.updateDeviceConfiguration {
+        configManager.updateDeviceConfiguration {
             it.apply {
                 this.selectedModules = selectedModules.map { module -> module.name }
                 logMessageForCrashReport("Modules set to ${this.selectedModules.values()}")

@@ -3,8 +3,8 @@ package com.simprints.infra.sync.config.worker
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectWithConfig
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.sync.config.testtools.project
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
@@ -30,7 +30,7 @@ class ProjectConfigDownSyncWorkerTest {
     private lateinit var authStore: AuthStore
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var handleProjectStateUseCase: HandleProjectStateUseCase
@@ -48,7 +48,7 @@ class ProjectConfigDownSyncWorkerTest {
             context = mockk(),
             params = mockk(relaxed = true),
             authStore = authStore,
-            configRepository = configRepository,
+            configManager = configManager,
             handleProjectState = handleProjectStateUseCase,
             rescheduleWorkersIfConfigChanged = rescheduleWorkersIfConfigChangedUseCase,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
@@ -66,7 +66,7 @@ class ProjectConfigDownSyncWorkerTest {
     @Test
     fun `should fail if the config service throws an exception`() = runTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configRepository.refreshProject(PROJECT_ID) } throws Exception()
+        coEvery { configManager.refreshProject(PROJECT_ID) } throws Exception()
 
         val result = projectConfigDownSyncWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -75,7 +75,7 @@ class ProjectConfigDownSyncWorkerTest {
     @Test
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configRepository.refreshProject(PROJECT_ID) } returns ProjectWithConfig(
+        coEvery { configManager.refreshProject(PROJECT_ID) } returns ProjectWithConfig(
             project,
             projectConfiguration
         )
