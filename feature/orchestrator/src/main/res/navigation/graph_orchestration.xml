@@ -69,4 +69,10 @@
     <action
         android:id="@+id/action_orchestratorFragment_to_matcher"
         app:destination="@id/graph_matcher" />
+
+    <include app:graph="@navigation/graph_validate_subject_pool" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_validateSubjectPool"
+        app:destination="@id/graph_validate_subject_pool"
+        />
 </navigation>

@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":feature:select-subject"))
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:matcher"))
+    implementation(project(":feature:validate-subject-pool"))
 
     implementation(project(":face:capture"))
 

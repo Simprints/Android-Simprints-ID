@@ -8,4 +8,6 @@ android {
 }
 
 dependencies {
+
+    implementation(project(":infra:enrolment-records-store"))
 }

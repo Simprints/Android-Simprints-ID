@@ -14,6 +14,7 @@ import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.setup.SetupResult
+import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.matcher.FaceMatchResult
@@ -54,6 +55,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = SelectSubjectResult::class, name = "SelectSubjectResult"),
     JsonSubTypes.Type(value = AlertResult::class, name = "AlertResult"),
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
+    JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
 )
 abstract class SerializableMixin : Serializable
 
