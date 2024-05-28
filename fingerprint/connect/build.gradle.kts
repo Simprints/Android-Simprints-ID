@@ -10,6 +10,7 @@ android {
 dependencies {
 
     implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:recent-user-activity"))
 

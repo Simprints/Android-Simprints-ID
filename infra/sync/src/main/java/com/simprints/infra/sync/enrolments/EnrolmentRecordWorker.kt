@@ -2,11 +2,10 @@ package com.simprints.infra.sync.enrolments
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherIO
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.sync.SyncConstants
 import dagger.assisted.Assisted
@@ -19,7 +18,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
 
@@ -37,7 +36,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
 
             enrolmentRecordRepository.uploadRecords(subjectIds.toList())
 
-            configRepository.updateDeviceConfiguration {
+            configManager.updateDeviceConfiguration {
                 it.apply { it.lastInstructionId = instructionId }
             }
 
