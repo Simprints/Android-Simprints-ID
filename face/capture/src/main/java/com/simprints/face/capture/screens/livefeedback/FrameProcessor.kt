@@ -6,6 +6,7 @@ import android.graphics.RectF
 import android.util.Size
 import androidx.camera.core.ImageProxy
 import androidx.core.graphics.toRect
+import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
 import com.simprints.face.capture.usecases.ImageProxyToBitmapUseCase
 import java.lang.Float.min
@@ -20,7 +21,7 @@ internal class FrameProcessor @Inject constructor(
     private var previewViewHeight: Int = 0
 
     private lateinit var boxOnTheScreen: RectF
-    private lateinit var cropRect: Rect
+    private var cropRect: Rect? = null
 
     /**
      * Init the frame processor
@@ -35,6 +36,10 @@ internal class FrameProcessor @Inject constructor(
         this.boxOnTheScreen = boxOnTheScreen
     }
 
+    fun clear() {
+        cropRect = null
+    }
+
     /**
      * Extracts part of the image that lays inside
      * the cropRect
@@ -42,15 +47,13 @@ internal class FrameProcessor @Inject constructor(
      * @param image
      * @return Bitmap
      */
-    fun cropRotateFrame(image: ImageProxy): Bitmap {
-        if (!this::cropRect.isInitialized) {
-            // The cropRect should be calculated once as its value will be the same for all images.
-            calcRotatedCropRect(image)
-        }
+    fun cropRotateFrame(image: ImageProxy, screenOrientation: ScreenOrientation): Bitmap {
+        val cropRect = this.cropRect
+            ?: calcRotatedCropRect(image, screenOrientation).also { this.cropRect = it }
         return imageProxyToBitmap(image, cropRect)
     }
 
-    private fun calcRotatedCropRect(image: ImageProxy) {
+    private fun calcRotatedCropRect(image: ImageProxy, screenOrientation: ScreenOrientation): Rect {
         val cameraWidth = image.width
         val cameraHeight = image.height
 
@@ -64,10 +67,14 @@ internal class FrameProcessor @Inject constructor(
             boxOnTheScreen
         )
 
-        val newBoundingBox =
-            CameraTargetOverlay.rectForPlane(rotatedCameraWidth, rotatedCameraHeight, newRectSize)
+        val newBoundingBox = CameraTargetOverlay.rectForPlane(
+            width = rotatedCameraWidth,
+            height = rotatedCameraHeight,
+            rectSize = newRectSize,
+            screenOrientation = screenOrientation
+        )
 
-        cropRect = getRotatedBoundingBox(
+        return getRotatedBoundingBox(
             image.imageInfo.rotationDegrees,
             newBoundingBox,
             cameraWidth,

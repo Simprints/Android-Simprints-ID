@@ -24,6 +24,7 @@ import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -74,6 +75,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initFragment()
+    }
+
+    override fun onDestroyView() {
+        vm.clearFrameProcessor()
+        super.onDestroyView()
     }
 
     private fun initFragment() {
@@ -133,7 +139,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onStop() {
         // Shut down our background executor
-        if(::cameraExecutor.isInitialized) {
+        if (::cameraExecutor.isInitialized) {
             cameraExecutor.shutdown()
         }
         super.onStop()
@@ -161,7 +167,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun analyze(image: ImageProxy) {
         try {
-            vm.process(image)
+            vm.process(
+                image = image,
+                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
+            )
         } catch (t: Throwable) {
             Simber.e(t)
             // Image analysis is running in bg thread
@@ -185,7 +194,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturingStateColors() {
         with(binding) {
-            captureOverlay.drawWhiteTarget()
+            captureOverlay.drawWhiteTarget(
+                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
+            )
 
             captureTitle.setTextColor(
                 ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
@@ -198,7 +209,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturingNotStarted() {
         binding.apply {
-            captureOverlay.drawSemiTransparentTarget()
+            captureOverlay.drawSemiTransparentTarget(
+                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
+            )
             captureTitle.text = getString(IDR.string.face_capture_preparation_title)
             captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_title_previewing)
         }

@@ -11,6 +11,7 @@ import com.simprints.core.tools.extentions.area
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
+import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.models.SymmetricTarget
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.infra.config.store.ConfigRepository
@@ -55,9 +56,9 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      *
      * @param image is the camera frame
      */
-    fun process(image: ImageProxy) {
+    fun process(image: ImageProxy, screenOrientation: ScreenOrientation) {
         val captureStartTime = timeHelper.now()
-        val croppedBitmap = frameProcessor.cropRotateFrame(image)
+        val croppedBitmap = frameProcessor.cropRotateFrame(image, screenOrientation)
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
@@ -91,6 +92,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         this.attemptNumber = attemptNumber
         frameProcessor.init(previewSize, cropRect)
     }
+
+    fun clearFrameProcessor() = frameProcessor.clear()
 
     fun startCapture() {
         capturingState.value = CapturingState.CAPTURING
