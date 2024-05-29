@@ -5,16 +5,21 @@ import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
+import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
 
-internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
+internal class MapRefusalOrErrorResultUseCase @Inject constructor(
+    private val eventRepository: SessionEventRepository,
+) {
 
-    operator fun invoke(result: Serializable): AppResponse? = when (result) {
+    suspend operator fun invoke(result: Serializable): AppResponse? = when (result) {
         is ExitFormResult -> AppRefusalResponse.fromResult(result)
         is FetchSubjectResult -> result.takeUnless { it.found }?.let {
             AppErrorResponse(
@@ -30,6 +35,9 @@ internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
             ?.let { AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR) }
 
         is AlertResult -> AppErrorResponse(result.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR)
+
+        is ValidateSubjectPoolResult -> result.takeUnless { it.isValid }
+            ?.let { AppIdentifyResponse(emptyList(), eventRepository.getCurrentSessionScope().id) }
 
         else -> null
     }

@@ -79,7 +79,6 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun handleResult(result: Serializable) = viewModelScope.launch {
         Simber.d(result.toString())
-        // TODO handle subject pool validation result
 
         val errorResponse = mapRefusalOrErrorResult(result)
         if (errorResponse != null) {
