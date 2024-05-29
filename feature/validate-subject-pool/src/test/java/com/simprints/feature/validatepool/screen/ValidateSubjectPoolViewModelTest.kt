@@ -2,15 +2,20 @@ package com.simprints.feature.validatepool.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
+import com.simprints.feature.validatepool.usecase.RunBlockingEventSyncUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import io.mockk.justRun
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -33,6 +38,9 @@ class ValidateSubjectPoolViewModelTest {
     @MockK
     private lateinit var shouldSuggestSyncUseCase: ShouldSuggestSyncUseCase
 
+    @MockK
+    private lateinit var runBlockingSync: RunBlockingEventSyncUseCase
+
     private lateinit var viewModel: ValidateSubjectPoolViewModel
 
     @Before
@@ -43,6 +51,7 @@ class ValidateSubjectPoolViewModelTest {
             hasRecordsUseCase,
             isModuleIdNotSyncedUseCase,
             shouldSuggestSyncUseCase,
+            runBlockingSync,
         )
     }
 
@@ -158,4 +167,23 @@ class ValidateSubjectPoolViewModelTest {
 
             assertThat(viewModel.state.value?.peekContent()).isEqualTo(ValidateSubjectPoolState.PoolEmpty)
         }
+
+    @Test
+    fun `runs sync and check`() = runTest {
+        val subjectQuery = SubjectQuery(projectId = "projectId")
+
+        coEvery { hasRecordsUseCase(any()) } returnsMany listOf(true)
+        coJustRun { runBlockingSync() }
+
+        val result = viewModel.state.test()
+
+        viewModel.syncAndRetry(subjectQuery)
+
+        assertThat(result.valueHistory().map { it.peekContent() }).containsExactly(
+            ValidateSubjectPoolState.SyncInProgress,
+            ValidateSubjectPoolState.Validating,
+            ValidateSubjectPoolState.Success,
+        )
+        coVerify(exactly = 1) { runBlockingSync() }
+    }
 }

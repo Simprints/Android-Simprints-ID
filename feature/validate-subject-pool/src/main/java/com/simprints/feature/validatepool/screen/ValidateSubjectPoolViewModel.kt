@@ -8,6 +8,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
+import com.simprints.feature.validatepool.usecase.RunBlockingEventSyncUseCase
 import com.simprints.feature.validatepool.usecase.ShouldSuggestSyncUseCase
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
     private val hasRecords: HasRecordsUseCase,
     private val isModuleIdNotSynced: IsModuleIdNotSyncedUseCase,
     private val shouldSuggestSync: ShouldSuggestSyncUseCase,
+    private val runBlockingSync: RunBlockingEventSyncUseCase,
 ) : ViewModel() {
 
     val state: LiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>
@@ -39,4 +41,11 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
         _state.send(validationState)
     }
 
+    fun syncAndRetry(subjectQuery: SubjectQuery) = viewModelScope.launch {
+        _state.send(ValidateSubjectPoolState.SyncInProgress)
+        runBlockingSync()
+        checkIdentificationPool(subjectQuery)
+    }
+
 }
+
