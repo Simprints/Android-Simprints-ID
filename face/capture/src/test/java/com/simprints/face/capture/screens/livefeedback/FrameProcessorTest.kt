@@ -6,6 +6,7 @@ import android.graphics.RectF
 import android.util.Size
 import androidx.camera.core.ImageProxy
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.usecases.ImageProxyToBitmapUseCase
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
@@ -52,7 +53,7 @@ internal class FrameProcessorTest {
 
         frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
         // When
-        frameProcessor.cropRotateFrame(image)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
 
         // Then
         assertThat(cropRectCapture.captured.toString())
@@ -71,7 +72,7 @@ internal class FrameProcessorTest {
 
         frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
         // When
-        frameProcessor.cropRotateFrame(image)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
 
         // Then
         assertThat(cropRectCapture.captured.toString())
@@ -90,7 +91,7 @@ internal class FrameProcessorTest {
 
         frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
         // When
-        frameProcessor.cropRotateFrame(image)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
 
         // Then
         assertThat(cropRectCapture.captured.toString())
@@ -109,7 +110,7 @@ internal class FrameProcessorTest {
 
         frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
         // When
-        frameProcessor.cropRotateFrame(image)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
 
         // Then
         assertThat(cropRectCapture.captured.toString())
@@ -128,7 +129,7 @@ internal class FrameProcessorTest {
 
         frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
         // When
-        frameProcessor.cropRotateFrame(image)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
         // Then throw IllegalArgumentException
 
     }
@@ -145,7 +146,7 @@ internal class FrameProcessorTest {
 
         frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
         // When
-        frameProcessor.cropRotateFrame(image)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
         // Then
         assertThat(cropRectCapture.captured.toString())
             .isEqualTo(Rect(100, 100, 200, 200).toString())
@@ -163,7 +164,7 @@ internal class FrameProcessorTest {
 
         frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
         // When
-        frameProcessor.cropRotateFrame(image)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
         // Then
         assertThat(cropRectCapture.captured.toString())
             .isEqualTo(Rect(100, 100, 200, 200).toString())

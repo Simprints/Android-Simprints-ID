@@ -10,21 +10,25 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.justRun
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.util.*
 import kotlin.random.Random
 
 @RunWith(RobolectricTestRunner::class)
@@ -61,6 +65,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     private val previewViewSize: Size = Size(100, 100)
+    private val screenOrientation = ScreenOrientation.Portrait
 
     private lateinit var viewModel: LiveFeedbackFragmentViewModel
 
@@ -73,7 +78,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         justRun { frameProcessor.init(any(), any()) }
         justRun { frame.close() }
         justRun { previewFrame.recycle() }
-        every { frameProcessor.cropRotateFrame(frame) } returns previewFrame
+        every { frameProcessor.cropRotateFrame(frame, screenOrientation) } returns previewFrame
 
         viewModel = LiveFeedbackFragmentViewModel(
             frameProcessor,
@@ -89,7 +94,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         coEvery { faceDetector.analyze(previewFrame) } returns getFace()
 
         viewModel.initFrameProcessor(1, 0, rectF, previewViewSize)
-        viewModel.process(frame)
+        viewModel.process(frame, screenOrientation)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -102,9 +107,9 @@ internal class LiveFeedbackFragmentViewModelTest {
         coEvery { faceDetector.analyze(previewFrame) } returns getFace()
 
         viewModel.initFrameProcessor(1, 0, rectF, previewViewSize)
-        viewModel.process(frame)
+        viewModel.process(frame, screenOrientation)
         viewModel.startCapture()
-        viewModel.process(frame)
+        viewModel.process(frame, screenOrientation)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.VALID_CAPTURING)
@@ -120,7 +125,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         val rolledFace: Face = getFace(roll = 45f)
         val noFace = null
 
-        every { frameProcessor.cropRotateFrame(frame) } returns previewFrame
+        every { frameProcessor.cropRotateFrame(frame, screenOrientation) } returns previewFrame
         every { faceDetector.analyze(previewFrame) } returnsMany listOf(
             smallFace,
             bigFace,
@@ -132,11 +137,11 @@ internal class LiveFeedbackFragmentViewModelTest {
         val detections = viewModel.currentDetection.testObserver()
         viewModel.initFrameProcessor(2, 0, rectF, previewViewSize)
 
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, screenOrientation)
+        viewModel.process(frame, screenOrientation)
+        viewModel.process(frame, screenOrientation)
+        viewModel.process(frame, screenOrientation)
+        viewModel.process(frame, screenOrientation)
 
         detections.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
@@ -152,17 +157,17 @@ internal class LiveFeedbackFragmentViewModelTest {
     @Test
     fun `Save all valid captures without fallback image`() = runTest {
         val validFace: Face = getFace()
-        every { frameProcessor.cropRotateFrame(frame) } returns previewFrame
+        every { frameProcessor.cropRotateFrame(frame, screenOrientation) } returns previewFrame
         every { faceDetector.analyze(previewFrame) } returns validFace
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
         viewModel.initFrameProcessor(2, 0, rectF, previewViewSize)
-        viewModel.process(frame)
+        viewModel.process(frame, screenOrientation)
         viewModel.startCapture()
-        viewModel.process(frame)
-        viewModel.process(frame)
+        viewModel.process(frame, screenOrientation)
+        viewModel.process(frame, screenOrientation)
 
         currentDetectionObserver.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
