@@ -513,6 +513,7 @@ class SyncInfoViewModelTest {
                 partitionType = partitionType,
                 moduleOptions = modules.map(String::asTokenizableRaw),
                 maxNbOfModules = 0,
+                maxAge = "PT24H",
             )
         )
     }

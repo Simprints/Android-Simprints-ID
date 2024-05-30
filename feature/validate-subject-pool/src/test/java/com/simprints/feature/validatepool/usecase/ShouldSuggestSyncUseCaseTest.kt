@@ -2,6 +2,7 @@ package com.simprints.feature.validatepool.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -19,13 +20,16 @@ class ShouldSuggestSyncUseCaseTest {
     @MockK
     lateinit var syncManager: EventSyncManager
 
+    @MockK
+    lateinit var configRepository: ConfigRepository
+
     private lateinit var usecase: ShouldSuggestSyncUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        usecase = ShouldSuggestSyncUseCase(timeHelper, syncManager)
+        usecase = ShouldSuggestSyncUseCase(timeHelper, syncManager, configRepository)
     }
 
     @Test
@@ -39,6 +43,9 @@ class ShouldSuggestSyncUseCaseTest {
     fun `returns true if not synced recently`() = runTest {
         coEvery { syncManager.getLastSyncTime() } returns Date()
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns WEEK_MS
+        coEvery {
+            configRepository.getProjectConfiguration().synchronization.down.maxAge
+        } returns "PT24H"
 
         assertThat(usecase()).isTrue()
     }
@@ -47,6 +54,9 @@ class ShouldSuggestSyncUseCaseTest {
     fun `returns false if synced recently`() = runTest {
         coEvery { syncManager.getLastSyncTime() } returns Date()
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns HOUR_MS
+        coEvery {
+            configRepository.getProjectConfiguration().synchronization.down.maxAge
+        } returns "PT24H"
 
         assertThat(usecase()).isFalse()
     }
