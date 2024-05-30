@@ -170,4 +170,23 @@ internal class FrameProcessorTest {
             .isEqualTo(Rect(100, 100, 200, 200).toString())
     }
 
+    @Test
+    fun `when clear is called, cropRect becomes null`() {
+        every { image.width } returns 2000
+        every { image.height } returns 1000
+        every { image.imageInfo.rotationDegrees } returns 90
+
+        val screenWidth = 1000
+        val screenHeight = 500
+
+        frameProcessor.init(Size(screenWidth, screenHeight), boxOnTheScreen)
+        frameProcessor.cropRotateFrame(image, ScreenOrientation.Portrait)
+
+        assertThat(frameProcessor.cropRect).isNotNull()
+
+        frameProcessor.clear()
+
+        assertThat(frameProcessor.cropRect).isNull()
+    }
+
 }

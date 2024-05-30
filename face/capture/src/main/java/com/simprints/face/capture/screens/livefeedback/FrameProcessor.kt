@@ -21,7 +21,8 @@ internal class FrameProcessor @Inject constructor(
     private var previewViewHeight: Int = 0
 
     private lateinit var boxOnTheScreen: RectF
-    private var cropRect: Rect? = null
+    var cropRect: Rect? = null
+        private set
 
     /**
      * Init the frame processor
