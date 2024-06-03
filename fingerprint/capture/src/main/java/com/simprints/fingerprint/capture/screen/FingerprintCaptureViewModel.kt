@@ -57,6 +57,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -616,6 +617,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         val resultItems = collectedFingers.map { (captureId, collectedFinger) ->
             FingerprintCaptureResult.Item(
                 identifier = captureId.finger,
+                captureEventId = captureEventIds[captureId],
                 sample = FingerprintCaptureResult.Sample(
                     fingerIdentifier = captureId.finger,
                     template = collectedFinger.scanResult.template,
@@ -630,7 +632,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected) {
         val captureEventId = captureEventIds[id]
-        val imageRef = saveImage(bioSdkConfiguration.vero2!!, captureEventId, collectedFinger)
+        val imageRef = saveImage(
+            vero2Configuration = bioSdkConfiguration.vero2!!,
+            finger = id.finger,
+            captureEventId = captureEventId,
+            collectedFinger = collectedFinger,
+        )
         imageRefs[id] = imageRef
     }
 

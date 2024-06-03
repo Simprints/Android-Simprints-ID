@@ -1,22 +1,29 @@
 package com.simprints.infra.images
 
 import com.simprints.infra.images.local.ImageLocalDataSource
+import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.ImageRemoteDataSource
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-class ImageRepositoryImpl @Inject internal constructor(
+internal class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val remoteDataSource: ImageRemoteDataSource,
+    private val metadataStore: ImageMetadataStore,
 ) : ImageRepository {
 
     override suspend fun storeImageSecurely(
         imageBytes: ByteArray,
         projectId: String,
         relativePath: Path,
-    ): SecuredImageRef? = localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
+        metadata: Map<String, String>,
+    ): SecuredImageRef? {
+        return localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
+            // Only store metadata if the image was stored successfully
+            ?.also { metadataStore.storeMetadata(relativePath, metadata) }
+    }
 
     override suspend fun getNumberOfImagesToUpload(projectId: String): Int =
         localDataSource.listImages(projectId).count()
@@ -29,9 +36,11 @@ class ImageRepositoryImpl @Inject internal constructor(
         images.forEach { imageRef ->
             try {
                 localDataSource.decryptImage(imageRef)?.let { stream ->
-                    val uploadResult = remoteDataSource.uploadImage(stream, imageRef)
+                    val metadata = metadataStore.getMetadata(imageRef.relativePath)
+                    val uploadResult = remoteDataSource.uploadImage(stream, imageRef, metadata)
                     if (uploadResult.isUploadSuccessful()) {
                         localDataSource.deleteImage(imageRef)
+                        metadataStore.deleteMetadata(imageRef.relativePath)
                     } else {
                         allImagesUploaded = false
                         Simber.e("Failed to upload image without exception")
@@ -47,6 +56,7 @@ class ImageRepositoryImpl @Inject internal constructor(
     }
 
     override suspend fun deleteStoredImages() {
+        metadataStore.deleteAllMetadata()
         for (image in localDataSource.listImages(null)) {
             localDataSource.deleteImage(image)
         }
