@@ -13,7 +13,8 @@ data class FingerprintConfiguration(
         val decisionPolicy: DecisionPolicy,
         val comparisonStrategyForVerification: FingerComparisonStrategy,
         val vero1: Vero1Configuration? = null,
-        val vero2: Vero2Configuration? = null
+        val vero2: Vero2Configuration? = null,
+        val allowedAgeRange: IntRange? = null,
     )
 
     enum class VeroGeneration {

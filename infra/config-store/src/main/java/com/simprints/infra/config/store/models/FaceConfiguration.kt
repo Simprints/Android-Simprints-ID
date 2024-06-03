@@ -5,6 +5,7 @@ data class FaceConfiguration(
     val qualityThreshold: Int,
     val imageSavingStrategy: ImageSavingStrategy,
     val decisionPolicy: DecisionPolicy,
+    val allowedAgeRange: IntRange? = null,
 ) {
 
     enum class ImageSavingStrategy {

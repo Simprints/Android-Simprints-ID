@@ -60,6 +60,7 @@
         <item name="android:statusBarColor">?colorPrimaryVariant</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:listDivider"> @color/simprints_off_white</item>
     </style>
 
     <!-- Theme variant with logo on a blue background, can be used for splash screen activities -->

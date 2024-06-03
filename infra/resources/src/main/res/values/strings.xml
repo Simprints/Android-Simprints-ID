@@ -424,4 +424,11 @@
     <!-- Notifications -->
     <string name="notification_sync_description">Sync in progress</string>
 
+    <!-- Age group selection -->
+    <string name="age_group_selection_age_range_to">to</string>
+    <string name="age_group_selection_age_range_and_above">and above</string>
+    <string name="age_group_selection_months">months</string>
+    <string name="age_group_selection_year">year</string>
+    <string name="age_group_selection_years">years</string>
+
 </resources>

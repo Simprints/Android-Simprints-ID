@@ -15,6 +15,7 @@ internal object StepId {
     const val CONSENT = STEP_BASE_CORE + 3
     const val ENROL_LAST_BIOMETRIC = STEP_BASE_CORE + 4
     const val CONFIRM_IDENTITY = STEP_BASE_CORE + 5
+    const val SELECT_SUBJECT_AGE = STEP_BASE_CORE + 6
 
     // Face step ids
     private const val STEP_BASE_FINGERPRINT = 300
@@ -23,7 +24,6 @@ internal object StepId {
 
     // Face step ids
     private const val STEP_BASE_FACE = 500
-    const val FACE_CONFIGURATION = STEP_BASE_FACE + 1
     const val FACE_CAPTURE = STEP_BASE_FACE + 2
     const val FACE_MATCHER = STEP_BASE_FACE + 3
 }

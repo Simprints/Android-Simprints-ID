@@ -110,6 +110,7 @@ include(
     ":feature:consent",
     ":feature:setup",
     ":feature:matcher",
+    ":feature:select-subject-age-group",
 )
 
 // Infra modules
