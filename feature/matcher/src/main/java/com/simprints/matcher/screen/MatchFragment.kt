@@ -3,13 +3,18 @@ package com.simprints.matcher.screen
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.extentions.hasPermission
+import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource.Companion.permissionName
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.R
@@ -28,11 +33,33 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private val binding by viewBinding(FragmentMatcherBinding::bind)
     private val args by navArgs<MatchFragmentArgs>()
 
+    private val permissionCall = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val status = args.params.biometricDataSource.permissionName()
+            ?.let { requireActivity().permissionFromResult(it, granted) }
+            ?: PermissionStatus.Granted
+
+        when (status) {
+            PermissionStatus.Granted -> viewModel.setupMatch(args.params)
+            PermissionStatus.Denied -> {}
+            PermissionStatus.DeniedNeverAskAgain -> {}
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         observeViewModel()
-        viewModel.setupMatch(args.params)
+        val requiredPermissionName = args.params.biometricDataSource
+            .permissionName()
+            ?.takeUnless { requireActivity().hasPermission(it) }
+
+        if (requiredPermissionName != null) {
+            permissionCall.launch(requiredPermissionName)
+        } else {
+            viewModel.setupMatch(args.params)
+        }
     }
 
     private fun setIdentificationProgress(progress: Int) = requireActivity().runOnUiThread {
@@ -44,7 +71,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
 
     private fun observeViewModel() {
         viewModel.matchResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-             findNavController().finishWithResult(this, it)
+            findNavController().finishWithResult(this, it)
         })
         viewModel.matchState.observe(viewLifecycleOwner) { matchState ->
             when (matchState) {
@@ -123,6 +150,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     }
 
     companion object {
+
         private const val MAX_PROGRESS = 100
         private const val PROGRESS_DURATION_MULTIPLIER = 10L
         private const val LOADING_PROGRESS = 25

@@ -33,6 +33,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     companion object {
         val CASE_METADATA_URI: Uri = Uri.parse("content://org.commcare.dalvik.case/casedb/case")
         val CASE_DATA_URI: Uri = Uri.parse("content://org.commcare.dalvik.case/casedb/data")
+        const val PERMISSION_NAME = "org.commcare.dalvik.provider.cases.read"
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
