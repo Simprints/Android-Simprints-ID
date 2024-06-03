@@ -941,7 +941,7 @@ class FingerprintCaptureViewModelTest {
 
         vm.handleConfirmFingerprintsAndContinue()
         // Save image is called even if scanResult.image == null
-        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any()) }
+        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any(),any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
