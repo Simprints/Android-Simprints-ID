@@ -7,7 +7,7 @@ internal class MatchResultSet<T : MatchResultItem>(
     private val maxSize: Int = MAX_RESULTS,
 ) {
 
-    private var lowestConfidence: Float = Float.MIN_VALUE
+    private var lowestConfidence: Float = 0f
 
     private val treeSet = TreeSet { o1: T, o2: T ->
         // Reverse order for descending sort

@@ -61,7 +61,6 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _finishFlowEvent
     private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<FaceCaptureResult>>()
 
-
     val invalidLicense: LiveData<LiveDataEvent>
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
@@ -105,12 +104,13 @@ internal class FaceCaptureViewModel @Inject constructor(
 
             val items = faceDetections.mapIndexed { index, detection ->
                 FaceCaptureResult.Item(
-                    index,
-                    FaceCaptureResult.Sample(
-                        detection.id,
-                        detection.face?.template ?: ByteArray(0),
-                        detection.securedImageRef,
-                        detection.face?.format ?: "",
+                    captureEventId = detection.id,
+                    index = index,
+                    sample = FaceCaptureResult.Sample(
+                        faceId = detection.id,
+                        template = detection.face?.template ?: ByteArray(0),
+                        imageRef = detection.securedImageRef,
+                        format = detection.face?.format ?: "",
                     )
                 )
             }
@@ -157,6 +157,5 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun addCaptureConfirmationAction(startTime: Timestamp, isContinue: Boolean) {
         eventReporter.addCaptureConfirmationEvent(startTime, isContinue)
     }
-
 
 }
