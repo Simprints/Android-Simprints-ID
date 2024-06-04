@@ -76,6 +76,13 @@ internal class MatchViewModelTest {
     }
 
     @Test
+    fun `Handles no permission call`() = runTest {
+        val states = viewModel.matchState.test()
+        viewModel.noPermission(true)
+        assertThat(states.value()).isEqualTo(MatchViewModel.MatchState.NoPermission(true))
+    }
+
+    @Test
     fun `Handle face match request correctly`() = runTest {
         val responseItems = listOf(
             FaceMatchResult.Item("1", 90f),

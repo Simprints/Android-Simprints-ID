@@ -14,15 +14,13 @@ import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
+import com.simprints.core.tools.extentions.applicationSettingsIntent
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource.Companion.permissionName
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.R
 import com.simprints.matcher.databinding.FragmentMatcherBinding
-import com.simprints.matcher.screen.MatchViewModel.MatchState.Finished
-import com.simprints.matcher.screen.MatchViewModel.MatchState.LoadingCandidates
-import com.simprints.matcher.screen.MatchViewModel.MatchState.Matching
-import com.simprints.matcher.screen.MatchViewModel.MatchState.NotStarted
+import com.simprints.matcher.screen.MatchViewModel.MatchState.*
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -42,23 +40,33 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
 
         when (status) {
             PermissionStatus.Granted -> viewModel.setupMatch(args.params)
-            PermissionStatus.Denied -> {}
-            PermissionStatus.DeniedNeverAskAgain -> {}
+            PermissionStatus.Denied -> viewModel.noPermission(neverAskAgain = false)
+            PermissionStatus.DeniedNeverAskAgain -> viewModel.noPermission(neverAskAgain = true)
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         observeViewModel()
+    }
+
+    override fun onResume() {
+        super.onResume()
         val requiredPermissionName = args.params.biometricDataSource
             .permissionName()
             ?.takeUnless { requireActivity().hasPermission(it) }
 
-        if (requiredPermissionName != null) {
-            permissionCall.launch(requiredPermissionName)
+        // This flag prevents infinite loop of permission checks
+        if (viewModel.shouldCheckPermission) {
+            viewModel.shouldCheckPermission = false
+
+            if (requiredPermissionName != null) {
+                permissionCall.launch(requiredPermissionName)
+            } else {
+                viewModel.setupMatch(args.params)
+            }
         } else {
-            viewModel.setupMatch(args.params)
+            viewModel.shouldCheckPermission = true
         }
     }
 
@@ -79,11 +87,13 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
                 LoadingCandidates -> renderLoadingCandidates()
                 is Matching -> renderMatching()
                 is Finished -> renderFinished(matchState)
+                is NoPermission -> renderNoPermission(matchState)
             }
         }
     }
 
     private fun renderNotStarted() = binding.apply {
+        binding.faceMatchPermissionRequestButton.isGone = true
         faceMatchTvMatchingProgressStatus1.isGone = true
         faceMatchTvMatchingProgressStatus2.isGone = true
         faceMatchProgress.isGone = true
@@ -93,21 +103,24 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     }
 
     private fun renderLoadingCandidates() {
+        binding.faceMatchPermissionRequestButton.isVisible = false
         binding.apply {
             faceMatchTvMatchingProgressStatus1.isVisible = true
-            faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.matcher_loading_candidates)
+            faceMatchTvMatchingProgressStatus1.setText(IDR.string.matcher_loading_candidates)
             faceMatchProgress.isVisible = true
         }
         setIdentificationProgress(LOADING_PROGRESS)
     }
 
     private fun renderMatching() {
-        binding.faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.matcher_matching_candidates)
+        binding.faceMatchPermissionRequestButton.isVisible = false
+        binding.faceMatchTvMatchingProgressStatus1.setText(IDR.string.matcher_matching_candidates)
 
         setIdentificationProgress(MATCHING_PROGRESS)
     }
 
     private fun renderFinished(matchState: Finished) {
+        binding.faceMatchPermissionRequestButton.isVisible = false
         binding.faceMatchTvMatchingProgressStatus1.text = resources.getQuantityString(
             IDR.plurals.matcher_matched_candidates,
             matchState.candidatesMatched,
@@ -147,6 +160,18 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         }
 
         setIdentificationProgress(MAX_PROGRESS)
+    }
+
+    private fun renderNoPermission(state: NoPermission) = with(binding) {
+        faceMatchMessage.setText(IDR.string.matcher_missing_access_permission)
+
+        val name = args.params.biometricDataSource.permissionName()
+        faceMatchPermissionRequestButton.isVisible = name != null
+
+        faceMatchPermissionRequestButton.setOnClickListener {
+            if (state.shouldOpenSettings) startActivity(requireContext().applicationSettingsIntent)
+            else permissionCall.launch(name)
+        }
     }
 
     companion object {
