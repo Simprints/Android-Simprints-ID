@@ -57,7 +57,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -161,16 +160,18 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
 
-    private fun start(fingerprintsToCapture: List<IFingerIdentifier>) {
+    private fun start(
+        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintSdk: FingerprintConfiguration.BioSdk
+    ) {
         if (!hasStarted) {
             hasStarted = true
 
             runBlocking {
-                initBioSdk()
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
                 configuration = configManager.getProjectConfiguration().fingerprint!!
-                bioSdkConfiguration = configuration.bioSdkConfiguration
+                initBioSdk(fingerprintSdk)
             }
 
             originalFingerprintsToCapture = fingerprintsToCapture
@@ -179,10 +180,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private suspend fun initBioSdk() {
+    private suspend fun initBioSdk(fingerprintSdk: FingerprintConfiguration.BioSdk) {
         try {
-            bioSdkWrapper = resolveBioSdkWrapperUseCase()
+            bioSdkWrapper = resolveBioSdkWrapperUseCase(fingerprintSdk)
             bioSdkWrapper.initialize()
+            bioSdkConfiguration = when (fingerprintSdk) {
+                FingerprintConfiguration.BioSdk.NEC -> configuration.nec!!
+                FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> configuration.secugenSimMatcher!!
+            }
         } catch (e: BioSdkException.BioSdkInitializationException) {
             Simber.e(e)
             _invalidLicense.send()
@@ -645,13 +650,16 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         setStartingState(originalFingerprintsToCapture)
     }
 
-    fun handleOnViewCreated(fingerprintsToCapture: List<IFingerIdentifier>) {
+    fun handleOnViewCreated(
+        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintSdk: FingerprintConfiguration.BioSdk
+    ) {
         updateState {
             it.copy(
                 isShowingConnectionScreen = false
             )
         }
-        start(fingerprintsToCapture)
+        start(fingerprintsToCapture, fingerprintSdk)
     }
 
     fun handleOnResume() {
