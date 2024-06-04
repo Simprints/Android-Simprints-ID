@@ -1,5 +1,5 @@
 [versions]
-kotlin_version = "1.9.23"
+kotlin_version = "2.0.0"
 kotlin_coroutine_version = "1.8.1"
 
 android_gradlePlugin_version = "8.4.1"
@@ -85,7 +85,7 @@ jacoco_version = "0.8.12"
 
 sonar_plugin_version = "5.0.0.4638"
 retry_version = "1.5.9"
-realm_version = "1.16.0"
+realm_version = "2.0.0"
 protobuf_plugin_version = "0.9.4"
 deps_graph_version = "0.8.0"
 tink_version = "1.13.0"
