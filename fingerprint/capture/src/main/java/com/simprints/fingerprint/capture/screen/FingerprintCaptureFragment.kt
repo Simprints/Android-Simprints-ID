@@ -6,7 +6,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -54,7 +54,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private val args: FingerprintCaptureFragmentArgs by navArgs()
     private val binding by viewBinding(FragmentFingerprintCaptureBinding::bind)
-    private val vm: FingerprintCaptureViewModel by activityViewModels()
+    private val vm: FingerprintCaptureViewModel by viewModels()
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private var confirmDialog: AlertDialog? = null
