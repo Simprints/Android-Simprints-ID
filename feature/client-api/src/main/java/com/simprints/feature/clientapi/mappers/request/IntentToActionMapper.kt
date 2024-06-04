@@ -50,10 +50,7 @@ internal class IntentToActionMapper @Inject constructor(
         return when (actionIdentifier.packageName) {
             OdkConstants.PACKAGE_NAME -> mapOdkAction(actionIdentifier, extras, project)
             CommCareConstants.PACKAGE_NAME -> mapCommCareAction(actionIdentifier, extras, project)
-            LibSimprintsConstants.PACKAGE_NAME -> {
-                mapLibSimprintsAction(actionIdentifier, extras, project)
-            }
-
+            LibSimprintsConstants.PACKAGE_NAME -> mapLibSimprintsAction(actionIdentifier, extras, project)
             else -> throw InvalidRequestException(
                 "Unsupported package name", ClientApiError.INVALID_STATE_FOR_INTENT_ACTION
             )
