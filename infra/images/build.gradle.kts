@@ -1,5 +1,6 @@
 plugins {
     id("simprints.infra")
+    id("simprints.library.room")
     id("kotlin-parcelize")
     id("simprints.testing.android")
 }
@@ -12,6 +13,7 @@ android {
 dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
 
     // Firebase
     implementation(libs.firebase.storage)

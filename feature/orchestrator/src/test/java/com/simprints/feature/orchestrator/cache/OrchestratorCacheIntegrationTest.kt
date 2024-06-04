@@ -10,6 +10,7 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.security.SecurityManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -62,6 +63,7 @@ class OrchestratorCacheIntegrationTest {
                 result = FingerprintCaptureResult(
                     results = listOf(
                         FingerprintCaptureResult.Item(
+                            captureEventId = GUID1,
                             identifier = IFingerIdentifier.LEFT_THUMB,
                             sample = null
                         )

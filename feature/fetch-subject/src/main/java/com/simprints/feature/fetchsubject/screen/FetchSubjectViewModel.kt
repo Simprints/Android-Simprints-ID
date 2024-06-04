@@ -9,7 +9,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.fetchsubject.screen.usecase.FetchSubjectUseCase
 import com.simprints.feature.fetchsubject.screen.usecase.SaveSubjectFetchEventUseCase
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +19,7 @@ internal class FetchSubjectViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val fetchSubjectUseCase: FetchSubjectUseCase,
     private val saveSubjectFetchEventUseCase: SaveSubjectFetchEventUseCase,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
 ) : ViewModel() {
 
     val subjectState: LiveData<LiveDataEventWithContent<FetchSubjectState>>
@@ -47,7 +47,7 @@ internal class FetchSubjectViewModel @Inject constructor(
 
     fun startExitForm() {
         viewModelScope.launch {
-            val modalities = configRepository.getProjectConfiguration().general.modalities
+            val modalities = configManager.getProjectConfiguration().general.modalities
             _subjectState.send(FetchSubjectState.ShowExitForm(modalities))
         }
     }

@@ -7,8 +7,8 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -41,7 +41,7 @@ class FaceCaptureViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var faceImageUseCase: SaveFaceImageUseCase
@@ -77,7 +77,7 @@ class FaceCaptureViewModelTest {
         every { bitmapToByteArrayUseCase.invoke(any()) } returns byteArrayOf()
 
         viewModel = FaceCaptureViewModel(
-            configRepository,
+            configManager,
             faceImageUseCase,
             eventReporter,
             bitmapToByteArrayUseCase,
@@ -89,7 +89,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Save face detections should not be called when image saving strategy set to NEVER`() {
-        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.NEVER
+        coEvery { configManager.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.NEVER
 
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
@@ -97,8 +97,8 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `Save face detections should be called when image saving strategy set to ONLY_GOO_SCAN`() {
-        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_USED_IN_REFERENCE
+    fun `Save face detections should be called when image saving strategy set to ONLY_GOOD_SCAN`() {
+        coEvery { configManager.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_GOOD_SCAN
 
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()

@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.biosdk
 
 import com.google.common.truth.Truth
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -24,7 +24,7 @@ class ResolveBioSdkWrapperUseCaseTest {
     private lateinit var simprintsBioSdkWrapper: BioSdkWrapper
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var fingerprintConfiguration: FingerprintConfiguration
@@ -32,11 +32,11 @@ class ResolveBioSdkWrapperUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { fingerprint } returns fingerprintConfiguration
         }
         bioSdkResolverUseCase =
-            ResolveBioSdkWrapperUseCase(configRepository, simprintsBioSdkWrapper, necBioSdkWrapper)
+            ResolveBioSdkWrapperUseCase(configManager, simprintsBioSdkWrapper, necBioSdkWrapper)
     }
 
     @Test

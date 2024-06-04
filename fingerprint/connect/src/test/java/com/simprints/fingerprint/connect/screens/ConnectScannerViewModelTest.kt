@@ -26,8 +26,8 @@ import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerFactory
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -35,8 +35,15 @@ import com.simprints.testtools.common.livedata.assertEventReceivedWithContent
 import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
 import com.simprints.testtools.common.livedata.assertEventWithContentNeverReceived
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -57,7 +64,7 @@ class ConnectScannerViewModelTest {
     private lateinit var fingerprintConfiguration: FingerprintConfiguration
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var bluetoothAdapter: ComponentBluetoothAdapter
@@ -86,7 +93,7 @@ class ConnectScannerViewModelTest {
             FingerprintConfiguration.VeroGeneration.VERO_1,
             FingerprintConfiguration.VeroGeneration.VERO_2
         )
-        coEvery { configRepository.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
+        coEvery { configManager.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
         coJustRun { scannerFactory.initScannerOperationWrappers(any()) }
 
         scannerManager = ScannerManagerImpl(
@@ -97,7 +104,7 @@ class ConnectScannerViewModelTest {
             mockk(relaxed = true),
         )
         viewModel = ConnectScannerViewModel(
-            configRepository,
+            configManager,
             scannerManager,
             nfcManager,
             recentUserActivityManager,
@@ -205,7 +212,7 @@ class ConnectScannerViewModelTest {
     fun start_noScannersPairedWithoutFingerprintConfigAndNfc_sendsSerialEntryIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 0)
         setupNfc(doesDeviceHaveNfcCapability = false, isEnabled = true)
-        coEvery { configRepository.getProjectConfiguration().fingerprint } returns null
+        coEvery { configManager.getProjectConfiguration().fingerprint } returns null
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 

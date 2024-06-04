@@ -40,12 +40,12 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedE
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.EAGER
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.NEVER
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
@@ -57,13 +57,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.min
 
 @HiltViewModel
 internal class FingerprintCaptureViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
     private val saveImage: SaveImageUseCase,
@@ -168,7 +169,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 initBioSdk()
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
-                configuration = configRepository.getProjectConfiguration().fingerprint!!
+                configuration = configManager.getProjectConfiguration().fingerprint!!
                 bioSdkConfiguration = configuration.bioSdkConfiguration
             }
 
@@ -616,6 +617,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         val resultItems = collectedFingers.map { (captureId, collectedFinger) ->
             FingerprintCaptureResult.Item(
                 identifier = captureId.finger,
+                captureEventId = captureEventIds[captureId],
                 sample = FingerprintCaptureResult.Sample(
                     fingerIdentifier = captureId.finger,
                     template = collectedFinger.scanResult.template,
@@ -630,7 +632,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected) {
         val captureEventId = captureEventIds[id]
-        val imageRef = saveImage(bioSdkConfiguration.vero2!!, captureEventId, collectedFinger)
+        val imageRef = saveImage(
+            vero2Configuration = bioSdkConfiguration.vero2!!,
+            finger = id.finger,
+            captureEventId = captureEventId,
+            collectedFinger = collectedFinger,
+        )
         imageRefs[id] = imageRef
     }
 

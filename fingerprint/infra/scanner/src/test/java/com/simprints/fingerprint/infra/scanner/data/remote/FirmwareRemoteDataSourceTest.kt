@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.data.FirmwareTestData
 import com.simprints.fingerprint.infra.scanner.data.remote.network.FingerprintFileDownloader
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -15,7 +15,7 @@ import org.junit.Test
 
 class FirmwareRemoteDataSourceTest {
     private val fingerprintFileDownloaderMock: FingerprintFileDownloader = mockk()
-    private val fingerprintPreferencesMock = mockk<ConfigRepository> {
+    private val fingerprintPreferencesMock = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions } returns RESPONSE_MAP
         }

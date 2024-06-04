@@ -8,12 +8,12 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class PrivacyNoticeViewModel @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val authStore: AuthStore,
 ) : ViewModel() {
 
@@ -43,8 +43,8 @@ internal class PrivacyNoticeViewModel @Inject constructor(
     }
 
     fun retrievePrivacyNotice() = viewModelScope.launch {
-        val deviceConfiguration = configRepository.getDeviceConfiguration()
-        configRepository.getPrivacyNotice(
+        val deviceConfiguration = configManager.getDeviceConfiguration()
+        configManager.getPrivacyNotice(
             authStore.signedInProjectId,
             deviceConfiguration.language
         )
