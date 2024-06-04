@@ -25,6 +25,14 @@ sealed class ActionRequest(
     open val unknownExtras: Map<String, Any?>,
 ) : Serializable {
 
+    fun getSubjectAgeIfAvailable(): Int? =
+        when (this) {
+            is EnrolActionRequest -> subjectAge
+            is IdentifyActionRequest -> subjectAge
+            is VerifyActionRequest ->subjectAge
+            else -> null
+        }
+
     @Keep
     data class EnrolActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
@@ -32,6 +40,7 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val biometricDataSource: String,
+        val subjectAge: Int? = null,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
@@ -43,6 +52,7 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val biometricDataSource: String,
+        val subjectAge: Int? = null,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
@@ -54,6 +64,7 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val biometricDataSource: String,
+        val subjectAge: Int? = null,
         val metadata: String,
         val verifyGuid: String,
         override val unknownExtras: Map<String, Any?>,
