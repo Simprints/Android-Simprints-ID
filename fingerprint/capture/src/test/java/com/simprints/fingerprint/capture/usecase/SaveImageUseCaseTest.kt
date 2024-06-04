@@ -1,11 +1,10 @@
 package com.simprints.fingerprint.capture.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
-import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
@@ -38,6 +37,7 @@ class SaveImageUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { vero2Configuration.imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.EAGER
+        every { vero2Configuration.captureStrategy } returns Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1300_DPI
 
         useCase = SaveImageUseCase(imageRepo, eventRepo)
     }
@@ -46,6 +46,7 @@ class SaveImageUseCaseTest {
     fun `Returns null if no scan image`() = runTest {
         val result = useCase.invoke(
             vero2Configuration,
+            IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
             createCollectedStub(null)
         )
@@ -56,6 +57,7 @@ class SaveImageUseCaseTest {
     fun `Returns null if no capture event id`() = runTest {
         val result = useCase.invoke(
             vero2Configuration,
+            IFingerIdentifier.LEFT_3RD_FINGER,
             null,
             createCollectedStub(byteArrayOf())
         )
@@ -76,11 +78,12 @@ class SaveImageUseCaseTest {
             "captureEventId.wsq"
         ))
         coEvery {
-            imageRepo.storeImageSecurely(any(), "projectId", any())
+            imageRepo.storeImageSecurely(any(), "projectId", any(), any())
         } returns SecuredImageRef(expectedPath)
 
         assertThat(useCase.invoke(
             vero2Configuration,
+            IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
             createCollectedStub(byteArrayOf())
         )).isNotNull()
@@ -91,7 +94,8 @@ class SaveImageUseCaseTest {
                 "projectId",
                 withArg {
                     assert(expectedPath.compose().contains(it.compose()))
-                }
+                },
+                any()
             )
         }
     }
@@ -102,6 +106,7 @@ class SaveImageUseCaseTest {
 
         assertThat(useCase.invoke(
             vero2Configuration,
+            IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
             createCollectedStub(byteArrayOf())
         )).isNull()
@@ -114,16 +119,17 @@ class SaveImageUseCaseTest {
             every { id } returns "sessionId"
         }
         coEvery {
-            imageRepo.storeImageSecurely(any(), "projectId", any())
+            imageRepo.storeImageSecurely(any(), "projectId", any(), any())
         } returns null
 
         assertThat(useCase.invoke(
             vero2Configuration,
+            IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
             createCollectedStub(byteArrayOf())
         )).isNull()
 
-        coVerify { imageRepo.storeImageSecurely(any(), "projectId", any()) }
+        coVerify { imageRepo.storeImageSecurely(any(), "projectId", any(), any()) }
     }
 
     private fun createCollectedStub(image: ByteArray?) = CaptureState.Collected(

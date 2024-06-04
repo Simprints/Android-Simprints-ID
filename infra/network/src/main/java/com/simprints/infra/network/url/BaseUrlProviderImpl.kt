@@ -49,14 +49,13 @@ internal class BaseUrlProviderImpl @Inject constructor(
             DEFAULT_BASE_URL
         }
 
-        Simber.e("Setting API base URL to $newValue")
+        Simber.d("Setting API base URL to $newValue")
 
         prefs.edit(commit = true) { putString(API_BASE_URL_KEY, newValue) }
-        Simber.e("Setting API base URL to ${getApiBaseUrl()}")
     }
 
     override fun resetApiBaseUrl() {
-        Simber.e("Resetting API base")
+        Simber.d("Resetting API base")
         prefs.edit(commit = true) { putString(API_BASE_URL_KEY, DEFAULT_BASE_URL) }
     }
 

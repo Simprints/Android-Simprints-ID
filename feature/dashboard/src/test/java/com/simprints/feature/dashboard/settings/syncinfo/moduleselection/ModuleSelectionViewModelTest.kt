@@ -11,11 +11,11 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -52,7 +52,7 @@ class ModuleSelectionViewModelTest {
     private lateinit var syncOrchestrator: SyncOrchestrator
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -77,11 +77,11 @@ class ModuleSelectionViewModelTest {
         )
         coEvery { repository.getModules() } returns modulesDefault
         coEvery { repository.getMaxNumberOfModules() } returns 2
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
         }
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configRepository.getProject(PROJECT_ID) } returns project
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
         modulesDefault.forEach {
             coEvery {
                 tokenizationProcessor.decrypt(
@@ -96,7 +96,7 @@ class ModuleSelectionViewModelTest {
             authStore = authStore,
             moduleRepository = repository,
             syncOrchestrator = syncOrchestrator,
-            configRepository = configRepository,
+            configManager = configManager,
             tokenizationProcessor = tokenizationProcessor,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )

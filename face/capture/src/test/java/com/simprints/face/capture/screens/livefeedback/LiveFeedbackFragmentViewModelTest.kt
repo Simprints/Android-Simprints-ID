@@ -12,7 +12,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -56,7 +56,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     lateinit var rectF: RectF
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var eventReporter: SimpleCaptureEventReporter
@@ -73,7 +73,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configRepository.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
+        coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { frameProcessor.init(any(), any()) }
         justRun { frame.close() }
@@ -83,7 +83,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         viewModel = LiveFeedbackFragmentViewModel(
             frameProcessor,
             faceDetector,
-            configRepository,
+            configManager,
             eventReporter,
             timeHelper
         )

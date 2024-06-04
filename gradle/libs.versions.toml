@@ -1,14 +1,14 @@
 [versions]
-kotlin_version = "1.9.23"
+kotlin_version = "2.0.0"
 kotlin_coroutine_version = "1.8.1"
 
-android_gradlePlugin_version = "8.3.2"
+android_gradlePlugin_version = "8.4.1"
 androidx_version = "1.5.2"
 androidx_core_version = "1.13.1"
-androidx_app_compat_version = "1.6.1"
+androidx_app_compat_version = "1.7.0"
 androidx_fragment_version = "1.6.2"
 androidx_navigation_version = "2.7.7"
-androidx_lifecycle_version = "2.7.0"
+androidx_lifecycle_version = "2.8.0"
 androidx_work_version = "2.9.0"
 androidx_room_version = "2.6.1"
 androidx_datastore_version = "1.1.0"
@@ -19,9 +19,9 @@ androidx_constraint_version = "2.1.4"
 androidx_coordinator_version = "1.2.0"
 androidx_cardview_version = "1.0.0"
 androidx_preferences_version = "1.2.1"
-androidx_viewpager_version = "1.0.0"
+androidx_viewpager_version = "1.1.0"
 androidx_security_version = "1.0.0"
-androidx_annotation_version = "1.7.1"
+androidx_annotation_version = "1.8.0"
 androidx_arch_core_version = "2.2.0"
 matertial_version = "1.12.0"
 
@@ -31,7 +31,7 @@ hilt_androidx_version = "1.2.0"
 play_base_services_version = "18.4.0"
 play_location_services_version = "21.2.0"
 play_integrity_version = "1.3.0"
-gsm_plugin_version = "4.4.1"
+gsm_plugin_version = "4.4.2"
 play_publisher_version = "3.9.1"
 play_barcode_version = "18.3.0"
 
@@ -44,7 +44,8 @@ firebase_crashlyticsPlugin_version = "3.0.1"
 firebase_perfPlugin_version = "1.4.2"
 firebase_distrtibutionPlugin_version = "5.0.0"
 
-retrofit_version = "2.11.0"
+# [MS-483] Newer versions of Retrofit (>=2.10.0) don't support android apis <=25 beacuse of the internal Jackson library
+retrofit_version = "2.9.0"
 okttp_version = "4.12.0"
 # Newer versions of Jackson don't support android apis <=25.Jackson shouldn't be updated as long as SID MIN supported APIs <=25
 jackson_version = "2.13.4"
@@ -68,16 +69,14 @@ libsimprints_version = "2024.1.1"
 simmatcher_version = "1.2.0"
 roc_wrapper_version = "1.23"
 nec_version = "1.5.0"
-secugen_version = "1.0.0"
-wsq_version = "1.2"
-bitmapConverter_version = "0.2.0"
+secugen_version = "1.1.0"
 
 junit_version = "4.13.2"
 junit_ext_version = "1.1.5"
 truth_version = "1.4.2"
 livedata_testing_version = "1.3.0"
-mockk_version = "1.13.10"
-robolectric_version = "4.12.1"
+mockk_version = "1.13.11"
+robolectric_version = "4.12.2"
 espresso_version = "3.5.1"
 espresso_accessibility_version = "4.1.1"
 barista_version = "4.3.0"
@@ -86,7 +85,7 @@ jacoco_version = "0.8.12"
 
 sonar_plugin_version = "5.0.0.4638"
 retry_version = "1.5.9"
-realm_version = "1.15.0"
+realm_version = "2.0.0"
 protobuf_plugin_version = "0.9.4"
 deps_graph_version = "0.8.0"
 tink_version = "1.13.0"
@@ -208,12 +207,6 @@ nec-wrapper = { module = " com.simprints:necwrapper", version.ref = "nec_version
 nec-lib = { module = "com.nec:lib", version.ref = "nec_version" }
 # secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
 secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
-
-#WSQ
-wsqDecoder = { module = "com.gemalto.wsq:wsq-android", version.ref = "wsq_version" }
-# BitmapConverter
-bitmapConverter= {module= "com.github.yoanngoular:bitmapconverter", version.ref = "bitmapConverter_version"}
-
 
 #hilt
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }

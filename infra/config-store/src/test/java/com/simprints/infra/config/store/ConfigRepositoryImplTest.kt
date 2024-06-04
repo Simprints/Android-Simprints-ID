@@ -58,7 +58,7 @@ class ConfigRepositoryImplTest {
     fun `should get the project locally if available`() = runTest {
         coEvery { localDataSource.getProject() } returns project
 
-        val receivedProject = configServiceImpl.getProject(PROJECT_ID)
+        val receivedProject = configServiceImpl.getProject()
 
         assertThat(receivedProject).isEqualTo(project)
         coVerify(exactly = 1) { localDataSource.getProject() }
@@ -66,26 +66,11 @@ class ConfigRepositoryImplTest {
     }
 
     @Test
-    fun `should get the project remotely if not available locally and save it`() = runTest {
-        coEvery { localDataSource.saveProject(project) } returns Unit
-        coEvery { localDataSource.getProject() } throws NoSuchElementException()
-        coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
-
-        val receivedProject = configServiceImpl.getProject(PROJECT_ID)
-
-        assertThat(receivedProject).isEqualTo(project)
-        coVerify(exactly = 1) { localDataSource.getProject() }
-        coVerify(exactly = 1) { localDataSource.saveProject(project) }
-        coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
-        coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
-    }
-
-    @Test
     fun `should throw the exception if there is an issue`() = runTest {
         val exception = Exception("exception")
         coEvery { localDataSource.getProject() } throws exception
 
-        val receivedException = assertThrows<Exception> { configServiceImpl.getProject(PROJECT_ID) }
+        val receivedException = assertThrows<Exception> { configServiceImpl.getProject() }
 
         assertThat(receivedException).isEqualTo(exception)
         coVerify(exactly = 1) { localDataSource.getProject() }

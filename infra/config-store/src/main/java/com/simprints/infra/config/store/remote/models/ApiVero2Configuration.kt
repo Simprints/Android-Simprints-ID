@@ -25,11 +25,13 @@ internal data class ApiVero2Configuration(
     enum class ImageSavingStrategy {
         NEVER,
         ONLY_GOOD_SCAN,
+        ONLY_USED_IN_REFERENCE,
         EAGER;
 
         fun toDomain(): Vero2Configuration.ImageSavingStrategy =
             when (this) {
                 NEVER -> Vero2Configuration.ImageSavingStrategy.NEVER
+                ONLY_USED_IN_REFERENCE -> Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
                 ONLY_GOOD_SCAN -> Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
                 EAGER -> Vero2Configuration.ImageSavingStrategy.EAGER
             }

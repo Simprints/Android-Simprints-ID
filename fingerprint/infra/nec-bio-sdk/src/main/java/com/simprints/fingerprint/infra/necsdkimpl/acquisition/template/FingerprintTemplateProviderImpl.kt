@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
+import com.secugen.RawImage
+import com.secugen.WSQConverter
 import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -14,7 +16,7 @@ import javax.inject.Inject
 
 internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
-    private val decodeWSQImageUseCase: DecodeWSQImageUseCase,
+    private val wsqConverter: WSQConverter,
     private val secugenImageCorrection: SecugenImageCorrection,
     private val acquireImageDistortionConfigurationUseCase: AcquireImageDistortionConfigurationUseCase,
     private val calculateNecImageQualityUseCase: CalculateNecImageQualityUseCase,
@@ -40,15 +42,19 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
             // Always require a new image from the scanner using the minimum resolution as we will
             // process it using secugen image correction
             log("Acquiring unprocessed image")
-            val unprocessedImage = captureWrapper.acquireUnprocessedImage(
+            val rawFingerprintScan = captureWrapper.acquireUnprocessedImage(
                 Dpi(MIN_CAPTURE_DPI)
             ).rawUnprocessedImage
-            captureProcessedImageCache.recentlyCapturedImage = unprocessedImage.imageData
+            captureProcessedImageCache.recentlyCapturedImage = rawFingerprintScan.imageData
             log("Unprocessed image acquired, processing it")
-            val decodedImage = decodeWSQImageUseCase(unprocessedImage)
-            log("Image decoded successfully ${decodedImage.resolution}")
+            val decodedImage = wsqConverter.fromWSQToRaw(rawFingerprintScan.imageData)
             log("processing image using secugen image correction")
-            val secugenProcessedImage = processImage(settings, decodedImage)
+            val secugenProcessedImage = processImage(
+                settings,
+                decodedImage,
+                rawFingerprintScan.un20SerialNumber,
+                rawFingerprintScan.brightness
+            )
             log("quality checking image using nec sdk")
             val qualityScore = calculateNecImageQualityUseCase(secugenProcessedImage)
             log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
@@ -73,16 +79,17 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
 
     private suspend fun processImage(
         settings: FingerprintTemplateAcquisitionSettings,
-        rawImage: FingerprintRawImage
+        rawImage: RawImage,
+        un20SerialNumber: ByteArray,
+        brightness: Byte
     ): FingerprintImage {
         val scannerConfig = SecugenImageCorrection.ScannerConfig(
             acquireImageDistortionConfigurationUseCase(),
             settings.processingResolution?.value ?: DEFAULT_RESOLUTION,
-            rawImage.un20SerialNumber,
-            rawImage.brightness
+            un20SerialNumber,
+            brightness
         )
-        val processedImage =
-            secugenImageCorrection.processRawImage(rawImage.imageBytes, scannerConfig)
+        val processedImage = secugenImageCorrection.processRawImage(rawImage.bytes, scannerConfig)
         return FingerprintImage(
             processedImage.imageBytes,
             processedImage.width,

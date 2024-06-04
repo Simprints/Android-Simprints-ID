@@ -9,9 +9,9 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
 import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentTextHelper
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -50,7 +50,7 @@ class ConsentViewModelTest {
     private lateinit var parentalConsentTextHelper: ParentalConsentTextHelper
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var projectConfig: ProjectConfiguration
@@ -66,7 +66,7 @@ class ConsentViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
+        coEvery { configManager.getProjectConfiguration() } returns projectConfig
         every { projectConfig.consent } returns mockk()
 
         every { timeHelper.now() } returns TIMESTAMP
@@ -75,7 +75,7 @@ class ConsentViewModelTest {
 
         vm = ConsentViewModel(
             timeHelper,
-            configRepository,
+            configManager,
             eventRepository,
             generalConsentTextHelper,
             parentalConsentTextHelper,
@@ -92,7 +92,7 @@ class ConsentViewModelTest {
         vm.loadConfiguration(ConsentType.ENROL)
         val state = vm.viewState.getOrAwaitValue()
 
-        coVerify { configRepository.getProjectConfiguration() }
+        coVerify { configManager.getProjectConfiguration() }
         verify { generalConsentTextHelper.assembleText(any(), eq(defaultModalityList), eq(ConsentType.ENROL)) }
         verify { parentalConsentTextHelper.assembleText(any(), eq(defaultModalityList), eq(ConsentType.ENROL)) }
 

@@ -13,7 +13,7 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -29,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class EnrolLastBiometricViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val hasDuplicateEnrolments: HasDuplicateEnrolmentsUseCase,
@@ -51,7 +51,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     fun enrolBiometric(params: EnrolLastBiometricParams) = viewModelScope.launch {
         enrolWasAttempted = true
 
-        val projectConfig = configRepository.getProjectConfiguration()
+        val projectConfig = configManager.getProjectConfiguration()
         val modalities = projectConfig.general.modalities
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)

@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
-import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
+import com.simprints.infra.config.store.models.Vero2Configuration
 
 internal fun Vero2Configuration.toProto(): ProtoVero2Configuration =
     ProtoVero2Configuration.newBuilder()
@@ -16,6 +16,7 @@ internal fun Vero2Configuration.ImageSavingStrategy.toProto(): ProtoVero2Configu
     when (this) {
         Vero2Configuration.ImageSavingStrategy.NEVER -> ProtoVero2Configuration.ImageSavingStrategy.NEVER
         Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN -> ProtoVero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+        Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE -> ProtoVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
         Vero2Configuration.ImageSavingStrategy.EAGER -> ProtoVero2Configuration.ImageSavingStrategy.EAGER
     }
 
@@ -47,6 +48,7 @@ internal fun ProtoVero2Configuration.ImageSavingStrategy.toDomain(): Vero2Config
     when (this) {
         ProtoVero2Configuration.ImageSavingStrategy.NEVER -> Vero2Configuration.ImageSavingStrategy.NEVER
         ProtoVero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN -> Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+        ProtoVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE -> Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
         ProtoVero2Configuration.ImageSavingStrategy.EAGER -> Vero2Configuration.ImageSavingStrategy.EAGER
         ProtoVero2Configuration.ImageSavingStrategy.UNRECOGNIZED -> throw InvalidProtobufEnumException(
             "invalid ImageSavingStrategy $name"

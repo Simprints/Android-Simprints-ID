@@ -9,6 +9,7 @@ android {
 
 dependencies {
     implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:events"))
     implementation(project(":feature:exit-form"))

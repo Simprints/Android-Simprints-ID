@@ -14,8 +14,7 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -31,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class FaceCaptureViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val saveFaceImage: SaveFaceImageUseCase,
     private val eventReporter: SimpleCaptureEventReporter,
     private val bitmapToByteArray: BitmapToByteArrayUseCase,
@@ -61,7 +60,6 @@ internal class FaceCaptureViewModel @Inject constructor(
     val finishFlowEvent: LiveData<LiveDataEventWithContent<FaceCaptureResult>>
         get() = _finishFlowEvent
     private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<FaceCaptureResult>>()
-
 
     val invalidLicense: LiveData<LiveDataEvent>
         get() = _invalidLicense
@@ -99,19 +97,20 @@ internal class FaceCaptureViewModel @Inject constructor(
 
     fun flowFinished() {
         viewModelScope.launch {
-            val projectConfiguration = configRepository.getProjectConfiguration()
-            if (projectConfiguration.face?.imageSavingStrategy == FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN) {
+            val projectConfiguration = configManager.getProjectConfiguration()
+            if (projectConfiguration.face?.imageSavingStrategy?.shouldSaveImage() == true) {
                 saveFaceDetections()
             }
 
             val items = faceDetections.mapIndexed { index, detection ->
                 FaceCaptureResult.Item(
-                    index,
-                    FaceCaptureResult.Sample(
-                        detection.id,
-                        detection.face?.template ?: ByteArray(0),
-                        detection.securedImageRef,
-                        detection.face?.format ?: "",
+                    captureEventId = detection.id,
+                    index = index,
+                    sample = FaceCaptureResult.Sample(
+                        faceId = detection.id,
+                        template = detection.face?.template ?: ByteArray(0),
+                        imageRef = detection.securedImageRef,
+                        format = detection.face?.format ?: "",
                     )
                 )
             }
@@ -158,6 +157,5 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun addCaptureConfirmationAction(startTime: Timestamp, isContinue: Boolean) {
         eventReporter.addCaptureConfirmationEvent(startTime, isContinue)
     }
-
 
 }

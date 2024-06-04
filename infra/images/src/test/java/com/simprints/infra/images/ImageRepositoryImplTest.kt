@@ -2,6 +2,7 @@ package com.simprints.infra.images
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.images.local.ImageLocalDataSource
+import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.ImageRemoteDataSource
@@ -9,6 +10,7 @@ import com.simprints.infra.images.remote.UploadResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -25,15 +27,19 @@ internal class ImageRepositoryImplTest {
 
     @MockK
     lateinit var localDataSource: ImageLocalDataSource
+
     @MockK
     lateinit var remoteDataSource: ImageRemoteDataSource
+
+    @MockK
+    lateinit var metadataStore: ImageMetadataStore
 
     private lateinit var repository: ImageRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        repository = ImageRepositoryImpl(localDataSource, remoteDataSource)
+        repository = ImageRepositoryImpl(localDataSource, remoteDataSource, metadataStore)
         initValidImageMocks()
     }
 
@@ -88,6 +94,7 @@ internal class ImageRepositoryImplTest {
 
         coVerify(exactly = 3) { localDataSource.decryptImage(any()) }
         coVerify(exactly = 3) { localDataSource.deleteImage(any()) }
+        coVerify(exactly = 3) { metadataStore.deleteMetadata(any()) }
         assertThat(successful).isTrue()
     }
 
@@ -107,6 +114,7 @@ internal class ImageRepositoryImplTest {
         repository.deleteStoredImages()
 
         coVerify(exactly = 5) { localDataSource.deleteImage(any()) }
+        coVerify(exactly = 1) { metadataStore.deleteAllMetadata() }
     }
 
     @Test
@@ -131,8 +139,13 @@ internal class ImageRepositoryImplTest {
             localDataSource.decryptImage(validImage)
         } returns mockStream
 
+        coJustRun { metadataStore.storeMetadata(any(), any()) }
+        coEvery { metadataStore.getMetadata(any()) } returns emptyMap()
+        coJustRun { metadataStore.deleteMetadata(any()) }
+        coJustRun { metadataStore.deleteAllMetadata() }
+
         coEvery {
-            remoteDataSource.uploadImage(mockStream, validImage)
+            remoteDataSource.uploadImage(mockStream, validImage, emptyMap())
         } returns UploadResult(
             validImage,
             UploadResult.Status.SUCCESSFUL
@@ -148,7 +161,7 @@ internal class ImageRepositoryImplTest {
         } returns mockStream
 
         coEvery {
-            remoteDataSource.uploadImage(mockStream, invalidImage)
+            remoteDataSource.uploadImage(mockStream, invalidImage, emptyMap())
         } returns UploadResult(
             invalidImage,
             UploadResult.Status.FAILED

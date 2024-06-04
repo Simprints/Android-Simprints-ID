@@ -10,12 +10,12 @@ import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
@@ -39,7 +39,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     @Assisted params: WorkerParameters,
     private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val eventSyncCache: EventSyncCache,
     private val eventRepository: EventRepository,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
@@ -75,7 +75,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                 // check if device is rooted before starting the sync
                 securityManager.checkIfDeviceIsRooted()
                 crashlyticsLog("Start")
-                val configuration = configRepository.getProjectConfiguration()
+                val configuration = configManager.getProjectConfiguration()
 
                 if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed(configuration)) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
@@ -148,7 +148,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
 
     private suspend fun isEventDownSyncAllowed(configuration: ProjectConfiguration): Boolean {
         val isProjectPaused =
-            configRepository.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
+            configManager.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
 
         val isDownSyncConfigEnabled =
             configuration.synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC

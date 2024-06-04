@@ -7,8 +7,8 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifi
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -25,7 +25,7 @@ import javax.inject.Inject
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
@@ -99,7 +99,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         isCrossFingerMatchingEnabled(flowType),
     )
 
-    private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configRepository
+    private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configManager
         .takeIf { flowType == FlowType.VERIFY }
         ?.getProjectConfiguration()
         ?.fingerprint

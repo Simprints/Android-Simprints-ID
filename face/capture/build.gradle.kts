@@ -19,6 +19,7 @@ dependencies {
 
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:events"))
     implementation(project(":infra:images"))

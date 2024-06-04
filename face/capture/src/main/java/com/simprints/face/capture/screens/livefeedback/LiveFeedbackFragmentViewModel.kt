@@ -14,7 +14,7 @@ import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.models.SymmetricTarget
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +29,7 @@ import javax.inject.Inject
 internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val frameProcessor: FrameProcessor,
     private val faceDetector: FaceDetector,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
@@ -104,7 +104,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun finishCapture(attemptNumber: Int) {
         viewModelScope.launch {
-            val projectConfiguration = configRepository.getProjectConfiguration()
+            val projectConfiguration = configManager.getProjectConfiguration()
             sortedQualifyingCaptures = userCaptures
                 .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
                 .sortedByDescending { it.face?.quality }
@@ -210,7 +210,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private suspend fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
         val qualityThreshold =
-            configRepository.getProjectConfiguration().face!!.qualityThreshold.toFloat()
+            configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
         eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
 

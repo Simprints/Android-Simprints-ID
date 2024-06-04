@@ -4,7 +4,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class SignerManager @Inject constructor(
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val authStore: AuthStore,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val simNetwork: SimNetwork,
@@ -37,14 +37,14 @@ internal class SignerManager @Inject constructor(
         try {
             // Store Firebase token so it can be used by ConfigManager
             authStore.storeFirebaseToken(token)
-            configRepository.refreshProject(projectId)
+            configManager.refreshProject(projectId)
             // Only store credentials if all other calls succeeded. This avoids the undefined state
             // where credentials are store (i.e. user is considered logged in) but project configuration
             // is missing
             authStore.signedInProjectId = projectId
         } catch (e: Exception) {
             authStore.clearFirebaseToken()
-            configRepository.clearData()
+            configManager.clearData()
             authStore.cleanCredentials()
 
             throw e
@@ -54,7 +54,7 @@ internal class SignerManager @Inject constructor(
     suspend fun signOut() = withContext(dispatcher) {
 
         simNetwork.resetApiBaseUrl()
-        configRepository.clearData()
+        configManager.clearData()
         recentUserActivityManager.clearRecentActivity()
 
         imageRepository.deleteStoredImages()

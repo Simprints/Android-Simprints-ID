@@ -2,6 +2,7 @@ package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
+import com.secugen.WSQConverter
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper
@@ -40,7 +41,7 @@ class FingerprintTemplateProviderImplTest {
     private lateinit var extractNecTemplateUseCase: ExtractNecTemplateUseCase
 
     @RelaxedMockK
-    private lateinit var decodeWsqImageUseCase: DecodeWSQImageUseCase
+    private lateinit var wsqConverter: WSQConverter
 
     @RelaxedMockK
     private lateinit var processedImageCache: ProcessedImageCache
@@ -68,7 +69,7 @@ class FingerprintTemplateProviderImplTest {
         ))
         fingerprintTemplateProviderImpl = FingerprintTemplateProviderImpl(
             fingerprintCaptureWrapperFactory = fingerprintCaptureWrapperFactory,
-            decodeWSQImageUseCase = decodeWsqImageUseCase,
+            wsqConverter = wsqConverter,
             secugenImageCorrection = secugenImageCorrection,
             acquireImageDistortionConfigurationUseCase = acquireImageDistortionConfigurationUseCase,
             calculateNecImageQualityUseCase = calculateNecImageQualityUseCase,
@@ -104,7 +105,7 @@ class FingerprintTemplateProviderImplTest {
         coVerify {
             captureWrapper
                 .acquireUnprocessedImage(any())
-            decodeWsqImageUseCase.invoke(any())
+            wsqConverter.fromWSQToRaw(any())
             processedImageCache.recentlyCapturedImage = any()
             secugenImageCorrection.processRawImage(any(), any())
             calculateNecImageQualityUseCase.invoke(any())
@@ -130,7 +131,7 @@ class FingerprintTemplateProviderImplTest {
             coVerify {
                 captureWrapper
                     .acquireUnprocessedImage(any())
-                decodeWsqImageUseCase.invoke(any())
+                wsqConverter.fromWSQToRaw(any())
                 processedImageCache.recentlyCapturedImage = any()
                 secugenImageCorrection.processRawImage(any(), any())
                 calculateNecImageQualityUseCase.invoke(any())
@@ -157,7 +158,7 @@ class FingerprintTemplateProviderImplTest {
             coVerify {
                 captureWrapper
                     .acquireUnprocessedImage(any())
-                decodeWsqImageUseCase.invoke(any())
+                wsqConverter.fromWSQToRaw(any())
                 processedImageCache.recentlyCapturedImage = any()
                 secugenImageCorrection.processRawImage(any(), any())
                 calculateNecImageQualityUseCase.invoke(any())

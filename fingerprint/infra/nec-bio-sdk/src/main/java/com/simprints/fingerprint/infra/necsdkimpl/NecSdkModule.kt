@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.necsdkimpl
 
+import com.secugen.WSQConverter
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.FingerprintImageProviderImpl
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
@@ -10,7 +11,6 @@ import com.simprints.fingerprint.infra.necsdkimpl.matching.FingerprintMatcherImp
 import com.simprints.fingerprint.infra.necsdkimpl.matching.NecMatchingSettings
 import com.simprints.necwrapper.nec.NEC
 import com.simprints.sgimagecorrection.SecugenImageCorrection
-import com.ygoular.bitmapconverter.BitmapConverter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,7 +49,7 @@ object NecSdkModule {
 
     @Provides
     @Singleton
-    internal fun provideBitmapConverter() = BitmapConverter()
+    internal fun provideWSQConverter () = WSQConverter()
 
     @Provides
     @Singleton

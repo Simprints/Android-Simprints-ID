@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.SessionEventRepository
@@ -35,7 +35,7 @@ class SaveMatchEventUseCaseTest {
     private lateinit var eventRepository: SessionEventRepository
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     private lateinit var useCase: SaveMatchEventUseCase
 
@@ -46,12 +46,12 @@ class SaveMatchEventUseCaseTest {
         coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
 
         coEvery {
-            configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.comparisonStrategyForVerification
+            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.comparisonStrategyForVerification
         } returns FingerComparisonStrategy.SAME_FINGER
 
         useCase = SaveMatchEventUseCase(
             eventRepository,
-            configRepository,
+            configManager,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }

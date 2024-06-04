@@ -1,7 +1,9 @@
 package com.simprints.fingerprint.capture.usecase
 
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedException
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
+import com.simprints.fingerprint.capture.extensions.toInt
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.SessionEventRepository
@@ -18,13 +20,16 @@ internal class SaveImageUseCase @Inject constructor(
 
     suspend operator fun invoke(
         vero2Configuration: Vero2Configuration,
+        finger: IFingerIdentifier,
         captureEventId: String?,
         collectedFinger: CaptureState.Collected,
     ) = if (collectedFinger.scanResult.image != null && captureEventId != null) {
         saveImage(
-            collectedFinger.scanResult.image,
-            captureEventId,
-            vero2Configuration.imageSavingStrategy.deduceFileExtension()
+            imageBytes = collectedFinger.scanResult.image,
+            captureEventId = captureEventId,
+            fileExtension = vero2Configuration.imageSavingStrategy.deduceFileExtension(),
+            finger = finger,
+            dpi = vero2Configuration.captureStrategy.toInt(),
         )
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
         Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
@@ -35,12 +40,22 @@ internal class SaveImageUseCase @Inject constructor(
         imageBytes: ByteArray,
         captureEventId: String,
         fileExtension: String,
+        finger: IFingerIdentifier,
+        dpi: Int,
     ): SecuredImageRef? = determinePath(captureEventId, fileExtension)?.let { path ->
         Simber.d("Saving fingerprint image ${path}")
         val currentSession = coreEventRepository.getCurrentSessionScope()
         val projectId = currentSession.projectId
 
-        val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, projectId, Path(path.parts))
+        val securedImageRef = coreImageRepository.storeImageSecurely(
+            imageBytes = imageBytes,
+            projectId = projectId,
+            relativePath = Path(path.parts),
+            metadata = mapOf(
+                META_KEY_FINGER_ID to finger.name,
+                META_KEY_DPI to dpi.toString(),
+            ),
+        )
 
         if (securedImageRef != null) {
             SecuredImageRef(Path(securedImageRef.relativePath.parts))
@@ -70,5 +85,8 @@ internal class SaveImageUseCase @Inject constructor(
 
         const val SESSIONS_PATH = "sessions"
         const val FINGERPRINTS_PATH = "fingerprints"
+
+        private const val META_KEY_DPI = "dpi"
+        private const val META_KEY_FINGER_ID = "finger"
     }
 }

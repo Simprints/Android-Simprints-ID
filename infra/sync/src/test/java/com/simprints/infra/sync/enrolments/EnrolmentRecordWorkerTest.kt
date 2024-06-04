@@ -3,8 +3,8 @@ package com.simprints.infra.sync.enrolments
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.sync.SyncConstants
 import io.mockk.coEvery
@@ -24,7 +24,7 @@ class EnrolmentRecordWorkerTest {
     }
 
     private val repository = mockk<EnrolmentRecordRepository>(relaxed = true)
-    private val configRepository = mockk<ConfigRepository>()
+    private val configManager = mockk<ConfigManager>()
     private val params = mockk<WorkerParameters>(relaxed = true) {
         every { inputData } returns workDataOf(
             SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME to INSTRUCTION_ID,
@@ -35,7 +35,7 @@ class EnrolmentRecordWorkerTest {
         mockk(relaxed = true),
         params,
         repository,
-        configRepository,
+        configManager,
         UnconfinedTestDispatcher(),
     )
 
@@ -43,7 +43,7 @@ class EnrolmentRecordWorkerTest {
     @Test
     fun `should do work correctly`() = runTest {
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
-        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        coEvery { configManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
 
         worker.doWork()
 

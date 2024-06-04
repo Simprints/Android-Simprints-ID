@@ -11,6 +11,7 @@ data class FaceCaptureResult(
 
     @Keep
     data class Item(
+        val captureEventId: String?,
         val index: Int,
         val sample: Sample?,
     ) : Serializable

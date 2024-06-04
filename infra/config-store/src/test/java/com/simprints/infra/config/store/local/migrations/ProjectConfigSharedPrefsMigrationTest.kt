@@ -639,7 +639,7 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val PROTO_FACE_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
             .setNbOfImagesToCapture(2)
             .setQualityThreshold(-1)
-            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN)
+            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
             .setDecisionPolicy(
                 ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
             )

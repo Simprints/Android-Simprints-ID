@@ -18,6 +18,7 @@ class ApiVero2ConfigurationTest {
         val mapping = mapOf(
             ApiVero2Configuration.ImageSavingStrategy.NEVER to Vero2Configuration.ImageSavingStrategy.NEVER,
             ApiVero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN to Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
+            ApiVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE to Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE,
             ApiVero2Configuration.ImageSavingStrategy.EAGER to Vero2Configuration.ImageSavingStrategy.EAGER,
         )
 

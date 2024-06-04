@@ -2,7 +2,7 @@ package com.simprints.feature.logincheck.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
@@ -27,7 +27,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     private lateinit var useCase: UpdateSessionScopePayloadUseCase
 
@@ -38,14 +38,14 @@ internal class UpdateSessionScopePayloadUseCaseTest {
         useCase = UpdateSessionScopePayloadUseCase(
             eventRepository,
             enrolmentRecordRepository,
-            configRepository
+            configManager
         )
     }
 
     @Test
     fun `Updates current scope with data from enrolments`() = runTest {
         coEvery { enrolmentRecordRepository.count() } returns 42
-        coEvery { configRepository.getProjectConfiguration().updatedAt } returns "configUpdatedAt"
+        coEvery { configManager.getProjectConfiguration().updatedAt } returns "configUpdatedAt"
 
         coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope()
 

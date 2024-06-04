@@ -16,9 +16,9 @@ import com.simprints.feature.exitform.ExitFormConfigurationBuilder
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.resources.R
@@ -31,7 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
     private val generalConsentTextHelper: GeneralConsentTextHelper,
     private val parentalConsentTextHelper: ParentalConsentTextHelper,
@@ -55,7 +55,7 @@ internal class ConsentViewModel @Inject constructor(
 
     fun loadConfiguration(consentType: ConsentType) {
         viewModelScope.launch {
-            val projectConfig = configRepository.getProjectConfiguration()
+            val projectConfig = configManager.getProjectConfiguration()
             _viewState.postValue(
                 mapConfigToViewState(
                     projectConfig = projectConfig,
@@ -74,7 +74,7 @@ internal class ConsentViewModel @Inject constructor(
     fun declineClicked(currentConsentTab: ConsentTab) {
         saveConsentEvent(currentConsentTab, ConsentEvent.ConsentPayload.Result.DECLINED)
         viewModelScope.launch {
-            val projectConfig = configRepository.getProjectConfiguration()
+            val projectConfig = configManager.getProjectConfiguration()
             _showExitForm.send(getExitFormFromModalities(projectConfig.general.modalities))
         }
     }

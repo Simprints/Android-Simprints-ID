@@ -2,9 +2,9 @@ package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.cosync.CoSyncEvents
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
@@ -27,7 +27,7 @@ class GetEventsForCoSyncUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configRepository: ConfigRepository
+    private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var eventRepository: EventRepository
@@ -52,12 +52,12 @@ class GetEventsForCoSyncUseCaseTest {
             mockk<EnrolmentEventV2>(relaxed = true),
         )
 
-        useCase = GetEventsForCoSyncUseCase(configRepository, eventRepository, jsonHelper, tokenizationProcessor)
+        useCase = GetEventsForCoSyncUseCase(configManager, eventRepository, jsonHelper, tokenizationProcessor)
     }
 
     @Test
     fun `returns null if coSync disabled`() = runTest {
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         }
 
@@ -68,7 +68,7 @@ class GetEventsForCoSyncUseCaseTest {
 
     @Test
     fun `returns all events if full coSync enabled`() = runTest {
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
         }
         every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
@@ -80,7 +80,7 @@ class GetEventsForCoSyncUseCaseTest {
 
     @Test
     fun `returns only analytics events if analytics coSync enabled`() = runTest {
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
         }
         every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
@@ -92,7 +92,7 @@ class GetEventsForCoSyncUseCaseTest {
 
     @Test
     fun `returns only biometric events if biometric coSync enabled`() = runTest {
-        coEvery { configRepository.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
         every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"

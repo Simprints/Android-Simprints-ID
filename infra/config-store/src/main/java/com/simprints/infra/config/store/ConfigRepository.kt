@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface ConfigRepository {
 
     suspend fun refreshProject(projectId: String): ProjectWithConfig
-    suspend fun getProject(projectId: String): Project
+    suspend fun getProject(): Project
     suspend fun getProjectConfiguration(): ProjectConfiguration
 
     suspend fun getDeviceState(): DeviceState

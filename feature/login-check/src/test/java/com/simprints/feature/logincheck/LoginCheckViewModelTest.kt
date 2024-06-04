@@ -15,8 +15,8 @@ import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
 import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.infra.sync.SyncOrchestrator
@@ -59,7 +59,7 @@ internal class LoginCheckViewModelTest {
     lateinit var isUserSignedInUseCase: IsUserSignedInUseCase
 
     @MockK
-    lateinit var configRepository: ConfigRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
@@ -89,7 +89,7 @@ internal class LoginCheckViewModelTest {
             extractCrashKeysUseCase,
             addAuthorizationEventUseCase,
             isUserSignedInUseCase,
-            configRepository,
+            configManager,
             startBackgroundSync,
             syncOrchestrator,
             updateSessionScopePayloadUseCase,
@@ -255,7 +255,7 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(true, null))
 
-        coVerify { configRepository.getProject(any()) }
+        coVerify { configManager.getProject(any()) }
     }
 
     @Test
@@ -264,13 +264,13 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        coVerify { configRepository.getProject(any()) }
+        coVerify { configManager.getProject(any()) }
     }
 
     @Test
     fun `Triggers alert if project is paused`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_PAUSED
+        coEvery { configManager.getProject(any()).state } returns ProjectState.PROJECT_PAUSED
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -281,7 +281,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Triggers alert if project is ending`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_ENDING
+        coEvery { configManager.getProject(any()).state } returns ProjectState.PROJECT_ENDING
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -292,7 +292,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Triggers login attempt if project has ended`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_ENDED
+        coEvery { configManager.getProject(any()).state } returns ProjectState.PROJECT_ENDED
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -303,7 +303,7 @@ internal class LoginCheckViewModelTest {
     @Test
     fun `Correctly handles if user signed in active project`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { configRepository.getProject(any()).state } returns ProjectState.RUNNING
+        coEvery { configManager.getProject(any()).state } returns ProjectState.RUNNING
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 

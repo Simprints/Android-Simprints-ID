@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -8,12 +9,11 @@ import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Before
 import org.junit.Test
-import java.io.Serializable
 
 internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
@@ -48,13 +48,17 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         val result = useCase(listOf(
             FaceCaptureResult(
                 results = listOf(
-                    FaceCaptureResult.Item(0, null),
-                    FaceCaptureResult.Item(0, FaceCaptureResult.Sample(
-                        faceId = "faceId",
-                        template = byteArrayOf(),
-                        imageRef = null,
-                        format = "format"
-                    ))
+                    FaceCaptureResult.Item(captureEventId = null, index = 0, sample = null),
+                    FaceCaptureResult.Item(
+                        captureEventId = GUID1,
+                        index = 0,
+                        sample = FaceCaptureResult.Sample(
+                            faceId = "faceId",
+                            template = byteArrayOf(),
+                            imageRef = null,
+                            format = "format"
+                        )
+                    )
                 ),
             )
         ))
@@ -81,15 +85,18 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         val result = useCase(listOf(
             FingerprintCaptureResult(
                 results = listOf(
-                    FingerprintCaptureResult.Item(IFingerIdentifier.LEFT_THUMB, null),
+                    FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_THUMB, null),
                     FingerprintCaptureResult.Item(
-                      IFingerIdentifier.RIGHT_THUMB, FingerprintCaptureResult.Sample(
-                        fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
-                        template = byteArrayOf(),
-                        templateQualityScore = 0,
-                        imageRef = null,
-                        format = "format"
-                    ))
+                        identifier = IFingerIdentifier.RIGHT_THUMB,
+                        captureEventId = GUID1,
+                        sample = FingerprintCaptureResult.Sample(
+                            fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
+                            template = byteArrayOf(),
+                            templateQualityScore = 0,
+                            imageRef = null,
+                            format = "format"
+                        )
+                    )
                 ),
             )
         ))

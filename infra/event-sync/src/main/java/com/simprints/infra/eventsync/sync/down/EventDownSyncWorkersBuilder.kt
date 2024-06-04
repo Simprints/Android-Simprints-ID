@@ -8,7 +8,7 @@ import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.sync.MIN_BACKOFF_SECS
@@ -27,15 +27,15 @@ import javax.inject.Inject
 internal class EventDownSyncWorkersBuilder @Inject constructor(
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val jsonHelper: JsonHelper,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
 ) {
 
     suspend fun buildDownSyncWorkerChain(
         uniqueSyncId: String,
         uniqueDownSyncId: String,
     ): List<OneTimeWorkRequest> {
-        val projectConfiguration = configRepository.getProjectConfiguration()
-        val deviceConfiguration = configRepository.getDeviceConfiguration()
+        val projectConfiguration = configManager.getProjectConfiguration()
+        val deviceConfiguration = configManager.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = projectConfiguration.general.modalities.map { it.toMode() },

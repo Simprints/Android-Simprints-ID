@@ -37,6 +37,7 @@ message ProtoFaceConfiguration {
     enum ImageSavingStrategy {
         NEVER = 0;
         ONLY_GOOD_SCAN = 1;
+        ONLY_USED_IN_REFERENCE = 2;
     }
 }
 
@@ -93,6 +94,7 @@ message ProtoVero2Configuration {
         NEVER = 0;
         ONLY_GOOD_SCAN = 1;
         EAGER = 2;
+        ONLY_USED_IN_REFERENCE = 3;
     }
 
     enum CaptureStrategy {
