@@ -24,7 +24,7 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
         viewModel.ageGroups.observe(viewLifecycleOwner) { ageGroupsList ->
             fillRecyclerView(ageGroupsList)
         }
-        viewModel.createAgeGroups()
+        viewModel.start()
 
         viewModel.finish.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let(::finishWithResult)

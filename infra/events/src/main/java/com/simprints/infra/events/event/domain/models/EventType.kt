@@ -131,6 +131,8 @@ enum class EventType {
 
     /* key added: LICENSE_CHECK_KEY */
     LICENSE_CHECK,
+    /* key added: AGE_GROUP_SELECTION_KEY */
+    AGE_GROUP_SELECTION,
     ;
 
     companion object {
@@ -175,5 +177,6 @@ enum class EventType {
         const val EVENT_DOWN_SYNC_REQUEST_KEY = "EVENT_DOWN_SYNC_REQUEST"
         const val EVENT_UP_SYNC_REQUEST_KEY = "EVENT_UP_SYNC_REQUEST"
         const val LICENSE_CHECK_KEY = "LICENSE_CHECK"
+        const val AGE_GROUP_SELECTION_KEY = "AGE_GROUP_SELECTION"
     }
 }

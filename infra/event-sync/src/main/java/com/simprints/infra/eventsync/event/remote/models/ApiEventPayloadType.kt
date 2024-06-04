@@ -103,6 +103,9 @@ internal enum class ApiEventPayloadType {
 
     /* key added: LICENSE_CHECK_KEY */
     LicenseCheck,
+    /* key added: AGE_GROUP_SELECTION_KEY */
+    AGE_GROUP_SELECTION,
+
     ;
 
     companion object {
@@ -185,6 +188,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
     EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
     LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
+    AGE_GROUP_SELECTION -> ApiEventPayloadType.AGE_GROUP_SELECTION
 }
 
 
@@ -218,6 +222,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.EventDownSyncRequest -> EVENT_DOWN_SYNC_REQUEST
     ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
     ApiEventPayloadType.LicenseCheck -> LICENSE_CHECK
+    ApiEventPayloadType.AGE_GROUP_SELECTION -> AGE_GROUP_SELECTION
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }
