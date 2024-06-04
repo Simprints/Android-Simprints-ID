@@ -120,6 +120,8 @@
         <item quantity="one">%d match</item>
         <item quantity="other">%d matches</item>
     </plurals>
+    <string name="matcher_missing_access_permission">Permission is required to access data provided by the Data Collector application</string>
+    <string name="matcher_grant_permission_action">Grant permission</string>
 
     <!-- Orchestrator -->
     <string name="orchestrator_generic_error_title">Error occurred</string>

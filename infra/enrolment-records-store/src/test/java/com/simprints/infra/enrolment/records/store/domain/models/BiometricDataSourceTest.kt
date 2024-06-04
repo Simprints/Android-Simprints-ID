@@ -1,5 +1,6 @@
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource.Companion.permissionName
 import org.junit.Test
 
 class BiometricDataSourceTest {
@@ -20,5 +21,11 @@ class BiometricDataSourceTest {
     fun `should return SIMPRINTS when value is unknown`() {
         val result = BiometricDataSource.fromString("UNKNOWN")
         assertThat(result).isEqualTo(BiometricDataSource.SIMPRINTS)
+    }
+
+    @Test
+    fun `should return correct permission name for data sources`() {
+        assertThat(BiometricDataSource.SIMPRINTS.permissionName()).isNull()
+        assertThat(BiometricDataSource.COMMCARE.permissionName()).isNotEmpty()
     }
 }
