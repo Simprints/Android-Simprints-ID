@@ -40,10 +40,11 @@ internal class EnrolRequestBuilder(
         actionIdentifier = actionIdentifier,
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId().asTokenizableRaw(),
+        moduleId = extractor.getModuleId().asTokenizableRaw(),
         biometricDataSource = extractor.getBiometricDataSource(),
+        subjectAge = extractor.getSubjectAge(),
         callerPackageName = extractor.getCallerPackageName(),
         metadata = extractor.getMetadata(),
-        moduleId = extractor.getModuleId().asTokenizableRaw(),
         unknownExtras = extractor.getUnknownExtras()
     )
 }
