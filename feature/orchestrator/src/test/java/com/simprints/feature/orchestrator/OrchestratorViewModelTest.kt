@@ -124,7 +124,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
-        every { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
 
         val stepsObserver = viewModel.currentStep.test()
@@ -139,7 +139,7 @@ internal class OrchestratorViewModelTest {
     @Test
     fun `Creates person if required after step result`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns emptyList()
-        every { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any()) } returns null
 
         every { shouldCreatePerson(any(), any(), any()) } returns true
         coJustRun { createPersonEvent(any()) }
@@ -155,7 +155,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
-        every { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
         coEvery { appResponseBuilder(any(), any(), any()) } returns mockk()
         coJustRun { dailyActivityUseCase(any()) }
@@ -174,7 +174,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
-        every { mapRefusalOrErrorResult(any()) } returns AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
+        coEvery { mapRefusalOrErrorResult(any()) } returns AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(SetupResult(true))
@@ -191,7 +191,7 @@ internal class OrchestratorViewModelTest {
                 SubjectQuery(),
                 BiometricDataSource.SIMPRINTS)),
         )
-        every { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())
@@ -211,7 +211,7 @@ internal class OrchestratorViewModelTest {
                 SubjectQuery(),
                 BiometricDataSource.SIMPRINTS)),
         )
-        every { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())

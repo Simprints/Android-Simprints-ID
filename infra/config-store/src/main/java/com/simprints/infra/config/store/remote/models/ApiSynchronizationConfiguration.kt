@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.Companion.DEFAULT_DOWN_SYNC_MAX_AGE
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 
@@ -104,13 +105,15 @@ internal data class ApiSynchronizationConfiguration(
         val partitionType: PartitionType,
         val maxNbOfModules: Int,
         val moduleOptions: List<String>?,
+        val maxAge: String?,
     ) {
 
         fun toDomain(): DownSynchronizationConfiguration =
             DownSynchronizationConfiguration(
                 partitionType.toDomain(),
                 maxNbOfModules,
-                moduleOptions?.map(String::asTokenizableEncrypted) ?: emptyList()
+                moduleOptions?.map(String::asTokenizableEncrypted) ?: emptyList(),
+                maxAge ?: DEFAULT_DOWN_SYNC_MAX_AGE,
             )
 
         @Keep
