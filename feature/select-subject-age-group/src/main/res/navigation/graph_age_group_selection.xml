@@ -13,4 +13,13 @@
 
     </fragment>
 
+
+    <include app:graph="@navigation/graph_exit_form" />
+
+    <action
+        android:id="@+id/action_selectSubjectAgeGroupFragment_to_refusalFragment"
+        app:destination="@id/graph_exit_form"
+        app:popUpToInclusive="true" />
+
+
 </navigation>

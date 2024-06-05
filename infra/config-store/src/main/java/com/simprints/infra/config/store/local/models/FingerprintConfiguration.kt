@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 internal fun FingerprintConfiguration.toProto(): ProtoFingerprintConfiguration =
@@ -87,6 +88,7 @@ internal fun ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.toDo
         comparisonStrategyForVerification.toDomain(),
         if (hasVero1()) vero1.toDomain() else null,
         if (hasVero2()) vero2.toDomain() else null,
+        AgeGroup(130, 300),
     )
 
 

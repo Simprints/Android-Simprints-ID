@@ -14,8 +14,8 @@ import com.simprints.infra.resources.R as IDR
 // The age groups should be sorted as follows: Newborn, Baby, Child, Adult
 // because the icons are in that order
 internal class AgeGroupAdapter(
-    private val ageGroups: List<AgeGroup>,
-    private val onClick: (AgeGroup) -> Unit
+    private val ageGroups: List<AgeGroupDisplayModel>,
+    private val onClick: (AgeGroupDisplayModel) -> Unit
 ) :
     RecyclerView.Adapter<AgeGroupAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,13 +42,13 @@ internal class AgeGroupAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val ageGroupTextView: TextView = itemView.findViewById(R.id.item_label)
         private val ageGroupIcon: ImageView = itemView.findViewById(R.id.item_icon)
-        fun bind(ageGroup: AgeGroup, position: Int) {
-            ageGroupTextView.text = ageGroup.displayString
+        fun bind(ageGroupDisplayModel: AgeGroupDisplayModel, position: Int) {
+            ageGroupTextView.text = ageGroupDisplayModel.displayString
             ageGroupIcon.setImageResource(icons[position])
-            Simber.i("Age group: $ageGroup")
+            Simber.i("Age group: $ageGroupDisplayModel")
             itemView.setOnClickListener {
-                onClick(ageGroup)
-                Simber.i("Age group clicked: $ageGroup")
+                onClick(ageGroupDisplayModel)
+                Simber.i("Age group clicked: $ageGroupDisplayModel")
             }
         }
     }

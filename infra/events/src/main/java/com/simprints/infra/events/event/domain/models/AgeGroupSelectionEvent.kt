@@ -42,8 +42,8 @@ data class AgeGroupSelectionEvent(
 
     @Keep
     data class AgeGroup(
-        val from: Int,
-        val to: Int?,
+        val startInclusive: Int,
+        val endExclusive: Int?,
     )
 
     companion object {

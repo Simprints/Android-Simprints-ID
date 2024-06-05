@@ -44,12 +44,10 @@ fun ProjectConfiguration.isEventDownSyncAllowed(): Boolean =
 fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean =
     synchronization.up.simprints.imagesRequireUnmeteredConnection
 
-fun ProjectConfiguration.allowedAgeRanges(): List<IntRange> {
+fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> {
     return listOf(
-        face?.allowedAgeRange,
+        //Todo add face roc sdk ,
         fingerprint?.secugenSimMatcher?.allowedAgeRange,
         fingerprint?.nec?.allowedAgeRange
-    ).mapNotNull { it }.also {
-        Simber.i("Allowed age ranges: $it")
-    }
+    ).mapNotNull { it }
 }

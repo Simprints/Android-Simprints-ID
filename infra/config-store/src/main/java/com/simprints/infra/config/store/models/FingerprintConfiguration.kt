@@ -14,7 +14,7 @@ data class FingerprintConfiguration(
         val comparisonStrategyForVerification: FingerComparisonStrategy,
         val vero1: Vero1Configuration? = null,
         val vero2: Vero2Configuration? = null,
-        val allowedAgeRange: IntRange? = null,
+        val allowedAgeRange: AgeGroup? = null,
     )
 
     enum class VeroGeneration {

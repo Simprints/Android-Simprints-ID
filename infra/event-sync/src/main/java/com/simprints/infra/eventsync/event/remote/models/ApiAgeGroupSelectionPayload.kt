@@ -21,15 +21,15 @@ internal data class ApiAgeGroupSelectionPayload(
         null // this payload doesn't have tokenizable fields
 
     data class ApiAgeGroup(
-        val from: Int,
-        val to: Int,
+        val startInclusive: Int,
+        val endExclusive: Int?,
     )
 
 }
 
 private fun AgeGroupSelectionEvent.AgeGroup.fromDomainToApi() =
     ApiAgeGroupSelectionPayload.ApiAgeGroup(
-        from = from,
-        to = to,
+        startInclusive = startInclusive,
+        endExclusive = endExclusive,
     )
 

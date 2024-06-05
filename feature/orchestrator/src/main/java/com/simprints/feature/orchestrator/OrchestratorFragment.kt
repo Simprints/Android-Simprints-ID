@@ -24,6 +24,7 @@ import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.logincheck.LoginCheckViewModel
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
+import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupContract
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.validatepool.ValidateSubjectPoolContract
@@ -116,6 +117,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(FingerprintCaptureContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(FetchSubjectContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(ValidateSubjectPoolContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(SelectSubjectAgeGroupContract.DESTINATION, orchestratorVm::handleResult)
     }
 
     private fun <T : Serializable> handleResult(destination: Int, block: (T) -> Unit) {
