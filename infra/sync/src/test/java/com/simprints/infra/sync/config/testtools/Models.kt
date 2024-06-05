@@ -76,7 +76,8 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
         1,
-        listOf("module1".asTokenizableEncrypted())
+        listOf("module1".asTokenizableEncrypted()),
+        "PT24H",
     )
 )
 

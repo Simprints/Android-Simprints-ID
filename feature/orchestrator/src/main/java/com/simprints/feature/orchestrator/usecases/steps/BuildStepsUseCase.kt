@@ -17,6 +17,7 @@ import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrol
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupContract
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
+import com.simprints.feature.validatepool.ValidateSubjectPoolContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -55,21 +56,26 @@ internal class BuildStepsUseCase @Inject constructor(
             } else emptyList(),
         )
 
-        is ActionRequest.IdentifyActionRequest -> listOf(
-            buildSetupStep(),
-            buildAgeSelectionStep(action, projectConfiguration),
-            buildConsentStep(ConsentType.IDENTIFY),
-            buildModalityCaptureSteps(
-                projectConfiguration,
-                FlowType.IDENTIFY,
-            ),
-            buildModalityMatcherSteps(
-                projectConfiguration,
-                FlowType.IDENTIFY,
-                buildMatcherSubjectQuery(projectConfiguration, action),
-                BiometricDataSource.fromString(action.biometricDataSource),
+        is ActionRequest.IdentifyActionRequest -> {
+            val subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action)
+
+            listOf(
+                buildSetupStep(),
+                buildValidateIdPoolStep(subjectQuery),
+                buildAgeSelectionStep(action, projectConfiguration),
+                buildConsentStep(ConsentType.IDENTIFY),
+                buildModalityCaptureSteps(
+                    projectConfiguration,
+                    FlowType.IDENTIFY,
+                ),
+                buildModalityMatcherSteps(
+                    projectConfiguration,
+                    FlowType.IDENTIFY,
+                    subjectQuery,
+                    BiometricDataSource.fromString(action.biometricDataSource),
+                )
             )
-        )
+        }
 
         is ActionRequest.VerifyActionRequest -> listOf(
             buildSetupStep(),
@@ -143,6 +149,12 @@ internal class BuildStepsUseCase @Inject constructor(
         )
     )
 
+    private fun buildValidateIdPoolStep(subjectQuery: SubjectQuery) = listOf(Step(
+        id = StepId.VALIDATE_ID_POOL,
+        navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
+        destinationId = ValidateSubjectPoolContract.DESTINATION,
+        payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
+    ))
 
     private fun buildModalityCaptureSteps(
         projectConfiguration: ProjectConfiguration,

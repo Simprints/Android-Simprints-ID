@@ -14,6 +14,7 @@ internal fun DownSynchronizationConfiguration.toProto(): ProtoDownSynchronizatio
         .setMaxNbOfModules(maxNbOfModules)
         .addAllModuleOptions(moduleOptions.values())
         .setIsTokenized(isTokenized)
+        .setMaxAge(maxAge)
         .build()
 }
 
@@ -31,6 +32,7 @@ internal fun ProtoDownSynchronizationConfiguration.toDomain(): DownSynchronizati
         moduleOptionsList.map {
             if (isTokenized) it.asTokenizableEncrypted() else it.asTokenizableRaw()
         },
+        maxAge,
     )
 
 internal fun ProtoDownSynchronizationConfiguration.PartitionType.toDomain(): DownSynchronizationConfiguration.PartitionType =

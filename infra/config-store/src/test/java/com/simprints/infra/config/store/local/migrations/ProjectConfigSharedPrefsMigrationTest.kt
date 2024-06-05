@@ -516,6 +516,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
                         .setMaxNbOfModules(5)
                         .addAllModuleOptions(listOf("module1", "module2"))
+                        .setMaxAge("PT24H")
+                        .build()
                 )
                 .build()
 
@@ -542,6 +544,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
                         .setMaxNbOfModules(5)
                         .addAllModuleOptions(listOf("module1", "module2"))
+                        .setMaxAge("PT24H")
+                        .build()
                 )
                 .build()
 
@@ -568,6 +572,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
                         .setMaxNbOfModules(5)
                         .addAllModuleOptions(listOf("module1", "module2"))
+                        .setMaxAge("PT24H")
+                        .build()
                 )
                 .build()
 
@@ -595,6 +601,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
                         .setMaxNbOfModules(5)
                         .addAllModuleOptions(listOf("module1", "module2"))
+                        .setMaxAge("PT24H")
+                        .build()
                 )
                 .build()
 

@@ -265,7 +265,8 @@ class SyncInfoViewModelTest {
                             EventSyncWorkerType.DOWNLOADER,
                             EventSyncWorkerState.Running
                         )
-                    )
+                    ),
+                    reporterStates = listOf(),
                 )
             )
 
@@ -286,7 +287,8 @@ class SyncInfoViewModelTest {
                             EventSyncWorkerType.DOWNLOADER,
                             EventSyncWorkerState.Succeeded
                         )
-                    )
+                    ),
+                    reporterStates = listOf(),
                 )
             )
 
@@ -306,7 +308,8 @@ class SyncInfoViewModelTest {
                         EventSyncWorkerType.DOWNLOADER,
                         EventSyncWorkerState.Succeeded
                     )
-                )
+                ),
+                reporterStates = listOf(),
             )
 
             viewModel.fetchSyncInformationIfNeeded(state)
@@ -362,7 +365,7 @@ class SyncInfoViewModelTest {
             )
         }
         viewModel.refreshInformation()
-        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList(), emptyList())
 
         connectionLiveData.value = false
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
@@ -382,7 +385,7 @@ class SyncInfoViewModelTest {
         viewModel.refreshInformation()
         connectionLiveData.value = true
 
-        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList(), emptyList())
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
 
         stateLiveData.value = EventSyncState(
@@ -395,7 +398,8 @@ class SyncInfoViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Running
                 )
-            )
+            ),
+            reporterStates = listOf(),
         )
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
 
@@ -409,7 +413,8 @@ class SyncInfoViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Succeeded
                 )
-            )
+            ),
+            reporterStates = listOf(),
         )
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
     }
@@ -423,7 +428,7 @@ class SyncInfoViewModelTest {
         }
         viewModel.refreshInformation()
         connectionLiveData.value = true
-        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList(), emptyList())
 
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
     }
@@ -438,7 +443,7 @@ class SyncInfoViewModelTest {
         }
         viewModel.refreshInformation()
         connectionLiveData.value = true
-        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList(), emptyList())
 
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
     }
@@ -447,12 +452,14 @@ class SyncInfoViewModelTest {
     fun `emit ReloginRequired = false when lastSyncState updates with different status`() =
         runTest {
             stateLiveData.value = EventSyncState(
-                "", 0, 0, listOf(), listOf(
+                "", 0, 0, listOf(),
+                listOf(
                     EventSyncState.SyncWorkerInfo(
                         EventSyncWorkerType.DOWNLOADER,
                         EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
                     )
-                )
+                ),
+                reporterStates = listOf(),
             )
 
             assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isFalse()
@@ -461,12 +468,14 @@ class SyncInfoViewModelTest {
     @Test
     fun `emit ReloginRequired = true when lastSyncState updates with such status`() = runTest {
         stateLiveData.value = EventSyncState(
-            "", 0, 0, listOf(), listOf(
+            "", 0, 0, listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
                 )
-            )
+            ),
+            reporterStates = listOf(),
         )
 
         assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isTrue()
@@ -504,6 +513,7 @@ class SyncInfoViewModelTest {
                 partitionType = partitionType,
                 moduleOptions = modules.map(String::asTokenizableRaw),
                 maxNbOfModules = 0,
+                maxAge = "PT24H",
             )
         )
     }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_validate_subject_pool"
+    app:startDestination="@id/validateSubjectPoolFragment">
+
+    <fragment
+        android:id="@+id/validateSubjectPoolFragment"
+        android:name="com.simprints.feature.validatepool.screen.ValidateSubjectPoolFragment"
+        android:label="ValidateSubjectPoolFragment"
+        tools:layout="@layout/fragment_validate_subject_pool">
+
+        <argument
+            android:name="subjectQuery"
+            app:argType="com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery" />
+
+    </fragment>
+
+</navigation>

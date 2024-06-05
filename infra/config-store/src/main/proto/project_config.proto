@@ -162,6 +162,7 @@ message ProtoDownSynchronizationConfiguration {
     int32 max_nb_of_modules = 2;
     repeated string module_options = 3;
     bool is_tokenized = 4;
+    string max_age = 5;
 
     enum PartitionType {
         PROJECT = 0;

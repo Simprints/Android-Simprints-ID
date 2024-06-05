@@ -11,17 +11,10 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Companion.fromWorkInfo
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.END_SYNC_REPORTER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.START_SYNC_REPORTER
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
-import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
-import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProvider
-import com.simprints.infra.eventsync.sync.common.didFailBecauseBackendMaintenance
-import com.simprints.infra.eventsync.sync.common.didFailBecauseCloudIntegration
-import com.simprints.infra.eventsync.sync.common.didFailBecauseReloginRequired
-import com.simprints.infra.eventsync.sync.common.didFailBecauseTooManyRequests
-import com.simprints.infra.eventsync.sync.common.filterByTags
-import com.simprints.infra.eventsync.sync.common.getEstimatedOutageTime
-import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
+import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.eventsync.sync.down.workers.extractDownSyncMaxCount
 import com.simprints.infra.eventsync.sync.down.workers.extractDownSyncProgress
 import com.simprints.infra.eventsync.sync.master.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
@@ -45,12 +38,15 @@ internal class EventSyncStateProcessor @Inject constructor(
                     val upSyncStates = upSyncUploadersStates(syncWorkers)
                     val downSyncStates = downSyncDownloadersStates(syncWorkers)
 
+                    val syncReporterStates = syncStartReporterStates(syncWorkers) + syncEndReporterStates(syncWorkers)
+
                     val syncState = EventSyncState(
                         lastSyncId,
                         progress,
                         total,
                         upSyncStates,
-                        downSyncStates
+                        downSyncStates,
+                        syncReporterStates,
                     )
 
                     emit(syncState)
@@ -121,6 +117,16 @@ internal class EventSyncStateProcessor @Inject constructor(
     private fun downSyncDownloadersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
         workInfos.filterByTags(tagForType(DOWNLOADER)).map {
             SyncWorkerInfo(DOWNLOADER, it.toEventSyncWorkerState())
+        }
+
+    private fun syncStartReporterStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
+        workInfos.filterByTags(tagForType(START_SYNC_REPORTER)).map {
+            SyncWorkerInfo(START_SYNC_REPORTER, it.toEventSyncWorkerState())
+        }
+
+    private fun syncEndReporterStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
+        workInfos.filterByTags(tagForType(END_SYNC_REPORTER)).map {
+            SyncWorkerInfo(END_SYNC_REPORTER, it.toEventSyncWorkerState())
         }
 
     private fun WorkInfo.toEventSyncWorkerState(): EventSyncWorkerState =
