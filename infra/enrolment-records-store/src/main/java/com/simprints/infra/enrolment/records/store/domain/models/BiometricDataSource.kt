@@ -8,7 +8,10 @@ enum class BiometricDataSource {
 
     companion object {
 
-        fun fromString(value: String) = when (value.uppercase()) {
+        fun fromString(
+            value: String,
+            callerPackageName: String,
+        ) = when (value.uppercase()) {
             "COMMCARE" -> COMMCARE
             else -> SIMPRINTS
         }

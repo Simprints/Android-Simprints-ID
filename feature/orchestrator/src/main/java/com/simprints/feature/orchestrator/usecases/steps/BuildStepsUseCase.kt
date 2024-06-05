@@ -46,7 +46,10 @@ internal class BuildStepsUseCase @Inject constructor(
                     projectConfiguration,
                     FlowType.ENROL,
                     buildMatcherSubjectQuery(projectConfiguration, action),
-                    BiometricDataSource.fromString(action.biometricDataSource),
+                    BiometricDataSource.fromString(
+                        action.biometricDataSource,
+                        action.callerPackageName
+                    ),
                 )
             } else emptyList(),
         )
@@ -62,7 +65,10 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.IDENTIFY,
                 buildMatcherSubjectQuery(projectConfiguration, action),
-                BiometricDataSource.fromString(action.biometricDataSource),
+                BiometricDataSource.fromString(
+                    action.biometricDataSource,
+                    action.callerPackageName
+                ),
             )
         )
 
@@ -78,7 +84,10 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.VERIFY,
                 SubjectQuery(subjectId = action.verifyGuid),
-                BiometricDataSource.fromString(action.biometricDataSource),
+                BiometricDataSource.fromString(
+                    action.biometricDataSource,
+                    action.callerPackageName
+                ),
             )
         )
 
@@ -114,8 +123,8 @@ internal class BuildStepsUseCase @Inject constructor(
 
 
     private fun buildModalityCaptureSteps(
-      projectConfiguration: ProjectConfiguration,
-      flowType: FlowType,
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowType,
     ) = projectConfiguration.general.modalities.map {
         when (it) {
             Modality.FINGERPRINT -> {
@@ -144,10 +153,10 @@ internal class BuildStepsUseCase @Inject constructor(
     }
 
     private fun buildModalityMatcherSteps(
-      projectConfiguration: ProjectConfiguration,
-      flowType: FlowType,
-      subjectQuery: SubjectQuery,
-      biometricDataSource: BiometricDataSource,
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowType,
+        subjectQuery: SubjectQuery,
+        biometricDataSource: BiometricDataSource,
     ) = projectConfiguration.general.modalities.map {
         Step(
             id = when (it) {
