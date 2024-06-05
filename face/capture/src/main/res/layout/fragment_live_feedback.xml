@@ -58,7 +58,6 @@
         android:layout_height="40dp"
         android:layout_marginTop="190dp"
         android:background="@drawable/feedback_chip_white"
-        android:textColor="@color/feedback_chip_text"
         android:drawablePadding="4dp"
         android:gravity="center"
         android:paddingStart="12dp"
@@ -66,6 +65,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="4dp"
         android:text="@string/face_capture_title_previewing"
+        android:textColor="@color/feedback_chip_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/capture_guide_frame" />
@@ -83,5 +83,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_title"
         tools:text="Move closer" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/capture_feedback_permission_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/face_capture_permission_action"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_explanation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

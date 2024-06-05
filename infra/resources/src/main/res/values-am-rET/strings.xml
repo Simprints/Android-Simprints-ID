@@ -180,7 +180,7 @@
     <string name="face_capture_error_look_straight">ሰዉየዉ ቀጥታ ካሜራዉን  እንዲያይ አድርግ</string>
     <string name="face_capture_begin_button">ለማንሳት ተጫን</string>
     <string name="face_capture_prep_begin_button_capturing">በማንሳት ላይ....</string>
-    <string name="face_capturing_permission_denied">የካሜራ ፈቃድ አብራ</string>
+    <string name="face_capture_permission_denied">የካሜራ ፈቃድ አብራ</string>
     <string name="face_capture_hold">ባለበት ፖዚሽኑ ላይ አቆይ....</string>
     <string name="face_capture_successfully_title">የፊት ምስል በስኬት ተመዝግቧል</string>
     <string name="face_capture_confirmation_title">ማረጋገጥ</string>
