@@ -1,10 +1,26 @@
 package com.simprints.infra.enrolment.records.store.domain.models
 
-import com.simprints.infra.enrolment.records.store.commcare.CommCareIdentityDataSource
+import android.os.Parcelable
+import androidx.annotation.Keep
+import kotlinx.parcelize.Parcelize
 
-enum class BiometricDataSource {
-    SIMPRINTS,
-    COMMCARE;
+@Keep
+sealed class BiometricDataSource: Parcelable {
+
+    open fun callerPackageName(): String = ""
+    open fun permissionName(): String? = null
+
+    @Parcelize
+    data object Simprints : BiometricDataSource(), Parcelable
+
+    @Parcelize
+    data class CommCare(
+        private val callerPackageName: String,
+    ) : BiometricDataSource(), Parcelable {
+
+        override fun callerPackageName() = callerPackageName
+        override fun permissionName() = "$callerPackageName.provider.cases.read"
+    }
 
     companion object {
 
@@ -12,13 +28,9 @@ enum class BiometricDataSource {
             value: String,
             callerPackageName: String,
         ) = when (value.uppercase()) {
-            "COMMCARE" -> COMMCARE
-            else -> SIMPRINTS
+            "COMMCARE" -> CommCare(callerPackageName)
+            else -> Simprints
         }
 
-        fun BiometricDataSource.permissionName(): String? = when (this) {
-            COMMCARE -> CommCareIdentityDataSource.PERMISSION_NAME
-            else -> null
-        }
     }
 }

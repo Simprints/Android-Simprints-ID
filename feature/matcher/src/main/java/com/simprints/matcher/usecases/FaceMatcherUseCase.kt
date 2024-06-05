@@ -59,7 +59,7 @@ internal class FaceMatcherUseCase @Inject constructor(
     private suspend fun getCandidates(
         query: SubjectQuery,
         range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.SIMPRINTS,
+        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ) = enrolmentRecordRepository
         .loadFaceIdentities(query, range, dataSource)
         .map {

@@ -15,7 +15,6 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.core.tools.extentions.applicationSettingsIntent
-import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource.Companion.permissionName
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.R

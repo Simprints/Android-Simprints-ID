@@ -81,7 +81,7 @@ internal class FingerprintMatcherUseCaseTest {
             MatchParams(
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
         )
 
@@ -105,7 +105,7 @@ internal class FingerprintMatcherUseCaseTest {
                 ),
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
         )
 
@@ -154,7 +154,7 @@ internal class FingerprintMatcherUseCaseTest {
                 ),
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             onLoadingCandidates = { onLoadingCalled = true },
         )
