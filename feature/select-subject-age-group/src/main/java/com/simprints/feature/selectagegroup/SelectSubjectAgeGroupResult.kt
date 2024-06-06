@@ -5,7 +5,7 @@ import com.simprints.infra.config.store.models.AgeGroup
 import java.io.Serializable
 
 @Keep
-data class SelectSubjectAgeResult(
+data class SelectSubjectAgeGroupResult(
     val ageGroup: AgeGroup,
 ) : Serializable
 

@@ -12,7 +12,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.login.LoginResult
-import com.simprints.feature.selectagegroup.SelectSubjectAgeResult
+import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
@@ -57,7 +57,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = AlertResult::class, name = "AlertResult"),
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
-    JsonSubTypes.Type(value = SelectSubjectAgeResult::class, name = "SelectSubjectAgeResult"),
+    JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeResult"),
 )
 abstract class SerializableMixin : Serializable
 

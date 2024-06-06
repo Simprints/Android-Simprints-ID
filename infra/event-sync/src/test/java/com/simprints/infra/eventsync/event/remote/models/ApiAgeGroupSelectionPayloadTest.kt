@@ -5,7 +5,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import io.mockk.mockk
 import org.junit.Test
 
-class ApiAgeGroupSelectionPayloadTest {
+class ApiGuidSelectionPayloadTest {
 
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {

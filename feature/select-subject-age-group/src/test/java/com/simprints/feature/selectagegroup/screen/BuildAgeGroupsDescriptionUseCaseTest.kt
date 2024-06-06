@@ -41,29 +41,40 @@ class BuildAgeGroupsDescriptionUseCaseTest {
 
     @Test
     fun testAgeGroupDescriptions() = runTest {
-
         coEvery { configurationRepo.getProjectConfiguration().allowedAgeRanges() } returns listOf(
             AgeGroup(6, 60), AgeGroup(120, null), AgeGroup(60, 120)
         )
-
         val result = buildAgeGroupsDescription()
-        val expected =
-            arrayOf("0 months to 6 months", "6 months to 5 years", "5 years to 10 years", "10 years and above")
-
+        val expected = arrayOf(
+            "0 months to 6 months",
+            "6 months to 5 years",
+            "5 years to 10 years",
+            "10 years and above"
+        )
         assertAgeGroupDescriptionsMatchExpected(result, expected)
-
     }
 
+    @Test
+    fun testAgeGroupsOverlapping() = runTest {
+        coEvery { configurationRepo.getProjectConfiguration().allowedAgeRanges() } returns listOf(
+            AgeGroup(6, 60), AgeGroup(36, null), AgeGroup(60, null)
+        )
+
+        val result = buildAgeGroupsDescription()
+        val expected = arrayOf(
+            "0 months to 6 months", "6 months to 3 years", "3 years to 5 years", "5 years and above"
+        )
+        assertAgeGroupDescriptionsMatchExpected(result, expected)
+    }
 
     @Test
     fun testAgeGroupWithInitialAndFinalMissing() = runTest {
         coEvery { configurationRepo.getProjectConfiguration().allowedAgeRanges() } returns listOf(
-            AgeGroup(6, 60), AgeGroup(60, null)
+            AgeGroup(6, 60)
         )
 
         val result = buildAgeGroupsDescription()
-        val expected =
-            arrayOf("0 months to 6 months", "6 months to 5 years", "5 years and above")
+        val expected = arrayOf("0 months to 6 months", "6 months to 5 years", "5 years and above")
 
         assertAgeGroupDescriptionsMatchExpected(result, expected)
     }
@@ -79,8 +90,7 @@ class BuildAgeGroupsDescriptionUseCaseTest {
     }
 
     private fun assertAgeGroupDescriptionsMatchExpected(
-        result: List<AgeGroupDisplayModel>,
-        expected: Array<String>
+        result: List<AgeGroupDisplayModel>, expected: Array<String>
     ) {
         result.forEachIndexed { index, ageGroupDisplayModel ->
             Truth.assertThat(

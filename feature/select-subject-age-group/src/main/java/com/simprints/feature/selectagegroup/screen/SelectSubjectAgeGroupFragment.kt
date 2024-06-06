@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.feature.exitform.toArgs
 import com.simprints.feature.selectagegroup.R
-import com.simprints.feature.selectagegroup.SelectSubjectAgeResult
+import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectagegroup.databinding.FragmentAgeGroupSelectionBinding
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.uibase.navigation.finishWithResult
@@ -64,6 +64,6 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
     }
 
     private fun finishWithResult(ageGroup: AgeGroup) {
-        findNavController().finishWithResult(this, SelectSubjectAgeResult(ageGroup))
+        findNavController().finishWithResult(this, SelectSubjectAgeGroupResult(ageGroup))
     }
 }
