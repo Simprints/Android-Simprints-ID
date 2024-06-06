@@ -23,8 +23,10 @@ internal fun FingerprintConfiguration.FingerprintSdkConfiguration.toProto() =
         .also {
             if (vero1 != null) it.vero1 = vero1.toProto()
             if (vero2 != null) it.vero2 = vero2.toProto()
-        }
-        .build()
+            if (allowedAgeRange != null)
+                it.allowedAgeRange = allowedAgeRange.toProto()
+        }.build()
+
 
 internal fun FingerprintConfiguration.VeroGeneration.toProto() = when (this) {
     FingerprintConfiguration.VeroGeneration.VERO_1 -> ProtoFingerprintConfiguration.VeroGeneration.VERO_1
@@ -88,7 +90,7 @@ internal fun ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.toDo
         comparisonStrategyForVerification.toDomain(),
         if (hasVero1()) vero1.toDomain() else null,
         if (hasVero2()) vero2.toDomain() else null,
-        AgeGroup(130, 300),
+        if (hasAllowedAgeRange()) allowedAgeRange.toDomain() else null
     )
 
 
@@ -107,3 +109,11 @@ internal fun ProtoFingerprintConfiguration.FingerComparisonStrategy.toDomain() =
         "invalid FingerComparisonStrategy $name"
     )
 }
+
+internal fun ProtoAllowedAgeRange.toDomain() = AgeGroup(startInclusive, endExclusive)
+
+internal fun AgeGroup.toProto() =
+    ProtoAllowedAgeRange.newBuilder().setStartInclusive(startInclusive).let { builder ->
+        endExclusive?.let { builder.setEndExclusive(it) }
+        builder.build()
+    }

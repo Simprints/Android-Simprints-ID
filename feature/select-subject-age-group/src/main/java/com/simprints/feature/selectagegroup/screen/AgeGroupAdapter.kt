@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.selectagegroup.R
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R as IDR
 
 
@@ -16,8 +15,7 @@ import com.simprints.infra.resources.R as IDR
 internal class AgeGroupAdapter(
     private val ageGroups: List<AgeGroupDisplayModel>,
     private val onClick: (AgeGroupDisplayModel) -> Unit
-) :
-    RecyclerView.Adapter<AgeGroupAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<AgeGroupAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val view = layoutInflater.inflate(R.layout.age_group_item, parent, false)
@@ -44,11 +42,11 @@ internal class AgeGroupAdapter(
         private val ageGroupIcon: ImageView = itemView.findViewById(R.id.item_icon)
         fun bind(ageGroupDisplayModel: AgeGroupDisplayModel, position: Int) {
             ageGroupTextView.text = ageGroupDisplayModel.displayString
-            ageGroupIcon.setImageResource(icons[position])
-            Simber.i("Age group: $ageGroupDisplayModel")
+            // if the position is greater than the number of icons, use the last icon
+            ageGroupIcon.setImageResource(icons.getOrNull(position) ?: icons.last())
+
             itemView.setOnClickListener {
                 onClick(ageGroupDisplayModel)
-                Simber.i("Age group clicked: $ageGroupDisplayModel")
             }
         }
     }

@@ -7,6 +7,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.events.sampledata.createAgeGroupSelectionEvent
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createAuthenticationEvent
 import com.simprints.infra.events.sampledata.createAuthorizationEvent
@@ -49,6 +50,7 @@ import com.simprints.infra.events.sampledata.createVerificationCallbackEventV2
 import com.simprints.infra.events.sampledata.createVerificationCalloutEvent
 import com.simprints.infra.events.sampledata.createVero2InfoSnapshotEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AgeGroupSelection
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AlertScreen
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authentication
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authorization
@@ -81,6 +83,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Sca
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.SuspiciousIntent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Vero2InfoSnapshot
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
+import com.simprints.infra.eventsync.event.validateAgeGroupSelectionEventApiModel
 import com.simprints.infra.eventsync.event.validateAlertScreenEventApiModel
 import com.simprints.infra.eventsync.event.validateAuthenticationEventApiModel
 import com.simprints.infra.eventsync.event.validateAuthorizationEventApiModel
@@ -492,6 +495,14 @@ class ApiEventTest {
 
         validateUpSyncRequestEventApiModel(json)
     }
+    @Test
+    fun validate_ageGroupSelectionEventApiModel() {
+        val event = createAgeGroupSelectionEvent()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateAgeGroupSelectionEventApiModel(json)
+    }
 
     @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
@@ -589,6 +600,7 @@ class ApiEventTest {
             EventDownSyncRequest -> validate_DownSyncRequestEventApiModel()
             EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
             LicenseCheck -> validate_licenseCheckEventApiModel()
+            AgeGroupSelection-> validate_ageGroupSelectionEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

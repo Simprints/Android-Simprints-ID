@@ -418,3 +418,9 @@ fun createLicenseCheckEvent() = LicenseCheckEvent(
     vendor = "NEC_FINGERPRINT",
 
 )
+
+fun createAgeGroupSelectionEvent() = AgeGroupSelectionEvent(
+    createdAt = CREATED_AT,
+    endedAt = ENDED_AT,
+    subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2)
+)
