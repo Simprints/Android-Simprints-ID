@@ -53,7 +53,7 @@ internal class MatchViewModel @Inject constructor(
             else -> fingerprintMatcher
         }
 
-        val (sortedResults, totalCandidates) = matcherUseCase(
+        val matcherResult = matcherUseCase(
             params,
             onLoadingCandidates = { tag ->
                 Simber.tag(tag).i("Loading candidates")
@@ -67,20 +67,20 @@ internal class MatchViewModel @Inject constructor(
             startTime,
             endTime,
             params,
-            totalCandidates,
-            matcherUseCase.matcherName(),
-            sortedResults
+            matcherResult.totalCandidates,
+            matcherResult.matcherName,
+            matcherResult.matchResultItems
         )
 
-        setMatchState(totalCandidates, sortedResults)
+        setMatchState(matcherResult.totalCandidates, matcherResult.matchResultItems)
 
         // wait a bit for the user to see the results
         delay(matchingEndWaitTimeInMillis)
 
         _matchResponse.send(
             when {
-                isFaceMatch -> FaceMatchResult(sortedResults)
-                else -> FingerprintMatchResult(sortedResults)
+                isFaceMatch -> FaceMatchResult(matcherResult.matchResultItems)
+                else -> FingerprintMatchResult(matcherResult.matchResultItems)
             }
         )
     }

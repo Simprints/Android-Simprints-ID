@@ -27,6 +27,7 @@ import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
+import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -168,7 +169,13 @@ internal class OrchestratorViewModel @Inject constructor(
             }
         }
         if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult) {
-            val matchingStep = steps.firstOrNull { it.id == StepId.FINGERPRINT_MATCHER }
+            val captureParams = currentStep.payload.getParcelable<FingerprintCaptureParams>("params")
+            // Find the matching step for the same fingerprint SDK as there may be multiple match steps
+            val matchingStep = steps.firstOrNull { step ->
+                (step.id == StepId.FINGERPRINT_MATCHER)
+                        && (step.payload.getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)?.fingerprintSDK
+                        == captureParams?.fingerprintSDK)
+            }
 
             if (matchingStep != null) {
                 val fingerprintSamples = result.results.mapNotNull { it.sample }
