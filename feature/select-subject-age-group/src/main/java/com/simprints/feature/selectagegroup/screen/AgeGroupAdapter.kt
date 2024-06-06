@@ -6,12 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.selectagegroup.R
 import com.simprints.infra.resources.R as IDR
 
 
 // The age groups should be sorted as follows: Newborn, Baby, Child, Adult
 // because the icons are in that order
+@ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
 internal class AgeGroupAdapter(
     private val ageGroups: List<AgeGroupDisplayModel>,
     private val onClick: (AgeGroupDisplayModel) -> Unit
@@ -37,6 +39,7 @@ internal class AgeGroupAdapter(
         IDR.drawable.ic_age_group_selection_adult
     )
 
+    @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val ageGroupTextView: TextView = itemView.findViewById(R.id.item_label)
         private val ageGroupIcon: ImageView = itemView.findViewById(R.id.item_icon)

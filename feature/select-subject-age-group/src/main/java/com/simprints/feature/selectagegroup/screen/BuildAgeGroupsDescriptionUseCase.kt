@@ -17,25 +17,18 @@ internal class BuildAgeGroupsDescriptionUseCase @Inject constructor(
      * Builds a list of age groups for display
      * it reads the allowed age ranges from the configuration and formats them for display
      * it also adds a 0-<first age range> and <last age range>-above if they are not present
-     * overlapping age ranges are not yet supported
      */
     suspend operator fun invoke(): List<AgeGroupDisplayModel> {
+
         val allowedAgeRanges = configurationRepo.getProjectConfiguration().allowedAgeRanges()
-        return formatAgeRangesForDisplay(allowedAgeRanges)
-    }
+        val processedAgeRanges = generateSortedUniqueAgeGroups(allowedAgeRanges)
 
-    private fun formatAgeRangesForDisplay(ageGroups: List<AgeGroup>): List<AgeGroupDisplayModel> {
-
-        // Sorting the age ranges
-        val sortedRanges = processAgeGroups(ageGroups).toMutableList()
-
-        return sortedRanges.map { ageGroup ->
+        return processedAgeRanges.map { ageGroup ->
             AgeGroupDisplayModel(ageGroup.getDisplayName(), ageGroup)
         }
-
     }
 
-    private fun processAgeGroups(ageGroups: List<AgeGroup>): List<AgeGroup> {
+    private fun generateSortedUniqueAgeGroups(ageGroups: List<AgeGroup>): List<AgeGroup> {
         // Handle empty list case by returning a single age group starting at 0 and ending with null
         if (ageGroups.isEmpty()) return listOf(AgeGroup(0, null))
 
@@ -68,26 +61,26 @@ internal class BuildAgeGroupsDescriptionUseCase @Inject constructor(
     }
 
 
-    private fun getString(id: Int): String {
+    private fun getResourceString(id: Int): String {
         return context.getString(id)
     }
 
     // Helper function to convert months to readable format
     private fun formatAgeInMonthsForDisplay(ageInMonths: Int): String {
         return when {
-            ageInMonths < 12 -> "$ageInMonths ${getString(IDR.age_group_selection_months)}"
-            ageInMonths < 24 -> "1 ${getString(IDR.age_group_selection_year)}"
-            else -> "${ageInMonths / 12} ${getString(IDR.age_group_selection_years)}"
+            ageInMonths < 12 -> "$ageInMonths ${getResourceString(IDR.age_group_selection_months)}"
+            ageInMonths < 24 -> "1 ${getResourceString(IDR.age_group_selection_year)}"
+            else -> "${ageInMonths / 12} ${getResourceString(IDR.age_group_selection_years)}"
         }
     }
 
     private fun AgeGroup.getDisplayName(): String {
         val start = formatAgeInMonthsForDisplay(startInclusive)
         val end = endExclusive?.let {
-            "${getString(IDR.age_group_selection_age_range_to)} ${
+            "${getResourceString(IDR.age_group_selection_age_range_to)} ${
                 formatAgeInMonthsForDisplay(it)
             }"
-        } ?: getString(IDR.age_group_selection_age_range_and_above)
+        } ?: getResourceString(IDR.age_group_selection_age_range_and_above)
         return "$start $end"
     }
 }
