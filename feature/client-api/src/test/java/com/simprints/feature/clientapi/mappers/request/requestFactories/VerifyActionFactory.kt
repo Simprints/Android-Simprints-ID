@@ -26,6 +26,7 @@ internal object VerifyActionFactory : RequestActionFactory() {
         metadata = MOCK_METADATA,
         verifyGuid = MOCK_VERIFY_GUID,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
+        callerPackageName = MOCK_CALLER_PACKAGE_NAME,
         unknownExtras = emptyMap()
     )
 

@@ -65,7 +65,7 @@ class SaveMatchEventUseCaseTest {
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
@@ -104,7 +104,7 @@ class SaveMatchEventUseCaseTest {
                         byteArrayOf(1, 2, 3)
                     )
                 ),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
@@ -138,7 +138,7 @@ class SaveMatchEventUseCaseTest {
                 emptyList(),
                 FlowType.IDENTIFY,
                 SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
             "faceMatcherName",
@@ -169,7 +169,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(attendantId = "userId"),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             0,
             "faceMatcherName",
@@ -192,7 +192,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId"),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             0,
             "faceMatcherName",
@@ -216,7 +216,7 @@ class SaveMatchEventUseCaseTest {
                 emptyList(),
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             0,
             "faceMatcherName",

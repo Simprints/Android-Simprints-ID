@@ -189,7 +189,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(
                 FlowType.VERIFY,
                 SubjectQuery(),
-                BiometricDataSource.SIMPRINTS)),
+                BiometricDataSource.Simprints)),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
@@ -209,7 +209,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(
                 FlowType.VERIFY,
                 SubjectQuery(),
-                BiometricDataSource.SIMPRINTS)),
+                BiometricDataSource.Simprints)),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false

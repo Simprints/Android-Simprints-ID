@@ -105,7 +105,7 @@ internal class MatchViewModelTest {
             probeFaceSamples = listOf(getFaceSample()),
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {},
-            biometricDataSource = BiometricDataSource.SIMPRINTS,
+            biometricDataSource = BiometricDataSource.Simprints,
         ))
         advanceUntilIdle()
 
@@ -147,7 +147,7 @@ internal class MatchViewModelTest {
             probeFingerprintSamples = listOf(getFingerprintSample()),
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {},
-            biometricDataSource = BiometricDataSource.SIMPRINTS,
+            biometricDataSource = BiometricDataSource.Simprints,
         ))
         advanceUntilIdle()
 

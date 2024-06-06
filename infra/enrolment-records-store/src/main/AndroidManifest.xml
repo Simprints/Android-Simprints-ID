@@ -2,5 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="org.commcare.dalvik.provider.cases.read" />
+    <uses-permission android:name="org.commcare.dalvik.debug.provider.cases.read" />
 
 </manifest>
