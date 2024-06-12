@@ -60,7 +60,7 @@ object SimprintsBioSdkModule {
 
     @Provides
     internal fun provideFingerprintMatcher(simAfisMatcher: SimAfisMatcher): FingerprintMatcher<SimAfisMatcherSettings> =
-        FingerprintMatcherImpl(simAfisMatcher)
+        FingerprintMatcherImpl()
 }
 
 

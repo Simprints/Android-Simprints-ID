@@ -77,23 +77,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
-        val license = licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        var licenseStatus = license.determineLicenseStatus()
-
-        if (licenseStatus == LicenseStatus.VALID) {
-            if (!faceBioSdkInitializer.tryInitWithLicense(activity, license!!.data)) {
-                // License is valid but the SDK failed to initialize
-                // This is should reported as an error
-                licenseStatus = LicenseStatus.ERROR
-            }
-        }
-        if (licenseStatus != LicenseStatus.VALID) {
-            Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus")
-            licenseRepository.deleteCachedLicense(Vendor.RANK_ONE)
-            _invalidLicense.send()
-        }
-        saveLicenseCheckEvent(Vendor.RANK_ONE, licenseStatus)
-
+        faceBioSdkInitializer.tryInitWithLicense(activity, "")
     }
 
     fun getSampleDetection() = faceDetections.firstOrNull()

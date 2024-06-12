@@ -10,6 +10,4 @@ android {
     }
 }
 
-dependencies {
-    runtimeOnly(libs.simmatcher)
-}
+ 

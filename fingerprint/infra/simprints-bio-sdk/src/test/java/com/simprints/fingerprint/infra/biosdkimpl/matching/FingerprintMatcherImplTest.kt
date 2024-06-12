@@ -10,20 +10,17 @@ import org.junit.Test
 
 class FingerprintMatcherImplTest {
 
-    private var simAfisMatcher: SimAfisMatcher = mockk()
 
     @Test
     fun match() = runTest {
         // Given
-        val matcher = FingerprintMatcherImpl(simAfisMatcher)
+        val matcher = FingerprintMatcherImpl()
         val probe: FingerprintIdentity = mockk()
         val candidates: List<FingerprintIdentity> = mockk()
         val simAfisMatcherSettings = SimAfisMatcherSettings()
         simAfisMatcherSettings.crossFingerComparison=false
         val matchResult: List<MatchResult> = mockk()
-        every {
-            simAfisMatcher.match(probe, candidates, false)
-        } returns matchResult
+
 
         // When
         val result = matcher.match(probe, candidates, simAfisMatcherSettings)

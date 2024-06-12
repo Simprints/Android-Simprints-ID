@@ -114,7 +114,6 @@ internal class SetupViewModel @Inject constructor(
 private val ProjectConfiguration.requiredLicenses: List<Vendor>
     get() = general.modalities.mapNotNull {
         when {
-            it == GeneralConfiguration.Modality.FACE -> RANK_ONE
             it == GeneralConfiguration.Modality.FINGERPRINT &&
                 fingerprint?.allowedSDKs?.contains(
                     FingerprintConfiguration.BioSdk.NEC

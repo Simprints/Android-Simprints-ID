@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.infra.necsdkimpl
 
-import com.secugen.WSQConverter
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.FingerprintImageProviderImpl
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
@@ -9,8 +8,6 @@ import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.Fingerpri
 import com.simprints.fingerprint.infra.necsdkimpl.initialization.SdkInitializerImpl
 import com.simprints.fingerprint.infra.necsdkimpl.matching.FingerprintMatcherImpl
 import com.simprints.fingerprint.infra.necsdkimpl.matching.NecMatchingSettings
-import com.simprints.necwrapper.nec.NEC
-import com.simprints.sgimagecorrection.SecugenImageCorrection
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,16 +39,5 @@ object NecSdkModule {
         )
     }
 
-    // NEC instance must be a singleton because it is initialized only once
-    @Provides
-    @Singleton
-    internal fun provideNecInstance() = NEC()
 
-    @Provides
-    @Singleton
-    internal fun provideWSQConverter () = WSQConverter()
-
-    @Provides
-    @Singleton
-    internal fun provideSecugenImageCorrection() = SecugenImageCorrection()
 }

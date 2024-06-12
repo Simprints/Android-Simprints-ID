@@ -36,4 +36,5 @@ interface AuthStore {
     fun getLegacyAppFallback(): FirebaseApp
 
     suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T>
+
 }

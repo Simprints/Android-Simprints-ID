@@ -30,7 +30,7 @@ dependencies {
 
     //BIO SDK
     implementation(project(":face:infra:face-bio-sdk"))
-    implementation(project(":face:infra:roc-wrapper"))
+    implementation(project(":face:infra:facenet-wrapper"))
 
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)

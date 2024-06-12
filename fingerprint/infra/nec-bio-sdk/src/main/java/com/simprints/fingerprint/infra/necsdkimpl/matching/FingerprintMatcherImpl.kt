@@ -7,12 +7,9 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
-import com.simprints.necwrapper.nec.NEC
-import com.simprints.necwrapper.nec.models.NECTemplate
 import javax.inject.Inject
 
 internal class FingerprintMatcherImpl @Inject constructor(
-    private val nec: NEC
 ) : FingerprintMatcher<NecMatchingSettings> {
 
     override val supportedTemplateFormat: String = NEC_TEMPLATE_FORMAT
@@ -27,11 +24,8 @@ internal class FingerprintMatcherImpl @Inject constructor(
         if (probe.templateFormatNotSupportedByNecMatcher()) {
             return emptyList()
         }
-        return if (settings?.crossFingerComparison == true) {
-            crossFingerMatching(probe, candidates)
-        } else {
-            sameFingerMatching(probe, candidates)
-        }
+        return            sameFingerMatching(probe, candidates)
+
     }
 
     private fun sameFingerMatching(
@@ -55,57 +49,13 @@ internal class FingerprintMatcherImpl @Inject constructor(
         probe: FingerprintIdentity,
         candidate: FingerprintIdentity
     ): MatchResult {
-        var fingers = 0 // the number of fingers used in matching
-        val total = probe.fingerprints.sumOf { fingerprint ->
-            candidate.templateForFinger(fingerprint.fingerId)?.let { candidateTemplate ->
-                fingers++
-                verify(fingerprint, candidateTemplate)
-            } ?: 0.toDouble()
-        }
-        return MatchResult(candidate.subjectId, getOverallScore(total, fingers))
+
+        return MatchResult(candidate.subjectId, 0f)
     }
 
-    private fun verify(probe: Fingerprint, candidate: Fingerprint) = try {
-        nec.match(
-            probe.toNecTemplate(),
-            candidate.toNecTemplate()
-        ).toDouble()
-    } catch (e: Exception) {
-        throw BioSdkException.TemplateMatchingException(e)
-    }
+    private fun verify(probe: Fingerprint, candidate: Fingerprint) =0
 
-    private fun crossFingerMatching(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>
-    ) = candidates.map { crossFingerMatching(probe, it) }
-
-    private fun crossFingerMatching(
-        probe: FingerprintIdentity,
-        candidate: FingerprintIdentity,
-    ): MatchResult {
-        // Number of fingers used in matching
-        val fingers = probe.fingerprints.size
-        // Sum of maximum matching score for each finger
-        val total = probe.fingerprints.sumOf { probeTemplate ->
-            candidate.fingerprints.maxOf { candidateTemplate ->
-                verify(probeTemplate, candidateTemplate)
-            }
-        }
-        // Matching score  = total/number of fingers
-        return MatchResult(candidate.subjectId, getOverallScore(total, fingers))
-    }
-
-    private fun FingerprintIdentity.templateForFinger(fingerId: FingerIdentifier) =
-        fingerprints.find { it.fingerId == fingerId }
-
-    private fun Fingerprint.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
-    private fun getOverallScore(total: Double, fingers: Int) =
-        if (fingers == 0) {
-            0.toFloat()
-        } else {
-            (total / fingers).toFloat()
-        }
-}
+  }
 
 private fun FingerprintIdentity.templateFormatNotSupportedByNecMatcher(): Boolean =
     fingerprints.any { it.format != NEC_TEMPLATE_FORMAT }

@@ -9,14 +9,11 @@ import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.determineLicenseStatus
-import com.simprints.necwrapper.nec.NEC
-import com.simprints.necwrapper.nec.tools.toByteBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 internal class SdkInitializerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val necInstance: NEC,
     private val licenseRepository: LicenseRepository,
     private val saveLicenseCheck: SaveLicenseCheckEventUseCase
 ) : SdkInitializer<Unit> {
@@ -28,7 +25,6 @@ internal class SdkInitializerImpl @Inject constructor(
             if (licenseStatus != LicenseStatus.VALID) {
                 throw BioSdkException.BioSdkInitializationException(message = "License is $licenseStatus")
             }
-            necInstance.init(licence!!.data.encodeAndConvertToByteBuffer(), context)
         } catch (e: Exception) {
             licenseRepository.deleteCachedLicense(Vendor.NEC)
             licenseStatus = LicenseStatus.ERROR
@@ -38,9 +34,4 @@ internal class SdkInitializerImpl @Inject constructor(
         }
     }
 }
-
-
-private fun String.encodeAndConvertToByteBuffer() =
-    EncodingUtilsImpl.base64ToBytes(this).toByteBuffer()
-
 
