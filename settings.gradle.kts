@@ -95,6 +95,7 @@ include(
     ":face:infra:bio-sdk-resolver",
     ":face:infra:roc-v1",
     ":face:infra:roc-v3",
+    ":face:infra:facenet-wrapper",
 )
 
 // Feature modules

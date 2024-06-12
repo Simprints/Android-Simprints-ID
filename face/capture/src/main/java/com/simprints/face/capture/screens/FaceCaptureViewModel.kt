@@ -18,6 +18,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.facenetwrapper.initialization.FaceNetInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
@@ -86,25 +87,32 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
-        val licenseVendor = Vendor.RANK_ONE
-        val license = licenseRepository.getCachedLicense(licenseVendor)
-        var licenseStatus = license.determineLicenseStatus()
-        if (licenseStatus == LicenseStatus.VALID) {
-            licenseStatus = initialize(activity, license!!)
-        }
+        val initializer = resolveFaceBioSdk().initializer
 
-        // In some cases license is invalidated on initialisation attempt
-        if (licenseStatus != LicenseStatus.VALID) {
-            Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus - attempting download")
-            licenseStatus = refreshLicenceAndRetry(activity, licenseVendor)
+        // TODO consider moving licence into initializer
+        if (initializer is FaceNetInitializer) {
+            initializer.tryInitWithLicense(activity, "")
+        } else {
+            val licenseVendor = Vendor.RANK_ONE
+            val license = licenseRepository.getCachedLicense(licenseVendor)
+            var licenseStatus = license.determineLicenseStatus()
+            if (licenseStatus == LicenseStatus.VALID) {
+                licenseStatus = initialize(activity, license!!)
+            }
+
+            // In some cases license is invalidated on initialisation attempt
+            if (licenseStatus != LicenseStatus.VALID) {
+                Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus - attempting download")
+                licenseStatus = refreshLicenceAndRetry(activity, licenseVendor)
+            }
+            // Still invalid after attempted refresh
+            if (licenseStatus != LicenseStatus.VALID) {
+                Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus")
+                licenseRepository.deleteCachedLicense(Vendor.RANK_ONE)
+                _invalidLicense.send()
+            }
+            saveLicenseCheckEvent(Vendor.RANK_ONE, licenseStatus)
         }
-        // Still invalid after attempted refresh
-        if (licenseStatus != LicenseStatus.VALID) {
-            Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus")
-            licenseRepository.deleteCachedLicense(Vendor.RANK_ONE)
-            _invalidLicense.send()
-        }
-        saveLicenseCheckEvent(Vendor.RANK_ONE, licenseStatus)
     }
 
     private suspend fun initialize(activity: Activity, license: License): LicenseStatus {

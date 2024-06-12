@@ -44,6 +44,7 @@ firebase_perf_version = "21.0.1"
 firebase_crashlyticsPlugin_version = "3.0.2"
 firebase_perfPlugin_version = "1.4.2"
 firebase_distrtibutionPlugin_version = "5.0.0"
+faceDetectionVersion = "16.1.6"
 
 # [MS-483] Newer versions of Retrofit (>=2.10.0) don't support android apis <=25 beacuse of the internal Jackson library
 retrofit_version = "2.9.0"
@@ -65,6 +66,8 @@ kronos_version = "0.0.1-alpha11"
 # Protobuf version is tied to Firebase dependencies and must be checked for compatibility on each update
 protobuf_version = "4.26.1"
 circleImageView_version = "3.1.0"
+tensorflowLiteSupportVersion = "0.4.4"
+tensorflowLiteVersion = "2.16.1"
 timber_version = "5.0.1"
 
 libsimprints_version = "2024.2.2"
@@ -139,6 +142,13 @@ androidX-annotation-annotation = { module = "androidx.annotation:annotation", ve
 
 #Support
 support-material = { module = "com.google.android.material:material", version.ref = "matertial_version" }
+
+# TensorFlow Lite
+tensorflow-lite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tensorflowLiteVersion" }
+tensorflow-lite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tensorflowLiteVersion" }
+tensorflow-lite-gpu-api = { module = "org.tensorflow:tensorflow-lite-gpu-api", version.ref = "tensorflowLiteVersion" }
+tensorflow-lite-support = { module = "org.tensorflow:tensorflow-lite-support", version.ref = "tensorflowLiteSupportVersion" }
+face-detection = { module = "com.google.mlkit:face-detection", version.ref = "faceDetectionVersion" }
 
 #WorkManager
 workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx_work_version" }
