@@ -113,7 +113,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     private fun observeBioSdkInit() {
-        vm.invalidLicense.observe(viewLifecycleOwner) {
+        vm.invalidLicense.observe(viewLifecycleOwner, LiveDataEventObserver {
             findNavController().navigateSafely(
                 this,
                 R.id.action_fingerprintCaptureFragment_to_graphAlert,
@@ -127,7 +127,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     eventType = AlertScreenEventType.LICENSE_INVALID
                 }.toArgs()
             )
-        }
+        })
     }
 
     private fun openRefusal() {
