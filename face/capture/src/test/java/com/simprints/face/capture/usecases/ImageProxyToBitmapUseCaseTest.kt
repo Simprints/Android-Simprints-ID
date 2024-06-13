@@ -4,7 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import androidx.camera.core.ImageProxy
-import com.google.common.truth.Truth
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -13,7 +14,9 @@ import io.mockk.unmockkStatic
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class ImageProxyToBitmapUseCaseTest {
 
     private var imageBytes: ByteArray = ByteArray(BYTEARRAY_SIZE)
@@ -34,7 +37,6 @@ class ImageProxyToBitmapUseCaseTest {
     private val bitmapMock = mockk<Bitmap> {
         justRun { copyPixelsFromBuffer(any()) }
         justRun { recycle() }
-        every { config } returns Bitmap.Config.ARGB_8888
     }
 
     @Before
@@ -59,7 +61,17 @@ class ImageProxyToBitmapUseCaseTest {
             Rect(CROP_RECT_LEFT, CROP_RECT_TOP, CROP_RECT_RIGHT, CROP_RECT_BOTTOM)
         )
         // Then
-        Truth.assertThat(bitmap.config).isEqualTo(Bitmap.Config.ARGB_8888)
+        assertThat(bitmap).isNotNull()
+    }
+
+    @Test
+    fun `Should return a null if cropRect is empty`() {
+
+        val rect = Rect(CROP_RECT_LEFT, CROP_RECT_TOP, CROP_RECT_LEFT, CROP_RECT_TOP)
+        // When
+        val bitmap = useCase.invoke(imageProxy, rect)
+        // Then
+        assertThat(bitmap).isNull()
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -76,6 +88,7 @@ class ImageProxyToBitmapUseCaseTest {
     }
 
     companion object {
+
         const val IMAGE_WIDTH = 150
         const val IMAGE_HEIGHT = 150
 

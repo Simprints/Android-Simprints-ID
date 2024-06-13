@@ -180,7 +180,7 @@
     <string name="face_capture_error_look_straight">ব্যক্তি ক্যামেরার দিকে সোজা তাকাচ্ছে কিনা নিশ্চিত করুন</string>
     <string name="face_capture_begin_button">ছবি তুলতে এখানে চাপুন</string>
     <string name="face_capture_prep_begin_button_capturing">ছবি তোলা হচ্ছে</string>
-    <string name="face_capturing_permission_denied">অনুগ্রহ করে ক্যামেরা ব্যাবহারের অনুমতি দিন</string>
+    <string name="face_capture_permission_denied">অনুগ্রহ করে ক্যামেরা ব্যাবহারের অনুমতি দিন</string>
     <string name="face_capture_hold">স্থির থাকুন</string>
     <string name="face_capture_successfully_title">ব্যক্তির মুখের ছবি তোলা সফল হয়েছে</string>
     <string name="face_capture_confirmation_title">নিশ্চিত করা হচ্ছে</string>

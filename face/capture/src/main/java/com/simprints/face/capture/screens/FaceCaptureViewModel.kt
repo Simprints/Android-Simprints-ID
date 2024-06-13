@@ -26,6 +26,7 @@ import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,6 +43,8 @@ internal class FaceCaptureViewModel @Inject constructor(
     // Updated in live feedback screen
     var attemptNumber: Int = 0
     var samplesToCapture = 1
+
+    var shouldCheckCameraPermissions = AtomicBoolean(true)
 
     private var faceDetections = listOf<FaceDetection>()
 
