@@ -63,3 +63,6 @@
 # Keep all marshallable classes as-is
 -keep class com.simprints.** extends java.io.Serializable { *; }
 -keep class com.simprints.** extends android.os.Parcelable { *; }
+
+-keep class retrofit2.** { *; }
+-keep interface retrofit2.** { *; }
