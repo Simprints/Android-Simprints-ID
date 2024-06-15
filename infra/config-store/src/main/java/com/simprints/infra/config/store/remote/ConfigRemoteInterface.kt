@@ -12,9 +12,6 @@ import retrofit2.http.Query
 
 internal interface ConfigRemoteInterface : SimRemoteInterface {
 
-    @GET("projects/{projectId}/configuration")
-    suspend fun getConfiguration(@Path("projectId") projectId: String): ApiProjectConfiguration
-
     @GET("projects/{projectId}")
     suspend fun getProject(@Path("projectId") projectId: String): ApiProject
 

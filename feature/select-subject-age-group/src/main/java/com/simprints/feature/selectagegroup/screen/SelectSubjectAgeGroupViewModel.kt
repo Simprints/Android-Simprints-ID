@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -45,7 +46,8 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
 
     val showExitForm: LiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>
         get() = _showExitForm
-    private val _showExitForm = MutableLiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>()
+    private val _showExitForm =
+        MutableLiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>()
 
     fun start() = viewModelScope.launch {
         startTime = timeHelper.now()
@@ -56,15 +58,15 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
 
     fun saveAgeGroupSelection(ageRange: AgeGroup) = externalScope.launch {
 
-            val event = AgeGroupSelectionEvent(
-                startTime,
-                timeHelper.now(),
-                AgeGroupSelectionEvent.AgeGroup(ageRange.startInclusive, ageRange.endExclusive)
-            )
-            eventRepository.addOrUpdateEvent(event)
+        val event = AgeGroupSelectionEvent(
+            startTime,
+            timeHelper.now(),
+            AgeGroupSelectionEvent.AgeGroup(ageRange.startInclusive, ageRange.endExclusive)
+        )
+        eventRepository.addOrUpdateEvent(event)
 
-            Simber.tag(SESSION.name).i("Added Age Group Selection Event")
-            _finish.send(ageRange)
+        Simber.tag(SESSION.name).i("Added Age Group Selection Event")
+        _finish.send(ageRange)
     }
 
     fun onBackPressed() {
@@ -74,6 +76,8 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
             _showExitForm.send(getExitFormFromModalities(projectConfig.general.modalities))
         }
     }
+
+    @ExcludedFromGeneratedTestCoverageReports(reason = "UI code")
     private fun getExitFormFromModalities(modalities: List<GeneralConfiguration.Modality>) = when {
         modalities.size != 1 -> exitFormConfiguration {
             titleRes = R.string.exit_form_title_biometrics
