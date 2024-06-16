@@ -185,7 +185,7 @@
     <string name="face_capture_error_look_straight">Assurez-vous que la personne regarde droit vers la caméra.</string>
     <string name="face_capture_begin_button">Touchez pour capturer</string>
     <string name="face_capture_prep_begin_button_capturing">Capture en cours...</string>
-    <string name="face_capturing_permission_denied">Veuillez autoriser les permissions de l\'appareil photo</string>
+    <string name="face_capture_permission_denied">Veuillez autoriser les permissions de l\'appareil photo</string>
     <string name="face_capture_hold">Maintenez la position...</string>
     <string name="face_capture_successfully_title">Le visage a été capturé avec succès.</string>
     <string name="face_capture_confirmation_title">Confirmation</string>

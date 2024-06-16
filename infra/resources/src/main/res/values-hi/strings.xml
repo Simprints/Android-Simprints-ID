@@ -180,7 +180,7 @@
     <string name="face_capture_error_look_straight">सुनिश्चित करें कि व्यक्ति सीधे कैमरे में देख रहा है</string>
     <string name="face_capture_begin_button">कैप्चर करने के लिए टैप करें</string>
     <string name="face_capture_prep_begin_button_capturing">कैप्चर हो रहा है.......</string>
-    <string name="face_capturing_permission_denied">कृपया कैमरे की अनुमति दें</string>
+    <string name="face_capture_permission_denied">कृपया कैमरे की अनुमति दें</string>
     <string name="face_capture_hold">अपनी जगह पर रहें</string>
     <string name="face_capture_successfully_title">चेहरे को सफलतापूर्वक कैप्चर कर लिया गया है।</string>
     <string name="face_capture_confirmation_title">पुष्टीकरण</string>

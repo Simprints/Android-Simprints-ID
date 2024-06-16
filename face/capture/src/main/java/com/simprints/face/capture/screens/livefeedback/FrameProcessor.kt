@@ -13,14 +13,14 @@ import javax.inject.Inject
 
 
 internal class FrameProcessor @Inject constructor(
-    private val imageProxyToBitmap: ImageProxyToBitmapUseCase
+    private val imageProxyToBitmap: ImageProxyToBitmapUseCase,
 ) {
 
     private var previewViewWidth: Int = 0
     private var previewViewHeight: Int = 0
 
     private lateinit var boxOnTheScreen: RectF
-    private lateinit var cropRect: Rect
+    private var cropRect: Rect? = null
 
     /**
      * Init the frame processor
@@ -42,15 +42,14 @@ internal class FrameProcessor @Inject constructor(
      * @param image
      * @return Bitmap
      */
-    fun cropRotateFrame(image: ImageProxy): Bitmap {
-        if (!this::cropRect.isInitialized) {
-            // The cropRect should be calculated once as its value will be the same for all images.
-            calcRotatedCropRect(image)
-        }
-        return imageProxyToBitmap(image, cropRect)
+    fun cropRotateFrame(image: ImageProxy): Bitmap? {
+        val rect = cropRect?.takeUnless { it.isEmpty }
+            ?: calcRotatedCropRect(image).also { cropRect = it }
+
+        return imageProxyToBitmap(image, rect)
     }
 
-    private fun calcRotatedCropRect(image: ImageProxy) {
+    private fun calcRotatedCropRect(image: ImageProxy): Rect {
         val cameraWidth = image.width
         val cameraHeight = image.height
 
@@ -67,7 +66,7 @@ internal class FrameProcessor @Inject constructor(
         val newBoundingBox =
             CameraTargetOverlay.rectForPlane(rotatedCameraWidth, rotatedCameraHeight, newRectSize)
 
-        cropRect = getRotatedBoundingBox(
+        return getRotatedBoundingBox(
             image.imageInfo.rotationDegrees,
             newBoundingBox,
             cameraWidth,
@@ -79,7 +78,7 @@ internal class FrameProcessor @Inject constructor(
         rotation: Int,
         newBoundingBox: RectF,
         cameraWidth: Int,
-        cameraHeight: Int
+        cameraHeight: Int,
     ): RectF {
         return when (360 - rotation) {
             0, 360 -> newBoundingBox
@@ -113,7 +112,7 @@ internal class FrameProcessor @Inject constructor(
         screenHeight: Int,
         cameraWidth: Int,
         cameraHeight: Int,
-        boxOnTheScreen: RectF
+        boxOnTheScreen: RectF,
     ): Float {
         return if (screenWidth == cameraWidth || screenHeight == cameraHeight) {
             val cameraArea = cameraHeight * cameraWidth
@@ -157,7 +156,7 @@ internal class FrameProcessor @Inject constructor(
         screenWidth: Int,
         cameraHeight: Int,
         screenHeight: Int,
-        currentWidth: Float
+        currentWidth: Float,
     ): Float {
         val widthRatio = cameraWidth / screenWidth.toFloat()
         val heightRatio = cameraHeight / screenHeight.toFloat()

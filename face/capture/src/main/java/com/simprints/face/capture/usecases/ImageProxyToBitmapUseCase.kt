@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 internal class ImageProxyToBitmapUseCase @Inject constructor() {
 
-    operator fun invoke(imageProxy: ImageProxy, cropRect: Rect): Bitmap {
+    operator fun invoke(imageProxy: ImageProxy, cropRect: Rect): Bitmap? {
         require(imageProxy.format == PixelFormat.RGBA_8888) {
             "${imageProxy.format} is not supported. RGBA_8888 is the only supported image format"
         }
@@ -27,6 +27,11 @@ internal class ImageProxyToBitmapUseCase @Inject constructor() {
         bitmap.copyPixelsFromBuffer(buffer)
         val rotationMatrix = Matrix()
         rotationMatrix.postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
+
+        if (cropRect.isEmpty) {
+            return null
+        }
+
         val croppedRotatedBitmap = Bitmap.createBitmap(
             bitmap,
             cropRect.left,
