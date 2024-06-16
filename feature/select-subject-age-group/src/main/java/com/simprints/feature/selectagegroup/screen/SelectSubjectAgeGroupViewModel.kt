@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -73,7 +72,6 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
         }
     }
 
-    @ExcludedFromGeneratedTestCoverageReports(reason = "UI code")
     private fun getExitFormFromModalities(modalities: List<GeneralConfiguration.Modality>) = when {
         modalities.size != 1 -> exitFormConfiguration {
             titleRes = R.string.exit_form_title_biometrics
