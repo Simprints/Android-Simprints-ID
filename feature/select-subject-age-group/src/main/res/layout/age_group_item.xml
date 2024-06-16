@@ -15,7 +15,7 @@
         android:background="@drawable/shadow_rounded_bg"
         android:elevation="4dp"
         android:padding="8dp"
-        android:src="@drawable/ic_age_group_selection_child" />
+        tools:src=" @drawable/ic_age_group_selection_child" />
 
     <TextView
         android:id="@+id/item_label"

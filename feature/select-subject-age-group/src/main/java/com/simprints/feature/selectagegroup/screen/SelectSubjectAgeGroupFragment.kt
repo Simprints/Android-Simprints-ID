@@ -48,9 +48,6 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
     }
 
     private fun fillRecyclerView(ageGroupsList: List<AgeGroupDisplayModel>) {
-        // fill the recycler view with the age groups
-        // 0 to 6 months, 6 months to 5 years, 5 to 10 years, 10 years and above
-        // on click of an age group, call viewModel.saveGuidSelection(args.projectId, args.subjectId)
         with(binding.ageGroupRecyclerView) {
             layoutManager = LinearLayoutManager(requireContext())
             val dividerItemDecoration = DividerItemDecoration(

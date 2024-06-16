@@ -33,8 +33,7 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     private val buildAgeGroups: BuildAgeGroupsDescriptionUseCase,
     private val configurationRepo: ConfigRepository,
     @ExternalScope private val externalScope: CoroutineScope,
-
-    ) : ViewModel() {
+) : ViewModel() {
 
     val finish: LiveData<LiveDataEventWithContent<AgeGroup>>
         get() = _finish
@@ -57,20 +56,17 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     }
 
     fun saveAgeGroupSelection(ageRange: AgeGroup) = externalScope.launch {
-
         val event = AgeGroupSelectionEvent(
             startTime,
             timeHelper.now(),
             AgeGroupSelectionEvent.AgeGroup(ageRange.startInclusive, ageRange.endExclusive)
         )
         eventRepository.addOrUpdateEvent(event)
-
         Simber.tag(SESSION.name).i("Added Age Group Selection Event")
         _finish.send(ageRange)
     }
 
     fun onBackPressed() {
-
         viewModelScope.launch {
             val projectConfig = configurationRepo.getProjectConfiguration()
             _showExitForm.send(getExitFormFromModalities(projectConfig.general.modalities))
