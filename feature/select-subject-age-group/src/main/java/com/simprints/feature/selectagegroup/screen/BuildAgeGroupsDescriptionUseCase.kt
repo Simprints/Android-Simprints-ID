@@ -69,8 +69,15 @@ internal class BuildAgeGroupsDescriptionUseCase @Inject constructor(
     private fun formatAgeInMonthsForDisplay(ageInMonths: Int): String {
         return when {
             ageInMonths < 12 -> "$ageInMonths ${getResourceString(IDR.age_group_selection_months)}"
-            ageInMonths < 24 -> "1 ${getResourceString(IDR.age_group_selection_year)}"
-            else -> "${ageInMonths / 12} ${getResourceString(IDR.age_group_selection_years)}"
+            else -> {
+                val years = ageInMonths / 12
+                val remainingMonths = ageInMonths % 12
+                if (remainingMonths == 0) {
+                    "$years ${getResourceString(IDR.age_group_selection_years)}"
+                } else {
+                    "$years ${getResourceString(IDR.age_group_selection_years)}, $remainingMonths ${getResourceString(IDR.age_group_selection_months)}"
+                }
+            }
         }
     }
 
