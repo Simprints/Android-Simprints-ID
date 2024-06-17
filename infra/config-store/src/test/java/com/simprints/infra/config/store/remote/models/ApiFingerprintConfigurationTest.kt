@@ -29,6 +29,7 @@ class ApiFingerprintConfigurationTest {
                 ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 null,
                 apiFingerprintConfiguration.secugenSimMatcher?.vero2,
+                apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
             ),
             null,
         )
@@ -42,6 +43,7 @@ class ApiFingerprintConfigurationTest {
                 FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 null,
                 fingerprintConfiguration.secugenSimMatcher?.vero2,
+                fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
             ),
             null,
         )
@@ -62,6 +64,7 @@ class ApiFingerprintConfigurationTest {
                 ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 ApiVero1Configuration(10),
                 null,
+                apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!
             ),
 
             )
@@ -76,6 +79,7 @@ class ApiFingerprintConfigurationTest {
                 FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 Vero1Configuration(10),
                 null,
+                fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!
             ),
 
             )

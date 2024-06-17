@@ -15,7 +15,7 @@ extra.apply {
      *
      * Dev version >= 2024.2.1 is required for receiving biometric sdk age restrictions
      */
-    set("VERSION_NAME", "2024.1.1")
+    set("VERSION_NAME", "2024.2.1")
 
     /**
      * Build type. The version code describes which build type was used for the build.

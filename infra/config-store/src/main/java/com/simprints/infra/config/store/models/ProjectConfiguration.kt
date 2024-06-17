@@ -1,7 +1,5 @@
 package com.simprints.infra.config.store.models
 
-import com.simprints.infra.logging.Simber
-
 data class ProjectConfiguration(
     val projectId: String,
     val updatedAt: String,
@@ -49,5 +47,5 @@ fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> {
         //Todo add face roc sdk ,
         fingerprint?.secugenSimMatcher?.allowedAgeRange,
         fingerprint?.nec?.allowedAgeRange
-    ).mapNotNull { it }
+    ).filterNotNull().filterNot { it.isEmpty() }
 }
