@@ -113,8 +113,9 @@ internal fun ProtoFingerprintConfiguration.FingerComparisonStrategy.toDomain() =
 
 internal fun ProtoAllowedAgeRange.toDomain() = AgeGroup(startInclusive, if (hasEndExclusive()) endExclusive else null)
 
-internal fun AgeGroup.toProto() =
-    ProtoAllowedAgeRange.newBuilder().setStartInclusive(startInclusive).let { builder ->
-        endExclusive?.let { builder.setEndExclusive(it) }
-        builder.build()
+internal fun AgeGroup.toProto() = ProtoAllowedAgeRange.newBuilder()
+    .also {
+        it.setStartInclusive(startInclusive)
+        if (endExclusive != null) it.setEndExclusive(endExclusive)
     }
+    .build()
