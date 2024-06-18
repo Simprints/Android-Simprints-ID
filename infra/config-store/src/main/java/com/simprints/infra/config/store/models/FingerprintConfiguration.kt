@@ -15,6 +15,7 @@ data class FingerprintConfiguration(
         val vero1: Vero1Configuration? = null,
         val vero2: Vero2Configuration? = null,
         val allowedAgeRange: AgeGroup? = null,
+        val verificationMatchThreshold: Float? = null,
     )
 
     enum class VeroGeneration {
@@ -32,7 +33,7 @@ data class FingerprintConfiguration(
         CROSS_FINGER_USING_MEAN_OF_MAX;
     }
 
-    // Todo we didn't yet implement the logic to select the SDK based on the configuration
+    // TODO(milen): remove
     // so we are just using  secugenSimMatcher if it is not null or nec otherwise
     // See ticket SIM-81 for more details
     val bioSdkConfiguration: FingerprintSdkConfiguration
