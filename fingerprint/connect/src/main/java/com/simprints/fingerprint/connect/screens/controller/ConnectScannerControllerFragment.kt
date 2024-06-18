@@ -72,10 +72,7 @@ internal class ConnectScannerControllerFragment :
         val permission = permissions
             .filterKeys(bluetoothPermissions::contains)
             .map { (permission, isGranted) ->
-                requireActivity().permissionFromResult(
-                    permission,
-                    isGranted
-                )
+                requireActivity().permissionFromResult(permission, isGranted)
             }
             .worstPermissionStatus()
 
@@ -108,16 +105,16 @@ internal class ConnectScannerControllerFragment :
         }
 
         findNavController().handleResult(
-            this,
-            R.id.connectScannerControllerFragment,
-            ExitFormContract.DESTINATION,
-            ::handleExitForm
+            lifecycleOwner = this,
+            currentDestinationId = R.id.connectScannerControllerFragment,
+            targetDestinationId = ExitFormContract.DESTINATION,
+            handler = ::handleExitForm
         )
         findNavController().handleResult(
-            this,
-            R.id.connectScannerControllerFragment,
-            AlertContract.DESTINATION,
-            ::handleResult
+            lifecycleOwner = this,
+            currentDestinationId = R.id.connectScannerControllerFragment,
+            targetDestinationId = AlertContract.DESTINATION,
+            handler = ::handleResult
         )
 
         activityViewModel.showScannerIssueScreen.observe(
@@ -158,9 +155,7 @@ internal class ConnectScannerControllerFragment :
                     )
 
                     is ConnectScannerIssueScreen.ScannerError -> screen.currentScannerId?.let {
-                        showKnownScannerDialog(
-                            it
-                        )
+                        showKnownScannerDialog(it)
                     }
 
                     is ConnectScannerIssueScreen.Ota -> internalNavController?.navigateSafely(

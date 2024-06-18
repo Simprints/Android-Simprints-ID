@@ -118,10 +118,10 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     private fun <T : Serializable> handleResult(destination: Int, block: (T) -> Unit) {
         findNavController().handleResult(
-            viewLifecycleOwner,
-            R.id.orchestratorRootFragment,
-            destination,
-            block
+            lifecycleOwner = viewLifecycleOwner,
+            currentDestinationId = R.id.orchestratorRootFragment,
+            targetDestinationId = destination,
+            handler = block
         )
     }
 
