@@ -115,7 +115,7 @@ internal class SyncViewModelTest {
 
     @Test
     fun `should initialize the live data syncToBFSIDAllowed correctly`() {
-        syncState.postValue(EventSyncState("", 0, 0, listOf(), listOf()))
+        syncState.postValue(EventSyncState("", 0, 0, listOf(), listOf(), listOf()))
         isConnected.postValue(true)
 
         val viewModel = initViewModel()
@@ -155,7 +155,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Running
                 )
-            ), listOf()
+            ), listOf(), listOf()
         )
         isConnected.value = true
 
@@ -200,7 +200,7 @@ internal class SyncViewModelTest {
     fun `should post a SyncDefault card state if there is no sync history`() {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
-        syncState.value = EventSyncState("", 0, 0, listOf(), listOf())
+        syncState.value = EventSyncState("", 0, 0, listOf(), listOf(), listOf())
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
         assertThat(syncCardLiveData).isEqualTo(SyncDefault(DATE))
@@ -217,7 +217,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Succeeded
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -236,7 +236,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Succeeded
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -254,7 +254,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Running
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -272,7 +272,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Enqueued
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -289,7 +289,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -306,7 +306,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -323,7 +323,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -369,7 +369,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -389,7 +389,7 @@ internal class SyncViewModelTest {
                         estimatedOutage = 30
                     )
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -407,7 +407,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed()
                 )
-            )
+            ), listOf()
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -426,7 +426,7 @@ internal class SyncViewModelTest {
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Succeeded
                 )
-            )
+            ), listOf()
         )
         val viewModel = initViewModel()
         viewModel.syncCardLiveData.getOrAwaitValue()

@@ -237,7 +237,8 @@ internal data class OldProjectConfig(
                     if (syncGroup == "GLOBAL") "PROJECT" else syncGroup
                 ),
                 maxNbOfModules = maxNbOfModules.toInt(),
-                moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw)
+                moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw),
+                maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
             ),
         )
 

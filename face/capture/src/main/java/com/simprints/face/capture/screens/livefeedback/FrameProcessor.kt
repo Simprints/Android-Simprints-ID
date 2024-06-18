@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 
 internal class FrameProcessor @Inject constructor(
-    private val imageProxyToBitmap: ImageProxyToBitmapUseCase
+    private val imageProxyToBitmap: ImageProxyToBitmapUseCase,
 ) {
 
     private var previewViewWidth: Int = 0
@@ -48,7 +48,7 @@ internal class FrameProcessor @Inject constructor(
      * @param image
      * @return Bitmap
      */
-    fun cropRotateFrame(image: ImageProxy, screenOrientation: ScreenOrientation): Bitmap {
+    fun cropRotateFrame(image: ImageProxy, screenOrientation: ScreenOrientation): Bitmap? {
         val cropRect = this.cropRect
             ?: calcRotatedCropRect(image, screenOrientation).also { this.cropRect = it }
         return imageProxyToBitmap(image, cropRect)
@@ -87,7 +87,7 @@ internal class FrameProcessor @Inject constructor(
         rotation: Int,
         newBoundingBox: RectF,
         cameraWidth: Int,
-        cameraHeight: Int
+        cameraHeight: Int,
     ): RectF {
         return when (360 - rotation) {
             0, 360 -> newBoundingBox
@@ -121,7 +121,7 @@ internal class FrameProcessor @Inject constructor(
         screenHeight: Int,
         cameraWidth: Int,
         cameraHeight: Int,
-        boxOnTheScreen: RectF
+        boxOnTheScreen: RectF,
     ): Float {
         return if (screenWidth == cameraWidth || screenHeight == cameraHeight) {
             val cameraArea = cameraHeight * cameraWidth
@@ -165,7 +165,7 @@ internal class FrameProcessor @Inject constructor(
         screenWidth: Int,
         cameraHeight: Int,
         screenHeight: Int,
-        currentWidth: Float
+        currentWidth: Float,
     ): Float {
         val widthRatio = cameraWidth / screenWidth.toFloat()
         val heightRatio = cameraHeight / screenHeight.toFloat()

@@ -6,24 +6,38 @@ import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
+import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class MapRefusalOrErrorResultUseCaseTest {
 
+    @MockK
+    private lateinit var eventRepository: SessionEventRepository
+
     private lateinit var useCase: MapRefusalOrErrorResultUseCase
 
     @Before
     fun setUp() {
-        useCase = MapRefusalOrErrorResultUseCase()
+        MockKAnnotations.init(this)
+
+        coEvery { eventRepository.getCurrentSessionScope().id } returns "sessionId"
+
+        useCase = MapRefusalOrErrorResultUseCase(eventRepository)
     }
 
     @Test
-    fun `Maps terminal step results to appropriate response`() {
+    fun `Maps terminal step results to appropriate response`() = runTest {
         mapOf(
             ExitFormResult(true) to AppRefusalResponse::class.java,
             FetchSubjectResult(found = false) to AppErrorResponse::class.java,
@@ -36,7 +50,13 @@ class MapRefusalOrErrorResultUseCaseTest {
     }
 
     @Test
-    fun `Maps successful step results to null`() {
+    fun `Maps id pool validation results`() = runTest {
+        assertThat(useCase(ValidateSubjectPoolResult(isValid = true))).isNull()
+        assertThat(useCase(ValidateSubjectPoolResult(isValid = false))).isInstanceOf(AppIdentifyResponse::class.java)
+    }
+
+    @Test
+    fun `Maps successful step results to null`() = runTest {
         listOf(
             FetchSubjectResult(found = true),
             SetupResult(isSuccess = true),
@@ -45,7 +65,7 @@ class MapRefusalOrErrorResultUseCaseTest {
     }
 
     @Test
-    fun `Maps non-result serializable to null`() {
+    fun `Maps non-result serializable to null`() = runTest {
         assertThat(useCase(mockk())).isNull()
     }
 }

@@ -6,7 +6,8 @@ import com.simprints.core.domain.tokenization.TokenizableString
 data class DownSynchronizationConfiguration(
     val partitionType: PartitionType,
     val maxNbOfModules: Int,
-    val moduleOptions: List<TokenizableString>
+    val moduleOptions: List<TokenizableString>,
+    val maxAge: String,
 ) {
 
     enum class PartitionType {
@@ -19,5 +20,11 @@ data class DownSynchronizationConfiguration(
             MODULE -> Partitioning.MODULE
             USER -> Partitioning.USER
         }
+    }
+
+
+    companion object {
+
+        const val DEFAULT_DOWN_SYNC_MAX_AGE = "PT24H"
     }
 }

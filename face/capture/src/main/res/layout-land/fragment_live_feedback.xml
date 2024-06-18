@@ -86,6 +86,20 @@
             android:gravity="center"
             tools:text="Move closer" />
     </LinearLayout>
+    tools:text="Move closer" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/capture_feedback_permission_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/face_capture_permission_action"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginVertical="@dimen/margin_huge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

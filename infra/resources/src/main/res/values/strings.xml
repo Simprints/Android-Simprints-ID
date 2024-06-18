@@ -180,7 +180,8 @@
     <string name="face_capture_error_look_straight">Make sure the person is looking straight at the camera</string>
     <string name="face_capture_begin_button">Tap to capture</string>
     <string name="face_capture_prep_begin_button_capturing">Capturing…</string>
-    <string name="face_capturing_permission_denied">Please allow camera permission</string>
+    <string name="face_capture_permission_denied">Please grant the camera permission</string>
+    <string name="face_capture_permission_action">Grant permission</string>
     <string name="face_capture_hold">Hold the position…</string>
     <string name="face_capture_successfully_title">Face has been successfully captured.</string>
     <string name="face_capture_confirmation_title">Confirmation</string>
@@ -423,5 +424,16 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">Sync in progress</string>
+
+    <!-- Identification pool validation -->
+    <string name="id_pool_validation_issue_title">Identification issue</string>
+    <string name="id_pool_validation_default_message">Checking identification candidate pool</string>
+    <string name="id_pool_validation_user_mismatch_message">Provided attendant ID does not match synchronised data</string>
+    <string name="id_pool_validation_module_mismatch_message">Provided module ID does not match synchronised data</string>
+    <string name="id_pool_validation_sync_required_message">Data has not been synchronised recently</string>
+    <string name="id_pool_validation_syncing_message">Syncing…</string>
+    <string name="id_pool_validation_pool_empty_message">There are no records on the device</string>
+    <string name="id_pool_validation_action_close">Close</string>
+    <string name="id_pool_validation_action_sync">Sync and retry</string>
 
 </resources>

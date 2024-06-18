@@ -12,6 +12,7 @@ import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.Companion.DEFAULT_DOWN_SYNC_MAX_AGE
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -109,19 +110,20 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         fileForPrivacyNotice(projectId, language).exists()
 
     override fun deletePrivacyNotices() {
-        File("$absolutePath${File.separator}${ConfigLocalDataSourceImpl.Companion.PRIVACY_NOTICE_FOLDER}").deleteRecursively()
+        File("$absolutePath${File.separator}$PRIVACY_NOTICE_FOLDER").deleteRecursively()
     }
 
     private fun fileForPrivacyNotice(projectId: String, language: String): File =
         File(
             filePathForPrivacyNoticeDirectory(projectId),
-            "$language.${ConfigLocalDataSourceImpl.Companion.FILE_TYPE}"
+            "$language.$FILE_TYPE"
         )
 
     private fun filePathForPrivacyNoticeDirectory(projectId: String): String =
-        "$absolutePath${File.separator}${ConfigLocalDataSourceImpl.Companion.PRIVACY_NOTICE_FOLDER}${File.separator}$projectId"
+        "$absolutePath${File.separator}$PRIVACY_NOTICE_FOLDER${File.separator}$projectId"
 
     companion object {
+
         val defaultProjectConfiguration: ProtoProjectConfiguration =
             ProjectConfiguration(
                 projectId = "",
@@ -191,6 +193,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         partitionType = DownSynchronizationConfiguration.PartitionType.USER,
                         maxNbOfModules = 6,
                         moduleOptions = listOf(),
+                        maxAge = DEFAULT_DOWN_SYNC_MAX_AGE,
                     ),
                 ),
             ).toProto()

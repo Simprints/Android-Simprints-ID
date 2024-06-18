@@ -59,6 +59,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     fun process(image: ImageProxy, screenOrientation: ScreenOrientation) {
         val captureStartTime = timeHelper.now()
         val croppedBitmap = frameProcessor.cropRotateFrame(image, screenOrientation)
+        if (croppedBitmap == null) {
+            image.close()
+            return
+        }
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)

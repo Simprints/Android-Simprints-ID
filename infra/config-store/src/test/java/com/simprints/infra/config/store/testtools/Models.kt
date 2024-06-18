@@ -228,7 +228,8 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
     ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
         ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration.PartitionType.PROJECT,
         1,
-        listOf("module1")
+        listOf("module1"),
+        "PT24H",
     )
 )
 
@@ -249,7 +250,8 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
         1,
-        listOf("module1".asTokenizableEncrypted())
+        listOf("module1".asTokenizableEncrypted()),
+        "PT24H",
     )
 )
 
@@ -282,6 +284,8 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .setMaxNbOfModules(1)
             .setIsTokenized(true)
             .addModuleOptions("module1")
+            .setMaxAge("PT24H")
+            .build()
     )
     .build()
 
