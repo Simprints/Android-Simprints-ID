@@ -31,7 +31,6 @@ import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
-import com.simprints.infra.config.store.remote.models.ApiAgeGroup
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiDeviceState
@@ -125,10 +124,15 @@ internal val apiFaceConfiguration =
 internal val faceConfiguration =
     FaceConfiguration(2, -1, FaceConfiguration.ImageSavingStrategy.NEVER, decisionPolicy)
 internal val protoFaceConfiguration = ProtoFaceConfiguration.newBuilder()
-    .setNbOfImagesToCapture(2)
-    .setQualityThreshold(-1)
-    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
-    .setDecisionPolicy(protoDecisionPolicy)
+    .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+    .setRankOne(
+        ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
+            .setNbOfImagesToCapture(2)
+            .setQualityThreshold(-1)
+            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
+            .setDecisionPolicy(protoDecisionPolicy)
+            .build()
+    )
     .build()
 
 internal val apiVero2Configuration = ApiVero2Configuration(

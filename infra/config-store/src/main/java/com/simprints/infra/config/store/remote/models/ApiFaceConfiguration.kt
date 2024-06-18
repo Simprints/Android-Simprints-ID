@@ -5,19 +5,43 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 
 @Keep
 internal data class ApiFaceConfiguration(
-    val nbOfImagesToCapture: Int,
-    val qualityThreshold: Int,
-    val imageSavingStrategy: ImageSavingStrategy,
-    val decisionPolicy: ApiDecisionPolicy,
+    val allowedSDKs: List<BioSdk>,
+    val rankOne: ApiFaceSdkConfiguration,
 ) {
 
     fun toDomain(): FaceConfiguration =
         FaceConfiguration(
-            nbOfImagesToCapture,
-            qualityThreshold,
-            imageSavingStrategy.toDomain(),
-            decisionPolicy.toDomain()
+            allowedSDKs = allowedSDKs.map { it.toDomain() },
+            rankOne = rankOne.toDomain()
         )
+
+    @Keep
+    data class ApiFaceSdkConfiguration(
+        val nbOfImagesToCapture: Int,
+        val qualityThreshold: Int,
+        val decisionPolicy: ApiDecisionPolicy,
+        val imageSavingStrategy: ImageSavingStrategy,
+        val allowedAgeRange: ApiAllowedAgeRange?,
+        val verificationMatchThreshold: Float?,
+    ) {
+        fun toDomain() = FaceConfiguration.FaceSdkConfiguration(
+            nbOfImagesToCapture = nbOfImagesToCapture,
+            qualityThreshold = qualityThreshold,
+            decisionPolicy = decisionPolicy.toDomain(),
+            imageSavingStrategy = imageSavingStrategy.toDomain(),
+            allowedAgeRange = allowedAgeRange?.toDomain(),
+            verificationMatchThreshold = verificationMatchThreshold
+        )
+    }
+
+    @Keep
+    enum class BioSdk {
+        RANK_ONE;
+
+        fun toDomain() = when (this) {
+            RANK_ONE -> FaceConfiguration.BioSdk.RANK_ONE
+        }
+    }
 
     @Keep
     enum class ImageSavingStrategy {
