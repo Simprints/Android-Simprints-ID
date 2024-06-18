@@ -28,8 +28,8 @@ internal data class ApiFingerprintConfiguration(
         val comparisonStrategyForVerification: FingerComparisonStrategy,
         val vero1: ApiVero1Configuration? = null,
         val vero2: ApiVero2Configuration? = null,
-        val allowedAgeRange: ApiAllowedAgeRange?,
-        val verificationMatchThreshold: Float?,
+        val allowedAgeRange: ApiAllowedAgeRange? = null,
+        val verificationMatchThreshold: Float? = null,
     ) {
         fun toDomain() = FingerprintConfiguration.FingerprintSdkConfiguration(
             fingersToCapture = fingersToCapture.map { it.toDomain() },
