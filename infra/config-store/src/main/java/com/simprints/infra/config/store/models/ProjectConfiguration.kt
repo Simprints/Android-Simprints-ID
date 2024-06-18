@@ -1,7 +1,5 @@
 package com.simprints.infra.config.store.models
 
-import com.simprints.infra.logging.Simber
-
 data class ProjectConfiguration(
     val projectId: String,
     val updatedAt: String,
@@ -44,10 +42,8 @@ fun ProjectConfiguration.isEventDownSyncAllowed(): Boolean =
 fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean =
     synchronization.up.simprints.imagesRequireUnmeteredConnection
 
-fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> {
-    return listOf(
-        //Todo add face roc sdk ,
-        fingerprint?.secugenSimMatcher?.allowedAgeRange,
-        fingerprint?.nec?.allowedAgeRange
-    ).mapNotNull { it }
-}
+fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOf(
+    //Todo add face roc sdk ,
+    fingerprint?.secugenSimMatcher?.allowedAgeRange,
+    fingerprint?.nec?.allowedAgeRange
+).mapNotNull { it }

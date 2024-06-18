@@ -15,6 +15,7 @@ data class FingerprintConfiguration(
         val vero1: Vero1Configuration? = null,
         val vero2: Vero2Configuration? = null,
         val allowedAgeRange: AgeGroup? = null,
+        val verificationMatchThreshold: Float? = null,
     )
 
     enum class VeroGeneration {

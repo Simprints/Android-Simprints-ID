@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.testtools
 
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
 import com.simprints.infra.config.store.local.models.ProtoDecisionPolicy
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
@@ -17,6 +18,7 @@ import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.local.models.toProto
 import com.simprints.infra.config.store.models.*
 import com.simprints.infra.config.store.remote.models.*
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
@@ -98,6 +100,10 @@ internal val protoConsentConfiguration = ProtoConsentConfiguration.newBuilder()
     )
     .build()
 
+internal val apiAllowedAgeRange = ApiAllowedAgeRange(2, 10)
+internal val allowedAgeRange = AgeGroup(2, 10)
+internal val protoAllowedAgeRange = ProtoAllowedAgeRange.newBuilder().setStartInclusive(2).setEndExclusive(10).build()
+
 internal val apiDecisionPolicy = ApiDecisionPolicy(10, 30, 40)
 internal val decisionPolicy = DecisionPolicy(10, 30, 40)
 internal val protoDecisionPolicy =
@@ -152,14 +158,45 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
         apiDecisionPolicy,
         ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
         ApiVero1Configuration(10),
-        apiVero2Configuration
+        apiVero2Configuration,
+        apiAllowedAgeRange,
+        42.0f,
     ),
     null,
 )
 
-internal val fingerprintConfiguration = apiFingerprintConfiguration.toDomain()
+internal val fingerprintConfiguration = FingerprintConfiguration(
+    allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
+    allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+    displayHandIcons = true,
+    secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
+        fingersToCapture = listOf(Finger.LEFT_3RD_FINGER),
+        decisionPolicy = decisionPolicy,
+        comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+        vero1 = Vero1Configuration(qualityThreshold = 10),
+        vero2 = vero2Configuration,
+        allowedAgeRange = allowedAgeRange,
+        verificationMatchThreshold = 42.0f,
+    ),
+    nec = null,
+)
 
-internal val protoFingerprintConfiguration = fingerprintConfiguration.toProto()
+internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBuilder()
+    .addAllowedScanners(ProtoFingerprintConfiguration.VeroGeneration.VERO_2)
+    .addAllowedSdks(ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER)
+    .setDisplayHandIcons(true)
+    .setSecugenSimMatcher(
+        ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.newBuilder()
+            .addFingersToCapture(ProtoFinger.LEFT_3RD_FINGER)
+            .setDecisionPolicy(protoDecisionPolicy)
+            .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
+            .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(10).build())
+            .setVero2(protoVero2Configuration)
+            .setAllowedAgeRange(protoAllowedAgeRange)
+            .setVerificationMatchThreshold(42.0f)
+            .build()
+    )
+    .build()
 
 internal val apiGeneralConfiguration = ApiGeneralConfiguration(
     listOf(ApiGeneralConfiguration.Modality.FACE),
@@ -369,6 +406,6 @@ internal val apiDeviceState = ApiDeviceState(
 )
 internal val deviceState = DeviceState(
     "deviceId",
-   false,
+    false,
     null
 )
