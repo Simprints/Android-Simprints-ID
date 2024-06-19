@@ -169,6 +169,7 @@ class LibSimprintsResponseMapperTest {
             AppErrorReason.BACKEND_MAINTENANCE_ERROR to Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR,
             AppErrorReason.PROJECT_PAUSED to Constants.SIMPRINTS_PROJECT_PAUSED,
             AppErrorReason.PROJECT_ENDING to Constants.SIMPRINTS_PROJECT_ENDING,
+            AppErrorReason.AGE_GROUP_NOT_SUPPORTED to Constants.SIMPRINTS_AGE_GROUP_NOT_SUPPORTED,
         ).forEach { (reason, expectedCode) ->
             val extras = mapper(
                 ActionResponse.ErrorActionResponse(
