@@ -1,26 +1,30 @@
 package com.simprints.feature.selectagegroup.screen
 
-import android.content.Context
-import com.google.common.truth.Truth
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.allowedAgeRanges
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import com.simprints.infra.resources.R.string as IDR
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
-
+@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
+@Config(application = HiltTestApplication::class)
 class BuildAgeGroupsDescriptionUseCaseTest {
     private lateinit var buildAgeGroupsDescription: BuildAgeGroupsDescriptionUseCase
 
-    @MockK
-    private lateinit var context: Context
+    private val context = InstrumentationRegistry.getInstrumentation().context
 
     @MockK
     private lateinit var configurationRepo: ConfigRepository
@@ -30,13 +34,6 @@ class BuildAgeGroupsDescriptionUseCaseTest {
         MockKAnnotations.init(this)
         mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
         buildAgeGroupsDescription = BuildAgeGroupsDescriptionUseCase(configurationRepo, context)
-        with(context) {
-            every { getString(IDR.age_group_selection_months) } returns "months"
-            every { getString(IDR.age_group_selection_year) } returns "year"
-            every { getString(IDR.age_group_selection_years) } returns "years"
-            every { getString(IDR.age_group_selection_age_range_to) } returns "to"
-            every { getString(IDR.age_group_selection_age_range_and_above) } returns "and above"
-        }
     }
 
     @Test
@@ -64,6 +61,7 @@ class BuildAgeGroupsDescriptionUseCaseTest {
         val expected = arrayOf(
             "0 months to 6 months", "6 months to 3 years", "3 years to 5 years", "5 years and above"
         )
+
         assertAgeGroupDescriptionsMatchExpected(result, expected)
     }
 
@@ -101,20 +99,14 @@ class BuildAgeGroupsDescriptionUseCaseTest {
             "5 years, 3 months to 10 years, 5 months",
             "10 years, 5 months and above"
         )
-        assertAgeGroupDescriptionsMatchExpected(result, expected)
 
+        assertAgeGroupDescriptionsMatchExpected(result, expected)
     }
 
     private fun assertAgeGroupDescriptionsMatchExpected(
         result: List<AgeGroupDisplayModel>, expected: Array<String>
-    ) {
-        result.forEachIndexed { index, ageGroupDisplayModel ->
-            Truth.assertThat(
-                ageGroupDisplayModel.displayString
-            ).isEqualTo(expected[index])
-        }
+    ) = assertThat(result.map { it.displayString }).containsExactlyElementsIn(expected)
 
-    }
 
 }
 

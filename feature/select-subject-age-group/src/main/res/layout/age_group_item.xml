@@ -19,12 +19,11 @@
 
     <TextView
         android:id="@+id/item_label"
+        style="@style/Text.Subtitle1.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="@dimen/margin_default"
-        android:textColor="@color/simprints_text_white"
-        android:textSize="@dimen/text_size_large"
         tools:text="Age Group" />
 
 </LinearLayout>
