@@ -4,9 +4,9 @@ import android.os.Parcelable
 import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowType
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.matcher.MatchContract
 import com.simprints.matcher.MatchParams
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import kotlinx.parcelize.Parcelize
 
 /**

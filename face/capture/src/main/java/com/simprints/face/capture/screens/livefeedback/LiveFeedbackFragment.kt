@@ -30,6 +30,7 @@ import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -77,6 +78,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         initFragment()
     }
 
+    override fun onDestroyView() {
+        vm.clearFrameProcessor()
+        super.onDestroyView()
+    }
+
     private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
@@ -122,25 +128,38 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     override fun onResume() {
         super.onResume()
 
-        if (mainVm.shouldCheckCameraPermissions.getAndSet(false)) {
-            // Check permission in onResume() so that if user left the app to go to Settings
-            // and give the permission, it's reflected when they come back to SID
-            if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
-                setUpCamera()
-            } else {
-                launchPermissionRequest.launch(Manifest.permission.CAMERA)
+        when {
+            requireActivity().hasPermission(Manifest.permission.CAMERA) -> setUpCamera()
+            mainVm.shouldCheckCameraPermissions.getAndSet(false) -> {
+                // Check permission in onResume() so that if user left the app to go to Settings
+                // and give the permission, it's reflected when they come back to SID
+                if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
+                    setUpCamera()
+                } else {
+                    launchPermissionRequest.launch(Manifest.permission.CAMERA)
+                }
             }
-        } else {
-            mainVm.shouldCheckCameraPermissions.set(true)
+            else -> mainVm.shouldCheckCameraPermissions.set(true)
         }
+//        if (mainVm.shouldCheckCameraPermissions.getAndSet(false)) {
+//            // Check permission in onResume() so that if user left the app to go to Settings
+//            // and give the permission, it's reflected when they come back to SID
+//            if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
+//                setUpCamera()
+//            } else {
+//                launchPermissionRequest.launch(Manifest.permission.CAMERA)
+//            }
+//        } else {
+//            mainVm.shouldCheckCameraPermissions.set(true)
+//        }
     }
 
-    override fun onPause() {
+    override fun onStop() {
         // Shut down our background executor
         if (::cameraExecutor.isInitialized) {
             cameraExecutor.shutdown()
         }
-        super.onPause()
+        super.onStop()
     }
 
     private fun bindViewModel() {
@@ -157,8 +176,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
-                        this,
-                        R.id.action_faceLiveFeedbackFragment_to_faceConfirmationFragment
+                        currentFragment = this,
+                        actionId = R.id.action_faceLiveFeedbackFragment_to_faceConfirmationFragment
                     )
                 }
 
@@ -168,7 +187,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun analyze(image: ImageProxy) {
         try {
-            vm.process(image)
+            vm.process(
+                image = image,
+                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
+            )
         } catch (t: Throwable) {
             Simber.e(t)
             // Image analysis is running in bg thread
@@ -192,7 +214,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturingStateColors() {
         with(binding) {
-            captureOverlay.drawWhiteTarget()
+            captureOverlay.drawWhiteTarget(
+                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
+            )
 
             captureTitle.setTextColor(
                 ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
@@ -205,7 +229,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturingNotStarted() {
         binding.apply {
-            captureOverlay.drawSemiTransparentTarget()
+            captureOverlay.drawSemiTransparentTarget(
+                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
+            )
             captureTitle.setText(IDR.string.face_capture_preparation_title)
             captureFeedbackTxtTitle.isVisible = true
             captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_previewing)
@@ -330,7 +356,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderNoPermission(shouldOpenSettings: Boolean) {
         binding.apply {
-            captureOverlay.drawSemiTransparentTarget()
+            captureOverlay.drawSemiTransparentTarget(
+                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
+            )
             captureFeedbackTxtTitle.isInvisible = true
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_permission_denied)
 

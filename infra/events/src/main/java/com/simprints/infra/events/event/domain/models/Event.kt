@@ -23,9 +23,9 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.CANDID
 import com.simprints.infra.events.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONSENT_KEY
-import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_DOWN_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V1_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_DOWN_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_CONFIRMATION_KEY

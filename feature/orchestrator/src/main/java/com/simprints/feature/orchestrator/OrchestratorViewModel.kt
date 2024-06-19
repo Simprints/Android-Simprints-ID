@@ -52,8 +52,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val updateDailyActivity: UpdateDailyActivityUseCase,
 ) : ViewModel() {
 
-    var requestProcessed = false
-
+    var isRequestProcessed = false
     private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
@@ -175,9 +174,9 @@ internal class OrchestratorViewModel @Inject constructor(
                 val fingerprintSamples = result.results.mapNotNull { it.sample }
                     .map {
                         MatchParams.FingerprintSample(
-                            it.fingerIdentifier,
-                            it.format,
-                            it.template
+                            fingerId = it.fingerIdentifier,
+                            format = it.format,
+                            template = it.template
                         )
                     }
                 val newPayload = matchingStep.payload

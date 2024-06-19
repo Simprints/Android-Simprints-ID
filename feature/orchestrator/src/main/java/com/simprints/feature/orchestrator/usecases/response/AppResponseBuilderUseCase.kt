@@ -1,9 +1,9 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
-import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject

@@ -32,19 +32,26 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         super.onViewCreated(view, savedInstanceState)
 
         observeViewModel()
-        viewModel.setupMatch(args.params)
+        if (!viewModel.isInitialized) {
+            viewModel.setupMatch(args.params)
+        }
     }
 
     private fun setIdentificationProgress(progress: Int) = requireActivity().runOnUiThread {
         ObjectAnimator
-            .ofInt(binding.faceMatchProgress, "progress", binding.faceMatchProgress.progress, progress)
+            .ofInt(
+                binding.faceMatchProgress,
+                "progress",
+                binding.faceMatchProgress.progress,
+                progress
+            )
             .setDuration(progress * PROGRESS_DURATION_MULTIPLIER)
             .start()
     }
 
     private fun observeViewModel() {
         viewModel.matchResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-             findNavController().finishWithResult(this, it)
+            findNavController().finishWithResult(this, it)
         })
         viewModel.matchState.observe(viewLifecycleOwner) { matchState ->
             when (matchState) {
@@ -68,14 +75,16 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private fun renderLoadingCandidates() {
         binding.apply {
             faceMatchTvMatchingProgressStatus1.isVisible = true
-            faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.matcher_loading_candidates)
+            faceMatchTvMatchingProgressStatus1.text =
+                getString(IDR.string.matcher_loading_candidates)
             faceMatchProgress.isVisible = true
         }
         setIdentificationProgress(LOADING_PROGRESS)
     }
 
     private fun renderMatching() {
-        binding.faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.matcher_matching_candidates)
+        binding.faceMatchTvMatchingProgressStatus1.text =
+            getString(IDR.string.matcher_matching_candidates)
 
         setIdentificationProgress(MATCHING_PROGRESS)
     }

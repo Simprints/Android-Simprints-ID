@@ -7,10 +7,23 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.simprints.infra.events.BuildConfig
-import com.simprints.infra.events.event.local.migrations.*
+import com.simprints.infra.events.event.local.migrations.EventMigration10to11
+import com.simprints.infra.events.event.local.migrations.EventMigration11to12
+import com.simprints.infra.events.event.local.migrations.EventMigration12to13
+import com.simprints.infra.events.event.local.migrations.EventMigration13to14
+import com.simprints.infra.events.event.local.migrations.EventMigration14to15
+import com.simprints.infra.events.event.local.migrations.EventMigration15to16
+import com.simprints.infra.events.event.local.migrations.EventMigration1to2
+import com.simprints.infra.events.event.local.migrations.EventMigration2to3
+import com.simprints.infra.events.event.local.migrations.EventMigration3to4
+import com.simprints.infra.events.event.local.migrations.EventMigration4to5
+import com.simprints.infra.events.event.local.migrations.EventMigration5to6
+import com.simprints.infra.events.event.local.migrations.EventMigration7to8
+import com.simprints.infra.events.event.local.migrations.EventMigration8to9
+import com.simprints.infra.events.event.local.migrations.EventMigration9to10
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.DbEventScope
-import com.simprints.infra.events.local.migrations.*
+import com.simprints.infra.events.local.migrations.EventMigration6to7
 import net.sqlcipher.database.SupportFactory
 
 

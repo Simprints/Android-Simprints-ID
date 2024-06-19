@@ -5,4 +5,5 @@ internal data class ConsentViewState(
     val consentText: String = "",
     val showParentalConsent: Boolean = false,
     val parentalConsentText: String = "",
+    val selectedTab: Int = 0
 )
