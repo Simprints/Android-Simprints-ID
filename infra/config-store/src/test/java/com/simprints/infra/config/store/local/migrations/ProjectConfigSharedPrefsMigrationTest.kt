@@ -10,6 +10,8 @@ import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPref
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.store.local.migrations.models.OldProjectConfig
 import com.simprints.infra.config.store.local.models.*
+import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration.ProtoFaceSdkConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.testtools.protoProjectConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
@@ -628,20 +630,26 @@ class ProjectConfigSharedPrefsMigrationTest {
                 "{\"FaceMatchThreshold\":30, \"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
             )
         private val PROTO_FACE_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
-            .setNbOfImagesToCapture(2)
-            .setQualityThreshold(-1)
-            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
+            .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+            .setRankOne(
+                ProtoFaceSdkConfiguration.newBuilder()
+                    .setNbOfImagesToCapture(2)
+                    .setQualityThreshold(-1)
+                    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
+                    .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build())
+                    .build()
             )
             .build()
 
         private val PROTO_FACE_DEFAULT_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
-            .setNbOfImagesToCapture(2)
-            .setQualityThreshold(-1)
-            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
+            .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+            .setRankOne(
+                ProtoFaceSdkConfiguration.newBuilder()
+                    .setNbOfImagesToCapture(2)
+                    .setQualityThreshold(-1)
+                    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
+                    .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build())
+                    .build()
             )
             .build()
 
@@ -690,14 +698,14 @@ class ProjectConfigSharedPrefsMigrationTest {
                         )
                     )
                     .setDecisionPolicy(
-                        ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(40).setHigh(200)
-                            .build()
+                        ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(40).setHigh(200).build()
                     )
                     .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
                     .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
                     .setVero2(PROTO_VERO_2_CONFIGURATION)
                     .build()
-            ).build()
+            )
+            .build()
 
         private val PROTO_FINGERPRINT_DEFAULT_CONFIGURATION =
             ProtoFingerprintConfiguration.newBuilder()
@@ -721,6 +729,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                             ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build()
                         )
                         .build()
-                ).build()
+                )
+                .build()
     }
 }

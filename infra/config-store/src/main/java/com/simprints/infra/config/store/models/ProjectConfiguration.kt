@@ -9,8 +9,7 @@ data class ProjectConfiguration(
     val consent: ConsentConfiguration,
     val identification: IdentificationConfiguration,
     val synchronization: SynchronizationConfiguration,
-) {
-}
+)
 
 fun ProjectConfiguration.canCoSyncAllData(): Boolean =
     synchronization.up.coSync.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -43,7 +42,7 @@ fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean =
     synchronization.up.simprints.imagesRequireUnmeteredConnection
 
 fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOf(
-    //Todo add face roc sdk ,
     fingerprint?.secugenSimMatcher?.allowedAgeRange,
-    fingerprint?.nec?.allowedAgeRange
+    fingerprint?.nec?.allowedAgeRange,
+    face?.rankOne?.allowedAgeRange,
 ).mapNotNull { it }

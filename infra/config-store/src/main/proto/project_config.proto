@@ -29,10 +29,26 @@ message ProtoGeneralConfiguration {
 }
 
 message ProtoFaceConfiguration {
-    int32 nb_of_images_to_capture = 1;
-    int32 quality_threshold = 2;
-    ImageSavingStrategy image_saving_strategy = 3;
-    ProtoDecisionPolicy decision_policy = 4;
+    int32 nb_of_images_to_capture = 1; // TODO: remove this field after migration to 2024.2.0
+    int32 quality_threshold = 2; // TODO: remove this field after migration to 2024.2.0
+    ImageSavingStrategy image_saving_strategy = 3; // TODO: remove this field after migration to 2024.2.0
+    ProtoDecisionPolicy decision_policy = 4; // TODO: remove this field after migration to 2024.2.0
+
+    repeated ProtoBioSdk allowed_sdks = 5;
+    optional ProtoFaceSdkConfiguration rank_one = 6;
+
+    enum ProtoBioSdk {
+        RANK_ONE = 0;
+    }
+
+    message ProtoFaceSdkConfiguration{
+        int32 nb_of_images_to_capture = 1;
+        int32 quality_threshold = 2;
+        ImageSavingStrategy image_saving_strategy = 3;
+        ProtoDecisionPolicy decision_policy = 4;
+        optional ProtoAllowedAgeRange allowed_age_range = 5;
+        optional float verification_match_threshold = 6;
+    }
 
     enum ImageSavingStrategy {
         NEVER = 0;

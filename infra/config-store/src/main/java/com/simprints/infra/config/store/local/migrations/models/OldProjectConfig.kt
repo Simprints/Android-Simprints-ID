@@ -81,16 +81,19 @@ internal data class OldProjectConfig(
         if (faceQualityThreshold == null) null
         else
             FaceConfiguration(
-                nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull()
-                    ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
-                qualityThreshold = faceQualityThreshold.toInt(),
-                imageSavingStrategy = if (saveFaceImages.toBoolean()) {
-                    FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
-                } else {
-                    FaceConfiguration.ImageSavingStrategy.NEVER
-                },
-                decisionPolicy = faceConfidenceThresholds?.let { parseDecisionPolicy(it) }
-                    ?: DecisionPolicy(0, 0, 0),
+                allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+                rankOne = FaceConfiguration.FaceSdkConfiguration(
+                    nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull()
+                        ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
+                    qualityThreshold = faceQualityThreshold.toInt(),
+                    imageSavingStrategy = if (saveFaceImages.toBoolean()) {
+                        FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
+                    } else {
+                        FaceConfiguration.ImageSavingStrategy.NEVER
+                    },
+                    decisionPolicy = faceConfidenceThresholds?.let { parseDecisionPolicy(it) }
+                        ?: DecisionPolicy(0, 0, 0),
+                ),
             )
 
     private fun fingerprintConfiguration(): FingerprintConfiguration? =

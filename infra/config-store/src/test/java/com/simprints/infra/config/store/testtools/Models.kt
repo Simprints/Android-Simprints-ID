@@ -7,6 +7,9 @@ import com.simprints.infra.config.store.local.models.ProtoDecisionPolicy
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration
+import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration.ProtoFaceSdkConfiguration
+import com.simprints.infra.config.store.local.models.ProtoFinger
+import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration
 import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
 import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProject
@@ -14,19 +17,39 @@ import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
-import com.simprints.infra.config.store.local.models.toProto
-import com.simprints.infra.config.store.models.*
-import com.simprints.infra.config.store.remote.models.*
 import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.DeviceState
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Vero1Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.remote.models.ApiAllowedAgeRange
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
+import com.simprints.infra.config.store.remote.models.ApiDeviceState
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFingerprintConfiguration
 import com.simprints.infra.config.store.remote.models.ApiGeneralConfiguration
 import com.simprints.infra.config.store.remote.models.ApiIdentificationConfiguration
 import com.simprints.infra.config.store.remote.models.ApiProject
 import com.simprints.infra.config.store.remote.models.ApiProjectConfiguration
+import com.simprints.infra.config.store.remote.models.ApiProjectState
 import com.simprints.infra.config.store.remote.models.ApiSynchronizationConfiguration
 import com.simprints.infra.config.store.remote.models.ApiVero1Configuration
 import com.simprints.infra.config.store.remote.models.ApiVero2Configuration
@@ -109,15 +132,42 @@ internal val decisionPolicy = DecisionPolicy(10, 30, 40)
 internal val protoDecisionPolicy =
     ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(30).setHigh(40).build()
 
-internal val apiFaceConfiguration =
-    ApiFaceConfiguration(2, -1, ApiFaceConfiguration.ImageSavingStrategy.NEVER, apiDecisionPolicy)
-internal val faceConfiguration =
-    FaceConfiguration(2, -1, FaceConfiguration.ImageSavingStrategy.NEVER, decisionPolicy)
+internal val apiFaceConfiguration = ApiFaceConfiguration(
+    allowedSDKs = listOf(ApiFaceConfiguration.BioSdk.RANK_ONE),
+    rankOne = ApiFaceConfiguration.ApiFaceSdkConfiguration(
+        nbOfImagesToCapture = 2,
+        qualityThreshold = -1,
+        imageSavingStrategy = ApiFaceConfiguration.ImageSavingStrategy.NEVER,
+        decisionPolicy = apiDecisionPolicy,
+        allowedAgeRange = apiAllowedAgeRange,
+        verificationMatchThreshold = 42f,
+    )
+)
+
+internal val faceConfiguration = FaceConfiguration(
+    allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+    rankOne = FaceConfiguration.FaceSdkConfiguration(
+        nbOfImagesToCapture = 2,
+        qualityThreshold = -1,
+        imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+        decisionPolicy = decisionPolicy,
+        allowedAgeRange = allowedAgeRange,
+        verificationMatchThreshold = 42f,
+    ),
+)
+
 internal val protoFaceConfiguration = ProtoFaceConfiguration.newBuilder()
-    .setNbOfImagesToCapture(2)
-    .setQualityThreshold(-1)
-    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
-    .setDecisionPolicy(protoDecisionPolicy)
+    .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+    .setRankOne(
+        ProtoFaceSdkConfiguration.newBuilder()
+            .setNbOfImagesToCapture(2)
+            .setQualityThreshold(-1)
+            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
+            .setDecisionPolicy(protoDecisionPolicy)
+            .setAllowedAgeRange(protoAllowedAgeRange)
+            .setVerificationMatchThreshold(42f)
+            .build()
+    )
     .build()
 
 internal val apiVero2Configuration = ApiVero2Configuration(
