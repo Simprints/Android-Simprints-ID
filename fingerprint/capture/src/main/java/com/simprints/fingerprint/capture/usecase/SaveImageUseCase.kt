@@ -22,7 +22,7 @@ internal class SaveImageUseCase @Inject constructor(
         vero2Configuration: Vero2Configuration,
         finger: IFingerIdentifier,
         captureEventId: String?,
-        collectedFinger: CaptureState.Collected,
+        collectedFinger: CaptureState.ScanProcess.Collected,
     ) = if (collectedFinger.scanResult.image != null && captureEventId != null) {
         saveImage(
             imageBytes = collectedFinger.scanResult.image,

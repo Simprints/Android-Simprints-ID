@@ -4,55 +4,104 @@ internal sealed class CaptureState {
 
     data object NotCollected : CaptureState()
     data object Skipped : CaptureState()
-    data class Scanning(val numberOfBadScans: Int = 0) : CaptureState()
-    data class TransferringImage(val scanResult: ScanResult, val numberOfBadScans: Int = 0) : CaptureState()
-    data class NotDetected(val numberOfBadScans: Int = 0) : CaptureState()
-    data class Collected(val scanResult: ScanResult, val numberOfBadScans: Int = 0) : CaptureState()
+    sealed class ScanProcess : CaptureState() {
+        abstract val numberOfBadScans: Int
+        abstract val numberOfNoFingerDetectedScans: Int
 
-    fun isCommunicating(): Boolean = this is Scanning || this is TransferringImage
+        data class Scanning(
+            override val numberOfBadScans: Int,
+            override val numberOfNoFingerDetectedScans: Int
+        ) : ScanProcess()
+
+        data class TransferringImage(
+            override val numberOfBadScans: Int,
+            override val numberOfNoFingerDetectedScans: Int,
+            val scanResult: ScanResult,
+        ) : ScanProcess()
+
+        data class NotDetected(
+            override val numberOfBadScans: Int,
+            override val numberOfNoFingerDetectedScans: Int
+        ) : ScanProcess()
+
+        data class Collected(
+            override val numberOfBadScans: Int,
+            override val numberOfNoFingerDetectedScans: Int,
+            val scanResult: ScanResult
+        ) : ScanProcess()
+
+    }
+
+    fun isCommunicating(): Boolean =
+        this is ScanProcess.Scanning || this is ScanProcess.TransferringImage
 
     fun toNotCollected() = NotCollected
 
     fun toSkipped() = Skipped
 
-    fun toScanning(): Scanning = when (this) {
-        is Scanning -> Scanning(numberOfBadScans)
-        is TransferringImage -> Scanning(numberOfBadScans)
-        is NotDetected -> Scanning(numberOfBadScans)
-        is Collected -> Scanning(numberOfBadScans)
-        else -> Scanning()
+    fun toScanning(): ScanProcess.Scanning = when (this) {
+        is ScanProcess -> ScanProcess.Scanning(
+            numberOfBadScans = numberOfBadScans,
+            numberOfNoFingerDetectedScans = numberOfNoFingerDetectedScans
+        )
+
+        else -> ScanProcess.Scanning(
+            numberOfBadScans = 0,
+            numberOfNoFingerDetectedScans = 0
+        )
     }
 
-    fun toTransferringImage(scanResult: ScanResult): TransferringImage = when (this) {
-        is TransferringImage -> TransferringImage(scanResult, numberOfBadScans)
-        is Scanning -> TransferringImage(scanResult, numberOfBadScans)
-        is NotDetected -> TransferringImage(scanResult, numberOfBadScans)
-        is Collected -> TransferringImage(scanResult, numberOfBadScans)
-        else -> TransferringImage(scanResult)
+    fun toTransferringImage(scanResult: ScanResult): ScanProcess.TransferringImage = when (this) {
+        is ScanProcess -> ScanProcess.TransferringImage(
+            numberOfBadScans = numberOfBadScans,
+            numberOfNoFingerDetectedScans = numberOfNoFingerDetectedScans,
+            scanResult = scanResult
+        )
+
+        else -> ScanProcess.TransferringImage(
+            numberOfBadScans = 0,
+            numberOfNoFingerDetectedScans = 0,
+            scanResult = scanResult
+        )
     }
 
-    fun toNotDetected(): NotDetected = when (this) {
-        is NotDetected -> NotDetected(numberOfBadScans)
-        is Scanning -> NotDetected(numberOfBadScans)
-        is TransferringImage -> NotDetected(numberOfBadScans)
-        is Collected -> NotDetected(numberOfBadScans)
-        else -> NotDetected()
+    fun toNotDetected(): ScanProcess.NotDetected = when (this) {
+        is ScanProcess -> ScanProcess.NotDetected(
+            numberOfBadScans = numberOfBadScans,
+            numberOfNoFingerDetectedScans = numberOfNoFingerDetectedScans + 1
+        )
+
+        else -> ScanProcess.NotDetected(
+            numberOfBadScans = 0,
+            numberOfNoFingerDetectedScans = 0
+        )
     }
 
-    fun toCollected(scanResult: ScanResult): Collected = when (this) {
-        is Scanning -> Collected(scanResult, numberOfBadScans + incIfBadScan(scanResult))
-        is TransferringImage -> Collected(scanResult, numberOfBadScans + incIfBadScan(scanResult))
-        is NotDetected -> Collected(scanResult, numberOfBadScans + incIfBadScan(scanResult))
-        is Collected -> Collected(scanResult, numberOfBadScans + incIfBadScan(scanResult))
-        else -> Collected(scanResult, incIfBadScan(scanResult))
+    fun toCollected(scanResult: ScanResult): ScanProcess.Collected = when (this) {
+        is ScanProcess -> ScanProcess.Collected(
+            numberOfBadScans = numberOfBadScans + incIfBadScan(scanResult),
+            numberOfNoFingerDetectedScans = numberOfNoFingerDetectedScans,
+            scanResult = scanResult
+        )
+
+        else -> ScanProcess.Collected(
+            numberOfBadScans = incIfBadScan(scanResult),
+            numberOfNoFingerDetectedScans = 0,
+            scanResult,
+        )
     }
 
     private fun incIfBadScan(scanResult: ScanResult) =
         if (scanResult.isGoodScan()) 0 else 1
 
-    fun toCollected(imageBytes: ByteArray): Collected = when (this) {
-        is TransferringImage -> toCollected(scanResult.copy(image = imageBytes))
-        is Collected -> Collected(scanResult.copy(image = imageBytes), numberOfBadScans)
+    fun toCollected(imageBytes: ByteArray): ScanProcess.Collected = when (this) {
+        is ScanProcess.TransferringImage -> toCollected(scanResult.copy(image = imageBytes))
+        is ScanProcess.Collected -> ScanProcess.Collected(
+            numberOfBadScans = numberOfBadScans,
+            numberOfNoFingerDetectedScans = numberOfNoFingerDetectedScans,
+            scanResult = scanResult.copy(image = imageBytes)
+        )
+
         else -> throw IllegalStateException("Illegal attempt to move to collected state without scan result")
     }
 }

@@ -141,12 +141,12 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                         )
                     }
 
-                    is CaptureState.Scanning -> startTimeoutBar()
-                    is CaptureState.TransferringImage -> {
+                    is CaptureState.ScanProcess.Scanning -> startTimeoutBar()
+                    is CaptureState.ScanProcess.TransferringImage -> {
                         //Do nothing
                     }
 
-                    is CaptureState.NotDetected -> {
+                    is CaptureState.ScanProcess.NotDetected -> {
                         handleCancelled()
                         progressBar.progressDrawable = ContextCompat.getDrawable(
                             requireContext(),
@@ -154,7 +154,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                         )
                     }
 
-                    is CaptureState.Collected -> if (fingerState.scanResult.isGoodScan()) {
+                    is CaptureState.ScanProcess.Collected -> if (fingerState.scanResult.isGoodScan()) {
                         handleCancelled()
                         progressBar.progressDrawable = ContextCompat.getDrawable(
                             requireContext(),

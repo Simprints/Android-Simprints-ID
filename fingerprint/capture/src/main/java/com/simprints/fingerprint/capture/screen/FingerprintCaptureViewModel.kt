@@ -57,7 +57,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -206,14 +205,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             }
 
             when (it.currentCaptureState()) {
-                is CaptureState.Scanning,
-                is CaptureState.TransferringImage,
+                is CaptureState.ScanProcess.Scanning,
+                is CaptureState.ScanProcess.TransferringImage,
                 -> pauseLiveFeedback()
 
                 CaptureState.NotCollected,
                 CaptureState.Skipped,
-                is CaptureState.NotDetected,
-                is CaptureState.Collected,
+                is CaptureState.ScanProcess.NotDetected,
+                is CaptureState.ScanProcess.Collected,
                 -> {
                     if (it.isShowingConfirmDialog) stopLiveFeedback()
                     else startLiveFeedback(scannerManager.scanner)
@@ -271,11 +270,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
      * */
     fun progressBarTimeout() =
         bioSdkWrapper.scanningTimeoutMs +
-            if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
+                if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
 
     private fun isImageTransferRequired(): Boolean =
         bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
-            scannerManager.scanner.isImageTransferSupported()
+                scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
         viewModelScope.launch {
@@ -306,7 +305,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleScanButtonPressed() {
         val state = state
         val fingerState = this.state.currentCaptureState()
-        if (fingerState is CaptureState.Collected && fingerState.scanResult.isGoodScan() && state.isAskingRescan.not()) {
+        if (fingerState is CaptureState.ScanProcess.Collected && fingerState.scanResult.isGoodScan() && state.isAskingRescan.not()) {
             updateState { it.copy(isAskingRescan = true) }
         } else {
             updateState { it.copy(isAskingRescan = false) }
@@ -317,16 +316,16 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun isBusyForScanning(): Boolean = with(state) {
-        currentCaptureState() is CaptureState.TransferringImage || isShowingConfirmDialog || isShowingSplashScreen
+        currentCaptureState() is CaptureState.ScanProcess.TransferringImage || isShowingConfirmDialog || isShowingSplashScreen
     }
 
     private fun toggleScanning() {
         when (state.currentCaptureState()) {
-            is CaptureState.Scanning -> cancelScanning()
-            is CaptureState.TransferringImage -> { /* do nothing */
+            is CaptureState.ScanProcess.Scanning -> cancelScanning()
+            is CaptureState.ScanProcess.TransferringImage -> { /* do nothing */
             }
 
-            is CaptureState.NotCollected, is CaptureState.Skipped, is CaptureState.NotDetected, is CaptureState.Collected -> startScanning()
+            is CaptureState.NotCollected, is CaptureState.Skipped, is CaptureState.ScanProcess.NotDetected, is CaptureState.ScanProcess.Collected -> startScanning()
         }
     }
 
@@ -349,7 +348,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                     bioSdkWrapper.scanningTimeoutMs.toInt(),
                     qualityThreshold(),
                     // is this is the last bad scan, we allow low quality extraction
-                    tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
+                    isTooManyBadScans(state.currentCaptureState(), plusBadScan = true)
                 )
 
                 handleCaptureSuccess(capturedFingerprint)
@@ -382,7 +381,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun shouldProceedToImageTransfer(quality: Int): Boolean {
         val isGoodScan = quality >= qualityThreshold()
-        val isTooManyBadScans = tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
+        val isTooManyBadScans = isTooManyBadScans(state.currentCaptureState(), plusBadScan = true)
 
         val shouldUploadImage = when (bioSdkConfiguration.vero2?.imageSavingStrategy) {
             NEVER, null -> false
@@ -436,7 +435,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 lastCaptureStartedAt,
                 fingerState,
                 qualityThreshold(),
-                tooManyBadScans(captureState, plusBadScan = false)
+                isTooManyBadScans(captureState, plusBadScan = false)
             )
         }
         captureEventIds[CaptureId(fingerState.id, fingerState.currentCaptureIndex)] = payloadId
@@ -445,7 +444,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private fun saveCurrentImageIfEager() {
         if (bioSdkConfiguration.vero2?.imageSavingStrategy?.isEager() == true) {
             with(state.currentFingerState()) {
-                (currentCapture() as? CaptureState.Collected)?.let { capture ->
+                (currentCapture() as? CaptureState.ScanProcess.Collected)?.let { capture ->
                     runBlocking {
                         saveImageIfExists(CaptureId(id, currentCaptureIndex), capture)
                     }
@@ -472,7 +471,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         if (isScanningEndStateAchieved()) {
             Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints dialog shown")
             updateState { it.copy(isShowingConfirmDialog = true) }
-        } else if (currentCaptureState().let { it is CaptureState.Collected && it.scanResult.isGoodScan() }) {
+        } else if (currentCaptureState().let { it is CaptureState.ScanProcess.Collected && it.scanResult.isGoodScan() }) {
             nudgeToNextFinger()
         } else {
             if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
@@ -533,6 +532,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         _vibrate.send()
         updateCaptureState(CaptureState::toNotDetected)
         addCaptureAndBiometricEventsInSession()
+        if(isNumberOfNoFingerDetectedReached(state.currentCaptureState())){
+            handleCaptureFinished()
+        }
     }
 
     fun handleMissingFingerButtonPressed() {
@@ -551,12 +553,26 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private fun CollectFingerprintsState.everyActiveFingerHasSatisfiedTerminalCondition(): Boolean =
         fingerStates.all { captureHasSatisfiedTerminalCondition(it.currentCapture()) }
 
-    private fun tooManyBadScans(fingerState: CaptureState, plusBadScan: Boolean): Boolean =
+    private fun isTooManyBadScans(fingerState: CaptureState, plusBadScan: Boolean): Boolean {
+        val isNumberOfBadScansReached = isNumberOfBadScansReached(fingerState, plusBadScan)
+        val isNumberOfNoFingerDetectedReached = isNumberOfNoFingerDetectedReached(fingerState)
+        return isNumberOfBadScansReached || isNumberOfNoFingerDetectedReached
+    }
+
+    private fun isNumberOfNoFingerDetectedReached(fingerState: CaptureState): Boolean {
+        val noFingerDetectedThreshold = configuration.secugenSimMatcher?.noFingerDetectedThreshold
+            ?: return false
+
+        val currentNumberOfNoFingerDetectedScans = when (fingerState) {
+            is CaptureState.ScanProcess -> fingerState.numberOfNoFingerDetectedScans
+            else -> 0
+        }
+        return noFingerDetectedThreshold > 0 && currentNumberOfNoFingerDetectedScans >= noFingerDetectedThreshold
+    }
+
+    private fun isNumberOfBadScansReached(fingerState: CaptureState, plusBadScan: Boolean) =
         when (fingerState) {
-            is CaptureState.Scanning -> fingerState.numberOfBadScans
-            is CaptureState.TransferringImage -> fingerState.numberOfBadScans
-            is CaptureState.NotDetected -> fingerState.numberOfBadScans
-            is CaptureState.Collected -> fingerState.numberOfBadScans
+            is CaptureState.ScanProcess -> fingerState.numberOfBadScans
             else -> 0
         } >= numberOfBadScansRequiredToAutoAddNewFinger - if (plusBadScan) 1 else 0
 
@@ -566,7 +582,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private fun CollectFingerprintsState.weHaveTheMinimumNumberOfGoodScans(): Boolean =
         fingerStates.filter {
             val currentCapture = it.currentCapture()
-            currentCapture is CaptureState.Collected && currentCapture.scanResult.isGoodScan()
+            currentCapture is CaptureState.ScanProcess.Collected && currentCapture.scanResult.isGoodScan()
         }.size >= min(targetNumberOfGoodScans, numberOfOriginalFingers())
 
     private fun CollectFingerprintsState.weHaveTheMinimumNumberOfAnyQualityScans() =
@@ -576,10 +592,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun numberOfOriginalFingers() = originalFingerprintsToCapture.toSet().size
 
-    private fun captureHasSatisfiedTerminalCondition(captureState: CaptureState) =
-        captureState is CaptureState.Collected && (tooManyBadScans(
+    private fun captureHasSatisfiedTerminalCondition(captureState: CaptureState): Boolean {
+        val isCollected = captureState is CaptureState.ScanProcess.Collected && (isTooManyBadScans(
             captureState, plusBadScan = false
-        ) || captureState.scanResult.isGoodScan()) || captureState is CaptureState.Skipped
+        ) || captureState.scanResult.isGoodScan())
+        val isSkipped = captureState is CaptureState.Skipped
+        val isNotDetected = isNumberOfNoFingerDetectedReached(captureState)
+        return isCollected || isSkipped || isNotDetected
+    }
 
     private fun fingerHasSatisfiedTerminalCondition(fingerState: FingerState) =
         fingerState.captures.all { captureHasSatisfiedTerminalCondition(it) }
@@ -587,7 +607,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleConfirmFingerprintsAndContinue() {
         val collectedFingers = state.fingerStates.flatMap {
             it.captures.mapIndexedNotNull { index, capture ->
-                if (capture is CaptureState.Collected) Pair(
+                if (capture is CaptureState.ScanProcess.Collected) Pair(
                     CaptureId(it.id, index),
                     capture
                 ) else null
@@ -605,7 +625,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun saveImages(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
+    private fun saveImages(collectedFingers: List<Pair<CaptureId, CaptureState.ScanProcess.Collected>>) {
         runBlocking {
             collectedFingers.map { (id, collectedFinger) ->
                 saveImageIfExists(id, collectedFinger)
@@ -613,7 +633,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
+    private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.ScanProcess.Collected>>) {
         val resultItems = collectedFingers.map { (captureId, collectedFinger) ->
             FingerprintCaptureResult.Item(
                 identifier = captureId.finger,
@@ -630,7 +650,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         _finishWithFingerprints.send(FingerprintCaptureResult(resultItems))
     }
 
-    private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected) {
+    private suspend fun saveImageIfExists(
+        id: CaptureId,
+        collectedFinger: CaptureState.ScanProcess.Collected
+    ) {
         val captureEventId = captureEventIds[id]
         val imageRef = saveImage(
             vero2Configuration = bioSdkConfiguration.vero2!!,
