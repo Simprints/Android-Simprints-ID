@@ -1,13 +1,13 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
-import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
-import com.simprints.infra.orchestration.data.ActionRequest
-import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject

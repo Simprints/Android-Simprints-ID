@@ -106,11 +106,6 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         }
         binding.loginButtonSignIn.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Login button clicked")
-
-            binding.loginProgress.isVisible = true
-            binding.loginButtonScanQr.isEnabled = false
-            binding.loginButtonSignIn.isEnabled = false
-
             viewModel.signInClicked(
                 args.loginParams,
                 binding.loginProjectId.text.toString(),
@@ -120,17 +115,18 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     }
 
     private fun observeUiState() {
+        viewModel.isProcessingSignIn.observe(viewLifecycleOwner) { isProcessingSignIn ->
+            binding.loginProgress.isVisible = isProcessingSignIn
+            binding.loginButtonScanQr.isEnabled = !isProcessingSignIn
+            binding.loginButtonSignIn.isEnabled = !isProcessingSignIn
+        }
         viewModel.signInState.observe(viewLifecycleOwner) { event ->
             event?.getContentIfNotHandled()?.let(::handleSignInResult)
         }
     }
 
     private fun handleSignInResult(result: SignInState) {
-        binding.loginProgress.isVisible = false
         binding.loginErrorCard.isVisible = false
-        binding.loginButtonScanQr.isEnabled = true
-        binding.loginButtonSignIn.isEnabled = true
-
 
         when (result) {
             // Showing toast

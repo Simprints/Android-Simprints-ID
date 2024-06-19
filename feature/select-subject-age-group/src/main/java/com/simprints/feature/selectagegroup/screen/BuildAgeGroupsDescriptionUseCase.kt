@@ -41,40 +41,35 @@ internal class BuildAgeGroupsDescriptionUseCase @Inject constructor(
         )
     }
 
-    private fun getResourceString(id: Int) = context.getString(id)
-
-    private fun getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any) =
-        context.resources.getQuantityString(id, quantity, *formatArgs)
-
     // Helper function to convert months to readable format
-    private fun formatAgeInMonthsForDisplay(ageInMonths: Int) = when {
-        ageInMonths < 12 -> getQuantityString(
+    private fun formatAgeInMonthsForDisplay(ageInMonths: Int): String {
+        val years = ageInMonths / 12
+        val remainingMonths = ageInMonths % 12
+
+        val yearsString = context.resources.getQuantityString(
+            IDR.plurals.age_group_selection_age_in_years, years, years
+        )
+        val monthsString = context.resources.getQuantityString(
             IDR.plurals.age_group_selection_age_in_months, ageInMonths, ageInMonths
         )
 
-        else -> {
-            val years = ageInMonths / 12
-            val remainingMonths = ageInMonths % 12
-            if (remainingMonths == 0) {
-                getQuantityString(IDR.plurals.age_group_selection_age_in_years, years, years)
-            } else {
-                val yearsString =
-                    getQuantityString(IDR.plurals.age_group_selection_age_in_years, years, years)
-                val monthsString = getQuantityString(
-                    IDR.plurals.age_group_selection_age_in_months, remainingMonths, remainingMonths
-                )
-                "$yearsString, $monthsString"
-            }
+        val remainingMonthsString = context.resources.getQuantityString(
+            IDR.plurals.age_group_selection_age_in_months, remainingMonths, remainingMonths
+        )
+        return when {
+            years == 0 -> monthsString
+            remainingMonths == 0 -> yearsString
+            else -> "$yearsString, $remainingMonthsString"
         }
     }
 
     private fun AgeGroup.getDisplayName(): String {
         val start = formatAgeInMonthsForDisplay(startInclusive)
         val end = endExclusive?.let {
-            "${getResourceString(IDR.string.age_group_selection_age_range_to)} ${
+            "${context.getString(IDR.string.age_group_selection_age_range_to)} ${
                 formatAgeInMonthsForDisplay(it)
             }"
-        } ?: getResourceString(IDR.string.age_group_selection_age_range_and_above)
+        } ?: context.getString(IDR.string.age_group_selection_age_range_and_above)
         return "$start $end"
     }
 }

@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -15,7 +16,6 @@ import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import io.mockk.MockKAnnotations
 import io.mockk.every

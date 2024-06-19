@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.connect.screens.issues.serialentrypair
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -45,6 +46,14 @@ internal class SerialEntryPairViewModelTest {
         viewModel.startPairing(ADDRESS)
 
         verify { scannerPairViewModel.startPairingToDevice(ADDRESS) }
+    }
+
+    @Test
+    fun `when serial number is set, then its value is stored correctly`() {
+        assertThat(viewModel.scannerNumber).isNull()
+        val expected = "12345"
+        viewModel.scannerNumber = expected
+        assertThat(viewModel.scannerNumber).isEqualTo(expected)
     }
 
     companion object {

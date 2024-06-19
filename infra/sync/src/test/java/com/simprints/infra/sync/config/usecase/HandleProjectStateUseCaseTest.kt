@@ -2,8 +2,6 @@ package com.simprints.infra.sync.config.usecase
 
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
-import com.simprints.infra.sync.config.usecase.LogoutUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

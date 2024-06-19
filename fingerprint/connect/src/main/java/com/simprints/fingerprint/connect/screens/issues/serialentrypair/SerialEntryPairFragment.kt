@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.InputMethodManager
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -64,7 +65,15 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
         screenReporter.reportSerialEntry()
 
         binding.serialEntryOkButton.setOnClickListener { parseTextAndCommencePair() }
+        viewModel.scannerNumber?.let { binding.serialEntryEditText.setText(it) }
+
         setupDoneButtonForEditText()
+
+        binding.serialEntryEditText.addTextChangedListener(
+            afterTextChanged = { text ->
+                viewModel.scannerNumber = text?.toString()
+            }
+        )
 
         viewModel.awaitingToPairToMacAddress.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
             binding.serialEntryOkButton.visibility = View.INVISIBLE
@@ -129,7 +138,7 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
     private fun parseTextAndCommencePair() {
         try {
             val serialNumber = scannerPairingManager.interpretEnteredTextAsSerialNumber(
-                binding.serialEntryEditText.text.toString()
+                viewModel.scannerNumber.orEmpty()
             )
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {

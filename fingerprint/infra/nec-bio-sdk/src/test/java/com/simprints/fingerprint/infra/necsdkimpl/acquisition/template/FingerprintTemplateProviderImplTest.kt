@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
-import com.secugen.WSQConverter
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
+import com.secugen.WSQConverter
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper

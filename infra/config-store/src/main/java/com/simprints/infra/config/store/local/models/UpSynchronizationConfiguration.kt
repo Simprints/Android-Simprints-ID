@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 
 internal fun UpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration =
     ProtoUpSynchronizationConfiguration.newBuilder()

@@ -3,10 +3,8 @@ package com.simprints.infra.config.store.remote
 import com.simprints.infra.config.store.remote.models.ApiDeviceState
 import com.simprints.infra.config.store.remote.models.ApiFileUrl
 import com.simprints.infra.config.store.remote.models.ApiProject
-import com.simprints.infra.config.store.remote.models.ApiProjectConfiguration
 import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
 

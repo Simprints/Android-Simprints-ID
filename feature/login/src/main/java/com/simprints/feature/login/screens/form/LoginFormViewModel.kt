@@ -30,6 +30,9 @@ internal class LoginFormViewModel @Inject constructor(
     private val jsonHelper: JsonHelper,
 ) : ViewModel() {
 
+    val isProcessingSignIn: LiveData<Boolean>
+        get() = _isProcessingSignIn
+    private val _isProcessingSignIn = MutableLiveData<Boolean>()
     val signInState: LiveData<LiveDataEventWithContent<SignInState>>
         get() = _signInState
     private val _signInState = MutableLiveData<LiveDataEventWithContent<SignInState>>(null)
@@ -46,13 +49,15 @@ internal class LoginFormViewModel @Inject constructor(
             _signInState.send(SignInState.ProjectIdMismatch)
         } else {
             viewModelScope.launch {
+                _isProcessingSignIn.value = true
                 val result = authManager.authenticateSafely(
-                    loginParams.userId.value,
-                    projectId,
-                    projectSecret,
-                    deviceId
+                    userId = loginParams.userId.value,
+                    projectId = projectId,
+                    projectSecret = projectSecret,
+                    deviceId = deviceId
                 )
                 _signInState.send(mapAuthDataResult(result))
+                _isProcessingSignIn.value = false
             }
         }
     }
@@ -121,5 +126,4 @@ internal class LoginFormViewModel @Inject constructor(
     } else {
         simNetwork.setApiBaseUrl(newUrl)
     }
-
 }

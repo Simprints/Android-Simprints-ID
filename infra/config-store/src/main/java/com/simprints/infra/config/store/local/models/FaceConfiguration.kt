@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
-import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
+import com.simprints.infra.config.store.models.FaceConfiguration
 
 internal fun FaceConfiguration.toProto(): ProtoFaceConfiguration =
     ProtoFaceConfiguration.newBuilder()
