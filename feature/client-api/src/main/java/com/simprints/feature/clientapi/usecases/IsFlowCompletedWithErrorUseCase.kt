@@ -18,6 +18,7 @@ internal class IsFlowCompletedWithErrorUseCase @Inject constructor() {
         AppErrorReason.GUID_NOT_FOUND_OFFLINE,
         AppErrorReason.PROJECT_PAUSED,
         AppErrorReason.PROJECT_ENDING,
+        AppErrorReason.AGE_GROUP_NOT_SUPPORTED,
         -> true
 
         AppErrorReason.ROOTED_DEVICE,
