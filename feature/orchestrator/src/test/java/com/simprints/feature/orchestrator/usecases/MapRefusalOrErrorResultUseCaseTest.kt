@@ -5,15 +5,19 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
+import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
+import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -67,5 +71,18 @@ class MapRefusalOrErrorResultUseCaseTest {
     @Test
     fun `Maps non-result serializable to null`() = runTest {
         assertThat(useCase(mockk())).isNull()
+    }
+
+    @Test
+    fun `Maps SelectSubjectAgeGroupResult to appropriate response`() = runTest {
+        val projectConfiguration = mockk<ProjectConfiguration>(relaxed = true)
+
+        val ageGroupSupported = AgeGroup(0, 10)
+        val ageGroupNotSupported = AgeGroup(11, 20)
+
+        every { projectConfiguration.face?.rankOne?.allowedAgeRange } returns ageGroupSupported
+
+        assertThat(useCase(SelectSubjectAgeGroupResult(ageGroupSupported), projectConfiguration)).isNull()
+        assertThat(useCase(SelectSubjectAgeGroupResult(ageGroupNotSupported), projectConfiguration)).isInstanceOf(AppErrorResponse::class.java)
     }
 }
