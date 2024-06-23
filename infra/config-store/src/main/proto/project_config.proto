@@ -76,8 +76,13 @@ message ProtoFingerprintConfiguration {
         FingerComparisonStrategy comparison_strategy_for_verification = 3;
         optional ProtoVero2Configuration vero_2 = 4;
         optional ProtoVero1Configuration vero_1 = 5;
+        optional ProtoAllowedAgeRange allowed_age_range = 6;
 
     }
+}
+message ProtoAllowedAgeRange {
+    int32 startInclusive = 1;
+    optional int32 endExclusive = 2;
 }
 message ProtoVero1Configuration {
     int32 quality_threshold = 1;

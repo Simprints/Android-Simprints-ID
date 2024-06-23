@@ -8,6 +8,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
+import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent
@@ -441,4 +442,10 @@ fun createLicenseCheckEvent() = LicenseCheckEvent(
     status = LicenseCheckEvent.LicenseStatus.VALID,
     vendor = "NEC_FINGERPRINT",
 
+)
+
+fun createAgeGroupSelectionEvent() = AgeGroupSelectionEvent(
+    createdAt = CREATED_AT,
+    endedAt = ENDED_AT,
+    subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2)
 )

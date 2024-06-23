@@ -58,6 +58,18 @@ class FingerprintConfigurationTest {
             assertThat(it.value.toProto()).isEqualTo(it.key)
         }
     }
+    @Test
+    fun `should map correctly the allowedAgeRange`() {
+        val mapping = mapOf(
+            ProtoFingerprintConfiguration.VeroGeneration.VERO_1 to FingerprintConfiguration.VeroGeneration.VERO_1,
+            ProtoFingerprintConfiguration.VeroGeneration.VERO_2 to FingerprintConfiguration.VeroGeneration.VERO_2,
+        )
+
+        mapping.forEach {
+            assertThat(it.key.toDomain()).isEqualTo(it.value)
+            assertThat(it.value.toProto()).isEqualTo(it.key)
+        }
+    }
 
     @Test
     fun `should map correctly the FingerComparisonStrategy enums`() {

@@ -3,6 +3,7 @@ package com.simprints.infra.events.event.domain.models
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent.AgeGroupSelectionPayload
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
@@ -87,6 +88,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = EventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = EventUpSyncRequestPayload::class, name = Companion.EVENT_UP_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = LicenseCheckEventPayload::class, name = Companion.LICENSE_CHECK_KEY),
+    JsonSubTypes.Type(value = AgeGroupSelectionPayload::class, name = Companion.AGE_GROUP_SELECTION_KEY),
 )
 abstract class EventPayload {
     abstract val type: EventType

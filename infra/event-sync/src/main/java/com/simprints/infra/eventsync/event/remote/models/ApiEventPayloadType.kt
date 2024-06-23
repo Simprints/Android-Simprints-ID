@@ -43,6 +43,7 @@ import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTI
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
+import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECTION
 
 @Keep
 internal enum class ApiEventPayloadType {
@@ -143,6 +144,9 @@ internal enum class ApiEventPayloadType {
 
     /* key added: LICENSE_CHECK_KEY */
     LicenseCheck,
+    /* key added: AGE_GROUP_SELECTION_KEY */
+    AgeGroupSelection,
+
     ;
 
     companion object {
@@ -225,6 +229,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
     EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
     LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
+    AGE_GROUP_SELECTION -> ApiEventPayloadType.AgeGroupSelection
 }
 
 
@@ -258,6 +263,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.EventDownSyncRequest -> EVENT_DOWN_SYNC_REQUEST
     ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
     ApiEventPayloadType.LicenseCheck -> LICENSE_CHECK
+    ApiEventPayloadType.AgeGroupSelection -> AGE_GROUP_SELECTION
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }

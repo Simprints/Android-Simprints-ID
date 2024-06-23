@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:matcher"))
     implementation(project(":feature:validate-subject-pool"))
+    implementation(project(":feature:select-subject-age-group"))
 
     implementation(project(":face:capture"))
 

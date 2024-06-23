@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ripple_effect"
+    android:orientation="horizontal"
+    android:padding="@dimen/padding_default">
+
+    <ImageView
+        android:id="@+id/item_icon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/shadow_rounded_bg"
+        android:elevation="4dp"
+        android:padding="8dp"
+        tools:src=" @drawable/ic_age_group_selection_child" />
+
+    <TextView
+        android:id="@+id/item_label"
+        style="@style/Text.Subtitle1.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/margin_default"
+        tools:text="Age Group" />
+
+</LinearLayout>

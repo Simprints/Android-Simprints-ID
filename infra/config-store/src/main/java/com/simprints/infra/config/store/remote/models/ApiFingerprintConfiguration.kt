@@ -27,15 +27,16 @@ internal data class ApiFingerprintConfiguration(
         val decisionPolicy: ApiDecisionPolicy,
         val comparisonStrategyForVerification: FingerComparisonStrategy,
         val vero1: ApiVero1Configuration? = null,
-        val vero2: ApiVero2Configuration? = null
+        val vero2: ApiVero2Configuration? = null,
+        val allowedAgeRange: ApiAgeGroup,
     ) {
         fun toDomain() = FingerprintConfiguration.FingerprintSdkConfiguration(
             fingersToCapture.map { it.toDomain() },
             decisionPolicy.toDomain(),
             comparisonStrategyForVerification.toDomain(),
             vero1?.toDomain(),
-            vero2?.toDomain()
-
+            vero2?.toDomain(),
+            allowedAgeRange.toDomain(),
         )
     }
 
@@ -98,4 +99,5 @@ internal data class ApiFingerprintConfiguration(
             CROSS_FINGER_USING_MEAN_OF_MAX -> FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
         }
     }
+
 }

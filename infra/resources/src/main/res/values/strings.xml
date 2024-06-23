@@ -436,4 +436,17 @@
     <string name="id_pool_validation_action_close">Close</string>
     <string name="id_pool_validation_action_sync">Sync and retry</string>
 
+    <!-- Age group selection -->
+    <string name="age_group_selection_title">Select Subject\'s Age Group</string>
+    <string name="age_group_selection_age_range_to">to</string>
+    <string name="age_group_selection_age_range_and_above">and above</string>
+    <plurals name="age_group_selection_age_in_months">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="age_group_selection_age_in_years">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+
 </resources>

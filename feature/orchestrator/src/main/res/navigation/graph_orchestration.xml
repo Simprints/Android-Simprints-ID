@@ -34,6 +34,10 @@
         android:id="@+id/action_orchestratorFragment_to_setup"
         app:destination="@id/graph_setup" />
 
+    <include app:graph="@navigation/graph_age_group_selection" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_age_group_selection"
+        app:destination="@id/graph_age_group_selection" />
     <include app:graph="@navigation/graph_consent" />
     <action
         android:id="@+id/action_orchestratorFragment_to_consent"

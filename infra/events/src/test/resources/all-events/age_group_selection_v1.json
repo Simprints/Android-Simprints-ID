@@ -1,0 +1,19 @@
+{
+  "id": "c3670beb-4d01-4fc3-ae4e-19e8c6b687f3",
+  "type": "AGE_GROUP_SELECTION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb3",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "AGE_GROUP_SELECTION",
+    "eventVersion": 1,
+    "createdAt": 221675670,
+    "endedAt": 9141278930,
+    "subjectAgeGroup": {
+      "startInclusive": 10,
+      "endExclusive": 210
+    }
+  }
+}

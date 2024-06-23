@@ -61,6 +61,7 @@ jobs:
                 feature:login-check
                 feature:alert
                 feature:exit-form
+                feature:select-subject-age-group
             reportsId: feature1
 
     feature-unit-tests2:

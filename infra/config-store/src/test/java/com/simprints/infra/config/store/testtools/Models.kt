@@ -31,6 +31,7 @@ import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.remote.models.ApiAgeGroup
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiDeviceState
@@ -137,6 +138,7 @@ internal val apiVero2Configuration = ApiVero2Configuration(
     false,
     mapOf("E-1" to ApiVero2Configuration.ApiVero2FirmwareVersions("1.1", "1.2", "1.4"))
 )
+internal val apiAgeGroup = ApiAgeGroup(18, 65)
 
 internal val vero2Configuration = Vero2Configuration(
     30,
@@ -168,7 +170,9 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
         apiDecisionPolicy,
         ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
         ApiVero1Configuration(10),
-        apiVero2Configuration
+        apiVero2Configuration,
+        apiAgeGroup ,
+
     ),
     null,
 )

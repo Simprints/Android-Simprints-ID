@@ -605,4 +605,12 @@ fun validateUpSyncRequestEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateAgeGroupSelectionEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "AgeGroupSelection", 1)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        validateTimestamp(getJSONObject("endTime"))
+        assertThat(getString("subjectAgeGroup")).isNotNull()
+    }
+}
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

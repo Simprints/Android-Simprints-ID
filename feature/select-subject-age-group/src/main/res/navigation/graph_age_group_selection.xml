@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_age_group_selection"
+    app:startDestination="@id/selectSubjectAgeGroupFragment">
+    <fragment
+        android:id="@+id/selectSubjectAgeGroupFragment"
+        android:name="com.simprints.feature.selectagegroup.screen.SelectSubjectAgeGroupFragment"
+        android:label="SelectSubjectFragment"
+        tools:layout="@layout/fragment_age_group_selection" />
+    <include app:graph="@navigation/graph_exit_form" />
+    <action
+        android:id="@+id/action_selectSubjectAgeGroupFragment_to_refusalFragment"
+        app:destination="@id/graph_exit_form"
+        app:popUpToInclusive="true" />
+</navigation>
