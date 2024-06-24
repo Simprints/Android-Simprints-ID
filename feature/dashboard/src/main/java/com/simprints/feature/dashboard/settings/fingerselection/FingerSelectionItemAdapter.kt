@@ -5,45 +5,82 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.dashboard.databinding.ItemFingerSelectionBinding
+import com.simprints.feature.dashboard.databinding.HeaderSdkNameBinding
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.resources.R as IDR
 
 internal class FingerSelectionItemAdapter(
-    private val getItems: () -> List<FingerSelectionItem>,
-) :
-    RecyclerView.Adapter<FingerSelectionItemAdapter.FingerSelectionItemViewHolder>() {
+    private val getItems: () -> List<FingerSelectionSection>,
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): FingerSelectionItemViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemFingerSelectionBinding.inflate(inflater, parent, false)
-        return FingerSelectionItemViewHolder(
-            parent.context,
-            getItems,
-            binding
-        )
+    companion object {
+        private const val TYPE_HEADER = 0
+        private const val TYPE_ITEM = 1
     }
 
-    override fun getItemCount(): Int = getItems().size
+    override fun getItemCount(): Int = getItems().sumOf { it.items.size + 1 }
 
-    override fun onBindViewHolder(viewHolder: FingerSelectionItemViewHolder, position: Int) {
-        viewHolder.bind()
+    override fun getItemViewType(position: Int): Int {
+        var pos = 0
+        for (section in getItems()) {
+            if (position == pos) {
+                return TYPE_HEADER
+            }
+            pos += section.items.size + 1
+            if (position < pos) {
+                return TYPE_ITEM
+            }
+        }
+        throw IllegalArgumentException("Invalid position")
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return if (viewType == TYPE_HEADER) {
+            val binding = HeaderSdkNameBinding.inflate(inflater, parent, false)
+            HeaderViewHolder(parent.context, binding)
+        } else {
+            val binding = ItemFingerSelectionBinding.inflate(inflater, parent, false)
+            return FingerSelectionItemViewHolder(parent.context, binding)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        var totalItems = 0
+        for (section in getItems()) {
+            if (position == totalItems && holder is HeaderViewHolder) {
+                holder.bind(section.sdkName)
+                return
+            } else if (position < totalItems + section.items.size + 1 && holder is FingerSelectionItemViewHolder) {
+                holder.bind(section.items[position - totalItems - 1])
+                return
+            }
+            totalItems += section.items.size + 1
+        }
+    }
+
+    class HeaderViewHolder(
+        val context: Context,
+        binding: HeaderSdkNameBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+        private val textView = binding.headerText
+
+        fun bind(sdkName: String) {
+            textView.text = sdkName
+        }
     }
 
     class FingerSelectionItemViewHolder(
         val context: Context,
-        private val getItems: () -> List<FingerSelectionItem>,
         binding: ItemFingerSelectionBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val fingerNameTextView = binding.fingerNameTextView
         private val fingerQuantityTextView = binding.fingerQuantityTextView
 
-        fun bind() {
-            fingerNameTextView.text = getItems()[adapterPosition].finger.toString(context)
-            fingerQuantityTextView.text = getItems()[adapterPosition].quantity.toString()
+        fun bind(item: FingerSelectionItem) {
+            fingerNameTextView.text = item.finger.toString(context)
+            fingerQuantityTextView.text = item.quantity.toString()
         }
     }
 }
