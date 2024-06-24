@@ -23,6 +23,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
+private const val SIM_MATCHER_NAME = "SimMatcher"
+
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
@@ -33,56 +35,47 @@ class FingerSelectionFragmentTest {
 
     @BindValue
     @JvmField
-    internal val viewModel = mockk<FingerSelectionViewModel>(relaxed = true) {
-        every { fingerSelections } returns mockk {
-            every { value } returns listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 1),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2)
-            )
-            every { observe(any(), any()) } answers {
-                secondArg<Observer<List<FingerSelectionItem>>>().onChanged(
-                    listOf(
-                        FingerSelectionItem(Finger.LEFT_THUMB, 1),
-                        FingerSelectionItem(Finger.RIGHT_THUMB, 1),
-                        FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2)
-                    )
-                )
-            }
-        }
-    }
+    internal val viewModel = mockk<FingerSelectionViewModel>(relaxed = true)
 
     @Test
     fun `should display the fingers correctly`() {
         mockFingerSelections(
             listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 3),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2)
+                FingerSelectionSection(
+                    sdkName = SIM_MATCHER_NAME,
+                    items = listOf(
+                        FingerSelectionItem(Finger.LEFT_THUMB, 1),
+                        FingerSelectionItem(Finger.RIGHT_THUMB, 2),
+                        FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 3)
+                    )
+                ),
             )
         )
         launchFragmentInHiltContainer<FingerSelectionFragment>()
 
-        onView(withId(R.id.fingerSelectionRecyclerView)).check(matches(hasChildCount(3)))
+        onView(withId(R.id.fingerSelectionRecyclerView)).check(matches(hasChildCount(4)))
 
         onView(nThFingerSelection(0))
+            .check(matches(hasDescendant(withText(SIM_MATCHER_NAME))))
+
+        onView(nThFingerSelection(1))
             .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_l_1))))
             .check(matches(hasDescendant(withText("1"))))
 
-        onView(nThFingerSelection(1))
-            .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_r_1))))
-            .check(matches(hasDescendant(withText("3"))))
-
         onView(nThFingerSelection(2))
-            .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_l_2))))
+            .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_r_1))))
             .check(matches(hasDescendant(withText("2"))))
+
+        onView(nThFingerSelection(3))
+            .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_l_2))))
+            .check(matches(hasDescendant(withText("3"))))
     }
 
-    private fun mockFingerSelections(fingers: List<FingerSelectionItem>) {
+    private fun mockFingerSelections(fingers: List<FingerSelectionSection>) {
         every { viewModel.fingerSelections } returns mockk {
             every { value } returns fingers
             every { observe(any(), any()) } answers {
-                secondArg<Observer<List<FingerSelectionItem>>>().onChanged(fingers)
+                secondArg<Observer<List<FingerSelectionSection>>>().onChanged(fingers)
             }
         }
     }
