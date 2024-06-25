@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.protobuf) apply false
     alias(libs.plugins.navigation.args) apply false
+    alias(libs.plugins.room) apply false
 
     alias(libs.plugins.gms) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
