@@ -26,7 +26,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.EnrolActionResponse(
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             enrolledGuid = "guid",
             subjectActions = "subjects"
         ))
@@ -41,7 +40,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
             actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             identifications = listOf(
                 AppMatchResult(
                     guid = "guid-1",
@@ -72,7 +70,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
             actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             identifications = listOf()
         ))
 
@@ -84,7 +81,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.ConfirmActionResponse(
             actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             confirmed = true,
         ))
 
@@ -97,7 +93,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.VerifyActionResponse(
             actionIdentifier = VerifyActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             matchResult = AppMatchResult(
                 guid = "guid",
                 confidenceScore = 50,
@@ -118,7 +113,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.ExitFormActionResponse(
             actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             reason = "reason",
             extraText = "extra",
         ))
@@ -134,7 +128,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.ErrorActionResponse(
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             reason = AppErrorReason.UNEXPECTED_ERROR,
             flowCompleted = true,
         ))

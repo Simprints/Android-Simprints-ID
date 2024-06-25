@@ -75,7 +75,6 @@ class ActionToIntentMapperTest {
     private fun setupActionResponse(packageName: String) = ActionResponse.ConfirmActionResponse(
         actionIdentifier = ConfirmIdentityActionFactory.getIdentifier().copy(packageName = packageName),
         sessionId = "sessionId",
-        eventsJson = null,
         confirmed = true,
     )
 
