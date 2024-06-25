@@ -21,6 +21,7 @@ import com.simprints.fingerprint.capture.models.CaptureId
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CaptureState.NotCollected.toNotCollected
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
+import com.simprints.fingerprint.capture.state.ConfirmationDialogState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.LiveFeedbackState
 import com.simprints.fingerprint.capture.state.ScanResult
@@ -149,7 +150,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private val scannerTriggerListener = ScannerTriggerListener {
         viewModelScope.launch {
-            if (state.isShowingConfirmDialog) {
+            if (state.isShowingDialog()) {
                 Simber.tag(FINGER_CAPTURE.name).i("Scanner trigger clicked for confirm dialog")
                 handleConfirmFingerprintsAndContinue()
             } else {
@@ -214,7 +215,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 is CaptureState.NotDetected,
                 is CaptureState.Collected,
                 -> {
-                    if (it.isShowingConfirmDialog) stopLiveFeedback()
+                    if (it.isShowingDialog()) stopLiveFeedback()
                     else startLiveFeedback(scannerManager.scanner)
                 }
             }
@@ -270,11 +271,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
      * */
     fun progressBarTimeout() =
         bioSdkWrapper.scanningTimeoutMs +
-            if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
+                if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
 
     private fun isImageTransferRequired(): Boolean =
         bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
-            scannerManager.scanner.isImageTransferSupported()
+                scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
         viewModelScope.launch {
@@ -316,7 +317,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun isBusyForScanning(): Boolean = with(state) {
-        currentCaptureState() is CaptureState.TransferringImage || isShowingConfirmDialog || isShowingSplashScreen
+        currentCaptureState() is CaptureState.TransferringImage || isShowingDialog() || isShowingSplashScreen
     }
 
     private fun toggleScanning() {
@@ -470,7 +471,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private fun resolveFingerTerminalConditionTriggered() = with(state) {
         if (isScanningEndStateAchieved()) {
             Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints dialog shown")
-            updateState { it.copy(isShowingConfirmDialog = true) }
+            displayDialog()
         } else if (currentCaptureState().let { it is CaptureState.Collected && it.scanResult.isGoodScan() }) {
             nudgeToNextFinger()
         } else {
@@ -479,6 +480,23 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             } else if (!isOnLastFinger()) {
                 showSplashAndNudge(addNewFinger = false)
             }
+        }
+    }
+
+    private fun displayDialog() {
+        val successfulCaptures = state.fingerStates.count {
+            it.captures.any { capture -> capture is CaptureState.Collected && capture.scanResult.isGoodScan() }
+        }
+        updateState { currentState ->
+            currentState.copy(
+                confirmationDialogState = ConfirmationDialogState.Displayed(
+                    isSuccessful = true,
+                    // TODO [MS-492] pass the proper thresholds from the configuration
+                    lowerThreshold = null,
+                    upperThreshold = null,
+                    successfulCaptures = successfulCaptures
+                )
+            )
         }
     }
 

@@ -246,7 +246,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     private fun updateConfirmDialog(state: CollectFingerprintsState) {
-        confirmDialog = if (state.isShowingConfirmDialog && confirmDialog == null) {
+        confirmDialog = if (state.isShowingDialog() && confirmDialog == null) {
             val dialogItems = state.fingerStates.map {
                 ConfirmFingerprintsDialog.Item(
                     it.id,
@@ -264,7 +264,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     vm.handleRestart()
                 })
                 .create().also { it.show() }
-        } else if (!state.isShowingConfirmDialog) {
+        } else if (!state.isShowingDialog()) {
             confirmDialog?.let { if (it.isShowing) it.dismiss() }
             null
         } else {
