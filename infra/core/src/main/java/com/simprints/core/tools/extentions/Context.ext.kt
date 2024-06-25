@@ -15,7 +15,7 @@ val Context.deviceHardwareId: String
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 val Context.packageVersionName: String
     get() = try {
-        packageManager.getPackageInfo(packageName, 0).versionName
+        packageManager.getPackageInfo(packageName, 0).versionName ?: ""
     } catch (e: PackageManager.NameNotFoundException) {
         "Version Name Not Found"
     }

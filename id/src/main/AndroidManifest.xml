@@ -25,7 +25,7 @@
 
         <service
             android:name=".services.sync.events.down.EventDownSyncResetService"
-            android:foregroundServiceType="dataSync"
+            android:foregroundServiceType="shortService|dataSync"
             android:exported="false" />
 
         <service
