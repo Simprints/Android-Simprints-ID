@@ -42,7 +42,7 @@ internal class ConnectScannerViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var isReconnect = false
-    private lateinit var allowedGenerations: List<FingerprintConfiguration.VeroGeneration>
+    private var allowedGenerations: List<FingerprintConfiguration.VeroGeneration> = emptyList()
     private var remainingConnectionAttempts = 0
 
     val currentStep: LiveData<Step>
