@@ -17,6 +17,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
+import com.simprints.infra.rocwrapper.detection.log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -68,7 +69,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = timeHelper.now()
-
+        log("Face detection: $faceDetection, userCaptures: $userCaptures")
         currentDetection.postValue(faceDetection)
 
         when (capturingState.value) {
