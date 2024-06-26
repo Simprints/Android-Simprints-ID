@@ -256,12 +256,7 @@ internal class BuildStepsUseCase @Inject constructor(
             Modality.FINGERPRINT -> {
                 determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
 
-                    val sdkConfiguration = when (bioSDK) {
-                        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER ->
-                            projectConfiguration.fingerprint?.secugenSimMatcher
-                        FingerprintConfiguration.BioSdk.NEC ->
-                            projectConfiguration.fingerprint?.nec
-                    }
+                    val sdkConfiguration = projectConfiguration.fingerprint?.getSdkConfiguration(bioSDK)
 
                     //TODO: fingersToCollect can be read directly from FingerprintCapture
                     val fingersToCollect = sdkConfiguration?.fingersToCapture.orEmpty()

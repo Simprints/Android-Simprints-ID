@@ -49,14 +49,14 @@ class MapRefusalOrErrorResultUseCaseTest {
             FingerprintConnectResult(isSuccess = false) to AppErrorResponse::class.java,
             AlertResult(buttonKey = "buttonKey") to AppErrorResponse::class.java,
         ).forEach { (result, responseClass) ->
-            assertThat(useCase(result)).isInstanceOf(responseClass)
+            assertThat(useCase(result, mockk())).isInstanceOf(responseClass)
         }
     }
 
     @Test
     fun `Maps id pool validation results`() = runTest {
-        assertThat(useCase(ValidateSubjectPoolResult(isValid = true))).isNull()
-        assertThat(useCase(ValidateSubjectPoolResult(isValid = false))).isInstanceOf(AppIdentifyResponse::class.java)
+        assertThat(useCase(ValidateSubjectPoolResult(isValid = true), mockk())).isNull()
+        assertThat(useCase(ValidateSubjectPoolResult(isValid = false), mockk())).isInstanceOf(AppIdentifyResponse::class.java)
     }
 
     @Test
@@ -65,12 +65,12 @@ class MapRefusalOrErrorResultUseCaseTest {
             FetchSubjectResult(found = true),
             SetupResult(isSuccess = true),
             FaceCaptureResult(emptyList())
-        ).forEach { result -> assertThat(useCase(result)).isNull() }
+        ).forEach { result -> assertThat(useCase(result, mockk())).isNull() }
     }
 
     @Test
     fun `Maps non-result serializable to null`() = runTest {
-        assertThat(useCase(mockk())).isNull()
+        assertThat(useCase(mockk(), mockk())).isNull()
     }
 
     @Test

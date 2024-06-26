@@ -184,10 +184,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         try {
             bioSdkWrapper = resolveBioSdkWrapperUseCase(fingerprintSdk)
             bioSdkWrapper.initialize()
-            bioSdkConfiguration = when (fingerprintSdk) {
-                FingerprintConfiguration.BioSdk.NEC -> configuration.nec!!
-                FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> configuration.secugenSimMatcher!!
-            }
+            bioSdkConfiguration = configuration.getSdkConfiguration(fingerprintSdk)!!
         } catch (e: BioSdkException.BioSdkInitializationException) {
             Simber.e(e)
             _invalidLicense.send()
@@ -350,11 +347,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             try {
                 scannerManager.scanner.setUiIdle()
                 val capturedFingerprint = bioSdkWrapper.acquireFingerprintTemplate(
-                    bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
-                    bioSdkWrapper.scanningTimeoutMs.toInt(),
-                    qualityThreshold(),
+                    capturingResolution = bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
+                    timeOutMs = bioSdkWrapper.scanningTimeoutMs.toInt(),
+                    qualityThreshold = qualityThreshold(),
                     // is this is the last bad scan, we allow low quality extraction
-                    tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
+                    allowLowQualityExtraction = tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
                 )
 
                 handleCaptureSuccess(capturedFingerprint)
@@ -369,11 +366,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun handleCaptureSuccess(acquireFingerprintTemplateResponse: AcquireFingerprintTemplateResponse) {
         val scanResult = ScanResult(
-            acquireFingerprintTemplateResponse.imageQualityScore,
-            acquireFingerprintTemplateResponse.template,
-            acquireFingerprintTemplateResponse.templateFormat,
-            null,
-            qualityThreshold()
+            qualityScore = acquireFingerprintTemplateResponse.imageQualityScore,
+            template = acquireFingerprintTemplateResponse.template,
+            templateFormat = acquireFingerprintTemplateResponse.templateFormat,
+            image = null,
+            qualityThreshold = qualityThreshold()
         )
         _vibrate.send()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {

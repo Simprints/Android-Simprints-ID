@@ -21,14 +21,10 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
     ): AppResponse {
         val currentSessionId = eventRepository.getCurrentSessionScope().id
 
-        val faceDecisionPolicy = projectConfiguration.face?.decisionPolicy
-        val faceResults = getFaceMatchResults(faceDecisionPolicy, results, projectConfiguration)
+        val faceResults = getFaceMatchResults(results, projectConfiguration)
         val bestFaceConfidence = faceResults.firstOrNull()?.confidenceScore ?: 0
 
-        val fingerprintDecisionPolicy =
-            projectConfiguration.fingerprint?.bioSdkConfiguration?.decisionPolicy
-        val fingerprintResults =
-            getFingerprintResults(fingerprintDecisionPolicy, results, projectConfiguration)
+        val fingerprintResults = getFingerprintResults(results, projectConfiguration)
         val bestFingerprintConfidence = fingerprintResults.firstOrNull()?.confidenceScore ?: 0
 
         return AppIdentifyResponse(
@@ -43,36 +39,39 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
     }
 
     private fun getFingerprintResults(
-        fingerprintDecisionPolicy: DecisionPolicy?,
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
-    ) = if (fingerprintDecisionPolicy != null) {
-        val matches = results.filterIsInstance(FingerprintMatchResult::class.java).lastOrNull()?.results.orEmpty()
-        val goodResults = matches
-            .filter { it.confidence >= fingerprintDecisionPolicy.low }
-            .sortedByDescending { it.confidence }
-        // Attempt to include only high confidence matches
-        goodResults
-            .filter { it.confidence >= fingerprintDecisionPolicy.high }
-            .ifEmpty { goodResults }
-            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
-            .map { AppMatchResult(it.subjectId, it.confidence, fingerprintDecisionPolicy) }
-    } else emptyList()
+    ) =  results.filterIsInstance<FingerprintMatchResult>().lastOrNull()?.let { fingerprintMatchResult ->
+            projectConfiguration.fingerprint?.getSdkConfiguration(fingerprintMatchResult.sdk)
+                ?.decisionPolicy?.let { fingerprintDecisionPolicy ->
+                    val matches = fingerprintMatchResult.results
+                    val goodResults = matches
+                        .filter { it.confidence >= fingerprintDecisionPolicy.low }
+                        .sortedByDescending { it.confidence }
+                    // Attempt to include only high confidence matches
+                    goodResults
+                        .filter { it.confidence >= fingerprintDecisionPolicy.high }
+                        .ifEmpty { goodResults }
+                        .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                        .map { AppMatchResult(it.subjectId, it.confidence, fingerprintDecisionPolicy) }
+                }
+        } ?: emptyList()
 
     private fun getFaceMatchResults(
-        faceDecisionPolicy: DecisionPolicy?,
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
-    ) = if (faceDecisionPolicy != null) {
-        val matches = results.filterIsInstance(FaceMatchResult::class.java).lastOrNull()?.results.orEmpty()
-        val goodResults = matches
-            .filter { it.confidence >= faceDecisionPolicy.low }
-            .sortedByDescending { it.confidence }
-        // Attempt to include only high confidence matches
-        goodResults
-            .filter { it.confidence >= faceDecisionPolicy.high }
-            .ifEmpty { goodResults }
-            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
-            .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
-    } else emptyList()
+    ) = results.filterIsInstance<FaceMatchResult>().lastOrNull()?.let { faceMatchResult ->
+        projectConfiguration.face?.decisionPolicy?.let { faceDecisionPolicy ->
+            val matches = faceMatchResult.results
+            val goodResults = matches
+                .filter { it.confidence >= faceDecisionPolicy.low }
+                .sortedByDescending { it.confidence }
+            // Attempt to include only high confidence matches
+            goodResults
+                .filter { it.confidence >= faceDecisionPolicy.high }
+                .ifEmpty { goodResults }
+                .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
+        }
+    } ?: emptyList()
 }

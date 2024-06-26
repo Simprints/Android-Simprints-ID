@@ -77,8 +77,9 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
 
         connectScannerViewModel.disableBackButton()
         viewModel.startOta(
-            args.params.availableOtas,
-            args.params.currentRetryAttempt
+            fingerprintSdk = args.params.fingerprintSDK,
+            availableOtas = args.params.availableOtas,
+            currentRetryAttempt = args.params.currentRetryAttempt
         )
     }
 

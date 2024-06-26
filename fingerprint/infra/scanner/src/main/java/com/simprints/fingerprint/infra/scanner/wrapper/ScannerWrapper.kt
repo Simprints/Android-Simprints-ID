@@ -5,6 +5,7 @@ import com.simprints.fingerprint.infra.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2FeatureException
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 /**
  * A common interface for both Vero 1 and Vero 2. Some features are only available on later versions
@@ -24,7 +25,7 @@ interface ScannerWrapper {
      *
      * @throws OtaAvailableException
      */
-    suspend fun setScannerInfoAndCheckAvailableOta()
+    suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk)
 
     suspend fun sensorWakeUp()
     suspend fun sensorShutDown()
