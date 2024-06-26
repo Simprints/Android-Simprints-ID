@@ -118,16 +118,17 @@ internal class ScannerWrapperV2Test {
                 any(),
                 any(),
                 any(),
+                any(),
                 any()
             )
         } answers {
-            val scannerInfoCallback = args[2] as ((ScannerVersion) -> Unit)
+            val scannerInfoCallback = args[3] as ((ScannerVersion) -> Unit)
             scannerInfoCallback.invoke(expectedVersion)
-            val batteryInfoCallback = args[3] as ((BatteryInfo) -> Unit)
+            val batteryInfoCallback = args[4] as ((BatteryInfo) -> Unit)
             batteryInfoCallback.invoke(expectedBatteryInfo)
         }
 
-        scannerWrapper.setScannerInfoAndCheckAvailableOta()
+        scannerWrapper.setScannerInfoAndCheckAvailableOta(mockk())
 
         val actualVersion = scannerWrapper.versionInformation()
 
@@ -139,9 +140,9 @@ internal class ScannerWrapperV2Test {
     fun `should throw UnexpectedScannerException if setupScannerWithOtaCheck throws IllegalStateException`() =
         runTest {
             coEvery {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(any(), any(), any(), any())
+                scannerInitialSetupHelper.setupScannerWithOtaCheck(any(), any(), any(), any(), any())
             } throws IllegalStateException()
-            scannerWrapper.setScannerInfoAndCheckAvailableOta()
+            scannerWrapper.setScannerInfoAndCheckAvailableOta(mockk())
         }
 
 

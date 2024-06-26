@@ -15,6 +15,7 @@ import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -50,7 +51,7 @@ class BuildSubjectUseCaseTest {
     fun `has no samples if no valid steps provided`() {
         val result = useCase(createParams(listOf(
             EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
-            EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList()),
+            EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
             EnrolLastBiometricStepResult.FaceMatchResult(emptyList()),
         )))
 
@@ -61,7 +62,7 @@ class BuildSubjectUseCaseTest {
     @Test
     fun `maps first available fingerprint capture step results`() {
         val result = useCase(createParams(listOf(
-            EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList()),
+            EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
             EnrolLastBiometricStepResult.FingerprintCaptureResult(listOf(mockFingerprintResults(Finger.RIGHT_THUMB))),
             EnrolLastBiometricStepResult.FingerprintCaptureResult(listOf(mockFingerprintResults(Finger.LEFT_THUMB))),
         )))

@@ -1,7 +1,6 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.MatchResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
@@ -37,28 +36,30 @@ internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
 
     private fun getFingerprintMatchResult(steps: List<EnrolLastBiometricStepResult>) =
         steps.filterIsInstance<EnrolLastBiometricStepResult.FingerprintMatchResult>()
-            .lastOrNull()?.results
+            .lastOrNull()
 
     private fun getFaceMatchResult(steps: List<EnrolLastBiometricStepResult>) =
-        steps.filterIsInstance<EnrolLastBiometricStepResult.FaceMatchResult>().lastOrNull()?.results
+        steps.filterIsInstance<EnrolLastBiometricStepResult.FaceMatchResult>()
+            .lastOrNull()
 
     private fun isAnyResponseWithHighConfidence(
         configuration: ProjectConfiguration,
-        fingerprintResponse: List<MatchResult>?,
-        faceResponse: List<MatchResult>?,
+        fingerprintResponse: EnrolLastBiometricStepResult.FingerprintMatchResult?,
+        faceResponse: EnrolLastBiometricStepResult.FaceMatchResult?,
     ): Boolean {
-        val fingerprintThreshold = configuration.fingerprint
-            ?.bioSdkConfiguration
-            ?.decisionPolicy
-            ?.high?.toFloat()
-            ?: Float.MAX_VALUE
+        val fingerprintThreshold = fingerprintResponse?.let {
+            configuration.fingerprint
+                ?.getSdkConfiguration(fingerprintResponse.sdk)
+                ?.decisionPolicy
+                ?.high?.toFloat()
+        } ?: Float.MAX_VALUE
+
         val faceThreshold = configuration.face
             ?.decisionPolicy
             ?.high?.toFloat()
             ?: Float.MAX_VALUE
 
-        return fingerprintResponse?.any { it.confidenceScore >= fingerprintThreshold } == true
-            || faceResponse?.any { it.confidenceScore >= faceThreshold } == true
+        return fingerprintResponse?.results?.any { it.confidenceScore >= fingerprintThreshold } == true
+            || faceResponse?.results?.any { it.confidenceScore >= faceThreshold } == true
     }
-
 }

@@ -8,6 +8,7 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
@@ -58,7 +59,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             .map { range ->
                 async(dispatcher) {
                     val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource)
-                    match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper)
+                    match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK)
                         .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
                             acc.add(FingerprintMatchResult.Item(item.id, item.score))
                         }
@@ -97,17 +98,21 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         candidates: List<FingerprintIdentity>,
         flowType: FlowType,
         bioSdkWrapper: BioSdkWrapper,
+        bioSdk: FingerprintConfiguration.BioSdk,
     ) = bioSdkWrapper.match(
         FingerprintIdentity("", probes),
         candidates,
-        isCrossFingerMatchingEnabled(flowType),
+        isCrossFingerMatchingEnabled(flowType, bioSdk),
     )
 
-    private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configManager
+    private suspend fun isCrossFingerMatchingEnabled(
+        flowType: FlowType,
+        bioSdk: FingerprintConfiguration.BioSdk,
+    ): Boolean = configManager
         .takeIf { flowType == FlowType.VERIFY }
         ?.getProjectConfiguration()
         ?.fingerprint
-        ?.bioSdkConfiguration
+        ?.getSdkConfiguration(bioSdk)
         ?.comparisonStrategyForVerification == CROSS_FINGER_USING_MEAN_OF_MAX
 
     private fun IFingerIdentifier.toMatcherDomain() = when (this) {

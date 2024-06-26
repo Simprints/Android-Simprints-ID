@@ -3,8 +3,9 @@ package com.simprints.fingerprint.infra.scanner.data
 import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.infra.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.fingerprint.infra.scanner.domain.versions.getAvailableVersionsForDownload
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration.Vero2FirmwareVersions
+import com.simprints.fingerprint.infra.scanner.domain.versions.getMissingVersionsToDownload
 import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.MockKAnnotations
 import io.mockk.Ordering
@@ -12,6 +13,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +23,7 @@ class FirmwareRepositoryTest {
     @MockK(relaxUnitFun = true)
     private lateinit var firmwareLocalDataSourceMock: FirmwareLocalDataSource
 
-    @MockK
+    @MockK(relaxed = true)
     private lateinit var firmwareRemoteDataSourceMock: FirmwareRemoteDataSource
 
     @MockK
@@ -37,11 +39,11 @@ class FirmwareRepositoryTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery {
-            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2
+            configManager.getProjectConfiguration().fingerprint?.secugenSimMatcher?.vero2
         } returns vero2Configuration
 
         every { vero2Configuration.firmwareVersions } returns mapOf(
-            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+            HARDWARE_VERSION to Vero2FirmwareVersions(
                 CYPRESS_VERSION_HIGH,
                 STM_VERSION_HIGH,
                 UN20_VERSION_HIGH
@@ -53,6 +55,8 @@ class FirmwareRepositoryTest {
             firmwareLocalDataSourceMock,
             configManager
         )
+
+        mockkStatic("com.simprints.fingerprint.infra.scanner.domain.versions.ScannerHardwareRevisionsKt")
     }
 
     @Test
@@ -62,16 +66,6 @@ class FirmwareRepositoryTest {
             coEvery {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
-            val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
-                HARDWARE_VERSION,
-                emptyMap()
-            )
-            coEvery {
-                firmwareRemoteDataSourceMock.getDownloadableFirmwares(
-                    any(),
-                    any()
-                )
-            } returns availableForDownload
 
             firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
@@ -79,15 +73,9 @@ class FirmwareRepositoryTest {
                 firmwareRemoteDataSourceMock.downloadFirmware(any())
             }
             coVerify(Ordering.ORDERED) {
-                firmwareLocalDataSourceMock.saveCypressFirmwareBytes(
-                    any(), any()
-                )
-                firmwareLocalDataSourceMock.saveStmFirmwareBytes(
-                    any(), any()
-                )
-                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
-                    any(), any()
-                )
+                firmwareLocalDataSourceMock.saveCypressFirmwareBytes(any(), any())
+                firmwareLocalDataSourceMock.saveStmFirmwareBytes(any(), any())
+                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(any(), any())
             }
         }
 
@@ -97,58 +85,32 @@ class FirmwareRepositoryTest {
             coEvery {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
-            coEvery {
-                firmwareRemoteDataSourceMock.getDownloadableFirmwares(
-                    any(),
-                    any()
-                )
+            every {
+                any<Vero2FirmwareVersions>().getMissingVersionsToDownload(any())
             } returns emptyList()
 
             firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
             coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
-            coVerify(exactly = 0) {
-                firmwareLocalDataSourceMock.saveCypressFirmwareBytes(
-                    any(),
-                    any()
-                )
-            }
+            coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveCypressFirmwareBytes(any(), any()) }
             coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveStmFirmwareBytes(any(), any()) }
-            coVerify(exactly = 0) {
-                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
-                    any(),
-                    any()
-                )
-            }
+            coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveUn20FirmwareBytes(any(), any()) }
         }
 
     @Test
     fun `updateStoredFirmwareFilesWithLatest downloads other files when only one versions available`() =
         runTest {
+            coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any()) } returns CYPRESS_BIN
             coEvery {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW_UN20_HIGH
-            val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
-                HARDWARE_VERSION,
-                SCANNER_VERSIONS_HIGH
-            )
-            coEvery {
-                firmwareRemoteDataSourceMock.getDownloadableFirmwares(
-                    any(),
-                    any()
-                )
-            } returns availableForDownload
 
             firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
-            coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
-
-            coVerify(exactly = 0) {
-                firmwareLocalDataSourceMock.saveUn20FirmwareBytes(
-                    any(),
-                    any()
-                )
-            }
+            coVerify(exactly = 2) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
+            coVerify(exactly = 1) { firmwareLocalDataSourceMock.saveCypressFirmwareBytes(any(), any()) }
+            coVerify(exactly = 1) { firmwareLocalDataSourceMock.saveStmFirmwareBytes(any(), any()) }
+            coVerify(exactly = 0) { firmwareLocalDataSourceMock.saveUn20FirmwareBytes(any(), any()) }
         }
 
     @Test
@@ -207,13 +169,6 @@ class FirmwareRepositoryTest {
         private const val UN20_VERSION_LOW = "1.E-1.2"
         private const val UN20_VERSION_HIGH = "1.E-1.3"
 
-        private val RESPONSE_MAP = mapOf(
-            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                CYPRESS_VERSION_HIGH,
-                STM_VERSION_HIGH,
-                UN20_VERSION_HIGH
-            )
-        )
         private val SCANNER_VERSIONS_LOW = mapOf(
             DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_LOW),
             DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_LOW),

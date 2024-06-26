@@ -231,7 +231,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             findNavController().navigateSafely(
                 this,
                 R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
-                FingerprintConnectContract.getArgs(true)
+                FingerprintConnectContract.getArgs(args.params.fingerprintSDK)
             )
         } catch (e: Exception) {
             Simber.tag(FINGER_CAPTURE.name).i("Error launching scanner connection screen", e)

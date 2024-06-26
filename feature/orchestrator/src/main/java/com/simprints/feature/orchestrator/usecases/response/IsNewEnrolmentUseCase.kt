@@ -34,12 +34,14 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
     private fun isValidEnrolmentFingerprintResult(
         projectConfiguration: ProjectConfiguration,
         fingerprintResult: FingerprintMatchResult?
-    ): Boolean = projectConfiguration.fingerprint
-        ?.bioSdkConfiguration
-        ?.decisionPolicy
-        ?.medium?.toFloat()
-        ?.let { threshold -> fingerprintResult?.results?.all { it.confidence < threshold } }
-        ?: true
+    ): Boolean = fingerprintResult?.let {
+        projectConfiguration.fingerprint
+            ?.getSdkConfiguration(fingerprintResult.sdk)
+            ?.decisionPolicy
+            ?.medium?.toFloat()
+            ?.let { threshold -> fingerprintResult.results.all { it.confidence < threshold } }
+    } ?: true
+
 
     // Missing results and configuration are ignored as "valid" to allow creating new records.
     private fun isNewEnrolmentFaceResult(

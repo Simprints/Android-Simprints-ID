@@ -34,7 +34,8 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             )
 
             is FingerprintMatchResult -> EnrolLastBiometricStepResult.FingerprintMatchResult(
-                result.results.map { MatchResult(it.subjectId, it.confidence) }
+                result.results.map { MatchResult(it.subjectId, it.confidence) },
+                result.sdk,
             )
 
             is FaceCaptureResult -> EnrolLastBiometricStepResult.FaceCaptureResult(

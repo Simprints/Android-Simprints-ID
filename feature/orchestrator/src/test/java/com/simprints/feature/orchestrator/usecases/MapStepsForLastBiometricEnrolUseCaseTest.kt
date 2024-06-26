@@ -9,6 +9,7 @@ import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -74,10 +75,10 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     @Test
     fun `maps FingerprintMatchResult correctly`() {
         val result = useCase(listOf(
-            FingerprintMatchResult(emptyList())
+            FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC)
         ))
 
-        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList()))
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
     }
 
     @Test

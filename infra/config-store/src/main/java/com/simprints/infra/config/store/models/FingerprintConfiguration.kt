@@ -33,14 +33,8 @@ data class FingerprintConfiguration(
         CROSS_FINGER_USING_MEAN_OF_MAX;
     }
 
-    // TODO(milen): remove
-    // so we are just using  secugenSimMatcher if it is not null or nec otherwise
-    // See ticket SIM-81 for more details
-    val bioSdkConfiguration: FingerprintSdkConfiguration
-        get() = when {
-            secugenSimMatcher != null -> secugenSimMatcher
-            nec != null -> nec
-            else -> throw IllegalStateException("No active BioSdk")
-        }
-
+    fun getSdkConfiguration(sdk: BioSdk): FingerprintSdkConfiguration? = when (sdk) {
+        BioSdk.SECUGEN_SIM_MATCHER -> secugenSimMatcher
+        BioSdk.NEC -> nec
+    }
 }
