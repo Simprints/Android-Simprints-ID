@@ -23,7 +23,6 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_moduleId") moduleId: String?,
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
-        @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
     ): Response<Void>
 
@@ -44,7 +43,6 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_moduleId") moduleId: String?,
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
-        @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
     ): Response<ResponseBody>
 

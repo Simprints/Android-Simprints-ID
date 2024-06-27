@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
-import com.simprints.infra.eventsync.event.remote.fromDomainToApi
 import org.junit.Test
 
 class RemoteEventQueryTest {
@@ -29,7 +28,6 @@ class RemoteEventQueryTest {
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID.value)
             assertThat(subjectId).isEqualTo(GUID1)
             assertThat(lastEventId).isEqualTo(GUID2)
-            assertThat(modes).isEqualTo(DEFAULT_MODES.map { it.fromDomainToApi() })
         }
     }
 }
