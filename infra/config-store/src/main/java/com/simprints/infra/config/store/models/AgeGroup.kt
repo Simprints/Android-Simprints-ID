@@ -5,5 +5,5 @@ data class AgeGroup(
     val endExclusive: Int?,
 ) {
     fun isEmpty(): Boolean =
-        startInclusive == 0 && endExclusive == null
+        startInclusive == 0 && (endExclusive == null || endExclusive == 0)
 }
