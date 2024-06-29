@@ -1,4 +1,4 @@
-package com.simprints.infra.rocwrapper.initialization
+package com.simprints.face.infra.rocv1.initialization
 
 import android.app.Activity
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports

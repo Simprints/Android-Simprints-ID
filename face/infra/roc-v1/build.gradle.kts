@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.simprints.feature.rocwrapper"
+    namespace = "com.simprints.face.infra.rocv1"
 }
 
 dependencies {
