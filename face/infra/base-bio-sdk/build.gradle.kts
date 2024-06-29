@@ -4,5 +4,5 @@ plugins {
 }
 
 android {
-    namespace = "com.simprints.infra.facebiosdk"
+    namespace = "com.simprints.infra.face.basebiosdk"
 }

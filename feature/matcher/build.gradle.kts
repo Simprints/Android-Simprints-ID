@@ -16,7 +16,7 @@ dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
 
-    implementation(project(":face:infra:face-bio-sdk"))
+    implementation(project(":face:infra:base-bio-sdk"))
     implementation(project(":face:infra:roc-wrapper"))
 
     implementation(project(":fingerprint:infra:bio-sdk"))

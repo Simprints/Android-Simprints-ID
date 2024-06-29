@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":feature:alert"))
 
     //BIO SDK
-    implementation(project(":face:infra:face-bio-sdk"))
+    implementation(project(":face:infra:base-bio-sdk"))
     implementation(project(":face:infra:roc-wrapper"))
 
     implementation(libs.androidX.cameraX.core)

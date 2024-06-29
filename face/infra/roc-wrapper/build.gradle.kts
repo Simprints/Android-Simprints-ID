@@ -7,6 +7,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":face:infra:face-bio-sdk"))
+    implementation(project(":face:infra:base-bio-sdk"))
     implementation(libs.roc)
 }
