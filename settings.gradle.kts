@@ -138,4 +138,5 @@ include(
     ":infra:ui-base",
     ":infra:sync",
     ":infra:event-sync",
+    ":infra:template-protection",
 )
