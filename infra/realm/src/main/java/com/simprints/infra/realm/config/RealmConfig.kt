@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.realm.BuildConfig
 import com.simprints.infra.realm.migration.RealmMigrations
+import com.simprints.infra.realm.models.DbAuxData
 import com.simprints.infra.realm.models.DbFaceSample
 import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbProject
@@ -27,6 +28,8 @@ class RealmConfig @Inject constructor() {
                 DbFaceSample::class,
                 DbSubject::class,
                 DbProject::class,
+                // TODO for security purposes this should be stored in a separate DB in the real implementation
+                DbAuxData::class,
             )
         )
         .name("$databaseName.realm")
@@ -40,6 +43,6 @@ class RealmConfig @Inject constructor() {
 
     companion object {
 
-        private const val REALM_SCHEMA_VERSION: Long = 15
+        private const val REALM_SCHEMA_VERSION: Long = 16
     }
 }
