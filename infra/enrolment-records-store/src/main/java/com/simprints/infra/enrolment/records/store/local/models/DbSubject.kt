@@ -30,6 +30,8 @@ internal fun DbSubject.fromDbToDomain(): Subject {
         toSync = toSync,
         fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
         faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain),
+        // TODO for security purposes this should be stored in a separate DB in the real implementation
+        auxData = auxData?.fromDbToDomain()
     )
 }
 
@@ -47,4 +49,6 @@ internal fun Subject.fromDomainToDb(): DbSubject =
         subject.faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
         subject.isModuleIdTokenized = moduleId.isTokenized()
         subject.isAttendantIdTokenized = attendantId.isTokenized()
+        // TODO for security purposes this should be stored in a separate DB in the real implementation
+        subject.auxData = auxData?.fromDomainToDb()
     }
