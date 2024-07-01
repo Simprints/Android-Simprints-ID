@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync.status.down.domain
 import androidx.annotation.Keep
 import com.simprints.core.domain.modality.Modes
 import com.simprints.infra.eventsync.event.remote.ApiRemoteEventQuery
-import com.simprints.infra.eventsync.event.remote.fromDomainToApi
 
 
 @Keep
@@ -22,7 +21,6 @@ internal data class RemoteEventQuery(
         moduleId = moduleId,
         subjectId = subjectId,
         lastEventId = lastEventId,
-        modes = modes.map { it.fromDomainToApi() },
     )
 }
 

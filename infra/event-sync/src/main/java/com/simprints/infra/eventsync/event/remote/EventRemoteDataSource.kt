@@ -37,7 +37,6 @@ internal class EventRemoteDataSource @Inject constructor(
                 moduleId = query.moduleId,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
-                modes = query.modes,
                 lastEventId = query.lastEventId
             )
         }
@@ -125,7 +124,6 @@ internal class EventRemoteDataSource @Inject constructor(
                 moduleId = query.moduleId,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
-                modes = query.modes,
                 lastEventId = query.lastEventId
             )
         }
