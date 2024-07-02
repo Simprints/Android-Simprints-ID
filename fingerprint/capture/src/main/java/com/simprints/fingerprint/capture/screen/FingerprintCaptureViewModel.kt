@@ -516,7 +516,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             }
 
             is NoFingerDetectedException -> {
-                Simber.e(e)
+                Simber.i(e)
                 handleNoFingerDetected()
             }
 
