@@ -12,7 +12,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmati
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
-import com.simprints.infra.facebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify

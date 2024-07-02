@@ -2,7 +2,7 @@ package com.simprints.face.capture.models
 
 import android.graphics.Bitmap
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.facebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.infra.images.model.SecuredImageRef
 import java.util.UUID
 

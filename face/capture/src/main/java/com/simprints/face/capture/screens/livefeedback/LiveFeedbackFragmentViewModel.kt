@@ -14,9 +14,10 @@ import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.models.SymmetricTarget
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
+import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.facebiosdk.detection.Face
-import com.simprints.infra.facebiosdk.detection.FaceDetector
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -28,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val frameProcessor: FrameProcessor,
-    private val faceDetector: FaceDetector,
+    private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val configManager: ConfigManager,
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
@@ -38,9 +39,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private var samplesToCapture: Int = 1
 
     private val faceTarget = FaceTarget(
-        SymmetricTarget(VALID_YAW_DELTA),
-        SymmetricTarget(VALID_ROLL_DELTA),
-        0.25f..0.5f
+        SymmetricTarget(VALID_YAW_DELTA), SymmetricTarget(VALID_ROLL_DELTA), 0.25f..0.5f
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
@@ -50,6 +49,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
+    private lateinit var faceDetector: FaceDetector
 
     /**
      * Processes the image
@@ -94,7 +94,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     ) {
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
-        frameProcessor.init(previewSize, cropRect)
+        viewModelScope.launch {
+            faceDetector = resolveFaceBioSdk().detector
+            frameProcessor.init(previewSize, cropRect)
+        }
     }
 
     fun clearFrameProcessor() = frameProcessor.clear()

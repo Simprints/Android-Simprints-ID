@@ -33,6 +33,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         const val IS_ATTENDANT_ID_TOKENIZED_FIELD = "isAttendantIdTokenized"
         const val IS_MODULE_ID_TOKENIZED_FIELD = "isModuleIdTokenized"
         const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
+        const val FACE_SAMPLES_FIELD = "faceSamples"
         const val FORMAT_FIELD = "format"
     }
 
@@ -154,6 +155,12 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             realmQuery = realmQuery.query(
                 "ANY $FINGERPRINT_SAMPLES_FIELD.$FORMAT_FIELD == $0",
                 query.fingerprintSampleFormat
+            )
+        }
+        if (query.faceSampleFormat != null) {
+            realmQuery = realmQuery.query(
+                "ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $0",
+                query.faceSampleFormat
             )
         }
         if (query.afterSubjectId != null) {

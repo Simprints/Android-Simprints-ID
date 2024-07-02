@@ -4,11 +4,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
+import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -32,6 +33,9 @@ internal class FaceMatcherUseCaseTest {
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
+    lateinit var resolveFaceBioSdk: ResolveFaceBioSdkUseCase
+
+    @MockK
     lateinit var faceMatcher: FaceMatcher
 
     @MockK
@@ -42,10 +46,10 @@ internal class FaceMatcherUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
+        coEvery { resolveFaceBioSdk().matcher } returns faceMatcher
         useCase = FaceMatcherUseCase(
             enrolmentRecordRepository,
-            faceMatcher,
+            resolveFaceBioSdk,
             createRangesUseCase,
             testCoroutineRule.testCoroutineDispatcher,
         )

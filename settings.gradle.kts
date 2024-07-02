@@ -91,8 +91,10 @@ include(
 // Face modality modules
 include(
     ":face:capture",
-    ":face:infra:face-bio-sdk",
-    ":face:infra:roc-wrapper",
+    ":face:infra:base-bio-sdk",
+    ":face:infra:bio-sdk-resolver",
+    ":face:infra:roc-v1",
+    ":face:infra:roc-v3",
 )
 
 // Feature modules
