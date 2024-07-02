@@ -1,7 +1,7 @@
 package com.simprints.face.capture
 
-import android.os.Bundle
 import com.simprints.face.capture.screens.controller.FaceCaptureControllerFragmentArgs
+import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 
 object FaceCaptureContract {
 
@@ -9,5 +9,11 @@ object FaceCaptureContract {
 
     fun getArgs(
         samplesToCapture: Int,
-    ): Bundle = FaceCaptureControllerFragmentArgs(samplesToCapture).toBundle()
+        auxData: TemplateAuxData?,
+    ) = FaceCaptureControllerFragmentArgs(
+        FaceCaptureParams(
+            samplesToCapture = samplesToCapture,
+            auxData = auxData,
+        )
+    ).toBundle()
 }

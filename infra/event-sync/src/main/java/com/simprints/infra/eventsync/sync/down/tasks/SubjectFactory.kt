@@ -8,6 +8,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
@@ -33,6 +34,7 @@ class SubjectFactory @Inject constructor(
                 moduleId = moduleId,
                 fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
                 faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
+                // TODO aux data on sync
             )
         }
 
@@ -45,6 +47,7 @@ class SubjectFactory @Inject constructor(
                 moduleId = moduleId,
                 fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
                 faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
+                // TODO aux data on sync
             )
         }
 
@@ -64,6 +67,7 @@ class SubjectFactory @Inject constructor(
             createdAt = Date(timeHelper.now().ms),
             fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
             faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
+            auxData = faceResponse?.let { it.auxData?.copy(subjectId = subjectId) }
         )
     }
 
@@ -75,7 +79,8 @@ class SubjectFactory @Inject constructor(
         createdAt: Date? = null,
         updatedAt: Date? = null,
         fingerprintSamples: List<FingerprintSample> = emptyList(),
-        faceSamples: List<FaceSample> = emptyList()
+        faceSamples: List<FaceSample> = emptyList(),
+        auxData: TemplateAuxData? = null,
     ) = Subject(
         subjectId = subjectId,
         projectId = projectId,
@@ -84,7 +89,8 @@ class SubjectFactory @Inject constructor(
         createdAt = createdAt,
         updatedAt = updatedAt,
         fingerprintSamples = fingerprintSamples,
-        faceSamples = faceSamples
+        faceSamples = faceSamples,
+        auxData = auxData,
     )
 
     private fun extractFingerprintSamples(

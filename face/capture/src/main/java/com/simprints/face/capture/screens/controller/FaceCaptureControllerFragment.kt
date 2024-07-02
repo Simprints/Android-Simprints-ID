@@ -67,7 +67,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             findNavController().finishWithResult(this, result)
         }
 
-        viewModel.setupCapture(args.samplesToCapture)
+        viewModel.setupCapture(args.params.samplesToCapture, args.params.auxData)
         initFaceBioSdk()
         viewModel.recaptureEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
             internalNavController?.navigateSafely(currentlyDisplayedInternalFragment, R.id.action_global_faceLiveFeedback)

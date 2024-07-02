@@ -9,8 +9,8 @@
         android:name="com.simprints.face.capture.screens.controller.FaceCaptureControllerFragment"
         android:label="FaceCaptureController">
         <argument
-            android:name="samplesToCapture"
-            app:argType="integer" />
+            android:name="params"
+            app:argType="com.simprints.face.capture.FaceCaptureParams" />
     </fragment>
 
     <include app:graph="@navigation/graph_alert" />
