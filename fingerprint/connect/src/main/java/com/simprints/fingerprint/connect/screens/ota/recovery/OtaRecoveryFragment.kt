@@ -68,8 +68,9 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
         findNavController().navigateSafely(
             this,
             OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFragment(OtaFragmentParams(
-                args.params.remainingOtas,
-                args.params.currentRetryAttempt + 1
+                fingerprintSDK = args.params.fingerprintSDK,
+                availableOtas = args.params.remainingOtas,
+                currentRetryAttempt = args.params.currentRetryAttempt + 1
             ))
         )
     }

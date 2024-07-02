@@ -10,7 +10,7 @@ import com.simprints.infra.facebiosdk.matching.FaceSample
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
+import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -25,23 +25,22 @@ internal class FaceMatcherUseCase @Inject constructor(
 ) : MatcherUseCase {
 
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING.name
-    override suspend fun matcherName ()= faceMatcher.matcherName
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
         onLoadingCandidates: (tag: String) -> Unit,
-    ): Pair<List<MatchResultItem>, Int> = coroutineScope {
+    ): MatcherResult = coroutineScope {
         if (matchParams.probeFaceSamples.isEmpty()) {
-            return@coroutineScope Pair(emptyList(), 0)
+            return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
         val totalCandidates = enrolmentRecordRepository.count(matchParams.queryForCandidates, dataSource = matchParams.biometricDataSource)
         if (totalCandidates == 0) {
-            return@coroutineScope Pair(emptyList(), 0)
+            return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
 
         onLoadingCandidates(crashReportTag)
-        createRanges(totalCandidates)
+        val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
                     val batchCandidates = getCandidates(matchParams.queryForCandidates, range, dataSource = matchParams.biometricDataSource)
@@ -50,7 +49,8 @@ internal class FaceMatcherUseCase @Inject constructor(
             }
             .awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
-            .toList() to totalCandidates
+            .toList()
+        MatcherResult(resultItems, totalCandidates, faceMatcher.matcherName)
     }
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes

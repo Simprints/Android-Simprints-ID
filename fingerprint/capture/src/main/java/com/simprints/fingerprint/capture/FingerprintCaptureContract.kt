@@ -3,6 +3,7 @@ package com.simprints.fingerprint.capture
 import com.simprints.core.domain.common.FlowType
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureFragmentArgs
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 
 object FingerprintCaptureContract {
 
@@ -11,6 +12,7 @@ object FingerprintCaptureContract {
     fun getArgs(
         flowType: FlowType,
         fingers: List<IFingerIdentifier>,
-    ) = FingerprintCaptureFragmentArgs(FingerprintCaptureParams(flowType, fingers)).toBundle()
+        fingerprintSDK: FingerprintConfiguration.BioSdk,
+    ) = FingerprintCaptureFragmentArgs(FingerprintCaptureParams(flowType, fingers, fingerprintSDK)).toBundle()
 
 }

@@ -17,6 +17,7 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.LOGIN_NOT_COMPLETE
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.PROJECT_ENDING
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.PROJECT_PAUSED
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.AGE_GROUP_NOT_SUPPORTED
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.UNEXPECTED_ERROR
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
@@ -44,7 +45,8 @@ internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCal
         LICENSE_INVALID,
         PROJECT_ENDING,
         PROJECT_PAUSED,
-        BLUETOOTH_NO_PERMISSION
+        BLUETOOTH_NO_PERMISSION,
+        AGE_GROUP_NOT_SUPPORTED,
     }
 }
 
@@ -66,6 +68,7 @@ internal fun Reason.fromDomainToApi() =
         PROJECT_ENDING -> ApiReason.PROJECT_ENDING
         PROJECT_PAUSED -> ApiReason.PROJECT_PAUSED
         BLUETOOTH_NO_PERMISSION -> ApiReason.BLUETOOTH_NO_PERMISSION
+        AGE_GROUP_NOT_SUPPORTED -> ApiReason.AGE_GROUP_NOT_SUPPORTED
     }
 
 
@@ -86,4 +89,5 @@ internal fun ApiReason.fromApiToDomain(): Reason =
         ApiReason.PROJECT_ENDING -> PROJECT_ENDING
         ApiReason.PROJECT_PAUSED -> PROJECT_PAUSED
         ApiReason.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
+        ApiReason.AGE_GROUP_NOT_SUPPORTED -> AGE_GROUP_NOT_SUPPORTED
     }

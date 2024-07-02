@@ -57,6 +57,7 @@ class ErrorCallbackEventTest {
             AppErrorReason.PROJECT_PAUSED to ErrorReason.PROJECT_PAUSED,
             AppErrorReason.PROJECT_ENDING to ErrorReason.PROJECT_ENDING,
             AppErrorReason.BLUETOOTH_NO_PERMISSION to ErrorReason.BLUETOOTH_NO_PERMISSION,
+            AppErrorReason.AGE_GROUP_NOT_SUPPORTED to ErrorReason.AGE_GROUP_NOT_SUPPORTED,
         ).forEach {
             assertThat(fromAppResponseErrorReasonToEventReason(it.key)).isEqualTo(it.value)
         }

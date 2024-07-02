@@ -9,6 +9,7 @@ import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.infra.scanner.tools.BatteryLevelChecker
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
 import kotlinx.coroutines.delay
@@ -40,6 +41,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
      * @throws OtaAvailableException If an OTA update is available and the battery is sufficiently charged.
      */
     suspend fun setupScannerWithOtaCheck(
+        fingerprintSdk: FingerprintConfiguration.BioSdk,
         scanner: Scanner,
         macAddress: String,
         withScannerVersion: (ScannerVersion) -> Unit,
@@ -57,13 +59,13 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         delay(100) // Speculatively needed
         val batteryInfo = getBatteryInfo(scanner, withBatteryInfo)
         ifAvailableOtasPrepareScannerThenThrow(
+            fingerprintSdk,
             scannerVersion.hardwareVersion,
             scanner,
             macAddress,
             batteryInfo
         )
     }
-
 
     private suspend fun getBatteryInfo(
         scanner: Scanner,
@@ -85,16 +87,18 @@ internal class ScannerInitialSetupHelper @Inject constructor(
     }
 
     private suspend fun ifAvailableOtasPrepareScannerThenThrow(
+        fingerprintSdk: FingerprintConfiguration.BioSdk,
         hardwareVersion: String,
         scanner: Scanner,
         macAddress: String,
         batteryInfo: BatteryInfo,
     ) {
-        val availableVersions =
-            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.get(
-                hardwareVersion
-            )
-        val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
+        val configuredVersions =  configManager.getProjectConfiguration().fingerprint
+                ?.getSdkConfiguration(fingerprintSdk)
+                ?.vero2
+                ?.firmwareVersions
+                ?.get(hardwareVersion)
+        val availableOtas = determineAvailableOtas(scannerVersion.firmware, configuredVersions)
         val requiresOtaUpdate = availableOtas.isNotEmpty()
             && !batteryInfo.isLowBattery()
             && !batteryLevelChecker.isLowBattery()
@@ -107,22 +111,22 @@ internal class ScannerInitialSetupHelper @Inject constructor(
 
     private suspend fun determineAvailableOtas(
         current: ScannerFirmwareVersions,
-        available: Vero2Configuration.Vero2FirmwareVersions?,
+        configured: Vero2Configuration.Vero2FirmwareVersions?,
     ): List<AvailableOta> {
-        if (available == null) {
+        if (configured == null) {
             return emptyList()
         }
         val localFiles = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         return listOfNotNull(
             if (
-                localFiles[Chip.CYPRESS]?.contains(available.cypress) == true
-                && current.cypress != available.cypress
+                localFiles[Chip.CYPRESS]?.contains(configured.cypress) == true
+                && current.cypress != configured.cypress
             ) AvailableOta.CYPRESS else null,
-            if (localFiles[Chip.STM]?.contains(available.stm) == true &&
-                current.stm != available.stm
+            if (localFiles[Chip.STM]?.contains(configured.stm) == true &&
+                current.stm != configured.stm
             ) AvailableOta.STM else null,
-            if (localFiles[Chip.UN20]?.contains(available.un20) == true &&
-                current.un20 != available.un20
+            if (localFiles[Chip.UN20]?.contains(configured.un20) == true &&
+                current.un20 != configured.un20
             ) AvailableOta.UN20 else null
         )
     }

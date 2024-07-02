@@ -161,7 +161,10 @@ internal class ConnectScannerControllerFragment :
                     is ConnectScannerIssueScreen.Ota -> internalNavController?.navigateSafely(
                         currentlyDisplayedInternalFragment,
                         R.id.otaFragment,
-                        OtaFragmentArgs(OtaFragmentParams(screen.availableOtas)).toBundle()
+                        OtaFragmentArgs(OtaFragmentParams(
+                            args.params.fingerprintSDK,
+                            screen.availableOtas
+                        )).toBundle()
                     )
                 }
             })

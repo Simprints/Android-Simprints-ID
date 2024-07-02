@@ -61,7 +61,8 @@ data class ErrorCallbackEvent(
             PROJECT_ENDING,
             PROJECT_PAUSED,
             BLUETOOTH_NO_PERMISSION,
-            FACE_CONFIGURATION_ERROR;
+            FACE_CONFIGURATION_ERROR,
+            AGE_GROUP_NOT_SUPPORTED;
 
             companion object {
 
@@ -84,6 +85,7 @@ data class ErrorCallbackEvent(
                         AppErrorReason.ROOTED_DEVICE -> throw Throwable("Can't convert from rooted device")
                         AppErrorReason.PROJECT_ENDING -> PROJECT_ENDING
                         AppErrorReason.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
+                        AppErrorReason.AGE_GROUP_NOT_SUPPORTED -> AGE_GROUP_NOT_SUPPORTED
                     }
             }
         }

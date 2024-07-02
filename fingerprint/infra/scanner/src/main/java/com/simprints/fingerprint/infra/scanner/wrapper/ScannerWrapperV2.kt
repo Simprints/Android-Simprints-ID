@@ -18,6 +18,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoRea
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
 import com.simprints.fingerprint.infra.scanner.v2.tools.wrapErrorFromScanner
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
@@ -70,17 +71,19 @@ internal class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      * @throws OtaFailedException
      */
-    override suspend fun setScannerInfoAndCheckAvailableOta() = withContext(ioDispatcher) {
-        try {
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(
-                scannerV2,
-                macAddress,
-                { scannerVersion = it },
-                { batteryInfo = it }
-            )
-        } catch (ex: Throwable) {
-            throw wrapErrorFromScanner(ex)
-        }
+    override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) =
+        withContext(ioDispatcher) {
+            try {
+                scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                    fingerprintSdk,
+                    scannerV2,
+                    macAddress,
+                    { scannerVersion = it },
+                    { batteryInfo = it }
+                )
+            } catch (ex: Throwable) {
+                throw wrapErrorFromScanner(ex)
+            }
     }
 
     override suspend fun disconnect() = withContext(ioDispatcher) {

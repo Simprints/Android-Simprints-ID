@@ -14,6 +14,7 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.infra.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerOtaOperationsWrapper
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -75,7 +76,7 @@ class OtaViewModelTest {
         coEvery {
             recentUserActivityManager.getRecentUserActivity()
         } returns RecentUserActivity(HARDWARE_VERSION, "", "".asTokenizableRaw(), 0, 0, 0, 0)
-        coEvery { configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions } returns mapOf(
+        coEvery { configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER)?.vero2?.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                 NEW_CYPRESS_VERSION,
                 NEW_STM_VERSION,
@@ -101,7 +102,7 @@ class OtaViewModelTest {
     fun oneOta_updatesStateCorrectlyAndSavesEvent() = runTest {
         val progressObserver = otaViewModel.progress.testObserver()
 
-        otaViewModel.startOta(listOf(AvailableOta.CYPRESS), 0)
+        otaViewModel.startOta(SECUGEN_SIM_MATCHER, listOf(AvailableOta.CYPRESS), 0)
 
         progressObserver.observedValues.assertAlmostContainsExactlyElementsIn(
             listOf(0f) + CYPRESS_OTA_STEPS.map { it.totalProgress } + listOf(1f)
@@ -119,7 +120,7 @@ class OtaViewModelTest {
         val progressObserver = otaViewModel.progress.testObserver()
         val completeObserver = otaViewModel.otaComplete.testObserver()
 
-        otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
+        otaViewModel.startOta(SECUGEN_SIM_MATCHER, listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
         progressObserver.observedValues.assertAlmostContainsExactlyElementsIn(
             listOf(0f) +
@@ -144,7 +145,7 @@ class OtaViewModelTest {
             throw OtaFailedException("oops")
         }
 
-        otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
+        otaViewModel.startOta(SECUGEN_SIM_MATCHER, listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
         verify { reportFirmwareUpdate.invoke(any(), any(), any(), null) }
         verify { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
@@ -164,6 +165,7 @@ class OtaViewModelTest {
         }
 
         otaViewModel.startOta(
+            SECUGEN_SIM_MATCHER,
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
             OtaViewModel.MAX_RETRY_ATTEMPTS
         )
@@ -183,6 +185,7 @@ class OtaViewModelTest {
         }
 
         otaViewModel.startOta(
+            SECUGEN_SIM_MATCHER,
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
             OtaViewModel.MAX_RETRY_ATTEMPTS
         )
@@ -202,6 +205,7 @@ class OtaViewModelTest {
         }
 
         otaViewModel.startOta(
+            SECUGEN_SIM_MATCHER,
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
             0
         )
