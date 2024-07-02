@@ -25,6 +25,7 @@ import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.matcher.MatchContract
 import javax.inject.Inject
@@ -37,7 +38,11 @@ internal class BuildStepsUseCase @Inject constructor(
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) {
 
-    fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration) = when (action) {
+    fun build(
+        action: ActionRequest,
+        projectConfiguration: ProjectConfiguration,
+        auxData: TemplateAuxData? = null,
+    ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
             buildConsentStep(ConsentType.ENROL),
@@ -45,6 +50,7 @@ internal class BuildStepsUseCase @Inject constructor(
             buildModalityCaptureSteps(
                 projectConfiguration,
                 FlowType.ENROL,
+                auxData,
             ),
             if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
                 buildModalityMatcherSteps(
@@ -67,6 +73,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 buildModalityCaptureSteps(
                     projectConfiguration,
                     FlowType.IDENTIFY,
+                    null // TODO template protection for identifying
                 ),
                 buildModalityMatcherSteps(
                     projectConfiguration,
@@ -85,6 +92,7 @@ internal class BuildStepsUseCase @Inject constructor(
             buildModalityCaptureSteps(
                 projectConfiguration,
                 FlowType.VERIFY,
+                auxData,
             ),
             buildModalityMatcherSteps(
                 projectConfiguration,
@@ -159,6 +167,7 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildModalityCaptureSteps(
         projectConfiguration: ProjectConfiguration,
         flowType: FlowType,
+        auxData: TemplateAuxData?,
     ) = projectConfiguration.general.modalities.map {
         when (it) {
             Modality.FINGERPRINT -> {
@@ -180,7 +189,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.FACE_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
                     destinationId = FaceCaptureContract.DESTINATION,
-                    payload = FaceCaptureContract.getArgs(samplesToCapture),
+                    payload = FaceCaptureContract.getArgs(samplesToCapture, auxData),
                 )
             }
         }

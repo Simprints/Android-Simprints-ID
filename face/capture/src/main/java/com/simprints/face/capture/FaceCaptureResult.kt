@@ -1,12 +1,14 @@
 package com.simprints.face.capture
 
 import androidx.annotation.Keep
+import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.images.model.SecuredImageRef
 import java.io.Serializable
 
 @Keep
 data class FaceCaptureResult(
     val results: List<Item>,
+    val auxData: TemplateAuxData?,
 ) : Serializable {
 
     @Keep
