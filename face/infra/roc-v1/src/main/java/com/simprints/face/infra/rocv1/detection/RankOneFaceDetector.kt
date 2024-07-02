@@ -3,8 +3,8 @@ package com.simprints.face.infra.rocv1.detection
 import android.graphics.Bitmap
 import android.graphics.Rect
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.infra.facebiosdk.detection.Face
-import com.simprints.infra.facebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_float
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char

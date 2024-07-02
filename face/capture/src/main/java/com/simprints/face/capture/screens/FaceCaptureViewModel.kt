@@ -14,8 +14,8 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
+import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -36,7 +36,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val eventReporter: SimpleCaptureEventReporter,
     private val bitmapToByteArray: BitmapToByteArrayUseCase,
     private val licenseRepository: LicenseRepository,
-    private val faceBioSdkInitializer: FaceBioSdkInitializer,
+    private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
 ) : ViewModel() {
 
@@ -81,7 +81,8 @@ internal class FaceCaptureViewModel @Inject constructor(
         var licenseStatus = license.determineLicenseStatus()
 
         if (licenseStatus == LicenseStatus.VALID) {
-            if (!faceBioSdkInitializer.tryInitWithLicense(activity, license!!.data)) {
+            val initializer = resolveFaceBioSdk().initializer
+            if (!initializer.tryInitWithLicense(activity, license!!.data)) {
                 // License is valid but the SDK failed to initialize
                 // This is should reported as an error
                 licenseStatus = LicenseStatus.ERROR

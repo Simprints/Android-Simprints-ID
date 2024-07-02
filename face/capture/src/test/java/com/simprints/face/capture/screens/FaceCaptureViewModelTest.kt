@@ -7,9 +7,9 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
+import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
@@ -82,7 +82,9 @@ class FaceCaptureViewModelTest {
             eventReporter,
             bitmapToByteArrayUseCase,
             licenseRepository,
-            faceBioSdkInitializer,
+            mockk {
+                coEvery { this@mockk().initializer } returns faceBioSdkInitializer
+            },
             saveLicenseCheckEvent
         )
     }
@@ -146,10 +148,10 @@ class FaceCaptureViewModelTest {
     fun `test initFaceBioSdk should initialize faceBioSdk`() {
         // Given
         val license = "license"
-        every  { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
+        every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
         coEvery {
             licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns  License("2133-12-30T17:32:28Z", license)
+        } returns License("2133-12-30T17:32:28Z", license)
         val licenseStatusSlot = slot<LicenseStatus>()
         coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
 
@@ -178,6 +180,7 @@ class FaceCaptureViewModelTest {
         coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.ERROR)
     }
+
     @Test
     fun `test initFaceBioSdk should post invalid license when license is expired`() {
         // Given

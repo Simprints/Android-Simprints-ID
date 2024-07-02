@@ -1,6 +1,6 @@
 package com.simprints.face.capture.models
 
-import com.simprints.infra.facebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.Face
 import kotlin.math.abs
 
 internal data class FaceTarget(

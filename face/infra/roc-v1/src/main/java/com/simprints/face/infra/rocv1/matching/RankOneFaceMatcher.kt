@@ -1,7 +1,8 @@
 package com.simprints.face.infra.rocv1.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.infra.facebiosdk.matching.FaceMatcher
+import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
+import com.simprints.face.infra.rocv1.detection.RankOneFaceDetector.Companion.RANK_ONE_TEMPLATE_FORMAT_1_23
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.rocConstants.ROC_FAST_FV_SIZE
 import javax.inject.Inject
@@ -10,6 +11,8 @@ class RankOneFaceMatcher @Inject constructor() : FaceMatcher() {
     override val matcherName
         get() = "RANK_ONE"
 
+    override val supportedTemplateFormat
+        get() = RANK_ONE_TEMPLATE_FORMAT_1_23
 
     // Ignore this method from test coverage calculations
     // because it uses jni native code which is hard to test

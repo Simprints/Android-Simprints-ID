@@ -1,8 +1,8 @@
 package com.simprints.face.infra.rocv1
 
-import com.simprints.infra.facebiosdk.detection.FaceDetector
-import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
-import com.simprints.infra.facebiosdk.matching.FaceMatcher
+import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
+import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.rocv1.detection.RankOneFaceDetector
 import com.simprints.face.infra.rocv1.initialization.RankOneInitializer
 import com.simprints.face.infra.rocv1.matching.RankOneFaceMatcher

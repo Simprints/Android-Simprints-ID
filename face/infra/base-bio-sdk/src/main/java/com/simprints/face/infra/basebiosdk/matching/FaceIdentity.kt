@@ -1,4 +1,4 @@
-package com.simprints.infra.facebiosdk.matching
+package com.simprints.face.infra.basebiosdk.matching
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

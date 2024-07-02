@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":face:infra:base-bio-sdk"))
-    implementation(libs.roc)
+    // Use API dependencies to ensure that the dependencies are exposed to consumers of the library
+    api(project(":face:infra:base-bio-sdk"))
+    implementation(libs.roc.v1)
 }

@@ -1,6 +1,9 @@
 package com.simprints.infra.facebiosdk.matching
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
+import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
+import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import io.mockk.coEvery
 import io.mockk.spyk
 import kotlinx.coroutines.test.runTest

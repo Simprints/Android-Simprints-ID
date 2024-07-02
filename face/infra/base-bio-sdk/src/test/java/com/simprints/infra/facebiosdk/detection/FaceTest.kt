@@ -3,6 +3,7 @@ package com.simprints.infra.facebiosdk.detection
 import android.graphics.Rect
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.infra.basebiosdk.detection.Face
 import org.junit.Test
 import org.junit.runner.RunWith
 

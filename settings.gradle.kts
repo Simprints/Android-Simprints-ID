@@ -92,7 +92,9 @@ include(
 include(
     ":face:capture",
     ":face:infra:base-bio-sdk",
+    ":face:infra:bio-sdk-resolver",
     ":face:infra:roc-v1",
+    ":face:infra:roc-v3",
 )
 
 // Feature modules

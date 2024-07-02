@@ -1,4 +1,4 @@
-package com.simprints.infra.facebiosdk.initialization
+package com.simprints.face.infra.basebiosdk.initialization
 
 import android.app.Activity
 

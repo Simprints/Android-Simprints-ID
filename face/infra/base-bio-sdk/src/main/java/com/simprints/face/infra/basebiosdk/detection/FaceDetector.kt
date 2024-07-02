@@ -1,4 +1,4 @@
-package com.simprints.infra.facebiosdk.detection
+package com.simprints.face.infra.basebiosdk.detection
 
 import android.graphics.Bitmap
 

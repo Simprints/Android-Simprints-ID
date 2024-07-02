@@ -1,4 +1,4 @@
-package com.simprints.infra.facebiosdk.matching
+package com.simprints.face.infra.basebiosdk.matching
 
 
 abstract class FaceMatcher {
@@ -6,6 +6,7 @@ abstract class FaceMatcher {
      * The matching SDK name
      */
     abstract val matcherName: String
+    abstract val supportedTemplateFormat: String
 
     /**
      * Returns a comparison score of two templates  from 0.0 - 100.0
