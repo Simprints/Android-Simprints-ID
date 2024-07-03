@@ -9,12 +9,14 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.infra.protection.auxiliary.AuxDataRepository
 import java.io.Serializable
 import javax.inject.Inject
 
 internal class CreateEnrolResponseUseCase @Inject constructor(
     private val subjectFactory: SubjectFactory,
     private val enrolSubject: EnrolSubjectUseCase,
+    private val auxDataRepository: AuxDataRepository,
 ) {
 
     suspend operator fun invoke(request: ActionRequest.EnrolActionRequest, results: List<Serializable>): AppResponse {
@@ -30,6 +32,11 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
                 faceResponse = faceCapture
             )
             enrolSubject(subject)
+
+            // TODO Storing aux data for this subject - PoC
+            faceCapture?.auxData
+                ?.copy(subjectId = subject.subjectId)
+                ?.let { auxDataRepository.saveAuxData(it) }
 
             AppEnrolResponse(subject.subjectId)
         } catch (e: Exception) {

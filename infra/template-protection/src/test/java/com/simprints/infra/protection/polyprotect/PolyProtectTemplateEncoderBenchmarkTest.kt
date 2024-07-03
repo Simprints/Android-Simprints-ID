@@ -1,6 +1,7 @@
 package com.simprints.infra.protection.polyprotect
 
 import com.simprints.infra.protection.auxiliary.AuxDataFactory
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -8,7 +9,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
 import kotlin.time.toDuration
 
-//@Ignore("This is a basic setup to check how efficient is the template encoding implementation")
+@Ignore("This is a basic setup to check how efficient is the template encoding implementation")
 class PolyProtectTemplateEncoderBenchmarkTest {
 
     private val auxDataFactory = AuxDataFactory()

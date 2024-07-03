@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records.store.domain.models
+package com.simprints.infra.protection.auxiliary
 
 import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports

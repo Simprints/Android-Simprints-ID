@@ -1,7 +1,7 @@
 package com.simprints.infra.protection.polyprotect
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.protection.auxiliary.AuxData
+import com.simprints.infra.protection.auxiliary.TemplateAuxData
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -10,7 +10,7 @@ import kotlin.math.abs
 
 @RunWith(Parameterized::class)
 class PolyProtectTemplateEncoderParameterTest(
-    private val given: Pair<List<Double>, AuxData>,
+    private val given: Pair<List<Double>, TemplateAuxData>,
     private val expected: List<Double>
 ) {
 
@@ -65,9 +65,10 @@ class PolyProtectTemplateEncoderParameterTest(
                     0.2892785979,
                     0.3398633496,
                     -0.09878652073
-                ) to AuxData(
-                    e = intArrayOf(1, 2, 3, 4, 5),
-                    c = intArrayOf(10, 20, 30, 40, 50)
+                ) to TemplateAuxData(
+                    subjectId = "",
+                    exponents = intArrayOf(1, 2, 3, 4, 5),
+                    coefficients = intArrayOf(10, 20, 30, 40, 50)
                 ),
                 // Expected
                 listOf(4.970039955, 0.8406559131, 1.116541916, 8.376161797, 7.509119748, -0.6948732895, 3.362235598)
@@ -97,9 +98,10 @@ class PolyProtectTemplateEncoderParameterTest(
                     0.0495447296,
                     -0.2834924903,
                     0.2892785979,
-                ) to AuxData(
-                    e = intArrayOf(1, 2, 3, 4, 5),
-                    c = intArrayOf(10, 20, 30, 40, 50)
+                ) to TemplateAuxData(
+                    subjectId = "",
+                    exponents = intArrayOf(1, 2, 3, 4, 5),
+                    coefficients = intArrayOf(10, 20, 30, 40, 50)
                 ),
                 // Expected
                 listOf(
@@ -132,9 +134,10 @@ class PolyProtectTemplateEncoderParameterTest(
                     -0.00713160069,
                     0.2892785979,
                     0.4425149409
-                ) to AuxData(
-                    e = intArrayOf(3, 5, 1, 2, 4),
-                    c = intArrayOf(35, -83, -27, 79, 12)
+                ) to TemplateAuxData(
+                    subjectId = "",
+                    exponents = intArrayOf(3, 5, 1, 2, 4),
+                    coefficients = intArrayOf(35, -83, -27, 79, 12)
                 ),
                 // Expected
                 listOf(

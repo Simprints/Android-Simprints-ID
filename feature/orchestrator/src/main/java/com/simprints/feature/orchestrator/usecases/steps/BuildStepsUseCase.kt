@@ -25,8 +25,8 @@ import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.protection.auxiliary.TemplateAuxData
 import com.simprints.matcher.MatchContract
 import javax.inject.Inject
 
@@ -61,6 +61,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             } else emptyList(),
         )
+
 
         is ActionRequest.IdentifyActionRequest -> {
             val subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action)

@@ -1,8 +1,8 @@
 package com.simprints.face.capture
 
 import androidx.annotation.Keep
-import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.protection.auxiliary.TemplateAuxData
 import java.io.Serializable
 
 @Keep

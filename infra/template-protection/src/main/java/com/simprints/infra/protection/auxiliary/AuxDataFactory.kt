@@ -8,14 +8,16 @@ import kotlin.let
 import kotlin.random.Random
 import kotlin.takeUnless
 
-class AuxDataFactory @Inject constructor() {
+internal class AuxDataFactory @Inject constructor() {
 
     fun createAuxData(
+        subjectId: String = "",
         arraySize: Int = AUX_ARRAY_SIZE,
         coefficientBounds: Int = AUX_COEFFICIENT_BOUND,
-    ): AuxData = AuxData(
-        e = generateExponents(arraySize),
-        c = generateCoefficients(arraySize, coefficientBounds)
+    ): TemplateAuxData = TemplateAuxData(
+        subjectId = subjectId,
+        exponents = generateExponents(arraySize),
+        coefficients = generateCoefficients(arraySize, coefficientBounds)
     )
 
     /**

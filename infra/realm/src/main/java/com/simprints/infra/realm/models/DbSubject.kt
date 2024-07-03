@@ -29,7 +29,4 @@ class DbSubject : RealmObject {
     var toSync: Boolean = false
     var isAttendantIdTokenized: Boolean = false
     var isModuleIdTokenized: Boolean = false
-
-    // TODO for security purposes this should be stored in a separate DB in the real implementation
-    var auxData: DbAuxData? = null
 }
