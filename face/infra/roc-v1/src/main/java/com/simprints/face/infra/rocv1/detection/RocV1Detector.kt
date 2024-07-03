@@ -20,7 +20,7 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports(
     reason = "This class uses roc class that has native functions and can't be mocked"
 )
-class RankOneFaceDetector @Inject constructor() : FaceDetector {
+class RocV1Detector @Inject constructor() : FaceDetector {
     companion object {
         const val RANK_ONE_TEMPLATE_FORMAT_1_23 = "RANK_ONE_1_23"
     }

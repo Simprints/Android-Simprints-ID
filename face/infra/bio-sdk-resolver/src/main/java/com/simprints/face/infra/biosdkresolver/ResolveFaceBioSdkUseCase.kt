@@ -15,7 +15,7 @@ class ResolveFaceBioSdkUseCase @Inject constructor(
         val config = configRepository.getProjectConfiguration()
         // Todo we didn't yet implement the logic to select the SDK based on the configuration
         // so we are just using the v1  SDK for now
-        return rocV1BioSdk
+        return rocV3BioSdk
 
     }
 }

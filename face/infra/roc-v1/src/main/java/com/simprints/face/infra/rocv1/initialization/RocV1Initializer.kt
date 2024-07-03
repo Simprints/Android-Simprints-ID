@@ -7,7 +7,7 @@ import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
 import javax.inject.Inject
 
-class RankOneInitializer @Inject constructor() : FaceBioSdkInitializer {
+class RocV1Initializer @Inject constructor() : FaceBioSdkInitializer {
 
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].

@@ -2,7 +2,6 @@ package com.simprints.face.infra.rocv3.detection
 
 import ai.roc.rocsdk.embedded.SWIGTYPE_p_float
 import ai.roc.rocsdk.embedded.SWIGTYPE_p_unsigned_char
-import ai.roc.rocsdk.embedded.roc
 import ai.roc.rocsdk.embedded.roc_detection
 import ai.roc.rocsdk.embedded.roc_image
 import ai.roc.rocsdk.embedded.roc_landmark
@@ -15,147 +14,107 @@ import com.simprints.infra.logging.Simber
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
+import ai.roc.rocsdk.embedded.roc as roc3
 
 
 @ExcludedFromGeneratedTestCoverageReports(
-    reason = "This class uses roc class that has native functions and can't be mocked"
+    reason = "This class uses roc 3 class that has native functions and can't be mocked"
 )
 @Singleton
 class RocV3Detector @Inject constructor() : FaceDetector {
     companion object {
         const val RANK_ONE_TEMPLATE_FORMAT_3_1 = "RANK_ONE_EMBEDDED_3_1"
-    }
-
-    private val maxFaces = 1
-    private val falseDetectionRate = 0.1f
-    private val relativeMinSize = 0.2f
-    private val absoluteMinSize = 36L
-
-    // Ignore this class from test coverage calculations
-    // because it uses jni native code which is hard to test
-    @ExcludedFromGeneratedTestCoverageReports(
-        reason = "This class uses roc class that has native functions and can't be mocked"
-    )
-    data class ROCFace(
-        var face: roc_detection,
-        var template: SWIGTYPE_p_unsigned_char,
-        var yaw: SWIGTYPE_p_float,
-        var quality: SWIGTYPE_p_float
-    ) {
-        fun cleanup() {
-            face.delete()
-            roc.delete_uint8_t_array(template)
-            roc.delete_float(yaw)
-            roc.delete_float(quality)
-        }
+        const val MAX_FACE_DETECTION = 1
+        const val FALSE_DETECTION_RATE = 0.1f
+        const val RELATIVE_MIN_SIZE = 0.2f
+        const val ABSOLUTE_MIN_SIZE = 36L
     }
 
     override fun analyze(bitmap: Bitmap): Face? {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
-
-        val byteBuffer: ByteBuffer = ByteBuffer.allocate(bitmap.rowBytes * bitmap.height)
-        bitmap.copyPixelsToBuffer(byteBuffer)
-        roc.roc_from_rgba(
+        val byteBuffer = bitmap.toByteBuffer()
+        roc3.roc_from_rgba(
             byteBuffer.array(),
             bitmap.width.toLong(),
             bitmap.height.toLong(),
             bitmap.rowBytes.toLong(),
             rocColorImage
         )
-
-        roc.roc_bgr2gray(rocColorImage, rocGrayImage)
-
-        roc.roc_free_image(rocColorImage)
-
-        return analyze(rocColorImage, rocGrayImage, bitmap.width, bitmap.height)
+        roc3.roc_bgr2gray(rocColorImage, rocGrayImage)
+        return detectFace(rocColorImage, rocGrayImage, bitmap.width, bitmap.height)
     }
 
-    /**
-     * @param rocGrayImage is a grayscale roc_image
+    /*
+    To detect a face from image
+    1- use the gray image to detect the face
+    2- if the face is detected, then use the gray image to generate the landmarks
+    3- use the landmarks and the color image to generate the face template
      */
-    private fun analyze(
-        rocColorImage: roc_image,
-        rocGrayImage: roc_image,
-        imageWidth: Int,
-        imageHeight: Int
+    private fun detectFace(
+        coloredImage: roc_image, grayImage: roc_image, width: Int, height: Int
     ): Face? {
-        val rocFace = ROCFace(
-            roc_detection(),
-            roc.new_uint8_t_array(roc.ROC_FACE_FAST_FV_SIZE.toInt()),
-            roc.new_float(),
-            roc.new_float()
-        )
+        val detection = roc_detection()
+        val template = roc3.new_uint8_t_array(roc3.ROC_FACE_FAST_FV_SIZE.toInt())
+        val yaw = roc3.new_float()
+        val quality = roc3.new_float()
 
-        val faceDetected = getRocTemplateFromImage(rocColorImage, rocGrayImage, rocFace)
-
-        if (!faceDetected) {
-            roc.roc_free_image(rocGrayImage)
-            rocFace.cleanup()
-            return null
+        val face = if (isFaceDetected(grayImage, detection)) {
+            generateFaceTemplateFromImage(
+                coloredImage, grayImage, detection, yaw, template, quality
+            )
+            val yawValue = roc3.float_value(yaw)
+            val qualityValue = roc3.float_value(quality)
+            Face(
+                width,
+                height,
+                detection.boundingRect(),
+                yawValue,
+                detection.rotation,
+                qualityValue,
+                roc3.cdata(roc3.roc_cast(template), roc3.ROC_FACE_FAST_FV_SIZE.toInt()),
+                RANK_ONE_TEMPLATE_FORMAT_3_1
+            )
+        } else {
+            null
         }
-        val yawValue = roc.float_value(rocFace.yaw)
-
-        val qualityValue = roc.float_value(rocFace.quality)
-        log("Yaw: $yawValue, Quality: $qualityValue")
-        val face = Face(
-            imageWidth,
-            imageHeight,
-            Rect(
-                (rocFace.face.x - rocFace.face.width / 2).toInt(),
-                (rocFace.face.y - rocFace.face.height / 2).toInt(),
-                (rocFace.face.x + rocFace.face.width / 2).toInt(),
-                (rocFace.face.y + rocFace.face.height / 2).toInt()
-            ),
-            yawValue,
-            rocFace.face.rotation,
-            qualityValue,
-            roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FACE_FAST_FV_SIZE.toInt()),
-            RANK_ONE_TEMPLATE_FORMAT_3_1
-        )
-
-        // Free all resources after getting the face
-        roc.roc_free_image(rocGrayImage)
-        rocFace.cleanup()
-        log("Face detected: ${face.template.size}")
+        // Free all resources
+        roc3.roc_free_image(grayImage)
+        roc3.roc_free_image(coloredImage)
+        roc3.delete_float(yaw)
+        roc3.delete_float(quality)
+        roc3.delete_uint8_t_array(template)
+        detection.delete()
         return face
     }
 
-
-    private fun getRocTemplateFromImage(
+    private fun generateFaceTemplateFromImage(
         colorImage: roc_image,
         grayImage: roc_image,
-        rocFace: ROCFace
-    ): Boolean {
-        if (noFaceDetected(grayImage, rocFace)) {
-            return false
-        }
+        detection: roc_detection,
+        yaw: SWIGTYPE_p_float,
+        template: SWIGTYPE_p_unsigned_char,
+        quality: SWIGTYPE_p_float
+    ) {
 
-        val landmarks =
-            roc.new_roc_landmark_array(roc.roc_num_landmarks_for_pose(rocFace.face.pose))
+
+        val landmarks = roc3.new_roc_landmark_array(roc3.roc_num_landmarks_for_pose(detection.pose))
         val rightEye = roc_landmark()
         val leftEye = roc_landmark()
         val chin = roc_landmark()
-        roc.roc_embedded_landmark_face(
-            grayImage,
-            rocFace.face,
-            landmarks,
-            rightEye,
-            leftEye,
-            chin,
-            null,
-            rocFace.yaw
+        roc3.roc_embedded_landmark_face(
+            grayImage, detection, landmarks, rightEye, leftEye, chin, null, yaw
         )
-        roc.delete_roc_landmark_array(landmarks)
+        roc3.delete_roc_landmark_array(landmarks)
 
-        roc.roc_embedded_represent_face(
+        roc3.roc_embedded_represent_face(
             colorImage,
-            rocFace.face,
+            detection,
             rightEye,
             leftEye,
             chin,
-            rocFace.template,
-            rocFace.quality,
+            template,
+            quality,
             null,
             null,
             null,
@@ -166,45 +125,46 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             null,
             null
         )
-
-        return true
     }
 
 
-    private fun noFaceDetected(
-        image: roc_image,
-        rocFace: ROCFace,
+    private fun isFaceDetected(
+        image: roc_image, detection: roc_detection
     ): Boolean {
 
-        val adaptiveMinimumSize = roc.new_size_t()
+        val adaptiveMinimumSize = roc3.new_size_t()
 
-        roc.roc_adaptive_minimum_size(
-            image.width,
-            image.height,
-            relativeMinSize,
-            absoluteMinSize,
-            adaptiveMinimumSize
+        roc3.roc_adaptive_minimum_size(
+            image.width, image.height, RELATIVE_MIN_SIZE, ABSOLUTE_MIN_SIZE, adaptiveMinimumSize
         )
-        val n = roc.new_size_t()
+        val n = roc3.new_size_t()
 
-        roc.roc_embedded_detect_faces(
+        roc3.roc_embedded_detect_faces(
             image,
-            roc.size_t_value(adaptiveMinimumSize),
-            maxFaces,
-            falseDetectionRate,
+            roc3.size_t_value(adaptiveMinimumSize),
+            MAX_FACE_DETECTION,
+            FALSE_DETECTION_RATE,
             n,
-            rocFace.face
+            detection
         )
-        val numFaces = roc.size_t_value(n)
-        roc.delete_size_t(n)
-        roc.delete_size_t(adaptiveMinimumSize)
+        val numFaces = roc3.size_t_value(n)
+        roc3.delete_size_t(n)
+        roc3.delete_size_t(adaptiveMinimumSize)
 
-        return numFaces != 1L
+        return numFaces == 1L
     }
 
+    private fun roc_detection.boundingRect() = Rect(
+        (x - width / 2).toInt(),
+        (y - height / 2).toInt(),
+        (x + width / 2).toInt(),
+        (y + height / 2).toInt()
+    )
 
-}
+    private fun Bitmap.toByteBuffer(): ByteBuffer {
+        val byteBuffer = ByteBuffer.allocate(rowBytes * height)
+        copyPixelsToBuffer(byteBuffer)
+        return byteBuffer
+    }
 
-fun log(message: String) {
-    Simber.tag("RankOne").i(message)
 }
