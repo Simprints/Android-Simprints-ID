@@ -11,7 +11,6 @@ import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.logging.Simber
@@ -102,17 +101,6 @@ internal class EnrolmentRecordRepositoryImpl(
                 else -> Simber.e(e)
             }
         }
-    }
-
-    override suspend fun getAuxData(subjectId: String): TemplateAuxData? = try {
-        val query = SubjectQuery(subjectId = subjectId)
-        localDataSource.load(query).mapNotNull { subject -> subject.auxData }.firstOrNull()
-    } catch (e: Exception) {
-        when (e) {
-            is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
-            else -> Simber.e(e)
-        }
-        null
     }
 
     private fun tokenizeIfNecessary(

@@ -1,5 +1,6 @@
 plugins {
     id("simprints.infra")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -7,4 +8,6 @@ android {
 }
 
 dependencies {
+
+    implementation(project(":infra:realm"))
 }

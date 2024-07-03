@@ -6,16 +6,12 @@ import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSo
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 
 @ExcludedFromGeneratedTestCoverageReports("This is an interface with no logic")
 interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
     suspend fun uploadRecords(subjectIds: List<String>)
     suspend fun tokenizeExistingRecords(project: Project)
-
-    // TODO Simplest way to do it for the PoC
-    suspend fun getAuxData(subjectId: String): TemplateAuxData?
 
     override suspend fun count(
         query: SubjectQuery,

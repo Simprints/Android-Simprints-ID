@@ -20,7 +20,4 @@ data class Subject(
 
     @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
     val toSync: Boolean = false,
-
-    // TODO for security purposes this should be stored in a separate DB in the real implementation
-    val auxData: TemplateAuxData? = null,
 ) : Parcelable

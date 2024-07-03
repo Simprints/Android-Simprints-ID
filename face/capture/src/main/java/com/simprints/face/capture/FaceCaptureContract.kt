@@ -1,7 +1,7 @@
 package com.simprints.face.capture
 
 import com.simprints.face.capture.screens.controller.FaceCaptureControllerFragmentArgs
-import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
+import com.simprints.infra.protection.auxiliary.TemplateAuxData
 
 object FaceCaptureContract {
 

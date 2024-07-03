@@ -34,14 +34,11 @@ import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
-import com.simprints.infra.protection.auxiliary.AuxData
-import com.simprints.infra.protection.auxiliary.AuxDataFactory
+import com.simprints.infra.protection.auxiliary.AuxDataRepository
 import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -60,8 +57,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val appResponseBuilder: AppResponseBuilderUseCase,
     private val addCallbackEvent: AddCallbackEventUseCase,
     private val updateDailyActivity: UpdateDailyActivityUseCase,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val auxDataFactory: AuxDataFactory,
+    private val auxDataRepository: AuxDataRepository,
 ) : ViewModel() {
 
     var isRequestProcessed = false
@@ -90,11 +86,10 @@ internal class OrchestratorViewModel @Inject constructor(
             return@launch
         }
 
+        // TODO fetching or creating aux data to pass to capture step
         val auxData = when (action) {
-            is ActionRequest.EnrolActionRequest -> auxDataFactory.createAuxData().toTemplateAuxData()
-            is ActionRequest.VerifyActionRequest -> enrolmentRecordRepository.getAuxData(action.verifyGuid)
-                ?: auxDataFactory.createAuxData().toTemplateAuxData(action.verifyGuid)
-
+            is ActionRequest.EnrolActionRequest -> auxDataRepository.createAuxData()
+            is ActionRequest.VerifyActionRequest -> auxDataRepository.getOrCreateAuxData(action.verifyGuid)
             else -> null
         }
 
@@ -104,8 +99,6 @@ internal class OrchestratorViewModel @Inject constructor(
 
         doNextStep()
     }
-
-    private fun AuxData.toTemplateAuxData(subjectId: String = "") = TemplateAuxData(subjectId, e, c)
 
     fun handleResult(result: Serializable) = viewModelScope.launch {
         Simber.d(result.toString())

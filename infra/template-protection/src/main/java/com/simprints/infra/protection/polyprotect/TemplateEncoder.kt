@@ -1,6 +1,6 @@
 package com.simprints.infra.protection.polyprotect
 
-import com.simprints.infra.protection.auxiliary.AuxData
+import com.simprints.infra.protection.auxiliary.TemplateAuxData
 import javax.inject.Inject
 import kotlin.math.pow
 
@@ -11,7 +11,7 @@ class TemplateEncoder @Inject constructor() {
      */
     fun encodeTemplate(
         template: FloatArray,
-        auxData: AuxData,
+        auxData: TemplateAuxData,
         overlap: Int = OVERLAP,
     ): FloatArray = encodeTemplate(
         template.map { it.toDouble() },
@@ -21,13 +21,13 @@ class TemplateEncoder @Inject constructor() {
 
     fun encodeTemplate(
         template: List<Double>,
-        auxData: AuxData,
+        auxData: TemplateAuxData,
         overlap: Int = OVERLAP,
     ): List<Double> {
-        val (e, c) = auxData // For convenience
+        val (_, e, c) = auxData // For convenience
         assert(e.size == c.size) { "Auxiliary data sizes must be equal" }
 
-        val stepSize = auxData.e.size - overlap
+        val stepSize = e.size - overlap
         val eIndices = e.indices
 
         val protectedTemplate = mutableListOf<Double>()

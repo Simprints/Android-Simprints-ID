@@ -18,7 +18,6 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.domain.models.TemplateAuxData
 import com.simprints.infra.facenetwrapper.initialization.FaceNetInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
@@ -31,7 +30,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.mlkitwrapper.tools.toBytes
 import com.simprints.infra.mlkitwrapper.tools.toFloats
-import com.simprints.infra.protection.auxiliary.AuxData
+import com.simprints.infra.protection.auxiliary.TemplateAuxData
 import com.simprints.infra.protection.polyprotect.TemplateEncoder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
@@ -163,10 +162,9 @@ internal class FaceCaptureViewModel @Inject constructor(
                                 if (subjectAuxData == null) {
                                     template
                                 } else {
-                                    // TODO fix the conversions
                                     templateEncoder.encodeTemplate(
                                         template = template.toFloats(),
-                                        auxData = subjectAuxData!!.let { AuxData(e = it.exponents, c = it.coefficients) }
+                                        auxData = subjectAuxData!!
                                     ).toBytes()
                                 }
                             }
