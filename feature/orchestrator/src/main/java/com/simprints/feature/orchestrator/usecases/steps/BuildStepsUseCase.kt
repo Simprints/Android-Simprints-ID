@@ -27,11 +27,9 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.isAgeRestricted
-import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
-import com.simprints.infra.protection.auxiliary.TemplateAuxData
 import com.simprints.matcher.MatchContract
 import javax.inject.Inject
 
@@ -44,13 +42,12 @@ internal class BuildStepsUseCase @Inject constructor(
     fun build(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
-        auxData: TemplateAuxData? = null,
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
             buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
-            buildModalityCaptureAndMatchStepsForEnrol(action, projectConfiguration, null, auxData)
+            buildModalityCaptureAndMatchStepsForEnrol(action, projectConfiguration, null)
         )
 
 
@@ -127,7 +124,6 @@ internal class BuildStepsUseCase @Inject constructor(
         action: ActionRequest.EnrolActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
-        auxData: TemplateAuxData? = null,
     ): List<Step> {
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
 
@@ -136,7 +132,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.ENROL,
                 resolvedAgeGroup,
-                auxData,
             ),
             if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
                 buildModalityMatcherSteps(
@@ -158,7 +153,6 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
         subjectQuery: SubjectQuery,
-        auxData: TemplateAuxData? = null,
     ): List<Step> {
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
         return listOf(
@@ -166,8 +160,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.IDENTIFY,
                 resolvedAgeGroup,
-                null // TODO template protection for identifying,
-
             ),
             buildModalityMatcherSteps(
                 projectConfiguration,
@@ -186,7 +178,6 @@ internal class BuildStepsUseCase @Inject constructor(
         action: ActionRequest.VerifyActionRequest,
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
-        auxData: TemplateAuxData? = null,
     ): List<Step> {
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
 
@@ -195,7 +186,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.VERIFY,
                 resolvedAgeGroup,
-                auxData,
             ),
             buildModalityMatcherSteps(
                 projectConfiguration,
@@ -299,7 +289,6 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         flowType: FlowType,
         ageGroup: AgeGroup?,
-        auxData: TemplateAuxData?,
     ): List<Step> = projectConfiguration.general.modalities.flatMap { modality ->
         when (modality) {
             Modality.FINGERPRINT -> {
@@ -329,7 +318,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         id = StepId.FACE_CAPTURE,
                         navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
                         destinationId = FaceCaptureContract.DESTINATION,
-                        payload = FaceCaptureContract.getArgs(samplesToCapture, auxData),
+                        payload = FaceCaptureContract.getArgs(samplesToCapture),
                     )
                 }
             }
@@ -440,7 +429,7 @@ internal class BuildStepsUseCase @Inject constructor(
 
     private fun ageGroupFromSubjectAge(action: ActionRequest, projectConfiguration: ProjectConfiguration): AgeGroup? {
         return action.getSubjectAgeIfAvailable()?.let { subjectAge ->
-            projectConfiguration.sortedUniqueAgeGroups().firstOrNull { it.includes(subjectAge) }
+            projectConfiguration.allowedAgeRanges().firstOrNull { it.includes(subjectAge) }
         }
     }
 }

@@ -5,10 +5,14 @@ import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.core.tools.extentions.toFloats
+import com.simprints.core.tools.extentions.toBytes
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.protection.auxiliary.AuxDataRepository
+import com.simprints.infra.protection.polyprotect.TemplateEncoder
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
@@ -23,10 +27,13 @@ internal class FaceMatcherUseCase @Inject constructor(
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    private val auxDataRepository: AuxDataRepository,
+    private val templateEncoder: TemplateEncoder,
 ) : MatcherUseCase {
 
     private lateinit var faceMatcher: FaceMatcher
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING.name
+    override suspend fun matcherName() = faceMatcher.matcherName
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
@@ -85,10 +92,25 @@ internal class FaceMatcherUseCase @Inject constructor(
         batchCandidates: List<FaceIdentity>,
         samples: List<FaceSample>,
     ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, item ->
+        val candidateAux = auxDataRepository.getAuxData(item.subjectId)
+
+        // TODO this is a very inefficient 1:N implementation with protected templates
+        val encodedSamples = if (candidateAux != null) {
+            samples.map { face ->
+                face.copy(
+                    template = templateEncoder.encodeTemplate(
+                        template = face.template.toFloats(),
+                        auxData = candidateAux,
+                        overlap = 2,
+                    ).toBytes()
+                )
+            }
+        } else samples
+
         acc.add(
             FaceMatchResult.Item(
                 item.subjectId,
-                faceMatcher.getHighestComparisonScoreForCandidate(samples, item)
+                faceMatcher.getHighestComparisonScoreForCandidate(encodedSamples, item)
             )
         )
     }

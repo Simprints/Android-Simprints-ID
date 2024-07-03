@@ -28,10 +28,6 @@ import com.simprints.infra.license.determineLicenseStatus
 import com.simprints.infra.license.remote.License
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.mlkitwrapper.tools.toBytes
-import com.simprints.infra.mlkitwrapper.tools.toFloats
-import com.simprints.infra.protection.auxiliary.TemplateAuxData
-import com.simprints.infra.protection.polyprotect.TemplateEncoder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.last
@@ -51,14 +47,12 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
-    private val templateEncoder: TemplateEncoder,
     @DeviceID private val deviceID: String,
 ) : ViewModel() {
 
     // Updated in live feedback screen
     var attemptNumber: Int = 0
     var samplesToCapture = 1
-    var subjectAuxData: TemplateAuxData? = null
 
     var shouldCheckCameraPermissions = AtomicBoolean(true)
 
@@ -88,9 +82,8 @@ internal class FaceCaptureViewModel @Inject constructor(
         Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face capture flow")
     }
 
-    fun setupCapture(samplesToCapture: Int, auxData: TemplateAuxData?) {
+    fun setupCapture(samplesToCapture: Int) {
         this.samplesToCapture = samplesToCapture
-        this.subjectAuxData = auxData
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
@@ -157,18 +150,7 @@ internal class FaceCaptureViewModel @Inject constructor(
                 FaceCaptureResult.Item(
                     captureEventId = detection.id, index = index, sample = FaceCaptureResult.Sample(
                         faceId = detection.id,
-                        template = detection.face?.template
-                            ?.let { template ->
-                                if (subjectAuxData == null) {
-                                    template
-                                } else {
-                                    templateEncoder.encodeTemplate(
-                                        template = template.toFloats(),
-                                        auxData = subjectAuxData!!
-                                    ).toBytes()
-                                }
-                            }
-                            ?: ByteArray(0),
+                        template = detection.face?.template ?: ByteArray(0),
                         imageRef = detection.securedImageRef,
                         format = detection.face?.format ?: "",
                     )
@@ -177,7 +159,6 @@ internal class FaceCaptureViewModel @Inject constructor(
 
             _finishFlowEvent.send(
                 FaceCaptureResult(
-                    auxData = subjectAuxData!!,
                     results = items
                 )
             )

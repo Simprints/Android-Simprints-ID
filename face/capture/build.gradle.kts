@@ -32,8 +32,6 @@ dependencies {
     //BIO SDK
     implementation(project(":face:infra:bio-sdk-resolver"))
 
-    implementation(project(":infra:template-protection"))
-
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)

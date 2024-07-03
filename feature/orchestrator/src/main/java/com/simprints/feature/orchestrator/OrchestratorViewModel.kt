@@ -86,14 +86,7 @@ internal class OrchestratorViewModel @Inject constructor(
             return@launch
         }
 
-        // TODO fetching or creating aux data to pass to capture step
-        val auxData = when (action) {
-            is ActionRequest.EnrolActionRequest -> auxDataRepository.createAuxData()
-            is ActionRequest.VerifyActionRequest -> auxDataRepository.getOrCreateAuxData(action.verifyGuid)
-            else -> null
-        }
-
-        steps = stepsBuilder.build(action, projectConfiguration, auxData)
+        steps = stepsBuilder.build(action, projectConfiguration)
 
         actionRequest = action
 
