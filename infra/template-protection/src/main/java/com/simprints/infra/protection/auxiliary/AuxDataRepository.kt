@@ -17,9 +17,11 @@ class AuxDataRepository @Inject internal constructor(
     }
 
     suspend fun getOrCreateAuxData(subjectId: String): TemplateAuxData =
-        getAuxData(subjectId) ?: createAuxData()
+        getAuxData(subjectId) ?: createAuxData(subjectId)
 
-    suspend fun createAuxData(): TemplateAuxData = auxDataFactory.createAuxData()
+    suspend fun createAuxData(subjectId: String): TemplateAuxData = auxDataFactory.createAuxData(
+        subjectId = subjectId
+    )
 
     suspend fun getAuxData(subjectId: String): TemplateAuxData? = try {
         realmWrapper.readRealm { realm ->

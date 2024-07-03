@@ -41,7 +41,6 @@ internal class BuildStepsUseCase @Inject constructor(
     fun build(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
-        auxData: TemplateAuxData? = null,
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
@@ -50,7 +49,6 @@ internal class BuildStepsUseCase @Inject constructor(
             buildModalityCaptureSteps(
                 projectConfiguration,
                 FlowType.ENROL,
-                auxData,
             ),
             if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
                 buildModalityMatcherSteps(
@@ -74,7 +72,6 @@ internal class BuildStepsUseCase @Inject constructor(
                 buildModalityCaptureSteps(
                     projectConfiguration,
                     FlowType.IDENTIFY,
-                    null // TODO template protection for identifying
                 ),
                 buildModalityMatcherSteps(
                     projectConfiguration,
@@ -93,7 +90,6 @@ internal class BuildStepsUseCase @Inject constructor(
             buildModalityCaptureSteps(
                 projectConfiguration,
                 FlowType.VERIFY,
-                auxData,
             ),
             buildModalityMatcherSteps(
                 projectConfiguration,
@@ -168,7 +164,6 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildModalityCaptureSteps(
         projectConfiguration: ProjectConfiguration,
         flowType: FlowType,
-        auxData: TemplateAuxData?,
     ) = projectConfiguration.general.modalities.map {
         when (it) {
             Modality.FINGERPRINT -> {
@@ -190,7 +185,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.FACE_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
                     destinationId = FaceCaptureContract.DESTINATION,
-                    payload = FaceCaptureContract.getArgs(samplesToCapture, auxData),
+                    payload = FaceCaptureContract.getArgs(samplesToCapture),
                 )
             }
         }

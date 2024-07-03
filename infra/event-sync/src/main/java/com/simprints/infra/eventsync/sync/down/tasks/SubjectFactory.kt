@@ -51,23 +51,21 @@ class SubjectFactory @Inject constructor(
         }
 
     fun buildSubjectFromCaptureResults(
+        subjectId: String,
         projectId: String,
         attendantId: TokenizableString,
         moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResult?,
         faceResponse: FaceCaptureResult?,
-    ): Subject {
-        val subjectId = UUID.randomUUID().toString()
-        return buildSubject(
-            subjectId = subjectId,
-            projectId = projectId,
-            attendantId = attendantId,
-            moduleId = moduleId,
-            createdAt = Date(timeHelper.now().ms),
-            fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
-            faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
-        )
-    }
+    ): Subject = buildSubject(
+        subjectId = subjectId,
+        projectId = projectId,
+        attendantId = attendantId,
+        moduleId = moduleId,
+        createdAt = Date(timeHelper.now().ms),
+        fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
+        faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
+    )
 
     fun buildSubject(
         subjectId: String,

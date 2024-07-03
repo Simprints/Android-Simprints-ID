@@ -1,9 +1,9 @@
 package com.simprints.infra.facenetwrapper.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.tools.extentions.toFloats
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.infra.mlkitwrapper.tools.cosineSimilarity
-import com.simprints.infra.mlkitwrapper.tools.toFloats
 import javax.inject.Inject
 
 class FaceNetMatcher @Inject constructor() : FaceMatcher() {

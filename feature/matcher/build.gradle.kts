@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
 
+    implementation(project(":infra:template-protection"))
+
     implementation(project(":face:infra:face-bio-sdk"))
     implementation(project(":face:infra:facenet-wrapper"))
 

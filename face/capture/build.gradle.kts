@@ -32,8 +32,6 @@ dependencies {
     implementation(project(":face:infra:face-bio-sdk"))
     implementation(project(":face:infra:facenet-wrapper"))
 
-    implementation(project(":infra:template-protection"))
-
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)

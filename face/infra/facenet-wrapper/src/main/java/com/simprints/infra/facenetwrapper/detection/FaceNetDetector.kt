@@ -7,10 +7,10 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.tools.extentions.toBytes
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.infra.facenetwrapper.initialization.FaceNetInitializer
-import com.simprints.infra.mlkitwrapper.tools.toBytes
 import javax.inject.Inject
 import com.google.mlkit.vision.face.Face as MLFace
 
