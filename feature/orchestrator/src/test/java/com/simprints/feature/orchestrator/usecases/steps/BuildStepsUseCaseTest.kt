@@ -5,6 +5,7 @@ import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedExcep
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
+import com.simprints.feature.orchestrator.usecases.UpdateSessionModalitiesUseCase
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Finger
@@ -18,6 +19,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -40,12 +42,15 @@ class BuildStepsUseCaseTest {
     @RelaxedMockK
     private lateinit var nec: FingerprintConfiguration.FingerprintSdkConfiguration
 
+    @RelaxedMockK
+    private lateinit var updateSessionModalitiesUseCase: UpdateSessionModalitiesUseCase
+
     private lateinit var useCase: BuildStepsUseCase
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        useCase = BuildStepsUseCase(buildMatcherSubjectQuery, cache, mapStepsForLastBiometrics)
+        useCase = BuildStepsUseCase(buildMatcherSubjectQuery, cache, mapStepsForLastBiometrics, updateSessionModalitiesUseCase)
     }
 
     private fun mockCommonProjectConfiguration(): ProjectConfiguration {
@@ -104,6 +109,7 @@ class BuildStepsUseCaseTest {
             StepId.FINGERPRINT_CAPTURE,
             StepId.FACE_CAPTURE,
         )
+        verify { updateSessionModalitiesUseCase(listOf(Modality.FINGERPRINT, Modality.FACE)) }
     }
 
     @Test

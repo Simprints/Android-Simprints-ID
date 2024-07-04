@@ -14,6 +14,7 @@ import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
+import com.simprints.feature.orchestrator.usecases.UpdateSessionModalitiesUseCase
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupContract
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
@@ -37,6 +38,7 @@ internal class BuildStepsUseCase @Inject constructor(
     private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase,
     private val cache: OrchestratorCache,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
+    private val updateSessionModalitiesUseCase: UpdateSessionModalitiesUseCase,
 ) {
 
     fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration) = when (action) {
@@ -284,6 +286,17 @@ internal class BuildStepsUseCase @Inject constructor(
                     )
                 }
             }
+        }
+    }.also { steps ->
+        // Update session with modalities that will actually be used (if user doesn't exit)
+        steps.mapNotNull { step ->
+            when (step.id) {
+                StepId.FINGERPRINT_CAPTURE -> Modality.FINGERPRINT
+                StepId.FACE_CAPTURE -> Modality.FACE
+                else -> null
+            }
+        }.distinct().takeIf { it.isNotEmpty() }?.let { modalities ->
+            updateSessionModalitiesUseCase(modalities)
         }
     }
 
