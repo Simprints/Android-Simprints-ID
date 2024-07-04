@@ -20,7 +20,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
             Constants.SIMPRINTS_REGISTRATION to Registration(response.enrolledGuid),
-        ).appendCoSyncData(response.eventsJson, response.subjectActions)
+        ).appendCoSyncData(response.subjectActions)
 
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -30,12 +30,12 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                     Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
                 }
             ),
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -45,23 +45,22 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                 Tier.valueOf(response.matchResult.tier.name),
                 response.matchResult.guid,
             ),
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
             Constants.SIMPRINTS_REFUSAL_FORM to RefusalForm(response.reason, response.extraText),
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.ErrorActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to response.flowCompleted,
             RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode()
-        ).appendCoSyncData(response.eventsJson)
+        )
     }
 
-    private fun Bundle.appendCoSyncData(events: String?, actions: String? = null) = apply {
-        events?.let { putString(Constants.SIMPRINTS_COSYNC_EVENT, it) }
+    private fun Bundle.appendCoSyncData(actions: String?) = apply {
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 

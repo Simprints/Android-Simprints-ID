@@ -16,18 +16,8 @@ import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.Simber
-import io.mockk.MockKAnnotations
-import io.mockk.Runs
-import io.mockk.clearAllMocks
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
-import io.mockk.unmockkStatic
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -128,6 +118,11 @@ class CommCareIdentityDataSourceTest {
         MockKAnnotations.init(this)
 
         every { context.contentResolver } returns mockContentResolver
+
+        every { Uri.parse(any()) } answers {
+            val uriPath =  it.invocation.args[0] as String
+            if (uriPath.endsWith("case")) mockMetadataUri else mockDataUri
+        }
 
         mockMetadataCursor = mockk(relaxed = true)
         mockDataCursor = mockk(relaxed = true)

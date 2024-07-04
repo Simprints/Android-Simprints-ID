@@ -16,6 +16,9 @@ import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
@@ -47,7 +50,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var eventRepository: EventRepository
 
     @Inject
-    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+    lateinit var enrolmentRecordRepository: EnrolmentRecordLocalDataSource
 
     @Inject
     @DispatcherIO
