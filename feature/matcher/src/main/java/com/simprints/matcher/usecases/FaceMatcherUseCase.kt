@@ -33,7 +33,6 @@ internal class FaceMatcherUseCase @Inject constructor(
 
     private lateinit var faceMatcher: FaceMatcher
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING.name
-    override suspend fun matcherName() = faceMatcher.matcherName
 
     override suspend operator fun invoke(
         matchParams: MatchParams,

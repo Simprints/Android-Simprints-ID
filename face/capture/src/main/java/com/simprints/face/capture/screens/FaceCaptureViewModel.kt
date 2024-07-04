@@ -18,7 +18,6 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.facenetwrapper.initialization.FaceNetInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
@@ -28,6 +27,8 @@ import com.simprints.infra.license.determineLicenseStatus
 import com.simprints.infra.license.remote.License
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.mlkitwrapper.initialization.EdgeFaceInitializer
+import com.simprints.infra.mlkitwrapper.initialization.FaceNetInitializer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.last
@@ -90,7 +91,7 @@ internal class FaceCaptureViewModel @Inject constructor(
         val initializer = resolveFaceBioSdk().initializer
 
         // TODO consider moving licence into initializer
-        if (initializer is FaceNetInitializer) {
+        if (initializer is EdgeFaceInitializer || initializer is FaceNetInitializer) {
             initializer.tryInitWithLicense(activity, "")
         } else {
             val licenseVendor = Vendor.RANK_ONE

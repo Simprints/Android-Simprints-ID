@@ -15,9 +15,6 @@ class AuxDataRepository @Inject internal constructor(
         private const val SUBJECT_ID_FIELD = "subjectId"
     }
 
-    suspend fun getOrCreateAuxData(subjectId: String): TemplateAuxData =
-        getAuxData(subjectId) ?: createAuxData(subjectId)
-
     suspend fun createAuxData(subjectId: String): TemplateAuxData = auxDataFactory.createAuxData(
         subjectId = subjectId
     )
