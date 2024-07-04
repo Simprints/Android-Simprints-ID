@@ -7,7 +7,7 @@
     android:padding="@dimen/margin_large">
 
     <TextView
-        android:id="@+id/face_match_please_wait"
+        android:id="@+id/face_match_message"
         style="@style/Text.Subtitle2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingProgressStatus1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/face_match_please_wait"
+        app:layout_constraintTop_toBottomOf="@id/face_match_message"
         tools:progress="50" />
 
     <TextView
@@ -96,5 +96,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/face_match_tv_matchingResultStatus2"
         tools:text="10 matches" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/face_match_permission_request_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/matcher_grant_permission_action"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/face_match_tv_matchingResultStatus3"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,6 +32,9 @@ internal class MatchViewModel @Inject constructor(
 
     var isInitialized = false
         private set
+
+    var shouldCheckPermission: Boolean = true
+
     val matchState: LiveData<MatchState>
         get() = _matchState
     private val _matchState = MutableLiveData<MatchState>(MatchState.NotStarted)
@@ -74,10 +77,12 @@ internal class MatchViewModel @Inject constructor(
         // wait a bit for the user to see the results
         delay(matchingEndWaitTimeInMillis)
 
-        _matchResponse.send(when {
-            isFaceMatch -> FaceMatchResult(sortedResults)
-            else -> FingerprintMatchResult(sortedResults)
-        })
+        _matchResponse.send(
+            when {
+                isFaceMatch -> FaceMatchResult(sortedResults)
+                else -> FingerprintMatchResult(sortedResults)
+            }
+        )
     }
 
     private fun setMatchState(candidatesMatched: Int, results: List<MatchResultItem>) {
@@ -87,31 +92,42 @@ internal class MatchViewModel @Inject constructor(
         val fairMatches =
             results.count { fairMatchThreshold <= it.confidence && it.confidence < goodMatchThreshold }
 
-        _matchState.postValue(MatchState.Finished(
-            candidatesMatched,
-            results.size,
-            veryGoodMatches,
-            goodMatches,
-            fairMatches
-        ))
+        _matchState.postValue(
+            MatchState.Finished(
+                candidatesMatched,
+                results.size,
+                veryGoodMatches,
+                goodMatches,
+                fairMatches
+            )
+        )
+    }
+
+    fun noPermission(neverAskAgain: Boolean) {
+        _matchState.postValue(MatchState.NoPermission(shouldOpenSettings = neverAskAgain))
     }
 
     sealed class MatchState {
         data object NotStarted : MatchState()
         data object LoadingCandidates : MatchState()
         data object Matching : MatchState()
+        data class NoPermission(
+            val shouldOpenSettings: Boolean,
+        ) : MatchState()
+
         data class Finished(
             val candidatesMatched: Int,
             val returnSize: Int,
             val veryGoodMatches: Int,
             val goodMatches: Int,
-            val fairMatches: Int
+            val fairMatches: Int,
         ) : MatchState()
     }
 
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
+
         private const val veryGoodMatchThreshold = 50.0
         private const val goodMatchThreshold = 35.0
         private const val fairMatchThreshold = 20.0

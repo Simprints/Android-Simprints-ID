@@ -257,7 +257,7 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedSubjectQuery = SubjectQuery()
         coEvery { localDataSource.count(expectedSubjectQuery) } returns 5
 
-        val count = repository.count(query = expectedSubjectQuery, dataSource = BiometricDataSource.SIMPRINTS)
+        val count = repository.count(query = expectedSubjectQuery, dataSource = BiometricDataSource.Simprints)
 
         assert(count == 5)
         coVerify(exactly = 1) { localDataSource.count(expectedSubjectQuery) }
@@ -266,12 +266,12 @@ class EnrolmentRecordRepositoryImplTest {
     @Test
     fun `should return the correct count of subjects when dataSource is CommCare`() = runTest {
         val expectedSubjectQuery = SubjectQuery()
-        coEvery { commCareDataSource.count(expectedSubjectQuery) } returns 5
+        coEvery { commCareDataSource.count(expectedSubjectQuery, any()) } returns 5
 
-        val count = repository.count(query = expectedSubjectQuery, dataSource = BiometricDataSource.COMMCARE)
+        val count = repository.count(query = expectedSubjectQuery, dataSource = BiometricDataSource.CommCare(""))
 
         assert(count == 5)
-        coVerify(exactly = 1) { commCareDataSource.count(expectedSubjectQuery) }
+        coVerify(exactly = 1) { commCareDataSource.count(expectedSubjectQuery, any()) }
     }
 
     @Test
@@ -284,11 +284,11 @@ class EnrolmentRecordRepositoryImplTest {
         val fingerprintIdentities = repository.loadFingerprintIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.SIMPRINTS
+            dataSource = BiometricDataSource.Simprints
         )
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
-        coVerify(exactly = 1) { localDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange) }
+        coVerify(exactly = 1) { localDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any()) }
     }
 
     @Test
@@ -301,11 +301,11 @@ class EnrolmentRecordRepositoryImplTest {
         val fingerprintIdentities = repository.loadFingerprintIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.COMMCARE
+            dataSource = BiometricDataSource.CommCare("")
         )
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
-        coVerify(exactly = 1) { commCareDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange) }
+        coVerify(exactly = 1) { commCareDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any()) }
     }
 
     @Test
@@ -318,7 +318,7 @@ class EnrolmentRecordRepositoryImplTest {
         val faceIdentities = repository.loadFaceIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.SIMPRINTS
+            dataSource = BiometricDataSource.Simprints
         )
 
         assert(faceIdentities == expectedFaceIdentities)
@@ -335,10 +335,10 @@ class EnrolmentRecordRepositoryImplTest {
         val faceIdentities = repository.loadFaceIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.COMMCARE
+            dataSource = BiometricDataSource.CommCare("")
         )
 
         assert(faceIdentities == expectedFaceIdentities)
-        coVerify(exactly = 1) { commCareDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange) }
+        coVerify(exactly = 1) { commCareDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any()) }
     }
 }

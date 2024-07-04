@@ -51,7 +51,10 @@ internal class BuildStepsUseCase @Inject constructor(
                     projectConfiguration,
                     FlowType.ENROL,
                     buildMatcherSubjectQuery(projectConfiguration, action),
-                    BiometricDataSource.fromString(action.biometricDataSource),
+                    BiometricDataSource.fromString(
+                        action.biometricDataSource,
+                        action.callerPackageName
+                    ),
                 )
             } else emptyList(),
         )
@@ -72,7 +75,10 @@ internal class BuildStepsUseCase @Inject constructor(
                     projectConfiguration,
                     FlowType.IDENTIFY,
                     subjectQuery,
-                    BiometricDataSource.fromString(action.biometricDataSource),
+                    BiometricDataSource.fromString(
+                        action.biometricDataSource,
+                        action.callerPackageName
+                    ),
                 )
             )
         }
@@ -90,7 +96,10 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectConfiguration,
                 FlowType.VERIFY,
                 SubjectQuery(subjectId = action.verifyGuid),
-                BiometricDataSource.fromString(action.biometricDataSource),
+                BiometricDataSource.fromString(
+                    action.biometricDataSource,
+                    action.callerPackageName
+                ),
             )
         )
 
@@ -149,12 +158,14 @@ internal class BuildStepsUseCase @Inject constructor(
         )
     )
 
-    private fun buildValidateIdPoolStep(subjectQuery: SubjectQuery) = listOf(Step(
-        id = StepId.VALIDATE_ID_POOL,
-        navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
-        destinationId = ValidateSubjectPoolContract.DESTINATION,
-        payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
-    ))
+    private fun buildValidateIdPoolStep(subjectQuery: SubjectQuery) = listOf(
+        Step(
+            id = StepId.VALIDATE_ID_POOL,
+            navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
+            destinationId = ValidateSubjectPoolContract.DESTINATION,
+            payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
+        )
+    )
 
     private fun buildModalityCaptureSteps(
         projectConfiguration: ProjectConfiguration,

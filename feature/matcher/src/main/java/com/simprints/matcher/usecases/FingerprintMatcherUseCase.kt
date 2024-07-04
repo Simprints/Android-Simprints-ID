@@ -73,7 +73,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private suspend fun getCandidates(
         query: SubjectQuery,
         range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.SIMPRINTS,
+        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ) = enrolmentRecordRepository
         .loadFingerprintIdentities(query, range, dataSource)
         .map {

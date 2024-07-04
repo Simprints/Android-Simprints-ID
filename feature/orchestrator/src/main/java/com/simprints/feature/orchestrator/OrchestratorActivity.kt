@@ -6,6 +6,7 @@ import android.os.PersistableBundle
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
+import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBinding
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.results.AppResult
@@ -50,6 +51,10 @@ internal class OrchestratorActivity : BaseActivity() {
             if (!isGraphInitialized) {
                 val action = intent.action.orEmpty()
                 val extras = intent.extras ?: bundleOf()
+
+                // Some co-sync functionality depends on the exact package name of the caller app,
+                // e.g. to switch content providers of debug and release variants of the caller app
+                extras.putString(ClientApiConstants.CALLER_PACKAGE_NAME, callingPackage)
 
                 findNavController(R.id.orchestrationHost).setGraph(
                     R.navigation.graph_orchestration,

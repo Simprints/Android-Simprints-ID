@@ -94,10 +94,17 @@ internal class MatchViewModelTest {
             probeFaceSamples = listOf(getFaceSample()),
             flowType = FlowType.ENROL,
             queryForCandidates = mockk {},
-            biometricDataSource = BiometricDataSource.SIMPRINTS,
+            biometricDataSource = BiometricDataSource.Simprints,
         ))
 
         assertThat(viewModel.isInitialized).isTrue()
+    }
+
+    @Test
+    fun `Handles no permission call`() = runTest {
+        val states = viewModel.matchState.test()
+        viewModel.noPermission(true)
+        assertThat(states.value()).isEqualTo(MatchViewModel.MatchState.NoPermission(true))
     }
 
     @Test
@@ -124,7 +131,7 @@ internal class MatchViewModelTest {
                 probeFaceSamples = listOf(getFaceSample()),
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             )
         )
         // Waiting for the ::delay in viewModel::setupMatch
@@ -169,7 +176,7 @@ internal class MatchViewModelTest {
                 probeFingerprintSamples = listOf(getFingerprintSample()),
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             )
         )
         // Waiting for the ::delay in viewModel::setupMatch
