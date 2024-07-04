@@ -92,7 +92,7 @@ include(
 include(
     ":face:capture",
     ":face:infra:face-bio-sdk",
-    ":face:infra:facenet-wrapper",
+    ":face:infra:mlkit-wrapper",
 )
 
 // Feature modules

@@ -19,7 +19,7 @@ dependencies {
     implementation(project(":infra:template-protection"))
 
     implementation(project(":face:infra:face-bio-sdk"))
-    implementation(project(":face:infra:facenet-wrapper"))
+    implementation(project(":face:infra:mlkit-wrapper"))
 
     implementation(project(":fingerprint:infra:bio-sdk"))
 }

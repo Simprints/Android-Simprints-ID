@@ -40,5 +40,5 @@ dependencies {
     implementation(project(":infra:template-protection"))
 
     implementation(libs.jackson.core)
-    implementation(project(":face:infra:facenet-wrapper"))
+    implementation(project(":face:infra:mlkit-wrapper"))
 }
