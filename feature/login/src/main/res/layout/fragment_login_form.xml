@@ -84,7 +84,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="16dp"
-                android:drawableEnd="@drawable/scan_qr"
+                app:icon="@drawable/scan_qr"
+                app:iconGravity="textEnd"
+                app:iconTint="@null"
+                android:textAlignment="center"
+                android:includeFontPadding="false"
                 android:padding="8dp"
                 android:text="@string/login_scan_qr_button" />
 
