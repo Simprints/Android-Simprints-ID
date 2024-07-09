@@ -110,6 +110,11 @@ internal open class EventLocalDataSource @Inject constructor(
             scopeDao.loadClosed(type).map { it.fromDbToDomain(jsonHelper) }
         }
 
+    suspend fun loadClosedScopes(type: EventScopeType, limit: Int): List<EventScope> =
+        useRoom(readingDispatcher) {
+            scopeDao.loadClosed(type, limit).map { it.fromDbToDomain(jsonHelper) }
+        }
+
     suspend fun loadEventScope(scopeId: String): EventScope? = useRoom(writingContext) {
         scopeDao.loadScope(scopeId)?.fromDbToDomain(jsonHelper)
     }

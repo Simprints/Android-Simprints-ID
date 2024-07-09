@@ -20,6 +20,7 @@ interface EventRepository {
     suspend fun saveEventScope(eventScope: EventScope)
     suspend fun getOpenEventScopes(type: EventScopeType): List<EventScope>
     suspend fun getClosedEventScopes(type: EventScopeType): List<EventScope>
+    suspend fun getClosedEventScopes(type: EventScopeType, limit: Int): List<EventScope>
     suspend fun deleteEventScope(scopeId: String)
     suspend fun deleteEventScopes(scopeIds: List<String>)
 
