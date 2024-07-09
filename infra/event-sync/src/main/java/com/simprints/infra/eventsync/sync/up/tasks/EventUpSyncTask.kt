@@ -170,45 +170,53 @@ internal class EventUpSyncTask @Inject constructor(
     ) = flow {
         Simber.tag(SYNC_LOG_TAG)
             .d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
-        val sessionScopes = getClosedScopesForType(eventScopeTypeToUpload)
 
-        // Re-emitting the number of uploaded corrupted events
-        attemptInvalidEventUpload(
-            projectId,
-            sessionScopes.getCorruptedScopes()
-        ).collect { emit(it) }
+        var hasMoreScopes = true
+        while (hasMoreScopes) {
+            val sessionScopes = getClosedScopesForType(eventScopeTypeToUpload, batchSize)
 
-        val scopesToUpload = sessionScopes
-            .filterValues { it != null }
-            .let(eventFilter)
-            .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty()) }
-        val uploadedScopes = mutableListOf<String>()
-
-        scopesToUpload.chunked(batchSize.coerceAtLeast(1)).forEach { scopes ->
-            val requestId = UUID.randomUUID().toString()
-
-            val requestStartTime = timeHelper.now()
-            try {
-                val result = eventRemoteDataSource.post(
-                    requestId,
+            if (sessionScopes.isEmpty()) {
+                hasMoreScopes = false
+            } else {
+                // Re-emitting the number of uploaded corrupted events
+                attemptInvalidEventUpload(
                     projectId,
-                    scopes.asApiUploadEventsBody(eventScopeTypeToUpload)
-                )
-                addRequestEvent(
-                    requestId = requestId,
-                    eventScope = eventScope,
-                    startTime = requestStartTime,
-                    result = result,
-                    content = createUpSyncContentContent(scopes.size),
-                )
-                uploadedScopes.addAll(scopes.map { it.id })
-            } catch (ex: Exception) {
-                handleFailedRequest(requestId, ex, eventScope, requestStartTime)
+                    sessionScopes.getCorruptedScopes()
+                ).collect { emit(it) }
+
+                val scopesToUpload = sessionScopes
+                    .filterValues { it != null }
+                    .let(eventFilter)
+                    .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty()) }
+                val uploadedScopes = mutableListOf<String>()
+
+                scopesToUpload.let { scopes ->
+                    val requestId = UUID.randomUUID().toString()
+
+                    val requestStartTime = timeHelper.now()
+                    try {
+                        val result = eventRemoteDataSource.post(
+                            requestId,
+                            projectId,
+                            scopes.asApiUploadEventsBody(eventScopeTypeToUpload)
+                        )
+                        addRequestEvent(
+                            requestId = requestId,
+                            eventScope = eventScope,
+                            startTime = requestStartTime,
+                            result = result,
+                            content = createUpSyncContentContent(scopes.size),
+                        )
+                        uploadedScopes.addAll(scopes.map { it.id })
+                    } catch (ex: Exception) {
+                        handleFailedRequest(requestId, ex, eventScope, requestStartTime)
+                    }
+                }
+
+                Simber.tag(SYNC_LOG_TAG).d("Deleting ${uploadedScopes.size} session scopes")
+                eventRepository.deleteEventScopes(uploadedScopes)
             }
         }
-
-        Simber.tag(SYNC_LOG_TAG).d("Deleting ${uploadedScopes.size} session scopes")
-        eventRepository.deleteEventScopes(uploadedScopes)
     }
 
     private fun List<ApiEventScope>.asApiUploadEventsBody(
@@ -229,8 +237,10 @@ internal class EventUpSyncTask @Inject constructor(
      *
      * Additionally emits the number of events in each scope to be used for progress tracking.
      */
-    private suspend fun FlowCollector<Int>.getClosedScopesForType(type: EventScopeType) =
-        eventRepository.getClosedEventScopes(type).associateWith {
+    private suspend fun FlowCollector<Int>.getClosedScopesForType(
+        type: EventScopeType,
+        limit: Int,
+    ) =  eventRepository.getClosedEventScopes(type, limit).associateWith {
             try {
                 eventRepository.getEventsFromScope(it.id)
                     .also { listOfEvents -> emit(listOfEvents.size) }
