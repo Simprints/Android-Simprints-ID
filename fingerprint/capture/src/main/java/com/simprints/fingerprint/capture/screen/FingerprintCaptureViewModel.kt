@@ -160,16 +160,18 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
 
-    private fun start(fingerprintsToCapture: List<IFingerIdentifier>) {
+    private fun start(
+        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintSdk: FingerprintConfiguration.BioSdk
+    ) {
         if (!hasStarted) {
             hasStarted = true
 
             runBlocking {
-                initBioSdk()
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
                 configuration = configManager.getProjectConfiguration().fingerprint!!
-                bioSdkConfiguration = configuration.bioSdkConfiguration
+                initBioSdk(fingerprintSdk)
             }
 
             originalFingerprintsToCapture = fingerprintsToCapture
@@ -178,10 +180,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private suspend fun initBioSdk() {
+    private suspend fun initBioSdk(fingerprintSdk: FingerprintConfiguration.BioSdk) {
         try {
-            bioSdkWrapper = resolveBioSdkWrapperUseCase()
+            bioSdkWrapper = resolveBioSdkWrapperUseCase(fingerprintSdk)
             bioSdkWrapper.initialize()
+            bioSdkConfiguration = configuration.getSdkConfiguration(fingerprintSdk)!!
         } catch (e: BioSdkException.BioSdkInitializationException) {
             Simber.e(e)
             _invalidLicense.send()
@@ -344,11 +347,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             try {
                 scannerManager.scanner.setUiIdle()
                 val capturedFingerprint = bioSdkWrapper.acquireFingerprintTemplate(
-                    bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
-                    bioSdkWrapper.scanningTimeoutMs.toInt(),
-                    qualityThreshold(),
+                    capturingResolution = bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
+                    timeOutMs = bioSdkWrapper.scanningTimeoutMs.toInt(),
+                    qualityThreshold = qualityThreshold(),
                     // is this is the last bad scan, we allow low quality extraction
-                    tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
+                    allowLowQualityExtraction = tooManyBadScans(state.currentCaptureState(), plusBadScan = true)
                 )
 
                 handleCaptureSuccess(capturedFingerprint)
@@ -363,11 +366,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun handleCaptureSuccess(acquireFingerprintTemplateResponse: AcquireFingerprintTemplateResponse) {
         val scanResult = ScanResult(
-            acquireFingerprintTemplateResponse.imageQualityScore,
-            acquireFingerprintTemplateResponse.template,
-            acquireFingerprintTemplateResponse.templateFormat,
-            null,
-            qualityThreshold()
+            qualityScore = acquireFingerprintTemplateResponse.imageQualityScore,
+            template = acquireFingerprintTemplateResponse.template,
+            templateFormat = acquireFingerprintTemplateResponse.templateFormat,
+            image = null,
+            qualityThreshold = qualityThreshold()
         )
         _vibrate.send()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
@@ -644,13 +647,16 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         setStartingState(originalFingerprintsToCapture)
     }
 
-    fun handleOnViewCreated(fingerprintsToCapture: List<IFingerIdentifier>) {
+    fun handleOnViewCreated(
+        fingerprintsToCapture: List<IFingerIdentifier>,
+        fingerprintSdk: FingerprintConfiguration.BioSdk
+    ) {
         updateState {
             it.copy(
                 isShowingConnectionScreen = false
             )
         }
-        start(fingerprintsToCapture)
+        start(fingerprintsToCapture, fingerprintSdk)
     }
 
     fun handleOnResume() {

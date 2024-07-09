@@ -43,6 +43,7 @@ internal class VerifyRequestBuilder(
         userId = extractor.getUserId().asTokenizableRaw(),
         moduleId = extractor.getModuleId().asTokenizableRaw(),
         biometricDataSource = extractor.getBiometricDataSource(),
+        subjectAge = extractor.getSubjectAge(),
         callerPackageName = extractor.getCallerPackageName(),
         metadata = extractor.getMetadata(),
         verifyGuid = extractor.getVerifyGuid(),

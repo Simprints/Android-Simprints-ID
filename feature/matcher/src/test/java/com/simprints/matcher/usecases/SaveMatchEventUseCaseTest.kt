@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
@@ -46,7 +47,7 @@ class SaveMatchEventUseCaseTest {
         coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
 
         coEvery {
-            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.comparisonStrategyForVerification
+            configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER)?.comparisonStrategyForVerification
         } returns FingerComparisonStrategy.SAME_FINGER
 
         useCase = SaveMatchEventUseCase(
@@ -104,6 +105,7 @@ class SaveMatchEventUseCaseTest {
                         byteArrayOf(1, 2, 3)
                     )
                 ),
+                fingerprintSDK = SECUGEN_SIM_MATCHER,
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             2,
@@ -131,18 +133,19 @@ class SaveMatchEventUseCaseTest {
     @Test
     fun `Correctly saves one to many match event`() = runTest {
         useCase.invoke(
-            Timestamp(1L),
-            Timestamp(2L),
-            MatchParams(
-                emptyList(),
-                emptyList(),
-                FlowType.IDENTIFY,
-                SubjectQuery(),
+            startTime = Timestamp(1L),
+            endTime = Timestamp(2L),
+            matchParams = MatchParams(
+                probeFaceSamples = emptyList(),
+                probeFingerprintSamples = emptyList(),
+                fingerprintSDK = null,
+                flowType = FlowType.IDENTIFY,
+                queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-            2,
-            "faceMatcherName",
-            listOf(
+            candidatesCount = 2,
+            matcherName = "faceMatcherName",
+            results = listOf(
                 FaceMatchResult.Item("guid1", 0.5f),
                 FaceMatchResult.Item("guid2", 0.1f)
             ),

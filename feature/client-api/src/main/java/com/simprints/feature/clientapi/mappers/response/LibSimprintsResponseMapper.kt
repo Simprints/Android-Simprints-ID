@@ -82,6 +82,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         AppErrorReason.BACKEND_MAINTENANCE_ERROR -> Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR
         AppErrorReason.PROJECT_PAUSED -> Constants.SIMPRINTS_PROJECT_PAUSED
         AppErrorReason.PROJECT_ENDING -> Constants.SIMPRINTS_PROJECT_ENDING
+        AppErrorReason.AGE_GROUP_NOT_SUPPORTED -> Constants.SIMPRINTS_AGE_GROUP_NOT_SUPPORTED
 
         /*
         TODO incorporate these error codes into the client api

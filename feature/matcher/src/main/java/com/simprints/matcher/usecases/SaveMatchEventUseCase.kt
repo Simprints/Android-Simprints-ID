@@ -3,6 +3,7 @@ package com.simprints.matcher.usecases
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.SessionEventRepository
@@ -39,7 +40,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     matcherName,
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
-                    if (matchParams.isFaceMatch()) null else getFingerprintComparisonStrategy(),
+                    if (matchParams.isFaceMatch()) null else getFingerprintComparisonStrategy(matchParams.fingerprintSDK!!),
                 )
             } else {
                 getOneToManyEvent(
@@ -54,9 +55,10 @@ internal class SaveMatchEventUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getFingerprintComparisonStrategy() = configManager.getProjectConfiguration()
+    private suspend fun getFingerprintComparisonStrategy(bioSdk: FingerprintConfiguration.BioSdk) =
+        configManager.getProjectConfiguration()
         .fingerprint
-        ?.bioSdkConfiguration
+        ?.getSdkConfiguration(bioSdk)
         ?.comparisonStrategyForVerification
         ?.let {
             when (it) {
