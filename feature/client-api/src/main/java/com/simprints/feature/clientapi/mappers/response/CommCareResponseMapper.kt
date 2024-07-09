@@ -43,7 +43,11 @@ internal class CommCareResponseMapper @Inject constructor() {
             CommCareConstants.VERIFICATION_GUID_KEY to response.matchResult.guid,
             CommCareConstants.VERIFICATION_CONFIDENCE_KEY to response.matchResult.confidenceScore.toString(),
             CommCareConstants.VERIFICATION_TIER_KEY to response.matchResult.tier.name,
-        ).toCommCareBundle()
+        ).also {
+            response.matchResult.verificationSuccess?.let { verificationSuccess ->
+                it.putString(CommCareConstants.VERIFICATION_SUCCESS_KEY, verificationSuccess.toString())
+            }
+        }.toCommCareBundle()
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
