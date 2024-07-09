@@ -30,11 +30,17 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
             .lastOrNull()?.let { fingerprintMatchResult ->
                 projectConfiguration.fingerprint
                     ?.getSdkConfiguration(fingerprintMatchResult.sdk)
-                    ?.decisionPolicy
-                    ?.let { decisionPolicy ->
+                    ?.let { sdkConfiguration ->
                         fingerprintMatchResult.results
                             .maxByOrNull { it.confidence }
-                            ?.let { AppMatchResult(it.subjectId, it.confidence, decisionPolicy) }
+                            ?.let {
+                                AppMatchResult(
+                                    guid = it.subjectId,
+                                    confidenceScore = it.confidence,
+                                    decisionPolicy = sdkConfiguration.decisionPolicy,
+                                    verificationMatchThreshold = sdkConfiguration.verificationMatchThreshold
+                                )
+                            }
                     }
             }
 
@@ -43,10 +49,17 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         results: List<Serializable>,
     ) = results.filterIsInstance<FaceMatchResult>()
         .lastOrNull()?.let { faceMatchResult ->
-            projectConfiguration.face?.decisionPolicy?.let { decisionPolicy ->
+            projectConfiguration.face?.let { faceConfiguration ->
                 faceMatchResult.results
                     .maxByOrNull { it.confidence }
-                    ?.let { AppMatchResult(it.subjectId, it.confidence, decisionPolicy) }
+                    ?.let {
+                        AppMatchResult(
+                            guid = it.subjectId,
+                            confidenceScore = it.confidence,
+                            decisionPolicy = faceConfiguration.decisionPolicy,
+                            verificationMatchThreshold = faceConfiguration.verificationMatchThreshold
+                        )
+                    }
             }
         }
 }

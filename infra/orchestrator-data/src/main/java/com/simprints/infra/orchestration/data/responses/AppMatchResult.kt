@@ -2,7 +2,6 @@ package com.simprints.infra.orchestration.data.responses
 
 import android.os.Parcelable
 import androidx.annotation.Keep
-import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.infra.config.store.models.DecisionPolicy
@@ -15,17 +14,20 @@ data class AppMatchResult(
     val confidenceScore: Int,
     val tier: AppResponseTier,
     val matchConfidence: AppMatchConfidence,
+    val verificationSuccess: Boolean? = null,
 ) : Parcelable {
 
     constructor(
         guid: String,
         confidenceScore: Float,
         decisionPolicy: DecisionPolicy,
+        verificationMatchThreshold: Float? = null
     ) : this(
-        guid,
-        confidenceScore.toInt(),
-        computeTier(confidenceScore),
-        computeMatchConfidence(confidenceScore.toInt(), decisionPolicy)
+        guid = guid,
+        confidenceScore = confidenceScore.toInt(),
+        tier = computeTier(confidenceScore),
+        matchConfidence = computeMatchConfidence(confidenceScore.toInt(), decisionPolicy),
+        verificationSuccess = computeVerificationSuccess(confidenceScore.toInt(), verificationMatchThreshold),
     )
 
     companion object {
@@ -43,6 +45,11 @@ data class AppMatchResult(
             confidenceScore < policy.medium -> AppMatchConfidence.LOW
             confidenceScore < policy.high -> AppMatchConfidence.MEDIUM
             else -> AppMatchConfidence.HIGH
+        }
+
+        fun computeVerificationSuccess(confidenceScore: Int, verificationMatchThreshold: Float?) = when {
+            verificationMatchThreshold == null -> null
+            else -> confidenceScore >= verificationMatchThreshold
         }
     }
 }

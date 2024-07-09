@@ -17,6 +17,9 @@ data class FaceConfiguration(
     val decisionPolicy: DecisionPolicy
         get() = rankOne?.decisionPolicy!!
 
+    val verificationMatchThreshold: Float?
+        get() = rankOne?.verificationMatchThreshold
+
     data class FaceSdkConfiguration(
         val nbOfImagesToCapture: Int,
         val qualityThreshold: Int,
