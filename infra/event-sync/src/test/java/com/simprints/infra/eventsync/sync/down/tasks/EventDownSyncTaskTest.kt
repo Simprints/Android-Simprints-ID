@@ -242,6 +242,24 @@ class EventDownSyncTaskTest {
     }
 
     @Test
+    fun downSync_shouldAddEventWithExceptionClassSimpleNameIfDownloadFails() = runTest {
+        val expectedException = Exception("Test")
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws expectedException
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                match {
+                    it is EventDownSyncRequestEvent &&
+                        it.payload.errorType == expectedException.javaClass.simpleName
+                }
+            )
+        }
+    }
+
+    @Test
     fun moveSubjectFromModulesUnderSyncing_theOriginalModuleSyncShouldDoNothing() = runTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
         mockProgressEmission(listOf(eventToMoveToModule2))

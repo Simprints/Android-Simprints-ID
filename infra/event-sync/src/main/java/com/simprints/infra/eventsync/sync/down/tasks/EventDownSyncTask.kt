@@ -75,7 +75,7 @@ internal class EventDownSyncTask @Inject constructor(
                 .catch {
                     // Track a case when event stream is closed due to a parser error,
                     // but the exception is handled gracefully and channel is closed correctly.
-                    errorType = it.toString()
+                    errorType = it.javaClass.simpleName
                 }
                 .collect {
                     batchOfEventsToProcess.add(it)
@@ -105,7 +105,7 @@ internal class EventDownSyncTask @Inject constructor(
             }
 
             Simber.d(t)
-            errorType = t.toString()
+            errorType = t.javaClass.simpleName
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
             emitProgress(lastOperation, count, count)

@@ -295,7 +295,7 @@ internal class EventUpSyncTask @Inject constructor(
                 endedAt = timeHelper.now(),
                 requestId = requestId,
                 responseStatus = result?.status,
-                errorType = ex.toString(),
+                errorType = ex.javaClass.simpleName,
             )
         )
     }
