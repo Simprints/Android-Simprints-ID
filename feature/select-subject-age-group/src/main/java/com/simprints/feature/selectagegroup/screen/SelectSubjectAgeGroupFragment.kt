@@ -8,12 +8,15 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.toArgs
 import com.simprints.feature.selectagegroup.R
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectagegroup.databinding.FragmentAgeGroupSelectionBinding
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +33,12 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
             fillRecyclerView(ageGroupsList)
         }
 
+        findNavController().handleResult<ExitFormResult>(
+            viewLifecycleOwner,
+            R.id.selectSubjectAgeGroupFragment,
+            ExitFormContract.DESTINATION,
+        ) { handleExitFormResponse(it) }
+
         viewModel.showExitForm.observe(viewLifecycleOwner) { exitFormConfig ->
             exitFormConfig.getContentIfNotHandled()?.let {
                 findNavController().navigateSafely(
@@ -45,6 +54,12 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
             it.getContentIfNotHandled()?.let(::finishWithResult)
         }
         viewModel.start()
+    }
+
+    private fun handleExitFormResponse(exitFormResult: ExitFormResult) {
+        if (exitFormResult.wasSubmitted) {
+            findNavController().finishWithResult(this, exitFormResult)
+        }
     }
 
     private fun fillRecyclerView(ageGroupsList: List<AgeGroupDisplayModel>) {
