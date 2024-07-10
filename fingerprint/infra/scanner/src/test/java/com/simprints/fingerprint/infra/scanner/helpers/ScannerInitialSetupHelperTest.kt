@@ -14,6 +14,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirm
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -35,7 +36,7 @@ class ScannerInitialSetupHelperTest {
     private val vero2Configuration = mockk<Vero2Configuration>()
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
-            every { fingerprint?.bioSdkConfiguration?.vero2 } returns vero2Configuration
+            every { fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER)?.vero2 } returns vero2Configuration
         }
     }
     private val firmwareLocalDataSource = mockk<FirmwareLocalDataSource>()
@@ -73,8 +74,13 @@ class ScannerInitialSetupHelperTest {
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
 
-        scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(
+            fingerprintSdk = SECUGEN_SIM_MATCHER,
+            scanner = scannerMock,
+            macAddress = MAC_ADDRESS,
+            withScannerVersion = {},
+            withBatteryInfo = {}
+        )
 
         coVerify(exactly = 0) { connectionHelperMock.reconnect(any(), any()) }
     }
@@ -91,8 +97,13 @@ class ScannerInitialSetupHelperTest {
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
         val exception = assertThrows<OtaAvailableException> {
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                fingerprintSdk = SECUGEN_SIM_MATCHER,
+                scanner = scannerMock,
+                macAddress = MAC_ADDRESS,
+                withScannerVersion = {},
+                withBatteryInfo = {}
+            )
         }
 
         assertThat(exception.availableOtas).isEqualTo(listOf(AvailableOta.CYPRESS))
@@ -113,10 +124,11 @@ class ScannerInitialSetupHelperTest {
         var batteryInfo: BatteryInfo? = null
 
         scannerInitialSetupHelper.setupScannerWithOtaCheck(
-            scannerMock,
-            MAC_ADDRESS,
-            { version = it },
-            { batteryInfo = it })
+            fingerprintSdk = SECUGEN_SIM_MATCHER,
+            scanner = scannerMock,
+            macAddress = MAC_ADDRESS,
+            withScannerVersion = { version = it },
+            withBatteryInfo = { batteryInfo = it })
 
         assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
         assertThat(batteryInfo).isEqualTo(HIGH_BATTERY_INFO)
@@ -136,8 +148,13 @@ class ScannerInitialSetupHelperTest {
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
 
-        scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(
+            fingerprintSdk = SECUGEN_SIM_MATCHER,
+            scanner = scannerMock,
+            macAddress = MAC_ADDRESS,
+            withScannerVersion = {},
+            withBatteryInfo = {}
+        )
     }
 
     @Test
@@ -154,8 +171,13 @@ class ScannerInitialSetupHelperTest {
             setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
             val exception = assertThrows<OtaAvailableException> {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-
+                scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                    fingerprintSdk = SECUGEN_SIM_MATCHER,
+                    scanner = scannerMock,
+                    macAddress = MAC_ADDRESS,
+                    withScannerVersion = {},
+                    withBatteryInfo = {}
+                )
             }
 
             assertThat(exception.availableOtas).isEqualTo(
@@ -181,8 +203,13 @@ class ScannerInitialSetupHelperTest {
             setupScannerWithBatteryInfo(LOW_BATTERY_INFO)
 
 
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                fingerprintSdk = SECUGEN_SIM_MATCHER,
+                scanner = scannerMock,
+                macAddress = MAC_ADDRESS,
+                withScannerVersion = {},
+                withBatteryInfo = {}
+            )
         }
 
     @Test
@@ -198,8 +225,13 @@ class ScannerInitialSetupHelperTest {
             setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
 
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(scannerMock, MAC_ADDRESS, {}, {})
-
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                fingerprintSdk = SECUGEN_SIM_MATCHER,
+                scanner = scannerMock,
+                macAddress = MAC_ADDRESS,
+                withScannerVersion = {},
+                withBatteryInfo = {}
+            )
         }
 
     @Test
@@ -220,10 +252,11 @@ class ScannerInitialSetupHelperTest {
 
             val exception = assertThrows<OtaAvailableException> {
                 scannerInitialSetupHelper.setupScannerWithOtaCheck(
-                    scannerMock,
-                    MAC_ADDRESS,
-                    { version = it },
-                    { batteryInfo = it })
+                    fingerprintSdk = SECUGEN_SIM_MATCHER,
+                    scanner = scannerMock,
+                    macAddress = MAC_ADDRESS,
+                    withScannerVersion = { version = it },
+                    withBatteryInfo = { batteryInfo = it })
             }
 
             assertThat(exception.availableOtas).isEqualTo(

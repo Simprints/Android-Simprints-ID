@@ -1,5 +1,10 @@
 package com.simprints.feature.clientapi.models
 
+ object ClientApiConstants {
+
+    const val CALLER_PACKAGE_NAME = "callerPackageName"
+}
+
 internal object OdkConstants {
 
     const val PACKAGE_NAME = "com.simprints.simodkadapter"

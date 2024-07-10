@@ -1,5 +1,6 @@
 package com.simprints.infra.enrolment.records.store.local
 
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
@@ -46,6 +47,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
+        dataSource: BiometricDataSource,
     ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
         realm.query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -61,6 +63,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
+        dataSource: BiometricDataSource,
     ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
         realm.query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -87,7 +90,10 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun count(query: SubjectQuery): Int = realmWrapper.readRealm { realm ->
+    override suspend fun count(
+        query: SubjectQuery,
+        dataSource: BiometricDataSource,
+    ): Int = realmWrapper.readRealm { realm ->
         realm.query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .count()

@@ -24,6 +24,7 @@ internal object EnrolActionFactory : RequestActionFactory() {
         metadata = MOCK_METADATA,
         moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
+        callerPackageName = MOCK_CALLER_PACKAGE_NAME,
         unknownExtras = emptyMap()
     )
 

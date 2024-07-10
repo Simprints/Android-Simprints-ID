@@ -37,12 +37,8 @@ internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
 
     private fun tagsForDeprecatedWorkers() = listOf(
         "TAG_PEOPLE_SYNC_WORKER_TYPE_DOWN_COUNTER", // 2023.1.0
-        "TAG_PEOPLE_SYNC_WORKER_TYPE_DOWNLOADER", // 2023.1.0
-        "TAG_PEOPLE_SYNC_WORKER_TYPE_END_SYNC_REPORTER", // 2023.1.0
-        "TAG_PEOPLE_SYNC_WORKER_TYPE_START_SYNC_REPORTER", // 2023.1.0
         "MASTER_SYNC_SCHEDULERS", // 2023.1.0
         "TAG_PEOPLE_SYNC_WORKER_TYPE_UP_COUNTER", // 2023.1.0
-        "TAG_PEOPLE_SYNC_WORKER_TYPE_UPLOADER", // 2023.1.0
     )
 
 }

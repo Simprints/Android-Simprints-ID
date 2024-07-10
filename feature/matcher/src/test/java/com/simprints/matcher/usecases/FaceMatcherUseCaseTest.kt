@@ -63,7 +63,7 @@ internal class FaceMatcherUseCaseTest {
             MatchParams(
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
         )
 
@@ -81,7 +81,7 @@ internal class FaceMatcherUseCaseTest {
                 ),
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
         )
 
@@ -103,14 +103,14 @@ internal class FaceMatcherUseCaseTest {
 
         var onLoadingCalled = false
 
-        val results = useCase.invoke(
+        val result = useCase.invoke(
             matchParams = MatchParams(
                 probeFaceSamples = listOf(
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
                 ),
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             onLoadingCandidates = { onLoadingCalled = true },
         )
@@ -119,7 +119,7 @@ internal class FaceMatcherUseCaseTest {
 
         assertThat(onLoadingCalled).isTrue()
 
-        assertThat(results.first.first().subjectId).isEqualTo("subjectId")
-        assertThat(results.first.first().confidence).isEqualTo(42f)
+        assertThat(result.matchResultItems.first().subjectId).isEqualTo("subjectId")
+        assertThat(result.matchResultItems.first().confidence).isEqualTo(42f)
     }
 }

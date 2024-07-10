@@ -6,10 +6,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
+import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
@@ -21,14 +23,20 @@ import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
+import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
+import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.NEC
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -124,7 +132,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
-        coEvery { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
 
         val stepsObserver = viewModel.currentStep.test()
@@ -139,7 +147,7 @@ internal class OrchestratorViewModelTest {
     @Test
     fun `Creates person if required after step result`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns emptyList()
-        coEvery { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
 
         every { shouldCreatePerson(any(), any(), any()) } returns true
         coJustRun { createPersonEvent(any()) }
@@ -155,7 +163,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
-        coEvery { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
         coEvery { appResponseBuilder(any(), any(), any()) } returns mockk()
         coJustRun { dailyActivityUseCase(any()) }
@@ -174,12 +182,50 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
-        coEvery { mapRefusalOrErrorResult(any()) } returns AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(SetupResult(true))
 
         viewModel.appResponse.test().assertHasValue()
+    }
+
+    @Test
+    fun `Returns AGE_GROUP_NOT_SUPPORTED response when step builder throws SubjectAgeNotSupportedException`() = runTest {
+        every { stepsBuilder.build(any(), any()) } throws SubjectAgeNotSupportedException()
+
+        viewModel.handleAction(mockk())
+
+        val expectedResponse = AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED)
+        verify { addCallbackEvent(expectedResponse) }
+        viewModel.appResponse.test().value().peekContent().let { response ->
+            assertThat(response.response).isEqualTo(expectedResponse)
+        }
+    }
+
+    @Test
+    fun `Appends capture and match steps upon receiving SelectSubjectAgeGroupResult`() = runTest {
+        every { stepsBuilder.build(any(), any()) } returns listOf(
+            createMockStep(StepId.SELECT_SUBJECT_AGE),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+        every { shouldCreatePerson(any(), any(), any()) } returns false
+        val captureAndMatchSteps =  listOf(
+            createMockStep(StepId.FACE_CAPTURE),
+            createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(
+                FlowType.VERIFY,
+                SubjectQuery(),
+                BiometricDataSource.Simprints)),
+        )
+        every { stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(any(), any(), any()) } returns captureAndMatchSteps
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(SelectSubjectAgeGroupResult(AgeGroup(0, 1)))
+
+        verify { stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(any(), any(), any()) }
+        viewModel.currentStep.test().value().peekContent()?.let { step ->
+            assertThat(step.id).isEqualTo(StepId.FACE_CAPTURE)
+        }
     }
 
     @Test
@@ -189,9 +235,9 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(
                 FlowType.VERIFY,
                 SubjectQuery(),
-                BiometricDataSource.SIMPRINTS)),
+                BiometricDataSource.Simprints)),
         )
-        coEvery { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())
@@ -209,9 +255,9 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(
                 FlowType.VERIFY,
                 SubjectQuery(),
-                BiometricDataSource.SIMPRINTS)),
+                BiometricDataSource.Simprints)),
         )
-        coEvery { mapRefusalOrErrorResult(any()) } returns null
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())
@@ -219,6 +265,68 @@ internal class OrchestratorViewModelTest {
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
+        }
+    }
+
+    @Test
+    fun `Updates the correct fingerprint match step when multiple fingerprint SDKs are used`() = runTest {
+        every { stepsBuilder.build(any(), any()) } returns listOf(
+            createMockStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureContract.getArgs(
+                flowType = FlowType.VERIFY,
+                fingers = emptyList(),
+                fingerprintSDK = SECUGEN_SIM_MATCHER,
+            )),
+            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(
+                flowType = FlowType.VERIFY,
+                subjectQuery = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.Simprints,
+                fingerprintSDK = SECUGEN_SIM_MATCHER,
+            )),
+            createMockStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureContract.getArgs(
+                flowType = FlowType.VERIFY,
+                fingers = emptyList(),
+                fingerprintSDK = NEC,
+            )),
+            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(
+                flowType = FlowType.VERIFY,
+                subjectQuery = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.Simprints,
+                fingerprintSDK = NEC,
+            )),
+        )
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+        every { shouldCreatePerson(any(), any(), any()) } returns false
+        val format = "SimMatcher"
+        val sample1 = FingerprintCaptureResult.Sample(
+            IFingerIdentifier.LEFT_INDEX_FINGER,
+            ByteArray(0),
+            0,
+            null,
+            format,
+        )
+        val sample2 = FingerprintCaptureResult.Sample(
+            IFingerIdentifier.LEFT_THUMB,
+            ByteArray(0),
+            0,
+            null,
+            format,
+        )
+        val captureResults: List<FingerprintCaptureResult.Item> = listOf(
+            FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_INDEX_FINGER, sample1),
+            FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_THUMB, sample2),
+        )
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(FingerprintCaptureResult(captureResults))
+
+        viewModel.currentStep.test().value().peekContent()?.let { step ->
+            assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
+            val params = step.payload.getParcelable<MatchParams>("params")
+            assertThat(params).isNotNull()
+            assertThat(params?.fingerprintSDK).isEqualTo(SECUGEN_SIM_MATCHER)
+            assertThat(params?.probeFingerprintSamples?.size).isEqualTo(2)
+            assertThat(params?.probeFingerprintSamples?.get(0)?.format).isEqualTo(format)
+            assertThat(params?.probeFingerprintSamples?.get(1)?.format).isEqualTo(format)
         }
     }
 

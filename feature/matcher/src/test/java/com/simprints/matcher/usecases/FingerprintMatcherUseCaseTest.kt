@@ -7,7 +7,7 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
@@ -52,10 +52,10 @@ internal class FingerprintMatcherUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { resolveBioSdkWrapperUseCase() } returns bioSdkWrapper
+        coEvery { resolveBioSdkWrapperUseCase(any()) } returns bioSdkWrapper
         coEvery {
             configManager.getProjectConfiguration().fingerprint?.allowedSDKs
-        } returns listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+        } returns listOf(SECUGEN_SIM_MATCHER)
 
         useCase = FingerprintMatcherUseCase(
             enrolmentRecordRepository,
@@ -67,21 +67,14 @@ internal class FingerprintMatcherUseCaseTest {
     }
 
     @Test
-    fun `Correctly get the matcher name`() = runTest {
-        coEvery { bioSdkWrapper.matcherName } returns "SIM_AFIS"
-        coEvery { configManager.getProjectConfiguration().fingerprint?.allowedSDKs } returns listOf(
-            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
-        )
-        assertThat(useCase.matcherName()).isEqualTo("SIM_AFIS")
-    }
-
-    @Test
     fun `Skips matching if there are no probes`() = runTest {
         useCase.invoke(
             MatchParams(
+                probeFingerprintSamples = emptyList(),
+                fingerprintSDK = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
         )
 
@@ -103,9 +96,10 @@ internal class FingerprintMatcherUseCaseTest {
                         byteArrayOf(1, 2, 3)
                     ),
                 ),
+                fingerprintSDK = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
         )
 
@@ -152,9 +146,10 @@ internal class FingerprintMatcherUseCaseTest {
                         byteArrayOf(1, 2, 3)
                     ),
                 ),
+                fingerprintSDK = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.SIMPRINTS,
+                biometricDataSource = BiometricDataSource.Simprints,
             ),
             onLoadingCandidates = { onLoadingCalled = true },
         )

@@ -32,7 +32,6 @@ class LibSimprintsResponseMapperTest {
             ActionResponse.EnrolActionResponse(
                 actionIdentifier = EnrolActionFactory.getIdentifier(),
                 sessionId = "sessionId",
-                eventsJson = null,
                 enrolledGuid = "guid",
                 subjectActions = "subjects"
             )
@@ -51,7 +50,6 @@ class LibSimprintsResponseMapperTest {
             ActionResponse.IdentifyActionResponse(
                 actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
                 sessionId = "sessionId",
-                eventsJson = null,
                 identifications = listOf(
                     AppMatchResult(
                         guid = "guid-1",
@@ -82,7 +80,6 @@ class LibSimprintsResponseMapperTest {
             ActionResponse.ConfirmActionResponse(
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
-                eventsJson = null,
                 confirmed = true,
             )
         )
@@ -97,7 +94,6 @@ class LibSimprintsResponseMapperTest {
             ActionResponse.VerifyActionResponse(
                 actionIdentifier = VerifyActionFactory.getIdentifier(),
                 sessionId = "sessionId",
-                eventsJson = null,
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
@@ -123,7 +119,6 @@ class LibSimprintsResponseMapperTest {
             ActionResponse.ExitFormActionResponse(
                 actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
                 sessionId = "sessionId",
-                eventsJson = null,
                 reason = "reason",
                 extraText = "extra",
             )
@@ -142,7 +137,6 @@ class LibSimprintsResponseMapperTest {
             ActionResponse.ErrorActionResponse(
                 actionIdentifier = EnrolActionFactory.getIdentifier(),
                 sessionId = "sessionId",
-                eventsJson = null,
                 reason = AppErrorReason.UNEXPECTED_ERROR,
                 flowCompleted = true,
             )
@@ -175,12 +169,12 @@ class LibSimprintsResponseMapperTest {
             AppErrorReason.BACKEND_MAINTENANCE_ERROR to Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR,
             AppErrorReason.PROJECT_PAUSED to Constants.SIMPRINTS_PROJECT_PAUSED,
             AppErrorReason.PROJECT_ENDING to Constants.SIMPRINTS_PROJECT_ENDING,
+            AppErrorReason.AGE_GROUP_NOT_SUPPORTED to Constants.SIMPRINTS_AGE_GROUP_NOT_SUPPORTED,
         ).forEach { (reason, expectedCode) ->
             val extras = mapper(
                 ActionResponse.ErrorActionResponse(
                     actionIdentifier = EnrolActionFactory.getIdentifier(),
                     sessionId = "sessionId",
-                    eventsJson = null,
                     reason = reason,
                     flowCompleted = true,
                 )
