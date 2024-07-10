@@ -41,6 +41,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.UUID
+import kotlin.coroutines.cancellation.CancellationException
 
 class EventDownSyncTaskTest {
 
@@ -245,6 +246,30 @@ class EventDownSyncTaskTest {
     fun downSync_shouldAddEventWithExceptionClassSimpleNameIfDownloadFails() = runTest {
         val expectedException = Exception("Test")
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws expectedException
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
+        coVerify(exactly = 1) {
+            eventRepository.addOrUpdateEvent(
+                eventScope,
+                match {
+                    it is EventDownSyncRequestEvent &&
+                        it.payload.errorType == expectedException.javaClass.simpleName
+                }
+            )
+        }
+    }
+
+    @Test
+    fun downSync_shouldAddEventWithExceptionClassSimpleNameIfEventStreamFails() = runTest {
+        val expectedException = CancellationException("Test")
+        downloadEventsChannel = Channel(capacity = Channel.UNLIMITED)
+        coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } returns EventDownSyncResult(
+            0,
+            status = 200,
+            downloadEventsChannel
+        )
+        downloadEventsChannel.cancel(expectedException)
 
         eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
 
