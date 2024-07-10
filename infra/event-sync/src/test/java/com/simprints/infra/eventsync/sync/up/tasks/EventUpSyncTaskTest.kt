@@ -459,6 +459,30 @@ internal class EventUpSyncTaskTest {
     }
 
     @Test
+    fun `upSync should add event with exception class simple name if upload fails`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
+        coEvery { eventRepo.getClosedEventScopes(any()) } returns emptyList()
+        coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION) } returns listOf(
+            createSessionScope(GUID1),
+        )
+        coEvery {
+            eventRepo.getEventsFromScope(any())
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
+        val expectedException = NetworkConnectionException("Test", Throwable())
+        coEvery { eventRemoteDataSource.post(any(), any(), any()) } throws expectedException
+
+        eventUpSyncTask.upSync(operation, eventScope).toList()
+
+        coVerify(exactly = 1) {
+            eventRepo.addOrUpdateEvent(any(), match {
+                it is EventUpSyncRequestEvent &&
+                    it.payload.errorType == expectedException.javaClass.simpleName
+            })
+        }
+    }
+
+    @Test
     fun `upload should save request event for each upload request`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
 
