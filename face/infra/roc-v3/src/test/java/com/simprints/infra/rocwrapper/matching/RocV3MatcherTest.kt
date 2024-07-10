@@ -5,8 +5,6 @@ import com.simprints.face.infra.rocv3.matching.RocV3Matcher
 import org.junit.Test
 
 class RocV3MatcherTest {
-
-    // Dummy test to generate jacoco reports.
     @Test
     fun getMatcherName() {
         RocV3Matcher().matcherName

@@ -11,4 +11,6 @@ class RocV3BioSdk @Inject constructor(
     override val initializer: RocV3Initializer,
     override val detector: RocV3Detector,
     override val matcher: RocV3Matcher,
-) : FaceBioSDK
+) : FaceBioSDK {
+    override val version: String = "3.1"
+}

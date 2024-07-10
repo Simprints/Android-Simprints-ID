@@ -66,12 +66,10 @@ internal class LiveFeedbackFragmentViewModelTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
-
     private val previewViewSize: Size = Size(100, 100)
     private val screenOrientation = ScreenOrientation.Portrait
 
     private lateinit var viewModel: LiveFeedbackFragmentViewModel
-
 
     @Before
     fun setUp() {
@@ -91,11 +89,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
 
         viewModel = LiveFeedbackFragmentViewModel(
-            frameProcessor,
-            resolveFaceBioSdkUseCase,
-            configManager,
-            eventReporter,
-            timeHelper
+            frameProcessor, resolveFaceBioSdkUseCase, configManager, eventReporter, timeHelper
         )
     }
 

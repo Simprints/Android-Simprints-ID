@@ -10,7 +10,6 @@ import android.graphics.Rect
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
-import com.simprints.infra.logging.Simber
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,13 +21,6 @@ import ai.roc.rocsdk.embedded.roc as roc3
 )
 @Singleton
 class RocV3Detector @Inject constructor() : FaceDetector {
-    companion object {
-        const val RANK_ONE_TEMPLATE_FORMAT_3_1 = "RANK_ONE_EMBEDDED_3_1"
-        const val MAX_FACE_DETECTION = 1
-        const val FALSE_DETECTION_RATE = 0.1f
-        const val RELATIVE_MIN_SIZE = 0.2f
-        const val ABSOLUTE_MIN_SIZE = 36L
-    }
 
     override fun analyze(bitmap: Bitmap): Face? {
         val rocColorImage = roc_image()
@@ -58,7 +50,6 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         val template = roc3.new_uint8_t_array(roc3.ROC_FACE_FAST_FV_SIZE.toInt())
         val yaw = roc3.new_float()
         val quality = roc3.new_float()
-
         val face = if (isFaceDetected(grayImage, detection)) {
             generateFaceTemplateFromImage(
                 coloredImage, grayImage, detection, yaw, template, quality
@@ -96,8 +87,6 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         template: SWIGTYPE_p_unsigned_char,
         quality: SWIGTYPE_p_float
     ) {
-
-
         val landmarks = roc3.new_roc_landmark_array(roc3.roc_num_landmarks_for_pose(detection.pose))
         val rightEye = roc_landmark()
         val leftEye = roc_landmark()
@@ -126,7 +115,6 @@ class RocV3Detector @Inject constructor() : FaceDetector {
             null
         )
     }
-
 
     private fun isFaceDetected(
         image: roc_image, detection: roc_detection
@@ -167,4 +155,11 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         return byteBuffer
     }
 
+    companion object {
+        const val RANK_ONE_TEMPLATE_FORMAT_3_1 = "RANK_ONE_EMBEDDED_3_1"
+        const val MAX_FACE_DETECTION = 1
+        const val FALSE_DETECTION_RATE = 0.1f
+        const val RELATIVE_MIN_SIZE = 0.2f
+        const val ABSOLUTE_MIN_SIZE = 36L
+    }
 }

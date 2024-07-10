@@ -654,6 +654,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                     .setDecisionPolicy(
                         ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
                     )
+                    .setVersion("1.23")
                     .build()
             )
             .build()
@@ -668,6 +669,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                     .setDecisionPolicy(
                         ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
                     )
+                    .setVersion("1.23")
                     .build()
             )
             .build()

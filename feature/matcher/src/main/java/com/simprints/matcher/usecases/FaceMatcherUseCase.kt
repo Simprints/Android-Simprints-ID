@@ -9,7 +9,6 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
-import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
@@ -38,14 +37,12 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
-        val queryWithSupportedFormat =
-            matchParams.queryForCandidates.copy(
-                faceSampleFormat = faceMatcher.supportedTemplateFormat
-            )
+        val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
+            faceSampleFormat = faceMatcher.supportedTemplateFormat
+        )
         val totalCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat, dataSource = matchParams.biometricDataSource
         )
-        Simber.d("totalCandidates $totalCandidates")
         if (totalCandidates == 0) {
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
@@ -54,7 +51,11 @@ internal class FaceMatcherUseCase @Inject constructor(
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
-                    val batchCandidates = getCandidates(matchParams.queryForCandidates, range, dataSource = matchParams.biometricDataSource)
+                    val batchCandidates = getCandidates(
+                        matchParams.queryForCandidates,
+                        range,
+                        dataSource = matchParams.biometricDataSource
+                    )
                     match(batchCandidates, samples)
                 }
             }
@@ -86,7 +87,8 @@ internal class FaceMatcherUseCase @Inject constructor(
     ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, item ->
         acc.add(
             FaceMatchResult.Item(
-                item.subjectId, faceMatcher.getHighestComparisonScoreForCandidate(samples, item)
+                item.subjectId,
+                faceMatcher.getHighestComparisonScoreForCandidate(samples, item)
             )
         )
     }

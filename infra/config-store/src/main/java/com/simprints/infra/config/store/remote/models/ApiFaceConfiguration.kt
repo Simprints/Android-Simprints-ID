@@ -23,6 +23,7 @@ internal data class ApiFaceConfiguration(
         val imageSavingStrategy: ImageSavingStrategy,
         val allowedAgeRange: ApiAllowedAgeRange?,
         val verificationMatchThreshold: Float?,
+        val version: String
     ) {
         fun toDomain() = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = nbOfImagesToCapture,
@@ -30,7 +31,8 @@ internal data class ApiFaceConfiguration(
             decisionPolicy = decisionPolicy.toDomain(),
             imageSavingStrategy = imageSavingStrategy.toDomain(),
             allowedAgeRange = allowedAgeRange?.toDomain(),
-            verificationMatchThreshold = verificationMatchThreshold
+            verificationMatchThreshold = verificationMatchThreshold,
+            version = version
         )
     }
 

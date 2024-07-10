@@ -1,6 +1,7 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,10 +13,9 @@ class ResolveFaceBioSdkUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(): FaceBioSDK {
-        val config = configRepository.getProjectConfiguration()
-        // Todo we didn't yet implement the logic to select the SDK based on the configuration
-        // so we are just using the v1  SDK for now
-        return rocV3BioSdk
-
+        val version = configRepository.getProjectConfiguration().face?.rankOne?.version
+        Simber.d("FaceBioSDK version: $version")
+        // if the version is null, return rocV1BioSdk
+        return if (version == rocV3BioSdk.version) rocV3BioSdk else rocV1BioSdk
     }
 }

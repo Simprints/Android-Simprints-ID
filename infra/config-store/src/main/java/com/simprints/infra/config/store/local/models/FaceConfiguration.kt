@@ -21,6 +21,7 @@ internal fun FaceConfiguration.FaceSdkConfiguration.toProto() =
         .setQualityThreshold(qualityThreshold)
         .setImageSavingStrategy(imageSavingStrategy.toProto())
         .setDecisionPolicy(decisionPolicy.toProto())
+        .setVersion(version)
         .also {
             if (allowedAgeRange != null) it.allowedAgeRange = allowedAgeRange.toProto()
             if (verificationMatchThreshold != null) it.verificationMatchThreshold = verificationMatchThreshold
@@ -51,6 +52,7 @@ internal fun ProtoFaceConfiguration.ProtoFaceSdkConfiguration.toDomain() =
         qualityThreshold = qualityThreshold,
         imageSavingStrategy = imageSavingStrategy.toDomain(),
         decisionPolicy = decisionPolicy.toDomain(),
+        version = version,
         if (hasAllowedAgeRange()) allowedAgeRange.toDomain() else null,
         if (hasVerificationMatchThreshold()) verificationMatchThreshold else null
     )

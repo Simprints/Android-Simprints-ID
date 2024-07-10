@@ -106,6 +106,7 @@ internal data class OldProjectConfig(
                     },
                     decisionPolicy = faceConfidenceThresholds?.let { parseDecisionPolicy(it) }
                         ?: DecisionPolicy(0, 0, 0),
+                    version = DEFAULT_FACE_SDK_VERSION,
                 ),
             )
 
@@ -256,6 +257,7 @@ internal data class OldProjectConfig(
 
     companion object {
         private const val DEFAULT_FACE_FRAMES_TO_CAPTURE = 2
+        private const val DEFAULT_FACE_SDK_VERSION = "1.23"
     }
 }
 
