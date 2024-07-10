@@ -379,10 +379,10 @@ internal class EventLocalDataSourceTest {
         val dbSessionCaptureEvent = mockk<DbEventScope> {
             every { fromDbToDomain(any()) } returns mockk()
         }
-        coEvery { scopeDao.loadClosed(EventScopeType.SESSION) } returns listOf(dbSessionCaptureEvent)
-        eventLocalDataSource.loadClosedScopes(EventScopeType.SESSION)
+        coEvery { scopeDao.loadClosed(EventScopeType.SESSION, limit = 10) } returns listOf(dbSessionCaptureEvent)
+        eventLocalDataSource.loadClosedScopes(EventScopeType.SESSION, limit = 10)
 
-        coVerify { scopeDao.loadClosed(any()) }
+        coVerify { scopeDao.loadClosed(EventScopeType.SESSION, limit = 10) }
         verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
     }
 
@@ -429,7 +429,7 @@ internal class EventLocalDataSourceTest {
         ).toList()
 
         coVerify {
-            eventDao.observeCountFromType(type = CALLBACK_ENROLMENT,)
+            eventDao.observeCountFromType(type = CALLBACK_ENROLMENT)
         }
     }
 
@@ -472,7 +472,7 @@ internal class EventLocalDataSourceTest {
         coEvery { eventDao.loadAll() } returns emptyList()
         coEvery { eventDao.loadFromScope(any()) } returns emptyList()
         coEvery { scopeDao.loadOpen(any()) } returns emptyList()
-        coEvery { scopeDao.loadClosed(any()) } returns emptyList()
+        coEvery { scopeDao.loadClosed(any(), any()) } returns emptyList()
         coEvery { scopeDao.count(any()) } returns 0
         every { db.eventDao } returns eventDao
         every { db.scopeDao } returns scopeDao
