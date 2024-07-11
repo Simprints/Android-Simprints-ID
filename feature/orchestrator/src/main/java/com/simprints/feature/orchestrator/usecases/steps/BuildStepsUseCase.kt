@@ -68,7 +68,7 @@ internal class BuildStepsUseCase @Inject constructor(
         is ActionRequest.VerifyActionRequest -> listOf(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
-            buildFetchGuidStep(action.projectId, action.verifyGuid),
+            buildFetchGuidStepIfNeeded(action),
             buildConsentStep(ConsentType.VERIFY),
             buildModalityCaptureAndMatchStepsForVerify(action, projectConfiguration)
         )
@@ -222,14 +222,26 @@ internal class BuildStepsUseCase @Inject constructor(
         )
     )
 
-    private fun buildFetchGuidStep(projectId: String, subjectId: String) = listOf(
-        Step(
-            id = StepId.FETCH_GUID,
-            navigationActionId = R.id.action_orchestratorFragment_to_fetchSubject,
-            destinationId = FetchSubjectContract.DESTINATION,
-            payload = FetchSubjectContract.getArgs(projectId, subjectId),
-        )
-    )
+    private fun buildFetchGuidStepIfNeeded(action: ActionRequest.VerifyActionRequest) =
+        with(action) {
+            val isBiometricDataSourceSimprints =
+                BiometricDataSource.fromString(
+                    value = biometricDataSource,
+                    callerPackageName = callerPackageName,
+                ) == BiometricDataSource.Simprints
+            if (isBiometricDataSourceSimprints) {
+                listOf(
+                    Step(
+                        id = StepId.FETCH_GUID,
+                        navigationActionId = R.id.action_orchestratorFragment_to_fetchSubject,
+                        destinationId = FetchSubjectContract.DESTINATION,
+                        payload = FetchSubjectContract.getArgs(projectId, action.verifyGuid),
+                    )
+                )
+            } else {
+                emptyList()
+            }
+        }
 
     private fun buildConsentStep(consentType: ConsentType) = listOf(
         Step(
