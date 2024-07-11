@@ -21,15 +21,31 @@
         android:id="@+id/confirmation_img"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintHeight_max="300dp"
-        app:layout_constraintWidth_max="300dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/container_buttons"
+        app:layout_constraintBottom_toTopOf="@+id/confirmation_txt"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="300dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/face_confirm_title"
+        app:layout_constraintWidth_max="300dp"
         tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/confirmation_txt"
+        style="@style/Text.Headline5.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:drawablePadding="16dp"
+        android:gravity="center"
+        android:text="@string/face_capture_successfully_title"
+        app:layout_constraintBottom_toTopOf="@+id/container_buttons"
+        app:drawableStartCompat="@drawable/ic_checked_green_large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/confirmation_img" />
 
     <LinearLayout
         android:id="@+id/container_buttons"

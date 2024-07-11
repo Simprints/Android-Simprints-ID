@@ -22,21 +22,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <androidx.core.widget.NestedScrollView
         android:id="@+id/exitFormScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/simprints_blue"
         android:clipToPadding="false"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/exitFromButtons"
         app:layout_constraintTop_toBottomOf="@+id/exitFormTitle">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
 
             <RadioGroup
                 android:id="@+id/exitFormRadioGroup"
@@ -125,8 +122,8 @@
                 app:layout_constraintTop_toBottomOf="@id/exitFormRadioGroup"
                 app:shapeAppearance="@style/Shape.Simprints.MediumComponent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
@@ -138,7 +135,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:weightSum="2"
-        app:layout_constraintTop_toBottomOf="@+id/exitFormScrollView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
