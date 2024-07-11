@@ -14,9 +14,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/detection_onboarding_txt_continue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:gravity="top"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -29,8 +30,7 @@
             <ImageView
                 android:id="@+id/detection_onboarding_light_img"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_height="@dimen/preparation_land_max_image_height"
                 android:src="@drawable/onboarding_light"
                 app:layout_constraintBottom_toTopOf="@id/detection_onboarding_light_txt"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +65,7 @@
             <ImageView
                 android:id="@+id/detection_onboarding_fill_img"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/preparation_land_max_image_height"
                 android:src="@drawable/onboarding_fill"
                 app:layout_constraintBottom_toTopOf="@id/detection_onboarding_fill_txt"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -97,7 +97,7 @@
             <ImageView
                 android:id="@+id/detection_onboarding_straight_img"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/preparation_land_max_image_height"
                 android:src="@drawable/onboarding_straight"
                 app:layout_constraintBottom_toTopOf="@id/detection_onboarding_straight_txt"
                 app:layout_constraintEnd_toEndOf="parent"
