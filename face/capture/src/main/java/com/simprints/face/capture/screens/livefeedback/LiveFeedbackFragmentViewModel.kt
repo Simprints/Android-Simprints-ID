@@ -39,7 +39,9 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private var samplesToCapture: Int = 1
 
     private val faceTarget = FaceTarget(
-        SymmetricTarget(VALID_YAW_DELTA), SymmetricTarget(VALID_ROLL_DELTA), 0.25f..0.5f
+        SymmetricTarget(VALID_YAW_DELTA),
+        SymmetricTarget(VALID_ROLL_DELTA),
+        0.25f..0.5f
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)

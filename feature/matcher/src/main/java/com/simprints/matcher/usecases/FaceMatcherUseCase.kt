@@ -52,7 +52,7 @@ internal class FaceMatcherUseCase @Inject constructor(
             .map { range ->
                 async(dispatcher) {
                     val batchCandidates = getCandidates(
-                        matchParams.queryForCandidates,
+                        queryWithSupportedFormat,
                         range,
                         dataSource = matchParams.biometricDataSource
                     )

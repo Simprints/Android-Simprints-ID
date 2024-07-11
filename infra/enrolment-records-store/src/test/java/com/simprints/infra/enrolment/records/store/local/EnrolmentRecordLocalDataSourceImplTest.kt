@@ -6,6 +6,7 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FACE_SAMPLES_FIELD
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FINGERPRINT_SAMPLES_FIELD
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FORMAT_FIELD
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
@@ -123,12 +124,33 @@ class EnrolmentRecordLocalDataSourceImplTest {
     fun `correctly query supported fingerprint format`() = runTest {
         val format = "SupportedFormat"
 
-         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(SubjectQuery(fingerprintSampleFormat = format), IntRange(0, 20))
+        enrolmentRecordLocalDataSource
+            .loadFingerprintIdentities(
+                SubjectQuery(fingerprintSampleFormat = format),
+                IntRange(0, 20)
+            )
             .toList()
 
-        verify { realmQuery.query(
-            "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",format) }
+        verify {
+            realmQuery.query(
+                "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0", format
+            )
+        }
+    }
+
+    @Test
+    fun `correctly query supported face format`() = runTest {
+        val format = "SupportedFormat"
+
+        enrolmentRecordLocalDataSource
+            .loadFingerprintIdentities(SubjectQuery(faceSampleFormat = format), IntRange(0, 20))
+            .toList()
+
+        verify {
+            realmQuery.query(
+                "ANY ${FACE_SAMPLES_FIELD}.${FORMAT_FIELD} == $0", format
+            )
+        }
     }
 
     @Test
@@ -176,7 +198,8 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people =
-            enrolmentRecordLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId)).toList()
+            enrolmentRecordLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId))
+                .toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
         }
