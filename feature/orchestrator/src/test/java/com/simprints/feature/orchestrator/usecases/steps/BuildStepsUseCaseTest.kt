@@ -395,6 +395,32 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
+    fun `build - verify action - co-sync data source - returns steps without fetch GUID`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        val ageGroup = AgeGroup(18, 60)
+        every { secugenSimMatcher.allowedAgeRange } returns ageGroup
+        every { nec.allowedAgeRange } returns ageGroup
+        every { projectConfiguration.face?.rankOne?.allowedAgeRange } returns ageGroup
+
+        val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns 25 // Subject age within the supported range
+        every { action.biometricDataSource } returns "COMMCARE"
+        val steps = useCase.build(action, projectConfiguration)
+
+        assertStepOrder(steps,
+            StepId.SETUP,
+            // no StepId.FETCH_GUID
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER
+        )
+    }
+
+    @Test
     fun `build - enrol action - age restriction - subject age not supported - throws SubjectAgeNotSupportedException`() {
         val projectConfiguration = mockCommonProjectConfiguration()
         val ageGroup = AgeGroup(30, 40)
