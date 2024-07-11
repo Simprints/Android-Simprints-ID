@@ -54,7 +54,11 @@ internal class BuildStepsUseCase @Inject constructor(
 
             listOf(
                 buildSetupStep(),
-                buildValidateIdPoolStep(subjectQuery),
+                buildValidateIdPoolStep(
+                    subjectQuery = subjectQuery,
+                    biometricDataSource = action.biometricDataSource,
+                    callerPackageName = action.callerPackageName
+                ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStep(ConsentType.IDENTIFY),
                 buildModalityCaptureAndMatchStepsForIdentify(
@@ -252,14 +256,25 @@ internal class BuildStepsUseCase @Inject constructor(
         )
     )
 
-    private fun buildValidateIdPoolStep(subjectQuery: SubjectQuery) = listOf(
-        Step(
-            id = StepId.VALIDATE_ID_POOL,
-            navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
-            destinationId = ValidateSubjectPoolContract.DESTINATION,
-            payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
+    private fun buildValidateIdPoolStep(
+        subjectQuery: SubjectQuery,
+        biometricDataSource: String,
+        callerPackageName: String
+    ) = when (BiometricDataSource.fromString(
+        value = biometricDataSource,
+        callerPackageName = callerPackageName
+    )) {
+        BiometricDataSource.Simprints -> listOf(
+            Step(
+                id = StepId.VALIDATE_ID_POOL,
+                navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
+                destinationId = ValidateSubjectPoolContract.DESTINATION,
+                payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
+            )
         )
-    )
+
+        is BiometricDataSource.CommCare -> emptyList()
+    }
 
     private fun buildModalityCaptureSteps(
         projectConfiguration: ProjectConfiguration,
