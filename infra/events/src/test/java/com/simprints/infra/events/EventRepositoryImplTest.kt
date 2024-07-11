@@ -251,9 +251,9 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `should delegate closed scope fetch`() = runTest {
-        eventRepo.getClosedEventScopes(type = EventScopeType.SESSION)
+        eventRepo.getClosedEventScopes(type = EventScopeType.SESSION, limit = 10)
 
-        coVerify { eventLocalDataSource.loadClosedScopes(EventScopeType.SESSION) }
+        coVerify { eventLocalDataSource.loadClosedScopes(EventScopeType.SESSION, limit = 10) }
     }
 
     @Test
