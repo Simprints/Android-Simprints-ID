@@ -10,6 +10,7 @@ data class SubjectQuery(
     val subjectIds: List<String>? = null,
     val attendantId: String? = null,
     val fingerprintSampleFormat: String? = null,
+    val faceSampleFormat: String? = null,
     val hasUntokenizedFields: Boolean? = null,
     val moduleId: String? = null,
     val sort: Boolean = false,

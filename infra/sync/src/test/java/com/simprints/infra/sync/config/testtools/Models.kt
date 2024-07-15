@@ -43,7 +43,8 @@ internal val faceConfiguration =
             nbOfImagesToCapture = 2,
             qualityThreshold = -1,
             imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
-            decisionPolicy = decisionPolicy
+            decisionPolicy = decisionPolicy,
+            version = "1.0",
         )
     )
 

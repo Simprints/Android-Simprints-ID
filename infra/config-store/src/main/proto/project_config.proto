@@ -54,6 +54,7 @@ message ProtoFaceConfiguration {
         ProtoDecisionPolicy decision_policy = 4;
         optional ProtoAllowedAgeRange allowed_age_range = 5;
         optional float verification_match_threshold = 6;
+        string version = 7;
     }
 }
 
