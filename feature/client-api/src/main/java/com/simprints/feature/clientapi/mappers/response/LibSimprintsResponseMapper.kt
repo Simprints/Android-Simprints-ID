@@ -45,7 +45,11 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                 Tier.valueOf(response.matchResult.tier.name),
                 response.matchResult.guid,
             ),
-        )
+        ).also {
+            response.matchResult.verificationSuccess?.let { verificationSuccess ->
+                it.putBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS, verificationSuccess)
+            }
+        }
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
