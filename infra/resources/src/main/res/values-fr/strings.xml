@@ -86,7 +86,7 @@
     <string name="login_qr_code_scanning_camera_unavailable_error">Une erreur s\'est produite lors de l\'accès à l\'appareil photo, veuillez contacter votre administrateur système.</string>
     <string name="login_invalid_qr_code_error">Le QRCode scanné n\'est pas valide.</string>
     <string name="login_missing_credentials_error">Informations d\'identification manquantes. Veuillez vérifier l\'ID utilisateur, l\'ID projet et la clé, et réessayer.</string>
-    <string name="login_invalid_credentials_error">Informations d\'identification invalides. Veuillez vérifier l\'ID et la clé du projet</string>
+    <string name="login_invalid_credentials_error">Erreur de connexion. Veuillez vérifier les identifiants du project et le fait que ce dernier soit toujours actif.</string>
     <string name="login_project_id_intent_mismatch_error">L\'ID du projet est différent de celui fourni dans l\'appel depuis l\'autre application. Veuillez contacter votre administrateur système.</string>
     <string name="login_no_network_error">Actuellement hors ligne. Veuillez vérifier votre connexion Internet.</string>
     <string name="login_integrity_service_down_error">Une erreur s\'est produite en essayant de contacter le Service d\'Intégrité. Veuillez réessayer plus tard.</string>
@@ -125,6 +125,8 @@
         <item quantity="many">%d correspondances</item>
         <item quantity="other">%d correspondances</item>
     </plurals>
+    <string name="matcher_missing_access_permission">Permission requise pour accéder aux données fournies par l\'application de collecte de donnée.</string>
+    <string name="matcher_grant_permission_action">Donner la permission</string>
 
     <!-- Orchestrator -->
     <string name="orchestrator_generic_error_title">Une erreur est survenue</string>
@@ -186,6 +188,7 @@
     <string name="face_capture_begin_button">Touchez pour capturer</string>
     <string name="face_capture_prep_begin_button_capturing">Capture en cours...</string>
     <string name="face_capture_permission_denied">Veuillez autoriser les permissions de l\'appareil photo</string>
+    <string name="face_capture_permission_action">Donner la permission</string>
     <string name="face_capture_hold">Maintenez la position...</string>
     <string name="face_capture_successfully_title">Le visage a été capturé avec succès.</string>
     <string name="face_capture_confirmation_title">Confirmation</string>
@@ -430,5 +433,31 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">Synchronisation en cours</string>
+
+    <!-- Identification pool validation -->
+    <string name="id_pool_validation_issue_title">Problème d\'identification</string>
+    <string name="id_pool_validation_default_message"> Vérification de l\'identification dans le pool de candidats</string>
+    <string name="id_pool_validation_user_mismatch_message">L\'ID de d\'attendant ne correspond pas aux données synchronisées</string>
+    <string name="id_pool_validation_module_mismatch_message">L\'ID du module fourni ne correspond pas aux données synchronisées.</string>
+    <string name="id_pool_validation_sync_required_message">Les données n\'ont pas été synchronisées récemment.</string>
+    <string name="id_pool_validation_syncing_message">Synchronisation...</string>
+    <string name="id_pool_validation_pool_empty_message">Il n\'y a pas d\'enregistrements sur l\'appareil</string>
+    <string name="id_pool_validation_action_close">Fermer</string>
+    <string name="id_pool_validation_action_sync">Synchroniser et réessayer</string>
+
+    <!-- Age group selection -->
+    <string name="age_group_selection_title">Choisir le groupe d\'age du sujet</string>
+    <string name="age_group_selection_age_range_to">à</string>
+    <string name="age_group_selection_age_range_and_above">et plus</string>
+    <plurals name="age_group_selection_age_in_months">
+        <item quantity="one">%d mois</item>
+        <item quantity="many">%d mois</item>
+        <item quantity="other">%d mois</item>
+    </plurals>
+    <plurals name="age_group_selection_age_in_years">
+        <item quantity="one">%d année</item>
+        <item quantity="many">%d années</item>
+        <item quantity="other">%d année(s)</item>
+    </plurals>
 
 </resources>
