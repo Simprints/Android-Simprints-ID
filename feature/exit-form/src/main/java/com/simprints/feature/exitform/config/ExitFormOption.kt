@@ -44,6 +44,11 @@ enum class ExitFormOption(
         logName = "Too young",
         answer = RefusalEvent.RefusalPayload.Answer.REFUSED_YOUNG,
     ),
+    WrongAgeGroupSelected(
+        requiresInfo = false,
+        logName = "Wrong age group selected",
+        answer = RefusalEvent.RefusalPayload.Answer.WRONG_AGE_GROUP_SELECTED,
+    ),
     Other(
         requiresInfo = true,
         logName = "Other",

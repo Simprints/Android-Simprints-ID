@@ -59,6 +59,7 @@ data class RefusalEvent(
             APP_NOT_WORKING,
             REFUSED_NOT_PRESENT,
             REFUSED_YOUNG,
+            WRONG_AGE_GROUP_SELECTED,
             OTHER
         }
     }
