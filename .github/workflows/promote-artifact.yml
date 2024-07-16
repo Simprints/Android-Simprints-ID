@@ -55,6 +55,10 @@ jobs:
                 if: ${{inputs.deployment-track == 'Alpha'}}
                 run: ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
+            -   name: App sweep security scan
+                if: ${{inputs.deployment-track == 'Alpha'}}
+                uses: ./.github/workflows/app-sweep.yml
+
             -   name: Promote to production 25%
                 if: ${{inputs.deployment-track == 'Prod-25-Percent-Rollout'}}
                 run: ./gradlew promoteArtifact --from-track alpha --promote-track production --release-status inProgress --user-fraction .25
