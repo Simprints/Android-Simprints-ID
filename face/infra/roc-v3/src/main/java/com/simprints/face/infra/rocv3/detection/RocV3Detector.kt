@@ -156,7 +156,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
     }
 
     companion object {
-        const val RANK_ONE_TEMPLATE_FORMAT_3_1 = "RANK_ONE_EMBEDDED_3_1"
+        const val RANK_ONE_TEMPLATE_FORMAT_3_1 = "RANK_ONE_3_1"
         const val MAX_FACE_DETECTION = 1
         const val FALSE_DETECTION_RATE = 0.1f
         const val RELATIVE_MIN_SIZE = 0.2f
