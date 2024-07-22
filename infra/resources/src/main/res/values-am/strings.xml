@@ -450,7 +450,7 @@
     <string name="age_group_selection_age_range_and_above">እና በላይ</string>
     <plurals name="age_group_selection_age_in_months">
         <item quantity="one">%d month</item>
-        <item quantity="other">%d months</item>
+        <item quantity="other">%d ወራት</item>
     </plurals>
     <plurals name="age_group_selection_age_in_years">
         <item quantity="one">%d year</item>
