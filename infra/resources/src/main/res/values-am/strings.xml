@@ -454,7 +454,7 @@
     </plurals>
     <plurals name="age_group_selection_age_in_years">
         <item quantity="one">%d year</item>
-        <item quantity="other">%d years</item>
+        <item quantity="other">%d አመታት</item>
     </plurals>
 
 </resources>
