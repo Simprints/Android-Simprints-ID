@@ -76,7 +76,11 @@ message ProtoFingerprintConfiguration {
         FingerComparisonStrategy comparison_strategy_for_verification = 3;
         optional ProtoVero2Configuration vero_2 = 4;
         optional ProtoVero1Configuration vero_1 = 5;
+        ProtoMaxCaptureAttempts max_capture_attempts = 6;
+    }
 
+    message ProtoMaxCaptureAttempts {
+        int32 no_finger_detected = 1;
     }
 }
 message ProtoVero1Configuration {

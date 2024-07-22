@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.local.models
 
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.MaxCaptureAttempts
 
 internal fun FingerprintConfiguration.toProto(): ProtoFingerprintConfiguration =
     ProtoFingerprintConfiguration.newBuilder()
@@ -59,6 +60,7 @@ internal fun ProtoFingerprintConfiguration.toDomainOld() = FingerprintConfigurat
         comparisonStrategyForVerification = comparisonStrategyForVerification.toDomain(),
         vero1 = vero1.toDomain(),
         vero2 = vero2.toDomain(),
+        maxCaptureAttempts = null
     ),
     nec = null,
     displayHandIcons = displayHandIcons,
@@ -82,13 +84,17 @@ internal fun ProtoFingerprintConfiguration.ProtoBioSdk.toDomain() = when (this) 
 
 internal fun ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.toDomain() =
     FingerprintConfiguration.FingerprintSdkConfiguration(
-        fingersToCaptureList.map { it.toDomain() },
-        decisionPolicy.toDomain(),
-        comparisonStrategyForVerification.toDomain(),
-        if (hasVero1()) vero1.toDomain() else null,
-        if (hasVero2()) vero2.toDomain() else null,
+        fingersToCapture = fingersToCaptureList.map { it.toDomain() },
+        decisionPolicy = decisionPolicy.toDomain(),
+        comparisonStrategyForVerification = comparisonStrategyForVerification.toDomain(),
+        vero1 = if (hasVero1()) vero1.toDomain() else null,
+        vero2 = if (hasVero2()) vero2.toDomain() else null,
+        maxCaptureAttempts = maxCaptureAttempts.toDomain()
     )
 
+internal fun ProtoFingerprintConfiguration.ProtoMaxCaptureAttempts.toDomain() = MaxCaptureAttempts(
+    noFingerDetected = noFingerDetected
+)
 
 internal fun ProtoFingerprintConfiguration.VeroGeneration.toDomain() = when (this) {
     ProtoFingerprintConfiguration.VeroGeneration.VERO_1 -> FingerprintConfiguration.VeroGeneration.VERO_1

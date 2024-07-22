@@ -27,6 +27,7 @@ import com.simprints.fingerprint.capture.state.ScanResult
 import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
+import com.simprints.fingerprint.capture.usecase.IsNoFingerDetectedLimitReachedUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -70,6 +71,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
     private val addCaptureEvents: AddCaptureEventsUseCase,
+    private val isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -532,7 +534,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         _vibrate.send()
         updateCaptureState(CaptureState::toNotDetected)
         addCaptureAndBiometricEventsInSession()
-        if(isNumberOfNoFingerDetectedReached(state.currentCaptureState())){
+        if (isNoFingerDetectedLimitReachedUseCase(state.currentCaptureState(), configuration)) {
             handleCaptureFinished()
         }
     }
@@ -555,19 +557,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun isTooManyBadScans(fingerState: CaptureState, plusBadScan: Boolean): Boolean {
         val isNumberOfBadScansReached = isNumberOfBadScansReached(fingerState, plusBadScan)
-        val isNumberOfNoFingerDetectedReached = isNumberOfNoFingerDetectedReached(fingerState)
+        val isNumberOfNoFingerDetectedReached =
+            isNoFingerDetectedLimitReachedUseCase(fingerState, configuration)
         return isNumberOfBadScansReached || isNumberOfNoFingerDetectedReached
-    }
-
-    private fun isNumberOfNoFingerDetectedReached(fingerState: CaptureState): Boolean {
-        val noFingerDetectedThreshold = configuration.secugenSimMatcher?.noFingerDetectedThreshold
-            ?: return false
-
-        val currentNumberOfNoFingerDetectedScans = when (fingerState) {
-            is CaptureState.ScanProcess -> fingerState.numberOfNoFingerDetectedScans
-            else -> 0
-        }
-        return noFingerDetectedThreshold > 0 && currentNumberOfNoFingerDetectedScans >= noFingerDetectedThreshold
     }
 
     private fun isNumberOfBadScansReached(fingerState: CaptureState, plusBadScan: Boolean) =
@@ -597,7 +589,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             captureState, plusBadScan = false
         ) || captureState.scanResult.isGoodScan())
         val isSkipped = captureState is CaptureState.Skipped
-        val isNotDetected = isNumberOfNoFingerDetectedReached(captureState)
+        val isNotDetected = isNoFingerDetectedLimitReachedUseCase(captureState, configuration)
         return isCollected || isSkipped || isNotDetected
     }
 
@@ -726,7 +718,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         const val targetNumberOfGoodScans = 2
         const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
-
         const val AUTO_SWIPE_DELAY: Long = 500
 
         const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000

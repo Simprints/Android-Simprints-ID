@@ -14,8 +14,10 @@ data class FingerprintConfiguration(
         val comparisonStrategyForVerification: FingerComparisonStrategy,
         val vero1: Vero1Configuration? = null,
         val vero2: Vero2Configuration? = null,
-        // [MS-491] Allowed amount of 'No Finger Detected' scans before proceeding further
-        val noFingerDetectedThreshold: Int? = null
+        /**
+         * Allowed amount of 'No Finger Detected' scans before proceeding further
+         */
+        val maxCaptureAttempts: MaxCaptureAttempts?
     )
 
     enum class VeroGeneration {
