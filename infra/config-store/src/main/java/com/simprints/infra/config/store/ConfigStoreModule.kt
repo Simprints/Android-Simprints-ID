@@ -7,6 +7,7 @@ import androidx.datastore.dataStoreFile
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceBioSdkMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFingerprintBioSdkMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigQualityThresholdMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration
@@ -70,7 +71,8 @@ object DataStoreModule {
         @ApplicationContext appContext: Context,
         projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration,
         projectConfigQualityThresholdMigration: ProjectConfigQualityThresholdMigration,
-        projectConfigFingerprintBioSdkMigration: ProjectConfigFingerprintBioSdkMigration
+        projectConfigFingerprintBioSdkMigration: ProjectConfigFingerprintBioSdkMigration,
+        projectConfigFaceBioSdkMigration: ProjectConfigFaceBioSdkMigration,
     ): DataStore<ProtoProjectConfiguration> {
         return DataStoreFactory.create(
             serializer = ProjectConfigurationSerializer,
@@ -78,7 +80,8 @@ object DataStoreModule {
             migrations = listOf(
                 projectConfigSharedPrefsMigration,
                 projectConfigQualityThresholdMigration,
-                projectConfigFingerprintBioSdkMigration
+                projectConfigFingerprintBioSdkMigration,
+                projectConfigFaceBioSdkMigration
             )
         )
     }
