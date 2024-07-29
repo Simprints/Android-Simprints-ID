@@ -41,8 +41,8 @@ internal class ConnectScannerViewModel @Inject constructor(
     private val saveScannerConnectionEvents: SaveScannerConnectionEventsUseCase,
 ) : ViewModel() {
 
-    private lateinit var allowedGenerations: List<FingerprintConfiguration.VeroGeneration>
     private lateinit var fingerprintSdk: FingerprintConfiguration.BioSdk
+    private var allowedGenerations: List<FingerprintConfiguration.VeroGeneration> = emptyList()
     private var remainingConnectionAttempts = 0
 
     val currentStep: LiveData<Step>
