@@ -22,7 +22,7 @@
     <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.</string>
     <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.</string>
     <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.</string>
-    <string name="consent_parental_confirmation">May I use your child\'s %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\"</string>
+    <string name="consent_parental_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\"</string>
     <string name="consent_biometrics_general_fingerprint">use your fingerprints</string>
     <string name="consent_biometric_general_face">take photographs of your face</string>
     <string name="consent_biometrics_access_fingerprint">fingerprint information</string>
