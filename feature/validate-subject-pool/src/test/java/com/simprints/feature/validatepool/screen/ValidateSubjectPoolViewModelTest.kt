@@ -3,7 +3,6 @@ package com.simprints.feature.validatepool.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
-import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
 import com.simprints.feature.validatepool.usecase.RunBlockingEventSyncUseCase
@@ -15,7 +14,9 @@ import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -185,5 +186,21 @@ class ValidateSubjectPoolViewModelTest {
             ValidateSubjectPoolState.Success,
         )
         coVerify(exactly = 1) { runBlockingSync() }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `checkIdentificationPool not re-validating another time when sync in progress`() = runTest {
+        val subjectQuery = SubjectQuery(projectId = "projectId")
+        coEvery { hasRecordsUseCase(subjectQuery) } returns true
+        coEvery { runBlockingSync() } coAnswers {
+            delay(1000)
+        }
+        viewModel.syncAndRetry(subjectQuery)
+
+        viewModel.checkIdentificationPool(subjectQuery)
+
+        advanceUntilIdle()
+        coVerify(exactly = 1) { hasRecordsUseCase(any()) }
     }
 }

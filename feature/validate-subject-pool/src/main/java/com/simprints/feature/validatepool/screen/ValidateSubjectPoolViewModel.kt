@@ -26,8 +26,12 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
     val state: LiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>
         get() = _state
     private var _state = MutableLiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>()
+    private var isSyncing: Boolean = false
 
     fun checkIdentificationPool(subjectQuery: SubjectQuery) = viewModelScope.launch {
+        if (isSyncing) {
+            return@launch
+        }
         _state.send(ValidateSubjectPoolState.Validating)
 
         val validationState = when {
@@ -43,7 +47,9 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
 
     fun syncAndRetry(subjectQuery: SubjectQuery) = viewModelScope.launch {
         _state.send(ValidateSubjectPoolState.SyncInProgress)
+        isSyncing = true
         runBlockingSync()
+        isSyncing = false
         checkIdentificationPool(subjectQuery)
     }
 
