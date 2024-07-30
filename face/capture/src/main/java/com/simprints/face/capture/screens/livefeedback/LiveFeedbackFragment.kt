@@ -104,7 +104,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = lifecycleScope.launch {
-        if (::cameraExecutor.isInitialized) {
+        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             return@launch
         }
         // Initialize our background executor
@@ -118,6 +118,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         // Preview
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
         val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
+        cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(
             this@LiveFeedbackFragment, DEFAULT_BACK_CAMERA, preview, imageAnalyzer
         )
