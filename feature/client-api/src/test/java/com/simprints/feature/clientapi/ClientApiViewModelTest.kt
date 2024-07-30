@@ -169,6 +169,7 @@ internal class ClientApiViewModelTest {
 
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
+            simpleEventReporter.closeCurrentSessionNormally()
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.ConfirmActionResponse }) }

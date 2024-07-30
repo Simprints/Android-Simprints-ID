@@ -135,6 +135,7 @@ class ClientApiViewModel @Inject internal constructor(
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
+        simpleEventReporter.closeCurrentSessionNormally()
 
         deleteSessionEventsIfNeeded(currentSessionId)
 
