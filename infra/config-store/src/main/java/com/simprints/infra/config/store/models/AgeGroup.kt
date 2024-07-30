@@ -1,11 +1,12 @@
 package com.simprints.infra.config.store.models
 
+import java.io.Serializable
+
 data class AgeGroup(
     val startInclusive: Int,
     val endExclusive: Int?,
-) {
-    fun isEmpty(): Boolean =
-        startInclusive == 0 && (endExclusive == null || endExclusive == 0)
+) : Serializable {
+    fun isEmpty() = startInclusive == 0 && (endExclusive == null || endExclusive == 0)
 
     fun includes(age: Int): Boolean {
         val endExclusive = endExclusive ?: Int.MAX_VALUE
