@@ -9,9 +9,5 @@ data class ApiAllowedAgeRange(
     val endExclusive: Int?,
 ) {
 
-    fun toDomain() =
-        // When allowedAgeRange is disabled the API returns an empty object
-        // which is then parsed as {null, null}
-        if (startInclusive == null && endExclusive == null) null
-        else AgeGroup(startInclusive ?: 0, endExclusive)
+    fun toDomain() = AgeGroup(startInclusive ?: 0, endExclusive)
 }

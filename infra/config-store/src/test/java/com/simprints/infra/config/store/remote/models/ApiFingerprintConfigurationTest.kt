@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.remote.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero1Configuration
@@ -15,6 +16,21 @@ class ApiFingerprintConfigurationTest {
     @Test
     fun `should map correctly the model`() {
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
+    }
+
+    @Test
+    fun `should map correctly the model with allowedAgeRange null`() {
+        val apiFingerprintConfigurationWithAgeRange = apiFingerprintConfiguration.copy(
+            secugenSimMatcher = apiFingerprintConfiguration.secugenSimMatcher?.copy(
+                allowedAgeRange = null
+            )
+        )
+        val fingerprintConfigurationWithAgeRange = fingerprintConfiguration.copy(
+            secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
+                allowedAgeRange = AgeGroup(0, null)
+            )
+        )
+        assertThat(apiFingerprintConfigurationWithAgeRange.toDomain()).isEqualTo(fingerprintConfigurationWithAgeRange)
     }
 
     @Test

@@ -117,7 +117,7 @@ internal val rankOneConfiguration = FaceSdkConfiguration(
     qualityThreshold = -1,
     imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
     decisionPolicy = decisionPolicy,
-    allowedAgeRange = null,
+    allowedAgeRange = AgeGroup(0, null),
     verificationMatchThreshold = null,
     version = "1.0"
 )
@@ -147,6 +147,7 @@ internal val protoFaceConfiguration = ProtoFaceConfiguration.newBuilder()
             .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
             .setDecisionPolicy(protoDecisionPolicy)
             .setVersion("1.0")
+            .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
             .build()
     )
     .build()

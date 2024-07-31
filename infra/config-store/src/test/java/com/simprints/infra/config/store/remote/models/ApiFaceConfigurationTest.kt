@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.remote.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.testtools.apiFaceConfiguration
 import com.simprints.infra.config.store.testtools.faceConfiguration
@@ -11,6 +12,21 @@ class ApiFaceConfigurationTest {
     @Test
     fun `should map correctly the model`() {
         assertThat(apiFaceConfiguration.toDomain()).isEqualTo(faceConfiguration)
+    }
+
+    @Test
+    fun `should map correctly the model with allowedAgeRange present`() {
+        val apiFaceConfigurationWithAgeRange = apiFaceConfiguration.copy(
+            rankOne = apiFaceConfiguration.rankOne.copy(
+                allowedAgeRange = ApiAllowedAgeRange(10, 20)
+            )
+        )
+        val faceConfigurationWithAgeRange = faceConfiguration.copy(
+            rankOne = faceConfiguration.rankOne!!.copy(
+                allowedAgeRange = AgeGroup(10, 20)
+            )
+        )
+        assertThat(apiFaceConfigurationWithAgeRange.toDomain()).isEqualTo(faceConfigurationWithAgeRange)
     }
 
     @Test

@@ -60,7 +60,7 @@ class BuildStepsUseCaseTest {
             Finger.LEFT_THUMB,
             Finger.RIGHT_THUMB,
         )
-        every { secugenSimMatcher.allowedAgeRange } returns null
+        every { secugenSimMatcher.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.secugenSimMatcher } returns secugenSimMatcher
         every { projectConfiguration.fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER) } returns secugenSimMatcher
 
@@ -68,7 +68,7 @@ class BuildStepsUseCaseTest {
             Finger.LEFT_INDEX_FINGER,
             Finger.RIGHT_INDEX_FINGER,
         )
-        every { nec.allowedAgeRange } returns null
+        every { nec.allowedAgeRange } returns AgeGroup(0, null)
         every { projectConfiguration.fingerprint?.nec } returns nec
         every { projectConfiguration.fingerprint?.getSdkConfiguration(NEC) } returns nec
 
