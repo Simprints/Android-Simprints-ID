@@ -20,10 +20,10 @@ internal fun FingerprintConfiguration.FingerprintSdkConfiguration.toProto() =
         .addAllFingersToCapture(fingersToCapture.map { it.toProto() })
         .setDecisionPolicy(decisionPolicy.toProto())
         .setComparisonStrategyForVerification(comparisonStrategyForVerification.toProto())
+        .setAllowedAgeRange(allowedAgeRange.toProto())
         .also {
             if (vero1 != null) it.vero1 = vero1.toProto()
             if (vero2 != null) it.vero2 = vero2.toProto()
-            if (allowedAgeRange != null) it.allowedAgeRange = allowedAgeRange.toProto()
             if (verificationMatchThreshold != null) it.verificationMatchThreshold = verificationMatchThreshold
         }.build()
 
@@ -85,13 +85,13 @@ internal fun ProtoFingerprintConfiguration.ProtoBioSdk.toDomain() = when (this) 
 
 internal fun ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.toDomain() =
     FingerprintConfiguration.FingerprintSdkConfiguration(
-        fingersToCaptureList.map { it.toDomain() },
-        decisionPolicy.toDomain(),
-        comparisonStrategyForVerification.toDomain(),
-        if (hasVero1()) vero1.toDomain() else null,
-        if (hasVero2()) vero2.toDomain() else null,
-        if (hasAllowedAgeRange()) allowedAgeRange.toDomain() else null,
-        if (hasVerificationMatchThreshold()) verificationMatchThreshold else null,
+        fingersToCapture = fingersToCaptureList.map { it.toDomain() },
+        decisionPolicy = decisionPolicy.toDomain(),
+        comparisonStrategyForVerification = comparisonStrategyForVerification.toDomain(),
+        vero1 = if (hasVero1()) vero1.toDomain() else null,
+        vero2 = if (hasVero2()) vero2.toDomain() else null,
+        allowedAgeRange = if (hasAllowedAgeRange()) allowedAgeRange.toDomain() else AgeGroup(0, null),
+        verificationMatchThreshold = if (hasVerificationMatchThreshold()) verificationMatchThreshold else null,
     )
 
 

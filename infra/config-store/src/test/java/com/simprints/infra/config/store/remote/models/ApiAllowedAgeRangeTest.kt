@@ -14,10 +14,11 @@ class ApiAllowedAgeRangeTest {
     }
 
     @Test
-    fun `should return null when startInclusive and endExclusive are null`() {
+    fun `should return empty range when startInclusive and endExclusive are null`() {
         val apiAllowedAgeRange = ApiAllowedAgeRange(null, null)
+        val expectedAgeGroup = AgeGroup(0, null)
 
-        assertThat(apiAllowedAgeRange.toDomain()).isNull()
+        assertThat(apiAllowedAgeRange.toDomain()).isEqualTo(expectedAgeGroup)
     }
 
     @Test

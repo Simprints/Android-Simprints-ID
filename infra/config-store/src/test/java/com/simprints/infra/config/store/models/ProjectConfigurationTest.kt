@@ -269,38 +269,12 @@ class ProjectConfigurationTest {
     }
 
     @Test
-    fun `allowedAgeRanges does not return empty age ranges`() {
-        val faceAgeRange = AgeGroup(10, 20)
-        val emptyAgeRange = AgeGroup(0, 0)
-
-        val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(
-                rankOne = faceConfiguration.rankOne?.copy(
-                    allowedAgeRange = faceAgeRange
-                )
-            ),
-            fingerprint = fingerprintConfiguration.copy(
-                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
-                    allowedAgeRange = emptyAgeRange
-                ),
-                nec = null
-            )
-        )
-
-        // Act
-        val result = projectConfiguration.allowedAgeRanges()
-
-        // Assert
-        assertThat(result).containsExactly(faceAgeRange)
-    }
-
-    @Test
-    fun `isAgeRestricted should return false when all are null`() {
+    fun `isAgeRestricted should return false when all are empty`() {
         // Arrange
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = null)),
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = AgeGroup(0, null))),
             fingerprint = fingerprintConfiguration.copy(
-                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = null),
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = AgeGroup(0, null)),
                 nec = null
             )
         )
@@ -351,5 +325,140 @@ class ProjectConfigurationTest {
 
         // Assert
         assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `sortedUniqueAgeGroups should return (0, null) when all age groups are empty`() {
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = null),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = null,
+                nec = null
+            )
+        )
+
+        val result = projectConfiguration.sortedUniqueAgeGroups()
+        val expected = listOf(AgeGroup(0, null))
+
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `sortedUniqueAgeGroups should return a sorted list of unique age groups when there are no overlapping age groups`() {
+        val faceAgeRange = AgeGroup(10, 20)
+        val secugenSimMatcherAgeRange = AgeGroup(20, 30)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
+                nec = null
+            )
+        )
+
+        val result = projectConfiguration.sortedUniqueAgeGroups()
+        val expected = listOf(
+            AgeGroup(0, faceAgeRange.startInclusive),
+            faceAgeRange,
+            secugenSimMatcherAgeRange,
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+        )
+
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `sortedUniqueAgeGroups should handle overlapping age groups correctly`() {
+        val faceAgeRange = AgeGroup(10, 20)
+        val secugenSimMatcherAgeRange = AgeGroup(15, 30)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
+                nec = null
+            )
+        )
+
+        val result = projectConfiguration.sortedUniqueAgeGroups()
+        val expected = listOf(
+            AgeGroup(0, faceAgeRange.startInclusive),
+            AgeGroup(faceAgeRange.startInclusive, secugenSimMatcherAgeRange.startInclusive),
+            AgeGroup(secugenSimMatcherAgeRange.startInclusive, faceAgeRange.endExclusive),
+            AgeGroup(faceAgeRange.endExclusive!!, secugenSimMatcherAgeRange.endExclusive!!),
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+        )
+
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `sortedUniqueAgeGroups should remove duplicates and sort the age groups correctly`() {
+        val faceAgeRange = AgeGroup(10, 20)
+        val duplicateAgeRange = AgeGroup(10, 20)
+        val secugenSimMatcherAgeRange = AgeGroup(20, 30)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
+                nec = fingerprintConfiguration.nec?.copy(allowedAgeRange = duplicateAgeRange)
+            )
+        )
+
+        val result = projectConfiguration.sortedUniqueAgeGroups()
+        val expected = listOf(
+            AgeGroup(0, faceAgeRange.startInclusive),
+            faceAgeRange,
+            secugenSimMatcherAgeRange,
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+        )
+
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `sortedUniqueAgeGroups should handle correctly a mix of restricted and unrestricted SDKs`() {
+        val faceAgeRange = AgeGroup(0, null)
+        val secugenSimMatcherAgeRange = AgeGroup(20, 30)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
+                nec = null
+            )
+        )
+
+        val result = projectConfiguration.sortedUniqueAgeGroups()
+        val expected = listOf(
+            AgeGroup(0, secugenSimMatcherAgeRange.startInclusive),
+            secugenSimMatcherAgeRange,
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+        )
+
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `sortedUniqueAgeGroups should handle correctly overlapping null end ranges`() {
+        val faceAgeRange = AgeGroup(0, null)
+        val secugenSimMatcherAgeRange = AgeGroup(20, null)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
+                nec = null
+            )
+        )
+
+        val result = projectConfiguration.sortedUniqueAgeGroups()
+        val expected = listOf(
+            AgeGroup(0, secugenSimMatcherAgeRange.startInclusive),
+            secugenSimMatcherAgeRange,
+        )
+
+        assertThat(result).isEqualTo(expected)
     }
 }

@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
@@ -13,6 +14,20 @@ class FingerprintConfigurationTest {
     fun `should map correctly the model`() {
         assertThat(protoFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
         assertThat(fingerprintConfiguration.toProto()).isEqualTo(protoFingerprintConfiguration)
+    }
+
+    @Test
+    fun `should map correctly the model with allowedAgeRange missing`() {
+        val protoFingerprintConfigurationWithoutAgeRange = protoFingerprintConfiguration.toBuilder()
+            .setSecugenSimMatcher(protoFingerprintConfiguration.secugenSimMatcher.toBuilder().clearAllowedAgeRange())
+            .build()
+        val fingerprintConfigurationWithoutAgeRange = fingerprintConfiguration.copy(
+            secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
+                allowedAgeRange = AgeGroup(0, null)
+            )
+        )
+
+        assertThat(protoFingerprintConfigurationWithoutAgeRange.toDomain()).isEqualTo(fingerprintConfigurationWithoutAgeRange)
     }
 
     @Test

@@ -15,6 +15,15 @@ class FaceConfigurationTest {
     }
 
     @Test
+    fun `should map correctly the model with allowedAgeRange missing`() {
+        val protoFaceConfigurationWithoutAgeRange = protoFaceConfiguration.toBuilder()
+            .setRankOne(protoFaceConfiguration.rankOne.toBuilder().clearAllowedAgeRange())
+            .build()
+
+        assertThat(protoFaceConfigurationWithoutAgeRange.toDomain()).isEqualTo(faceConfiguration)
+    }
+
+    @Test
     fun `should map correctly the ImageSavingStrategy enums`() {
         val mapping = mapOf(
             ProtoFaceConfiguration.ImageSavingStrategy.NEVER to FaceConfiguration.ImageSavingStrategy.NEVER,

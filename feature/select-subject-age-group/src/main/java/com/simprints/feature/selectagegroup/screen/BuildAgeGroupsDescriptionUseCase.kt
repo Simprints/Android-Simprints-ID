@@ -3,7 +3,7 @@ package com.simprints.feature.selectagegroup.screen
 import android.content.Context
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.AgeGroup
-import com.simprints.infra.config.store.models.allowedAgeRanges
+import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -19,26 +19,10 @@ internal class BuildAgeGroupsDescriptionUseCase @Inject constructor(
      * it also adds a 0-<first age range> and <last age range>-above if they are not present
      */
     suspend operator fun invoke(): List<AgeGroupDisplayModel> {
-        val allowedAgeRanges = configurationRepo.getProjectConfiguration().allowedAgeRanges()
-        val processedAgeRanges = generateSortedUniqueAgeGroups(allowedAgeRanges)
+        val processedAgeRanges = configurationRepo.getProjectConfiguration().sortedUniqueAgeGroups()
         return processedAgeRanges.map { ageGroup ->
             AgeGroupDisplayModel(ageGroup.getDisplayName(), ageGroup)
         }
-    }
-
-    private fun generateSortedUniqueAgeGroups(ageGroups: List<AgeGroup>): List<AgeGroup> {
-        // Handle empty list case by returning a single age group starting at 0 and ending with null
-        if (ageGroups.isEmpty()) return listOf(AgeGroup(0, null))
-
-        // Flatten all start and end ages into a single list, removing nulls, duplicates, and sorting.
-        var sortedUniqueAges =
-            ageGroups.flatMap { listOf(it.startInclusive, it.endExclusive) }.filterNotNull()
-        // Ensure the first age group starts at 0
-        sortedUniqueAges = (listOf(0) + sortedUniqueAges).sorted().distinct()
-        // Create age groups based on sorted unique ages
-        return sortedUniqueAges.zipWithNext { start, end -> AgeGroup(start, end) } + AgeGroup(
-            sortedUniqueAges.last(), null
-        )
     }
 
     // Helper function to convert months to readable format
