@@ -19,6 +19,7 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         closeAllSessions(EventScopeEndCause.NEW_SESSION)
         return eventRepository.createEventScope(EventScopeType.SESSION).also { sessionScope ->
             sessionDataCache.eventScope = sessionScope
+            sessionDataCache.eventCache.clear()
         }
     }
 
@@ -81,9 +82,9 @@ internal class SessionEventRepositoryImpl @Inject constructor(
             ?.also { session -> loadEventsIntoCache(session.id) }
 
     private suspend fun loadEventsIntoCache(sessionId: String) {
-        eventRepository.getEventsFromScope(sessionId).forEach {
-            sessionDataCache.eventCache[it.id] = it
-        }
+        sessionDataCache.eventCache.clear()
+        eventRepository.getEventsFromScope(sessionId)
+            .forEach { sessionDataCache.eventCache[it.id] = it }
     }
 
     override suspend fun closeCurrentSession(reason: EventScopeEndCause?) {
