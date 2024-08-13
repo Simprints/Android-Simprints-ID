@@ -27,8 +27,8 @@ import com.simprints.infra.license.determineLicenseStatus
 import com.simprints.infra.license.remote.License
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.mlkitwrapper.initialization.EdgeFaceInitializer
-import com.simprints.infra.mlkitwrapper.initialization.FaceNetInitializer
+import com.simprints.infra.mlkitwrapper.models.edgeface.EdgeFaceInitializer
+import com.simprints.infra.mlkitwrapper.models.facenet.FaceNetInitializer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.last

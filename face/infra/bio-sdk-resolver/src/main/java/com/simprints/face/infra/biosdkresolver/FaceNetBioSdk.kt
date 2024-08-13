@@ -1,8 +1,8 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.simprints.infra.mlkitwrapper.detection.MlKitDetector
-import com.simprints.infra.mlkitwrapper.initialization.FaceNetInitializer
 import com.simprints.infra.mlkitwrapper.matching.MlKitMatcher
+import com.simprints.infra.mlkitwrapper.models.facenet.FaceNetInitializer
 import javax.inject.Inject
 import javax.inject.Singleton
 
