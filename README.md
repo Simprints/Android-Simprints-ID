@@ -112,7 +112,7 @@ Replace `<your-github-username>` and `<the-token-you-just-created>` with your ac
 
 For security reasons, some files are not included in the repository. You must download them separately:
 
-1. Download the necessary files from the internal [Google Drive](https://drive.google.com/drive/u/0/folders/19TVXD9m3-qME6N2Yqt8ND6ppPt3uYsN_). **Note:** This link is accessible to Simprints employees only.
+1. Download the necessary files from the internal [SID Development Resources folder](https://drive.google.com/drive/folders/1OLrGhx3AW91ab2zduy8FzNuE5r5VEs7g?usp=drive_link). **Note:** This link is accessible to Simprints employees only.
 2. Place the downloaded files as follows:
    - `signing_info.gradle.kts`: Place this in the `build-logic` directory.
    - `debug.keystore`: Place this in the root directory of the project.
