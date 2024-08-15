@@ -9,7 +9,7 @@ import java.util.TimeZone
 
 
 private fun License.isExpired(): Boolean {
-    if (expiration.isEmpty()) return false
+    if (expiration.isNullOrEmpty()) return false
 
     val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
     format.timeZone = TimeZone.getTimeZone("UTC")

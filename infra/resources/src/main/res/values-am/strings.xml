@@ -66,6 +66,7 @@
     <string name="exit_form_reason_scanner_not_working">ስካነር አይሰራም</string>
     <string name="exit_form_reason_person_not_present">ተጠቃሚው አልተገኝም</string>
     <string name="exit_form_reason_too_young">ጨቅላ</string>
+    <string name="exit_form_reason_wrong_age_group_selected">ልክ ያልሆነ የእድሜ ክልል ተመርጧል</string>
     <string name="exit_form_reason_other">ተጨማሪ</string>
 
     <!-- Fetch subject -->
@@ -86,7 +87,7 @@
     <string name="login_qr_code_scanning_camera_unavailable_error">ካሜራዉን ለማብራት ችግር አጋጥሟል፤ እባክዎ የሲስተም አስተዳደር ያሳዉቁ</string>
     <string name="login_invalid_qr_code_error">እስካን የተደረገው የፈጣን ምላሽ ሚስጥር ቁጥር ትክክል አይደለም</string>
     <string name="login_missing_credentials_error">ተጠቃሚው ተዘሏል ፡ እባክዎ የተጠቃሚውን መለያ ቁጥር ፡ የፕሮጀክት ቁጥር እና ቁልፍ በማረጋገጥ እንደገና ይሞክሩ፡፡</string>
-    <string name="login_invalid_credentials_error">ትክክል ያልሆነ ተጠቃሚ ነው ፡ እባክዎ የፕሮጀክት ቁጥር እና ቁልፍ ያረጋግጡ፡፡</string>
+    <string name="login_invalid_credentials_error">የ log in ስህተት፤እባክዎ ፕሮጀክቱን ቼክ ያድርጉ</string>
     <string name="login_project_id_intent_mismatch_error">የፕሮጀክት ቁጥሩ አቅራቢው ውስጥ ካለው ዝርዝር ጋር የተለየ ነው፡ እብክዎት የስስተም አስተዳዳሪውን ያነጋግሩ፡፡</string>
     <string name="login_no_network_error">አሁን ከግንኙነት ውጭ ነዎት፡ እባክዎት የኢንተርኔት ግንኙነቱን መኖሩን ያረጋግጡ</string>
     <string name="login_integrity_service_down_error"> የ Integrity Service. ስህተት አጋጥሟል.  እባክዎ እንደገና ይሞክሩ </string>
@@ -123,6 +124,8 @@
         <item quantity="one">%d ተመራጭ</item>
         <item quantity="other">%d ተዛምዶ</item>
     </plurals>
+    <string name="matcher_missing_access_permission">በመረጃ መሰብሰቢያው መተግበሪያ፤መረጃዉን ለማግኘት ፈቃድ ያስፈልጋል፤</string>
+    <string name="matcher_grant_permission_action">ፍቃድ ስጥ</string>
 
     <!-- Orchestrator -->
     <string name="orchestrator_generic_error_title">ስህተት ኣጋጥሟል</string>
@@ -183,7 +186,8 @@
     <string name="face_capture_error_look_straight">ሰዉየዉ ቀጥታ ካሜራዉን እንዲያይ አድርግ</string>
     <string name="face_capture_begin_button">ለማንሳት ተጫን</string>
     <string name="face_capture_prep_begin_button_capturing">በማንሳት ላይ....</string>
-    <string name="face_capture_permission_denied">እባክዎ የካሜራ ፍቃድ ያብሩ</string>
+    <string name="face_capture_permission_denied">የካሜራ ፍቃድ ስጥ</string>
+    <string name="face_capture_permission_action">ፍቃድ ስጥ</string>
     <string name="face_capture_hold">ባለበት ፖዚሽኑ ላይ አቆይ....</string>
     <string name="face_capture_successfully_title">የፊት ምስል በስኬት ተመዝግቧል</string>
     <string name="face_capture_confirmation_title">ማረጋገጥ</string>
@@ -428,5 +432,29 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">ሲንክ በማድረግ ላይ</string>
+
+    <!-- Identification pool validation -->
+    <string name="id_pool_validation_issue_title">የመለየት ችግር</string>
+    <string name="id_pool_validation_default_message">የልየታ እጩዎችን በማጣራት ላይ</string>
+    <string name="id_pool_validation_user_mismatch_message">የተጠቃሚው መለያ እና ሲንከ የተደረገው መረጃ አልተመሳሰለም</string>
+    <string name="id_pool_validation_module_mismatch_message">ሞጁሉ መለያ ሲንክ ከተደረገው መረጃ ጋር አልተመሳሰለም</string>
+    <string name="id_pool_validation_sync_required_message">መረጃው በቅርቡ አልተላከም</string>
+    <string name="id_pool_validation_syncing_message">ሲንክ በማድረግ ላይ</string>
+    <string name="id_pool_validation_pool_empty_message">ስልኩ ላይ ምንም መረጃ የለም</string>
+    <string name="id_pool_validation_action_close">ዝጋ</string>
+    <string name="id_pool_validation_action_sync">ሲንከ አድርግና እና እንደገና ሞክር</string>
+
+    <!-- Age group selection -->
+    <string name="age_group_selection_title">የተጠቃሚውን የእድሜ ክልል ምረጥ</string>
+    <string name="age_group_selection_age_range_to">ወደ</string>
+    <string name="age_group_selection_age_range_and_above">እና በላይ</string>
+    <plurals name="age_group_selection_age_in_months">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="age_group_selection_age_in_years">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
 
 </resources>

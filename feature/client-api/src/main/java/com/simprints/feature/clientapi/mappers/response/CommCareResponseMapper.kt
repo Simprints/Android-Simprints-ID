@@ -16,7 +16,7 @@ internal class CommCareResponseMapper @Inject constructor() {
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
             CommCareConstants.REGISTRATION_GUID_KEY to response.enrolledGuid,
-        ).appendCoSyncData(response.eventsJson, response.subjectActions).toCommCareBundle()
+        ).appendCoSyncData(response.subjectActions).toCommCareBundle()
 
         /**
          * CommCare expects Identification result as ParcelableArrayList containing Identification
@@ -30,12 +30,12 @@ internal class CommCareResponseMapper @Inject constructor() {
                     Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
                 }
             )
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
-        ).appendCoSyncData(response.eventsJson).toCommCareBundle()
+        ).toCommCareBundle()
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -43,23 +43,26 @@ internal class CommCareResponseMapper @Inject constructor() {
             CommCareConstants.VERIFICATION_GUID_KEY to response.matchResult.guid,
             CommCareConstants.VERIFICATION_CONFIDENCE_KEY to response.matchResult.confidenceScore.toString(),
             CommCareConstants.VERIFICATION_TIER_KEY to response.matchResult.tier.name,
-        ).appendCoSyncData(response.eventsJson).toCommCareBundle()
+        ).also {
+            response.matchResult.verificationSuccess?.let { verificationSuccess ->
+                it.putString(CommCareConstants.VERIFICATION_SUCCESS_KEY, verificationSuccess.toString())
+            }
+        }.toCommCareBundle()
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
             CommCareConstants.EXIT_REASON to response.reason,
             CommCareConstants.EXIT_EXTRA to response.extraText,
-        ).appendCoSyncData(response.eventsJson).toCommCareBundle()
+        ).toCommCareBundle()
 
         is ActionResponse.ErrorActionResponse -> bundleOf(
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to response.flowCompleted.toString(),
-        ).appendCoSyncData(response.eventsJson).toCommCareBundle()
+        ).toCommCareBundle()
     }
 
-    private fun Bundle.appendCoSyncData(events: String?, actions: String? = null) = apply {
-        events?.let { putString(Constants.SIMPRINTS_COSYNC_EVENT, it) }
+    private fun Bundle.appendCoSyncData(actions: String?) = apply {
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 

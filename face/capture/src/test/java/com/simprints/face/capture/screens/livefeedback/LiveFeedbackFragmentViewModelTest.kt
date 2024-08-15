@@ -12,9 +12,10 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
+import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.facebiosdk.detection.Face
-import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations
@@ -23,6 +24,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -79,13 +81,15 @@ internal class LiveFeedbackFragmentViewModelTest {
         justRun { frame.close() }
         justRun { previewFrame.recycle() }
         every { frameProcessor.cropRotateFrame(frame, screenOrientation) } returns previewFrame
+        val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
+            coEvery { this@mockk.invoke() } returns mockk {
+                every { detector } returns faceDetector
+            }
+        }
+
 
         viewModel = LiveFeedbackFragmentViewModel(
-            frameProcessor,
-            faceDetector,
-            configManager,
-            eventReporter,
-            timeHelper
+            frameProcessor, resolveFaceBioSdkUseCase, configManager, eventReporter, timeHelper
         )
     }
 

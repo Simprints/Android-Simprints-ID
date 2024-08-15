@@ -645,20 +645,32 @@ class ProjectConfigSharedPrefsMigrationTest {
                 "{\"FaceMatchThreshold\":30, \"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
             )
         private val PROTO_FACE_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
-            .setNbOfImagesToCapture(2)
-            .setQualityThreshold(-1)
-            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
+            .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+            .setRankOne(
+                ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
+                    .setNbOfImagesToCapture(2)
+                    .setQualityThreshold(-1)
+                    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
+                    .setDecisionPolicy(
+                        ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
+                    )
+                    .setVersion("1.23")
+                    .build()
             )
             .build()
 
         private val PROTO_FACE_DEFAULT_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
-            .setNbOfImagesToCapture(2)
-            .setQualityThreshold(-1)
-            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
+            .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+            .setRankOne(
+                ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
+                    .setNbOfImagesToCapture(2)
+                    .setQualityThreshold(-1)
+                    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
+                    .setDecisionPolicy(
+                        ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
+                    )
+                    .setVersion("1.23")
+                    .build()
             )
             .build()
 

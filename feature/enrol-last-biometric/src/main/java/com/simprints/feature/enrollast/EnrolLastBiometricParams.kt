@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import kotlinx.parcelize.Parcelize
 
 @Keep
@@ -23,7 +24,10 @@ sealed class EnrolLastBiometricStepResult : Parcelable {
 
     @Keep
     @Parcelize
-    data class FingerprintMatchResult(val results: List<MatchResult>) : EnrolLastBiometricStepResult()
+    data class FingerprintMatchResult(
+        val results: List<MatchResult>,
+        val sdk: FingerprintConfiguration.BioSdk,
+    ) : EnrolLastBiometricStepResult()
 
     @Keep
     @Parcelize

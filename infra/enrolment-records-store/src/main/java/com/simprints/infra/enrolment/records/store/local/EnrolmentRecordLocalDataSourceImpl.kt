@@ -1,5 +1,6 @@
 package com.simprints.infra.enrolment.records.store.local
 
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
@@ -33,6 +34,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         const val IS_ATTENDANT_ID_TOKENIZED_FIELD = "isAttendantIdTokenized"
         const val IS_MODULE_ID_TOKENIZED_FIELD = "isModuleIdTokenized"
         const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
+        const val FACE_SAMPLES_FIELD = "faceSamples"
         const val FORMAT_FIELD = "format"
     }
 
@@ -45,6 +47,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
+        dataSource: BiometricDataSource,
     ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
         realm.query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -60,6 +63,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
+        dataSource: BiometricDataSource,
     ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
         realm.query(DbSubject::class)
             .buildRealmQueryForSubject(query)
@@ -86,7 +90,10 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun count(query: SubjectQuery): Int = realmWrapper.readRealm { realm ->
+    override suspend fun count(
+        query: SubjectQuery,
+        dataSource: BiometricDataSource,
+    ): Int = realmWrapper.readRealm { realm ->
         realm.query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .count()
@@ -154,6 +161,12 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             realmQuery = realmQuery.query(
                 "ANY $FINGERPRINT_SAMPLES_FIELD.$FORMAT_FIELD == $0",
                 query.fingerprintSampleFormat
+            )
+        }
+        if (query.faceSampleFormat != null) {
+            realmQuery = realmQuery.query(
+                "ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $0",
+                query.faceSampleFormat
             )
         }
         if (query.afterSubjectId != null) {

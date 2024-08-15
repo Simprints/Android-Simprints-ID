@@ -15,16 +15,20 @@ internal class FingerSelectionViewModel @Inject constructor(
     private val configManager: ConfigManager,
 ) : ViewModel() {
 
-    val fingerSelections: LiveData<List<FingerSelectionItem>>
+    val fingerSelections: LiveData<List<FingerSelectionSection>>
         get() = _fingerSelections
-    private val _fingerSelections = MutableLiveData<List<FingerSelectionItem>>()
+    private val _fingerSelections = MutableLiveData<List<FingerSelectionSection>>()
 
     fun start() {
         viewModelScope.launch {
-            _fingerSelections.postValue(
-                configManager.getProjectConfiguration().fingerprint!!.bioSdkConfiguration.fingersToCapture
-                    .toFingerSelectionItems()
-            )
+            val fingerSelections = mutableListOf<FingerSelectionSection>()
+            configManager.getProjectConfiguration().fingerprint?.secugenSimMatcher?.fingersToCapture?.let {
+                fingerSelections.add(FingerSelectionSection("SimMatcher", it.toFingerSelectionItems()))
+            }
+            configManager.getProjectConfiguration().fingerprint?.nec?.fingersToCapture?.let {
+                fingerSelections.add(FingerSelectionSection("NEC", it.toFingerSelectionItems()))
+            }
+            _fingerSelections.postValue(fingerSelections)
         }
     }
 
@@ -44,6 +48,11 @@ internal class FingerSelectionViewModel @Inject constructor(
         return result
     }
 }
+
+data class FingerSelectionSection(
+    val sdkName: String,
+    val items: List<FingerSelectionItem>
+)
 
 data class FingerSelectionItem(
     var finger: Finger,

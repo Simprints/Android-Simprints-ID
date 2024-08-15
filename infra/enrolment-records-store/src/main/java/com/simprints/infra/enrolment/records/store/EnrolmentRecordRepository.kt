@@ -13,20 +13,20 @@ interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
     suspend fun uploadRecords(subjectIds: List<String>)
     suspend fun tokenizeExistingRecords(project: Project)
 
-    suspend fun count(
-        query: SubjectQuery = SubjectQuery(),
-        dataSource: BiometricDataSource = BiometricDataSource.SIMPRINTS
+    override suspend fun count(
+        query: SubjectQuery,
+        dataSource: BiometricDataSource,
     ): Int
 
-    suspend fun loadFingerprintIdentities(
+    override  suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.SIMPRINTS
+        dataSource: BiometricDataSource,
     ): List<FingerprintIdentity>
 
-    suspend fun loadFaceIdentities(
+    override  suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.SIMPRINTS
+        dataSource: BiometricDataSource,
     ): List<FaceIdentity>
 }

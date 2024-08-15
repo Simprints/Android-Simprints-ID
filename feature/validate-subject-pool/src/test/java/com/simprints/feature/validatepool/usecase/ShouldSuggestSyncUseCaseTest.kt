@@ -51,6 +51,17 @@ class ShouldSuggestSyncUseCaseTest {
     }
 
     @Test
+    fun `returns true if not synced recently with non ISO max age`() = runTest {
+        coEvery { syncManager.getLastSyncTime() } returns Date()
+        coEvery { timeHelper.msBetweenNowAndTime(any()) } returns WEEK_MS
+        coEvery {
+            configRepository.getProjectConfiguration().synchronization.down.maxAge
+        } returns "24h0m0s"
+
+        assertThat(usecase()).isTrue()
+    }
+
+    @Test
     fun `returns false if synced recently`() = runTest {
         coEvery { syncManager.getLastSyncTime() } returns Date()
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns HOUR_MS

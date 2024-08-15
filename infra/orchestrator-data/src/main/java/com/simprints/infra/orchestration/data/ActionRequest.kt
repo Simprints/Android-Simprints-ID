@@ -3,9 +3,11 @@ package com.simprints.infra.orchestration.data
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.tokenization.TokenizableString
 import java.io.Serializable
 
+@ExcludedFromGeneratedTestCoverageReports("This is a simple data class")
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
@@ -25,6 +27,14 @@ sealed class ActionRequest(
     open val unknownExtras: Map<String, Any?>,
 ) : Serializable {
 
+    fun getSubjectAgeIfAvailable(): Int? =
+        when (this) {
+            is EnrolActionRequest -> subjectAge
+            is IdentifyActionRequest -> subjectAge
+            is VerifyActionRequest ->subjectAge
+            else -> null
+        }
+
     @Keep
     data class EnrolActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
@@ -32,6 +42,8 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val biometricDataSource: String,
+        val subjectAge: Int? = null,
+        val callerPackageName: String,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
@@ -43,6 +55,8 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val biometricDataSource: String,
+        val subjectAge: Int? = null,
+        val callerPackageName: String,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
@@ -54,6 +68,8 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val biometricDataSource: String,
+        val subjectAge: Int? = null,
+        val callerPackageName: String,
         val metadata: String,
         val verifyGuid: String,
         override val unknownExtras: Map<String, Any?>,

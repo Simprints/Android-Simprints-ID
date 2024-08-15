@@ -55,9 +55,10 @@
         app:layout_constraintTop_toTopOf="@id/capture_guide_frame" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginHorizontal="@dimen/margin_default"
         android:orientation="vertical"
         android:paddingBottom="@dimen/margin_default"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -67,11 +68,12 @@
         <CheckedTextView
             android:id="@+id/capture_feedback_txt_title"
             style="@style/Text.Headline6.Bold"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@drawable/feedback_chip_white"
             android:drawablePadding="4dp"
             android:gravity="center"
+            android:textAlignment="center"
             android:paddingHorizontal="12dp"
             android:paddingVertical="4dp"
             android:text="@string/face_capture_title_previewing"
@@ -86,16 +88,14 @@
             android:gravity="center"
             tools:text="Move closer" />
     </LinearLayout>
-    tools:text="Move closer" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/capture_feedback_permission_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/face_capture_permission_action"
         android:visibility="gone"
-        tools:visibility="visible"
         android:layout_marginVertical="@dimen/margin_huge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

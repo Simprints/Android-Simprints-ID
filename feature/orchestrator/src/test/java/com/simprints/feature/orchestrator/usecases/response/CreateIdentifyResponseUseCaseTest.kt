@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.matcher.FaceMatchResult
@@ -37,7 +38,7 @@ class CreateIdentifyResponseUseCaseTest {
         val result = useCase(
             mockk {
                 every { face?.decisionPolicy } returns null
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns null
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f))
         )
@@ -51,7 +52,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns null
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(10f, 20f, 30f))
         )
@@ -66,7 +67,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns null
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(20f, 25f, 30f, 40f))
         )
@@ -81,7 +82,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns null
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
             results = listOf(createFaceMatchResult(15f, 30f, 100f))
         )
@@ -96,7 +97,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns null
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns DecisionPolicy(
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100
@@ -115,7 +116,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns null
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns DecisionPolicy(
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100
@@ -134,7 +135,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns null
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns DecisionPolicy(
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100
@@ -153,7 +154,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns DecisionPolicy(
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100
@@ -176,7 +177,7 @@ class CreateIdentifyResponseUseCaseTest {
             mockk {
                 every { identification.maxNbOfReturnedCandidates } returns 2
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
-                every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns DecisionPolicy(
+                every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
                     100
@@ -197,6 +198,7 @@ class CreateIdentifyResponseUseCaseTest {
     )
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) }
+        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) },
+        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
     )
 }

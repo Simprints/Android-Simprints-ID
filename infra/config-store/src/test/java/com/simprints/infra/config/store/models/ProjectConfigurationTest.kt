@@ -10,7 +10,10 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
+import com.simprints.infra.config.store.testtools.faceConfiguration
+import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.testtools.rankOneConfiguration
 import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test
@@ -237,5 +240,116 @@ class ProjectConfigurationTest {
             )
             assertThat(config.imagesUploadRequiresUnmeteredConnection()).isEqualTo(it)
         }
+    }
+
+    @Test
+    fun `allowedAgeRanges returns all non-null age ranges`() {
+        val faceAgeRange = AgeGroup(10, 20)
+        val secugenSimMatcherAgeRange = AgeGroup(20, 30)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(
+                rankOne = faceConfiguration.rankOne?.copy(
+                    allowedAgeRange = faceAgeRange
+                )
+            ),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
+                    allowedAgeRange = secugenSimMatcherAgeRange
+                ),
+                nec = null
+            )
+        )
+
+        // Act
+        val result = projectConfiguration.allowedAgeRanges()
+
+        // Assert
+        assertThat(result).containsExactly(faceAgeRange, secugenSimMatcherAgeRange)
+    }
+
+    @Test
+    fun `allowedAgeRanges does not return empty age ranges`() {
+        val faceAgeRange = AgeGroup(10, 20)
+        val emptyAgeRange = AgeGroup(0, 0)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(
+                rankOne = faceConfiguration.rankOne?.copy(
+                    allowedAgeRange = faceAgeRange
+                )
+            ),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
+                    allowedAgeRange = emptyAgeRange
+                ),
+                nec = null
+            )
+        )
+
+        // Act
+        val result = projectConfiguration.allowedAgeRanges()
+
+        // Assert
+        assertThat(result).containsExactly(faceAgeRange)
+    }
+
+    @Test
+    fun `isAgeRestricted should return false when all are null`() {
+        // Arrange
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = null)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = null),
+                nec = null
+            )
+        )
+
+        // Act
+        val result = projectConfiguration.isAgeRestricted()
+
+        // Assert
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `isAgeRestricted should return false when all age ranges are empty`() {
+        // Arrange
+        val emptyAgeRange = AgeGroup(0, 0)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = emptyAgeRange)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = emptyAgeRange),
+                nec = null
+            )
+        )
+
+        // Act
+        val result = projectConfiguration.isAgeRestricted()
+
+        // Assert
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `isAgeRestricted should return true when all age ranges are non-empty`() {
+        // Arrange
+        val faceAgeRange = AgeGroup(10, 20)
+        val secugenSimMatcherAgeRange = AgeGroup(20, 30)
+
+        val projectConfiguration = projectConfiguration.copy(
+            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            fingerprint = fingerprintConfiguration.copy(
+                secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
+                nec = null
+            )
+        )
+
+        // Act
+        val result = projectConfiguration.isAgeRestricted()
+
+        // Assert
+        assertThat(result).isTrue()
     }
 }

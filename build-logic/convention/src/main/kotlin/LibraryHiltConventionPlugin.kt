@@ -1,29 +1,18 @@
 import common.getLibs
 import common.implementation
-import common.kapt
-import common.kaptAndroidTest
-import common.kaptTest
+import common.ksp
+import common.kspAndroidTest
+import common.kspTest
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 class LibraryHiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
                 apply("dagger.hilt.android.plugin")
-                // KAPT must go last to avoid build warnings.
-                // See: https://stackoverflow.com/questions/70550883/warning-the-following-options-were-not-recognized-by-any-processor-dagger-f
-                apply("org.jetbrains.kotlin.kapt")
-            }
-
-            extensions.configure<KaptExtension> {
-                useBuildCache = true
-                arguments {
-                    arg("realm.ignoreKotlinNullability", true)
-                }
+                apply("com.google.devtools.ksp")
             }
 
             val libs = getLibs()
@@ -31,11 +20,11 @@ class LibraryHiltConventionPlugin : Plugin<Project> {
                 implementation(libs, "hilt")
                 implementation(libs, "hilt.work")
 
-                kapt(libs, "hilt.kapt")
-                kapt(libs, "hilt.compiler")
+                ksp(libs, "hilt.dagger.compiler")
+                ksp(libs, "hilt.compiler")
 
-                kaptTest(libs, "testing.hilt.kapt")
-                kaptAndroidTest(libs, "testing.hilt.kapt")
+                kspTest(libs, "testing.hilt.compiler")
+                kspAndroidTest(libs, "testing.hilt.compiler")
             }
         }
     }

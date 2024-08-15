@@ -11,6 +11,7 @@ import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayloa
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_RELIGION
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_YOUNG
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.SCANNER_NOT_WORKING
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.WRONG_AGE_GROUP_SELECTED
 import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload.ApiAnswer
 
 @Keep
@@ -31,6 +32,7 @@ internal data class ApiRefusalPayload(
         APP_NOT_WORKING,
         REFUSED_NOT_PRESENT,
         REFUSED_YOUNG,
+        WRONG_AGE_GROUP_SELECTED,
         OTHER
     }
 
@@ -54,5 +56,6 @@ internal fun RefusalPayload.Answer.toApiRefusalEventAnswer() = when (this) {
     APP_NOT_WORKING -> ApiAnswer.APP_NOT_WORKING
     REFUSED_NOT_PRESENT -> ApiAnswer.REFUSED_NOT_PRESENT
     REFUSED_YOUNG -> ApiAnswer.REFUSED_YOUNG
+    WRONG_AGE_GROUP_SELECTED -> ApiAnswer.WRONG_AGE_GROUP_SELECTED
     OTHER -> ApiAnswer.OTHER
 }

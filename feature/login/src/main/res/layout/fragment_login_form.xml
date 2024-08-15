@@ -81,23 +81,27 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/loginButtonScanQr"
                 style="@style/Widget.Simprints.Button.White"
-                android:layout_width="160dp"
+                android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="16dp"
-                android:drawableEnd="@drawable/scan_qr"
+                app:icon="@drawable/scan_qr"
+                app:iconGravity="textEnd"
+                app:iconTint="@null"
+                android:textAlignment="center"
+                android:includeFontPadding="false"
                 android:padding="8dp"
                 android:text="@string/login_scan_qr_button" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/loginButtonSignIn"
-                android:layout_width="160dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/login_log_in_button" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/loginErrorCard"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@color/simprints_white"
@@ -106,11 +110,12 @@
 
                 <TextView
                     android:id="@+id/loginErrorText"
+                    android:layout_gravity="center"
                     style="@style/Text.Body1.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="12dp"
-                    tools:text="Some text goes here" />
+                    tools:text="Some text goes heretext goes here" />
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
