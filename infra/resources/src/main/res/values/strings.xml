@@ -295,6 +295,7 @@
     <string name="fingerprint_capture_missing_finger_button"><u>Missing Finger</u></string>
     <string name="fingerprint_capture_try_another_title">Get Ready</string>
     <string name="fingerprint_capture_try_another_finger">Let\'s Try Another Finger!</string>
+    <string name="fingerprint_capture_confirm_requirement_text">Only %1$d good fingers scanned.\nRequired: %2$d</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">Dashboard</string>

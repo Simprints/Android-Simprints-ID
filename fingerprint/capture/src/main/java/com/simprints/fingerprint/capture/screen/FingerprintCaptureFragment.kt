@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventObserver
@@ -31,6 +32,7 @@ import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
+import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsBottomSheetDialog
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerManager
 import com.simprints.fingerprint.capture.views.tryagainsplash.TryAnotherFingerSplashDialogFragment
@@ -57,7 +59,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private val vm: FingerprintCaptureViewModel by viewModels()
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
-    private var confirmDialog: AlertDialog? = null
+    private var confirmDialog: BottomSheetDialogFragment? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -139,7 +141,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
             exitFormConfiguration {
                 titleRes = com.simprints.infra.resources.R.string.exit_form_title_fingerprinting
-                backButtonRes = com.simprints.infra.resources.R.string.exit_form_continue_fingerprints_button
+                backButtonRes =
+                    com.simprints.infra.resources.R.string.exit_form_continue_fingerprints_button
                 visibleOptions = scannerOptions()
             }.toArgs()
         )
@@ -160,7 +163,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             binding.fingerprintViewPager,
             binding.fingerprintIndicator,
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
-            isAbleToSelectNewFinger = { vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true }
+            isAbleToSelectNewFinger = {
+                vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true
+            }
         )
     }
 
@@ -185,12 +190,21 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         vm.stateLiveData.observe(viewLifecycleOwner) { state ->
             if (state != null) {
                 // Update pager
-                fingerViewPagerManager.setCurrentPageAndFingerStates(state.fingerStates, state.currentFingerIndex)
+                fingerViewPagerManager.setCurrentPageAndFingerStates(
+                    state.fingerStates,
+                    state.currentFingerIndex
+                )
 
                 // Update button
                 with(state.currentCaptureState()) {
-                    binding.fingerprintScanButton.text = getString(buttonTextId(state.isAskingRescan))
-                    binding.fingerprintScanButton.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
+                    binding.fingerprintScanButton.text =
+                        getString(buttonTextId(state.isAskingRescan))
+                    binding.fingerprintScanButton.setBackgroundColor(
+                        resources.getColor(
+                            buttonBackgroundColour(),
+                            null
+                        )
+                    )
                 }
 
                 updateConfirmDialog(state)
@@ -198,7 +212,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        vm.vibrate.observe(viewLifecycleOwner, LiveDataEventObserver { Vibrate.vibrate(requireContext()) })
+        vm.vibrate.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver { Vibrate.vibrate(requireContext()) })
 
         vm.noFingersScannedToast.observe(viewLifecycleOwner, LiveDataEventObserver {
             requireContext().showToast(IDR.string.fingerprint_capture_no_fingers_scanned)
@@ -218,9 +234,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 }.toArgs()
             )
         })
-        vm.finishWithFingerprints.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { fingerprints ->
-            findNavController().finishWithResult(this, fingerprints)
-        })
+        vm.finishWithFingerprints.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { fingerprints ->
+                findNavController().finishWithResult(this, fingerprints)
+            })
     }
 
     private fun launchConnection() {
@@ -251,24 +269,31 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private fun updateConfirmDialog(state: CollectFingerprintsState) {
         confirmDialog = if (state.isShowingDialog() && confirmDialog == null) {
             val dialogItems = state.fingerStates.map {
-                ConfirmFingerprintsDialog.Item(
+                ConfirmFingerprintsBottomSheetDialog.Item(
                     it.id,
                     it.captures.count { capture -> capture is CaptureState.Collected && capture.scanResult.isGoodScan() },
                     it.captures.size
                 )
             }
-            ConfirmFingerprintsDialog(requireContext(), dialogItems,
-                onConfirm = {
+            ConfirmFingerprintsBottomSheetDialog.build(
+                scannedFingers = dialogItems,
+                minSuccessfulScans = 1,
+                onPreferableActionClick = {
+                    //TODO CHANGE IMPLEMENTATION
                     Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints clicked")
                     vm.handleConfirmFingerprintsAndContinue()
                 },
-                onRestart = {
+                onNotDesirableActionClick = {
+                    //TODO CHANGE IMPLEMENTATION
                     Simber.tag(FINGER_CAPTURE.name).i("Restart clicked")
                     vm.handleRestart()
-                })
-                .create().also { it.show() }
+                }
+            ).also {
+                it.isCancelable = false
+                it.show(childFragmentManager, it.tag)
+            }
         } else if (!state.isShowingDialog()) {
-            confirmDialog?.let { if (it.isShowing) it.dismiss() }
+            confirmDialog?.let { if (it.isVisible) dismissDialog() }
             null
         } else {
             confirmDialog
@@ -286,8 +311,13 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         }
     }
 
-    override fun onDestroyView() {
+    override fun onSaveInstanceState(outState: Bundle) {
+        dismissDialog()
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun dismissDialog() {
         confirmDialog?.dismiss()
-        super.onDestroyView()
+        confirmDialog = null
     }
 }
