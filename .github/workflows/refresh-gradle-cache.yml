@@ -8,9 +8,17 @@ jobs:
     refresh-caches:
         runs-on: ubuntu-latest
         timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
-
+        environment: dev
         env:
             GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
+            BUILD_IS_DEBUGGABLE: ${{ vars.BUILD_IS_DEBUGGABLE }}
+            DB_IS_ENCRYPTED: ${{ vars.DB_IS_ENCRYPTED }}
+            FIREBASE_DIST_CREDENTIALS: ${{ secrets.FIREBASE_DIST_CREDENTIALS}}
+
+            SIGNING_JKS_FILE: ${{secrets.SIGNING_JKS_FILE}}
+            SIGNING_KEYSTORE_PASSWORD: ${{secrets.SIGNING_KEYSTORE_PASSWORD}}
+            SIGNING_KEY_ALIAS: ${{secrets.SIGNING_KEY_ALIAS}}
+            SIGNING_KEY_PASSWORD: ${{secrets.SIGNING_KEY_PASSWORD}}
 
         steps:
             -   name: Checkout
@@ -27,6 +35,10 @@ jobs:
                     source ci/pipeline/setup
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
                     echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+
+            -   name: Set up signing properties
+                run: source ci/deployment/signing_properties_setup
+
 
             -   name: Write Google Services file
                 run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json

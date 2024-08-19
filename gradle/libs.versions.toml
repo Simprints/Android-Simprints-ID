@@ -1,7 +1,7 @@
 [versions]
-kotlin_version = "2.0.10"
+kotlin_version = "2.0.20-RC2"
 kotlin_coroutine_version = "1.8.1"
-ksp_version = "2.0.0-1.0.24"
+ksp_version = "2.0.20-RC2-1.0.24"
 
 android_gradlePlugin_version = "8.5.2"
 androidx_version = "1.6.2"
