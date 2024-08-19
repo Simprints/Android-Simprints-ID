@@ -5,11 +5,13 @@ import ai.roc.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import ai.roc.rocsdk.embedded.roc_detection
 import ai.roc.rocsdk.embedded.roc_image
 import ai.roc.rocsdk.embedded.roc_landmark
+import ai.roc.rocsdk.embedded.roc_pose_options.ROC_POSE_FRONTAL
 import android.graphics.Bitmap
 import android.graphics.Rect
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.infra.logging.Simber
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -138,9 +140,40 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         val numFaces = roc3.size_t_value(n)
         roc3.delete_size_t(n)
         roc3.delete_size_t(adaptiveMinimumSize)
-
-        return numFaces == 1L
+        return numFaces == 1L && isFaceReasonablyCentered(image, detection.boundingRect()) &&
+            detection.pose.toInt() == ROC_POSE_FRONTAL
     }
+
+
+    private fun isFaceReasonablyCentered(
+        rocImage: roc_image,
+        faceRect: Rect
+    ): Boolean {
+
+        val minMargin = calculateMargin(faceRect.width(), rocImage.width.toInt())
+
+
+
+        Simber.tag("RocV3Detector")
+            .i("minMargin: $minMargin, left: ${faceRect.left}, right: ${faceRect.right}, top: ${faceRect.top}, bottom: ${faceRect.bottom}")
+        Simber.tag("RocV3Detector").i("top left :${faceRect.left > minMargin && faceRect.top > minMargin}")
+        Simber.tag("RocV3Detector").i("right :${faceRect.right < rocImage.width - minMargin}")
+        Simber.tag("RocV3Detector").i("bottom : ${faceRect.bottom < rocImage.height - minMargin}")
+
+        return faceRect.left > minMargin && faceRect.top > minMargin &&
+            faceRect.right < rocImage.width - minMargin && faceRect.bottom < rocImage.height - minMargin
+    }
+
+    private fun calculateMargin(faceWidth: Int, imageWidth: Int): Int {
+        // Calculate the ratio of the face width to the image width
+        val ratio = faceWidth.toFloat() / imageWidth.toFloat()
+
+        // Calculate the margin based on the ratio
+        val margin = ((1 - ratio) * imageWidth / 12).toInt()
+
+        return margin
+    }
+
 
     private fun roc_detection.boundingRect() = Rect(
         (x - width / 2).toInt(),
