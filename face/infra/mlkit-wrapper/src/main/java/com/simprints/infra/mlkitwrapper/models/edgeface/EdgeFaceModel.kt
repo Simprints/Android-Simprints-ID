@@ -24,6 +24,8 @@ import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.TensorProcessor
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.io.File
+import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import kotlin.apply
 import kotlin.collections.indices
@@ -69,7 +71,52 @@ class EdgeFaceModel(
 
 
     // Gets an face embedding using FaceNet.
-    override fun getFaceEmbedding(image: Bitmap): FloatArray = runEdgeFace(convertBitmapToBuffer(image))[0]
+    override fun getFaceEmbedding(image: Bitmap): FloatArray {
+
+        // TODO PoC - 0.  create directory in cache to store temporary files
+        //    full path /data/data/com.simprints.id/cache/dumpExtraction/<timestamp>
+        val folderName = System.currentTimeMillis().toString()
+        val folder = File(context.cacheDir, "/dumpExtraction/$folderName")
+        folder.mkdirs()
+
+        // TODO PoC - 1. - save scaled bitmap to cache
+        val scaledImage = Bitmap.createScaledBitmap(image, IMG_SIZE, IMG_SIZE, false)
+        FileOutputStream(File(folder, "image.png")).use { out ->
+            scaledImage.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+
+        // TODO PoC - 2. - save int array to file
+        val inputBuffer = scaledImage.toIntArray()
+        File(folder, "inputsInt.txt").printWriter().use { out ->
+            inputBuffer.toList()
+                .chunked(IMG_SIZE * 3) { it.joinToString(", ") }
+                .forEach { out.println(it) }
+        }
+
+        // TODO PoC - 3. - save floats array to file
+        val floatBuffer = inputBuffer.map { it / 255f }.toFloatArray()
+        File(folder, "inputsFloat.txt").printWriter().use { out ->
+            floatBuffer.toList()
+                .chunked(IMG_SIZE * 3) { it.joinToString(", ") }
+                .forEach { out.println(it) }
+        }
+
+        val outBuffer = TensorBuffer.createFixedSize(intArrayOf(IMG_SIZE, IMG_SIZE, 3), DataType.FLOAT32)
+        outBuffer.loadArray(floatBuffer)
+
+        // TODO PoC - 4. - save template array to file
+        val tensorBuffer = imageTensorProcessor.process(outBuffer).buffer
+        val output = runEdgeFace(tensorBuffer)[0]
+        File(folder, "output.txt").printWriter().use { out ->
+            output.toList().joinToString(", ").let { out.println(it) }
+        }
+
+        // TODO PoC - 4. - create a marker file to easily find corresponding templates across dump folders
+        val markerName = output.take(5).joinToString("-")
+        File(folder, markerName).printWriter().use { out -> out.println(0) }
+
+        return output
+    }
 
     // Run the FaceNet model.
     private fun runEdgeFace(inputs: Any): Array<FloatArray> {
@@ -92,7 +139,7 @@ class EdgeFaceModel(
         return imageTensorProcessor.process(outBuffer).buffer
     }
 
-    private fun Bitmap.toFloatArray(): FloatArray {
+    private fun Bitmap.toIntArray(): IntArray {
         var intValues = IntArray(IMG_SIZE * IMG_SIZE)
         getPixels(intValues, 0, IMG_SIZE, 0, 0, IMG_SIZE, IMG_SIZE)
 
@@ -104,6 +151,8 @@ class EdgeFaceModel(
             resultArray[j++] = intValues[i].and(255)
         }
 
-        return resultArray.map { it / 255f }.toFloatArray()
+        return resultArray
     }
+
+    private fun Bitmap.toFloatArray() = toIntArray().map { it / 255f }.toFloatArray()
 }
