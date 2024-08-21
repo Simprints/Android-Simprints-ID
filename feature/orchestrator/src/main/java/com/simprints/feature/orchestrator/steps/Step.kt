@@ -57,7 +57,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = AlertResult::class, name = "AlertResult"),
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
-    JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeResult"),
+    JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
 )
 abstract class SerializableMixin : Serializable
 

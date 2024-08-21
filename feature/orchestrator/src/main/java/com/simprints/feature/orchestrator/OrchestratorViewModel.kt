@@ -152,11 +152,13 @@ internal class OrchestratorViewModel @Inject constructor(
             val nextStep = steps.firstOrNull { it.status == StepStatus.NOT_STARTED }
             if (nextStep != null) {
                 nextStep.status = StepStatus.IN_PROGRESS
+                cache.steps = steps
                 _currentStep.send(nextStep)
             } else {
                 // Acquiring location info could take long time, so we should stop location tracker
                 // before returning to the caller app to avoid creating empty sessions.
                 locationStore.cancelLocationCollection()
+                cache.steps = steps
                 buildAppResponse()
             }
         }

@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 
 @Keep
@@ -30,7 +31,7 @@ internal data class ApiFaceConfiguration(
             qualityThreshold = qualityThreshold,
             decisionPolicy = decisionPolicy.toDomain(),
             imageSavingStrategy = imageSavingStrategy.toDomain(),
-            allowedAgeRange = allowedAgeRange?.toDomain(),
+            allowedAgeRange = allowedAgeRange?.toDomain() ?: AgeGroup(0, null),
             verificationMatchThreshold = verificationMatchThreshold,
             version = version
         )

@@ -26,7 +26,7 @@ data class FaceConfiguration(
         val imageSavingStrategy: ImageSavingStrategy,
         val decisionPolicy: DecisionPolicy,
         val version: String,
-        val allowedAgeRange: AgeGroup? = null,
+        val allowedAgeRange: AgeGroup = AgeGroup(0, null),
         val verificationMatchThreshold: Float? = null,
     )
 

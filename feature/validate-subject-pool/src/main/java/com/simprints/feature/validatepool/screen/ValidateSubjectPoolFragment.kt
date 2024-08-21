@@ -30,6 +30,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         viewModel.state.observe(viewLifecycleOwner, LiveDataEventWithContentObserver(::renderState))
 
         binding.validationActionsClose.setOnClickListener { finishWithResult(false) }
+        binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
         binding.validationActionsSync.setOnClickListener { viewModel.syncAndRetry(args.subjectQuery) }
 
         viewModel.checkIdentificationPool(args.subjectQuery)

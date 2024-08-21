@@ -27,6 +27,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.isAgeRestricted
+import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -422,7 +423,7 @@ internal class BuildStepsUseCase @Inject constructor(
 
     private fun ageGroupFromSubjectAge(action: ActionRequest, projectConfiguration: ProjectConfiguration): AgeGroup? {
         return action.getSubjectAgeIfAvailable()?.let { subjectAge ->
-            projectConfiguration.allowedAgeRanges().firstOrNull{ it.includes(subjectAge) }
+            projectConfiguration.sortedUniqueAgeGroups().firstOrNull{ it.includes(subjectAge) }
         }
     }
 }

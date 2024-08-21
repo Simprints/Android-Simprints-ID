@@ -61,6 +61,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
     private lateinit var screenSize: Size
+    private lateinit var targetResolution: Size
 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -104,20 +105,23 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = lifecycleScope.launch {
-        if (::cameraExecutor.isInitialized) {
+        if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             return@launch
         }
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
         // ImageAnalysis
         //Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
-        val targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
+        if (!::targetResolution.isInitialized) {
+            targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
+        }
         val imageAnalyzer = ImageAnalysis.Builder().setTargetResolution(targetResolution)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888).build()
         imageAnalyzer.setAnalyzer(cameraExecutor, ::analyze)
         // Preview
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
         val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
+        cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(
             this@LiveFeedbackFragment, DEFAULT_BACK_CAMERA, preview, imageAnalyzer
         )

@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
 
 internal fun FaceConfiguration.toProto(): ProtoFaceConfiguration =
@@ -22,8 +23,8 @@ internal fun FaceConfiguration.FaceSdkConfiguration.toProto() =
         .setImageSavingStrategy(imageSavingStrategy.toProto())
         .setDecisionPolicy(decisionPolicy.toProto())
         .setVersion(version)
+        .setAllowedAgeRange(allowedAgeRange.toProto())
         .also {
-            if (allowedAgeRange != null) it.allowedAgeRange = allowedAgeRange.toProto()
             if (verificationMatchThreshold != null) it.verificationMatchThreshold = verificationMatchThreshold
         }.build()
 
@@ -53,8 +54,8 @@ internal fun ProtoFaceConfiguration.ProtoFaceSdkConfiguration.toDomain() =
         imageSavingStrategy = imageSavingStrategy.toDomain(),
         decisionPolicy = decisionPolicy.toDomain(),
         version = version,
-        if (hasAllowedAgeRange()) allowedAgeRange.toDomain() else null,
-        if (hasVerificationMatchThreshold()) verificationMatchThreshold else null
+        allowedAgeRange = if (hasAllowedAgeRange()) allowedAgeRange.toDomain() else AgeGroup(0, null),
+        verificationMatchThreshold = if (hasVerificationMatchThreshold()) verificationMatchThreshold else null
     )
 
 internal fun ProtoFaceConfiguration.ImageSavingStrategy.toDomain(): FaceConfiguration.ImageSavingStrategy =

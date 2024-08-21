@@ -47,9 +47,6 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
-        if (!viewModel.isInitialized) {
-            viewModel.setupMatch(args.params)
-        }
     }
 
     override fun onResume() {

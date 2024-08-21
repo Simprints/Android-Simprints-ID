@@ -9,6 +9,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.ALL_KEYS
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.store.local.migrations.models.OldProjectConfig
+import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
 import com.simprints.infra.config.store.local.models.ProtoDecisionPolicy
 import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration
@@ -654,6 +655,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                     .setDecisionPolicy(
                         ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
                     )
+                    .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
                     .setVersion("1.23")
                     .build()
             )
@@ -669,6 +671,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                     .setDecisionPolicy(
                         ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
                     )
+                    .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().setStartInclusive(0).build())
                     .setVersion("1.23")
                     .build()
             )
@@ -725,6 +728,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                     .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
                     .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
                     .setVero2(PROTO_VERO_2_CONFIGURATION)
+                    .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
                     .build()
             ).build()
 
@@ -749,6 +753,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setVero1(
                             ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build()
                         )
+                        .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
                         .build()
                 ).build()
     }

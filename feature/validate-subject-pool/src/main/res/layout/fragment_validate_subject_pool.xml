@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/simprints_blue">
 
-
     <TextView
         android:id="@+id/validationIssueTitle"
         style="@style/Text.Headline5.White.Bold"
@@ -71,7 +70,18 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:background="@color/simprints_grey_light"
-            app:layout_constraintBottom_toTopOf="@id/validationActionsClose" />
+            app:layout_constraintBottom_toTopOf="@id/validationActionsContinue" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/validationActionsContinue"
+            style="@style/Widget.Simprints.Button.TextButton.White"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="2dp"
+            android:text="@string/id_pool_validation_action_continue"
+            app:layout_constraintBottom_toTopOf="@id/validationActionsClose"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/validationActionsClose"
@@ -96,7 +106,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/validationActionsClose"
             tools:visibility="visible" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
