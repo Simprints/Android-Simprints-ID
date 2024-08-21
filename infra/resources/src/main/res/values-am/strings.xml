@@ -449,12 +449,12 @@
     <string name="age_group_selection_age_range_to">ወደ</string>
     <string name="age_group_selection_age_range_and_above">እና በላይ</string>
     <plurals name="age_group_selection_age_in_months">
-        <item quantity="one">%d ወር</item>
-        <item quantity="other">%d ወራት</item>
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
     </plurals>
     <plurals name="age_group_selection_age_in_years">
-        <item quantity="one">%d አመት</item>
-        <item quantity="other">%d አመታት</item>
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
     </plurals>
 
 </resources>
