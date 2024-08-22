@@ -31,6 +31,8 @@ internal class ConfirmIdentifyRequestBuilderTest {
             actionIdentifier = ActionRequestIdentifier(
                 actionName = RequestActionFactory.MOCK_PACKAGE,
                 packageName = ActionConstants.ACTION_CONFIRM_IDENTITY,
+                callerPackageName = "",
+                callerVersion = 1,
             ),
             extractor = extractor,
             project = project,

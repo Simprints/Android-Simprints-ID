@@ -56,7 +56,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 buildValidateIdPoolStep(
                     subjectQuery = subjectQuery,
                     biometricDataSource = action.biometricDataSource,
-                    callerPackageName = action.callerPackageName
+                    callerPackageName = action.actionIdentifier.callerPackageName
                 ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
@@ -75,7 +75,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 projectId = action.projectId,
                 subjectId = action.verifyGuid,
                 biometricDataSource = action.biometricDataSource,
-                callerPackageName = action.callerPackageName
+                callerPackageName = action.actionIdentifier.callerPackageName,
             ),
             buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
             buildModalityCaptureAndMatchStepsForVerify(action, projectConfiguration)
@@ -138,7 +138,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     buildMatcherSubjectQuery(projectConfiguration, action),
                     BiometricDataSource.fromString(
                         action.biometricDataSource,
-                        action.callerPackageName
+                        action.actionIdentifier.callerPackageName,
                     ),
                 )
             } else emptyList(),
@@ -166,7 +166,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 subjectQuery,
                 BiometricDataSource.fromString(
                     action.biometricDataSource,
-                    action.callerPackageName
+                    action.actionIdentifier.callerPackageName,
                 ),
             )
         ).flatten()
@@ -192,7 +192,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 SubjectQuery(subjectId = action.verifyGuid),
                 BiometricDataSource.fromString(
                     action.biometricDataSource,
-                    action.callerPackageName
+                    action.actionIdentifier.callerPackageName,
                 ),
             )
         ).flatten()
