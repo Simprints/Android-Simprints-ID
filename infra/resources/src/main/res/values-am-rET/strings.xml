@@ -22,7 +22,7 @@
     <string name="consent_parental_share_data_no">ሲምፕሪንትስ፤በዩኬ የሚገኝ ለትርፍ ያልተቋቆመ ድርጅት የቦታ መገኛ መረጃ ያገኛል %1$s</string>
     <string name="consent_parental_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="consent_parental_privacy_rights">ከተስማሙ፤ፍቅዱን በማንኛውም ጊዜ ማንሳት ይችላሉ እና የልጅዎንም መረጃ እንዲጠፋ መጠየቅ ይችላሉ</string>
-    <string name="consent_parental_confirmation">የልጅዎን የጣት አሻራ መጠቀም እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
+    <string name="consent_parental_confirmation">እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="consent_biometrics_general_fingerprint">የጣት አሻራን ተጠቀም</string>
     <string name="consent_biometric_general_face">የፊቱን ፎቶግራፍ ማንሳት</string>
     <string name="consent_biometrics_access_fingerprint">የጣት አሻራ መረጃ</string>
@@ -440,6 +440,7 @@
     <string name="id_pool_validation_pool_empty_message">ስልኩ ላይ ምንም መረጃ የለም</string>
     <string name="id_pool_validation_action_close">ዝጋ</string>
     <string name="id_pool_validation_action_sync">ሲንከ አድርግና  እና እንደገና ሞክር</string>
+    <string name="id_pool_validation_action_continue">በመያዝ ይቀጥሉ</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">የተጠቃሚውን የእድሜ ክልል ምረጥ</string>
