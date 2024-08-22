@@ -5,8 +5,8 @@ import androidx.core.os.bundleOf
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Tier
+import com.simprints.libsimprints.Identification as LegacyIdentification
+import com.simprints.libsimprints.Tier as LegacyTier
 import javax.inject.Inject
 
 internal class CommCareResponseMapper @Inject constructor() {
@@ -25,9 +25,9 @@ internal class CommCareResponseMapper @Inject constructor() {
          */
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
-            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<Identification>(
+            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<LegacyIdentification>(
                 response.identifications.map {
-                    Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
+                    LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name))
                 }
             )
         )

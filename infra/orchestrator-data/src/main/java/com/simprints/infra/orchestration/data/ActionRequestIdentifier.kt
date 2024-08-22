@@ -7,14 +7,21 @@ import kotlinx.parcelize.Parcelize
 data class ActionRequestIdentifier(
     val actionName: String,
     val packageName: String,
-): Parcelable {
+    val callerPackageName: String,
+    val contractVersion: Int,
+) : Parcelable {
 
     companion object {
 
-        fun fromIntentAction(action: String): ActionRequestIdentifier {
-            val packageName = action.substringBeforeLast(".")
-            val actionName = action.substringAfterLast(".")
-            return ActionRequestIdentifier(actionName, packageName)
-        }
+        fun fromIntentAction(
+            action: String,
+            callerPackageName: String = "",
+            callerVersion: Int = 1,
+        ) = ActionRequestIdentifier(
+            actionName = action.substringAfterLast("."),
+            packageName = action.substringBeforeLast("."),
+            callerPackageName,
+            callerVersion,
+        )
     }
 }

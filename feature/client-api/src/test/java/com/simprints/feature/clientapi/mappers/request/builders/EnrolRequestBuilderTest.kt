@@ -30,6 +30,8 @@ internal class EnrolRequestBuilderTest {
             actionIdentifier = ActionRequestIdentifier(
                 actionName = RequestActionFactory.MOCK_PACKAGE,
                 packageName = ActionConstants.ACTION_ENROL,
+                callerPackageName = "",
+                contractVersion = 1,
             ),
             extractor = extractor,
             project = project,

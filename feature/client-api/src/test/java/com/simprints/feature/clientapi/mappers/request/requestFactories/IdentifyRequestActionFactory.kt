@@ -15,6 +15,8 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
         actionName = ActionConstants.ACTION_IDENTIFY,
+        callerPackageName = "",
+        contractVersion = 1,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.IdentifyActionRequest(
@@ -24,7 +26,6 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
         userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
-        callerPackageName = MOCK_CALLER_PACKAGE_NAME,
         unknownExtras = emptyMap()
     )
 

@@ -31,6 +31,8 @@ internal class VerifyRequestBuilderTest {
             actionIdentifier = ActionRequestIdentifier(
                 actionName = MOCK_PACKAGE,
                 packageName = ActionConstants.ACTION_VERIFY,
+                callerPackageName = "",
+                contractVersion = 1,
             ),
             extractor = extractor,
             project = project,

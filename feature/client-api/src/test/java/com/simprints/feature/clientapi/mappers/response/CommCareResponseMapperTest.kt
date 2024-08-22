@@ -15,8 +15,8 @@ import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Tier
+import com.simprints.libsimprints.Identification as LegacyIdentification
+import com.simprints.libsimprints.Tier as LegacyTier
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -63,11 +63,11 @@ class CommCareResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         @Suppress("DEPRECATION")
         //Intentionally using deprecated getParcelableArrayList() as this is what CommCare uses
-        assertThat(extras.getParcelableArrayList<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS))
-            .isEqualTo(ArrayList<Identification>(
+        assertThat(extras.getParcelableArrayList<LegacyIdentification>(Constants.SIMPRINTS_IDENTIFICATIONS))
+            .isEqualTo(ArrayList<LegacyIdentification>(
                 listOf(
-                    Identification("guid-1", 100, Tier.TIER_5),
-                    Identification("guid-2", 75, Tier.TIER_3),
+                    LegacyIdentification("guid-1", 100, LegacyTier.TIER_5),
+                    LegacyIdentification("guid-2", 75, LegacyTier.TIER_3),
                 )
             ))
     }
