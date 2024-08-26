@@ -51,6 +51,7 @@ class BuildStepsUseCaseTest {
     private fun mockCommonProjectConfiguration(): ProjectConfiguration {
         val projectConfiguration = mockk<ProjectConfiguration>(relaxed = true)
         every { projectConfiguration.general.modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
+        every { projectConfiguration.consent.collectConsent } returns true
         every { projectConfiguration.fingerprint?.allowedSDKs } returns listOf(
             SECUGEN_SIM_MATCHER,
             NEC
@@ -100,6 +101,24 @@ class BuildStepsUseCaseTest {
         assertStepOrder(steps,
             StepId.SETUP,
             StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+        )
+    }
+
+    @Test
+    fun `build - enrol action - no consent - returns expected steps`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.consent.collectConsent } returns false
+
+        val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration)
+
+        assertStepOrder(steps,
+            StepId.SETUP,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FACE_CAPTURE,
