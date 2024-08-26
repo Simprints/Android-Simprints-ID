@@ -22,7 +22,7 @@
     <string name="consent_parental_share_data_no">उनके %1$s व वर्तमान स्थान की जानकारी पर सिंप्रिंट्स की पहुँच होगी जोकि एक ब्रिटेन आधारित स्वयं-सेवी संस्था है।</string>
     <string name="consent_parental_share_data_yes">उनके %2$s व वर्तमान स्थान की जानकारी पर %1$s व सिंप्रिंट्स की पहुँच होगी जोकि एक ब्रिटेन आधारित स्वयं-सेवी संस्था है।</string>
     <string name="consent_parental_privacy_rights">यदि आप अभी सहमति देते हैं, तो भी बाद में किसी भी समय अपनी  सहमति वापस ले सकते हैं और अपने बच्चे का डाटा मिटाने के लिए कह सकते हैं।</string>
-    <string name="consent_parental_confirmation">क्या हम आपके बच्चे के %1$s का उपयोग कर सकते हैं ? कृपया कहें \"मैं सहमत हूँ \", \"मैं सहमत नहीं हूँ \", or \"मेरे कुछ सवाल हैं.\"</string>
+    <string name="consent_parental_confirmation">क्या हम आपके %1$s का उपयोग कर सकते हैं ? कृपया कहें \"मैं सहमत हूँ \", \"मैं सहमत नहीं हूँ \", या \"मेरे कुछ सवाल हैं.\"</string>
     <string name="consent_biometrics_general_fingerprint">अपनी उंगलियों के निशान का उपयोग करें</string>
     <string name="consent_biometric_general_face">अपने चेहरे की फ़ोटो लें</string>
     <string name="consent_biometrics_access_fingerprint">फ़िंगरप्रिंट जानकारी</string>
@@ -436,6 +436,7 @@
     <string name="id_pool_validation_pool_empty_message">डिवाइस पर कोई रिकॉर्ड नहीं है</string>
     <string name="id_pool_validation_action_close">बंद करें</string>
     <string name="id_pool_validation_action_sync">सिंक करें और पुनः प्रयास करें</string>
+    <string name="id_pool_validation_action_continue">कैप्चर करने के साथ आगे बढ़ें</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">विषय आयु समूह का चयन करें</string>
