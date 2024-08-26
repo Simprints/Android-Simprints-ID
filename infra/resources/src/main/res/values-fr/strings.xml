@@ -22,7 +22,7 @@
     <string name="consent_parental_share_data_no">Simprints, une organisation à but non lucratif basée au Royaume-Uni, aura accès à leurs %1$s et à son emplacement actuel.</string>
     <string name="consent_parental_share_data_yes">%1$s et Simprints, une organisation à but non lucratif basée au Royaume-Uni, auront accès à leurs %2$s et à leur localisation actuelle.</string>
     <string name="consent_parental_privacy_rights">Si vous acceptez, vous pouvez retirer votre autorisation à tout moment et demander que les données de votre enfant soient effacées.</string>
-    <string name="consent_parental_confirmation">Puis-je %1$s ? Veuillez dire \"Je l\'accepte\", \"Je le refuse\", ou \"J\'ai des questions\".</string>
+    <string name="consent_parental_confirmation">Puis-je %1$s ? Veuillez dire \"J\'accepte\", \"Je refuse\", ou \"J\'ai des questions\".</string>
     <string name="consent_biometrics_general_fingerprint">utiliser vos empreintes digitales</string>
     <string name="consent_biometric_general_face">prendre des photos de votre visage</string>
     <string name="consent_biometrics_access_fingerprint">empreintes digitales</string>
@@ -445,6 +445,7 @@
     <string name="id_pool_validation_pool_empty_message">Il n\'y a pas d\'enregistrements sur l\'appareil</string>
     <string name="id_pool_validation_action_close">Fermer</string>
     <string name="id_pool_validation_action_sync">Synchroniser et réessayer</string>
+    <string name="id_pool_validation_action_continue">Continuer et capturer</string>
 
     <!-- Age group selection -->
     <string name="age_group_selection_title">Choisir le groupe d\'age du sujet</string>

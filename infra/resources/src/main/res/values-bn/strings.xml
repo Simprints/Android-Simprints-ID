@@ -22,7 +22,7 @@
     <string name="consent_parental_share_data_no">সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক প্রতিষ্ঠানের কাছে তাঁর %1$s এবং বর্তমান ঠিকানা সংরক্ষিত আছে।</string>
     <string name="consent_parental_share_data_yes">%1$s এবং সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান, আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
     <string name="consent_parental_privacy_rights">আপনি সম্মতি দিলেও যে কোন সময় অনুমতি সরিয়ে নিয়ে আপনার সন্তানের তথ্য মুছে ফেলতে বলতে পারেন।</string>
-    <string name="consent_parental_confirmation">আমি কি আপনার সন্তানের %1$s ব্যবহার করতে পারি\? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি \", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে।\"</string>
+    <string name="consent_parental_confirmation">আমি কি %1$s করতে পারি? অনুগ্রহ করে \"আমি স্বীকার করি\", \"আমি প্রত্যাখ্যান করি\", অথবা \"আমার প্রশ্ন আছে।\" এর মাঝে থেকে আপনার উত্তরটি বলুন।</string>
     <string name="consent_biometrics_general_fingerprint">আপনার আঙ্গুলের ছাপ ব্যবহার</string>
     <string name="consent_biometric_general_face">আপনার ছবি তোলা হবে</string>
     <string name="consent_biometrics_access_fingerprint">আঙ্গুলের ছাপের তথ্য</string>
@@ -66,6 +66,7 @@
     <string name="exit_form_reason_scanner_not_working">স্ক্যানার কাজ করছে না</string>
     <string name="exit_form_reason_person_not_present">ব্যক্তি উপস্থিত নয়</string>
     <string name="exit_form_reason_too_young">বয়স কম</string>
+    <string name="exit_form_reason_wrong_age_group_selected">ভুল বয়সের কোঠা নির্বাচন করা হয়েছে</string>
     <string name="exit_form_reason_other">অন্যান্য</string>
 
     <!-- Fetch subject -->
@@ -86,7 +87,7 @@
     <string name="login_qr_code_scanning_camera_unavailable_error">ক্যামেরা ব্যাবহারের  চেষ্টা করার সময় একটি সমস্যা দেখা দিয়েছে, সুপারভাইসর এর সাথে যোগাযোগ করুন</string>
     <string name="login_invalid_qr_code_error">স্ক্যান করা কিউআর কোডটি সঠিক নয়</string>
     <string name="login_missing_credentials_error">তথ্য অসম্পূর্ণ। ব্যবহারকারী আইডি, প্রজেক্ট আইডি এবং কী চেক করুন এবং আবার চেষ্টা করুন</string>
-    <string name="login_invalid_credentials_error">তথ্য সঠিক নয়। প্রজেক্ট আইডি এবং কী চেক করুন।</string>
+    <string name="login_invalid_credentials_error">লগইন ত্রুটি। অনুগ্রহ করে প্রকল্পের প্রমাণপ্রত্রাদি পরীক্ষা করুন এবং প্রকল্পটি সক্রিয় আছে কিনা সেটা নিরীক্ষা করুন</string>
     <string name="login_project_id_intent_mismatch_error">ভিন্ন প্রজেক্ট আইডি। সিস্টেম অ্যাডমিন এর সাথে যোগাযোগ করুন</string>
     <string name="login_no_network_error">আপনি এখন অফলাইন। আপনার ইন্টারনেট সংযোগ চেক করুন</string>
     <string name="login_integrity_service_down_error">ইন্টিগ্রিটি সার্ভিসের সাথে কন্টাক্টের সময় একটি সমস্যা হয়েছে৷ অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন </string>
@@ -120,6 +121,8 @@
         <item quantity="one">%d মিল</item>
         <item quantity="other">%d মিল</item>
     </plurals>
+    <string name="matcher_missing_access_permission">ডেটা কালেক্টর অ্যাপ্লিকেশন দ্বারা প্রদত্ত ডেটা অ্যাক্সেস করার জন্য অনুমতি প্রয়োজন</string>
+    <string name="matcher_grant_permission_action">অনুমতি দিন </string>
 
     <!-- Orchestrator -->
     <string name="orchestrator_generic_error_title"> ত্রুটি দেখা দিয়েছে</string>
@@ -180,7 +183,8 @@
     <string name="face_capture_error_look_straight">ব্যক্তি ক্যামেরার দিকে সোজা তাকাচ্ছে কিনা নিশ্চিত করুন</string>
     <string name="face_capture_begin_button">ছবি তুলতে এখানে চাপুন</string>
     <string name="face_capture_prep_begin_button_capturing">ছবি তোলা হচ্ছে</string>
-    <string name="face_capture_permission_denied">অনুগ্রহ করে ক্যামেরা ব্যাবহারের অনুমতি দিন</string>
+    <string name="face_capture_permission_denied">অনুগ্রহ করে ক্যামেরার অনুমতি দিন</string>
+    <string name="face_capture_permission_action">অনুমতি দিন </string>
     <string name="face_capture_hold">স্থির থাকুন</string>
     <string name="face_capture_successfully_title">ব্যক্তির মুখের ছবি তোলা সফল হয়েছে</string>
     <string name="face_capture_confirmation_title">নিশ্চিত করা হচ্ছে</string>
@@ -425,5 +429,30 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">সিঙ্ক হচ্ছে </string>
+
+    <!-- Identification pool validation -->
+    <string name="id_pool_validation_issue_title">সনাক্তকরণ সমস্যা</string>
+    <string name="id_pool_validation_default_message">শনাক্তকারী প্রার্থীর তালিকা পরীক্ষা করা হচ্ছে</string>
+    <string name="id_pool_validation_user_mismatch_message">প্রদত্ত মডিউল আইডি সিঙ্ক্রোনাইজড ডেটার সাথে মেলে না</string>
+    <string name="id_pool_validation_module_mismatch_message">প্রদত্ত মডিউল আইডি সিঙ্ক্রোনাইজড ডেটার সাথে মেলে না</string>
+    <string name="id_pool_validation_sync_required_message">ডেটা সম্প্রতি সিঙ্ক্রোনাইজ করা হয়নি</string>
+    <string name="id_pool_validation_syncing_message">সিঙ্ক হচ্ছে...</string>
+    <string name="id_pool_validation_pool_empty_message">ডিভাইসে কোনো রেকর্ড নেই</string>
+    <string name="id_pool_validation_action_close">বন্ধ করুন </string>
+    <string name="id_pool_validation_action_sync">সিঙ্ক করুন এবং আবার চেষ্টা করুন</string>
+    <string name="id_pool_validation_action_continue">সংগ্রহের পর এগিয়ে যান</string>
+
+    <!-- Age group selection -->
+    <string name="age_group_selection_title">সাবজেক্টের বয়সের কোঠা নির্বাচন করুন</string>
+    <string name="age_group_selection_age_range_to">প্রতি</string>
+    <string name="age_group_selection_age_range_and_above">এবং উপরে</string>
+    <plurals name="age_group_selection_age_in_months">
+        <item quantity="one">%d মাস</item>
+        <item quantity="other">%d মাস</item>
+    </plurals>
+    <plurals name="age_group_selection_age_in_years">
+        <item quantity="one">%d বছর</item>
+        <item quantity="other">%d বছর</item>
+    </plurals>
 
 </resources>
