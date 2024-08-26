@@ -96,8 +96,12 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
 
     private fun updateUiWithState(state: ConsentViewState) {
         binding.consentLogo.isVisible = state.showLogo
+
+        val generalText = state.consentTextBuilder?.assembleText(requireActivity()).orEmpty()
+        val parentText = state.parentalTextBuilder?.assembleText(requireActivity()).orEmpty()
+
         // setup initial text to general consent
-        binding.consentTextHolderView.text = state.consentText
+        binding.consentTextHolderView.text = generalText
 
         with(binding.consentTabHost) {
             // Fully reset tab state
@@ -105,7 +109,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
             clearOnTabSelectedListeners()
             addTab(newTab().setText(IDR.string.consent_general_title), GENERAL_CONSENT_TAB)
             if (state.showParentalConsent) {
-                addParentalConsentTab(state.consentText, state.parentalConsentText)
+                addParentalConsentTab(generalText, parentText)
             }
             getTabAt(state.selectedTab)?.select()
         }
