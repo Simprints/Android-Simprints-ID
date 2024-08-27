@@ -105,4 +105,4 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
 
 }
 
-const val NEC_TEMPLATE_FORMAT = "NEC_1"
+const val NEC_TEMPLATE_FORMAT = "NEC_1_5"
