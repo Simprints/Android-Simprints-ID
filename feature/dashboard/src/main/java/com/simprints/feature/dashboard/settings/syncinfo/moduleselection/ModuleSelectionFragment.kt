@@ -84,12 +84,16 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         viewModel.screenLocked.observe(viewLifecycleOwner) {
             binding.modulesLockOverlay.isVisible = it?.locked == true
         }
+        SettingsPasswordDialogFragment.registerForResult(
+            fragmentManager = childFragmentManager,
+            lifecycleOwner = this,
+            onSuccess = { viewModel.unlockScreen() }
+        )
         binding.modulesLockOverlayClickableArea.setOnClickListener {
             val password = viewModel.screenLocked.value?.getNullablePassword()
             if (password != null) {
-                SettingsPasswordDialogFragment(
+                SettingsPasswordDialogFragment.newInstance(
                     passwordToMatch = password,
-                    onSuccess = { viewModel.unlockScreen() }
                 ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
             }
         }
@@ -129,7 +133,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
 
     private fun fetchData() {
         viewModel.modulesList.observe(viewLifecycleOwner) {
-            if(hasModulesSelectedInitially == null) {
+            if (hasModulesSelectedInitially == null) {
                 hasModulesSelectedInitially = it.any(Module::isSelected)
             }
             modulesToSelect = it

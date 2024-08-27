@@ -109,10 +109,15 @@ internal class AboutFragment : PreferenceFragmentCompat() {
             activity?.runOnUiThread {
                 val password = viewModel.settingsLocked.value?.getNullablePassword()
                 if (password != null) {
-                    SettingsPasswordDialogFragment(
+                    SettingsPasswordDialogFragment.registerForResult(
+                        fragmentManager = childFragmentManager,
+                        lifecycleOwner = this@AboutFragment,
+                        onSuccess = { viewModel.processLogoutRequest() }
+                    )
+                    SettingsPasswordDialogFragment.newInstance(
                         title = IDR.string.dashboard_password_lock_title_logout,
                         passwordToMatch = password,
-                        onSuccess = { viewModel.processLogoutRequest() }
+
                     ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                 } else {
                     confirmationDialogForLogout.show()
