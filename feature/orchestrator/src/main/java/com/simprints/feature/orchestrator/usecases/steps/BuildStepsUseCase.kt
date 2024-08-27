@@ -44,7 +44,7 @@ internal class BuildStepsUseCase @Inject constructor(
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
-            buildConsentStep(ConsentType.ENROL),
+            buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
             buildModalityCaptureAndMatchStepsForEnrol(action, projectConfiguration)
         )
 
@@ -59,7 +59,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     callerPackageName = action.callerPackageName
                 ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
-                buildConsentStep(ConsentType.IDENTIFY),
+                buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
                 buildModalityCaptureAndMatchStepsForIdentify(
                     action,
                     projectConfiguration,
@@ -77,7 +77,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 biometricDataSource = action.biometricDataSource,
                 callerPackageName = action.callerPackageName
             ),
-            buildConsentStep(ConsentType.VERIFY),
+            buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
             buildModalityCaptureAndMatchStepsForVerify(action, projectConfiguration)
         )
 
@@ -251,14 +251,17 @@ internal class BuildStepsUseCase @Inject constructor(
         is BiometricDataSource.CommCare -> emptyList()
     }
 
-    private fun buildConsentStep(consentType: ConsentType) = listOf(
+    private fun buildConsentStepIfNeeded(
+        consentType: ConsentType,
+        projectConfiguration: ProjectConfiguration,
+    ) = if (projectConfiguration.consent.collectConsent) listOf(
         Step(
             id = StepId.CONSENT,
             navigationActionId = R.id.action_orchestratorFragment_to_consent,
             destinationId = ConsentContract.DESTINATION,
             payload = ConsentContract.getArgs(consentType),
         )
-    )
+    ) else emptyList()
 
     private fun buildValidateIdPoolStep(
         subjectQuery: SubjectQuery,
@@ -338,6 +341,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     )
                 }
             }
+
             Modality.FACE -> {
                 determineFaceSDKs(projectConfiguration, ageGroup).map {
                     // Face bio SDK is currently ignored until we add a second one
@@ -423,7 +427,7 @@ internal class BuildStepsUseCase @Inject constructor(
 
     private fun ageGroupFromSubjectAge(action: ActionRequest, projectConfiguration: ProjectConfiguration): AgeGroup? {
         return action.getSubjectAgeIfAvailable()?.let { subjectAge ->
-            projectConfiguration.sortedUniqueAgeGroups().firstOrNull{ it.includes(subjectAge) }
+            projectConfiguration.sortedUniqueAgeGroups().firstOrNull { it.includes(subjectAge) }
         }
     }
 }
