@@ -77,6 +77,40 @@ class LicenseRepositoryImplTest {
     }
 
     @Test
+    fun `re-download license flow `() = runTest {
+        coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
+
+        val licenseStates = mutableListOf<LicenseState>()
+        licenseRepositoryImpl.redownloadLicence("validProject", "deviceId", RANK_ONE_FACE)
+            .toCollection(licenseStates)
+
+        with(licenseStates) {
+            assertThat(size).isEqualTo(3)
+            assertThat(get(0)).isEqualTo(LicenseState.Started)
+            assertThat(get(1)).isEqualTo(LicenseState.Downloading)
+            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithSuccess(license))
+        }
+        coVerify { licenseLocalDataSource.deleteCachedLicense(any()) }
+    }
+
+    @Test
+    fun `get error if re-downloading go wrong`() = runTest {
+        coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
+
+        val licenseStates = mutableListOf<LicenseState>()
+        licenseRepositoryImpl.redownloadLicence("invalidProject", "deviceId", RANK_ONE_FACE)
+            .toCollection(licenseStates)
+
+        with(licenseStates) {
+            assertThat(size).isEqualTo(3)
+            assertThat(get(0)).isEqualTo(LicenseState.Started)
+            assertThat(get(1)).isEqualTo(LicenseState.Downloading)
+            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithError("001"))
+        }
+        coVerify { licenseLocalDataSource.deleteCachedLicense(any()) }
+    }
+
+    @Test
     fun `get license flow from remote`() = runTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
