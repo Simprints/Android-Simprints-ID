@@ -45,6 +45,7 @@ class ShouldCreatePersonUseCaseTest {
                     userId = "".asTokenizableRaw(),
                     sessionId = "",
                     selectedGuid = "",
+                    metadata = "",
                     unknownExtras = emptyMap(),
                 ), modalities = emptySet(), results = emptyList()
             )

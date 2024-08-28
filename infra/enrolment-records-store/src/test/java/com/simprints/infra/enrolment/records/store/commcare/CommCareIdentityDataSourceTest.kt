@@ -87,8 +87,10 @@ class CommCareIdentityDataSourceTest {
 
         @JvmStatic
         lateinit var mockMetadataUri: Uri
+
         @JvmStatic
         lateinit var mockDataUri: Uri
+
         @JvmStatic
         lateinit var mockDataCaseIdUri: Uri
 
@@ -280,6 +282,24 @@ class CommCareIdentityDataSourceTest {
                     }.all { it }
             }.all { it }
         assertTrue(areContentsEqual)
+    }
+
+    @Test
+    fun `test load fingerprint fetches case by providedID`() = runTest {
+        every { mockDataCursor.moveToNext() } returns true
+        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
+        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
+        every { mockDataCursor.getString(0) } returnsMany
+            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
+        every { mockDataCursor.getString(1) } returnsMany
+            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2)
+
+        val query = SubjectQuery(metadata = """{"caseId":"CASE"}""")
+        val range = 0..1
+        dataSource.loadFingerprintIdentities(query, range)
+
+        coVerify(exactly = 0) { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+        coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test

@@ -19,12 +19,12 @@ import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIden
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.logging.Simber
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.json.JSONException
 import javax.inject.Inject
 
 internal class CommCareIdentityDataSource @Inject constructor(
@@ -38,6 +38,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
+
+        const val ARG_CASE_ID = "caseId"
     }
 
     private fun getCaseMetadataUri(packageName: String): Uri =
@@ -75,8 +77,12 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
-
         try {
+            val caseId = attemptExtractingCaseId(query.metadata)
+            if (caseId != null) {
+                return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query)
+            }
+
             context.contentResolver.query(
                 getCaseMetadataUri(callerPackageName), null, null, null, null
             )?.use { caseMetadataCursor ->
@@ -94,6 +100,16 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
         return enrolmentRecordCreationEvents
     }
+
+    private fun attemptExtractingCaseId(metadata: String?) = metadata
+        ?.takeUnless { it.isEmpty() }
+        ?.let {
+            try {
+                JsonHelper.fromJson<Map<String, Any>>(it)[ARG_CASE_ID] as? String
+            } catch (_: JSONException) {
+                null
+            }
+        }
 
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,

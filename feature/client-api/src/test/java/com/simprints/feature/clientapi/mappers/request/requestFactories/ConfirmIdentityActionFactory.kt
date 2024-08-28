@@ -24,6 +24,7 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
         userId = MOCK_USER_ID.asTokenizableRaw(),
         sessionId = MOCK_SESSION_ID,
         selectedGuid = MOCK_SELECTED_GUID,
+        metadata = MOCK_METADATA,
         unknownExtras = emptyMap()
     )
 
