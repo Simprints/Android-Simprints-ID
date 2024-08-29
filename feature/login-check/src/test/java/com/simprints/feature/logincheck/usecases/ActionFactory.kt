@@ -32,6 +32,7 @@ internal object ActionFactory {
         userId = MOCK_USER_ID,
         sessionId = "sessionId",
         selectedGuid = "selectedGuid",
+        metadata = "",
         unknownExtras = emptyMap()
     )
 

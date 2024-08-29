@@ -14,5 +14,6 @@ data class SubjectQuery(
     val hasUntokenizedFields: Boolean? = null,
     val moduleId: String? = null,
     val sort: Boolean = false,
-    val afterSubjectId: String? = null
+    val afterSubjectId: String? = null,
+    val metadata: String? = null,
 ) : Serializable
