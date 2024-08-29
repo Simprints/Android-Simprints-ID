@@ -74,6 +74,18 @@ class NfcPairViewModelTest {
         errorObserver.assertEventReceivedWithContent(R.string.fingerprint_connect_nfc_pair_toast_try_again)
     }
 
+    @Test
+    fun `Shows error when tag moved out of field`() {
+        every { nfcManager.readMacAddressDataFromBluetoothEasyPairTag(any()) } returns ADDRESS
+        every { scannerPairingManager.isScannerAddress(any()) } returns true
+        every { scannerPairingManager.startPairingToDevice(any()) } throws SecurityException("Test")
+
+        val errorObserver = viewModel.showToastWithStringRes.testObserver()
+        viewModel.handleNfcTagDetected(mockk())
+
+        errorObserver.assertEventReceivedWithContent(R.string.fingerprint_connect_nfc_pair_toast_try_again)
+    }
+
     companion object {
         private const val ADDRESS = "address"
     }
