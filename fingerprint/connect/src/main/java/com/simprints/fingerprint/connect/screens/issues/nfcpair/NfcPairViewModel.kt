@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.connect.screens.issues.nfcpair
 
+import android.nfc.TagLostException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,10 @@ internal class NfcPairViewModel @Inject constructor(
             _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_try_again)
         } catch (e: IllegalArgumentException) {
             _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_invalid)
+        } catch (e: SecurityException) {
+            _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_try_again)
+        } catch (e: TagLostException) {
+            _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_try_again)
         }
     }
 
