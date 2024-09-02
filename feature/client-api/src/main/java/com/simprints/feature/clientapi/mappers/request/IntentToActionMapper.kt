@@ -31,6 +31,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import com.simprints.libsimprints.Constants
 import javax.inject.Inject
 
 internal class IntentToActionMapper @Inject constructor(
@@ -122,23 +123,31 @@ internal class IntentToActionMapper @Inject constructor(
             extractor = IdentifyRequestExtractor(extras),
             project = project
         )
+        ActionConstants.ACTION_ENROL_LAST_BIOMETRICS -> ensureExtrasHaveSessionId(extras).let {
+            enrolLastBiometricsBuilder(
+                actionIdentifier = actionIdentifier,
+                extractor = EnrolLastBiometricsRequestExtractor(it),
+                project = project
+            )
+        }
 
-        ActionConstants.ACTION_ENROL_LAST_BIOMETRICS -> enrolLastBiometricsBuilder(
-            actionIdentifier = actionIdentifier,
-            extractor = EnrolLastBiometricsRequestExtractor(extras),
-            project = project
-        )
-
-        ActionConstants.ACTION_CONFIRM_IDENTITY -> confirmIdentifyBuilder(
-            actionIdentifier = actionIdentifier,
-            extractor = ConfirmIdentityRequestExtractor(extras),
-            project = project
-        )
+        ActionConstants.ACTION_CONFIRM_IDENTITY -> ensureExtrasHaveSessionId(extras).let {
+            confirmIdentifyBuilder(
+                actionIdentifier = actionIdentifier,
+                extractor = ConfirmIdentityRequestExtractor(it),
+                project = project
+            )
+        }
 
         else -> throw InvalidRequestException(
             "Invalid CommCare action", ClientApiError.INVALID_STATE_FOR_INTENT_ACTION
         )
     }.build()
+
+    // CommCare is not able to provide session ID so we assume that the last available session ID is correct
+    private suspend fun ensureExtrasHaveSessionId(map: Map<String, Any>) =
+        if (map.containsKey(Constants.SIMPRINTS_SESSION_ID)) map
+        else map.toMutableMap().also { it.put(Constants.SIMPRINTS_SESSION_ID, getCurrentSessionId()) }
 
     private suspend fun mapLibSimprintsAction(
         actionIdentifier: ActionRequestIdentifier,
