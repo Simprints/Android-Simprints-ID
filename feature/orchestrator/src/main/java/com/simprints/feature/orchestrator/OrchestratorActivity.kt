@@ -30,6 +30,8 @@ internal class OrchestratorActivity : BaseActivity() {
     private var isGraphInitialized = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Simber.i("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized")
+
         isGraphInitialized = savedInstanceState?.getBoolean(KEY_IS_GRAPH_INITIALIZED) ?: false
         lifecycle.addObserver(activityTracker)
 
@@ -39,6 +41,8 @@ internal class OrchestratorActivity : BaseActivity() {
             this,
             R.id.orchestratorRootFragment
         ) { result ->
+            Simber.i("OrchestratorActivity on result ${result.resultCode}")
+
             setResult(result.resultCode, Intent().putExtras(result.extras))
             finish()
         }
@@ -46,11 +50,14 @@ internal class OrchestratorActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+        Simber.i("OrchestratorActivity.onStart isGraphInitialized=$isGraphInitialized")
 
         if (activityTracker.isMain(activity = this)) {
             if (!isGraphInitialized) {
                 val action = intent.action.orEmpty()
                 val extras = intent.extras ?: bundleOf()
+                Simber.i("Intent received: $action")
+                Simber.i("Intent from: $callingPackage")
 
                 // Some co-sync functionality depends on the exact package name of the caller app,
                 // e.g. to switch content providers of debug and release variants of the caller app
