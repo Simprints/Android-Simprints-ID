@@ -148,9 +148,10 @@ internal class IntentToActionMapper @Inject constructor(
     }.build()
 
     // CommCare is not able to provide session ID so we assume that the last available session ID is correct
-    private suspend fun ensureExtrasHaveSessionId(map: Map<String, Any>) =
-        if (map.containsKey(Constants.SIMPRINTS_SESSION_ID)) map
-        else map.toMutableMap().also { it.put(Constants.SIMPRINTS_SESSION_ID, getCurrentSessionId()) }
+    private suspend fun ensureExtrasHaveSessionId(map: Map<String, Any>): Map<String, Any> =
+        if (map[Constants.SIMPRINTS_SESSION_ID].let { it as? String }.isNullOrBlank()) {
+            map.toMutableMap().also { it.put(Constants.SIMPRINTS_SESSION_ID, getCurrentSessionId()) }
+        } else map
 
     private suspend fun mapLibSimprintsAction(
         actionIdentifier: ActionRequestIdentifier,
