@@ -11,7 +11,6 @@
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
                 <action android:name="com.simprints.simodkadapter.IDENTIFY" />
-                <action android:name="com.simprints.simodkadapter.UPDATE" />
                 <action android:name="com.simprints.simodkadapter.VERIFY" />
                 <action android:name="com.simprints.simodkadapter.CONFIRM_IDENTITY" />
                 <action android:name="com.simprints.simodkadapter.REGISTER_LAST_BIOMETRICS" />
@@ -22,9 +21,9 @@
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
                 <action android:name="com.simprints.simodkadapter.IDENTIFY" />
-                <action android:name="com.simprints.simodkadapter.UPDATE" />
                 <action android:name="com.simprints.simodkadapter.VERIFY" />
                 <action android:name="com.simprints.simodkadapter.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.simodkadapter.REGISTER_LAST_BIOMETRICS" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -46,9 +45,9 @@
             <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
                 <action android:name="com.simprints.id.IDENTIFY" />
-                <action android:name="com.simprints.id.UPDATE" />
                 <action android:name="com.simprints.id.VERIFY" />
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.id.REGISTER_LAST_BIOMETRICS" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -60,9 +59,9 @@
             <intent-filter>
                 <action android:name="com.simprints.commcare.REGISTER" />
                 <action android:name="com.simprints.commcare.IDENTIFY" />
-                <action android:name="com.simprints.commcare.UPDATE" />
                 <action android:name="com.simprints.commcare.VERIFY" />
                 <action android:name="com.simprints.commcare.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.commcare.REGISTER_LAST_BIOMETRICS" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -70,9 +69,9 @@
             <intent-filter>
                 <action android:name="com.simprints.commcare.REGISTER" />
                 <action android:name="com.simprints.commcare.IDENTIFY" />
-                <action android:name="com.simprints.commcare.UPDATE" />
                 <action android:name="com.simprints.commcare.VERIFY" />
                 <action android:name="com.simprints.commcare.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.commcare.REGISTER_LAST_BIOMETRICS" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
