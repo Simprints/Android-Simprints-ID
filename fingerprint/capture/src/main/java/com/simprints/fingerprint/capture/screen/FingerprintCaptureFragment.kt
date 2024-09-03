@@ -4,7 +4,6 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -32,8 +31,8 @@ import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
+import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmActionDialog
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsBottomSheetDialog
-import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerManager
 import com.simprints.fingerprint.capture.views.tryagainsplash.TryAnotherFingerSplashDialogFragment
 import com.simprints.fingerprint.connect.FingerprintConnectContract
@@ -60,6 +59,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private var confirmDialog: BottomSheetDialogFragment? = null
+    private var confirmActionDialog: BottomSheetDialogFragment? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -266,39 +266,94 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         super.onPause()
     }
 
+    override fun onStop() {
+        dismissConfirmDialog()
+        dismissConfirmActionDialog()
+        super.onStop()
+    }
+
     private fun updateConfirmDialog(state: CollectFingerprintsState) {
         confirmDialog = if (state.isShowingDialog() && confirmDialog == null) {
             val dialogItems = state.fingerStates.map {
                 ConfirmFingerprintsBottomSheetDialog.Item(
-                    it.id,
-                    it.captures.count { capture -> capture is CaptureState.Collected && capture.scanResult.isGoodScan() },
-                    it.captures.size
+                    finger = it.id,
+                    numberOfSuccessfulScans = it.captures.count { capture -> capture is CaptureState.Collected && capture.scanResult.isGoodScan() },
+                    numberOfScans = it.captures.size
                 )
             }
-            ConfirmFingerprintsBottomSheetDialog.build(
-                scannedFingers = dialogItems,
-                minSuccessfulScans = 1,
-                onPreferableActionClick = {
-                    //TODO CHANGE IMPLEMENTATION
-                    Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints clicked")
-                    vm.handleConfirmFingerprintsAndContinue()
-                },
-                onNotDesirableActionClick = {
-                    //TODO CHANGE IMPLEMENTATION
-                    Simber.tag(FINGER_CAPTURE.name).i("Restart clicked")
-                    vm.handleRestart()
-                }
-            ).also {
+            val totalSuccessfulScans = dialogItems.count { it.numberOfSuccessfulScans > 0 }
+            val minSuccessfulScansRequired =
+                vm.configuration.secugenSimMatcher?.minSuccessfulScansRequired ?: 1
+            val isEnoughSuccessfulScans = totalSuccessfulScans >= minSuccessfulScansRequired
+
+            val dialogState = when (isEnoughSuccessfulScans) {
+                true -> ConfirmFingerprintsBottomSheetDialog.ConfirmationDialogState.EnoughSuccessfulScans(
+                    items = dialogItems,
+                    minSuccessfulScansRequired = minSuccessfulScansRequired,
+                    onContinueClick = {
+                        Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints clicked")
+                        vm.handleConfirmFingerprintsAndContinue()
+                    },
+                    onRestartClick = { displayRestartConfirmActionDialog() }
+                )
+
+                false -> ConfirmFingerprintsBottomSheetDialog.ConfirmationDialogState.NotEnoughSuccessfulScans(
+                    items = dialogItems,
+                    minSuccessfulScansRequired = minSuccessfulScansRequired,
+                    onContinueClick = { displayContinueConfirmActionDialog() },
+                    onRestartClick = {
+                        Simber.tag(FINGER_CAPTURE.name).i("Restart clicked")
+                        vm.handleRestart()
+                    }
+                )
+            }
+
+            ConfirmFingerprintsBottomSheetDialog.build(state = dialogState).also {
                 it.isCancelable = false
-                it.show(childFragmentManager, it.tag)
+                it.show(childFragmentManager, ConfirmFingerprintsBottomSheetDialog.TAG)
             }
         } else if (!state.isShowingDialog()) {
-            confirmDialog?.let { if (it.isVisible) dismissDialog() }
+            confirmDialog?.let { if (it.isVisible) dismissConfirmDialog() }
             null
         } else {
             confirmDialog
         }
     }
+
+    private fun displayRestartConfirmActionDialog() = displayConfirmActionDialog(
+        state = ConfirmActionDialog.ConfirmActionDialogState.Restart(
+            onCancelClick = {
+                dismissConfirmActionDialog()
+            },
+            onConfirmActionClick = {
+                Simber.tag(FINGER_CAPTURE.name).i("Restart clicked")
+                vm.handleRestart()
+                dismissConfirmActionDialog()
+            }
+        )
+    )
+
+
+    private fun displayContinueConfirmActionDialog() = displayConfirmActionDialog(
+        state = ConfirmActionDialog.ConfirmActionDialogState.Continue(
+            onCancelClick = {
+                dismissConfirmActionDialog()
+            },
+            onConfirmActionClick = {
+                Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints clicked")
+                vm.handleConfirmFingerprintsAndContinue()
+                dismissConfirmActionDialog()
+            }
+        )
+    )
+
+    private fun displayConfirmActionDialog(state: ConfirmActionDialog.ConfirmActionDialogState) {
+        confirmActionDialog = ConfirmActionDialog.build(state).also {
+            it.isCancelable = true
+            it.show(childFragmentManager, ConfirmActionDialog.TAG)
+        }
+    }
+
 
     private fun updateSplashScreen(state: CollectFingerprintsState) {
         if (state.isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
@@ -311,13 +366,13 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        dismissDialog()
-        super.onSaveInstanceState(outState)
+    private fun dismissConfirmDialog() {
+        confirmDialog?.dismissAllowingStateLoss()
+        confirmDialog = null
     }
 
-    private fun dismissDialog() {
-        confirmDialog?.dismiss()
-        confirmDialog = null
+    private fun dismissConfirmActionDialog() {
+        confirmActionDialog?.dismissAllowingStateLoss()
+        confirmActionDialog = null
     }
 }

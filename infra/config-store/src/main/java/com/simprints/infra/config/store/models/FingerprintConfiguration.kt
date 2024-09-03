@@ -16,6 +16,8 @@ data class FingerprintConfiguration(
         val vero2: Vero2Configuration? = null,
         val allowedAgeRange: AgeGroup? = null,
         val verificationMatchThreshold: Float? = null,
+        // TODO [MS-492] agree on format with the Cloud team, and initialize it in all constructor invocations
+        val minSuccessfulScansRequired: Int? = null
     )
 
     enum class VeroGeneration {

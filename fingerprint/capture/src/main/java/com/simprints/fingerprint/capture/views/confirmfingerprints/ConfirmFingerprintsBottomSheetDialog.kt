@@ -16,12 +16,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.resources.nameTextId
+import com.simprints.infra.resources.R as IDR
 
 class ConfirmFingerprintsBottomSheetDialog : BottomSheetDialogFragment() {
-    private var scannedFingers: List<Item> = emptyList()
-    private var minSuccessfulScans: Int = -1
-    private var onPreferableActionClick: () -> Unit = {}
-    private var onNotDesirableActionClick: () -> Unit = {}
+    private var state: ConfirmationDialogState? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,65 +32,108 @@ class ConfirmFingerprintsBottomSheetDialog : BottomSheetDialogFragment() {
         return BottomSheetDialog(requireContext(), theme).also {
             it.behavior.state = BottomSheetBehavior.STATE_EXPANDED
             it.behavior.skipCollapsed = true
+            it.behavior.isDraggable = false
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val state = this.state ?: return
         with(view) {
+            val scannedFingers: List<Item> = state.items
+            val minSuccessfulScansRequired: Int = state.minSuccessfulScansRequired
             val totalSuccessfulScans = scannedFingers.count { it.numberOfSuccessfulScans > 0 }
-            val isEnoughSuccessfulScans = totalSuccessfulScans >= minSuccessfulScans
+            val isEnoughSuccessfulScans = when (state) {
+                is ConfirmationDialogState.EnoughSuccessfulScans -> true
+                is ConfirmationDialogState.NotEnoughSuccessfulScans -> false
+            }
             val icon = when (isEnoughSuccessfulScans) {
-                true -> com.simprints.infra.resources.R.drawable.ic_check_circle_outline_24px
-                false -> com.simprints.infra.resources.R.drawable.ic_error_outline_24px
+                true -> IDR.drawable.ic_check_circle_outline_24px
+                false -> IDR.drawable.ic_error_outline_24px
             }
             val notDesirableActionTextRes = when (isEnoughSuccessfulScans) {
-                true -> com.simprints.infra.resources.R.string.fingerprint_capture_confirm_fingers_dialog_no
-                false -> com.simprints.infra.resources.R.string.fingerprint_capture_confirm_fingers_dialog_yes
+                true -> IDR.string.fingerprint_capture_confirm_fingers_dialog_no
+                false -> IDR.string.fingerprint_capture_confirm_fingers_dialog_yes
             }
             val isContinueButtonVisible = isEnoughSuccessfulScans
             val isRestartButtonVisible = !isEnoughSuccessfulScans
 
             findViewById<ImageView>(R.id.iconHeader)?.setImageResource(icon)
-            findViewById<TextView>(R.id.fingerprintList)?.text = getMapOfFingersAndQualityAsText()
+            findViewById<TextView>(R.id.fingerprintList)?.text =
+                getMapOfFingersAndQualityAsText(state)
             findViewById<TextView>(R.id.scanResultMessage)?.let {
                 it.isVisible = !isEnoughSuccessfulScans
                 if (!isEnoughSuccessfulScans) {
                     it.text = getString(
-                        com.simprints.infra.resources.R.string.fingerprint_capture_confirm_requirement_text,
+                        IDR.string.fingerprint_capture_confirm_requirement_text,
                         totalSuccessfulScans,
-                        minSuccessfulScans
+                        minSuccessfulScansRequired
                     )
                 }
             }
             findViewById<Button>(R.id.buttonNotDesirableAction)?.let {
                 it.setText(notDesirableActionTextRes)
-                it.setOnClickListener { onNotDesirableActionClick() }
+                it.setOnClickListener {
+                    when (state) {
+                        is ConfirmationDialogState.EnoughSuccessfulScans -> state.onRestartClick()
+                        is ConfirmationDialogState.NotEnoughSuccessfulScans -> state.onContinueClick()
+                    }
+                }
             }
             findViewById<View>(R.id.buttonContinue).let {
                 it.isVisible = isContinueButtonVisible
-                it.setOnClickListener { onPreferableActionClick() }
+                it.setOnClickListener {
+                    state.onContinueClick()
+                }
             }
 
             findViewById<View>(R.id.buttonRestart)?.let {
                 it.isVisible = isRestartButtonVisible
-                it.setOnClickListener { onPreferableActionClick() }
+                it.setOnClickListener { state.onRestartClick() }
             }
         }
     }
 
     @SuppressLint("DefaultLocale")
-    private fun getMapOfFingersAndQualityAsText(): String =
+    private fun getMapOfFingersAndQualityAsText(state: ConfirmationDialogState): String =
         StringBuilder().also {
-            scannedFingers.forEach { (fingerName, successes, scans) ->
+            state.items.forEachIndexed { index, item ->
+                val fingerName = item.finger
+                val successes = item.numberOfSuccessfulScans
+                val scans = item.numberOfScans
                 if (scans == 1) {
                     it.append(if (successes == 1) "✓ " else "× ")
                 } else {
                     it.append("$successes / $scans ")
                 }
-                it.append(getString(fingerName.nameTextId()) + "\n")
+                it.append(getString(fingerName.nameTextId()))
+                if (index < state.items.size - 1) {
+                    it.append("\n")
+                }
             }
         }.toString()
+
+    sealed class ConfirmationDialogState {
+        abstract val items: List<Item>
+        abstract val minSuccessfulScansRequired: Int
+        abstract val onContinueClick: () -> Unit
+        abstract val onRestartClick: () -> Unit
+
+        data class EnoughSuccessfulScans(
+            override val items: List<Item>,
+            override val minSuccessfulScansRequired: Int,
+            override val onContinueClick: () -> Unit,
+            override val onRestartClick: () -> Unit
+        ) : ConfirmationDialogState()
+
+        data class NotEnoughSuccessfulScans(
+            override val items: List<Item>,
+            override val minSuccessfulScansRequired: Int,
+            override val onContinueClick: () -> Unit,
+            override val onRestartClick: () -> Unit
+        ) : ConfirmationDialogState()
+
+    }
 
     data class Item(
         val finger: IFingerIdentifier,
@@ -101,16 +142,8 @@ class ConfirmFingerprintsBottomSheetDialog : BottomSheetDialogFragment() {
     )
 
     companion object {
-        fun build(
-            scannedFingers: List<Item>,
-            minSuccessfulScans: Int,
-            onPreferableActionClick: () -> Unit,
-            onNotDesirableActionClick: () -> Unit
-        ) = ConfirmFingerprintsBottomSheetDialog().also {
-            it.scannedFingers = scannedFingers
-            it.minSuccessfulScans = minSuccessfulScans
-            it.onPreferableActionClick = onPreferableActionClick
-            it.onNotDesirableActionClick = onNotDesirableActionClick
-        }
+        const val TAG = "ConfirmFingerprintsDialog"
+        fun build(state: ConfirmationDialogState) =
+            ConfirmFingerprintsBottomSheetDialog().also { it.state = state }
     }
 }

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/rounded_white_bg"
     android:orientation="vertical"
     android:padding="@dimen/activity_vertical_margin">
 
@@ -17,17 +18,18 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:importantForAccessibility="no"
-            tools:src="@drawable/ic_check_circle_outline_24px" />
+            android:src="@drawable/ic_error_outline_24px" />
 
         <View
             android:layout_width="@dimen/activity_horizontal_margin"
             android:layout_height="0dp" />
 
         <TextView
+            android:id="@+id/confirmActionTitle"
             style="@style/Text.Headline5.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/fingerprint_capture_confirm_fingers_dialog_title" />
+            tools:text="@string/fingerprint_capture_confirm_action_restart_title" />
     </LinearLayout>
 
     <View
@@ -37,21 +39,12 @@
         android:background="@color/divider" />
 
     <TextView
-        android:id="@+id/scanResultMessage"
+        android:id="@+id/confirmActionBody"
         style="@style/Text.Subtitle1.Secondary"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/margin_default"
-        android:visibility="gone"
-        tools:text="Only 2 good fingers scanned.\nRequired: 4"
-        tools:visibility="visible" />
-
-    <TextView
-        android:id="@+id/fingerprintList"
-        style="@style/Text.Body1.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="✓ Left Thumb\n✓ Right Thumb\n× Left Index Finger\n× Right Fifth Finger" />
+        tools:text="@string/fingerprint_capture_confirm_action_restart_body" />
 
     <View
         android:layout_width="wrap_content"
@@ -59,26 +52,15 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonNotDesirableAction"
-        style="@style/Widget.Simprints.Button.Grey"
+        style="@style/Widget.Simprints.Button.Grey.RedText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="RESTART/CONTINUE" />
+        tools:text="RESTART" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/buttonContinue"
-        style="@style/Widget.Simprints.Button.Green"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/fingerprint_capture_confirm_fingers_dialog_yes"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/buttonRestart"
+        android:id="@+id/buttonCancel"
         style="@style/Widget.Simprints.Button.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/fingerprint_capture_confirm_fingers_dialog_no"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:text="@string/fingerprint_capture_cancel_button" />
 </LinearLayout>

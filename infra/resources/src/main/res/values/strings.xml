@@ -296,6 +296,12 @@
     <string name="fingerprint_capture_try_another_title">Get Ready</string>
     <string name="fingerprint_capture_try_another_finger">Let\'s Try Another Finger!</string>
     <string name="fingerprint_capture_confirm_requirement_text">Only %1$d good fingers scanned.\nRequired: %2$d</string>
+    <string name="fingerprint_capture_confirm_action_continue_title">Continue?</string>
+    <string name="fingerprint_capture_confirm_action_restart_title">Restart?</string>
+    <string name="fingerprint_capture_confirm_action_continue_body">Do you want to proceed without enough good scans?</string>
+    <string name="fingerprint_capture_confirm_action_restart_body">All your current scans will be lost, are you sure you want to restart?</string>
+    <string name="fingerprint_capture_confirm_action_continue_button">Continue</string>
+    <string name="fingerprint_capture_confirm_action_restart_button">Restart</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">Dashboard</string>
