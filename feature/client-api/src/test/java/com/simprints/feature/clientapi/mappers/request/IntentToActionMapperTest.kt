@@ -94,6 +94,26 @@ class IntentToActionMapperTest {
     }
 
     @Test
+    fun `correctly handles CommCare intent without session ID`() = runTest {
+        mapOf(
+            "com.simprints.commcare.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
+            "com.simprints.commcare.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
+        ).forEach { (action, expectedClass) ->
+            assertThat(mapper(action, noSessionExtras, any())).isInstanceOf(expectedClass.java)
+        }
+    }
+
+    @Test
+    fun `correctly handles CommCare intent with blank session ID`() = runTest {
+        mapOf(
+            "com.simprints.commcare.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
+            "com.simprints.commcare.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
+        ).forEach { (action, expectedClass) ->
+            assertThat(mapper(action, blankSessionExtras, any())).isInstanceOf(expectedClass.java)
+        }
+    }
+
+    @Test
     fun `throws exception for invalid CommCare intent actions`() = runTest {
         assertThrows<InvalidRequestException> {
             mapper("com.simprints.commcare.INVALID", defaultExtras, any())
@@ -143,6 +163,23 @@ class IntentToActionMapperTest {
             SIMPRINTS_USER_ID to "userId",
             SIMPRINTS_MODULE_ID to "moduleId",
             SIMPRINTS_SESSION_ID to SESSION_ID,
+            SIMPRINTS_SELECTED_GUID to SESSION_ID,
+            SIMPRINTS_VERIFY_GUID to SESSION_ID,
+        )
+
+        private val noSessionExtras = mapOf(
+            SIMPRINTS_PROJECT_ID to "projectId-1111111111",
+            SIMPRINTS_USER_ID to "userId",
+            SIMPRINTS_MODULE_ID to "moduleId",
+            SIMPRINTS_SELECTED_GUID to SESSION_ID,
+            SIMPRINTS_VERIFY_GUID to SESSION_ID,
+        )
+
+        private val blankSessionExtras = mapOf(
+            SIMPRINTS_PROJECT_ID to "projectId-1111111111",
+            SIMPRINTS_USER_ID to "userId",
+            SIMPRINTS_MODULE_ID to "moduleId",
+            SIMPRINTS_SESSION_ID to "",
             SIMPRINTS_SELECTED_GUID to SESSION_ID,
             SIMPRINTS_VERIFY_GUID to SESSION_ID,
         )
