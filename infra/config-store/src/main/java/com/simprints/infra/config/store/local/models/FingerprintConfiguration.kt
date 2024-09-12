@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
+import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.ProtoMaxCaptureAttempts
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
 
@@ -23,6 +24,7 @@ internal fun FingerprintConfiguration.FingerprintSdkConfiguration.toProto() =
         .also {
             if (vero1 != null) it.vero1 = vero1.toProto()
             if (vero2 != null) it.vero2 = vero2.toProto()
+            if (maxCaptureAttempts != null) it.maxCaptureAttempts = maxCaptureAttempts.toProto()
         }
         .build()
 
@@ -40,6 +42,8 @@ internal fun FingerprintConfiguration.FingerComparisonStrategy.toProto() = when 
     FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER -> ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER
     FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX -> ProtoFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 }
+
+internal fun MaxCaptureAttempts.toProto() = ProtoMaxCaptureAttempts.newBuilder().setNoFingerDetected(noFingerDetected).build()
 
 
 internal fun ProtoFingerprintConfiguration.toDomain() =
