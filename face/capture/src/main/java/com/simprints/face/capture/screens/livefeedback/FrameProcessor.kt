@@ -58,62 +58,20 @@ internal class FrameProcessor @Inject constructor(
         val cameraWidth = image.width
         val cameraHeight = image.height
 
-        val (rotatedCameraWidth, rotatedCameraHeight) = getCameraRotatedPair(image)
-
         val newRectSize = getRectSizeBasedOnCameraCropping(
             previewViewWidth,
             previewViewHeight,
-            rotatedCameraWidth,
-            rotatedCameraHeight,
+            cameraWidth,
+            cameraHeight,
             boxOnTheScreen
         )
 
-        val newBoundingBox = CameraTargetOverlay.rectForPlane(
-            width = rotatedCameraWidth,
-            height = rotatedCameraHeight,
+        return CameraTargetOverlay.rectForPlane(
+            width = cameraWidth,
+            height = cameraHeight,
             rectSize = newRectSize,
             screenOrientation = screenOrientation
-        )
-
-        return getRotatedBoundingBox(
-            image.imageInfo.rotationDegrees,
-            newBoundingBox,
-            cameraWidth,
-            cameraHeight
         ).toRect()
-    }
-
-    private fun getRotatedBoundingBox(
-        rotation: Int,
-        newBoundingBox: RectF,
-        cameraWidth: Int,
-        cameraHeight: Int,
-    ): RectF {
-        return when (360 - rotation) {
-            0, 360 -> newBoundingBox
-            90 -> RectF(
-                cameraWidth - newBoundingBox.bottom,
-                newBoundingBox.left,
-                cameraWidth - newBoundingBox.top,
-                newBoundingBox.right
-            )
-
-            180 -> RectF(
-                cameraWidth - newBoundingBox.right,
-                cameraHeight - newBoundingBox.bottom,
-                cameraWidth - newBoundingBox.left,
-                cameraHeight - newBoundingBox.top
-            )
-
-            270 -> RectF(
-                newBoundingBox.top,
-                cameraHeight - newBoundingBox.right,
-                newBoundingBox.bottom,
-                cameraHeight - newBoundingBox.left
-            )
-
-            else -> throw IllegalArgumentException("Unsupported rotation angle: ${rotation}")
-        }
     }
 
     private fun getRectSizeBasedOnCameraCropping(
@@ -150,15 +108,6 @@ internal class FrameProcessor @Inject constructor(
             )
         }
     }
-
-    private fun getCameraRotatedPair(image: ImageProxy): Pair<Int, Int> =
-        if (cameraRotatedPortrait(image.imageInfo.rotationDegrees)) {
-            Pair(image.height, image.width)
-        } else {
-            Pair(image.width, image.height)
-        }
-
-    private fun cameraRotatedPortrait(rotation: Int) = rotation in arrayOf(90, 270)
 
     private fun sizeFromMinRatio(
         cameraWidth: Int,
