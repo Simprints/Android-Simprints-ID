@@ -76,7 +76,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initFragment()
@@ -118,9 +117,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         if (!::targetResolution.isInitialized) {
             targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
         }
-        val imageAnalyzer = ImageAnalysis.Builder().setTargetResolution(targetResolution)
-            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888).build()
+
+        val imageAnalyzer = ImageAnalysis.Builder()
+            .setTargetResolution(targetResolution)
+            .setOutputImageRotationEnabled(true)
+            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
+            .build()
         imageAnalyzer.setAnalyzer(cameraExecutor, ::analyze)
+
         // Preview
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
         val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
@@ -146,19 +150,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     launchPermissionRequest.launch(Manifest.permission.CAMERA)
                 }
             }
+
             else -> mainVm.shouldCheckCameraPermissions.set(true)
         }
-//        if (mainVm.shouldCheckCameraPermissions.getAndSet(false)) {
-//            // Check permission in onResume() so that if user left the app to go to Settings
-//            // and give the permission, it's reflected when they come back to SID
-//            if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
-//                setUpCamera()
-//            } else {
-//                launchPermissionRequest.launch(Manifest.permission.CAMERA)
-//            }
-//        } else {
-//            mainVm.shouldCheckCameraPermissions.set(true)
-//        }
     }
 
     override fun onStop() {

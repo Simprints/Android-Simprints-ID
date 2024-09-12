@@ -25,8 +25,6 @@ internal class ImageProxyToBitmapUseCase @Inject constructor() {
             imageProxy.width + rowPadding / pixelStride, imageProxy.height, Bitmap.Config.ARGB_8888
         )
         bitmap.copyPixelsFromBuffer(buffer)
-        val rotationMatrix = Matrix()
-        rotationMatrix.postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
 
         if (cropRect.isEmpty) {
             return null
@@ -38,7 +36,7 @@ internal class ImageProxyToBitmapUseCase @Inject constructor() {
             cropRect.top,
             cropRect.width(),
             cropRect.height(),
-            rotationMatrix,
+            null,
             true
         )
         bitmap.recycle()
