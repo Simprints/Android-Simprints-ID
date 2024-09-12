@@ -5,11 +5,13 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
+import com.simprints.fingerprint.capture.databinding.FragmentFingerNewBinding
 import com.simprints.fingerprint.capture.resources.captureNumberTextId
 import com.simprints.fingerprint.capture.resources.directionTextColour
 import com.simprints.fingerprint.capture.resources.directionTextId
@@ -27,9 +29,9 @@ import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-internal class FingerFragment : Fragment(R.layout.fragment_finger) {
+internal class FingerFragment : Fragment(R.layout.fragment_finger_new) {
 
-    private val binding by viewBinding(FragmentFingerBinding::bind)
+    private val binding by viewBinding(FragmentFingerNewBinding::bind)
     private val vm: FingerprintCaptureViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
     private lateinit var fingerId: IFingerIdentifier
@@ -47,7 +49,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
         vm.stateLiveData.observe(viewLifecycleOwner) {
             updateOrHideFingerImageAccordingToSettings()
             updateFingerNameText()
-            updateFingerCaptureNumberText()
+//            updateFingerCaptureNumberText()
             updateFingerResultText()
             updateFingerDirectionText(it)
             updateTimeoutBars()
@@ -67,8 +69,8 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                 ).apply { if (index != 0) marginStart = PROGRESS_BAR_MARGIN }
             }
         }.map { progressBar ->
-            binding.progressBarContainer.addView(progressBar)
-            ScanCountdownBar(progressBar, vm.progressBarTimeout())
+//            binding.progressBarContainer.addView(progressBar)
+            ScanCountdownBar(binding.progressBarContainer, vm.progressBarTimeout())
         }
     }
 
@@ -88,27 +90,27 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
     private fun updateFingerNameText() {
         binding.fingerNumberText.text = getString(fingerId.nameTextId())
-        binding.fingerNumberText.setTextColor(resources.getColor(fingerId.nameTextColour(), null))
     }
 
-    private fun updateFingerCaptureNumberText() = withFingerState {
-        if (isMultiCapture()) {
-            binding.fingerCaptureNumberText.setTextColor(
-                resources.getColor(
-                    nameTextColour(),
-                    null
-                )
-            )
-            binding.fingerCaptureNumberText.text =
-                getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
-            binding.fingerCaptureNumberText.visibility = View.VISIBLE
-        } else {
-            binding.fingerCaptureNumberText.visibility = View.GONE
-        }
-    }
+//    private fun updateFingerCaptureNumberText() = withFingerState {
+//        if (isMultiCapture()) {
+//            binding.fingerCaptureNumberText.setTextColor(
+//                resources.getColor(
+//                    nameTextColour(),
+//                    null
+//                )
+//            )
+//            binding.fingerCaptureNumberText.text =
+//                getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
+//            binding.fingerCaptureNumberText.visibility = View.VISIBLE
+//        } else {
+//            binding.fingerCaptureNumberText.visibility = View.GONE
+//        }
+//    }
 
 
     private fun updateFingerResultText() = withFingerState {
+        binding.fingerResultText.isVisible = currentCapture() !is CaptureState.Scanning
         binding.fingerResultText.text = getString(currentCapture().resultTextId())
         binding.fingerResultText.setTextColor(
             resources.getColor(
@@ -119,6 +121,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     }
 
     private fun updateFingerDirectionText(state: CollectFingerprintsState) = withFingerState {
+        binding.fingerResultText.isVisible = currentCapture() !is CaptureState.Scanning
         binding.fingerDirectionText.text = getString(directionTextId(state.isOnLastFinger()))
         binding.fingerDirectionText.setTextColor(
             resources.getColor(
@@ -131,14 +134,12 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     private fun updateTimeoutBars() = withFingerState {
         timeoutBars.forEachIndexed { captureIndex, timeoutBar ->
             with(timeoutBar) {
-                when (val fingerState = captures[captureIndex]) {
+                val fingerState = captures[captureIndex]
+                progressBar.isVisible = fingerState is CaptureState.Scanning
+                when (fingerState) {
                     is CaptureState.NotCollected,
                     is CaptureState.Skipped -> {
                         handleCancelled()
-                        progressBar.progressDrawable = ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.timer_progress_bar
-                        )
                     }
 
                     is CaptureState.Scanning -> startTimeoutBar()
@@ -148,24 +149,12 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
                     is CaptureState.NotDetected -> {
                         handleCancelled()
-                        progressBar.progressDrawable = ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.timer_progress_bad
-                        )
                     }
 
                     is CaptureState.Collected -> if (fingerState.scanResult.isGoodScan()) {
                         handleCancelled()
-                        progressBar.progressDrawable = ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.timer_progress_good
-                        )
                     } else {
                         handleCancelled()
-                        progressBar.progressDrawable = ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.timer_progress_bad
-                        )
                     }
                 }
             }

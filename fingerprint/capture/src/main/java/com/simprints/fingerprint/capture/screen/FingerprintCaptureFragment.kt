@@ -50,7 +50,7 @@ import java.io.Serializable
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerprint_capture) {
+internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerprint_capture_new) {
 
     private val args: FingerprintCaptureFragmentArgs by navArgs()
     private val binding by viewBinding(FragmentFingerprintCaptureBinding::bind)
@@ -165,9 +165,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     private fun initMissingFingerButton() {
-        binding.fingerprintMissingFinger.paintFlags =
-            binding.fingerprintMissingFinger.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-
         binding.fingerprintMissingFinger.setOnClickListener {
             Simber.tag(FINGER_CAPTURE.name).i("Missing finger text clicked")
             vm.handleMissingFingerButtonPressed()

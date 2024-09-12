@@ -29,17 +29,17 @@ internal fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int = when (thi
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @ColorRes
 internal fun CaptureState.buttonBackgroundColour(): Int = when (this) {
-    is CaptureState.NotCollected -> R.color.simprints_grey
+    is CaptureState.NotCollected -> R.color.simprints_blue
     is CaptureState.Scanning,
-    is CaptureState.TransferringImage -> R.color.simprints_blue
+    is CaptureState.TransferringImage -> R.color.simprints_grey
 
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.color.simprints_red
+    is CaptureState.NotDetected -> R.color.simprints_red_dark
 
     is CaptureState.Collected -> if (scanResult.isGoodScan()) {
         R.color.simprints_green
     } else {
-        R.color.simprints_red
+        R.color.simprints_red_dark
     }
 }
 
@@ -72,15 +72,15 @@ internal fun CaptureState.resultTextColour(): Int = when (this) {
     is CaptureState.TransferringImage -> if (scanResult.isGoodScan()) {
         R.color.simprints_green
     } else {
-        R.color.simprints_red
+        R.color.simprints_red_dark
     }
 
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.color.simprints_red
+    is CaptureState.NotDetected -> R.color.simprints_red_dark
 
     is CaptureState.Collected -> if (scanResult.isGoodScan()) {
         R.color.simprints_green
     } else {
-        R.color.simprints_red
+        R.color.simprints_red_dark
     }
 }

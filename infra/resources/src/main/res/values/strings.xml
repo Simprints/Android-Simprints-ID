@@ -292,7 +292,7 @@
     <string name="fingerprint_capture_rescan_question">Re-scan?</string>
     <string name="fingerprint_capture_scan">Scan</string>
     <string name="fingerprint_capture_please_wait">Please Wait</string>
-    <string name="fingerprint_capture_missing_finger_button"><u>Missing Finger</u></string>
+    <string name="fingerprint_capture_missing_finger_button">Skip Finger</string>
     <string name="fingerprint_capture_try_another_title">Get Ready</string>
     <string name="fingerprint_capture_try_another_finger">Let\'s Try Another Finger!</string>
 

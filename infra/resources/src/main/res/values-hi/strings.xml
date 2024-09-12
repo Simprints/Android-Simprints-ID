@@ -292,7 +292,7 @@
     <string name="fingerprint_capture_rescan_question">फिर से स्कैन ?</string>
     <string name="fingerprint_capture_scan">स्कैन</string>
     <string name="fingerprint_capture_please_wait">कृपया प्रतीक्षा करें</string>
-    <string name="fingerprint_capture_missing_finger_button"><u>उंगली गायब</u></string>
+    <string name="fingerprint_capture_missing_finger_button">उंगली गायब</string>
     <string name="fingerprint_capture_try_another_title">तैयार हो जाओ</string>
     <string name="fingerprint_capture_try_another_finger">आइए एक और उंगली आज़माएँ!</string>
 
