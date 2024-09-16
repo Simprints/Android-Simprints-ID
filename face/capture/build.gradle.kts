@@ -18,6 +18,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation(project(":infra:orchestrator-data"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
     implementation(project(":infra:enrolment-records-store"))
@@ -29,8 +30,7 @@ dependencies {
     implementation(project(":feature:alert"))
 
     //BIO SDK
-    implementation(project(":face:infra:face-bio-sdk"))
-    implementation(project(":face:infra:roc-wrapper"))
+    implementation(project(":face:infra:bio-sdk-resolver"))
 
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)

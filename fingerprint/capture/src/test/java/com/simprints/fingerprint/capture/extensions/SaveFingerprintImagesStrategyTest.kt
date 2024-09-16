@@ -3,8 +3,8 @@ package com.simprints.fingerprint.capture.extensions
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.EAGER
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.NEVER
-import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
 import org.junit.Test
 
 internal class SaveFingerprintImagesStrategyTest {

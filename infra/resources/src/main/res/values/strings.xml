@@ -22,7 +22,7 @@
     <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.</string>
     <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.</string>
     <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.</string>
-    <string name="consent_parental_confirmation">May I use your child\'s %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\"</string>
+    <string name="consent_parental_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\"</string>
     <string name="consent_biometrics_general_fingerprint">use your fingerprints</string>
     <string name="consent_biometric_general_face">take photographs of your face</string>
     <string name="consent_biometrics_access_fingerprint">fingerprint information</string>
@@ -66,6 +66,8 @@
     <string name="exit_form_reason_scanner_not_working">Scanner not working</string>
     <string name="exit_form_reason_person_not_present">Person not present</string>
     <string name="exit_form_reason_too_young">Too young</string>
+    <string name="exit_form_reason_wrong_age_group_selected">Wrong age group selected</string>
+    <string name="exit_form_reason_uncooperative_child">Uncooperative child</string>
     <string name="exit_form_reason_other">Other</string>
 
     <!-- Fetch subject -->
@@ -120,6 +122,8 @@
         <item quantity="one">%d match</item>
         <item quantity="other">%d matches</item>
     </plurals>
+    <string name="matcher_missing_access_permission">Permission is required to access data provided by the Data Collector application</string>
+    <string name="matcher_grant_permission_action">Grant permission</string>
 
     <!-- Orchestrator -->
     <string name="orchestrator_generic_error_title">Error occurred</string>
@@ -435,5 +439,19 @@
     <string name="id_pool_validation_pool_empty_message">There are no records on the device</string>
     <string name="id_pool_validation_action_close">Close</string>
     <string name="id_pool_validation_action_sync">Sync and retry</string>
+    <string name="id_pool_validation_action_continue">Proceed with capture</string>
+
+    <!-- Age group selection -->
+    <string name="age_group_selection_title">Select Subject\'s Age Group</string>
+    <string name="age_group_selection_age_range_to">to</string>
+    <string name="age_group_selection_age_range_and_above">and above</string>
+    <plurals name="age_group_selection_age_in_months">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="age_group_selection_age_in_years">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
 
 </resources>

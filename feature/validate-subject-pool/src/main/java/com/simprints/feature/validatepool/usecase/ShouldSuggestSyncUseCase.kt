@@ -19,7 +19,7 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
                 .synchronization
                 .down
                 .maxAge
-                .let(Duration.Companion::parseIsoString)
+                .let(Duration.Companion::parse)
                 .inWholeMilliseconds
 
             timeHelper.msBetweenNowAndTime(it.time) > thresholdMs

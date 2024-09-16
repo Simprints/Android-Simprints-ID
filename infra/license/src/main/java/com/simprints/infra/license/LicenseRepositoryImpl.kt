@@ -6,6 +6,7 @@ import com.simprints.infra.license.remote.License
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -14,6 +15,14 @@ internal class LicenseRepositoryImpl @Inject constructor(
     private val licenseRemoteDataSource: LicenseRemoteDataSource,
 ) : LicenseRepository {
 
+    override fun redownloadLicence(
+        projectId: String,
+        deviceId: String,
+        licenseVendor: Vendor
+    ): Flow<LicenseState> = flow {
+        licenseLocalDataSource.deleteCachedLicense(licenseVendor)
+        emitAll(getLicenseStates(projectId, deviceId, licenseVendor))
+    }
 
     override fun getLicenseStates(
         projectId: String,
@@ -50,7 +59,7 @@ internal class LicenseRepositoryImpl @Inject constructor(
      * @param licenseVendor
      * @return cached license as [String]
      */
-    override suspend fun getCachedLicense(licenseVendor: Vendor)=
+    override suspend fun getCachedLicense(licenseVendor: Vendor) =
         licenseLocalDataSource.getLicense(licenseVendor)
 
 

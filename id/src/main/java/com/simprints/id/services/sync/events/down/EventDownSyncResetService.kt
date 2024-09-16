@@ -10,6 +10,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.ExternalScope
 import com.simprints.infra.eventsync.EventSyncManager
@@ -18,6 +19,8 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,26 +36,34 @@ class EventDownSyncResetService : Service() {
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
 
+    private var resetJob: Job? = null
+
     @Inject
     @ExternalScope
     lateinit var externalScope: CoroutineScope
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Simber.tag(SYNC.name).i("Reset downSync")
-        externalScope.launch {
+        resetJob = externalScope.launch {
             startForegroundIfNeeded()
             // Reset current downsync state
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
             syncOrchestrator.startEventSync()
-            stopSelf()
+
         }
+        resetJob?.invokeOnCompletion { stopSelf() }
 
         return START_REDELIVER_INTENT
     }
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
+    }
+
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        resetJob?.cancel()
+        super.onTimeout(startId, fgsType)
     }
 
     private fun startForegroundIfNeeded() {
@@ -69,11 +80,17 @@ class EventDownSyncResetService : Service() {
                 .setPriority(NotificationManager.IMPORTANCE_LOW)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build()
-            // if runtime >= Q then use FOREGROUND_SERVICE_TYPE_DATA_SYNC
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            } else {
-                startForeground(1, notification)
+
+            when {
+                // In Android 15 dataSync type might be timed out/restricted
+                // while shortService ensures that it will always be executed
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ->
+                    startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
+                // Starting from Android 10 foreground services must declare type
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+                    startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+
+                else -> startForeground(1, notification)
             }
         }
     }

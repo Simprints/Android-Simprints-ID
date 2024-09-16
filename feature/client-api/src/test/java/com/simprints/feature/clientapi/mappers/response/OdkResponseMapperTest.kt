@@ -26,7 +26,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.EnrolActionResponse(
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             enrolledGuid = "guid",
             subjectActions = "subjects"
         ))
@@ -41,7 +40,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
             actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             identifications = listOf(
                 AppMatchResult(
                     guid = "guid-1",
@@ -72,7 +70,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
             actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             identifications = listOf()
         ))
 
@@ -84,7 +81,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.ConfirmActionResponse(
             actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             confirmed = true,
         ))
 
@@ -93,16 +89,16 @@ class OdkResponseMapperTest {
     }
 
     @Test
-    fun `correctly maps verify response`() {
+    fun `correctly maps verify response with null verificationSuccess`() {
         val extras = mapper(ActionResponse.VerifyActionResponse(
             actionIdentifier = VerifyActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             matchResult = AppMatchResult(
                 guid = "guid",
                 confidenceScore = 50,
                 tier = AppResponseTier.TIER_2,
                 matchConfidence = AppMatchConfidence.HIGH,
+                verificationSuccess = null,
             ),
         ))
 
@@ -111,6 +107,51 @@ class OdkResponseMapperTest {
         assertThat(extras.getString(OdkConstants.ODK_CONFIDENCES_KEY)).isEqualTo("50")
         assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_2")
         assertThat(extras.getBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(true)
+        assertThat(extras.getBoolean(OdkConstants.ODK_VERIFICATION_SUCCESS_KEY)).isEqualTo(false) // default value
+    }
+
+    @Test
+    fun `correctly maps verify response with verificationSuccess = false`() {
+        val extras = mapper(ActionResponse.VerifyActionResponse(
+            actionIdentifier = VerifyActionFactory.getIdentifier(),
+            sessionId = "sessionId",
+            matchResult = AppMatchResult(
+                guid = "guid",
+                confidenceScore = 50,
+                tier = AppResponseTier.TIER_2,
+                matchConfidence = AppMatchConfidence.HIGH,
+                verificationSuccess = false,
+            ),
+        ))
+
+        assertThat(extras.getString(OdkConstants.ODK_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(OdkConstants.ODK_GUIDS_KEY)).isEqualTo("guid")
+        assertThat(extras.getString(OdkConstants.ODK_CONFIDENCES_KEY)).isEqualTo("50")
+        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(true)
+        assertThat(extras.getBoolean(OdkConstants.ODK_VERIFICATION_SUCCESS_KEY)).isEqualTo(false)
+    }
+
+    @Test
+    fun `correctly maps verify response with verificationSuccess = true`() {
+        val extras = mapper(ActionResponse.VerifyActionResponse(
+            actionIdentifier = VerifyActionFactory.getIdentifier(),
+            sessionId = "sessionId",
+            matchResult = AppMatchResult(
+                guid = "guid",
+                confidenceScore = 50,
+                tier = AppResponseTier.TIER_2,
+                matchConfidence = AppMatchConfidence.HIGH,
+                verificationSuccess = true,
+            ),
+        ))
+
+        assertThat(extras.getString(OdkConstants.ODK_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(OdkConstants.ODK_GUIDS_KEY)).isEqualTo("guid")
+        assertThat(extras.getString(OdkConstants.ODK_CONFIDENCES_KEY)).isEqualTo("50")
+        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(true)
+        assertThat(extras.getBoolean(OdkConstants.ODK_VERIFICATION_SUCCESS_KEY)).isEqualTo(true)
     }
 
     @Test
@@ -118,7 +159,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.ExitFormActionResponse(
             actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             reason = "reason",
             extraText = "extra",
         ))
@@ -134,7 +174,6 @@ class OdkResponseMapperTest {
         val extras = mapper(ActionResponse.ErrorActionResponse(
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             reason = AppErrorReason.UNEXPECTED_ERROR,
             flowCompleted = true,
         ))

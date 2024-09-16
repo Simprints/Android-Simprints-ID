@@ -11,7 +11,6 @@ import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
-import com.simprints.feature.clientapi.usecases.GetEventsForCoSyncUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
@@ -58,9 +57,6 @@ internal class ClientApiViewModelTest {
     lateinit var createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase
 
     @MockK
-    lateinit var getEventJsonForSession: GetEventsForCoSyncUseCase
-
-    @MockK
     lateinit var getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase
 
     @MockK
@@ -83,7 +79,6 @@ internal class ClientApiViewModelTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         coEvery { getCurrentSessionId.invoke() } returns "sessionId"
-        coEvery { getEventJsonForSession.invoke(any(), any()) } returns "eventsJson"
         coEvery { getEnrolmentCreationEventForSubject.invoke(any(), any()) } returns "recordsJson"
         every { resultMapper.invoke(any()) } returns mockk()
         every { isFlowCompletedWithError.invoke(any()) } returns false
@@ -95,7 +90,6 @@ internal class ClientApiViewModelTest {
             simpleEventReporter = simpleEventReporter,
             getCurrentSessionId = getCurrentSessionId,
             createSessionIfRequiredUseCase = createSessionIfRequiredUseCase,
-            getEventJsonForSession = getEventJsonForSession,
             getEnrolmentCreationEventForSubject = getEnrolmentCreationEventForSubject,
             deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
             isFlowCompletedWithError = isFlowCompletedWithError,
@@ -148,7 +142,6 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.EnrolActionResponse }) }
@@ -176,7 +169,6 @@ internal class ClientApiViewModelTest {
 
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
-            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.ConfirmActionResponse }) }
@@ -193,7 +185,6 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.VerifyActionResponse }) }
@@ -213,7 +204,6 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.ExitFormActionResponse }) }
@@ -230,7 +220,6 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(false))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.ErrorActionResponse }) }

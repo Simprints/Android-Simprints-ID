@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/exitFormScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
@@ -12,141 +11,168 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <TextView
+        android:id="@+id/exitFormTitle"
+        style="@style/Text.Headline5.White.Bold"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:text="@string/exit_form_title_biometrics"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/exitFormTitle"
-            style="@style/Text.Headline5.White.Bold"
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/exitFormScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/simprints_blue"
+        android:clipToPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exitFormTitle">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <RadioGroup
+                android:id="@+id/exitFormRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioReligiousConcerns"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_religious_concerns" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioDataConcerns"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_data_concerns" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioNoPermission"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_does_not_have_permission" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioAppNotWorking"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_app_not_working" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioScannerNotWorking"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_scanner_not_working"
+                    android:visibility="gone" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFromRadioPersonNotPresent"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_person_not_present" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioTooYoung"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_too_young" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioWrongAgeGroupSelected"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_wrong_age_group_selected" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormUncooperativeChild"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_uncooperative_child" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormRadioOther"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_other" />
+            </RadioGroup>
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/exitFormInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/text_box_background"
+                android:gravity="top|start"
+                android:hint="@string/exit_form_other_reason_hint"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine"
+                android:maxLength="100"
+                android:maxLines="4"
+                android:minHeight="100dp"
+                android:padding="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/exitFormRadioGroup"
+                app:shapeAppearance="@style/Shape.Simprints.MediumComponent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/exitFromButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exitFormScrollView">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exitFormGoBack"
+            style="@style/Widget.Simprints.Button.White"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/exit_form_title_biometrics"
-            android:textAlignment="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/exit_form_continue_default_button" />
 
-        <RadioGroup
-            android:id="@+id/exitFormRadioGroup"
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exitFormSubmit"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/exitFormTitle">
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFormRadioReligiousConcerns"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_religious_concerns" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFormRadioDataConcerns"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_data_concerns" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFormRadioNoPermission"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_does_not_have_permission" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFormRadioAppNotWorking"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_app_not_working" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFormRadioScannerNotWorking"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_scanner_not_working"
-                android:visibility="gone" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFromRadioPersonNotPresent"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_person_not_present" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFormRadioTooYoung"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_too_young" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/exitFormRadioOther"
-                style="@style/Widget.Simprints.RadioButton.White"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/exit_form_reason_other" />
-        </RadioGroup>
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/exitFormInputField"
-            app:shapeAppearance="@style/Shape.Simprints.MediumComponent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/text_box_background"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
             android:enabled="false"
-            android:gravity="top|start"
-            android:hint="@string/exit_form_other_reason_hint"
-            android:imeOptions="actionDone"
-            android:inputType="textMultiLine"
-            android:maxLength="100"
-            android:maxLines="4"
-            android:minHeight="100dp"
-            android:padding="8dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exitFormRadioGroup" />
-
-        <LinearLayout
-            android:id="@+id/exitFromButtons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exitFormInputField">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/exitFormGoBack"
-                style="@style/Widget.Simprints.Button.White"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="@string/exit_form_continue_default_button" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/exitFormSubmit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:enabled="false"
-                android:text="@string/exit_form_submit_button"
-                tools:enabled="true" />
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.core.widget.NestedScrollView>
+            android:text="@string/exit_form_submit_button"
+            tools:enabled="true" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

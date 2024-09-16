@@ -6,13 +6,15 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
+import com.simprints.matcher.usecases.MatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -64,8 +66,6 @@ internal class MatchViewModelTest {
         cb1 = slot()
 
         every { timeHelper.now() } returns Timestamp(0L)
-        coEvery { faceMatcherUseCase.matcherName() } returns MATCHER_NAME
-        coEvery { fingerprintMatcherUseCase.matcherName() } returns MATCHER_NAME
 
         viewModel = MatchViewModel(
             faceMatcherUseCase,
@@ -73,6 +73,42 @@ internal class MatchViewModelTest {
             saveMatchEvent,
             timeHelper
         )
+    }
+
+    @Test
+    fun `when setup is called, then view model becomes initialized`() = runTest {
+        val responseItems = listOf(
+            FaceMatchResult.Item("1", 90f),
+        )
+
+        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
+            cb1.captured.invoke("tag1")
+            MatcherUseCase.MatcherResult(
+                matchResultItems = responseItems,
+                totalCandidates = responseItems.size,
+                matcherName = "MatcherName"
+            )
+        }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
+
+        assertThat(viewModel.isInitialized).isFalse()
+
+        viewModel.matchState.test()
+        viewModel.setupMatch(MatchParams(
+            probeFaceSamples = listOf(getFaceSample()),
+            flowType = FlowType.ENROL,
+            queryForCandidates = mockk {},
+            biometricDataSource = BiometricDataSource.Simprints,
+        ))
+
+        assertThat(viewModel.isInitialized).isTrue()
+    }
+
+    @Test
+    fun `Handles no permission call`() = runTest {
+        val states = viewModel.matchState.test()
+        viewModel.noPermission(true)
+        assertThat(states.value()).isEqualTo(MatchViewModel.MatchState.NoPermission(true))
     }
 
     @Test
@@ -89,17 +125,24 @@ internal class MatchViewModelTest {
 
         coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
             cb1.captured.invoke("tag1")
-            responseItems to responseItems.size
+            MatcherUseCase.MatcherResult(
+                matchResultItems = responseItems,
+                totalCandidates = responseItems.size,
+                matcherName = MATCHER_NAME
+            )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
 
         val states = viewModel.matchState.test()
-        viewModel.setupMatch(MatchParams(
-            probeFaceSamples = listOf(getFaceSample()),
-            flowType = FlowType.ENROL,
-            queryForCandidates = mockk {},
-            biometricDataSource = BiometricDataSource.SIMPRINTS,
-        ))
+        viewModel.setupMatch(
+            MatchParams(
+                probeFaceSamples = listOf(getFaceSample()),
+                flowType = FlowType.ENROL,
+                queryForCandidates = mockk {},
+                biometricDataSource = BiometricDataSource.Simprints,
+            )
+        )
+        // Waiting for the ::delay in viewModel::setupMatch
         advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
@@ -130,18 +173,26 @@ internal class MatchViewModelTest {
 
         coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1)) } answers {
             cb1.captured.invoke("tag1")
-            responseItems to responseItems.size
+            MatcherUseCase.MatcherResult(
+                matchResultItems = responseItems,
+                totalCandidates = responseItems.size,
+                matcherName = MATCHER_NAME
+            )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
 
         val states = viewModel.matchState.test()
 
-        viewModel.setupMatch(MatchParams(
-            probeFingerprintSamples = listOf(getFingerprintSample()),
-            flowType = FlowType.ENROL,
-            queryForCandidates = mockk {},
-            biometricDataSource = BiometricDataSource.SIMPRINTS,
-        ))
+        viewModel.setupMatch(
+            MatchParams(
+                probeFingerprintSamples = listOf(getFingerprintSample()),
+                fingerprintSDK = SECUGEN_SIM_MATCHER,
+                flowType = FlowType.ENROL,
+                queryForCandidates = mockk {},
+                biometricDataSource = BiometricDataSource.Simprints,
+            )
+        )
+        // Waiting for the ::delay in viewModel::setupMatch
         advanceUntilIdle()
 
         assertThat(states.valueHistory()).isEqualTo(
@@ -152,7 +203,7 @@ internal class MatchViewModelTest {
             )
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FingerprintMatchResult(responseItems)
+            FingerprintMatchResult(responseItems, SECUGEN_SIM_MATCHER)
         )
 
         verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
@@ -169,7 +220,6 @@ internal class MatchViewModelTest {
         )
 
     companion object {
-
         const val MATCHER_NAME = "any matcher"
     }
 }

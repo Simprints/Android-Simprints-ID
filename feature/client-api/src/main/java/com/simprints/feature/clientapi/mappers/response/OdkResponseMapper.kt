@@ -36,7 +36,11 @@ internal class OdkResponseMapper @Inject constructor() {
             OdkConstants.ODK_GUIDS_KEY to response.matchResult.guid,
             OdkConstants.ODK_CONFIDENCES_KEY to response.matchResult.confidenceScore.toString(),
             OdkConstants.ODK_TIERS_KEY to response.matchResult.tier.name,
-        ).addFlowCompletedCheckBasedOnAction(response.actionIdentifier, true)
+        ).also {
+            response.matchResult.verificationSuccess?.let { verificationSuccess ->
+                it.putBoolean(OdkConstants.ODK_VERIFICATION_SUCCESS_KEY, verificationSuccess)
+            }
+        }.addFlowCompletedCheckBasedOnAction(response.actionIdentifier, true)
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             OdkConstants.ODK_SESSION_ID to response.sessionId,

@@ -6,7 +6,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -54,7 +54,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private val args: FingerprintCaptureFragmentArgs by navArgs()
     private val binding by viewBinding(FragmentFingerprintCaptureBinding::bind)
-    private val vm: FingerprintCaptureViewModel by activityViewModels()
+    private val vm: FingerprintCaptureViewModel by viewModels()
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private var confirmDialog: AlertDialog? = null
@@ -99,7 +99,10 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
         vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
 
-        vm.handleOnViewCreated(args.params.fingerprintsToCapture)
+        vm.handleOnViewCreated(
+            args.params.fingerprintsToCapture,
+            args.params.fingerprintSDK,
+        )
 
         initUI()
     }
@@ -113,7 +116,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     private fun observeBioSdkInit() {
-        vm.invalidLicense.observe(viewLifecycleOwner) {
+        vm.invalidLicense.observe(viewLifecycleOwner, LiveDataEventObserver {
             findNavController().navigateSafely(
                 this,
                 R.id.action_fingerprintCaptureFragment_to_graphAlert,
@@ -127,7 +130,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     eventType = AlertScreenEventType.LICENSE_INVALID
                 }.toArgs()
             )
-        }
+        })
     }
 
     private fun openRefusal() {
@@ -228,7 +231,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             findNavController().navigateSafely(
                 this,
                 R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
-                FingerprintConnectContract.getArgs(true)
+                FingerprintConnectContract.getArgs(args.params.fingerprintSDK)
             )
         } catch (e: Exception) {
             Simber.tag(FINGER_CAPTURE.name).i("Error launching scanner connection screen", e)

@@ -10,15 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.infra.uibase.view.setTextWithFallbacks
-import com.simprints.infra.uibase.listeners.TextWatcherOnChangeListener
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.R
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.databinding.FragmentExitFormBinding
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.listeners.TextWatcherOnChangeListener
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.view.setTextWithFallbacks
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -48,17 +48,9 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
             default = IDR.string.exit_form_continue_default_button,
         )
 
-        setLayoutChangeListener()
         setOptionsVisible(config.visibleOptions)
         handleClicks()
         observeViewModel()
-    }
-
-    //Changes in the layout occur when the keyboard shows up
-    private fun setLayoutChangeListener() {
-        binding.exitFormScrollView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            binding.exitFormScrollView.fullScroll(View.FOCUS_DOWN)
-        }
     }
 
     private fun setOptionsVisible(options: Set<ExitFormOption>) = with(binding) {
@@ -69,6 +61,8 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         exitFormRadioScannerNotWorking.isVisible = options.contains(ExitFormOption.ScannerNotWorking)
         exitFromRadioPersonNotPresent.isVisible = options.contains(ExitFormOption.PersonNotPresent)
         exitFormRadioTooYoung.isVisible = options.contains(ExitFormOption.TooYoung)
+        exitFormRadioWrongAgeGroupSelected.isVisible = options.contains(ExitFormOption.WrongAgeGroupSelected)
+        exitFormUncooperativeChild.isVisible = options.contains(ExitFormOption.UncooperativeChild)
         exitFormRadioOther.isVisible = options.contains(ExitFormOption.Other)
     }
 
@@ -99,6 +93,8 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         R.id.exitFormRadioScannerNotWorking -> ExitFormOption.ScannerNotWorking
         R.id.exitFromRadioPersonNotPresent -> ExitFormOption.PersonNotPresent
         R.id.exitFormRadioTooYoung -> ExitFormOption.TooYoung
+        R.id.exitFormUncooperativeChild -> ExitFormOption.UncooperativeChild
+        R.id.exitFormRadioWrongAgeGroupSelected -> ExitFormOption.WrongAgeGroupSelected
         else -> ExitFormOption.Other
     }
 

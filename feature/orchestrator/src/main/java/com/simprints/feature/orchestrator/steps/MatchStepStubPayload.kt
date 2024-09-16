@@ -3,10 +3,11 @@ package com.simprints.feature.orchestrator.steps
 import android.os.Parcelable
 import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowType
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.matcher.MatchContract
 import com.simprints.matcher.MatchParams
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -20,6 +21,7 @@ internal data class MatchStepStubPayload(
     val flowType: FlowType,
     val subjectQuery: SubjectQuery,
     val biometricDataSource: BiometricDataSource,
+    val fingerprintSDK: FingerprintConfiguration.BioSdk?,
 ) : Parcelable {
 
     fun toFaceStepArgs(samples: List<MatchParams.FaceSample>) = MatchContract.getArgs(
@@ -31,6 +33,7 @@ internal data class MatchStepStubPayload(
 
     fun toFingerprintStepArgs(samples: List<MatchParams.FingerprintSample>) = MatchContract.getArgs(
         fingerprintSamples = samples,
+        fingerprintSDK = fingerprintSDK,
         flowType = flowType,
         subjectQuery =    subjectQuery,
         biometricDataSource = biometricDataSource,
@@ -43,6 +46,7 @@ internal data class MatchStepStubPayload(
             flowType: FlowType,
             subjectQuery: SubjectQuery,
             biometricDataSource: BiometricDataSource,
-        ) = bundleOf(STUB_KEY to MatchStepStubPayload(flowType, subjectQuery, biometricDataSource))
+            fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
+        ) = bundleOf(STUB_KEY to MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, fingerprintSDK))
     }
 }

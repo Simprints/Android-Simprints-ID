@@ -48,6 +48,17 @@ internal class SessionEventRepositoryImplTest {
     }
 
     @Test
+    fun `when create session is called, then the event cache is cleared`() = runTest {
+        coEvery { eventRepository.createEventScope(any()) } returns mockk()
+        sessionDataCache.eventCache["test"] = mockk()
+
+        sessionEventRepository.createSession()
+
+        coVerify { eventRepository.createEventScope(EventScopeType.SESSION) }
+        assertThat(sessionDataCache.eventCache).isEmpty()
+    }
+
+    @Test
     fun `closes existing sessions when creating new session`() = runTest {
         coEvery { eventRepository.createEventScope(any()) } returns createSessionScope("mockId")
 
@@ -112,10 +123,12 @@ internal class SessionEventRepositoryImplTest {
     @Test
     fun `return current scope from db if no cache`() = runTest {
         coEvery { eventRepository.getOpenEventScopes(any()) } returns listOf(createSessionScope("mockId"))
+        sessionDataCache.eventCache["test"] = mockk()
 
         val loadedSession = sessionEventRepository.getCurrentSessionScope()
 
         assertThat(loadedSession.id).isEqualTo("mockId")
+        assertThat(sessionDataCache.eventCache).isEmpty()
     }
 
     @Test

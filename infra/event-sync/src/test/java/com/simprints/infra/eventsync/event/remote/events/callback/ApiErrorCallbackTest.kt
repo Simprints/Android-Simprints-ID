@@ -1,15 +1,14 @@
 package com.simprints.infra.eventsync.event.remote.events.callback
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback
-import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.*
+import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
 import com.simprints.infra.eventsync.event.remote.models.callback.fromApiToDomain
 import com.simprints.infra.eventsync.event.remote.models.callback.fromDomainToApi
 import org.junit.Test
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 
 class ApiErrorCallbackTest {
-
 
     @Test
     fun `ApiReason correctly mapped to domain`() {
@@ -28,7 +27,8 @@ class ApiErrorCallbackTest {
             ApiErrorCallback.ApiReason.BACKEND_MAINTENANCE_ERROR to ErrorReason.BACKEND_MAINTENANCE_ERROR,
             ApiErrorCallback.ApiReason.PROJECT_ENDING to ErrorReason.PROJECT_ENDING,
             ApiErrorCallback.ApiReason.PROJECT_PAUSED to ErrorReason.PROJECT_PAUSED,
-            ApiErrorCallback.ApiReason.BLUETOOTH_NO_PERMISSION to ErrorReason.BLUETOOTH_NO_PERMISSION
+            ApiErrorCallback.ApiReason.BLUETOOTH_NO_PERMISSION to ErrorReason.BLUETOOTH_NO_PERMISSION,
+            ApiErrorCallback.ApiReason.AGE_GROUP_NOT_SUPPORTED to ErrorReason.AGE_GROUP_NOT_SUPPORTED,
         ).forEach {
             assertThat(it.key.fromApiToDomain()).isEqualTo(it.value)
         }
@@ -53,6 +53,7 @@ class ApiErrorCallbackTest {
             ErrorReason.PROJECT_ENDING to ApiErrorCallback.ApiReason.PROJECT_ENDING,
             ErrorReason.PROJECT_PAUSED to ApiErrorCallback.ApiReason.PROJECT_PAUSED,
             ErrorReason.BLUETOOTH_NO_PERMISSION to ApiErrorCallback.ApiReason.BLUETOOTH_NO_PERMISSION,
+            ErrorReason.AGE_GROUP_NOT_SUPPORTED to ApiErrorCallback.ApiReason.AGE_GROUP_NOT_SUPPORTED,
         ).forEach {
             assertThat(it.key.fromDomainToApi()).isEqualTo(it.value)
         }

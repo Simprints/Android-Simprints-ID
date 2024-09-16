@@ -13,7 +13,7 @@ internal data class ApiLicense(val licenses: Map<Vendor, License> = emptyMap()) 
 }
 
 @Keep
-data class License(val expiration: String, val data: String)
+data class License(val expiration: String?, val data: String)
 
 /**
  * BFSID returns an error in the following format:

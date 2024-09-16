@@ -30,6 +30,11 @@ internal class MatchViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
 
+    var isInitialized = false
+        private set
+
+    var shouldCheckPermission: Boolean = true
+
     val matchState: LiveData<MatchState>
         get() = _matchState
     private val _matchState = MutableLiveData<MatchState>(MatchState.NotStarted)
@@ -39,6 +44,7 @@ internal class MatchViewModel @Inject constructor(
     private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
+        isInitialized = true
         val startTime = timeHelper.now()
 
         val isFaceMatch = params.isFaceMatch()
@@ -47,7 +53,7 @@ internal class MatchViewModel @Inject constructor(
             else -> fingerprintMatcher
         }
 
-        val (sortedResults, totalCandidates) = matcherUseCase(
+        val matcherResult = matcherUseCase(
             params,
             onLoadingCandidates = { tag ->
                 Simber.tag(tag).i("Loading candidates")
@@ -61,20 +67,22 @@ internal class MatchViewModel @Inject constructor(
             startTime,
             endTime,
             params,
-            totalCandidates,
-            matcherUseCase.matcherName(),
-            sortedResults
+            matcherResult.totalCandidates,
+            matcherResult.matcherName,
+            matcherResult.matchResultItems
         )
 
-        setMatchState(totalCandidates, sortedResults)
+        setMatchState(matcherResult.totalCandidates, matcherResult.matchResultItems)
 
         // wait a bit for the user to see the results
         delay(matchingEndWaitTimeInMillis)
 
-        _matchResponse.send(when {
-            isFaceMatch -> FaceMatchResult(sortedResults)
-            else -> FingerprintMatchResult(sortedResults)
-        })
+        _matchResponse.send(
+            when {
+                isFaceMatch -> FaceMatchResult(matcherResult.matchResultItems)
+                else -> FingerprintMatchResult(matcherResult.matchResultItems, params.fingerprintSDK!!)
+            }
+        )
     }
 
     private fun setMatchState(candidatesMatched: Int, results: List<MatchResultItem>) {
@@ -84,31 +92,42 @@ internal class MatchViewModel @Inject constructor(
         val fairMatches =
             results.count { fairMatchThreshold <= it.confidence && it.confidence < goodMatchThreshold }
 
-        _matchState.postValue(MatchState.Finished(
-            candidatesMatched,
-            results.size,
-            veryGoodMatches,
-            goodMatches,
-            fairMatches
-        ))
+        _matchState.postValue(
+            MatchState.Finished(
+                candidatesMatched,
+                results.size,
+                veryGoodMatches,
+                goodMatches,
+                fairMatches
+            )
+        )
+    }
+
+    fun noPermission(neverAskAgain: Boolean) {
+        _matchState.postValue(MatchState.NoPermission(shouldOpenSettings = neverAskAgain))
     }
 
     sealed class MatchState {
         data object NotStarted : MatchState()
         data object LoadingCandidates : MatchState()
         data object Matching : MatchState()
+        data class NoPermission(
+            val shouldOpenSettings: Boolean,
+        ) : MatchState()
+
         data class Finished(
             val candidatesMatched: Int,
             val returnSize: Int,
             val veryGoodMatches: Int,
             val goodMatches: Int,
-            val fairMatches: Int
+            val fairMatches: Int,
         ) : MatchState()
     }
 
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
+
         private const val veryGoodMatchThreshold = 50.0
         private const val goodMatchThreshold = 35.0
         private const val fairMatchThreshold = 20.0

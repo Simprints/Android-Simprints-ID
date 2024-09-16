@@ -41,8 +41,8 @@ internal class ConnectScannerViewModel @Inject constructor(
     private val saveScannerConnectionEvents: SaveScannerConnectionEventsUseCase,
 ) : ViewModel() {
 
-    private var isReconnect = false
-    private lateinit var allowedGenerations: List<FingerprintConfiguration.VeroGeneration>
+    private lateinit var fingerprintSdk: FingerprintConfiguration.BioSdk
+    private var allowedGenerations: List<FingerprintConfiguration.VeroGeneration> = emptyList()
     private var remainingConnectionAttempts = 0
 
     val currentStep: LiveData<Step>
@@ -69,7 +69,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     private val backButtonBehaviour = MutableLiveData(BackButtonBehaviour.EXIT_FORM)
 
     fun init(params: FingerprintConnectParams) = viewModelScope.launch {
-        isReconnect = params.isReconnect
+        fingerprintSdk = params.fingerprintSDK
         allowedGenerations = configManager.getProjectConfiguration()
             .fingerprint
             ?.allowedScanners
@@ -166,7 +166,7 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     private suspend fun setupVero() {
         _currentStep.postValue(Step.SetupScanner)
-        scannerManager.scanner.setScannerInfoAndCheckAvailableOta()
+        scannerManager.scanner.setScannerInfoAndCheckAvailableOta(fingerprintSdk)
         setLastConnectedScannerInfo()
         logMessageForCrashReport("ScannerManager: setupVero")
     }

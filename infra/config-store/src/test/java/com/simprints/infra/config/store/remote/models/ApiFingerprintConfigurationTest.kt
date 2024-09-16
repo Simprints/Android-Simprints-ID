@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.remote.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero1Configuration
@@ -18,6 +19,21 @@ class ApiFingerprintConfigurationTest {
     }
 
     @Test
+    fun `should map correctly the model with allowedAgeRange null`() {
+        val apiFingerprintConfigurationWithAgeRange = apiFingerprintConfiguration.copy(
+            secugenSimMatcher = apiFingerprintConfiguration.secugenSimMatcher?.copy(
+                allowedAgeRange = null
+            )
+        )
+        val fingerprintConfigurationWithAgeRange = fingerprintConfiguration.copy(
+            secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
+                allowedAgeRange = AgeGroup(0, null)
+            )
+        )
+        assertThat(apiFingerprintConfigurationWithAgeRange.toDomain()).isEqualTo(fingerprintConfigurationWithAgeRange)
+    }
+
+    @Test
     fun `should map correctly the model when the vero1 is missing`() {
         val apiFingerprintConfiguration = ApiFingerprintConfiguration(
             listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
@@ -29,6 +45,7 @@ class ApiFingerprintConfigurationTest {
                 ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 null,
                 apiFingerprintConfiguration.secugenSimMatcher?.vero2,
+                apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
             ),
             null,
         )
@@ -42,6 +59,7 @@ class ApiFingerprintConfigurationTest {
                 FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 null,
                 fingerprintConfiguration.secugenSimMatcher?.vero2,
+                fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
             ),
             null,
         )
@@ -62,6 +80,7 @@ class ApiFingerprintConfigurationTest {
                 ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 ApiVero1Configuration(10),
                 null,
+                apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!
             ),
 
             )
@@ -76,6 +95,7 @@ class ApiFingerprintConfigurationTest {
                 FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 Vero1Configuration(10),
                 null,
+                fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!
             ),
 
             )

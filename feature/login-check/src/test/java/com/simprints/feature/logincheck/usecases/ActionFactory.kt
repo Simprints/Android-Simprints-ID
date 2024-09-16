@@ -19,6 +19,7 @@ internal object ActionFactory {
         moduleId = MOCK_MODULE_ID,
         unknownExtras = extras,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
+        callerPackageName = "",
         metadata = "",
     )
 
@@ -31,6 +32,7 @@ internal object ActionFactory {
         userId = MOCK_USER_ID,
         sessionId = "sessionId",
         selectedGuid = "selectedGuid",
+        metadata = "",
         unknownExtras = emptyMap()
     )
 

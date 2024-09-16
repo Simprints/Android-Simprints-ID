@@ -57,7 +57,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         withContext(dispatcherIo) {
             createDirectoryIfNonExistent(licenseDirectoryPath)
             saveLicenseData(vendor, license.data)
-            saveExpirationDate(vendor, license.expiration)
+            license.expiration?.let { saveExpirationDate(vendor, it) }
         }
 
     private fun saveLicenseData(vendor: Vendor, licenseData: String) {

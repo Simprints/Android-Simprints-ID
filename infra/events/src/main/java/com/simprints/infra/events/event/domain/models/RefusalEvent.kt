@@ -51,7 +51,6 @@ data class RefusalEvent(
 
         @Keep
         enum class Answer {
-
             REFUSED_RELIGION,
             REFUSED_DATA_CONCERNS,
             REFUSED_PERMISSION,
@@ -59,6 +58,8 @@ data class RefusalEvent(
             APP_NOT_WORKING,
             REFUSED_NOT_PRESENT,
             REFUSED_YOUNG,
+            WRONG_AGE_GROUP_SELECTED,
+            UNCOOPERATIVE_CHILD,
             OTHER
         }
     }

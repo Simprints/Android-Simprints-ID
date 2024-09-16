@@ -22,7 +22,7 @@
     <string name="consent_parental_share_data_no">उनके %1$s व वर्तमान स्थान की जानकारी पर सिंप्रिंट्स की पहुँच होगी जोकि एक ब्रिटेन आधारित स्वयं-सेवी संस्था है।</string>
     <string name="consent_parental_share_data_yes">उनके %2$s व वर्तमान स्थान की जानकारी पर %1$s व सिंप्रिंट्स की पहुँच होगी जोकि एक ब्रिटेन आधारित स्वयं-सेवी संस्था है।</string>
     <string name="consent_parental_privacy_rights">यदि आप अभी सहमति देते हैं, तो भी बाद में किसी भी समय अपनी  सहमति वापस ले सकते हैं और अपने बच्चे का डाटा मिटाने के लिए कह सकते हैं।</string>
-    <string name="consent_parental_confirmation">क्या हम आपके बच्चे के %1$s का उपयोग कर सकते हैं ? कृपया कहें \"मैं सहमत हूँ \", \"मैं सहमत नहीं हूँ \", or \"मेरे कुछ सवाल हैं.\"</string>
+    <string name="consent_parental_confirmation">क्या हम आपके %1$s का उपयोग कर सकते हैं ? कृपया कहें \"मैं सहमत हूँ \", \"मैं सहमत नहीं हूँ \", या \"मेरे कुछ सवाल हैं.\"</string>
     <string name="consent_biometrics_general_fingerprint">अपनी उंगलियों के निशान का उपयोग करें</string>
     <string name="consent_biometric_general_face">अपने चेहरे की फ़ोटो लें</string>
     <string name="consent_biometrics_access_fingerprint">फ़िंगरप्रिंट जानकारी</string>
@@ -66,6 +66,7 @@
     <string name="exit_form_reason_scanner_not_working">स्कैनर काम नहीं कर रहा</string>
     <string name="exit_form_reason_person_not_present">व्यक्ति उपस्थित नहीं है</string>
     <string name="exit_form_reason_too_young">आयु बहुत कम है</string>
+    <string name="exit_form_reason_wrong_age_group_selected">गलत आयु वर्ग का चयन किया गया है</string>
     <string name="exit_form_reason_other">अन्य</string>
 
     <!-- Fetch subject -->
@@ -86,7 +87,7 @@
     <string name="login_qr_code_scanning_camera_unavailable_error">फेस के प्रकार को कॉन्फ़िगर करते समय त्रुटि हुई, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
     <string name="login_invalid_qr_code_error">स्कैन किया गया क्यूआर कोड अमान्य है</string>
     <string name="login_missing_credentials_error">कोई प्रविष्टि छूट रही है। कृपया यूज़र ID, प्रोजेक्ट ID व कुंजी को जाँच लें व पुनः प्रयास करें।</string>
-    <string name="login_invalid_credentials_error">अमान्य प्रविष्टि। कृपया प्रोजेक्ट आईडी व कुंजी की जाँच करें।</string>
+    <string name="login_invalid_credentials_error">लॉगिन त्रुटि। कृपया प्रोजेक्ट क्रेडेंशियल की जांच करें और सुनिश्चित करें कि प्रोजेक्ट सक्रिय है।</string>
     <string name="login_project_id_intent_mismatch_error">प्रोजेक्ट आईडी भिन्न डाला गया है। कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें।</string>
     <string name="login_no_network_error">वर्तमान में ऑफ़-लाइन। कृपया अपने इंटरनेट कनेक्शन को जाँच लें।</string>
     <string name="login_integrity_service_down_error">सर्वर से जोड़ने में समस्या आ रही है। कृपया पुनः प्रयास करें।</string>
@@ -120,6 +121,8 @@
         <item quantity="one">%d मेल</item>
         <item quantity="other">%d मेल खाते हैं</item>
     </plurals>
+    <string name="matcher_missing_access_permission">डेटा कलेक्टर एप्लिकेशन द्वारा प्रदान किए गए डेटा तक पहुंचने के लिए अनुमति आवश्यक है</string>
+    <string name="matcher_grant_permission_action">अनुमति दीजिये</string>
 
     <!-- Orchestrator -->
     <string name="orchestrator_generic_error_title">त्रुटि</string>
@@ -181,6 +184,7 @@
     <string name="face_capture_begin_button">कैप्चर करने के लिए टैप करें</string>
     <string name="face_capture_prep_begin_button_capturing">कैप्चर हो रहा है.......</string>
     <string name="face_capture_permission_denied">कृपया कैमरे की अनुमति दें</string>
+    <string name="face_capture_permission_action">अनुमति दीजिये</string>
     <string name="face_capture_hold">अपनी जगह पर रहें</string>
     <string name="face_capture_successfully_title">चेहरे को सफलतापूर्वक कैप्चर कर लिया गया है।</string>
     <string name="face_capture_confirmation_title">पुष्टीकरण</string>
@@ -421,5 +425,30 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">समन्वयन प्रगति पर है</string>
+
+    <!-- Identification pool validation -->
+    <string name="id_pool_validation_issue_title">पहचान संबंधी समस्या</string>
+    <string name="id_pool_validation_default_message">पहचान उम्मीदवार पूल की जाँच की जा रही है</string>
+    <string name="id_pool_validation_user_mismatch_message">प्रदान की गई परिचर आईडी समकालिक डेटा से मेल नहीं खाती</string>
+    <string name="id_pool_validation_module_mismatch_message">प्रदान किया गया मॉड्यूल आईडी समकालिक डेटा से मेल नहीं खाता</string>
+    <string name="id_pool_validation_sync_required_message">हाल ही में डेटा सिंक्रनाइज़ नहीं किया गया है</string>
+    <string name="id_pool_validation_syncing_message">समन्वयन...</string>
+    <string name="id_pool_validation_pool_empty_message">डिवाइस पर कोई रिकॉर्ड नहीं है</string>
+    <string name="id_pool_validation_action_close">बंद करें</string>
+    <string name="id_pool_validation_action_sync">सिंक करें और पुनः प्रयास करें</string>
+    <string name="id_pool_validation_action_continue">कैप्चर करने के साथ आगे बढ़ें</string>
+
+    <!-- Age group selection -->
+    <string name="age_group_selection_title">विषय आयु समूह का चयन करें</string>
+    <string name="age_group_selection_age_range_to">को</string>
+    <string name="age_group_selection_age_range_and_above">और ऊपर</string>
+    <plurals name="age_group_selection_age_in_months">
+        <item quantity="one">%d महीना</item>
+        <item quantity="other">%d महीने</item>
+    </plurals>
+    <plurals name="age_group_selection_age_in_years">
+        <item quantity="one">%d साल</item>
+        <item quantity="other">%d साल</item>
+    </plurals>
 
 </resources>

@@ -30,7 +30,6 @@ class CommCareResponseMapperTest {
         val extras = mapper(ActionResponse.EnrolActionResponse(
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             enrolledGuid = "guid",
             subjectActions = "subjects"
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
@@ -45,7 +44,6 @@ class CommCareResponseMapperTest {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
             actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             identifications = listOf(
                 AppMatchResult(
                     guid = "guid-1",
@@ -79,7 +77,6 @@ class CommCareResponseMapperTest {
         val extras = mapper(ActionResponse.ConfirmActionResponse(
             actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             confirmed = true,
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
@@ -88,16 +85,16 @@ class CommCareResponseMapperTest {
     }
 
     @Test
-    fun `correctly maps verify response`() {
+    fun `correctly maps verify response with null verificationSuccess`() {
         val extras = mapper(ActionResponse.VerifyActionResponse(
             actionIdentifier = VerifyActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             matchResult = AppMatchResult(
                 guid = "guid",
                 confidenceScore = 50,
                 tier = AppResponseTier.TIER_2,
                 matchConfidence = AppMatchConfidence.HIGH,
+                verificationSuccess = null,
             ),
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
@@ -106,6 +103,51 @@ class CommCareResponseMapperTest {
         assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_2")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_SUCCESS_KEY)).isNull()
+    }
+
+    @Test
+    fun `correctly maps verify response with verificationSuccess = false`() {
+        val extras = mapper(ActionResponse.VerifyActionResponse(
+            actionIdentifier = VerifyActionFactory.getIdentifier(),
+            sessionId = "sessionId",
+            matchResult = AppMatchResult(
+                guid = "guid",
+                confidenceScore = 50,
+                tier = AppResponseTier.TIER_2,
+                matchConfidence = AppMatchConfidence.HIGH,
+                verificationSuccess = false,
+            ),
+        )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_SUCCESS_KEY)).isEqualTo("false")
+    }
+
+    @Test
+    fun `correctly maps verify response with verificationSuccess = true`() {
+        val extras = mapper(ActionResponse.VerifyActionResponse(
+            actionIdentifier = VerifyActionFactory.getIdentifier(),
+            sessionId = "sessionId",
+            matchResult = AppMatchResult(
+                guid = "guid",
+                confidenceScore = 50,
+                tier = AppResponseTier.TIER_2,
+                matchConfidence = AppMatchConfidence.HIGH,
+                verificationSuccess = true,
+            ),
+        )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
+
+        assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_SUCCESS_KEY)).isEqualTo("true")
     }
 
     @Test
@@ -113,7 +155,6 @@ class CommCareResponseMapperTest {
         val extras = mapper(ActionResponse.ExitFormActionResponse(
             actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             reason = "reason",
             extraText = "extra",
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
@@ -129,7 +170,6 @@ class CommCareResponseMapperTest {
         val extras = mapper(ActionResponse.ErrorActionResponse(
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
-            eventsJson = null,
             reason = AppErrorReason.UNEXPECTED_ERROR,
             flowCompleted = true,
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()

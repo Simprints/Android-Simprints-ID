@@ -8,6 +8,7 @@ import com.simprints.matcher.FingerprintMatchResult
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -24,7 +25,7 @@ internal class IsNewEnrolmentUseCaseTest {
 
 
         every { projectConfiguration.face?.decisionPolicy } returns faceConfidenceDecisionPolicy
-        every { projectConfiguration.fingerprint?.bioSdkConfiguration?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
+        every { projectConfiguration.fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
 
         useCase = IsNewEnrolmentUseCase()
     }
@@ -48,7 +49,10 @@ internal class IsNewEnrolmentUseCaseTest {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FingerprintMatchResult(
+                listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore)),
+                mockk(),
+            ),
         ))).isTrue()
     }
 
@@ -57,7 +61,10 @@ internal class IsNewEnrolmentUseCaseTest {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore))),
+            FingerprintMatchResult(
+                listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore)),
+                mockk(),
+            ),
         ))).isFalse()
     }
 
@@ -84,7 +91,10 @@ internal class IsNewEnrolmentUseCaseTest {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FingerprintMatchResult(
+                listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore)),
+                mockk(),
+            ),
             FaceMatchResult(listOf(FaceMatchResult.Item("", lowerThanMediumConfidenceScore))),
         ))).isTrue()
     }
@@ -94,7 +104,10 @@ internal class IsNewEnrolmentUseCaseTest {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FingerprintMatchResult(
+                listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore)),
+                mockk(),
+            ),
             FaceMatchResult(listOf(FaceMatchResult.Item("", higherThanMediumConfidenceScore))),
         ))).isFalse()
     }
@@ -104,7 +117,10 @@ internal class IsNewEnrolmentUseCaseTest {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore))),
+            FingerprintMatchResult(
+                listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore)),
+                mockk(),
+            ),
             FaceMatchResult(listOf(FaceMatchResult.Item("", lowerThanMediumConfidenceScore))),
         ))).isFalse()
     }

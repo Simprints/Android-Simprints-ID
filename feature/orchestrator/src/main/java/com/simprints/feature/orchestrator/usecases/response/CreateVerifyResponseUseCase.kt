@@ -1,8 +1,9 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
@@ -18,34 +19,52 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ): AppResponse = listOfNotNull(
-        getFingerprintMatchResults(
-            projectConfiguration.fingerprint?.bioSdkConfiguration?.decisionPolicy,
-            results
-        ),
-        getFaceMatchResults(projectConfiguration.face?.decisionPolicy, results),
+        getFingerprintMatchResults(projectConfiguration, results),
+        getFaceMatchResults(projectConfiguration, results),
     ).maxByOrNull { it.confidenceScore }
         ?.let { AppVerifyResponse(it) }
-        ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
+        ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR).also {
+            //if subject enrolled with an SDK and the user tries to verify with another SDK
+            Simber.tag(CrashReportTag.MATCHING.name).e("No match results found")
+        }
 
     private fun getFingerprintMatchResults(
-        faceDecisionPolicy: DecisionPolicy?,
+        projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
-    ) = if (faceDecisionPolicy != null) {
-        results.filterIsInstance(FingerprintMatchResult::class.java)
-            .lastOrNull()
-            ?.results
-            ?.maxByOrNull { it.confidence }
-            ?.let { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
-    } else null
+    ) =  results.filterIsInstance<FingerprintMatchResult>()
+            .lastOrNull()?.let { fingerprintMatchResult ->
+                projectConfiguration.fingerprint
+                    ?.getSdkConfiguration(fingerprintMatchResult.sdk)
+                    ?.let { sdkConfiguration ->
+                        fingerprintMatchResult.results
+                            .maxByOrNull { it.confidence }
+                            ?.let {
+                                AppMatchResult(
+                                    guid = it.subjectId,
+                                    confidenceScore = it.confidence,
+                                    decisionPolicy = sdkConfiguration.decisionPolicy,
+                                    verificationMatchThreshold = sdkConfiguration.verificationMatchThreshold
+                                )
+                            }
+                    }
+            }
 
     private fun getFaceMatchResults(
-        faceDecisionPolicy: DecisionPolicy?,
+        projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
-    ) = if (faceDecisionPolicy != null) {
-        results.filterIsInstance(FaceMatchResult::class.java)
-            .lastOrNull()
-            ?.results
-            ?.maxByOrNull { it.confidence }
-            ?.let { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
-    } else null
+    ) = results.filterIsInstance<FaceMatchResult>()
+        .lastOrNull()?.let { faceMatchResult ->
+            projectConfiguration.face?.let { faceConfiguration ->
+                faceMatchResult.results
+                    .maxByOrNull { it.confidence }
+                    ?.let {
+                        AppMatchResult(
+                            guid = it.subjectId,
+                            confidenceScore = it.confidence,
+                            decisionPolicy = faceConfiguration.decisionPolicy,
+                            verificationMatchThreshold = faceConfiguration.verificationMatchThreshold
+                        )
+                    }
+            }
+        }
 }

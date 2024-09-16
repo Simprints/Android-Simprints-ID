@@ -2,6 +2,7 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
@@ -9,7 +10,6 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
-import com.simprints.core.domain.response.AppErrorReason
 import javax.inject.Inject
 
 internal class LibSimprintsResponseMapper @Inject constructor() {
@@ -20,7 +20,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
             Constants.SIMPRINTS_REGISTRATION to Registration(response.enrolledGuid),
-        ).appendCoSyncData(response.eventsJson, response.subjectActions)
+        ).appendCoSyncData(response.subjectActions)
 
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -30,12 +30,12 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                     Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
                 }
             ),
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.VerifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -45,23 +45,26 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                 Tier.valueOf(response.matchResult.tier.name),
                 response.matchResult.guid,
             ),
-        ).appendCoSyncData(response.eventsJson)
+        ).also {
+            response.matchResult.verificationSuccess?.let { verificationSuccess ->
+                it.putBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS, verificationSuccess)
+            }
+        }
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
             Constants.SIMPRINTS_REFUSAL_FORM to RefusalForm(response.reason, response.extraText),
-        ).appendCoSyncData(response.eventsJson)
+        )
 
         is ActionResponse.ErrorActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to response.flowCompleted,
             RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode()
-        ).appendCoSyncData(response.eventsJson)
+        )
     }
 
-    private fun Bundle.appendCoSyncData(events: String?, actions: String? = null) = apply {
-        events?.let { putString(Constants.SIMPRINTS_COSYNC_EVENT, it) }
+    private fun Bundle.appendCoSyncData(actions: String?) = apply {
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 
@@ -83,6 +86,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         AppErrorReason.BACKEND_MAINTENANCE_ERROR -> Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR
         AppErrorReason.PROJECT_PAUSED -> Constants.SIMPRINTS_PROJECT_PAUSED
         AppErrorReason.PROJECT_ENDING -> Constants.SIMPRINTS_PROJECT_ENDING
+        AppErrorReason.AGE_GROUP_NOT_SUPPORTED -> Constants.SIMPRINTS_AGE_GROUP_NOT_SUPPORTED
 
         /*
         TODO incorporate these error codes into the client api

@@ -62,4 +62,44 @@ class AppMatchResultTest {
             assertThat(AppMatchResult.computeMatchConfidence(score, policy)).isEqualTo(expected)
         }
     }
+
+    @Test
+    fun `test computeVerificationSuccess with verificationMatchThreshold present`() {
+        mapOf(
+            0 to false,
+            10 to false,
+            20 to false,
+            30 to false,
+            35 to false,
+            40 to true,
+            50 to true,
+            60 to true,
+            70 to true,
+            75 to true,
+            80 to true,
+            90 to true,
+        ).forEach { (score, expected) ->
+            assertThat(AppMatchResult.computeVerificationSuccess(score, 40.0f)).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test computeVerificationSuccess with verificationMatchThreshold null`() {
+        mapOf(
+            0 to null,
+            10 to null,
+            20 to null,
+            30 to null,
+            35 to null,
+            40 to null,
+            50 to null,
+            60 to null,
+            70 to null,
+            75 to null,
+            80 to null,
+            90 to null,
+        ).forEach { (score, expected) ->
+            assertThat(AppMatchResult.computeVerificationSuccess(score, null)).isEqualTo(expected)
+        }
+    }
 }

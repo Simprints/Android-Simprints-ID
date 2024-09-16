@@ -1,7 +1,23 @@
 package com.simprints.infra.sync.config.testtools
 
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.config.store.models.*
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Vero1Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
 
 internal val generalConfiguration = GeneralConfiguration(
     listOf(GeneralConfiguration.Modality.FACE),
@@ -21,7 +37,16 @@ internal val vero2Configuration = Vero2Configuration(
     mapOf("E-1" to Vero2Configuration.Vero2FirmwareVersions("1.1", "1.2", "1.4"))
 )
 internal val faceConfiguration =
-    FaceConfiguration(2, -1, FaceConfiguration.ImageSavingStrategy.NEVER, decisionPolicy)
+    FaceConfiguration(
+        allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+        rankOne = FaceConfiguration.FaceSdkConfiguration(
+            nbOfImagesToCapture = 2,
+            qualityThreshold = -1,
+            imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+            decisionPolicy = decisionPolicy,
+            version = "1.0",
+        )
+    )
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
     allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
@@ -110,10 +135,3 @@ internal val project = Project(
     baseUrl = "baseUrl",
     tokenizationKeys = tokenizationKeysDomain
 )
-
-internal val deviceConfiguration =
-    DeviceConfiguration(
-        "en",
-        listOf("module1".asTokenizableEncrypted(), "module2".asTokenizableEncrypted()),
-        "instruction"
-    )

@@ -3,21 +3,21 @@ package com.simprints.feature.dashboard.settings.password
 import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
-import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.feature.dashboard.databinding.FragmentSettingsPasswordInputBinding
+import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
-class SettingsPasswordDialogFragment(
-  @StringRes val title: Int = IDR.string.dashboard_password_lock_title_default,
-  val passwordToMatch: String,
-  val onSuccess: () -> Unit,
-) : DialogFragment() {
+@AndroidEntryPoint
+class SettingsPasswordDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = MaterialAlertDialogBuilder(requireContext())
-        .setTitle(title)
+        .setTitle(arguments?.getInt(ARG_TITLE) ?: IDR.string.dashboard_password_lock_title_default)
         .setView(inflateInputView())
         .setNegativeButton(IDR.string.dashboard_password_lock_cancel) { _, _ -> dismiss() }
         .create()
@@ -40,9 +40,10 @@ class SettingsPasswordDialogFragment(
     }
 
     private fun FragmentSettingsPasswordInputBinding.checkPassword(text: Editable?) {
+        val passwordToMatch = arguments?.getString(ARG_PASSWORD).orEmpty()
         if (text?.length == passwordToMatch.length) {
             if (text.toString() == passwordToMatch) {
-                onSuccess()
+                parentFragmentManager.setFragmentResult(RESULT_KEY, bundleOf(RESULT_SUCCESS to true))
                 dismiss()
             } else {
                 passwordInputField.text = null
@@ -53,5 +54,31 @@ class SettingsPasswordDialogFragment(
 
     companion object {
         const val TAG = "SettingsPasswordDialogFragment"
+
+        private const val ARG_TITLE = "titleRes"
+        private const val ARG_PASSWORD = "toMatch"
+
+        private const val RESULT_KEY = "$TAG-result"
+        private const val RESULT_SUCCESS = "success"
+
+        fun newInstance(
+            title: Int = IDR.string.dashboard_password_lock_title_default,
+            passwordToMatch: String,
+        ): DialogFragment = SettingsPasswordDialogFragment().also {
+            it.arguments = bundleOf(
+                ARG_TITLE to title,
+                ARG_PASSWORD to passwordToMatch,
+            )
+        }
+
+        fun registerForResult(
+            fragmentManager: FragmentManager,
+            lifecycleOwner: LifecycleOwner,
+            onSuccess: () -> Unit,
+        ) {
+            fragmentManager.setFragmentResultListener(RESULT_KEY, lifecycleOwner) { key, result ->
+                if (result.getBoolean(RESULT_SUCCESS)) onSuccess()
+            }
+        }
     }
 }

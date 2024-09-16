@@ -70,4 +70,8 @@ jobs:
             -   name: Promote to production 100%
                 if: ${{inputs.deployment-track == 'Prod-100-Percent-Rollout'}}
                 run: ./gradlew promoteArtifact --update production --release-status completed
-
+    app-sweep-scan:
+        name: App Sweep Security Scan
+        if: ${{inputs.deployment-track == 'Alpha'}}
+        uses: ./.github/workflows/app-sweep.yml
+        secrets: inherit

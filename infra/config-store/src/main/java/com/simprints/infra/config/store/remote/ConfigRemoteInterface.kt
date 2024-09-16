@@ -3,17 +3,12 @@ package com.simprints.infra.config.store.remote
 import com.simprints.infra.config.store.remote.models.ApiDeviceState
 import com.simprints.infra.config.store.remote.models.ApiFileUrl
 import com.simprints.infra.config.store.remote.models.ApiProject
-import com.simprints.infra.config.store.remote.models.ApiProjectConfiguration
 import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 internal interface ConfigRemoteInterface : SimRemoteInterface {
-
-    @GET("projects/{projectId}/configuration")
-    suspend fun getConfiguration(@Path("projectId") projectId: String): ApiProjectConfiguration
 
     @GET("projects/{projectId}")
     suspend fun getProject(@Path("projectId") projectId: String): ApiProject

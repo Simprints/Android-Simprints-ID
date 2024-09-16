@@ -61,15 +61,19 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun bindClickListeners() {
+        SettingsPasswordDialogFragment.registerForResult(
+            fragmentManager = childFragmentManager,
+            lifecycleOwner = this,
+            onSuccess = {
+                viewModel.unlockSettings()
+                createLanguageSelectionDialog().show()
+            },
+        )
         getLanguagePreference()?.setOnPreferenceClickListener {
             val password = viewModel.settingsLocked.value?.getNullablePassword()
             if (password != null) {
-                SettingsPasswordDialogFragment(
+                SettingsPasswordDialogFragment.newInstance(
                     passwordToMatch = password,
-                    onSuccess = {
-                        viewModel.unlockSettings()
-                        createLanguageSelectionDialog().show()
-                    },
                 ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
             } else {
                 createLanguageSelectionDialog().show()

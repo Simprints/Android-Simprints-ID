@@ -2,7 +2,9 @@ package com.simprints.core.tools.extentions
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.provider.Settings
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
@@ -15,7 +17,14 @@ val Context.deviceHardwareId: String
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 val Context.packageVersionName: String
     get() = try {
-        packageManager.getPackageInfo(packageName, 0).versionName
+        packageManager.getPackageInfo(packageName, 0).versionName ?: ""
     } catch (e: PackageManager.NameNotFoundException) {
         "Version Name Not Found"
     }
+
+@ExcludedFromGeneratedTestCoverageReports("UI code")
+val Context.applicationSettingsIntent: Intent
+    get() = Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.parse("package:$packageName")
+    )

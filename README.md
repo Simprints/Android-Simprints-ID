@@ -73,21 +73,54 @@ Following the guidelines above the end goal of SID should look roughly like:
 
 ## Development setup
 
-Clone with `git clone https://github.com/Simprints/Android-Simprints-ID.git`
+### Prerequisites
 
-Generate a new Github token at <https://github.com/settings/tokens/new>, which generates a "Classic"
-token. The only scope needed is `read:packages`. Then add it to the `local.properties` file:
+- **Git**: Ensure you have Git installed to clone the repository.
+- **Android Studio**: Install the latest version of Android Studio.
+- **GitHub Account**: You will need a GitHub account to generate a token.
+
+### 1. Clone the Repository
+
+Start by cloning the SID repository to your local machine:
+
+```bash
+git clone https://github.com/Simprints/Android-Simprints-ID.git
+cd Android-Simprints-ID
+```
+
+### 2. Generate a GitHub Token
+
+To access GitHub packages, you need to generate a GitHub token with the `read:packages` scope:
+
+1. Visit [GitHub Tokens](https://github.com/settings/tokens/new) and create a "Classic" token.
+2. Ensure the `read:packages` scope is selected.
+3. Enable SSO (Single Sign-On) for the token to access the Simprints GitHub organization.
+4. Copy the generated token.
+
+### 3. Add the GitHub Token to `local.properties`
+
+Add your GitHub credentials to the `local.properties` file in the project’s root directory:
 
 ```properties
 GITHUB_USERNAME=<your-github-username>
 GITHUB_TOKEN=<the-token-you-just-created>
 ```
 
+Replace `<your-github-username>` and `<the-token-you-just-created>` with your actual GitHub username and the token you generated.
 
-For security reasons the debug.keystore and the google-services.json are not included in the repository.
-To build the app you need to add them to the project and update the signing_info.gradle.kts file with the correct passwords.
+### 4. Download Required Files
 
+For security reasons, some files are not included in the repository. You must download them separately:
 
+1. Download the necessary files from the internal [SID Development Resources folder](https://drive.google.com/drive/folders/1OLrGhx3AW91ab2zduy8FzNuE5r5VEs7g?usp=drive_link). **Note:** This link is accessible to Simprints employees only.
+2. Place the downloaded files as follows:
+   - `signing_info.gradle.kts`: Place this in the `build-logic` directory.
+   - `debug.keystore`: Place this in the root directory of the project.
+   - `google-services.json`: Place this in the `id/src` directory.
+
+### 5. Build and Run the App
+
+Open the project in Android Studio, sync the project with Gradle files, and then build and run the app on your connected device or emulator.
 
 
 ## Full CI Workflow

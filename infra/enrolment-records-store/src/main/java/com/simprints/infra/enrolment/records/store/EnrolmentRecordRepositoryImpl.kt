@@ -28,7 +28,7 @@ internal class EnrolmentRecordRepositoryImpl(
     private val tokenizationProcessor: TokenizationProcessor,
     private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
-) : EnrolmentRecordRepository, EnrolmentRecordLocalDataSource by localDataSource  {
+) : EnrolmentRecordRepository, EnrolmentRecordLocalDataSource by localDataSource {
 
     @Inject
     constructor(
@@ -116,25 +116,27 @@ internal class EnrolmentRecordRepositoryImpl(
         )
     }
 
-    override suspend fun count(query: SubjectQuery, dataSource: BiometricDataSource): Int =
-        fromIdentityDataSource(dataSource).count(query)
+    override suspend fun count(
+        query: SubjectQuery,
+        dataSource: BiometricDataSource,
+    ): Int = fromIdentityDataSource(dataSource).count(query, dataSource)
 
     override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
-        dataSource: BiometricDataSource
+        dataSource: BiometricDataSource,
     ): List<FingerprintIdentity> =
-        fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range)
+        fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range, dataSource)
 
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
-        dataSource: BiometricDataSource
+        dataSource: BiometricDataSource,
     ): List<FaceIdentity> =
-        fromIdentityDataSource(dataSource).loadFaceIdentities(query, range)
+        fromIdentityDataSource(dataSource).loadFaceIdentities(query, range, dataSource)
 
     private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
-        BiometricDataSource.SIMPRINTS -> localDataSource
-        BiometricDataSource.COMMCARE -> commCareDataSource
+        is BiometricDataSource.Simprints -> localDataSource
+        is BiometricDataSource.CommCare -> commCareDataSource
     }
 }

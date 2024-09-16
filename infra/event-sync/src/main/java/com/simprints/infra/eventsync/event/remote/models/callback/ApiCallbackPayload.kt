@@ -12,8 +12,6 @@ import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEv
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
-import com.simprints.infra.eventsync.event.remote.models.callback.*
-import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackType.*
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep

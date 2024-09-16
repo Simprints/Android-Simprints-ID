@@ -1,13 +1,11 @@
 package com.simprints.feature.consent.screens.consent
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
-import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
-import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentTextHelper
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -23,7 +21,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.slot
-import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -44,12 +41,6 @@ class ConsentViewModelTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var generalConsentTextHelper: GeneralConsentTextHelper
-
-    @MockK
-    private lateinit var parentalConsentTextHelper: ParentalConsentTextHelper
-
-    @MockK
     private lateinit var configManager: ConfigManager
 
     @MockK
@@ -68,17 +59,12 @@ class ConsentViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         coEvery { configManager.getProjectConfiguration() } returns projectConfig
         every { projectConfig.consent } returns mockk()
-
         every { timeHelper.now() } returns TIMESTAMP
-        every { generalConsentTextHelper.assembleText(any(), any(), any()) } returns GENERAL_CONSENT
-        every { parentalConsentTextHelper.assembleText(any(), any(), any()) } returns PARENTAL_CONSENT
 
         vm = ConsentViewModel(
             timeHelper,
             configManager,
             eventRepository,
-            generalConsentTextHelper,
-            parentalConsentTextHelper,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
     }
@@ -93,13 +79,11 @@ class ConsentViewModelTest {
         val state = vm.viewState.getOrAwaitValue()
 
         coVerify { configManager.getProjectConfiguration() }
-        verify { generalConsentTextHelper.assembleText(any(), eq(defaultModalityList), eq(ConsentType.ENROL)) }
-        verify { parentalConsentTextHelper.assembleText(any(), eq(defaultModalityList), eq(ConsentType.ENROL)) }
 
-        Truth.assertThat(state.showLogo).isEqualTo(false)
-        Truth.assertThat(state.consentText).isEqualTo(GENERAL_CONSENT)
-        Truth.assertThat(state.showParentalConsent).isTrue()
-        Truth.assertThat(state.parentalConsentText).isEqualTo(PARENTAL_CONSENT)
+        assertThat(state.showLogo).isEqualTo(false)
+        assertThat(state.consentTextBuilder).isNotNull()
+        assertThat(state.showParentalConsent).isTrue()
+        assertThat(state.parentalTextBuilder).isNotNull()
     }
 
 
@@ -111,9 +95,22 @@ class ConsentViewModelTest {
         vm.loadConfiguration(ConsentType.ENROL)
         val state = vm.viewState.getOrAwaitValue()
 
-        verify(exactly = 0) { parentalConsentTextHelper.assembleText(any(), any(), any()) }
-        Truth.assertThat(state.showParentalConsent).isFalse()
-        Truth.assertThat(state.parentalConsentText).isEmpty()
+        assertThat(state.showParentalConsent).isFalse()
+        assertThat(state.parentalTextBuilder).isNull()
+    }
+
+
+    @Test
+    fun `selected tab index is saved in the state`() = runTest {
+        every { projectConfig.consent.allowParentalConsent } returns false
+        every { projectConfig.general.modalities } returns defaultModalityList
+
+        val selectedTabIndex = 3
+        vm.setSelectedTab(selectedTabIndex)
+        vm.loadConfiguration(ConsentType.ENROL)
+        val state = vm.viewState.getOrAwaitValue()
+
+        assertThat(state.selectedTab).isEqualTo(selectedTabIndex)
     }
 
     @Test
@@ -124,12 +121,12 @@ class ConsentViewModelTest {
         val event = slot<ConsentEvent>()
         coVerify { eventRepository.addOrUpdateEvent(capture(event)) }
         with(event.captured) {
-            Truth.assertThat(payload.consentType).isEqualTo(ConsentEvent.ConsentPayload.Type.INDIVIDUAL)
-            Truth.assertThat(payload.result).isEqualTo(ConsentEvent.ConsentPayload.Result.ACCEPTED)
+            assertThat(payload.consentType).isEqualTo(ConsentEvent.ConsentPayload.Type.INDIVIDUAL)
+            assertThat(payload.result).isEqualTo(ConsentEvent.ConsentPayload.Result.ACCEPTED)
         }
 
-        Truth.assertThat(result.peekContent()).isInstanceOf(ConsentResult::class.java)
-        Truth.assertThat(vm.showExitForm.value).isNull()
+        assertThat(result.peekContent()).isInstanceOf(ConsentResult::class.java)
+        assertThat(vm.showExitForm.value).isNull()
     }
 
     @Test
@@ -139,8 +136,8 @@ class ConsentViewModelTest {
         val event = slot<ConsentEvent>()
         coVerify { eventRepository.addOrUpdateEvent(capture(event)) }
         with(event.captured) {
-            Truth.assertThat(payload.consentType).isEqualTo(ConsentEvent.ConsentPayload.Type.PARENTAL)
-            Truth.assertThat(payload.result).isEqualTo(ConsentEvent.ConsentPayload.Result.DECLINED)
+            assertThat(payload.consentType).isEqualTo(ConsentEvent.ConsentPayload.Type.PARENTAL)
+            assertThat(payload.result).isEqualTo(ConsentEvent.ConsentPayload.Result.DECLINED)
         }
     }
 
@@ -151,7 +148,7 @@ class ConsentViewModelTest {
         vm.declineClicked(ConsentTab.PARENTAL)
         val result = vm.showExitForm.getOrAwaitValue()
 
-        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_face)
+        assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_face)
     }
 
     @Test
@@ -161,7 +158,7 @@ class ConsentViewModelTest {
         vm.declineClicked(ConsentTab.PARENTAL)
         val result = vm.showExitForm.getOrAwaitValue()
 
-        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_fingerprinting)
+        assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_fingerprinting)
     }
 
     @Test
@@ -174,7 +171,7 @@ class ConsentViewModelTest {
         vm.declineClicked(ConsentTab.PARENTAL)
         val result = vm.showExitForm.getOrAwaitValue()
 
-        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_biometrics)
+        assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_biometrics)
     }
 
     @Test
@@ -182,7 +179,7 @@ class ConsentViewModelTest {
         vm.handleExitFormResponse(ExitFormResult(false))
 
         coVerify(exactly = 0) { eventRepository.removeLocationDataFromCurrentSession() }
-        Truth.assertThat(vm.showExitForm.value).isNull()
+        assertThat(vm.showExitForm.value).isNull()
     }
 
     @Test
@@ -192,12 +189,10 @@ class ConsentViewModelTest {
         val result = vm.returnConsentResult.getOrAwaitValue()
 
         coVerify { eventRepository.removeLocationDataFromCurrentSession() }
-        Truth.assertThat(result.getContentIfNotHandled()).isInstanceOf(ExitFormResult::class.java)
+        assertThat(result.getContentIfNotHandled()).isInstanceOf(ExitFormResult::class.java)
     }
 
     companion object {
         private val TIMESTAMP = Timestamp(1L)
-        private const val GENERAL_CONSENT = "General consent"
-        private const val PARENTAL_CONSENT = "Parental consent"
     }
 }

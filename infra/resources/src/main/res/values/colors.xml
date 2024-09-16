@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="simprints_blue">#00B3D1</color>
+    <color name="simprints_blue_light">#00B0C1</color>
     <color name="simprints_blue_dark">#009CB6</color>
 
     <color name="simprints_green_light">#40C057</color>

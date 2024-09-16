@@ -43,16 +43,21 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
         logoutWithoutSyncCancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
+        SettingsPasswordDialogFragment.registerForResult(
+            fragmentManager = childFragmentManager,
+            lifecycleOwner = this@LogoutSyncDeclineFragment,
+            onSuccess = { processLogoutConfirmation() }
+        )
+
         logoutWithoutSyncConfirmButton.setOnClickListener {
             viewModel.settingsLocked.observe(
                 viewLifecycleOwner,
                 LiveDataEventWithContentObserver { config ->
                     val password = config.getNullablePassword()
                     if (password != null) {
-                        SettingsPasswordDialogFragment(
+                        SettingsPasswordDialogFragment.newInstance(
                             title = IDR.string.dashboard_password_lock_title_logout,
                             passwordToMatch = password,
-                            onSuccess = { processLogoutConfirmation() }
                         ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                     } else {
                         confirmationDialogForLogout.show()

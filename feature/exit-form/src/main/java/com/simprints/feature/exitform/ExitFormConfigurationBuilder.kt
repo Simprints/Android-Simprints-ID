@@ -23,6 +23,8 @@ fun defaultOptions() = setOf(
     ExitFormOption.AppNotWorking,
     ExitFormOption.PersonNotPresent,
     ExitFormOption.TooYoung,
+    ExitFormOption.WrongAgeGroupSelected,
+    ExitFormOption.UncooperativeChild,
     ExitFormOption.Other,
 )
 
@@ -36,6 +38,8 @@ fun scannerOptions() = setOf(
     ExitFormOption.ScannerNotWorking,
     ExitFormOption.PersonNotPresent,
     ExitFormOption.TooYoung,
+    ExitFormOption.WrongAgeGroupSelected,
+    ExitFormOption.UncooperativeChild,
     ExitFormOption.Other,
 )
 

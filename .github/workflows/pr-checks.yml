@@ -61,6 +61,7 @@ jobs:
                 feature:login-check
                 feature:alert
                 feature:exit-form
+                feature:select-subject-age-group
             reportsId: feature1
 
     feature-unit-tests2:
@@ -94,8 +95,10 @@ jobs:
         with:
             modules: |
                 face:capture
-                face:infra:face-bio-sdk
-                face:infra:roc-wrapper
+                face:infra:base-bio-sdk
+                face:infra:bio-sdk-resolver
+                face:infra:roc-v1
+                face:infra:roc-v3
             reportsId: face
 
     fingerprint-unit-tests:

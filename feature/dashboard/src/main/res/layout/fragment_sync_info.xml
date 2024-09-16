@@ -1,344 +1,351 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".settings.syncinfo.SyncInfoFragment">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        tools:context=".settings.syncinfo.SyncInfoFragment">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/syncInfoToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            app:menu="@menu/sync_info_menu"
-            app:navigationContentDescription="back"
-            app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/dashboard_sync_info_title" />
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/recordsInLocalCardView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
-
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/totalRecordsOnDeviceText"
-                style="@style/Text.Body1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_weight="0.8"
-                android:padding="4dp"
-                android:text="@string/dashboard_sync_info_total_records_on_device" />
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/syncInfoToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                app:menu="@menu/sync_info_menu"
+                app:navigationContentDescription="back"
+                app:navigationIcon="?android:attr/homeAsUpIndicator"
+                app:title="@string/dashboard_sync_info_title" />
 
-            <TextView
-                android:id="@+id/totalRecordsCount"
-                style="@style/Text.Body1.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                tools:text="137" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-            <ProgressBar
-                android:id="@+id/totalRecordsProgress"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:indeterminate="true"
-                android:indeterminateTintMode="src_atop" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/recordsInLocalCardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/recordsToUploadCardView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/imagesToUploadCardView"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/recordsToUploadText"
-                style="@style/Text.Body1"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_weight="0.8"
-                android:gravity="center"
-                android:padding="4dp"
-                android:text="@string/dashboard_sync_info_records_to_upload" />
+                android:orientation="horizontal"
+                android:padding="8dp">
 
-            <TextView
-                android:id="@+id/recordsToUploadCount"
-                style="@style/Text.Body1.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                tools:text="0" />
+                <TextView
+                    android:id="@+id/totalRecordsOnDeviceText"
+                    style="@style/Text.Body1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="0.8"
+                    android:padding="4dp"
+                    android:text="@string/dashboard_sync_info_total_records_on_device" />
 
-            <ProgressBar
-                android:id="@+id/recordsToUploadProgress"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:indeterminate="true"
-                android:indeterminateTintMode="src_atop" />
+                <TextView
+                    android:id="@+id/totalRecordsCount"
+                    style="@style/Text.Body1.Secondary"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    tools:text="137" />
 
-        </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/totalRecordsProgress"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTintMode="src_atop" />
 
-    </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/imagesToUploadCardView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/recordsToUploadCardView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
-        app:layout_constraintTop_toTopOf="@id/recordsToUploadCardView">
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/recordsToUploadCardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/imagesToUploadCardView"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/imagesToUploadText"
-                style="@style/Text.Body1"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_weight="0.8"
-                android:gravity="center"
-                android:padding="4dp"
-                android:text="@string/dashboard_sync_info_images_to_upload" />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp">
 
-            <TextView
-                android:id="@+id/imagesToUploadCount"
-                style="@style/Text.Body1.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                tools:text="0" />
+                <TextView
+                    android:id="@+id/recordsToUploadText"
+                    style="@style/Text.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="0.8"
+                    android:gravity="center"
+                    android:padding="4dp"
+                    android:text="@string/dashboard_sync_info_records_to_upload" />
 
-            <ProgressBar
-                android:id="@+id/imagesToUploadProgress"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:indeterminate="true"
-                android:indeterminateTintMode="src_atop" />
+                <TextView
+                    android:id="@+id/recordsToUploadCount"
+                    style="@style/Text.Body1.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    tools:text="0" />
 
-        </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/recordsToUploadProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTintMode="src_atop" />
 
-    </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/recordsToDownloadCardView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@id/syncActionSection"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recordsToUploadCardView">
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/imagesToUploadCardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/recordsToUploadCardView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
+            app:layout_constraintTop_toTopOf="@id/recordsToUploadCardView">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/imagesToUploadText"
+                    style="@style/Text.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="0.8"
+                    android:gravity="center"
+                    android:padding="4dp"
+                    android:text="@string/dashboard_sync_info_images_to_upload" />
+
+                <TextView
+                    android:id="@+id/imagesToUploadCount"
+                    style="@style/Text.Body1.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    tools:text="0" />
+
+                <ProgressBar
+                    android:id="@+id/imagesToUploadProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTintMode="src_atop" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/recordsToDownloadCardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/syncActionSection"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recordsToUploadCardView">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/recordsToDownloadText"
+                    style="@style/Text.Body1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="0.8"
+                    android:padding="4dp"
+                    android:text="@string/dashboard_sync_info_records_to_download" />
+
+                <TextView
+                    android:id="@+id/recordsToDownloadCount"
+                    style="@style/Text.Body1.Secondary"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    tools:text="137" />
+
+                <ProgressBar
+                    android:id="@+id/recordsToDownloadProgress"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTintMode="src_atop" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/recordsToDownloadText"
-                style="@style/Text.Body1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_weight="0.8"
-                android:padding="4dp"
-                android:text="@string/dashboard_sync_info_records_to_download" />
-
-            <TextView
-                android:id="@+id/recordsToDownloadCount"
-                style="@style/Text.Body1.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:textSize="16sp"
-                tools:text="137" />
-
-            <ProgressBar
-                android:id="@+id/recordsToDownloadProgress"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:indeterminate="true"
-                android:indeterminateTintMode="src_atop" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <LinearLayout
-        android:id="@+id/syncActionSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
-        app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
-        app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/syncButton"
+            android:id="@+id/syncActionSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_sync_info_sync_now_button"
-            android:visibility="visible" />
-
-        <LinearLayout
-            android:id="@+id/syncReloginRequiredSection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/syncReloginRequiredMessage"
-                style="@style/Text.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/dashboard_sync_card_relogin_required" />
+            app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
+            app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
+            app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
+            app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/sync_relogin_required_login_button"
+                android:id="@+id/syncButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/login_log_in_button" />
+                android:text="@string/dashboard_sync_info_sync_now_button"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/syncReloginRequiredSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/syncReloginRequiredMessage"
+                    style="@style/Text.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/dashboard_sync_card_relogin_required" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sync_relogin_required_login_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_log_in_button" />
+            </LinearLayout>
+
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/modulesTabHost"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/cardview_light_background"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsCardsBarrier"
-        tools:ignore="SpeakableTextPresentCheck"
-        tools:visibility="visible">
-
-        <TextView
-            style="@style/Text.Body1"
+        <LinearLayout
+            android:id="@+id/modulesTabHost"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="@string/dashboard_sync_info_selected_modules"
-            android:textAlignment="center" />
-
-        <View
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/simprints_orange" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/selectedModulesView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fadeScrollbars="false"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/cardview_light_background"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:scrollbars="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="100"
-            tools:listitem="@layout/item_module_count" />
+            app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recordsCardsBarrier"
+            tools:ignore="SpeakableTextPresentCheck"
+            tools:visibility="visible">
 
-    </LinearLayout>
+            <TextView
+                style="@style/Text.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="@string/dashboard_sync_info_selected_modules"
+                android:textAlignment="center" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/moduleSelectionButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/dashboard_sync_info_select_modules_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
-        app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        tools:visibility="visible" />
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/simprints_orange" />
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/recordsCardsBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="recordsToUploadCardView,recordsToDownloadCardView,recordsToDownloadCardView,syncActionSection" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/selectedModulesView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fadeScrollbars="false"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:scrollbars="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="100"
+                tools:listitem="@layout/item_module_count" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/moduleSelectionButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/dashboard_sync_info_select_modules_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
+            app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/recordsCardsBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="recordsToUploadCardView,recordsToDownloadCardView,recordsToDownloadCardView,syncActionSection" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

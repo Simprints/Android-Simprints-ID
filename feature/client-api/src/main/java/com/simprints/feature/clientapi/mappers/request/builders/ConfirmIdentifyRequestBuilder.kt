@@ -36,6 +36,7 @@ internal class ConfirmIdentifyRequestBuilder(
         userId = extractor.getUserId().asTokenizableRaw(),
         sessionId = extractor.getSessionId(),
         selectedGuid = extractor.getSelectedGuid(),
+        metadata = extractor.getMetadata(),
         unknownExtras = extractor.getUnknownExtras(),
     )
 }

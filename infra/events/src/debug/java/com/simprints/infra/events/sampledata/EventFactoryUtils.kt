@@ -8,22 +8,47 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
-import com.simprints.infra.events.event.domain.models.*
+import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult.FOUND
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
+import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
+import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
+import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
+import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
+import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
+import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
+import com.simprints.infra.events.event.domain.models.MatchEntry
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
+import com.simprints.infra.events.event.domain.models.PersonCreationEvent
+import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
+import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
+import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
+import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
@@ -50,10 +75,10 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
-import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
@@ -417,4 +442,10 @@ fun createLicenseCheckEvent() = LicenseCheckEvent(
     status = LicenseCheckEvent.LicenseStatus.VALID,
     vendor = "NEC_FINGERPRINT",
 
+)
+
+fun createAgeGroupSelectionEvent() = AgeGroupSelectionEvent(
+    createdAt = CREATED_AT,
+    endedAt = ENDED_AT,
+    subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2)
 )

@@ -1,7 +1,9 @@
 package com.simprints.infra.images.metadata.database
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.google.errorprone.annotations.Keep
 
 @Database(

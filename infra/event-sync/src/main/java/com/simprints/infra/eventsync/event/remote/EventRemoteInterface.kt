@@ -3,7 +3,15 @@ package com.simprints.infra.eventsync.event.remote
 import com.simprints.infra.network.SimRemoteInterface
 import okhttp3.ResponseBody
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.HEAD
+import retrofit2.http.Header
+import retrofit2.http.Headers
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
+import retrofit2.http.Streaming
 
 
 @JvmSuppressWildcards
@@ -15,7 +23,6 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_moduleId") moduleId: String?,
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
-        @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
     ): Response<Void>
 
@@ -36,7 +43,6 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("l_moduleId") moduleId: String?,
         @Query("l_attendantId") attendantId: String?,
         @Query("l_subjectId") subjectId: String?,
-        @Query("l_mode") modes: List<ApiModes>,
         @Query("lastEventId") lastEventId: String?,
     ): Response<ResponseBody>
 

@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -8,13 +9,12 @@ import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Before
 import org.junit.Test
-import java.io.Serializable
 
 internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
@@ -75,10 +75,10 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     @Test
     fun `maps FingerprintMatchResult correctly`() {
         val result = useCase(listOf(
-            FingerprintMatchResult(emptyList())
+            FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC)
         ))
 
-        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList()))
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), FingerprintConfiguration.BioSdk.NEC))
     }
 
     @Test

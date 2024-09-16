@@ -1,7 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
-import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
+import com.simprints.infra.config.store.models.Vero2Configuration
 
 internal fun Vero2Configuration.toProto(): ProtoVero2Configuration =
     ProtoVero2Configuration.newBuilder()

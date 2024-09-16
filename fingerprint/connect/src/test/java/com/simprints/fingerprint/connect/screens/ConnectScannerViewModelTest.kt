@@ -27,6 +27,7 @@ import com.simprints.fingerprint.infra.scanner.wrapper.ScannerFactory
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -122,7 +123,7 @@ class ConnectScannerViewModelTest {
             if (connectFailException != null)
                 throw connectFailException
         }
-        coEvery { setScannerInfoAndCheckAvailableOta() } answers {}
+        coEvery { setScannerInfoAndCheckAvailableOta(fingerprintSdk = SECUGEN_SIM_MATCHER) } answers {}
         coEvery { sensorWakeUp() } answers {}
         coEvery { setUiIdle() } answers {}
         every { versionInformation() } returns when (scannerGeneration) {
@@ -139,7 +140,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.BluetoothOff)
@@ -155,7 +156,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.BluetoothNotSupported)
@@ -172,7 +173,7 @@ class ConnectScannerViewModelTest {
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val scannerStepObserver = viewModel.currentStep.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
@@ -194,7 +195,7 @@ class ConnectScannerViewModelTest {
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val scannerStepObserver = viewModel.currentStep.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         scannerConnectedObserver.assertEventReceivedWithContent(true)
@@ -216,7 +217,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.SerialEntryPair)
@@ -230,7 +231,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.NfcPair)
@@ -244,7 +245,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.NfcOff)
@@ -258,7 +259,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.SerialEntryPair)
@@ -272,7 +273,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.SerialEntryPair)
@@ -289,7 +290,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.SerialEntryPair)
@@ -303,7 +304,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.NfcPair)
@@ -319,7 +320,7 @@ class ConnectScannerViewModelTest {
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         scannerConnectedObserver.assertEventReceivedWithContent(false)
@@ -335,7 +336,7 @@ class ConnectScannerViewModelTest {
 
         val scannerConnectedObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         scannerConnectedObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.UnexpectedError)
@@ -352,7 +353,7 @@ class ConnectScannerViewModelTest {
 
         val scannerConnectedObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         scannerConnectedObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.LowBattery)
@@ -365,7 +366,7 @@ class ConnectScannerViewModelTest {
         setupBluetooth(numberOfPairedScanners = 1)
         coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(FingerprintConfiguration.VeroGeneration.VERO_2, e)
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
 
         viewModel.showScannerIssueScreen.assertEventReceivedWithContentAssertions {
@@ -392,7 +393,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
         viewModel.handleScannerDisconnectedNoClick()
 
@@ -406,7 +407,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.connect()
         viewModel.handleIncorrectScanner()
 
@@ -428,7 +429,7 @@ class ConnectScannerViewModelTest {
         val scannerWrapper = mockScannerWrapper(FingerprintConfiguration.VeroGeneration.VERO_1, UnknownScannerIssueException())
         every { scannerFactory.scannerWrapper } returns scannerWrapper
 
-        viewModel.init(FingerprintConnectParams(isReconnect = false))
+        viewModel.init(FingerprintConnectParams(fingerprintSDK = SECUGEN_SIM_MATCHER))
         viewModel.startRetryingToConnect()
 
         coVerify(exactly = 5) { scannerWrapper.connect() }

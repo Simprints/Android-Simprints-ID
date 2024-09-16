@@ -9,10 +9,28 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.ALL_KEYS
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.store.local.migrations.models.OldProjectConfig
-import com.simprints.infra.config.store.local.models.*
+import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
+import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
+import com.simprints.infra.config.store.local.models.ProtoDecisionPolicy
+import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration
+import com.simprints.infra.config.store.local.models.ProtoFinger
+import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration
+import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
+import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
+import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
+import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
+import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.testtools.protoProjectConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -628,20 +646,34 @@ class ProjectConfigSharedPrefsMigrationTest {
                 "{\"FaceMatchThreshold\":30, \"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
             )
         private val PROTO_FACE_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
-            .setNbOfImagesToCapture(2)
-            .setQualityThreshold(-1)
-            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
+            .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+            .setRankOne(
+                ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
+                    .setNbOfImagesToCapture(2)
+                    .setQualityThreshold(-1)
+                    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
+                    .setDecisionPolicy(
+                        ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
+                    )
+                    .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
+                    .setVersion("1.23")
+                    .build()
             )
             .build()
 
         private val PROTO_FACE_DEFAULT_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
-            .setNbOfImagesToCapture(2)
-            .setQualityThreshold(-1)
-            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
+            .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
+            .setRankOne(
+                ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
+                    .setNbOfImagesToCapture(2)
+                    .setQualityThreshold(-1)
+                    .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
+                    .setDecisionPolicy(
+                        ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
+                    )
+                    .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().setStartInclusive(0).build())
+                    .setVersion("1.23")
+                    .build()
             )
             .build()
 
@@ -696,6 +728,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                     .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
                     .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
                     .setVero2(PROTO_VERO_2_CONFIGURATION)
+                    .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
                     .build()
             ).build()
 
@@ -720,6 +753,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setVero1(
                             ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build()
                         )
+                        .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
                         .build()
                 ).build()
     }

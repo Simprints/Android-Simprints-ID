@@ -1,5 +1,10 @@
 package com.simprints.feature.clientapi.models
 
+ object ClientApiConstants {
+
+    const val CALLER_PACKAGE_NAME = "callerPackageName"
+}
+
 internal object OdkConstants {
 
     const val PACKAGE_NAME = "com.simprints.simodkadapter"
@@ -8,6 +13,7 @@ internal object OdkConstants {
     const val ODK_BIOMETRICS_COMPLETE_CHECK_KEY = "odk-biometrics-complete"
     const val ODK_CONFIDENCES_KEY = "odk-confidences"
     const val ODK_TIERS_KEY = "odk-tiers"
+    const val ODK_VERIFICATION_SUCCESS_KEY = "odk-verification-success"
     const val ODK_SESSION_ID = "odk-session-id"
     const val ODK_EXIT_REASON = "odk-exit-reason"
     const val ODK_EXIT_EXTRA = "odk-exit-extra"
@@ -53,6 +59,7 @@ internal object CommCareConstants {
     const val VERIFICATION_CONFIDENCE_KEY = "confidence"
     const val VERIFICATION_TIER_KEY = "tier"
     const val VERIFICATION_GUID_KEY = "guid"
+    const val VERIFICATION_SUCCESS_KEY = "verificationSuccess"
     const val EXIT_REASON = "exitReason"
     const val EXIT_EXTRA = "exitExtra"
     const val SIMPRINTS_SESSION_ID = "sessionId"

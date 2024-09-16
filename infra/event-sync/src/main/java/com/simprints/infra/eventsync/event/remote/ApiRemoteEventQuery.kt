@@ -7,5 +7,4 @@ internal data class ApiRemoteEventQuery(
     val moduleId: String? = null,
     val subjectId: String? = null,
     val lastEventId: String? = null,
-    val modes: List<ApiModes>,
 )

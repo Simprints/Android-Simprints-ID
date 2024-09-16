@@ -21,8 +21,16 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.coVerifySequence
+import io.mockk.every
+import io.mockk.excludeRecords
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
@@ -53,7 +61,6 @@ class EventRemoteDataSourceTest {
         moduleId = DEFAULT_MODULE_ID.value,
         subjectId = GUID1,
         lastEventId = GUID2,
-        modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
     )
 
     @Before
@@ -79,7 +86,7 @@ class EventRemoteDataSourceTest {
     @Test
     fun count_shouldMakeANetworkRequest() = runTest {
         coEvery {
-            eventRemoteInterface.countEvents(any(), any(), any(), any(), any(), any())
+            eventRemoteInterface.countEvents(any(), any(), any(), any(), any())
         } returns Response.success(
             null,
             mapOf("x-event-count" to "6", "x-event-count-is-lower-bound" to "true").toHeaders()
@@ -94,7 +101,6 @@ class EventRemoteDataSourceTest {
                 moduleId = DEFAULT_MODULE_ID.value,
                 attendantId = DEFAULT_USER_ID.value,
                 subjectId = GUID1,
-                modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
                 lastEventId = GUID2
             )
         }
@@ -109,7 +115,6 @@ class EventRemoteDataSourceTest {
                 any(),
                 any(),
                 any(),
-                any()
             )
         } throws Throwable("Request issue")
 
@@ -169,7 +174,6 @@ class EventRemoteDataSourceTest {
                 any(),
                 any(),
                 any(),
-                any()
             )
         } throws exception
 
@@ -198,7 +202,6 @@ class EventRemoteDataSourceTest {
                     any(),
                     any(),
                     any(),
-                    any()
                 )
             } throws exception
 
@@ -218,7 +221,6 @@ class EventRemoteDataSourceTest {
                 any(),
                 any(),
                 any(),
-                any()
             )
         } returns Response.success("".toResponseBody())
 
@@ -229,7 +231,7 @@ class EventRemoteDataSourceTest {
         with(query) {
             coVerify {
                 eventRemoteInterface.downloadEvents(
-                    GUID1, projectId, moduleId, userId, subjectId, modes, lastEventId
+                    GUID1, projectId, moduleId, userId, subjectId, lastEventId
                 )
             }
         }
@@ -238,7 +240,7 @@ class EventRemoteDataSourceTest {
     @Test
     fun getEvents_shouldReturnCorrectTotalHeader() = runTest {
         coEvery {
-            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any())
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
         } returns Response.success(
             "".toResponseBody(),
             mapOf("x-event-count" to "22").toHeaders()
@@ -255,7 +257,7 @@ class EventRemoteDataSourceTest {
     @Test
     fun getEvents_shouldReturnCorrectStatus() = runTest {
         coEvery {
-            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any())
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
         } returns Response.success(205, "".toResponseBody())
 
         val mockedScope: CoroutineScope = mockk()
@@ -267,7 +269,7 @@ class EventRemoteDataSourceTest {
     @Test
     fun getEvents_shouldNotReturnTotalHeaderWhenLowerBound() = runTest {
         coEvery {
-            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any(), any())
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
         } returns Response.success(
             "".toResponseBody(),
             mapOf("x-event-count" to "22", "x-event-count-is-lower-bound" to "true").toHeaders()

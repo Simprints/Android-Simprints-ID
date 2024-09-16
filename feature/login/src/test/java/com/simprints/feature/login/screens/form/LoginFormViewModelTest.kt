@@ -1,6 +1,7 @@
 package com.simprints.feature.login.screens.form
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
@@ -18,6 +19,8 @@ import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
@@ -91,6 +94,23 @@ internal class LoginFormViewModelTest {
         val result = viewModel.signInState.getOrAwaitValue()
 
         assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.ProjectIdMismatch::class.java)
+    }
+
+    @Test
+    fun `returns false from isProcessingSignIn sign in request is processed`() {
+        coEvery { authManager.authenticateSafely(any(), any(), any(), any()) } returns AuthenticateDataResult.Authenticated
+        val observer = mockk<Observer<Boolean>>()
+        val slot = slot<Boolean>()
+        val capturedValues = mutableListOf<Boolean>()
+        every { observer.onChanged(capture(slot)) } answers {
+            capturedValues.add(slot.captured)
+        }
+        viewModel.isProcessingSignIn.observeForever(observer)
+
+        viewModel.signInClicked(LoginParams(PROJECT_ID, USER_ID), PROJECT_ID, PROJECT_SECRET)
+
+        // Checking that captured values sequence contains 'true' and 'false', in that order
+        assertThat(capturedValues).isEqualTo(listOf(true, false))
     }
 
     @Test

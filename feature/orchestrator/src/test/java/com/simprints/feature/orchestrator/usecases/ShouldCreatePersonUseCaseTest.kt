@@ -45,6 +45,7 @@ class ShouldCreatePersonUseCaseTest {
                     userId = "".asTokenizableRaw(),
                     sessionId = "",
                     selectedGuid = "",
+                    metadata = "",
                     unknownExtras = emptyMap(),
                 ), modalities = emptySet(), results = emptyList()
             )
@@ -165,6 +166,7 @@ class ShouldCreatePersonUseCaseTest {
         userId = "".asTokenizableRaw(),
         moduleId = "".asTokenizableRaw(),
         biometricDataSource = "",
+        callerPackageName = "",
         metadata = "",
         unknownExtras = emptyMap(),
     )

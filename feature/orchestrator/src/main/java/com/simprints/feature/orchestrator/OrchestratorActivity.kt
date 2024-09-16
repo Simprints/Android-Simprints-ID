@@ -2,9 +2,11 @@ package com.simprints.feature.orchestrator
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
+import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBinding
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.results.AppResult
@@ -21,8 +23,16 @@ internal class OrchestratorActivity : BaseActivity() {
     @Inject
     lateinit var activityTracker: ExecutionTracker
 
+    /**
+     * Flag for the navigation graph initialization state. The graph should only be initialized once
+     * during the existence of this activity, and the flag tracks graph's state.
+     */
+    private var isGraphInitialized = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Simber.i("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized")
+
+        isGraphInitialized = savedInstanceState?.getBoolean(KEY_IS_GRAPH_INITIALIZED) ?: false
         lifecycle.addObserver(activityTracker)
 
         setContentView(binding.root)
@@ -31,6 +41,8 @@ internal class OrchestratorActivity : BaseActivity() {
             this,
             R.id.orchestratorRootFragment
         ) { result ->
+            Simber.i("OrchestratorActivity on result ${result.resultCode}")
+
             setResult(result.resultCode, Intent().putExtras(result.extras))
             finish()
         }
@@ -38,18 +50,37 @@ internal class OrchestratorActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+        Simber.i("OrchestratorActivity.onStart isGraphInitialized=$isGraphInitialized")
 
         if (activityTracker.isMain(activity = this)) {
-            val action = intent.action.orEmpty()
-            val extras = intent.extras ?: bundleOf()
+            if (!isGraphInitialized) {
+                val action = intent.action.orEmpty()
+                val extras = intent.extras ?: bundleOf()
+                Simber.i("Intent received: $action")
+                Simber.i("Intent from: $callingPackage")
 
-            findNavController(R.id.orchestrationHost).setGraph(
-                R.navigation.graph_orchestration,
-                OrchestratorFragmentArgs(action, extras).toBundle()
-            )
+                // Some co-sync functionality depends on the exact package name of the caller app,
+                // e.g. to switch content providers of debug and release variants of the caller app
+                extras.putString(ClientApiConstants.CALLER_PACKAGE_NAME, callingPackage)
+
+                findNavController(R.id.orchestrationHost).setGraph(
+                    R.navigation.graph_orchestration,
+                    OrchestratorFragmentArgs(action, extras).toBundle()
+                )
+                isGraphInitialized = true
+            }
         } else {
             Simber.e("Orchestrator already executing, finishing with RESULT_CANCELED")
             finish()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        outState.putBoolean(KEY_IS_GRAPH_INITIALIZED, isGraphInitialized)
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
+    companion object {
+        private const val KEY_IS_GRAPH_INITIALIZED = "KEY_IS_GRAPH_INITIALIZED"
     }
 }

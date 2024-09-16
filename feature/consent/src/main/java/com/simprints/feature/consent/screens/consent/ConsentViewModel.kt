@@ -33,8 +33,6 @@ internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
-    private val generalConsentTextHelper: GeneralConsentTextHelper,
-    private val parentalConsentTextHelper: ParentalConsentTextHelper,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -43,6 +41,7 @@ internal class ConsentViewModel @Inject constructor(
     val viewState: LiveData<ConsentViewState>
         get() = _viewState
     private val _viewState = MutableLiveData(ConsentViewState())
+    private var selectedTab: Int = 0
 
     val showExitForm: LiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>
         get() = _showExitForm
@@ -55,7 +54,13 @@ internal class ConsentViewModel @Inject constructor(
     fun loadConfiguration(consentType: ConsentType) {
         viewModelScope.launch {
             val projectConfig = configManager.getProjectConfiguration()
-            _viewState.postValue(mapConfigToViewState(projectConfig, consentType))
+            _viewState.postValue(
+                mapConfigToViewState(
+                    projectConfig = projectConfig,
+                    consentType = consentType,
+                    selectedTabIndex = selectedTab
+                )
+            )
         }
     }
 
@@ -82,18 +87,24 @@ internal class ConsentViewModel @Inject constructor(
     private fun mapConfigToViewState(
         projectConfig: ProjectConfiguration,
         consentType: ConsentType,
+        selectedTabIndex: Int
     ): ConsentViewState {
         val allowParentalConsent = projectConfig.consent.allowParentalConsent
 
         return ConsentViewState(
             showLogo = projectConfig.consent.displaySimprintsLogo,
-            consentText = generalConsentTextHelper
-                .assembleText(projectConfig.consent, projectConfig.general.modalities, consentType),
             showParentalConsent = allowParentalConsent,
-            parentalConsentText = parentalConsentTextHelper
-                .takeIf { allowParentalConsent }
-                ?.assembleText(projectConfig.consent, projectConfig.general.modalities, consentType)
-                .orEmpty(),
+            consentTextBuilder = GeneralConsentTextHelper(
+                projectConfig.consent,
+                projectConfig.general.modalities,
+                consentType,
+            ),
+            parentalTextBuilder = if (allowParentalConsent) ParentalConsentTextHelper(
+                projectConfig.consent,
+                projectConfig.general.modalities,
+                consentType,
+            ) else null,
+            selectedTab = selectedTabIndex,
         )
     }
 
@@ -101,12 +112,14 @@ internal class ConsentViewModel @Inject constructor(
         currentConsentTab: ConsentTab,
         result: ConsentEvent.ConsentPayload.Result
     ) = externalScope.launch {
-        eventRepository.addOrUpdateEvent(ConsentEvent(
-            startConsentEventTime,
-            timeHelper.now(),
-            currentConsentTab.asEventPayload(),
-            result
-        ))
+        eventRepository.addOrUpdateEvent(
+            ConsentEvent(
+                startConsentEventTime,
+                timeHelper.now(),
+                currentConsentTab.asEventPayload(),
+                result
+            )
+        )
     }
 
     private fun getExitFormFromModalities(modalities: List<GeneralConfiguration.Modality>) = when {
@@ -129,6 +142,10 @@ internal class ConsentViewModel @Inject constructor(
 
     private fun deleteLocationInfoFromSession() = externalScope.launch {
         eventRepository.removeLocationDataFromCurrentSession()
+    }
+
+    fun setSelectedTab(index: Int) {
+        selectedTab = index
     }
 
 }

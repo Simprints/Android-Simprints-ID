@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    tools:background="#66000000"
+    tools:ignore="ContentDescription">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/face_capture_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true" />
+
+    <!--
+        Make sure to change the CameraTargetOverlay::percentFromTopPortrait value if any change is
+        made to the layout_constraintGuide_percent value
+    -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/capture_guide_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
+        android:id="@+id/capture_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/capture_title"
+        style="@style/Text.Headline5.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_default"
+        android:text="@string/face_capture_preparation_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
+        android:id="@+id/capture_progress"
+        android:layout_width="242dp"
+        android:layout_height="242dp"
+        android:indeterminate="false"
+        android:visibility="gone"
+        app:dcp_color="@color/simprints_green_light"
+        app:dcp_max="10"
+        app:layout_constraintBottom_toBottomOf="@id/capture_guide_frame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/capture_guide_frame" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginHorizontal="@dimen/margin_default"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/margin_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <CheckedTextView
+            android:id="@+id/capture_feedback_txt_title"
+            style="@style/Text.Headline6.Bold"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/feedback_chip_white"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:text="@string/face_capture_title_previewing"
+            android:textColor="@color/feedback_chip_text" />
+
+        <TextView
+            android:id="@+id/capture_feedback_txt_explanation"
+            style="@style/Text.Headline5.White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_default"
+            android:gravity="center"
+            tools:text="Move closer" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/capture_feedback_permission_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/face_capture_permission_action"
+        android:visibility="gone"
+        android:layout_marginVertical="@dimen/margin_huge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
