@@ -1,9 +1,6 @@
 package com.simprints.face.capture.screens.livefeedback
 
 import android.graphics.Bitmap
-import android.graphics.RectF
-import android.util.Size
-import androidx.camera.core.ImageProxy
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +8,6 @@ import com.simprints.core.tools.extentions.area
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
-import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.models.SymmetricTarget
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
@@ -28,7 +24,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class LiveFeedbackFragmentViewModel @Inject constructor(
-    private val frameProcessor: FrameProcessor,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val configManager: ConfigManager,
     private val eventReporter: SimpleCaptureEventReporter,
@@ -58,13 +53,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      *
      * @param image is the camera frame
      */
-    fun process(image: ImageProxy, screenOrientation: ScreenOrientation) {
+    fun process(croppedBitmap: Bitmap) {
         val captureStartTime = timeHelper.now()
-        val croppedBitmap = frameProcessor.cropRotateFrame(image, screenOrientation)
-        if (croppedBitmap == null) {
-            image.close()
-            return
-        }
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
@@ -85,24 +75,18 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             else -> {//no-op
             }
         }
-        image.close()
     }
 
-    fun initFrameProcessor(
+    fun initCapture(
         samplesToCapture: Int,
         attemptNumber: Int,
-        cropRect: RectF,
-        previewSize: Size,
     ) {
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk().detector
-            frameProcessor.init(previewSize, cropRect)
         }
     }
-
-    fun clearFrameProcessor() = frameProcessor.clear()
 
     fun startCapture() {
         capturingState.value = CapturingState.CAPTURING

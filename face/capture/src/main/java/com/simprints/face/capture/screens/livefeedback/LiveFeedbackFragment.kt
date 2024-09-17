@@ -2,6 +2,7 @@ package com.simprints.face.capture.screens.livefeedback
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -11,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -32,7 +32,6 @@ import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.screens.FaceCaptureViewModel
-import com.simprints.face.capture.screens.livefeedback.views.log
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
@@ -41,8 +40,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.time.DurationUnit
-import kotlin.time.measureTime
 import com.simprints.infra.resources.R as IDR
 
 
@@ -81,11 +78,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         initFragment()
     }
 
-    override fun onDestroyView() {
-        vm.clearFrameProcessor()
-        super.onDestroyView()
-    }
-
     private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
@@ -96,11 +88,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         //Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
             if (view != null) {
-                vm.initFrameProcessor(
-                    mainVm.samplesToCapture, mainVm.attemptNumber,
-                    binding.captureOverlay.rectInCanvas,
-                    Size(binding.captureOverlay.width, binding.captureOverlay.height),
-                )
+                vm.initCapture(mainVm.samplesToCapture, mainVm.attemptNumber)
             }
         }
     }
@@ -123,7 +111,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             .setOutputImageRotationEnabled(true)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
-        imageAnalyzer.setAnalyzer(cameraExecutor, ::analyze)
+        val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
+
+        imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
 
         // Preview
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
@@ -186,18 +176,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun analyze(image: ImageProxy) {
+    private fun analyze(image: Bitmap) {
         try {
-            // measure the time it takes to process the image
-          val  time =  measureTime {
-
-            vm.process(
-                image = image,
-                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
-            )
-            }
-            log("Frame processing time = ${time.toInt(DurationUnit.MILLISECONDS)}")
-
+            vm.process(croppedBitmap = image)
         } catch (t: Throwable) {
             Simber.e(t)
             // Image analysis is running in bg thread
