@@ -17,6 +17,7 @@ import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
+import com.simprints.feature.clientapi.usecases.CreateErrorCallbackEventIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
@@ -45,6 +46,7 @@ class ClientApiViewModel @Inject internal constructor(
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
     private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
+    private val createErrorCallbackEventIfNeeded: CreateErrorCallbackEventIfNeededUseCase,
     private val authStore: AuthStore,
     private val configManager: ConfigManager,
 ) : ViewModel() {
@@ -203,7 +205,8 @@ class ClientApiViewModel @Inject internal constructor(
         val flowCompleted = isFlowCompletedWithError(errorResponse)
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = flowCompleted)
         simpleEventReporter.closeCurrentSessionNormally()
-
+        // [MS-719] Some error responses need to explicitly send the callback event
+        createErrorCallbackEventIfNeeded(errorReason = errorResponse.reason)
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(

@@ -7,6 +7,7 @@ import com.jraska.livedata.test
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
 import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
+import com.simprints.feature.clientapi.usecases.CreateErrorCallbackEventIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
@@ -66,6 +67,9 @@ internal class ClientApiViewModelTest {
     lateinit var isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase
 
     @MockK
+    lateinit var createCallbackEventIfNeeded: CreateErrorCallbackEventIfNeededUseCase
+
+    @MockK
     lateinit var authStore: AuthStore
 
     @MockK
@@ -93,6 +97,7 @@ internal class ClientApiViewModelTest {
             getEnrolmentCreationEventForSubject = getEnrolmentCreationEventForSubject,
             deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
             isFlowCompletedWithError = isFlowCompletedWithError,
+            createErrorCallbackEventIfNeeded = createCallbackEventIfNeeded,
             authStore = authStore,
             configManager = configManager
         )
