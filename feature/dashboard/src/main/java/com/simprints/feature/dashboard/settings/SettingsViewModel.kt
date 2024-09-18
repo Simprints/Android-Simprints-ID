@@ -9,6 +9,7 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
     private val configManager: ConfigManager,
+    private val syncOrchestrator: SyncOrchestrator,
 ) : ViewModel() {
 
     val generalConfiguration: LiveData<GeneralConfiguration>
@@ -52,5 +54,9 @@ internal class SettingsViewModel @Inject constructor(
 
     fun unlockSettings() {
         _settingsLocked.postValue(SettingsPasswordConfig.Unlocked)
+    }
+
+    fun scheduleConfigUpdate() {
+        syncOrchestrator.startDeviceSync()
     }
 }

@@ -6,11 +6,13 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -36,6 +38,9 @@ class SettingsViewModelTest {
     @MockK
     private lateinit var configManager: ConfigManager
 
+    @MockK
+    private lateinit var syncOrchestrator: SyncOrchestrator
+
     private lateinit var viewModel: SettingsViewModel
 
     @Before
@@ -45,7 +50,7 @@ class SettingsViewModelTest {
         coEvery { configManager.getProjectConfiguration().general } returns generalConfiguration
         coEvery { configManager.getDeviceConfiguration().language } returns LANGUAGE
 
-        viewModel = SettingsViewModel(configManager)
+        viewModel = SettingsViewModel(configManager, syncOrchestrator)
     }
 
     @Test
@@ -76,6 +81,13 @@ class SettingsViewModelTest {
         viewModel.unlockSettings()
 
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Unlocked)
+    }
+
+    @Test
+    fun `trigger device sync when called`() {
+        viewModel.scheduleConfigUpdate()
+
+        verify { syncOrchestrator.startDeviceSync() }
     }
 
     companion object {
