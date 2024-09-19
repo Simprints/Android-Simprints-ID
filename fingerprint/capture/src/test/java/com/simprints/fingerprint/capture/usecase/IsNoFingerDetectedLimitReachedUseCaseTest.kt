@@ -2,7 +2,6 @@ package com.simprints.fingerprint.capture.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.capture.state.CaptureState
-import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerprintSdkConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
 import io.mockk.every
@@ -12,18 +11,18 @@ import org.junit.Test
 
 internal class IsNoFingerDetectedLimitReachedUseCaseTest {
     private val isNoFingerDetectedLimitReachedUseCase = IsNoFingerDetectedLimitReachedUseCase()
-
+    
     @Test
     fun `when capture state is not ScanProcess, then returns false`() {
         val fingerStateNotCollected = mockk<CaptureState.NotCollected>()
         val fingerStateSkipped = mockk<CaptureState.Skipped>()
-        val configuration = mockk<FingerprintConfiguration>()
+        val sdkConfiguration = mockk<FingerprintSdkConfiguration>()
 
         listOf(fingerStateNotCollected, fingerStateSkipped).forEach { fingerState ->
             assertThat(
                 isNoFingerDetectedLimitReachedUseCase(
                     fingerState = fingerState,
-                    configuration = configuration
+                    sdkConfiguration = sdkConfiguration
                 )
             ).isFalse()
         }
@@ -34,13 +33,13 @@ internal class IsNoFingerDetectedLimitReachedUseCaseTest {
         val fingerState = mockk<CaptureState.ScanProcess> {
             every { numberOfNoFingerDetectedScans } returns IsNoFingerDetectedLimitReachedUseCase.MAXIMUM_LIMIT_OF_NO_FINGER_DETECTED_SCANS
         }
-        val configuration = mockk<FingerprintConfiguration> {
-            every { secugenSimMatcher } returns null
+        val sdkConfiguration = mockk<FingerprintSdkConfiguration> {
+            every { maxCaptureAttempts } returns null
         }
         assertThat(
             isNoFingerDetectedLimitReachedUseCase(
                 fingerState = fingerState,
-                configuration = configuration
+                sdkConfiguration = sdkConfiguration
             )
         ).isTrue()
     }
@@ -52,17 +51,15 @@ internal class IsNoFingerDetectedLimitReachedUseCaseTest {
         val fingerState = mockk<CaptureState.ScanProcess> {
             every { numberOfNoFingerDetectedScans } returns noFingerDetectedScans
         }
-        val configuration = mockk<FingerprintConfiguration> {
-            every { secugenSimMatcher } returns mockk<FingerprintSdkConfiguration> {
-                every { maxCaptureAttempts } returns mockk<MaxCaptureAttempts> {
-                    every { noFingerDetected } returns noFingerDetectedThreshold
-                }
+        val sdkConfiguration = mockk<FingerprintSdkConfiguration> {
+            every { maxCaptureAttempts } returns mockk<MaxCaptureAttempts> {
+                every { noFingerDetected } returns noFingerDetectedThreshold
             }
         }
         assertThat(
             isNoFingerDetectedLimitReachedUseCase(
                 fingerState = fingerState,
-                configuration = configuration
+                sdkConfiguration = sdkConfiguration
             )
         ).isTrue()
     }
@@ -75,17 +72,15 @@ internal class IsNoFingerDetectedLimitReachedUseCaseTest {
         val fingerState = mockk<CaptureState.ScanProcess> {
             every { numberOfNoFingerDetectedScans } returns noFingerDetectedScans
         }
-        val configuration = mockk<FingerprintConfiguration> {
-            every { secugenSimMatcher } returns mockk<FingerprintSdkConfiguration> {
+        val sdkConfiguration = mockk<FingerprintSdkConfiguration> {
                 every { maxCaptureAttempts } returns mockk<MaxCaptureAttempts> {
                     every { noFingerDetected } returns 1
                 }
-            }
         }
         assertThat(
             isNoFingerDetectedLimitReachedUseCase(
                 fingerState = fingerState,
-                configuration = configuration
+                sdkConfiguration = sdkConfiguration
             )
         ).isFalse()
     }

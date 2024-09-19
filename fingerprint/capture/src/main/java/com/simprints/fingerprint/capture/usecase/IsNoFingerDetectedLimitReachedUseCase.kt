@@ -7,12 +7,11 @@ import javax.inject.Inject
 internal class IsNoFingerDetectedLimitReachedUseCase @Inject constructor() {
     operator fun invoke(
         fingerState: CaptureState,
-        configuration: FingerprintConfiguration
-
+        sdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
     ): Boolean = when (fingerState) {
         is CaptureState.ScanProcess -> {
             val noFingerDetectedThreshold =
-                configuration.secugenSimMatcher?.maxCaptureAttempts?.noFingerDetected?.takeIf { it > 1 }
+                sdkConfiguration.maxCaptureAttempts?.noFingerDetected?.takeIf { it > 1 }
                     ?: MAXIMUM_LIMIT_OF_NO_FINGER_DETECTED_SCANS
             fingerState.numberOfNoFingerDetectedScans >= noFingerDetectedThreshold
         }

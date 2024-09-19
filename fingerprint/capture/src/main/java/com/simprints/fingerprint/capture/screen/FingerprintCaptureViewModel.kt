@@ -537,7 +537,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         _vibrate.send()
         updateCaptureState(CaptureState::toNotDetected)
         addCaptureAndBiometricEventsInSession()
-        if (isNoFingerDetectedLimitReachedUseCase(state.currentCaptureState(), configuration)) {
+        if (isNoFingerDetectedLimitReachedUseCase(state.currentCaptureState(), bioSdkConfiguration)) {
             handleCaptureFinished()
         }
     }
@@ -561,7 +561,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private fun isTooManyBadScans(fingerState: CaptureState, plusBadScan: Boolean): Boolean {
         val isNumberOfBadScansReached = isNumberOfBadScansReached(fingerState, plusBadScan)
         val isNumberOfNoFingerDetectedReached =
-            isNoFingerDetectedLimitReachedUseCase(fingerState, configuration)
+            isNoFingerDetectedLimitReachedUseCase(fingerState, bioSdkConfiguration)
         return isNumberOfBadScansReached || isNumberOfNoFingerDetectedReached
     }
 
@@ -592,7 +592,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             captureState, plusBadScan = false
         ) || captureState.scanResult.isGoodScan())
         val isSkipped = captureState is CaptureState.Skipped
-        val isNotDetected = isNoFingerDetectedLimitReachedUseCase(captureState, configuration)
+        val isNotDetected = isNoFingerDetectedLimitReachedUseCase(captureState, bioSdkConfiguration)
         return isCollected || isSkipped || isNotDetected
     }
 
