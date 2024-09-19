@@ -18,6 +18,11 @@
             android:key="@string/preference_sync_info_key"
             android:summary="@string/dashboard_preference_summary_sync_information"
             android:title="@string/dashboard_preference_sync_information_title" />
+
+        <Preference
+            android:key="@string/preference_update_config_key"
+            android:summary="@string/dashboard_preference_summary_update_config"
+            android:title="@string/dashboard_preference_update_config_title" />
     </PreferenceCategory>
 
     <PreferenceCategory
