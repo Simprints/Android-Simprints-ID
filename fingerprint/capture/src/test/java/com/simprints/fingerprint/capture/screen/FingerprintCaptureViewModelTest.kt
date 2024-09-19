@@ -99,9 +99,12 @@ class FingerprintCaptureViewModelTest {
     @MockK
     private lateinit var addCaptureEventsUseCase: AddCaptureEventsUseCase
 
+    @MockK
+    private lateinit var isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase
+
     private val getStartStateUseCase = GetStartStateUseCase()
     private val getNextFingerToAddUseCase = GetNextFingerToAddUseCase()
-    private val isNoFingerDetectedLimitReachedUseCase = IsNoFingerDetectedLimitReachedUseCase()
+
 
     private lateinit var vm: FingerprintCaptureViewModel
 
@@ -120,6 +123,7 @@ class FingerprintCaptureViewModelTest {
         }
 
         coEvery { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) } returns "payloadId"
+        coEvery { isNoFingerDetectedLimitReachedUseCase.invoke(any(), any()) } returns false
 
         every { scanner.isLiveFeedbackAvailable() } returns false
         every { scanner.isImageTransferSupported() } returns true
