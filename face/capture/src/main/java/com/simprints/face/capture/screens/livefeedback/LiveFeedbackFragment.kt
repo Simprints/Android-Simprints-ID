@@ -2,6 +2,7 @@ package com.simprints.face.capture.screens.livefeedback
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -11,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -73,15 +73,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initFragment()
-    }
-
-    override fun onDestroyView() {
-        vm.clearFrameProcessor()
-        super.onDestroyView()
     }
 
     private fun initFragment() {
@@ -94,11 +88,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         //Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
             if (view != null) {
-                vm.initFrameProcessor(
-                    mainVm.samplesToCapture, mainVm.attemptNumber,
-                    binding.captureOverlay.rectInCanvas,
-                    Size(binding.captureOverlay.width, binding.captureOverlay.height),
-                )
+                vm.initCapture(mainVm.samplesToCapture, mainVm.attemptNumber)
             }
         }
     }
@@ -115,9 +105,16 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         if (!::targetResolution.isInitialized) {
             targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
         }
-        val imageAnalyzer = ImageAnalysis.Builder().setTargetResolution(targetResolution)
-            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888).build()
-        imageAnalyzer.setAnalyzer(cameraExecutor, ::analyze)
+
+        val imageAnalyzer = ImageAnalysis.Builder()
+            .setTargetResolution(targetResolution)
+            .setOutputImageRotationEnabled(true)
+            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
+            .build()
+        val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
+
+        imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
+
         // Preview
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
         val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
@@ -143,19 +140,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     launchPermissionRequest.launch(Manifest.permission.CAMERA)
                 }
             }
+
             else -> mainVm.shouldCheckCameraPermissions.set(true)
         }
-//        if (mainVm.shouldCheckCameraPermissions.getAndSet(false)) {
-//            // Check permission in onResume() so that if user left the app to go to Settings
-//            // and give the permission, it's reflected when they come back to SID
-//            if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
-//                setUpCamera()
-//            } else {
-//                launchPermissionRequest.launch(Manifest.permission.CAMERA)
-//            }
-//        } else {
-//            mainVm.shouldCheckCameraPermissions.set(true)
-//        }
     }
 
     override fun onStop() {
@@ -189,12 +176,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun analyze(image: ImageProxy) {
+    private fun analyze(image: Bitmap) {
         try {
-            vm.process(
-                image = image,
-                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
-            )
+            vm.process(croppedBitmap = image)
         } catch (t: Throwable) {
             Simber.e(t)
             // Image analysis is running in bg thread

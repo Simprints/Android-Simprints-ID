@@ -95,8 +95,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         observeOrchestratorVm()
 
         handleResult<AlertResult>(AlertContract.DESTINATION) { alertResult ->
-            clientApiVm.handleErrorResponse(
-                args.requestAction,
+            orchestratorVm.handleErrorResponse(
                 AppErrorResponse(alertResult.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR)
             )
         }
@@ -151,8 +150,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             })
 
         loginCheckVm.returnLoginNotComplete.observe(viewLifecycleOwner, LiveDataEventObserver {
-            clientApiVm.handleErrorResponse(
-                args.requestAction,
+            orchestratorVm.handleErrorResponse(
                 AppErrorResponse(AppErrorReason.LOGIN_NOT_COMPLETE)
             )
         })

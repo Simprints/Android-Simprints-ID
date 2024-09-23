@@ -62,6 +62,7 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         exitFromRadioPersonNotPresent.isVisible = options.contains(ExitFormOption.PersonNotPresent)
         exitFormRadioTooYoung.isVisible = options.contains(ExitFormOption.TooYoung)
         exitFormRadioWrongAgeGroupSelected.isVisible = options.contains(ExitFormOption.WrongAgeGroupSelected)
+        exitFormUncooperativeChild.isVisible = options.contains(ExitFormOption.UncooperativeChild)
         exitFormRadioOther.isVisible = options.contains(ExitFormOption.Other)
     }
 
@@ -92,6 +93,7 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         R.id.exitFormRadioScannerNotWorking -> ExitFormOption.ScannerNotWorking
         R.id.exitFromRadioPersonNotPresent -> ExitFormOption.PersonNotPresent
         R.id.exitFormRadioTooYoung -> ExitFormOption.TooYoung
+        R.id.exitFormUncooperativeChild -> ExitFormOption.UncooperativeChild
         R.id.exitFormRadioWrongAgeGroupSelected -> ExitFormOption.WrongAgeGroupSelected
         else -> ExitFormOption.Other
     }

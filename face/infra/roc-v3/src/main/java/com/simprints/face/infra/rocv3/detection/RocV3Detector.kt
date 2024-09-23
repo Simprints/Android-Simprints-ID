@@ -50,7 +50,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         val template = roc3.new_uint8_t_array(roc3.ROC_FACE_FAST_FV_SIZE.toInt())
         val yaw = roc3.new_float()
         val quality = roc3.new_float()
-        val face = if (isFaceDetected(grayImage, detection)) {
+        val face = if (isFaceDetected(coloredImage, detection)) {
             generateFaceTemplateFromImage(
                 coloredImage, grayImage, detection, yaw, template, quality
             )
@@ -127,7 +127,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
         )
         val n = roc3.new_size_t()
 
-        roc3.roc_embedded_detect_faces(
+        roc3.roc_embedded_detect_faces_accurate(
             image,
             roc3.size_t_value(adaptiveMinimumSize),
             MAX_FACE_DETECTION,

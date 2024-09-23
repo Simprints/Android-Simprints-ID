@@ -142,16 +142,16 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger_new) {
                         handleCancelled()
                     }
 
-                    is CaptureState.Scanning -> startTimeoutBar()
-                    is CaptureState.TransferringImage -> {
+                    is CaptureState.ScanProcess.Scanning -> startTimeoutBar()
+                    is CaptureState.ScanProcess.TransferringImage -> {
                         //Do nothing
                     }
 
-                    is CaptureState.NotDetected -> {
+                    is CaptureState.ScanProcess.NotDetected -> {
                         handleCancelled()
                     }
 
-                    is CaptureState.Collected -> if (fingerState.scanResult.isGoodScan()) {
+                    is CaptureState.ScanProcess.Collected -> if (fingerState.scanResult.isGoodScan()) {
                         handleCancelled()
                     } else {
                         handleCancelled()

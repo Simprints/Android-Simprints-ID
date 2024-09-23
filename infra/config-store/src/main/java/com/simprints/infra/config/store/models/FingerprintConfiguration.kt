@@ -16,6 +16,10 @@ data class FingerprintConfiguration(
         val vero2: Vero2Configuration? = null,
         val allowedAgeRange: AgeGroup = AgeGroup(0, null),
         val verificationMatchThreshold: Float? = null,
+        /**
+         * Allowed amount of 'No Finger Detected' scans before proceeding further
+         */
+        val maxCaptureAttempts: MaxCaptureAttempts?
     )
 
     enum class VeroGeneration {

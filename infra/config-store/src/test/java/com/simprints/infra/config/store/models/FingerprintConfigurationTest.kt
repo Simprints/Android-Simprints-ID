@@ -18,6 +18,7 @@ class FingerprintConfigurationTest {
                 comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 vero1 = Vero1Configuration(60),
                 vero2 = null,
+                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
             ),
             nec = null,
         )
@@ -39,6 +40,7 @@ class FingerprintConfigurationTest {
                 comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 vero1 = Vero1Configuration(60),
                 vero2 = null,
+                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
             ),
         )
         Truth.assertThat(fingerprintConfiguration.getSdkConfiguration(FingerprintConfiguration.BioSdk.NEC))

@@ -43,7 +43,14 @@ class SettingsPasswordDialogFragment : DialogFragment() {
         val passwordToMatch = arguments?.getString(ARG_PASSWORD).orEmpty()
         if (text?.length == passwordToMatch.length) {
             if (text.toString() == passwordToMatch) {
-                parentFragmentManager.setFragmentResult(RESULT_KEY, bundleOf(RESULT_SUCCESS to true))
+                parentFragmentManager.setFragmentResult(
+                    RESULT_KEY,
+                    bundleOf(
+                        RESULT_SUCCESS to true,
+                        // Pass-through the action argument to resolve action on call side
+                        ARG_ACTION to arguments?.getString(ARG_ACTION),
+                    )
+                )
                 dismiss()
             } else {
                 passwordInputField.text = null
@@ -57,16 +64,19 @@ class SettingsPasswordDialogFragment : DialogFragment() {
 
         private const val ARG_TITLE = "titleRes"
         private const val ARG_PASSWORD = "toMatch"
+        private const val ARG_ACTION = "action"
 
         private const val RESULT_KEY = "$TAG-result"
         private const val RESULT_SUCCESS = "success"
 
         fun newInstance(
-            title: Int = IDR.string.dashboard_password_lock_title_default,
             passwordToMatch: String,
+            title: Int = IDR.string.dashboard_password_lock_title_default,
+            action: String? = null,
         ): DialogFragment = SettingsPasswordDialogFragment().also {
             it.arguments = bundleOf(
                 ARG_TITLE to title,
+                ARG_ACTION to action,
                 ARG_PASSWORD to passwordToMatch,
             )
         }
@@ -74,10 +84,10 @@ class SettingsPasswordDialogFragment : DialogFragment() {
         fun registerForResult(
             fragmentManager: FragmentManager,
             lifecycleOwner: LifecycleOwner,
-            onSuccess: () -> Unit,
+            onSuccess: (String?) -> Unit,
         ) {
             fragmentManager.setFragmentResultListener(RESULT_KEY, lifecycleOwner) { key, result ->
-                if (result.getBoolean(RESULT_SUCCESS)) onSuccess()
+                if (result.getBoolean(RESULT_SUCCESS)) onSuccess(result.getString(ARG_ACTION))
             }
         }
     }

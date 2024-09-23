@@ -1,6 +1,7 @@
 package com.simprints.infra.sync.config.testtools
 
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -9,6 +10,7 @@ import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.MaxCaptureAttempts
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
@@ -58,6 +60,10 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
         FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
         vero1 = Vero1Configuration(10),
         vero2 = vero2Configuration,
+        allowedAgeRange = AgeGroup(0, null),
+        verificationMatchThreshold = 42.0f,
+        maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
+
     ),
     nec = null,
 )
