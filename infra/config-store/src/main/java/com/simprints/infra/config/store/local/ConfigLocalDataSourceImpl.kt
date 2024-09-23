@@ -155,6 +155,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                         vero1 = Vero1Configuration(60),
                         vero2 = null,
+                        maxCaptureAttempts = null
                     ),
                     nec = null,
                 ),

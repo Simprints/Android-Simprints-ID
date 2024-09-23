@@ -132,14 +132,15 @@ class SaveImageUseCaseTest {
         coVerify { imageRepo.storeImageSecurely(any(), "projectId", any(), any()) }
     }
 
-    private fun createCollectedStub(image: ByteArray?) = CaptureState.Collected(
-        ScanResult(
+    private fun createCollectedStub(image: ByteArray?) = CaptureState.ScanProcess.Collected(
+        numberOfBadScans = 0,
+        numberOfNoFingerDetectedScans = 0,
+        scanResult = ScanResult(
             0,
             byteArrayOf(),
             "format",
             image,
             10,
         ),
-        0
     )
 }
