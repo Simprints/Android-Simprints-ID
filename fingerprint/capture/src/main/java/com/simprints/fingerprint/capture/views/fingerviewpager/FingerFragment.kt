@@ -110,7 +110,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger_new) {
 
 
     private fun updateFingerResultText() = withFingerState {
-        binding.fingerResultText.isVisible = currentCapture() !is CaptureState.Scanning
+        binding.fingerResultText.isVisible = currentCapture() !is CaptureState.ScanProcess.Scanning
         binding.fingerResultText.text = getString(currentCapture().resultTextId())
         binding.fingerResultText.setTextColor(
             resources.getColor(
@@ -121,7 +121,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger_new) {
     }
 
     private fun updateFingerDirectionText(state: CollectFingerprintsState) = withFingerState {
-        binding.fingerResultText.isVisible = currentCapture() !is CaptureState.Scanning
+        binding.fingerResultText.isVisible = currentCapture() !is CaptureState.ScanProcess.Scanning
         binding.fingerDirectionText.text = getString(directionTextId(state.isOnLastFinger()))
         binding.fingerDirectionText.setTextColor(
             resources.getColor(
@@ -135,7 +135,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger_new) {
         timeoutBars.forEachIndexed { captureIndex, timeoutBar ->
             with(timeoutBar) {
                 val fingerState = captures[captureIndex]
-                progressBar.isVisible = fingerState is CaptureState.Scanning
+                progressBar.isVisible = fingerState is CaptureState.ScanProcess.Scanning
                 when (fingerState) {
                     is CaptureState.NotCollected,
                     is CaptureState.Skipped -> {
