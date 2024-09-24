@@ -10,6 +10,8 @@
     <string name="preference_select_language_key" translatable="false">select_language_preference_key</string>
     <string name="preference_select_fingers_key" translatable="false">select_fingers_preference_key</string>
     <string name="preference_sync_info_key" translatable="false">sync_info_preference_key</string>
+    <string name="preference_update_config_key" translatable="false">preference_update_config_key</string>
+    <string name="preference_enable_audio_on_scan_complete_key" translatable="false">preference_enable_audio_on_scan_complete_key</string>
 
     <string name="preferences_app_details_key" translatable="false">app_details_key</string>
     <string name="preference_app_details_key" translatable="false">app_details_preference_key</string>

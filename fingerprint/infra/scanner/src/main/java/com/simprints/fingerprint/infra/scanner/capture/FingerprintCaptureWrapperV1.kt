@@ -23,6 +23,7 @@ import kotlin.coroutines.resumeWithException
 internal class FingerprintCaptureWrapperV1(
     private val scannerV1: Scanner,
     private val ioDispatcher: CoroutineDispatcher,
+    private val scanningStatusTracker: FingerprintScanningStatusTracker
 ) : FingerprintCaptureWrapper {
     override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse {
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
@@ -71,6 +72,7 @@ internal class FingerprintCaptureWrapperV1(
                         scannerV1.imageQuality
                     )
                 )
+                scanningStatusTracker.notifyScanCompleted()
             },
             failure = {
                 if (it == SCANNER_ERROR.TIMEOUT)
