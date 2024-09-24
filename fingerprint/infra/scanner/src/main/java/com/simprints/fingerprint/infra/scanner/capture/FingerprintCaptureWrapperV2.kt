@@ -24,6 +24,7 @@ internal class FingerprintCaptureWrapperV2(
     private val scannerV2: Scanner,
     private val scannerUiHelper: ScannerUiHelper,
     private val ioDispatcher: CoroutineDispatcher,
+    private val scanningStatusTracker: FingerprintScanningStatusTracker,
 ) : FingerprintCaptureWrapper {
 
     override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray =
@@ -54,6 +55,7 @@ internal class FingerprintCaptureWrapperV2(
             }
             // Capture fingerprint and ensure it's OK
             scannerV2.captureFingerprint().ensureCaptureResultOkOrError().await()
+            scanningStatusTracker.notifyScanCompleted()
             // Transfer the unprocessed image from the scanner
             acquireUnprocessedImage().switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire unprocessed image data")))
                 .wrapErrorsFromScanner().await()
@@ -83,6 +85,9 @@ internal class FingerprintCaptureWrapperV2(
         scannerV2
             .captureFingerprint(captureDpi)
             .ensureCaptureResultOkOrError()
+            .andThen(Completable.fromAction {
+                scanningStatusTracker.notifyScanCompleted()
+            })
             .andThen(scannerV2.getImageQualityScore())
             .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image quality score")))
             .setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold)
