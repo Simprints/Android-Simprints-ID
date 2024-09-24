@@ -275,7 +275,6 @@ plugin-firebase-distribution = { group = "com.google.firebase", name = "firebase
 plugin-sonar = { group = "org.sonarsource.scanner.gradle", name = "sonarqube-gradle-plugin", version.ref = "sonar_plugin_version" }
 plugin-jacoco = { group = "org.jacoco", name = "org.jacoco.core", version.ref = "jacoco_version" }
 plugin-retry = { group = "org.gradle", name = "test-retry-gradle-plugin", version.ref = "retry_version" }
-plugin-room = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "androidx_room_version" }
 
 [plugins]
 
@@ -296,4 +295,3 @@ play-publisher = { id = "com.github.triplet.play", version.ref = "play_publisher
 retry = { id = "org.gradle.test-retry", version.ref = "retry_version" }
 sonar = { id = "org.sonarqube", version.ref = "sonar_plugin_version" }
 depsGraph = { id = "com.vanniktech.dependency.graph.generator", version.ref = "deps_graph_version" }
-room = { id = "androidx.room", version.ref = "androidx_room_version" }
