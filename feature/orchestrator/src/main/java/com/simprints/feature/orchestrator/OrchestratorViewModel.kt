@@ -80,7 +80,7 @@ internal class OrchestratorViewModel @Inject constructor(
         try {
             steps = stepsBuilder.build(action, projectConfiguration)
         } catch (e: SubjectAgeNotSupportedException) {
-            sendErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
+            handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
             return@launch
         }
 
@@ -94,7 +94,7 @@ internal class OrchestratorViewModel @Inject constructor(
         val errorResponse = mapRefusalOrErrorResult(result, projectConfiguration)
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found
-            sendErrorResponse(errorResponse)
+            handleErrorResponse(errorResponse)
             return@launch
         }
 
@@ -121,7 +121,7 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
-    private fun sendErrorResponse(errorResponse: AppResponse) {
+    fun handleErrorResponse(errorResponse: AppResponse) {
         addCallbackEvent(errorResponse)
         _appResponse.send(OrchestratorResult(actionRequest, errorResponse))
     }

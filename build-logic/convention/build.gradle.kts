@@ -13,8 +13,6 @@ dependencies {
     compileOnly(libs.plugin.firebase.perf)
     // Protobuf
     compileOnly(libs.plugin.protobuf)
-    // Room
-    compileOnly(libs.plugin.room)
     // Hilt
     compileOnly(libs.plugin.hilt)
     // Android X Navigation components

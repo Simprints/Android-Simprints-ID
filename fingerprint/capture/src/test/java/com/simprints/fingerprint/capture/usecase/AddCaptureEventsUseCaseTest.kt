@@ -58,8 +58,10 @@ internal class AddCaptureEventsUseCaseTest {
         useCase.invoke(
             Timestamp(1L),
             FingerState(
-              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
-                ScanResult(0, byteArrayOf(), "", null, 10)))
+              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.ScanProcess.Collected(
+                    numberOfBadScans = 0,
+                    numberOfNoFingerDetectedScans = 0,
+                    scanResult = ScanResult(0, byteArrayOf(), "", null, 10)))
             ),
             10,
             false
@@ -74,8 +76,10 @@ internal class AddCaptureEventsUseCaseTest {
         useCase.invoke(
             Timestamp(1L),
             FingerState(
-              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
-                ScanResult(100, byteArrayOf(), "", null, 10)))
+              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.ScanProcess.Collected(
+                    numberOfBadScans = 0,
+                    numberOfNoFingerDetectedScans = 0,
+                    scanResult = ScanResult(100, byteArrayOf(), "", null, 10)))
             ),
             10,
             false
@@ -93,8 +97,10 @@ internal class AddCaptureEventsUseCaseTest {
         useCase.invoke(
             Timestamp(1L),
             FingerState(
-              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
-                ScanResult(0, byteArrayOf(), "", null, 10)))
+              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.ScanProcess.Collected(
+                    numberOfBadScans = 0,
+                    numberOfNoFingerDetectedScans = 0,
+                    scanResult = ScanResult(0, byteArrayOf(), "", null, 10)))
             ),
             10,
             true

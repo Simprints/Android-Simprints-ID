@@ -253,7 +253,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             val dialogItems = state.fingerStates.map {
                 ConfirmFingerprintsDialog.Item(
                     it.id,
-                    it.captures.count { capture -> capture is CaptureState.Collected && capture.scanResult.isGoodScan() },
+                    it.captures.count { capture -> capture is CaptureState.ScanProcess.Collected && capture.scanResult.isGoodScan() },
                     it.captures.size
                 )
             }

@@ -67,6 +67,7 @@
     <string name="exit_form_reason_person_not_present">Person not present</string>
     <string name="exit_form_reason_too_young">Too young</string>
     <string name="exit_form_reason_wrong_age_group_selected">Wrong age group selected</string>
+    <string name="exit_form_reason_uncooperative_child">Uncooperative child</string>
     <string name="exit_form_reason_other">Other</string>
 
     <!-- Fetch subject -->
@@ -364,11 +365,14 @@
     <string name="dashboard_preference_select_modules_title">Select modules</string>
     <string name="dashboard_preference_app_version_title">App Version</string>
     <string name="dashboard_preference_sync_information_title">Sync Information</string>
+    <string name="dashboard_preference_update_config_title">Update configuration</string>
     <string name="dashboard_preference_scanner_version_title">Scanner Version</string>
     <string name="dashboard_preference_device_id_title">Device ID</string>
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
+    <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
+    <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
 
 
     <!-- Dashboard - Sync info -->

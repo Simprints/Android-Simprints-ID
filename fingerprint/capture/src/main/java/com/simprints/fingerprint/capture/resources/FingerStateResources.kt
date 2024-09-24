@@ -18,14 +18,14 @@ internal fun FingerState.indicatorDrawableId(selected: Boolean): Int =
 @DrawableRes
 internal fun FingerState.indicatorSelectedDrawableId(): Int = when (this.currentCapture()) {
     is CaptureState.NotCollected,
-    is CaptureState.Scanning,
-    is CaptureState.TransferringImage -> R.drawable.blank_selected
+    is CaptureState.ScanProcess.Scanning,
+    is CaptureState.ScanProcess.TransferringImage -> R.drawable.blank_selected
 
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.drawable.alert_selected
+    is CaptureState.ScanProcess.NotDetected -> R.drawable.alert_selected
 
-    is CaptureState.Collected -> when {
-        captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() } -> R.drawable.ok_selected
+    is CaptureState.ScanProcess.Collected -> when {
+        captures.all { it is CaptureState.ScanProcess.Collected && it.scanResult.isGoodScan() } -> R.drawable.ok_selected
         captures.any { it is CaptureState.NotCollected } -> R.drawable.blank_selected
         else -> R.drawable.alert_selected
     }
@@ -35,14 +35,14 @@ internal fun FingerState.indicatorSelectedDrawableId(): Int = when (this.current
 @DrawableRes
 internal fun FingerState.indicatorDeselectedDrawableId(): Int = when (this.currentCapture()) {
     is CaptureState.NotCollected,
-    is CaptureState.Scanning,
-    is CaptureState.TransferringImage -> R.drawable.blank_deselected
+    is CaptureState.ScanProcess.Scanning,
+    is CaptureState.ScanProcess.TransferringImage -> R.drawable.blank_deselected
 
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.drawable.alert_deselected
+    is CaptureState.ScanProcess.NotDetected -> R.drawable.alert_deselected
 
-    is CaptureState.Collected -> when {
-        captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() } -> R.drawable.ok_deselected
+    is CaptureState.ScanProcess.Collected -> when {
+        captures.all { it is CaptureState.ScanProcess.Collected && it.scanResult.isGoodScan() } -> R.drawable.ok_deselected
         captures.any { it is CaptureState.NotCollected } -> R.drawable.blank_deselected
         else -> R.drawable.alert_deselected
     }
@@ -62,11 +62,11 @@ internal fun FingerState.captureNumberTextId(): Int = IDR.string.fingerprint_cap
 @StringRes
 internal fun FingerState.directionTextId(isLastFinger: Boolean): Int = when (val currentCapture = this.currentCapture()) {
     is CaptureState.NotCollected -> if (currentCaptureIndex == 0) IDR.string.fingerprint_capture_please_scan else IDR.string.fingerprint_capture_please_scan_again
-    is CaptureState.Scanning -> IDR.string.fingerprint_capture_scanning
-    is CaptureState.TransferringImage -> IDR.string.fingerprint_capture_transfering_data
+    is CaptureState.ScanProcess.Scanning -> IDR.string.fingerprint_capture_scanning
+    is CaptureState.ScanProcess.TransferringImage -> IDR.string.fingerprint_capture_transfering_data
     is CaptureState.Skipped -> IDR.string.fingerprint_capture_good_scan_direction
-    is CaptureState.NotDetected -> IDR.string.fingerprint_capture_poor_scan_direction
-    is CaptureState.Collected -> if (currentCapture.scanResult.isGoodScan()) {
+    is CaptureState.ScanProcess.NotDetected -> IDR.string.fingerprint_capture_poor_scan_direction
+    is CaptureState.ScanProcess.Collected -> if (currentCapture.scanResult.isGoodScan()) {
         if (isLastFinger || currentCaptureIndex + 1 < captures.size) IDR.string.fingerprint_capture_empty else IDR.string.fingerprint_capture_good_scan_direction
     } else {
         IDR.string.fingerprint_capture_poor_scan_direction

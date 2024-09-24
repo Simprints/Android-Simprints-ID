@@ -29,8 +29,8 @@
         android:layout_height="0dp"
         android:background="@color/simprints_blue"
         android:clipToPadding="false"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/exitFormTitle">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -105,6 +105,13 @@
                     android:text="@string/exit_form_reason_wrong_age_group_selected" />
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/exitFormUncooperativeChild"
+                    style="@style/Widget.Simprints.RadioButton.White"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exit_form_reason_uncooperative_child" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/exitFormRadioOther"
                     style="@style/Widget.Simprints.RadioButton.White"
                     android:layout_width="match_parent"
@@ -145,9 +152,9 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:weightSum="2"
-        app:layout_constraintTop_toBottomOf="@+id/exitFormScrollView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exitFormScrollView">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/exitFormGoBack"
