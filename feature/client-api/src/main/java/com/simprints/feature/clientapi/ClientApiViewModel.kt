@@ -203,7 +203,6 @@ class ClientApiViewModel @Inject internal constructor(
         val flowCompleted = isFlowCompletedWithError(errorResponse)
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = flowCompleted)
         simpleEventReporter.closeCurrentSessionNormally()
-
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(

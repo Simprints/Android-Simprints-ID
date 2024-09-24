@@ -9,6 +9,7 @@ import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationCon
 import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration
 import com.simprints.infra.config.store.local.models.ProtoFinger
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration
+import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.ProtoMaxCaptureAttempts
 import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
 import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProject
@@ -105,6 +106,7 @@ internal val protoConsentConfiguration = ProtoConsentConfiguration.newBuilder()
     .build()
 
 internal val apiAllowedAgeRange = ApiAllowedAgeRange(2, 10)
+internal val apiMaxCaptureAttempts = ApiMaxCaptureAttempts(noFingerDetected = 17)
 internal val allowedAgeRange = AgeGroup(2, 10)
 internal val protoAllowedAgeRange = ProtoAllowedAgeRange.newBuilder().setStartInclusive(2).setEndExclusive(10).build()
 
@@ -186,13 +188,14 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
     allowedSDKs = listOf(ApiFingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
     displayHandIcons = true,
     secugenSimMatcher = ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
-        listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
-        apiDecisionPolicy,
-        ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-        ApiVero1Configuration(10),
-        apiVero2Configuration,
-        apiAllowedAgeRange,
-        42.0f,
+        fingersToCapture = listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+        decisionPolicy = apiDecisionPolicy,
+        comparisonStrategyForVerification = ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+        vero1 = ApiVero1Configuration(10),
+        vero2 = apiVero2Configuration,
+        allowedAgeRange = apiAllowedAgeRange,
+        verificationMatchThreshold = 42.0f,
+        maxCaptureAttempts = apiMaxCaptureAttempts
     ),
     nec = null,
 )
@@ -209,6 +212,7 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
         vero2 = vero2Configuration,
         allowedAgeRange = allowedAgeRange,
         verificationMatchThreshold = 42.0f,
+        maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
     ),
     nec = null,
 )
@@ -226,6 +230,7 @@ internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBu
             .setVero2(protoVero2Configuration)
             .setAllowedAgeRange(protoAllowedAgeRange)
             .setVerificationMatchThreshold(42.0f)
+            .setMaxCaptureAttempts(ProtoMaxCaptureAttempts.newBuilder().setNoFingerDetected(17))
             .build()
     )
     .build()

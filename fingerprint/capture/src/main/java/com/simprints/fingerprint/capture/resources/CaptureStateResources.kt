@@ -10,12 +10,12 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
 @StringRes
 internal fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int = when (this) {
     is CaptureState.NotCollected -> R.string.fingerprint_capture_scan
-    is CaptureState.Scanning -> R.string.fingerprint_capture_cancel_button
-    is CaptureState.TransferringImage -> R.string.fingerprint_capture_please_wait
+    is CaptureState.ScanProcess.Scanning -> R.string.fingerprint_capture_cancel_button
+    is CaptureState.ScanProcess.TransferringImage -> R.string.fingerprint_capture_please_wait
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.string.fingerprint_capture_rescan
+    is CaptureState.ScanProcess.NotDetected -> R.string.fingerprint_capture_rescan
 
-    is CaptureState.Collected -> if (scanResult.isGoodScan()) {
+    is CaptureState.ScanProcess.Collected -> if (scanResult.isGoodScan()) {
         if (isAskingRescan) {
             R.string.fingerprint_capture_rescan_question
         } else {
@@ -30,13 +30,13 @@ internal fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int = when (thi
 @ColorRes
 internal fun CaptureState.buttonBackgroundColour(): Int = when (this) {
     is CaptureState.NotCollected -> R.color.simprints_grey
-    is CaptureState.Scanning,
-    is CaptureState.TransferringImage -> R.color.simprints_blue
+    is CaptureState.ScanProcess.Scanning,
+    is CaptureState.ScanProcess.TransferringImage -> R.color.simprints_blue
 
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.color.simprints_red
+    is CaptureState.ScanProcess.NotDetected -> R.color.simprints_red
 
-    is CaptureState.Collected -> if (scanResult.isGoodScan()) {
+    is CaptureState.ScanProcess.Collected -> if (scanResult.isGoodScan()) {
         R.color.simprints_green
     } else {
         R.color.simprints_red
@@ -47,16 +47,16 @@ internal fun CaptureState.buttonBackgroundColour(): Int = when (this) {
 @StringRes
 internal fun CaptureState.resultTextId(): Int = when (this) {
     is CaptureState.NotCollected -> R.string.fingerprint_capture_empty
-    is CaptureState.Scanning -> R.string.fingerprint_capture_empty
-    is CaptureState.TransferringImage -> if (scanResult.isGoodScan()) {
+    is CaptureState.ScanProcess.Scanning -> R.string.fingerprint_capture_empty
+    is CaptureState.ScanProcess.TransferringImage -> if (scanResult.isGoodScan()) {
         R.string.fingerprint_capture_good_scan_message
     } else {
         R.string.fingerprint_capture_poor_scan_message
     }
 
     is CaptureState.Skipped -> R.string.fingerprint_capture_finger_skipped_message
-    is CaptureState.NotDetected -> R.string.fingerprint_capture_no_finger_detected_message
-    is CaptureState.Collected -> if (scanResult.isGoodScan()) {
+    is CaptureState.ScanProcess.NotDetected -> R.string.fingerprint_capture_no_finger_detected_message
+    is CaptureState.ScanProcess.Collected -> if (scanResult.isGoodScan()) {
         R.string.fingerprint_capture_good_scan_message
     } else {
         R.string.fingerprint_capture_poor_scan_message
@@ -67,18 +67,18 @@ internal fun CaptureState.resultTextId(): Int = when (this) {
 @ColorRes
 internal fun CaptureState.resultTextColour(): Int = when (this) {
     is CaptureState.NotCollected,
-    is CaptureState.Scanning -> android.R.color.white
+    is CaptureState.ScanProcess.Scanning -> android.R.color.white
 
-    is CaptureState.TransferringImage -> if (scanResult.isGoodScan()) {
+    is CaptureState.ScanProcess.TransferringImage -> if (scanResult.isGoodScan()) {
         R.color.simprints_green
     } else {
         R.color.simprints_red
     }
 
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.color.simprints_red
+    is CaptureState.ScanProcess.NotDetected -> R.color.simprints_red
 
-    is CaptureState.Collected -> if (scanResult.isGoodScan()) {
+    is CaptureState.ScanProcess.Collected -> if (scanResult.isGoodScan()) {
         R.color.simprints_green
     } else {
         R.color.simprints_red

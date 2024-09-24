@@ -141,6 +141,7 @@ internal data class OldProjectConfig(
                         ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                     vero1 = Vero1Configuration(fingerprintQualityThreshold.toInt()),
                     vero2 = vero2Configuration(),
+                    maxCaptureAttempts = null
                 ),
                 nec = null,
             )
