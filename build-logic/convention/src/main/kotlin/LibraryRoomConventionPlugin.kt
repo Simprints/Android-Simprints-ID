@@ -2,7 +2,7 @@ import com.android.build.api.dsl.LibraryExtension
 import common.configureDbEncryptionBuild
 import common.getLibs
 import common.implementation
-import common.ksp
+import common.kapt
 import common.testImplementation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -14,7 +14,7 @@ class LibraryRoomConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("com.google.devtools.ksp")
+                apply("org.jetbrains.kotlin.kapt")
             }
 
             configureDbEncryptionBuild()
@@ -43,7 +43,7 @@ class LibraryRoomConventionPlugin : Plugin<Project> {
             dependencies {
                 implementation(libs, "androidX.Room.core")
                 implementation(libs, "androidX.Room.ktx")
-                ksp(libs, "androidX.Room.compiler")
+                kapt(libs, "androidX.Room.compiler")
 
                 implementation(libs, "sqlCipher.core")
 

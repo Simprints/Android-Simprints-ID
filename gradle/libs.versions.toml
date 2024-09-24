@@ -1,7 +1,6 @@
 [versions]
 kotlin_version = "2.0.10"
 kotlin_coroutine_version = "1.8.1"
-ksp_version = "2.0.10-1.0.24"
 
 android_gradlePlugin_version = "8.3.1"
 androidx_version = "1.6.2"
@@ -215,11 +214,11 @@ secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_vers
 
 #hilt
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
-hilt-dagger-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt_version" }
+hilt-kapt = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt_version" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt_androidx_version" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt_androidx_version" }
 testing-hilt = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt_version" }
-testing-hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt_version" }
+testing-hilt-kapt = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt_version" }
 
 #Datastore
 datastore = { module = "androidx.datastore:datastore", version.ref = "androidx_datastore_version" }
@@ -282,7 +281,6 @@ android-application = { id = "com.android.application", version.ref = "android_g
 android-library = { id = "com.android.library", version.ref = "android_gradlePlugin_version" }
 android-test = { id = "com.android.test", version.ref = "android_gradlePlugin_version" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_version" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp_version" }
 gms = { id = "com.google.gms.google-services", version.ref = "gsm_plugin_version" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebase_perfPlugin_version" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase_crashlyticsPlugin_version" }
