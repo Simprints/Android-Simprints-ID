@@ -131,7 +131,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             .getDefaultSharedPreferences(requireContext())
             .getBoolean(AUDIO_PREFERENCE_KEY, true)
 
-
     private fun initUI() {
         initToolbar(args.params.flowType)
         initMissingFingerButton()
@@ -164,8 +163,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
             exitFormConfiguration {
                 titleRes = com.simprints.infra.resources.R.string.exit_form_title_fingerprinting
-                backButtonRes =
-                    com.simprints.infra.resources.R.string.exit_form_continue_fingerprints_button
+                backButtonRes = com.simprints.infra.resources.R.string.exit_form_continue_fingerprints_button
                 visibleOptions = scannerOptions()
             }.toArgs()
         )
@@ -186,9 +184,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             binding.fingerprintViewPager,
             binding.fingerprintIndicator,
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
-            isAbleToSelectNewFinger = {
-                vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true
-            }
+            isAbleToSelectNewFinger = { vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true }
         )
     }
 
@@ -213,21 +209,12 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         vm.stateLiveData.observe(viewLifecycleOwner) { state ->
             if (state != null) {
                 // Update pager
-                fingerViewPagerManager.setCurrentPageAndFingerStates(
-                    state.fingerStates,
-                    state.currentFingerIndex
-                )
+                fingerViewPagerManager.setCurrentPageAndFingerStates(state.fingerStates, state.currentFingerIndex)
 
                 // Update button
                 with(state.currentCaptureState()) {
-                    binding.fingerprintScanButton.text =
-                        getString(buttonTextId(state.isAskingRescan))
-                    binding.fingerprintScanButton.setBackgroundColor(
-                        resources.getColor(
-                            buttonBackgroundColour(),
-                            null
-                        )
-                    )
+                    binding.fingerprintScanButton.text = getString(buttonTextId(state.isAskingRescan))
+                    binding.fingerprintScanButton.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
                 }
 
                 updateConfirmDialog(state)
@@ -235,9 +222,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        vm.vibrate.observe(
-            viewLifecycleOwner,
-            LiveDataEventObserver { Vibrate.vibrate(requireContext()) })
+        vm.vibrate.observe(viewLifecycleOwner, LiveDataEventObserver { Vibrate.vibrate(requireContext()) })
 
         vm.noFingersScannedToast.observe(viewLifecycleOwner, LiveDataEventObserver {
             requireContext().showToast(IDR.string.fingerprint_capture_no_fingers_scanned)
@@ -257,11 +242,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 }.toArgs()
             )
         })
-        vm.finishWithFingerprints.observe(
-            viewLifecycleOwner,
-            LiveDataEventWithContentObserver { fingerprints ->
-                findNavController().finishWithResult(this, fingerprints)
-            })
+        vm.finishWithFingerprints.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { fingerprints ->
+            findNavController().finishWithResult(this, fingerprints)
+        })
     }
 
     private fun launchConnection() {
