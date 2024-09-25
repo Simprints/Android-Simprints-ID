@@ -5,9 +5,17 @@ on:
     workflow_dispatch:
 jobs:
     sonarQube:
-
+        environment: dev
         env:
+            BUILD_IS_DEBUGGABLE: ${{ vars.BUILD_IS_DEBUGGABLE }}
+            DB_IS_ENCRYPTED: ${{ vars.DB_IS_ENCRYPTED }}
+            FIREBASE_DIST_CREDENTIALS: ${{ secrets.FIREBASE_DIST_CREDENTIALS}}
             GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
+
+            SIGNING_JKS_FILE: ${{secrets.SIGNING_JKS_FILE}}
+            SIGNING_KEYSTORE_PASSWORD: ${{secrets.SIGNING_KEYSTORE_PASSWORD}}
+            SIGNING_KEY_ALIAS: ${{secrets.SIGNING_KEY_ALIAS}}
+            SIGNING_KEY_PASSWORD: ${{secrets.SIGNING_KEY_PASSWORD}}
 
         runs-on: ubuntu-latest
         timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
@@ -22,15 +30,6 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
-            -   name: Restore gradle global directory
-                uses: actions/cache/restore@v4
-                id: cache
-                with:
-                    path: |
-                        ~/.gradle/
-                        .gradle/
-                    key: global-gradle-
-                    restore-keys: global-gradle-
 
             -   name: Set up local.properties
                 run: |
@@ -41,32 +40,12 @@ jobs:
             -   name: Write Google Services file
                 run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
 
-            -   name: download all artifacts
-                uses: actions/download-artifact@v4
-                with:
-                    path: test-reports
-            # Move all reports to the root directory
-            # Use -f to force the move and || true to prevent failure if the file doesn't exist
-            -   name: Move reports
-                run: |
-                    rsync -arv test-reports/core/* .  || true
-                    rsync -arv test-reports/infra1/* .  || true
-                    rsync -arv test-reports/infra2/* .  || true
-                    rsync -arv test-reports/feature1/* .  || true
-                    rsync -arv test-reports/feature2/* .  || true
-                    rsync -arv test-reports/dashboard/* .  || true
-                    rsync -arv test-reports/face/* .  || true
-                    rsync -arv test-reports/fingerprint/* .  || true
-
-            # list all reports for Id module
-            -   name: list reports
-                run: |
-                    ls -l id
+            -   name: Set up signing properties
+                run: source ci/deployment/signing_properties_setup
 
 
-            -   name: run sonar
+            -   name: run assemble release
                 env:
-                    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 run: |
-                    ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 --info
+                    ./gradlew assembleRelease

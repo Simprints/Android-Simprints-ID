@@ -36,7 +36,9 @@ android {
 
 dependencies {
     implementation(libs.firebase.crashlytics)
-    api(libs.firebase.analytics)
+    api(libs.firebase.analytics){
+        exclude("com.google.dagger","dagger")
+    }
     implementation(libs.firebase.perf)
     implementation(libs.timber) {
         exclude("org.jetbrains", "annotations")
