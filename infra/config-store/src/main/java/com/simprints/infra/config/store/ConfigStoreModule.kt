@@ -35,11 +35,11 @@ private const val DEVICE_CONFIG_DATA_STORE_FILE_NAME = "device_config_prefs.pb"
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ConfigManagerModule {
+abstract class ConfigStoreModule {
 
 
     @Binds
-    internal abstract fun provideconfigService(service: ConfigRepositoryImpl): ConfigRepository
+    internal abstract fun provideConfigRepository(service: ConfigRepositoryImpl): ConfigRepository
 
     @Binds
     internal abstract fun provideConfigRemoteDataSource(remoteDataSource: ConfigRemoteDataSourceImpl): ConfigRemoteDataSource
