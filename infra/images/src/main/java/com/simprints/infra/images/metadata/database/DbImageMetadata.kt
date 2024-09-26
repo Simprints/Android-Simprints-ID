@@ -1,7 +1,7 @@
 package com.simprints.infra.images.metadata.database
 
+import androidx.annotation.Keep
 import androidx.room.Entity
-import com.google.errorprone.annotations.Keep
 
 @Entity(
     tableName = "DbImageMetadata",
