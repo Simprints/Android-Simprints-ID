@@ -27,14 +27,14 @@ internal fun DependencyHandlerScope.androidTestImplementation(libs: VersionCatal
     add("androidTestImplementation", libs.findLibrary(name).get())
 }
 
-internal fun DependencyHandlerScope.kapt(libs: VersionCatalog, name: String) {
-    add("kapt", libs.findLibrary(name).get())
+internal fun DependencyHandlerScope.ksp(libs: VersionCatalog, name: String) {
+    add("ksp", libs.findLibrary(name).get())
 }
 
-internal fun DependencyHandlerScope.kaptTest(libs: VersionCatalog, name: String) {
-    add("kaptTest", libs.findLibrary(name).get())
+internal fun DependencyHandlerScope.kspTest(libs: VersionCatalog, name: String) {
+    add("kspTest", libs.findLibrary(name).get())
 }
 
-internal fun DependencyHandlerScope.kaptAndroidTest(libs: VersionCatalog, name: String) {
-    add("kaptAndroidTest", libs.findLibrary(name).get())
+internal fun DependencyHandlerScope.kspAndroidTest(libs: VersionCatalog, name: String) {
+    add("kspAndroidTest", libs.findLibrary(name).get())
 }
