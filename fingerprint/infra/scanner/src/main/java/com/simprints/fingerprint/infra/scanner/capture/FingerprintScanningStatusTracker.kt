@@ -1,17 +1,21 @@
 package com.simprints.fingerprint.infra.scanner.capture
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.simprints.core.livedata.LiveDataEvent
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FingerprintScanningStatusTracker @Inject constructor() {
-    private val _scanCompleted = MutableLiveData<LiveDataEvent>()
-    val scanCompleted: LiveData<LiveDataEvent> get() = _scanCompleted
+    private val _scanCompleted = MutableSharedFlow<Unit>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val scanCompleted: SharedFlow<Unit> get() = _scanCompleted
 
     fun notifyScanCompleted() {
-        _scanCompleted.postValue(LiveDataEvent())
+        _scanCompleted.tryEmit(Unit)
     }
 }

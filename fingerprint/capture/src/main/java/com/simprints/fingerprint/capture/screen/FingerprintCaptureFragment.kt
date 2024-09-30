@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.capture.screen
 
 import android.graphics.Paint
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -9,9 +8,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.preference.PreferenceManager
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventObserver
@@ -38,7 +37,6 @@ import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerMa
 import com.simprints.fingerprint.capture.views.tryagainsplash.TryAnotherFingerSplashDialogFragment
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
@@ -49,6 +47,7 @@ import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -65,7 +64,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private var hasSplashScreenBeenTriggered: Boolean = false
 
     @Inject
-    lateinit var scanningStatusTracker: FingerprintScanningStatusTracker
+    lateinit var fingerprintScanCompletionAudioNotifier: FingerprintScanCompletionAudioNotifier
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -110,26 +109,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             args.params.fingerprintsToCapture,
             args.params.fingerprintSDK,
         )
-
-        scanningStatusTracker.scanCompleted.observe(viewLifecycleOwner, LiveDataEventObserver {
-            if (isAudioEnabled())
-                playBeep()
-        })
+        lifecycleScope.launch {
+            fingerprintScanCompletionAudioNotifier.observeScanStatus()
+        }
         initUI()
     }
-
-    private fun playBeep() {
-        val mediaPlayer = MediaPlayer.create(context, R.raw.beep)
-        mediaPlayer.start()
-        mediaPlayer.setOnCompletionListener {
-            it.release()
-        }
-    }
-
-    private fun isAudioEnabled() =
-        PreferenceManager
-            .getDefaultSharedPreferences(requireContext())
-            .getBoolean(AUDIO_PREFERENCE_KEY, true)
 
     private fun initUI() {
         initToolbar(args.params.flowType)
@@ -312,10 +296,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     override fun onDestroyView() {
         confirmDialog?.dismiss()
+        fingerprintScanCompletionAudioNotifier.releaseMediaPlayer()
         super.onDestroyView()
-    }
-
-    companion object {
-        private const val AUDIO_PREFERENCE_KEY = "preference_enable_audio_on_scan_complete_key"
     }
 }

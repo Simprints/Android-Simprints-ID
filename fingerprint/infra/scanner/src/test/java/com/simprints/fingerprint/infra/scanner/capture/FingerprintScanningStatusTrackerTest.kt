@@ -1,34 +1,42 @@
 package com.simprints.fingerprint.infra.scanner.capture
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import com.simprints.core.livedata.LiveDataEvent
-import io.mockk.mockk
-import io.mockk.verify
-import org.junit.Before
-import org.junit.Rule
+import com.google.common.truth.Truth
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class FingerprintScanningStatusTrackerTest {
+    private val tracker = FingerprintScanningStatusTracker()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    private lateinit var fingerprintScanningStatusTracker: FingerprintScanningStatusTracker
-    private val scanCompletedObserver: Observer<LiveDataEvent> = mockk(relaxed = true)
-
-    @Before
-    fun setup() {
-        fingerprintScanningStatusTracker = FingerprintScanningStatusTracker()
-        fingerprintScanningStatusTracker.scanCompleted.observeForever(scanCompletedObserver)
+    @Test
+    fun `test notifyScanCompleted emits Unit`() = runTest(testDispatcher) {
+        var emitted = false
+        val job = launch {
+            tracker.scanCompleted.collect {
+                emitted = true
+            }
+        }
+        tracker.notifyScanCompleted()
+        Truth.assertThat(emitted).isTrue()
+        job.cancel()
     }
 
     @Test
-    fun `notifyScanCompleted posts LiveDataEvent to scanCompleted`() {
-        // Act
-        fingerprintScanningStatusTracker.notifyScanCompleted()
+    fun `test scanCompleted flow does not replay past emissions`() = runTest(testDispatcher) {
+        tracker.notifyScanCompleted()
 
-        // Assert
-        verify { scanCompletedObserver.onChanged(any()) }
+        var emitted = false
+        val job = launch {
+            tracker.scanCompleted.collect {
+                emitted = true
+            }
+        }
+        Truth.assertThat(emitted).isFalse()
+        job.cancel()
     }
+
 }

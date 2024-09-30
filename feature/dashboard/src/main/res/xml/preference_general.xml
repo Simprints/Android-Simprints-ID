@@ -25,7 +25,7 @@
             android:title="@string/dashboard_preference_update_config_title" />
 
         <SwitchPreferenceCompat
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="@string/preference_enable_audio_on_scan_complete_key"
             android:summary="@string/dashboard_preference_summary_enable_audio_on_scan_complete"
             android:title="@string/dashboard_preference_enable_audio_on_scan_complete" />
