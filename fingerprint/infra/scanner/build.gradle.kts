@@ -5,9 +5,6 @@ plugins {
 android {
     namespace = "com.simprints.fingerprint.infra.scanner"
 
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {
