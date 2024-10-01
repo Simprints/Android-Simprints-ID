@@ -11,6 +11,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -31,7 +32,8 @@ class FingerprintCaptureWrapperV1Test {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        scannerWrapper = FingerprintCaptureWrapperV1(scanner, UnconfinedTestDispatcher())
+        scannerWrapper =
+            FingerprintCaptureWrapperV1(scanner, UnconfinedTestDispatcher(), mockk(relaxed = true))
     }
 
     @Test(expected = ScannerOperationInterruptedException::class)

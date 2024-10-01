@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowType
@@ -46,7 +47,9 @@ import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.Serializable
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -59,6 +62,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private var confirmDialog: AlertDialog? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
+
+    @Inject
+    lateinit var fingerprintScanCompletionAudioNotifier: FingerprintScanCompletionAudioNotifier
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -103,7 +109,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             args.params.fingerprintsToCapture,
             args.params.fingerprintSDK,
         )
-
+        lifecycleScope.launch {
+            fingerprintScanCompletionAudioNotifier.observeScanStatus()
+        }
         initUI()
     }
 
@@ -288,6 +296,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     override fun onDestroyView() {
         confirmDialog?.dismiss()
+        fingerprintScanCompletionAudioNotifier.releaseMediaPlayer()
         super.onDestroyView()
     }
 }

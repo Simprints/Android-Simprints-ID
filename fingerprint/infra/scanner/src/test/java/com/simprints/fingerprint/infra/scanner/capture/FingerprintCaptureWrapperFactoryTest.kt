@@ -16,7 +16,9 @@ class FingerprintCaptureWrapperFactoryTest {
     @Before
     fun setUp() {
         fingerprintCaptureWrapperFactory =
-            FingerprintCaptureWrapperFactory(UnconfinedTestDispatcher(), ScannerUiHelper())
+            FingerprintCaptureWrapperFactory(
+                UnconfinedTestDispatcher(), ScannerUiHelper(), mockk(relaxed = true)
+            )
     }
 
     @Test(expected = NullScannerException::class)

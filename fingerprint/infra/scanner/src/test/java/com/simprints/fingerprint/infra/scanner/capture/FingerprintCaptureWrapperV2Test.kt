@@ -17,6 +17,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -39,7 +40,9 @@ class FingerprintCaptureWrapperV2Test {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         scannerWrapper =
-            FingerprintCaptureWrapperV2(scannerV2, scannerUiHelper, UnconfinedTestDispatcher())
+            FingerprintCaptureWrapperV2(
+                scannerV2, scannerUiHelper, UnconfinedTestDispatcher(), mockk(relaxed = true)
+            )
     }
 
     @Test

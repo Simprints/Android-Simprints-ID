@@ -13,6 +13,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 class FingerprintCaptureWrapperFactory @Inject constructor(
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
     private val scannerUiHelper: ScannerUiHelper,
+    private val scanningStatusTracker: FingerprintScanningStatusTracker
 ) {
     private var _captureWrapper: FingerprintCaptureWrapper? = null
 
@@ -20,10 +21,13 @@ class FingerprintCaptureWrapperFactory @Inject constructor(
         get() = _captureWrapper ?: throw NullScannerException()
 
     fun createV1(scannerV1: ScannerV1) {
-        _captureWrapper = FingerprintCaptureWrapperV1(scannerV1, ioDispatcher)
+        _captureWrapper =
+            FingerprintCaptureWrapperV1(scannerV1, ioDispatcher, scanningStatusTracker)
     }
 
     fun createV2(scannerV2: ScannerV2) {
-        _captureWrapper = FingerprintCaptureWrapperV2(scannerV2, scannerUiHelper, ioDispatcher)
+        _captureWrapper = FingerprintCaptureWrapperV2(
+            scannerV2, scannerUiHelper, ioDispatcher, scanningStatusTracker
+        )
     }
 }
