@@ -76,6 +76,7 @@ data class FaceCaptureEvent(
         enum class Result {
             VALID,
             INVALID,
+            BAD_QUALITY,
             OFF_YAW,
             OFF_ROLL,
             TOO_CLOSE,

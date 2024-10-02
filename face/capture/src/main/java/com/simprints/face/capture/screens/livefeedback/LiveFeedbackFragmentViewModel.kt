@@ -37,6 +37,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
+    private var qualityThreshold: Int = 0
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -99,6 +100,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk().detector
             frameProcessor.init(previewSize, cropRect)
+
+            qualityThreshold = configManager.getProjectConfiguration().face?.qualityThreshold ?: 0
         }
     }
 
@@ -113,9 +116,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun finishCapture(attemptNumber: Int) {
         viewModelScope.launch {
-            val projectConfiguration = configManager.getProjectConfiguration()
             sortedQualifyingCaptures = userCaptures
-                .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
+                .filter { it.hasValidStatus() }
                 .sortedByDescending { it.face?.quality }
                 .ifEmpty { listOf(fallbackCapture) }
 
@@ -145,43 +147,22 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private fun getFaceDetection(bitmap: Bitmap, potentialFace: Face): FaceDetection {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
-        return when {
-            areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                bitmap = bitmap,
-                face = potentialFace,
-                status = FaceDetection.Status.TOOFAR,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.TOOCLOSE,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.OFFYAW,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.OFFROLL,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            else -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
+        val status = when {
+            areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
+            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
+            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
+            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
+            potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
+            capturingState.value == CapturingState.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
+            else -> FaceDetection.Status.VALID
         }
+
+        return FaceDetection(
+            bitmap = bitmap, face = potentialFace,
+            status = status,
+            detectionStartTime = timeHelper.now(),
+            detectionEndTime = timeHelper.now(),
+        )
     }
 
     /**
