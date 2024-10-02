@@ -37,7 +37,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
-    private var qualityThreshold: Int = 0
+    private var qualityThreshold: Float = 0f
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -101,7 +101,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             faceDetector = resolveFaceBioSdk().detector
             frameProcessor.init(previewSize, cropRect)
 
-            qualityThreshold = configManager.getProjectConfiguration().face?.qualityThreshold ?: 0
+            qualityThreshold = configManager.getProjectConfiguration().face?.qualityThreshold ?: 0f
         }
     }
 
@@ -203,7 +203,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private suspend fun sendCaptureEvent(faceDetection: FaceDetection?, attemptNumber: Int) {
         if (faceDetection == null) return
-        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold.toFloat())
+        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
