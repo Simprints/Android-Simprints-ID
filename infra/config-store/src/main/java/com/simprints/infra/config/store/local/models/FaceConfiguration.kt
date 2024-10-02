@@ -19,7 +19,7 @@ internal fun FaceConfiguration.BioSdk.toProto() = when (this) {
 internal fun FaceConfiguration.FaceSdkConfiguration.toProto() =
     ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
         .setNbOfImagesToCapture(nbOfImagesToCapture)
-        .setQualityThreshold(qualityThreshold)
+        .setQualityThresholdPrecise(qualityThreshold)
         .setImageSavingStrategy(imageSavingStrategy.toProto())
         .setDecisionPolicy(decisionPolicy.toProto())
         .setVersion(version)
@@ -50,7 +50,7 @@ internal fun ProtoFaceConfiguration.ProtoBioSdk.toDomain() = when (this) {
 internal fun ProtoFaceConfiguration.ProtoFaceSdkConfiguration.toDomain() =
     FaceConfiguration.FaceSdkConfiguration(
         nbOfImagesToCapture = nbOfImagesToCapture,
-        qualityThreshold = qualityThreshold,
+        qualityThreshold = qualityThresholdPrecise,
         imageSavingStrategy = imageSavingStrategy.toDomain(),
         decisionPolicy = decisionPolicy.toDomain(),
         version = version,

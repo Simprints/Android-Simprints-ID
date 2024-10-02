@@ -8,7 +8,7 @@ data class FaceConfiguration(
     val nbOfImagesToCapture: Int
         get() = rankOne?.nbOfImagesToCapture!!
 
-    val qualityThreshold: Int
+    val qualityThreshold: Float
         get() = rankOne?.qualityThreshold!!
 
     val imageSavingStrategy: ImageSavingStrategy
@@ -22,7 +22,7 @@ data class FaceConfiguration(
 
     data class FaceSdkConfiguration(
         val nbOfImagesToCapture: Int,
-        val qualityThreshold: Int,
+        val qualityThreshold: Float,
         val imageSavingStrategy: ImageSavingStrategy,
         val decisionPolicy: DecisionPolicy,
         val version: String,

@@ -19,7 +19,7 @@ internal data class ApiFaceConfiguration(
     @Keep
     data class ApiFaceSdkConfiguration(
         val nbOfImagesToCapture: Int,
-        val qualityThreshold: Int,
+        val qualityThreshold: Float,
         val decisionPolicy: ApiDecisionPolicy,
         val imageSavingStrategy: ImageSavingStrategy,
         val allowedAgeRange: ApiAllowedAgeRange?,

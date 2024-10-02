@@ -114,7 +114,7 @@ internal val protoDecisionPolicy =
     ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(30).setHigh(40).build()
 internal val rankOneConfiguration = FaceSdkConfiguration(
     nbOfImagesToCapture = 2,
-    qualityThreshold = -1,
+    qualityThreshold = -1f,
     imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
     decisionPolicy = decisionPolicy,
     allowedAgeRange = AgeGroup(0, null),
@@ -126,7 +126,7 @@ internal val apiFaceConfiguration = ApiFaceConfiguration(
         allowedSDKs = listOf(ApiFaceConfiguration.BioSdk.RANK_ONE),
         rankOne = ApiFaceSdkConfiguration(
             nbOfImagesToCapture = 2,
-            qualityThreshold = -1,
+            qualityThreshold = -1f,
             decisionPolicy = apiDecisionPolicy,
             imageSavingStrategy = ApiFaceConfiguration.ImageSavingStrategy.NEVER,
             allowedAgeRange = null,
@@ -143,7 +143,7 @@ internal val protoFaceConfiguration = ProtoFaceConfiguration.newBuilder()
     .setRankOne(
         ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
             .setNbOfImagesToCapture(2)
-            .setQualityThreshold(-1)
+            .setQualityThresholdPrecise(-1f)
             .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
             .setDecisionPolicy(protoDecisionPolicy)
             .setVersion("1.0")
