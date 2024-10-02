@@ -123,7 +123,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
     @Test
     fun `Process bad quality face correctly`() = runTest {
-        coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns 100
+        coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns 100f
         coEvery { faceDetector.analyze(previewFrame) } returns getFace()
 
         viewModel.initFrameProcessor(1, 0, rectF, previewViewSize)
@@ -230,6 +230,6 @@ internal class LiveFeedbackFragmentViewModelTest {
 
     companion object {
 
-        private const val QUALITY_THRESHOLD = -1
+        private const val QUALITY_THRESHOLD = -1f
     }
 }
