@@ -122,6 +122,19 @@ internal class LiveFeedbackFragmentViewModelTest {
     }
 
     @Test
+    fun `Process bad quality face correctly`() = runTest {
+        coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns 100
+        coEvery { faceDetector.analyze(previewFrame) } returns getFace()
+
+        viewModel.initFrameProcessor(1, 0, rectF, previewViewSize)
+        viewModel.process(frame, screenOrientation)
+
+        val currentDetection = viewModel.currentDetection.testObserver()
+        assertThat(currentDetection.observedValues.last()?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
+        coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
+    }
+
+    @Test
     fun `Process invalid faces correctly`() = runTest {
         val smallFace: Face = getFace(Rect(0, 0, 30, 30))
         val bigFace: Face = getFace(Rect(0, 0, 80, 80))
