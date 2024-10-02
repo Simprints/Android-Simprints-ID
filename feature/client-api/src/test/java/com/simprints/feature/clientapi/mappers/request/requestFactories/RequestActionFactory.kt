@@ -19,7 +19,6 @@ internal abstract class RequestActionFactory {
         const val MOCK_SESSION_ID = "ddf01a3c-3081-4d3e-b872-538731517cb9"
         const val MOCK_SELECTED_GUID = "5390ef82-9c1f-40a9-b833-2e97ab369208"
         const val MOCK_BIOMETRIC_DATA_SOURCE = ""
-        const val MOCK_CALLER_PACKAGE_NAME = "com.test.caller.package"
     }
 
     abstract fun getIdentifier(): ActionRequestIdentifier
@@ -39,7 +38,6 @@ internal abstract class RequestActionFactory {
         every { mockExtractor.getMetadata() } returns MOCK_METADATA
         every { mockExtractor.getSubjectAge() } returns null
         every { mockExtractor.getBiometricDataSource() } returns MOCK_BIOMETRIC_DATA_SOURCE
-        every { mockExtractor.getCallerPackageName() } returns MOCK_CALLER_PACKAGE_NAME
         every { mockExtractor.getUnknownExtras() } returns emptyMap()
     }
 
