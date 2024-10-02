@@ -46,7 +46,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
-    private lateinit var fallbackCapture: FaceDetection
+    private var fallbackCapture: FaceDetection? = null
 
     val userCaptures = mutableListOf<FaceDetection>()
     var sortedQualifyingCaptures = listOf<FaceDetection>()
@@ -119,7 +119,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             sortedQualifyingCaptures = userCaptures
                 .filter { it.hasValidStatus() }
                 .sortedByDescending { it.face?.quality }
-                .ifEmpty { listOf(fallbackCapture) }
+                .ifEmpty { listOfNotNull(fallbackCapture) }
 
             sendAllCaptureEvents(attemptNumber)
 
@@ -170,7 +170,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * get any good images, at least one good image will be saved
      */
     private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
-        if (faceDetection.hasValidStatus()) {
+        val fallbackQuality = fallbackCapture?.face?.quality ?: -1f // To ensure that detection is better with defaults
+        val detectionQuality = faceDetection.face?.quality ?: 0f
+
+        if (faceDetection.hasValidStatus() && detectionQuality >= fallbackQuality) {
             fallbackCapture = faceDetection.apply { isFallback = true }
             createFirstFallbackCaptureEvent(faceDetection)
         }
@@ -198,10 +201,9 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             .awaitAll()
     }
 
-    private suspend fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
-        val qualityThreshold =
-            configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
-        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
+    private suspend fun sendCaptureEvent(faceDetection: FaceDetection?, attemptNumber: Int) {
+        if (faceDetection == null) return
+        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold.toFloat())
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
