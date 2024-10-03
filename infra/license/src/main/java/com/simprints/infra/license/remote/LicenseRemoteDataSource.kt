@@ -1,6 +1,7 @@
 package com.simprints.infra.license.remote
 
 import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.license.models.LicenseVersion
 
 
 internal interface LicenseRemoteDataSource {
@@ -9,5 +10,6 @@ internal interface LicenseRemoteDataSource {
         projectId: String,
         deviceId: String,
         vendor: Vendor,
+        version: LicenseVersion
     ): ApiLicenseResult
 }

@@ -12,5 +12,6 @@ internal interface LicenseRemoteInterface : SimRemoteInterface {
         @Path("projectId") projectId: String,
         @Path("deviceId") deviceId: String,
         @Query("vendor") vendor: String,
+        @Query("version") version: String,
     ): String
 }

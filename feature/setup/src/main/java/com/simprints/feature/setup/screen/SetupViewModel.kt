@@ -15,6 +15,7 @@ import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -43,7 +44,7 @@ internal class SetupViewModel @Inject constructor(
     val overallSetupResult: LiveData<Boolean>
         get() = _overallSetupResult
 
-    private lateinit var requiredLicenses: List<Vendor>
+    private lateinit var requiredLicenses: List<Pair<Vendor, LicenseVersion>>
 
     val requestNotificationPermission: LiveData<Unit>
         get() = _requestNotificationPermission
@@ -69,28 +70,26 @@ internal class SetupViewModel @Inject constructor(
                 _overallSetupResult.postValue(true)
                 return@launch
             }
-            requiredLicenses.forEach { licenseVendor ->
+            requiredLicenses.forEachIndexed { i, (licenseVendor, version) ->
                 licenseRepository.getLicenseStates(
                     authStore.signedInProjectId,
                     deviceID,
-                    licenseVendor
-                )
-                    .collect { licenceState ->
-                        _downloadLicenseState.postValue(licenceState)
-                        if (licenceState is LicenseState.FinishedWithError
-                            || licenceState is LicenseState.FinishedWithBackendMaintenanceError
-                        ) {
-                            // Save the license state event
-                            saveLicenseCheckEvent(licenseVendor,LicenseStatus.MISSING)
-                            _overallSetupResult.postValue(false)
-                        }
-                        // if this is the last license to download, then update the overall setup result
-                        if (licenseVendor == requiredLicenses.last() &&
-                            licenceState is LicenseState.FinishedWithSuccess
-                        ) {
-                            _overallSetupResult.postValue(true)
-                        }
+                    licenseVendor,
+                    version
+                ).collect { licenceState ->
+                    _downloadLicenseState.postValue(licenceState)
+                    if (licenceState is LicenseState.FinishedWithError
+                        || licenceState is LicenseState.FinishedWithBackendMaintenanceError
+                    ) {
+                        // Save the license state event
+                        saveLicenseCheckEvent(licenseVendor, LicenseStatus.MISSING)
+                        _overallSetupResult.postValue(false)
                     }
+                    // if this is the last license to download, then update the overall setup result
+                    if (i == requiredLicenses.lastIndex && licenceState is LicenseState.FinishedWithSuccess) {
+                        _overallSetupResult.postValue(true)
+                    }
+                }
             }
         }
     }
@@ -109,15 +108,19 @@ internal class SetupViewModel @Inject constructor(
 
 }
 
-private val ProjectConfiguration.requiredLicenses: List<Vendor>
+private val ProjectConfiguration.requiredLicenses: List<Pair<Vendor, LicenseVersion>>
     get() = general.modalities.mapNotNull {
         when {
-            it == GeneralConfiguration.Modality.FACE -> Vendor.RankOne
-            it == GeneralConfiguration.Modality.FINGERPRINT &&
-                fingerprint?.allowedSDKs?.contains(
-                    FingerprintConfiguration.BioSdk.NEC
-                ) == true -> Vendor.Nec
+            it == GeneralConfiguration.Modality.FACE -> {
+                Vendor.RankOne to LicenseVersion(face?.rankOne?.version.orEmpty())
+            }
+
+            it == GeneralConfiguration.Modality.FINGERPRINT && shouldIncludeNec() -> {
+                Vendor.Nec to LicenseVersion(fingerprint?.nec?.version.orEmpty())
+            }
 
             else -> null
         }
     }
+
+private fun ProjectConfiguration.shouldIncludeNec() = fingerprint?.allowedSDKs?.contains(FingerprintConfiguration.BioSdk.NEC) == true

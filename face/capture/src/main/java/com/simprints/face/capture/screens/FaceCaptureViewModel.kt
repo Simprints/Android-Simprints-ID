@@ -19,8 +19,8 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.license.determineLicenseStatus
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -94,7 +94,6 @@ internal class FaceCaptureViewModel @Inject constructor(
             _invalidLicense.send()
         }
         saveLicenseCheckEvent(Vendor.RankOne, licenseStatus)
-
     }
 
     fun getSampleDetection() = faceDetections.firstOrNull()

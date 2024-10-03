@@ -3,6 +3,7 @@ package com.simprints.infra.license.remote
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -26,9 +27,10 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
         projectId: String,
         deviceId: String,
         vendor: Vendor,
+        version: LicenseVersion,
     ): ApiLicenseResult = try {
         getProjectApiClient().executeCall {
-            it.getLicense(projectId, deviceId, vendor.value)
+            it.getLicense(projectId, deviceId, vendor.value, version.value)
                 .parseApiLicense()
                 .getLicenseBasedOnVendor(vendor)
                 ?.let { apiLicense -> ApiLicenseResult.Success(apiLicense) }

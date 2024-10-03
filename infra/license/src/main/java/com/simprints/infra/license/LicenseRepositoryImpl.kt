@@ -9,6 +9,7 @@ import com.simprints.infra.license.remote.ApiLicenseResult
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -17,18 +18,18 @@ internal class LicenseRepositoryImpl @Inject constructor(
     private val licenseRemoteDataSource: LicenseRemoteDataSource,
 ) : LicenseRepository {
 
-
     override fun getLicenseStates(
         projectId: String,
         deviceId: String,
-        licenseVendor: Vendor
+        licenseVendor: Vendor,
+        requiredVersion: LicenseVersion,
     ): Flow<LicenseState> = flow {
         emit(LicenseState.Started)
 
         val license = licenseLocalDataSource.getLicense(licenseVendor)
-        if (license == null) {
+        if (license == null || licenseVendor.versionComparator.compare(license.version.value, requiredVersion.value) < 0) {
             emit(LicenseState.Downloading)
-            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor)
+            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor, requiredVersion)
                 .let { result ->
                     when (result) {
                         is ApiLicenseResult.Success -> handleLicenseResultSuccess(

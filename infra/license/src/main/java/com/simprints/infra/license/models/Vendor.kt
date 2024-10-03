@@ -1,12 +1,19 @@
 package com.simprints.infra.license.models
 
+import com.simprints.infra.license.models.comparators.DefaultVersionComparator
+import com.simprints.infra.license.models.comparators.SemanticVersionComparator
 
 sealed class Vendor(val value: String) {
+    abstract val versionComparator: Comparator<String>
 
     object RankOne : Vendor("RANK_ONE_FACE") {
+        override val versionComparator: Comparator<String>
+            get() = SemanticVersionComparator()
     }
 
     object Nec : Vendor("NEC_FINGERPRINT") {
+        override val versionComparator: Comparator<String>
+            get() = DefaultVersionComparator()
     }
 
     companion object {
