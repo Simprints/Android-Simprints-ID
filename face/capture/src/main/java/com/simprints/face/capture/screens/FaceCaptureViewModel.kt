@@ -19,7 +19,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.license.determineLicenseStatus
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -77,7 +77,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
-        val license = licenseRepository.getCachedLicense(Vendor.RANK_ONE)
+        val license = licenseRepository.getCachedLicense(Vendor.RankOne)
         var licenseStatus = license.determineLicenseStatus()
 
         if (licenseStatus == LicenseStatus.VALID) {
@@ -90,10 +90,10 @@ internal class FaceCaptureViewModel @Inject constructor(
         }
         if (licenseStatus != LicenseStatus.VALID) {
             Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus")
-            licenseRepository.deleteCachedLicense(Vendor.RANK_ONE)
+            licenseRepository.deleteCachedLicense(Vendor.RankOne)
             _invalidLicense.send()
         }
-        saveLicenseCheckEvent(Vendor.RANK_ONE, licenseStatus)
+        saveLicenseCheckEvent(Vendor.RankOne, licenseStatus)
 
     }
 

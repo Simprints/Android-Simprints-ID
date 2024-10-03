@@ -12,12 +12,10 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
-import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
-import com.simprints.infra.license.Vendor.Companion.NEC
-import com.simprints.infra.license.Vendor.Companion.RANK_ONE
+import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.Vendor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -114,11 +112,11 @@ internal class SetupViewModel @Inject constructor(
 private val ProjectConfiguration.requiredLicenses: List<Vendor>
     get() = general.modalities.mapNotNull {
         when {
-            it == GeneralConfiguration.Modality.FACE -> RANK_ONE
+            it == GeneralConfiguration.Modality.FACE -> Vendor.RankOne
             it == GeneralConfiguration.Modality.FINGERPRINT &&
                 fingerprint?.allowedSDKs?.contains(
                     FingerprintConfiguration.BioSdk.NEC
-                ) == true -> NEC
+                ) == true -> Vendor.Nec
 
             else -> null
         }

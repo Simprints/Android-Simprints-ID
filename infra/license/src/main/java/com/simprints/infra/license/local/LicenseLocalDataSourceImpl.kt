@@ -2,9 +2,10 @@ package com.simprints.infra.license.local
 
 import android.content.Context
 import com.simprints.core.DispatcherIO
-import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.license.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +26,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         renameOldRocLicense()// TODO: remove this after a few releases when all users have migrated to the 2023.3.0 version
         val expirationDate = getExpirationDate(vendor)
         val licenseData = getFileFromStorage(vendor)
-        licenseData?.let { License(expirationDate, it) }
+        licenseData?.let { License(expirationDate, it, LicenseVersion.UNLIMITED) }
     }
 
     private fun getExpirationDate(vendor: Vendor): String {
