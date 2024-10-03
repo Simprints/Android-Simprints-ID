@@ -9,7 +9,6 @@ import com.simprints.infra.license.remote.ApiLicenseResult
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 

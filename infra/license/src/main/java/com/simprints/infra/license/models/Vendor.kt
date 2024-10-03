@@ -20,7 +20,7 @@ sealed class Vendor(val value: String) {
         fun fromKey(key: String): Vendor = when (key) {
             RankOne.value -> RankOne
             Nec.value -> Nec
-            else -> throw IllegalStateException("Invalid licence vendor requested")
+            else -> error("Invalid licence vendor requested")
         }
     }
 }

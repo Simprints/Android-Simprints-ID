@@ -8,11 +8,12 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
-import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -159,17 +160,47 @@ class SetupViewModelTest {
             }
             every { fingerprint } returns mockk {
                 every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
+                every { nec?.version } returns "1"
             }
+            every { face?.rankOne?.version } returns "1"
         }
         every {
-            licenseRepository.getLicenseStates(any(), any(), any())
-        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate","license"))).asFlow()
+            licenseRepository.getLicenseStates(any(), any(), any(), any())
+        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate", "license", LicenseVersion.UNLIMITED))).asFlow()
 
         // When
         viewModel.downloadRequiredLicenses()
 
         // Then
-        verify(exactly = 2) { licenseRepository.getLicenseStates(any(), any(), any()) }
+        verify(exactly = 2) { licenseRepository.getLicenseStates(any(), any(), any(), LicenseVersion("1")) }
+        viewModel.overallSetupResult.test().assertValue(true)
+    }
+
+    @Test
+    fun `should download required licenses with unlimited versions`() = runTest {
+        // Given
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general } returns mockk {
+                every { modalities } returns listOf(
+                    GeneralConfiguration.Modality.FINGERPRINT,
+                    GeneralConfiguration.Modality.FACE
+                )
+                every { fingerprint } returns mockk {
+                    every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
+                    every { nec?.version } returns null
+                }
+                every { face?.rankOne } returns null
+            }
+        }
+        every {
+            licenseRepository.getLicenseStates(any(), any(), any(), LicenseVersion.UNLIMITED)
+        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate", "license", LicenseVersion.UNLIMITED))).asFlow()
+
+        // When
+        viewModel.downloadRequiredLicenses()
+
+        // Then
+        verify(exactly = 2) { licenseRepository.getLicenseStates(any(), any(), any(), any()) }
         viewModel.overallSetupResult.test().assertValue(true)
     }
 
@@ -202,21 +233,23 @@ class SetupViewModelTest {
             }
             every { fingerprint } returns mockk {
                 every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
+                every { nec?.version } returns ""
             }
+            every { face?.rankOne?.version } returns ""
         }
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, LicenseStatus.MISSING)}
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, LicenseStatus.MISSING) }
         every {
-            licenseRepository.getLicenseStates(any(), any(), Vendor.NEC)
-        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate", ""))).asFlow()
+            licenseRepository.getLicenseStates(any(), any(), Vendor.Nec, any())
+        } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate", "", LicenseVersion.UNLIMITED))).asFlow()
         every {
-            licenseRepository.getLicenseStates(any(), any(), Vendor.RANK_ONE)
+            licenseRepository.getLicenseStates(any(), any(), Vendor.RankOne, any())
         } returns listOf(LicenseState.FinishedWithError("123")).asFlow()
 
         // When
         viewModel.downloadRequiredLicenses()
 
         // Then
-        coVerify { saveLicenseCheckEvent(Vendor.RANK_ONE, LicenseStatus.MISSING)}
+        coVerify { saveLicenseCheckEvent(Vendor.RankOne, LicenseStatus.MISSING) }
         viewModel.overallSetupResult.test().assertValue(false)
     }
 }

@@ -65,6 +65,7 @@ internal class SetupViewModel @Inject constructor(
     fun downloadRequiredLicenses() {
         viewModelScope.launch {
             requiredLicenses = configManager.getProjectConfiguration().requiredLicenses
+
             // if there are no required licenses, then the setup is complete
             if (requiredLicenses.isEmpty()) {
                 _overallSetupResult.postValue(true)
@@ -104,7 +105,6 @@ internal class SetupViewModel @Inject constructor(
 
     private suspend fun shouldCollectLocation() =
         configManager.getProjectConfiguration().general.collectLocation
-
 
 }
 
