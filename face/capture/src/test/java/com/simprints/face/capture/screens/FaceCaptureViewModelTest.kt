@@ -13,8 +13,9 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -150,10 +151,10 @@ class FaceCaptureViewModelTest {
         val license = "license"
         every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2133-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
         viewModel.initFaceBioSdk(mockk())
@@ -167,17 +168,17 @@ class FaceCaptureViewModelTest {
         // Given
         val license = "license"
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2133-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         coEvery { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns false
         // When
         viewModel.initFaceBioSdk(mockk())
         // Then
         viewModel.invalidLicense.assertEventReceived()
-        coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.RankOne) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.ERROR)
     }
 
@@ -186,16 +187,16 @@ class FaceCaptureViewModelTest {
         // Given
         val license = "license"
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2011-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2011-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
         viewModel.initFaceBioSdk(mockk())
         // Then
         viewModel.invalidLicense.assertEventReceived()
-        coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.RankOne) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.EXPIRED)
     }
 }
