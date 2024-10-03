@@ -96,6 +96,8 @@ message ProtoFingerprintConfiguration {
         optional ProtoVero1Configuration vero_1 = 5;
         optional ProtoAllowedAgeRange allowed_age_range = 6;
         optional float verification_match_threshold = 7;
+
+        optional string version = 9;
     }
 }
 

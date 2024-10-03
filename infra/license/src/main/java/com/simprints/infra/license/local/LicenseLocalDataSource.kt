@@ -1,7 +1,7 @@
 package com.simprints.infra.license.local
 
-import com.simprints.infra.license.Vendor
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.license.models.License
 
 internal interface LicenseLocalDataSource {
     suspend fun getLicense(vendor: Vendor): License?

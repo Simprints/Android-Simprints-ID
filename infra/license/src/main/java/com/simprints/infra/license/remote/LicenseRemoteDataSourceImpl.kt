@@ -2,7 +2,8 @@ package com.simprints.infra.license.remote
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -13,7 +14,8 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 internal class LicenseRemoteDataSourceImpl @Inject constructor(
-    private val authStore: AuthStore, private val jsonHelper: JsonHelper
+    private val authStore: AuthStore,
+    private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {
 
     companion object {
@@ -22,13 +24,16 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getLicense(
-        projectId: String, deviceId: String, vendor: Vendor
+        projectId: String,
+        deviceId: String,
+        vendor: Vendor,
+        version: LicenseVersion,
     ): ApiLicenseResult = try {
         getProjectApiClient().executeCall {
-            it.getLicense(projectId, deviceId, vendor).parseApiLicense()
-                .getLicenseBasedOnVendor(vendor)?.let { apiLicense ->
-                    ApiLicenseResult.Success(apiLicense)
-                }
+            it.getLicense(projectId, deviceId, vendor.value, version.value)
+                .parseApiLicense()
+                .getLicenseBasedOnVendor(vendor)
+                ?.let { apiLicense -> ApiLicenseResult.Success(apiLicense) }
         } ?: ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
     } catch (t: Throwable) {
         when (t) {

@@ -2,7 +2,9 @@ package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -45,12 +47,13 @@ class LicenseRemoteDataSourceImplTest {
         coEvery { authStore.buildClient(LicenseRemoteInterface::class) } returns simApiClient
 
         coEvery {
-            remoteInterface.getLicense("validProject", any(), any())
+            remoteInterface.getLicense("validProject", any(), any(), any())
         } returns """{
                 "RANK_ONE_FACE": {
                     "vendor": "RANK_ONE_FACE",
                     "expiration": "$expirationDate",
-                    "data": "$license"
+                    "data": "$license",
+                    "version": "1.0"
                 }
             }
         """
@@ -58,6 +61,7 @@ class LicenseRemoteDataSourceImplTest {
         coEvery {
             remoteInterface.getLicense(
                 "invalidProject",
+                any(),
                 any(),
                 any()
             )
@@ -72,6 +76,7 @@ class LicenseRemoteDataSourceImplTest {
             remoteInterface.getLicense(
                 "invalidProjectUnknownErrorCode",
                 any(),
+                any(),
                 any()
             )
         } throws SyncCloudIntegrationException(
@@ -85,6 +90,7 @@ class LicenseRemoteDataSourceImplTest {
             remoteInterface.getLicense(
                 "backendMaintenanceErrorProject",
                 any(),
+                any(),
                 any()
             )
         } throws BackendMaintenanceException(estimatedOutage = null)
@@ -92,6 +98,7 @@ class LicenseRemoteDataSourceImplTest {
         coEvery {
             remoteInterface.getLicense(
                 "noQuotaProject",
+                any(),
                 any(),
                 any()
             )
@@ -106,6 +113,7 @@ class LicenseRemoteDataSourceImplTest {
             remoteInterface.getLicense(
                 "serviceUnavailable",
                 any(),
+                any(),
                 any()
             )
         } throws SyncCloudIntegrationException(
@@ -117,6 +125,7 @@ class LicenseRemoteDataSourceImplTest {
             remoteInterface.getLicense(
                 "networkConnectionException",
                 any(),
+                any(),
                 any()
             )
         } throws NetworkConnectionException(
@@ -125,6 +134,7 @@ class LicenseRemoteDataSourceImplTest {
         coEvery {
             remoteInterface.getLicense(
                 "genericException",
+                any(),
                 any(),
                 any()
             )
@@ -137,10 +147,11 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "validProject",
                 "deviceId",
-                RANK_ONE_FACE
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
             )
 
-        assertThat(newLicense).isEqualTo(ApiLicenseResult.Success(License(expirationDate, license)))
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.Success(LicenseValue(expirationDate, license, "1.0")))
     }
 
     @Test
@@ -149,7 +160,8 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "invalidProject",
                 "deviceId",
-                RANK_ONE_FACE
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("001"))
@@ -161,7 +173,8 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "invalidProjectUnknownErrorCode",
                 "deviceId",
-                RANK_ONE_FACE
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
@@ -173,7 +186,8 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "backendMaintenanceErrorProject",
                 "deviceId",
-                RANK_ONE_FACE
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.BackendMaintenanceError())
@@ -185,7 +199,8 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "noQuotaProject",
                 "deviceId",
-                RANK_ONE_FACE
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("002"))
@@ -197,7 +212,8 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "serviceUnavailable",
                 "deviceId",
-                RANK_ONE_FACE
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
@@ -210,7 +226,8 @@ class LicenseRemoteDataSourceImplTest {
                 licenseRemoteDataSourceImpl.getLicense(
                     "networkConnectionException",
                     "deviceId",
-                    RANK_ONE_FACE
+                    RANK_ONE_FACE,
+                    LicenseVersion.UNLIMITED,
                 )
 
             assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
@@ -223,13 +240,14 @@ class LicenseRemoteDataSourceImplTest {
                 licenseRemoteDataSourceImpl.getLicense(
                     "genericException",
                     "deviceId",
-                    RANK_ONE_FACE
+                    RANK_ONE_FACE,
+                    LicenseVersion.UNLIMITED,
                 )
 
             assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
         }
 
     companion object {
-        private val RANK_ONE_FACE = Vendor("RANK_ONE_FACE")
+        private val RANK_ONE_FACE = Vendor.RankOne
     }
 }
