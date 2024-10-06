@@ -25,6 +25,7 @@ import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
@@ -48,6 +49,7 @@ import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -106,6 +108,9 @@ class FingerprintCaptureViewModelTest {
     private val getNextFingerToAddUseCase = GetNextFingerToAddUseCase()
 
 
+    @RelaxedMockK
+    private lateinit var tracker: FingerprintScanningStatusTracker
+
     private lateinit var vm: FingerprintCaptureViewModel
 
     @Before
@@ -145,6 +150,7 @@ class FingerprintCaptureViewModelTest {
             getStartState = getStartStateUseCase,
             addCaptureEvents = addCaptureEventsUseCase,
             isNoFingerDetectedLimitReachedUseCase = isNoFingerDetectedLimitReachedUseCase,
+            tracker = tracker,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
@@ -1334,7 +1340,7 @@ class FingerprintCaptureViewModelTest {
     @Test
     fun whenScannerDisconnects_AndUserSelectsDifferentFinger_updatesStateCorrectlyAndReconnects() = runTest {
         mockScannerSetUiIdle()
-        coEvery { scanner.setUiIdle() } throws ScannerDisconnectedException()
+        coEvery { scanner.turnOffSmileLeds() } throws ScannerDisconnectedException()
 
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.updateSelectedFinger(1)
@@ -1400,7 +1406,7 @@ class FingerprintCaptureViewModelTest {
     }
 
     private fun mockScannerSetUiIdle() {
-        coJustRun { scanner.setUiIdle() }
+        coJustRun { scanner.turnOffSmileLeds() }
     }
 
     @ExperimentalTime

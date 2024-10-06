@@ -55,6 +55,7 @@ internal class ScannerWrapperV2(
 
     override fun batteryInformation(): BatteryInfo = batteryInfo ?: BatteryInfo.UNKNOWN
 
+
     override fun isImageTransferSupported(): Boolean = true
 
     override suspend fun connect() =
@@ -158,7 +159,7 @@ internal class ScannerWrapperV2(
     override suspend fun stopLiveFeedback(): Unit = withContext(ioDispatcher) {
         if (isLiveFeedbackAvailable()) {
             scannerV2
-                .setSmileLedState(scannerUiHelper.idleLedState())
+                .setSmileLedState(scannerUiHelper.turnedOffState())
                 .onErrorComplete()
             scannerV2
                 .setScannerLedStateDefault()
@@ -180,9 +181,9 @@ internal class ScannerWrapperV2(
             }.await()
         }
 
-    override suspend fun setUiIdle() = withContext(ioDispatcher) {
+    override suspend fun turnOffSmileLeds() = withContext(ioDispatcher) {
         scannerV2
-            .setSmileLedState(scannerUiHelper.idleLedState())
+            .setSmileLedState(scannerUiHelper.turnedOffState())
             .wrapErrorsFromScanner()
             .await()
     }
@@ -211,5 +212,18 @@ internal class ScannerWrapperV2(
 
     private fun Completable.wrapErrorsFromScanner() =
         onErrorResumeNext { Completable.error(wrapErrorFromScanner(it)) }
+
+    override suspend fun turnFlashingOrangeLeds() =
+        scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()).onErrorComplete().await()
+
+    override suspend fun setUiGoodCapture() = scannerV2
+        .setSmileLedState(scannerUiHelper.goodScanLedState())
+        .onErrorComplete().await()
+
+    override suspend fun setUiBadCapture() = scannerV2
+        .setSmileLedState(scannerUiHelper.badScanLedState())
+        .onErrorComplete().await()
+
+
 
 }

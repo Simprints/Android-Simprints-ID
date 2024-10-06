@@ -7,6 +7,7 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplat
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.infra.logging.Simber
 import com.simprints.sgimagecorrection.SecugenImageCorrection
@@ -32,10 +33,10 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
             require(settings != null) { "Settings cannot be null" }
 
             // 1- Acquire unprocessed image from the scanner
-            // 2- Use secugen image processing to convert it to wsq format
-            // 3- Use wsq sdk to convert it to bitmap
-            // 4- Use nec sdk to check image quality
-            // 5- Use nec sdk to convert it to template
+            // 2- secugen wsq decoder to decode the wsq  image
+            // 3- secugen sdk to correct and upsample  the raw image
+            // 4- nec sdk to check image quality
+            // 5- nec sdk to convert it to template
             // 6- Return the template and cache the image for later use
             val captureWrapper = fingerprintCaptureWrapperFactory.captureWrapper
 

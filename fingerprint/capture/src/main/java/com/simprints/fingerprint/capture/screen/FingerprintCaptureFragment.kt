@@ -47,7 +47,6 @@ import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -64,7 +63,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private var hasSplashScreenBeenTriggered: Boolean = false
 
     @Inject
-    lateinit var fingerprintScanCompletionAudioNotifier: FingerprintScanCompletionAudioNotifier
+    lateinit var observeFingerprintScanFeedback: ObserveFingerprintScanFeedbackUseCase
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -90,9 +89,12 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             R.id.fingerprintCaptureFragment,
             FingerprintConnectContract.DESTINATION
         ) {
-            if (it !is FingerprintConnectResult || !it.isSuccess) {
-                findNavController().finishWithResult(this, it)
+            if (it is FingerprintConnectResult && it.isSuccess) {
+                // Start observing feedback after the scanner is connected
+                observeFingerprintScanFeedback(viewLifecycleOwner.lifecycleScope)
             }
+            if (it !is FingerprintConnectResult || !it.isSuccess)
+                findNavController().finishWithResult(this, it)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -109,9 +111,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             args.params.fingerprintsToCapture,
             args.params.fingerprintSDK,
         )
-        lifecycleScope.launch {
-            fingerprintScanCompletionAudioNotifier.observeScanStatus()
-        }
         initUI()
     }
 
@@ -295,8 +294,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     override fun onDestroyView() {
+        observeFingerprintScanFeedback.stopObserving()
         confirmDialog?.dismiss()
-        fingerprintScanCompletionAudioNotifier.releaseMediaPlayer()
         super.onDestroyView()
     }
 }
