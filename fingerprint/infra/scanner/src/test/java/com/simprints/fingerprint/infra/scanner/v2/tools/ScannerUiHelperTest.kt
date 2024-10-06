@@ -23,8 +23,8 @@ class ScannerUiHelperTest {
     }
 
     @Test
-    fun idleLedState() {
-        val result = scannerUiHelper.idleLedState()
+    fun turnedOffState() {
+        val result = scannerUiHelper.turnedOffState()
         assertThat(result).isEqualTo(SmileLedState(X, X, X, X, X))
     }
 

@@ -22,7 +22,7 @@ class FingerprintCaptureWrapperFactory @Inject constructor(
 
     fun createV1(scannerV1: ScannerV1) {
         _captureWrapper =
-            FingerprintCaptureWrapperV1(scannerV1, ioDispatcher, scanningStatusTracker)
+            FingerprintCaptureWrapperV1(scannerV1, ioDispatcher)
     }
 
     fun createV2(scannerV2: ScannerV2) {
