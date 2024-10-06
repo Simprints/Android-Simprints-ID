@@ -111,9 +111,10 @@ message ProtoVero1Configuration {
 message ProtoVero2Configuration {
     ImageSavingStrategy image_saving_strategy = 1;
     CaptureStrategy capture_strategy = 2;
-    bool display_live_feedback = 3;
+    bool display_live_feedback = 3; // TODO: remove this field after migration to 2024.2.1
     map<string, Vero2FirmwareVersions> firmware_versions = 4;
     int32 quality_threshold = 5;
+    LedsMode leds_mode = 6;
 
     enum ImageSavingStrategy {
         NEVER = 0;
@@ -129,6 +130,11 @@ message ProtoVero2Configuration {
         SECUGEN_ISO_1700_DPI = 3;
     }
 
+    enum LedsMode{
+        BASIC = 0;
+        LIVE_QUALITY_FEEDBACK = 1;
+        VISUAL_SCAN_FEEDBACK = 2;
+    }
     message Vero2FirmwareVersions {
         string cypress = 1;
         string stm = 2;

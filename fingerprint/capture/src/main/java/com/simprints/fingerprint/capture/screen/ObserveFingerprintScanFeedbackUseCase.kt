@@ -1,0 +1,109 @@
+package com.simprints.fingerprint.capture.screen
+
+import android.content.Context
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanState
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
+import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
+import com.simprints.infra.config.sync.ConfigManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
+import androidx.preference.PreferenceManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+
+@Singleton
+class ObserveFingerprintScanFeedbackUseCase @Inject constructor(
+    private val statusTracker: FingerprintScanningStatusTracker,
+    private val playAudioBeep: PlayAudioBeepUseCase,
+    private val configManager: ConfigManager,
+    private val scannerManager: ScannerManager,
+    @ApplicationContext private val context: Context,
+) {
+    private var observeJob: Job? = null
+    private var previousState: FingerprintScanState = FingerprintScanState.Idle
+    private var ledsMode: Vero2Configuration.LedsMode? = BASIC
+    private val preference = PreferenceManager.getDefaultSharedPreferences(context)
+
+    operator fun invoke(
+        coroutineScope: CoroutineScope, fingerprintSdk: FingerprintConfiguration.BioSdk
+    ) {
+        stopObserving()
+        observeJob = coroutineScope.launch {
+            ledsMode = configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(
+                fingerprintSdk
+            )?.vero2?.ledsMode
+            statusTracker.state.collect { state ->
+                provideFeedback(state)
+                previousState = state
+            }
+        }
+    }
+
+
+    private suspend fun provideFeedback(state: FingerprintScanState) {
+        when (state) {
+            is FingerprintScanState.Idle -> turnFlashingLedsOn()
+            is FingerprintScanState.Scanning -> turnFlashingLedsOn()
+            is FingerprintScanState.ScanCompleted -> setUiToRemoveFinger()
+            is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
+            is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
+
+        }
+    }
+
+    fun stopObserving() {
+        observeJob?.cancel()
+        playAudioBeep.releaseMediaPlayer()
+        observeJob = null
+    }
+
+    private suspend fun turnFlashingLedsOn() {
+        if (ledsMode == VISUAL_SCAN_FEEDBACK) {
+            scannerManager.scanner.turnFlashingOrangeLeds()
+        }
+    }
+
+    private suspend fun setUiAfterScan(isGoodScan: Boolean) {
+        // Check if the previous state was removeFinger to avoid displaying the bad or good scan UI twice
+        // There's no need to check the configuration, as the good/bad scan visual notifications apply across all LED modes.
+        if (previousState == FingerprintScanState.ScanCompleted) {
+            with(scannerManager.scanner) {
+                if (isGoodScan) setUiGoodCapture()
+                else setUiBadCapture()
+
+                //Wait before turn of the leds
+                longDelay()
+                turnOffSmileLeds()
+            }
+        }
+    }
+
+    private suspend fun setUiToRemoveFinger() {
+        // Verify that the previous state was not "ScanCompleted" to prevent the sound from playing twice.
+        if (previousState == FingerprintScanState.ScanCompleted) return
+
+        if (isAudioEnabled()) playAudioBeep()
+
+        if (ledsMode == VISUAL_SCAN_FEEDBACK) {
+            scannerManager.scanner.turnOffSmileLeds()
+        }
+    }
+
+
+    private suspend fun longDelay() = delay(LONG_DELAY)
+
+    private fun isAudioEnabled() = preference.getBoolean(AUDIO_PREFERENCE_KEY, false)
+
+
+    companion object {
+        const val LONG_DELAY = 3000L
+        private const val AUDIO_PREFERENCE_KEY = "preference_enable_audio_on_scan_complete_key"
+    }
+}
