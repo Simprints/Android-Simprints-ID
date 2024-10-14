@@ -19,6 +19,7 @@ import com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiome
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolValidator
 import com.simprints.feature.clientapi.mappers.request.validators.IdentifyValidator
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
+import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionConstants
@@ -46,7 +47,11 @@ internal class IntentToActionMapper @Inject constructor(
         extras: Map<String, Any>,
         project: Project?
     ): ActionRequest {
-        val actionIdentifier = ActionRequestIdentifier.fromIntentAction(action)
+        val actionIdentifier = ActionRequestIdentifier.fromIntentAction(
+            action,
+            extras[ClientApiConstants.CALLER_PACKAGE_NAME]?.let { it as? String }.orEmpty(),
+            extras[Constants.SIMPRINTS_LIB_VERSION]?.let { it as? Int } ?: 1,
+        )
 
         return when (actionIdentifier.packageName) {
             OdkConstants.PACKAGE_NAME -> mapOdkAction(actionIdentifier, extras, project)

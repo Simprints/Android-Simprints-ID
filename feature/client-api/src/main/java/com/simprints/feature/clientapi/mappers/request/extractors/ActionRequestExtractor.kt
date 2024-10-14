@@ -3,7 +3,6 @@ package com.simprints.feature.clientapi.mappers.request.extractors
 import android.content.Intent
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.clientapi.extensions.extractString
-import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.libsimprints.Constants
 
 
@@ -25,8 +24,6 @@ internal abstract class ActionRequestExtractor(private val extras: Map<String, A
     open fun getModuleId(): String = extras.extractString(Constants.SIMPRINTS_MODULE_ID)
     
     open fun getBiometricDataSource(): String = extras.extractString(Constants.SIMPRINTS_BIOMETRIC_DATA_SOURCE)
-
-    open fun getCallerPackageName(): String = extras.extractString(ClientApiConstants.CALLER_PACKAGE_NAME)
 
     open fun getMetadata(): String = extras.extractString(Constants.SIMPRINTS_METADATA)
 
