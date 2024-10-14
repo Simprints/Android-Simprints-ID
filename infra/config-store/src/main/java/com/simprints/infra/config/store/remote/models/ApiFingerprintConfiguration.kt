@@ -31,7 +31,6 @@ internal data class ApiFingerprintConfiguration(
         val vero2: ApiVero2Configuration? = null,
         val allowedAgeRange: ApiAllowedAgeRange? = null,
         val verificationMatchThreshold: Float? = null,
-        val version: String? = null,
     ) {
         fun toDomain() = FingerprintConfiguration.FingerprintSdkConfiguration(
             fingersToCapture = fingersToCapture.map { it.toDomain() },
@@ -41,7 +40,6 @@ internal data class ApiFingerprintConfiguration(
             vero2 = vero2?.toDomain(),
             allowedAgeRange = allowedAgeRange?.toDomain() ?: AgeGroup(0, null),
             verificationMatchThreshold = verificationMatchThreshold,
-            version = version.orEmpty(),
         )
     }
 
