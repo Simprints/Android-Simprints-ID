@@ -117,7 +117,8 @@ internal val projectConfiguration = ProjectConfiguration(
     fingerprintConfiguration,
     consentConfiguration,
     identificationConfiguration,
-    synchronizationConfiguration
+    synchronizationConfiguration,
+    null,
 )
 
 internal const val tokenizationJson =

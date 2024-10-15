@@ -342,6 +342,14 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
     )
     .build()
 
+internal val customKeyMap: Map<String, Any>? = mapOf(
+    "key1" to 7,
+    "key2" to 4.2,
+    "key3" to false,
+    "key4" to "test"
+)
+internal const val protoCustomKeyMapJson = "{\"key1\":7,\"key2\":4.2,\"key3\":false,\"key4\":\"test\"}"
+
 internal val apiProjectConfiguration = ApiProjectConfiguration(
     "projectId",
     "updatedAt",
@@ -350,7 +358,8 @@ internal val apiProjectConfiguration = ApiProjectConfiguration(
     apiFingerprintConfiguration,
     apiConsentConfiguration,
     apiIdentificationConfiguration,
-    apiSynchronizationConfiguration
+    apiSynchronizationConfiguration,
+    customKeyMap,
 )
 
 internal val projectConfiguration = ProjectConfiguration(
@@ -361,7 +370,8 @@ internal val projectConfiguration = ProjectConfiguration(
     fingerprintConfiguration,
     consentConfiguration,
     identificationConfiguration,
-    synchronizationConfiguration
+    synchronizationConfiguration,
+    customKeyMap,
 )
 
 internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
@@ -373,6 +383,7 @@ internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setConsent(protoConsentConfiguration)
     .setIdentification(protoIdentificationConfiguration)
     .setSynchronization(protoSynchronizationConfiguration)
+    .setCustomJson(protoCustomKeyMapJson)
     .build()
 
 
