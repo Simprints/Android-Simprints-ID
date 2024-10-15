@@ -8,4 +8,12 @@ data class ExperimentalProjectConfiguration(
     private val customConfig: Map<String, Any>?,
 ) {
 
+    val idPoolValidationEnabled: Boolean
+        get() = customConfig?.get(ENABLE_ID_POOL_VALIDATION)
+            ?.let { it as? Boolean }
+            .let { it == true }
+
+    companion object {
+        internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
+    }
 }
