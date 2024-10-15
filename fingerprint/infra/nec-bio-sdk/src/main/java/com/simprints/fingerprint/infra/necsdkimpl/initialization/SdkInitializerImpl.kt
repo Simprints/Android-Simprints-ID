@@ -7,8 +7,8 @@ import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.determineLicenseStatus
+import com.simprints.infra.license.models.Vendor
 import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.tools.toByteBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,18 +23,18 @@ internal class SdkInitializerImpl @Inject constructor(
     override suspend fun initialize(initializationParams: Unit?) {
         var licenseStatus: LicenseStatus? = null
         try {
-            val licence = licenseRepository.getCachedLicense(Vendor.NEC)
+            val licence = licenseRepository.getCachedLicense(Vendor.Nec)
             licenseStatus = licence.determineLicenseStatus()
             if (licenseStatus != LicenseStatus.VALID) {
                 throw BioSdkException.BioSdkInitializationException(message = "License is $licenseStatus")
             }
             necInstance.init(licence!!.data.encodeAndConvertToByteBuffer(), context)
         } catch (e: Exception) {
-            licenseRepository.deleteCachedLicense(Vendor.NEC)
+            licenseRepository.deleteCachedLicense(Vendor.Nec)
             licenseStatus = LicenseStatus.ERROR
             throw BioSdkException.BioSdkInitializationException(e)
         } finally {
-            licenseStatus?.let { saveLicenseCheck(Vendor.NEC, it) }
+            licenseStatus?.let { saveLicenseCheck(Vendor.Nec, it) }
         }
     }
 }

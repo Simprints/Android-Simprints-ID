@@ -5,6 +5,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
+import com.simprints.infra.license.models.Vendor
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -38,7 +39,7 @@ class SaveLicenseCheckEventUseCaseTest {
 
     @Test
     fun `invoke adds LicenseCheckEvent with VALID status to eventRepository`() = runTest {
-        val vendor = Vendor("TestVendor")
+        val vendor = Vendor.RankOne
         val status = LicenseStatus.VALID
 
         saveLicenseCheckEventUseCase(vendor, status)
@@ -53,7 +54,7 @@ class SaveLicenseCheckEventUseCaseTest {
     @Test
     fun `invoke adds LicenseCheckEvent with INVALID status to eventRepository`() = runTest {
         val status = LicenseStatus.INVALID
-        val vendor = Vendor("TestVendor")
+        val vendor = Vendor.RankOne
 
         saveLicenseCheckEventUseCase(vendor, status)
 

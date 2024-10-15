@@ -3,6 +3,7 @@ package com.simprints.infra.license
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
+import com.simprints.infra.license.models.Vendor
 import javax.inject.Inject
 
 class SaveLicenseCheckEventUseCase @Inject constructor(

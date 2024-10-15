@@ -1,6 +1,4 @@
-package com.simprints.infra.license
-
-import com.simprints.infra.license.remote.License
+package com.simprints.infra.license.models
 
 sealed class LicenseState {
     data object Started : LicenseState()
