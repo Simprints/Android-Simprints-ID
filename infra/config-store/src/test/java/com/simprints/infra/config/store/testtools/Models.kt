@@ -348,6 +348,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
     .build()
 
 internal val apiProjectConfiguration = ApiProjectConfiguration(
+    "id",
     "projectId",
     "updatedAt",
     apiGeneralConfiguration,
@@ -359,6 +360,7 @@ internal val apiProjectConfiguration = ApiProjectConfiguration(
 )
 
 internal val projectConfiguration = ProjectConfiguration(
+    "id",
     "projectId",
     "updatedAt",
     generalConfiguration,
@@ -370,6 +372,7 @@ internal val projectConfiguration = ProjectConfiguration(
 )
 
 internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
+    .setId("id")
     .setProjectId("projectId")
     .setUpdatedAt("updatedAt")
     .setGeneral(protoGeneralConfiguration)

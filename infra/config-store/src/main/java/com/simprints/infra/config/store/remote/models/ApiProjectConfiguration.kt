@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 
 @Keep
 internal data class ApiProjectConfiguration(
+    val id: String,
     val projectId: String,
     val updatedAt: String,
     val general: ApiGeneralConfiguration,
@@ -16,6 +17,7 @@ internal data class ApiProjectConfiguration(
 ) {
 
     fun toDomain(): ProjectConfiguration = ProjectConfiguration(
+        id,
         projectId,
         updatedAt,
         general.toDomain(),

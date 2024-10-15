@@ -4,6 +4,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 
 internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration =
     ProtoProjectConfiguration.newBuilder()
+        .setId(id)
         .setProjectId(projectId)
         .setUpdatedAt(updatedAt)
         .setConsent(consent.toProto())
@@ -18,6 +19,7 @@ internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration =
 
 internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration =
     ProjectConfiguration(
+        id,
         projectId,
         updatedAt,
         general.toDomain(),

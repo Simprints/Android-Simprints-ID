@@ -158,6 +158,7 @@ class ProjectAuthenticatorTest {
         } returns Token("", "", "", "")
 
         coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
+            "id",
             PROJECT_ID,
             "",
             general = GeneralConfiguration(

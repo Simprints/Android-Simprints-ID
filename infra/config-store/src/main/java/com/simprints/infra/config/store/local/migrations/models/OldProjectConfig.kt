@@ -64,6 +64,7 @@ internal data class OldProjectConfig(
 ) {
     fun toDomain(projectId: String): ProjectConfiguration =
         ProjectConfiguration(
+            id = "",
             projectId = projectId,
             updatedAt = "",
             general = generalConfiguration(),

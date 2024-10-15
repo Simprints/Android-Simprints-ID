@@ -116,6 +116,7 @@ internal val identificationConfiguration =
     IdentificationConfiguration(4, IdentificationConfiguration.PoolType.PROJECT)
 
 internal val projectConfiguration = ProjectConfiguration(
+    "id",
     "projectId",
     "updatedAt",
     generalConfiguration,
