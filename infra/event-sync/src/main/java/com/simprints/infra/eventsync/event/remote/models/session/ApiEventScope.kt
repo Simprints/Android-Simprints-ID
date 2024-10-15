@@ -26,6 +26,7 @@ internal data class ApiEventScope(
     val location: ApiLocation?,
     @JsonInclude(Include.NON_EMPTY)
     val projectConfigurationUpdatedAt: String,
+    val projectConfigurationId: String,
     val events: List<ApiEvent>,
 ) {
 
@@ -48,6 +49,7 @@ internal data class ApiEventScope(
             databaseInfo = scope.payload.databaseInfo.fromDomainToApi(),
             location = scope.payload.location?.fromDomainToApi(),
             projectConfigurationUpdatedAt = scope.payload.projectConfigurationUpdatedAt,
+            projectConfigurationId = scope.payload.projectConfigurationId.orEmpty(),
             events = events.map { it.fromDomainToApi() }
         )
     }

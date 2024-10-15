@@ -122,7 +122,8 @@ fun createSessionScope(
             device = deviceArg,
             databaseInfo = databaseInfoArg,
             location = locationArg,
-            projectConfigurationUpdatedAt = "projectConfigurationUpdatedAt"
+            projectConfigurationUpdatedAt = "projectConfigurationUpdatedAt",
+            projectConfigurationId = "projectConfigurationId",
         )
     )
 }
