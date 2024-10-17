@@ -59,15 +59,12 @@
         android:id="@+id/capture_feedback_txt_title"
         style="@style/Text.Headline6.Bold"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="190dp"
         android:background="@drawable/feedback_chip_white"
         android:drawablePadding="4dp"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="4dp"
+        android:padding="@dimen/padding_default"
         android:text="@string/face_capture_title_previewing"
         android:textColor="@color/feedback_chip_text"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,9 +92,9 @@
         android:layout_marginTop="16dp"
         android:text="@string/face_capture_permission_action"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_explanation" />
+        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_explanation"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

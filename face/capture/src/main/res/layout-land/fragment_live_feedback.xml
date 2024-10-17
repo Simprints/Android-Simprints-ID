@@ -69,13 +69,12 @@
             android:id="@+id/capture_feedback_txt_title"
             style="@style/Text.Headline6.Bold"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/feedback_chip_white"
             android:drawablePadding="4dp"
             android:gravity="center"
             android:textAlignment="center"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
+            android:padding="@dimen/padding_default"
             android:text="@string/face_capture_title_previewing"
             android:textColor="@color/feedback_chip_text" />
 

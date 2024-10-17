@@ -32,6 +32,7 @@ import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.face.capture.screens.livefeedback.views.log
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
@@ -40,6 +41,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.time.DurationUnit
+import kotlin.time.measureTime
 import com.simprints.infra.resources.R as IDR
 
 
@@ -191,10 +194,16 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun analyze(image: ImageProxy) {
         try {
+            // measure the time it takes to process the image
+          val  time =  measureTime {
+
             vm.process(
                 image = image,
                 screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
             )
+            }
+            log("Frame processing time = ${time.toInt(DurationUnit.MILLISECONDS)}")
+
         } catch (t: Throwable) {
             Simber.e(t)
             // Image analysis is running in bg thread

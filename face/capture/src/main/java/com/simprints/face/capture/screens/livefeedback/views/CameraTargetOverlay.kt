@@ -8,16 +8,17 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import com.simprints.core.tools.extentions.dpToPx
 import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class CameraTargetOverlay(
-    context: Context,
-    attrs: AttributeSet
+    context: Context, attrs: AttributeSet
 ) : AppCompatImageView(context, attrs) {
     companion object {
         private val SEMI_TRANSPARENT_OVERLAY = Color.argb(102, 0, 0, 0)
@@ -27,7 +28,7 @@ internal class CameraTargetOverlay(
          * Reference to the guideline's percentage of margin from the top of the screen. Used when
          * the screen is in the portrait (vertical) mode
          */
-        private const val percentFromTopPortrait = 0.3f
+        private const val percentFromTopPortrait = 0.4f
 
         /**
          * Reference to the guideline's percentage of margin from the top of the screen. Used when
@@ -36,10 +37,7 @@ internal class CameraTargetOverlay(
         private const val percentFromTopLandscape = 0.5f
 
         fun rectForPlane(
-            width: Int,
-            height: Int,
-            rectSize: Float,
-            screenOrientation: ScreenOrientation
+            width: Int, height: Int, rectSize: Float, screenOrientation: ScreenOrientation
         ): RectF {
             val percentFromTop = when (screenOrientation) {
                 ScreenOrientation.Landscape -> percentFromTopLandscape
@@ -55,6 +53,8 @@ internal class CameraTargetOverlay(
             return RectF(left, top, right, bottom)
         }
     }
+    @Inject lateinit var calculateTargetViewSize: CalculateTargetViewSizeUseCase
+
 
     private var drawingFunc: (Canvas.() -> Unit)? = null
         set(value) {
@@ -62,7 +62,6 @@ internal class CameraTargetOverlay(
             postInvalidate()
         }
 
-    private val rectSize = 240f.dpToPx(context)
 
     private val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.TRANSPARENT
@@ -76,8 +75,11 @@ internal class CameraTargetOverlay(
     }
     var rectInCanvas = RectF(0f, 0f, 0f, 0f)
 
+    private var targetSize = 0f
+
     init {
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
+        targetSize = calculateTargetViewSize()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -102,9 +104,10 @@ internal class CameraTargetOverlay(
     }
 
     private fun Canvas.drawTarget(screenOrientation: ScreenOrientation) {
-        rectInCanvas = rectForPlane(width, height, rectSize, screenOrientation)
+        rectInCanvas = rectForPlane(width, height, targetSize, screenOrientation)
 
         drawOval(rectInCanvas, circlePaint)
         drawOval(rectInCanvas, circleBorderPaint)
     }
+
 }

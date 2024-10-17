@@ -9,6 +9,8 @@ import android.widget.FrameLayout
 import com.simprints.core.tools.extentions.dpToPx
 import com.simprints.face.capture.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * This is a variant of circular progress bar that have spaces between bars (as opposed to a filled
@@ -23,8 +25,11 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
  * You can also set the number of steps as the [max] property. This doesn't translate to number of bars, it's
  * just the max number of steps you are going to use.
  */
+@AndroidEntryPoint
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class DashedCircularProgress(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
+    @Inject lateinit var calculateTargetSize: CalculateTargetViewSizeUseCase
+
     private var progressPainter: ProgressPainter? = null
     var progressColor = Color.WHITE
         set(value) {
@@ -74,6 +79,12 @@ internal class DashedCircularProgress(context: Context, attrs: AttributeSet) : F
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        val targetWidth = calculateTargetSize().toInt()
+        layoutParams = layoutParams.apply {
+            width = targetWidth
+            height = targetWidth
+        }
+
         progressPainter?.onSizeChanged(h, w)
     }
 }
