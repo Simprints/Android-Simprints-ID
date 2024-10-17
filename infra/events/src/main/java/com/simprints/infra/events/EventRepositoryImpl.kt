@@ -74,6 +74,7 @@ internal open class EventRepositoryImpl @Inject constructor(
                     ),
                     databaseInfo = DatabaseInfo(sessionCount),
                     projectConfigurationUpdatedAt = projectConfiguration.updatedAt,
+                    projectConfigurationId = projectConfiguration.id,
                 )
             )
         }

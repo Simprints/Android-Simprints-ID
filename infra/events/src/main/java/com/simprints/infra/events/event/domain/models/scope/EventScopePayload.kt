@@ -11,6 +11,7 @@ data class EventScopePayload(
     val libSimprintsVersion: String,
     val language: String,
     val projectConfigurationUpdatedAt: String,
+    val projectConfigurationId: String? = null,
 
     val modalities: List<GeneralConfiguration.Modality>,
     val device: Device,

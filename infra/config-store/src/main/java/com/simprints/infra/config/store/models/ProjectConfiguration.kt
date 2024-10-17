@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.models
 
 data class ProjectConfiguration(
+    val id: String,
     val projectId: String,
     val updatedAt: String,
     val general: GeneralConfiguration,

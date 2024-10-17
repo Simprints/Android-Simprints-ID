@@ -24,6 +24,7 @@ class ApiEventScopeTest {
             databaseInfo = ApiDatabaseInfo(0, 0),
             location = null,
             projectConfigurationUpdatedAt = "",
+            projectConfigurationId = "",
             events = emptyList()
         )
 
@@ -51,6 +52,7 @@ class ApiEventScopeTest {
             databaseInfo = ApiDatabaseInfo(0, 0),
             location = null,
             projectConfigurationUpdatedAt = "123",
+            projectConfigurationId = "",
             events = emptyList()
         )
 

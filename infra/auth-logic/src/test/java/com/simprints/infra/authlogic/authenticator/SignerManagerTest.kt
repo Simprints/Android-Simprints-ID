@@ -231,7 +231,7 @@ internal class SignerManagerTest {
                             tokenizationKeys = emptyMap()
                         ),
                         ProjectConfiguration(
-                            DEFAULT_PROJECT_ID, "", mockk(), mockk(), mockk(), mockk(), mockk(), mockk()
+                            "id", DEFAULT_PROJECT_ID, "", mockk(), mockk(), mockk(), mockk(), mockk(), mockk()
                         )
                     )
                 )

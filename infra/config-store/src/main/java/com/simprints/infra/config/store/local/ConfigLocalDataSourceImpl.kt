@@ -126,6 +126,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
         val defaultProjectConfiguration: ProtoProjectConfiguration =
             ProjectConfiguration(
+                id = "",
                 projectId = "",
                 updatedAt = "",
                 general = GeneralConfiguration(
