@@ -14,8 +14,10 @@ class ScannerUiHelper @Inject constructor() {
 
     fun badScanLedState() = SmileLedState(R, R, R, R, R)
 
-    fun idleLedState() = SmileLedState(X, X, X, X, X)
+    fun turnedOffState() = SmileLedState(X, X, X, X, X)
 
+    fun whiteFlashingLedState() = SmileLedState(W, W, W, W, W)
+    
     fun deduceLedStateFromQualityForLiveFeedback(quality: Int) =
         when (quality) {
             in QUALITY[0] -> SmileLedState(G, X, X, X, X)
@@ -23,7 +25,7 @@ class ScannerUiHelper @Inject constructor() {
             in QUALITY[2] -> SmileLedState(G, G, G, X, X)
             in QUALITY[3] -> SmileLedState(G, G, G, G, X)
             in QUALITY[4] -> SmileLedState(G, G, G, G, G)
-            else -> idleLedState()
+            else -> turnedOffState()
         }
 
     companion object {
@@ -38,6 +40,6 @@ class ScannerUiHelper @Inject constructor() {
         val X = LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00) // off
         val G = LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00) // green
         val R = LedState(DigitalValue.FALSE, 0x08, 0x00, 0x00) // red
-
+        val W = LedState(DigitalValue.TRUE, 0x08, 0x08, 0x08) // white
     }
 }

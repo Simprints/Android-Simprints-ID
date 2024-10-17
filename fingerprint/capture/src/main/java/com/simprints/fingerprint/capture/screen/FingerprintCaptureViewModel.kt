@@ -32,6 +32,7 @@ import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
@@ -70,6 +71,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
     private val addCaptureEvents: AddCaptureEventsUseCase,
+    private val tracker: FingerprintScanningStatusTracker,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -78,7 +80,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private lateinit var bioSdkWrapper: BioSdkWrapper
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
-        private set(value) {
+        set(value) {
             field = value
             _stateLiveData.postValue(value)
         }
@@ -177,6 +179,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             originalFingerprintsToCapture = fingerprintsToCapture
             setStartingState(fingerprintsToCapture)
             startObserverForLiveFeedback()
+            tracker.resetToIdle()
         }
     }
 
@@ -280,13 +283,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
-        viewModelScope.launch {
-            try {
-                scannerManager.scanner.setUiIdle()
-            } catch (ex: Exception) {
-                handleScannerCommunicationsError(ex)
-            }
-        }
         updateState {
             it.copy(
                 isAskingRescan = false,
@@ -339,13 +335,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun startScanning() {
+        tracker.startScanning()
         updateCaptureState(CaptureState::toScanning)
         lastCaptureStartedAt = timeHelper.now()
         scanningTask?.cancel()
 
         scanningTask = viewModelScope.launch {
             try {
-                scannerManager.scanner.setUiIdle()
                 val capturedFingerprint = bioSdkWrapper.acquireFingerprintTemplate(
                     capturingResolution = bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
                     timeOutMs = bioSdkWrapper.scanningTimeoutMs.toInt(),
@@ -373,6 +369,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             qualityThreshold = qualityThreshold()
         )
         _vibrate.send()
+        tracker.setImageQualityCheckingResult(scanResult.qualityScore >= qualityThreshold())
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
             updateCaptureState { it.toTransferringImage(scanResult) }
             proceedToImageTransfer()
@@ -417,6 +414,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private fun handleCaptureFinished() = with(state) {
         Simber.tag(FINGER_CAPTURE.name)
             .i("Finger scanned - ${currentFingerState().id}")
+        tracker.resetToIdle()
         addCaptureAndBiometricEventsInSession()
         saveCurrentImageIfEager()
         if (captureHasSatisfiedTerminalCondition(currentCaptureState())) {
@@ -461,11 +459,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             viewModelScope.launch {
                 delay(AUTO_SWIPE_DELAY)
                 updateFingerState { it.copy(currentCaptureIndex = currentCaptureIndex + 1) }
-                try {
-                    scannerManager.scanner.setUiIdle()
-                } catch (ex: Exception) {
-                    handleScannerCommunicationsError(ex)
-                }
             }
         }
     }
@@ -533,8 +526,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun handleNoFingerDetected() {
         _vibrate.send()
+        tracker.setImageQualityCheckingResult(false)
         updateCaptureState(CaptureState::toNotDetected)
         addCaptureAndBiometricEventsInSession()
+        tracker.resetToIdle()
     }
 
     fun handleMissingFingerButtonPressed() {
