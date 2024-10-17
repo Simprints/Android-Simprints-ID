@@ -12,6 +12,7 @@ message ProtoProjectConfiguration {
     ProtoIdentificationConfiguration identification = 6;
     ProtoSynchronizationConfiguration synchronization = 7;
     string updated_at = 8;
+    optional string customJson = 9;
 }
 
 message ProtoGeneralConfiguration {

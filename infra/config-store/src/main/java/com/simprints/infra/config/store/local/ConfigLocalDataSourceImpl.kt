@@ -197,6 +197,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         maxAge = DEFAULT_DOWN_SYNC_MAX_AGE,
                     ),
                 ),
+                custom = null,
             ).toProto()
         val defaultDeviceConfiguration: ProtoDeviceConfiguration = DeviceConfiguration(
             language = "",

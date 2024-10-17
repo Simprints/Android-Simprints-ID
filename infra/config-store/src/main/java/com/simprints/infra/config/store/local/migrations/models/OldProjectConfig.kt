@@ -72,6 +72,7 @@ internal data class OldProjectConfig(
             consent = consentConfiguration(),
             identification = identificationConfiguration(),
             synchronization = synchronizationConfiguration(),
+            custom = null,
         )
 
     private fun generalConfiguration(): GeneralConfiguration =
