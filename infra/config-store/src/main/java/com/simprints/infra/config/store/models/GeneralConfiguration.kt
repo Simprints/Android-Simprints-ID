@@ -20,4 +20,7 @@ data class GeneralConfiguration(
             FINGERPRINT -> Modes.FINGERPRINT
         }
     }
+
+    //TODO(milen): temp workaround until new config is implemented
+    fun matchingModalities() = listOf(Modality.FACE)
 }
