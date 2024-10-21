@@ -16,11 +16,11 @@ import com.simprints.feature.setup.R
 import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.setup.data.ErrorType
 import com.simprints.feature.setup.databinding.FragmentSetupBinding
-import com.simprints.infra.license.LicenseState.Downloading
-import com.simprints.infra.license.LicenseState.FinishedWithBackendMaintenanceError
-import com.simprints.infra.license.LicenseState.FinishedWithError
-import com.simprints.infra.license.LicenseState.FinishedWithSuccess
-import com.simprints.infra.license.LicenseState.Started
+import com.simprints.infra.license.models.LicenseState.Downloading
+import com.simprints.infra.license.models.LicenseState.FinishedWithBackendMaintenanceError
+import com.simprints.infra.license.models.LicenseState.FinishedWithError
+import com.simprints.infra.license.models.LicenseState.FinishedWithSuccess
+import com.simprints.infra.license.models.LicenseState.Started
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult

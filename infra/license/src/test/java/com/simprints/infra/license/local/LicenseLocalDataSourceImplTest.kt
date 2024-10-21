@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.security.crypto.EncryptedFile
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.license.Vendor
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -36,7 +37,8 @@ class LicenseLocalDataSourceImplTest {
     @MockK
     private lateinit var encryptedFile: EncryptedFile
 
-    private val licenseVendor = Vendor("vendor1")
+    private val licenseVendor = Vendor.RankOne
+    private val licenceVersion = "1.1"
     private val filesDirPath = "testpath"
 
     private lateinit var localSource: LicenseLocalDataSourceImpl
@@ -59,10 +61,49 @@ class LicenseLocalDataSourceImplTest {
     fun `check saving the file opens a file output`() = runTest {
         val fileName = "testfile"
         val expirationDate = "2023-01-01"
-        localSource.saveLicense(licenseVendor, License(expirationDate,fileName))
+        localSource.saveLicense(licenseVendor, License(expirationDate, fileName, LicenseVersion.UNLIMITED))
 
         assert(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}").exists())
         verify(exactly = 1) { encryptedFile.openFileOutput() }
+    }
+
+    @Test
+    fun `check saving the file with version opens a file output`() = runTest {
+        val licenceData = "testfile"
+        val expirationDate = "2023-01-01"
+        localSource.saveLicense(licenseVendor, License(expirationDate, licenceData, LicenseVersion(licenceVersion)))
+
+        assertThat(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}").exists()).isTrue()
+        assertThat(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}").isDirectory).isTrue()
+        verify(exactly = 1) { encryptedFile.openFileOutput() }
+    }
+
+    @Test
+    fun `check getting the file for version requests the file`() = runTest {
+        File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}").mkdirs()
+        File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}/$licenceVersion").createNewFile()
+
+        localSource.getLicense(licenseVendor)
+
+        verify(exactly = 1) { securityManager.getEncryptedFileBuilder(any(), any()) }
+        verify(exactly = 1) { encryptedFile.openFileInput() }
+    }
+
+    @Test
+    fun `check getting the file for version requests the file with highest version`() = runTest {
+        File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}").mkdirs()
+        File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}/0.9").createNewFile()
+        File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}/$licenceVersion").createNewFile()
+        File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/${licenseVendor.value}/1.2").createNewFile()
+
+        localSource.getLicense(licenseVendor)
+
+        verify(exactly = 1) {
+            securityManager.getEncryptedFileBuilder(withArg {
+                assertThat(it.name).isEqualTo("1.2")
+            }, any())
+        }
+        verify(exactly = 1) { encryptedFile.openFileInput() }
     }
 
     @Test

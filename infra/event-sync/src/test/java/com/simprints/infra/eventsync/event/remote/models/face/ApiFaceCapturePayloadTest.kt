@@ -76,6 +76,12 @@ class ApiFaceCapturePayloadTest {
     }
 
     @Test
+    fun `should map BAD QUALITY correctly`() {
+        val result = FaceCaptureEvent.FaceCapturePayload.Result.BAD_QUALITY.fromDomainToApi()
+        assertThat(result).isInstanceOf(ApiFaceCapturePayload.ApiResult.BAD_QUALITY::class.java)
+    }
+
+    @Test
     fun `should map api face correctly`() {
         val face = FaceCaptureEvent.FaceCapturePayload.Face(
             yaw = 2.0f,

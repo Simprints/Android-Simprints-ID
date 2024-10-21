@@ -62,6 +62,7 @@ internal fun ProtoFingerprintConfiguration.toDomainOld() = FingerprintConfigurat
         comparisonStrategyForVerification = comparisonStrategyForVerification.toDomain(),
         vero1 = vero1.toDomain(),
         vero2 = vero2.toDomain(),
+        version = "",
     ),
     nec = null,
     displayHandIcons = displayHandIcons,
@@ -92,6 +93,7 @@ internal fun ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.toDo
         vero2 = if (hasVero2()) vero2.toDomain() else null,
         allowedAgeRange = if (hasAllowedAgeRange()) allowedAgeRange.toDomain() else AgeGroup(0, null),
         verificationMatchThreshold = if (hasVerificationMatchThreshold()) verificationMatchThreshold else null,
+        version = version,
     )
 
 

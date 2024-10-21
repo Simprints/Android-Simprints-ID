@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.Face
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiFace
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.BAD_QUALITY
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.INVALID
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_ROLL
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_YAW
@@ -53,6 +54,7 @@ internal data class ApiFaceCapturePayload(
 
         VALID,
         INVALID,
+        BAD_QUALITY,
         OFF_YAW,
         OFF_ROLL,
         TOO_CLOSE,
@@ -68,6 +70,7 @@ internal fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, qual
 internal fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
     FaceCapturePayload.Result.VALID -> VALID
     FaceCapturePayload.Result.INVALID -> INVALID
+    FaceCapturePayload.Result.BAD_QUALITY -> BAD_QUALITY
     FaceCapturePayload.Result.OFF_YAW -> OFF_YAW
     FaceCapturePayload.Result.OFF_ROLL -> OFF_ROLL
     FaceCapturePayload.Result.TOO_CLOSE -> TOO_CLOSE
