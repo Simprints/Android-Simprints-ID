@@ -88,7 +88,7 @@ jacoco_version = "0.8.12"
 
 sonar_plugin_version = "5.1.0.4882"
 retry_version = "1.6.0"
-realm_version = "2.3.0"
+realm_version = "3.0.0"
 protobuf_plugin_version = "0.9.4"
 deps_graph_version = "0.8.0"
 tink_version = "1.15.0"
