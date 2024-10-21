@@ -8,7 +8,7 @@ internal data class ApiVero2Configuration(
     val qualityThreshold: Int,
     val imageSavingStrategy: ImageSavingStrategy,
     val captureStrategy: CaptureStrategy,
-    val displayLiveFeedback: Boolean,
+    val ledsMode: LedsMode,
     val firmwareVersions: Map<String, ApiVero2FirmwareVersions>,
 ) {
 
@@ -17,7 +17,7 @@ internal data class ApiVero2Configuration(
             qualityThreshold,
             imageSavingStrategy.toDomain(),
             captureStrategy.toDomain(),
-            displayLiveFeedback,
+            ledsMode.toDomain(),
             firmwareVersions.mapValues { it.value.toDomain() }
         )
 
@@ -53,6 +53,19 @@ internal data class ApiVero2Configuration(
             }
     }
 
+    @Keep
+    enum class LedsMode {
+        BASIC,
+        LIVE_QUALITY_FEEDBACK,
+        VISUAL_SCAN_FEEDBACK;
+
+        fun toDomain(): Vero2Configuration.LedsMode =
+            when (this) {
+                BASIC -> Vero2Configuration.LedsMode.BASIC
+                LIVE_QUALITY_FEEDBACK -> Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
+                VISUAL_SCAN_FEEDBACK -> Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
+            }
+    }
     @Keep
     data class ApiVero2FirmwareVersions(
         val cypress: String,

@@ -685,7 +685,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setQualityThreshold(60)
             .setCaptureStrategy(ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_500_DPI)
             .setImageSavingStrategy(ProtoVero2Configuration.ImageSavingStrategy.EAGER)
-            .setDisplayLiveFeedback(true)
+            .setLedsMode(ProtoVero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK)
             .putAllFirmwareVersions(
                 mapOf(
                     "E-1" to ProtoVero2Configuration.Vero2FirmwareVersions.newBuilder()
