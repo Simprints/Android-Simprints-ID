@@ -289,7 +289,7 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         flowType: FlowType,
         ageGroup: AgeGroup?,
-    ): List<Step> = projectConfiguration.general.modalities.flatMap { modality ->
+    ): List<Step> = modalitiesForFlowType(projectConfiguration, flowType).flatMap { modality ->
         when (modality) {
             Modality.FINGERPRINT -> {
                 determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
@@ -331,7 +331,7 @@ internal class BuildStepsUseCase @Inject constructor(
         ageGroup: AgeGroup?,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
-    ): List<Step> = projectConfiguration.general.modalities.flatMap { modality ->
+    ): List<Step> = modalitiesForFlowType(projectConfiguration, flowType).flatMap { modality ->
         when (modality) {
             Modality.FINGERPRINT -> {
                 determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
@@ -429,6 +429,14 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun ageGroupFromSubjectAge(action: ActionRequest, projectConfiguration: ProjectConfiguration): AgeGroup? {
         return action.getSubjectAgeIfAvailable()?.let { subjectAge ->
             projectConfiguration.sortedUniqueAgeGroups().firstOrNull { it.includes(subjectAge) }
+        }
+    }
+
+    private fun modalitiesForFlowType(projectConfiguration: ProjectConfiguration, flowType: FlowType): List<Modality> {
+        return when (flowType) {
+            FlowType.ENROL -> projectConfiguration.general.modalities
+            FlowType.IDENTIFY -> projectConfiguration.general.matchingModalities()
+            FlowType.VERIFY -> projectConfiguration.general.matchingModalities()
         }
     }
 }
