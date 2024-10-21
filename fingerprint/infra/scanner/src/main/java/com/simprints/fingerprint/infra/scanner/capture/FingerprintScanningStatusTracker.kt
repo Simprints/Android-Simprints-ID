@@ -30,7 +30,7 @@ class FingerprintScanningStatusTracker @Inject constructor() {
     }
 
     fun resetToIdle() {
-        _state.tryEmit(Idle)
+    _state.tryEmit(Idle)
     }
 }
 

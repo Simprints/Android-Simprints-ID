@@ -63,7 +63,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private var hasSplashScreenBeenTriggered: Boolean = false
 
     @Inject
-    lateinit var observeFingerprintScanFeedback: ObserveFingerprintScanFeedbackUseCase
+    lateinit var observeFingerprintScanStatus: ObserveFingerprintScanStatusUseCase
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -91,7 +91,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         ) {
             if (it is FingerprintConnectResult && it.isSuccess) {
                 // Start observing feedback after the scanner is connected
-                observeFingerprintScanFeedback(
+                observeFingerprintScanStatus(
                     viewLifecycleOwner.lifecycleScope,
                     args.params.fingerprintSDK
                 )
@@ -297,7 +297,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     override fun onDestroyView() {
-        observeFingerprintScanFeedback.stopObserving()
+        observeFingerprintScanStatus.stopObserving()
         confirmDialog?.dismiss()
         super.onDestroyView()
     }

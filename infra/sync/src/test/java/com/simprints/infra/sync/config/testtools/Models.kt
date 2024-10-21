@@ -33,7 +33,7 @@ internal val vero2Configuration = Vero2Configuration(
     30,
     Vero2Configuration.ImageSavingStrategy.EAGER,
     Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI,
-    false,
+    Vero2Configuration.LedsMode.BASIC,
     mapOf("E-1" to Vero2Configuration.Vero2FirmwareVersions("1.1", "1.2", "1.4"))
 )
 internal val faceConfiguration =

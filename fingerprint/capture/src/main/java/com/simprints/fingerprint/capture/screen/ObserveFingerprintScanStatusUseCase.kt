@@ -19,7 +19,7 @@ import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Singleton
-class ObserveFingerprintScanFeedbackUseCase @Inject constructor(
+class ObserveFingerprintScanStatusUseCase @Inject constructor(
     private val statusTracker: FingerprintScanningStatusTracker,
     private val playAudioBeep: PlayAudioBeepUseCase,
     private val configManager: ConfigManager,
@@ -71,7 +71,7 @@ class ObserveFingerprintScanFeedbackUseCase @Inject constructor(
     }
 
     private suspend fun setUiAfterScan(isGoodScan: Boolean) {
-        // Check if the previous state was removeFinger to avoid displaying the bad or good scan UI twice
+        // Check if the previous state was ScanCompleted to avoid displaying the bad or good scan UI twice
         // There's no need to check the configuration, as the good/bad scan visual notifications apply across all LED modes.
         if (previousState == FingerprintScanState.ScanCompleted) {
             with(scannerManager.scanner) {
