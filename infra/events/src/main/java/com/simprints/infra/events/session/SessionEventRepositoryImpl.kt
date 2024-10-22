@@ -6,6 +6,7 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -46,10 +47,19 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         return session != null
     }
 
-    override suspend fun getCurrentSessionScope(): EventScope =
-        sessionDataCache.eventScope
-            ?: localSessionScope()
-            ?: createSession()
+    override suspend fun getCurrentSessionScope(): EventScope {
+        val cachedScope = sessionDataCache.eventScope
+        if (cachedScope != null) return cachedScope
+
+        val restoredScope = localSessionScope()
+        if (restoredScope != null) {
+            Simber.w("Restored session from DB")
+            return restoredScope
+        }
+
+        Simber.w("Creating new session DB")
+        return createSession()
+    }
 
     override suspend fun removeLocationDataFromCurrentSession() {
         val sessionScope = getCurrentSessionScope()
