@@ -1,8 +1,10 @@
 package com.simprints.feature.orchestrator.cache
 
 import android.content.SharedPreferences
+import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.Step
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.security.SecurityManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -78,9 +80,31 @@ class OrchestratorCacheTest {
     }
 
     @Test
-    fun `Clears steps when requested`() {
-        val result = cache.clearSteps()
+    fun `Stores age group if passed value`() {
+        val json = "[1,2]"
+        every { jsonHelper.toJson(any()) } returns json
 
-        verify { prefs.edit().remove(any()) }
+        cache.ageGroup = AgeGroup(1, 2)
+
+        verify(exactly = 1) { prefs.edit().putString(any(), json) }
+    }
+
+    @Test
+    fun `Restores age group if stored`() {
+        val json = "[1,2]"
+        every { prefs.getString(any(), any()) } returns json
+        every { jsonHelper.fromJson<AgeGroup>(any(), any<TypeReference<AgeGroup>>()) } returns AgeGroup(1, 2)
+
+        val result = cache.ageGroup
+
+        verify(exactly = 1) { prefs.getString(any(), any()) }
+    }
+
+    @Test
+    fun `Clears cache when requested`() {
+        val result = cache.clearCache()
+
+        verify(exactly = 1) { prefs.edit().remove("steps") }
+        verify(exactly = 1) { prefs.edit().remove("age_group") }
     }
 }
