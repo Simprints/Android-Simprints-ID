@@ -6,6 +6,8 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +17,9 @@ internal class SessionEventRepositoryImpl @Inject constructor(
     private val sessionDataCache: SessionDataCache,
 ) : SessionEventRepository {
 
-    override suspend fun createSession(): EventScope {
+    private val eventsLock = Mutex()
+
+    override suspend fun createSession(): EventScope = eventsLock.withLock {
         closeAllSessions(EventScopeEndCause.NEW_SESSION)
         return eventRepository.createEventScope(EventScopeType.SESSION).also { sessionScope ->
             sessionDataCache.eventScope = sessionScope
@@ -30,7 +34,7 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         eventRepository.closeAllOpenScopes(EventScopeType.SESSION, reason)
     }
 
-    override suspend fun saveSessionScope(eventScope: EventScope) {
+    override suspend fun saveSessionScope(eventScope: EventScope) = eventsLock.withLock {
         if (eventScope.id == sessionDataCache.eventScope?.id) {
             sessionDataCache.eventScope = eventScope
         }
@@ -59,14 +63,15 @@ internal class SessionEventRepositoryImpl @Inject constructor(
 
     override suspend fun getEventsInCurrentSession(): List<Event> {
         val sessionId = getCurrentSessionScope().id
-        if (sessionDataCache.eventCache.isEmpty()) {
-            loadEventsIntoCache(sessionId)
+        return eventsLock.withLock {
+            if (sessionDataCache.eventCache.isEmpty()) {
+                loadEventsIntoCache(sessionId)
+            }
+            sessionDataCache.eventCache.values.toList()
         }
-        return sessionDataCache.eventCache.values.toList()
     }
 
-
-    override suspend fun addOrUpdateEvent(event: Event) {
+    override suspend fun addOrUpdateEvent(event: Event) = eventsLock.withLock {
         val currentEvents = sessionDataCache.eventCache.values.toList()
         val savedEvent = eventRepository.addOrUpdateEvent(
             getCurrentSessionScope(),
@@ -76,10 +81,15 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         sessionDataCache.eventCache[savedEvent.id] = savedEvent
     }
 
-    private suspend fun localSessionScope() =
-        eventRepository.getOpenEventScopes(EventScopeType.SESSION)
-            .firstOrNull()
-            ?.also { session -> loadEventsIntoCache(session.id) }
+    private suspend fun localSessionScope() = eventRepository
+        .getOpenEventScopes(EventScopeType.SESSION)
+        .firstOrNull()
+        ?.also { session ->
+            eventsLock.withLock {
+                sessionDataCache.eventScope = session
+                loadEventsIntoCache(session.id)
+            }
+        }
 
     private suspend fun loadEventsIntoCache(sessionId: String) {
         sessionDataCache.eventCache.clear()
@@ -87,7 +97,7 @@ internal class SessionEventRepositoryImpl @Inject constructor(
             .forEach { sessionDataCache.eventCache[it.id] = it }
     }
 
-    override suspend fun closeCurrentSession(reason: EventScopeEndCause?) {
+    override suspend fun closeCurrentSession(reason: EventScopeEndCause?) = eventsLock.withLock {
         val session = getCurrentSessionScope()
         eventRepository.closeEventScope(session, reason)
 
