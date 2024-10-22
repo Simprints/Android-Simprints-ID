@@ -78,9 +78,10 @@ class OrchestratorCacheTest {
     }
 
     @Test
-    fun `Clears steps when requested`() {
-        val result = cache.clearSteps()
+    fun `Clears cache when requested`() {
+        val result = cache.clearCache()
 
-        verify { prefs.edit().remove(any()) }
+        verify(exactly = 1) { prefs.edit().remove("steps") }
+        verify(exactly = 1) { prefs.edit().remove("age_group") }
     }
 }
