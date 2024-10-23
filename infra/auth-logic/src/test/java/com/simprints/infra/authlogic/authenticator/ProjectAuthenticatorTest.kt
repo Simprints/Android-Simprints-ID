@@ -162,6 +162,7 @@ class ProjectAuthenticatorTest {
             "",
             general = GeneralConfiguration(
                 modalities = mockk(),
+                matchingModalities = mockk(),
                 languageOptions = listOf(LANGUAGE_1, LANGUAGE_2),
                 defaultLanguage = LANGUAGE_1,
                 collectLocation = false,
