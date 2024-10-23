@@ -39,7 +39,7 @@ internal class CropToTargetOverlayAnalyzerTest {
     fun `Skip cropping when target is empty`() {
         // Target is a square 600x600px with 200px from top bounds
         setupScreenSize(1000, 2000)
-        every { targetOverlay.rectInCanvas } returns RectF(200f, 200f, 200f, 200f)
+        every { targetOverlay.circleRect } returns RectF(200f, 200f, 200f, 200f)
         setupImageSize(1000, 1000)
 
         analyzer.analyze(imageProxy)
@@ -53,7 +53,7 @@ internal class CropToTargetOverlayAnalyzerTest {
     fun `Correctly crops when camera resolution is smaller than preview in portrait`() {
         // Target is a square 600x600px with 200px from top bounds
         setupScreenSize(1000, 2000)
-        every { targetOverlay.rectInCanvas } returns RectF(200f, 200f, 800f, 800f)
+        every { targetOverlay.circleRect } returns RectF(200f, 200f, 800f, 800f)
         setupImageSize(1000, 1000)
 
         analyzer.analyze(imageProxy)
@@ -67,7 +67,7 @@ internal class CropToTargetOverlayAnalyzerTest {
     fun `Correctly crops when camera resolution is smaller than preview in landscape`() {
         // Target is a square 600x600px with 200px from top bounds
         setupScreenSize(2000, 1000)
-        every { targetOverlay.rectInCanvas } returns RectF(700f, 200f, 1300f, 800f)
+        every { targetOverlay.circleRect } returns RectF(700f, 200f, 1300f, 800f)
         setupImageSize(1000, 1000)
 
         analyzer.analyze(imageProxy)
@@ -81,7 +81,7 @@ internal class CropToTargetOverlayAnalyzerTest {
     fun `Correctly crops when camera resolution is larger than preview in portrait`() {
         // Target is a square 600x600px with 200px from top bounds
         setupScreenSize(1000, 2000)
-        every { targetOverlay.rectInCanvas } returns RectF(200f, 200f, 800f, 800f)
+        every { targetOverlay.circleRect } returns RectF(200f, 200f, 800f, 800f)
         setupImageSize(2000, 2000)
 
         analyzer.analyze(imageProxy)
@@ -96,7 +96,7 @@ internal class CropToTargetOverlayAnalyzerTest {
     fun `Correctly crops when camera resolution is larger than preview in landscape`() {
         // Target is a square 600x600px with 200px from top bounds
         setupScreenSize(2000, 1000)
-        every { targetOverlay.rectInCanvas } returns RectF(700f, 200f, 1300f, 800f)
+        every { targetOverlay.circleRect } returns RectF(700f, 200f, 1300f, 800f)
         setupImageSize(2000, 2000)
 
         analyzer.analyze(imageProxy)

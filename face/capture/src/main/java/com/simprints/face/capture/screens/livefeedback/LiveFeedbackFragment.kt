@@ -30,7 +30,6 @@ import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
-import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -202,9 +201,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturingStateColors() {
         with(binding) {
-            captureOverlay.drawWhiteTarget(
-                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
-            )
+            captureOverlay.drawWhiteTarget()
 
             captureTitle.setTextColor(
                 ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
@@ -217,9 +214,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturingNotStarted() {
         binding.apply {
-            captureOverlay.drawSemiTransparentTarget(
-                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
-            )
+            captureOverlay.drawSemiTransparentTarget()
             captureTitle.setText(IDR.string.face_capture_preparation_title)
             captureFeedbackTxtTitle.isVisible = true
             captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_previewing)
@@ -344,9 +339,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderNoPermission(shouldOpenSettings: Boolean) {
         binding.apply {
-            captureOverlay.drawSemiTransparentTarget(
-                screenOrientation = ScreenOrientation.getCurrentOrientation(resources)
-            )
+            captureOverlay.drawSemiTransparentTarget()
             captureFeedbackTxtTitle.isInvisible = true
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_permission_denied)
 

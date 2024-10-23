@@ -14,16 +14,12 @@
         android:layout_height="match_parent"
         android:keepScreenOn="true" />
 
-    <!--
-        Make sure to change the CameraTargetOverlay::percentFromTopPortrait value if any change is
-        made to the layout_constraintGuide_percent value
-    -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/capture_guide_frame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/guideline_margin_percent" />
 
     <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
         android:id="@+id/capture_overlay"
@@ -43,39 +39,41 @@
 
     <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
         android:id="@+id/capture_progress"
-        android:layout_width="242dp"
-        android:layout_height="242dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:indeterminate="false"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:dcp_color="@color/simprints_green_light"
         app:dcp_max="10"
-        app:layout_constraintBottom_toBottomOf="@id/capture_guide_frame"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/capture_guide_frame" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintHeight_percent="@dimen/capture_target_size_percent"
+        app:layout_constraintStart_toEndOf="@id/capture_guide_frame"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/margin_default"
         android:layout_marginHorizontal="@dimen/margin_default"
+        android:gravity="center"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/margin_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toEndOf="@id/capture_progress">
 
         <CheckedTextView
             android:id="@+id/capture_feedback_txt_title"
             style="@style/Text.Headline6.Bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
             android:background="@drawable/feedback_chip_white"
-            android:drawablePadding="4dp"
             android:gravity="center"
-            android:textAlignment="center"
             android:padding="@dimen/padding_default"
             android:text="@string/face_capture_title_previewing"
+            android:textAlignment="center"
             android:textColor="@color/feedback_chip_text" />
 
         <TextView
@@ -92,13 +90,13 @@
         android:id="@+id/capture_feedback_permission_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/margin_huge"
         android:layout_marginTop="16dp"
         android:text="@string/face_capture_permission_action"
         android:visibility="gone"
-        android:layout_marginVertical="@dimen/margin_huge"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
