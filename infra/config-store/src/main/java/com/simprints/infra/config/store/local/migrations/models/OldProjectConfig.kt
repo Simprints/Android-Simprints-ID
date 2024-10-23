@@ -72,6 +72,7 @@ internal data class OldProjectConfig(
             consent = consentConfiguration(),
             identification = identificationConfiguration(),
             synchronization = synchronizationConfiguration(),
+            custom = null,
         )
 
     private fun generalConfiguration(): GeneralConfiguration =
@@ -98,7 +99,7 @@ internal data class OldProjectConfig(
                 rankOne = FaceConfiguration.FaceSdkConfiguration(
                     nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull()
                         ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
-                    qualityThreshold = faceQualityThreshold.toInt(),
+                    qualityThreshold = faceQualityThreshold.toFloat(),
                     imageSavingStrategy = if (saveFaceImages.toBoolean()) {
                         FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
                     } else {

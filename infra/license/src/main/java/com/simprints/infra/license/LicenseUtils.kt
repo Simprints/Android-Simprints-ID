@@ -1,6 +1,6 @@
 package com.simprints.infra.license
 
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.License
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date

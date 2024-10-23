@@ -1,8 +1,11 @@
 package com.simprints.infra.license
 
 import com.simprints.infra.license.local.LicenseLocalDataSource
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.license.remote.ApiLicenseResult
-import com.simprints.infra.license.remote.License
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -14,23 +17,27 @@ internal class LicenseRepositoryImpl @Inject constructor(
     private val licenseRemoteDataSource: LicenseRemoteDataSource,
 ) : LicenseRepository {
 
-
     override fun getLicenseStates(
         projectId: String,
         deviceId: String,
-        licenseVendor: Vendor
+        licenseVendor: Vendor,
+        requiredVersion: LicenseVersion,
     ): Flow<LicenseState> = flow {
         emit(LicenseState.Started)
 
         val license = licenseLocalDataSource.getLicense(licenseVendor)
-        if (license == null) {
+        if (license == null || licenseVendor.versionComparator.compare(license.version.value, requiredVersion.value) < 0) {
             emit(LicenseState.Downloading)
-            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor)
+            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor, requiredVersion)
                 .let { result ->
                     when (result) {
                         is ApiLicenseResult.Success -> handleLicenseResultSuccess(
                             licenseVendor,
-                            result.license
+                            License(
+                                result.license.expiration,
+                                result.license.data,
+                                LicenseVersion(result.license.version),
+                            )
                         )
 
                         is ApiLicenseResult.Error -> handleLicenseResultError(result)
@@ -50,7 +57,7 @@ internal class LicenseRepositoryImpl @Inject constructor(
      * @param licenseVendor
      * @return cached license as [String]
      */
-    override suspend fun getCachedLicense(licenseVendor: Vendor)=
+    override suspend fun getCachedLicense(licenseVendor: Vendor) =
         licenseLocalDataSource.getLicense(licenseVendor)
 
 

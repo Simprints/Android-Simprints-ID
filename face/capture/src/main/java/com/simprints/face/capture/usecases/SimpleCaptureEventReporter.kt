@@ -66,6 +66,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
             FaceDetection.Status.VALID -> FaceCapturePayload.Result.VALID
             FaceDetection.Status.VALID_CAPTURING -> FaceCapturePayload.Result.VALID
             FaceDetection.Status.NOFACE -> FaceCapturePayload.Result.INVALID
+            FaceDetection.Status.BAD_QUALITY -> FaceCapturePayload.Result.BAD_QUALITY
             FaceDetection.Status.OFFYAW -> FaceCapturePayload.Result.OFF_YAW
             FaceDetection.Status.OFFROLL -> FaceCapturePayload.Result.OFF_ROLL
             FaceDetection.Status.TOOCLOSE -> FaceCapturePayload.Result.TOO_CLOSE

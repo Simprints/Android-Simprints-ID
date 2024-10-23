@@ -199,6 +199,6 @@ internal class LiveFeedbackFragmentViewModelTest {
 
     companion object {
 
-        private const val QUALITY_THRESHOLD = -1
+        private const val QUALITY_THRESHOLD = -1f
     }
 }

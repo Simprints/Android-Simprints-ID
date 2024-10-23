@@ -9,6 +9,7 @@ data class ProjectConfiguration(
     val consent: ConsentConfiguration,
     val identification: IdentificationConfiguration,
     val synchronization: SynchronizationConfiguration,
+    val custom: Map<String, Any>?,
 )
 
 fun ProjectConfiguration.canCoSyncAllData(): Boolean =
@@ -72,3 +73,5 @@ fun ProjectConfiguration.sortedUniqueAgeGroups(): List<AgeGroup> {
 }
 
 fun ProjectConfiguration.isAgeRestricted() = allowedAgeRanges().any { !it.isEmpty()}
+
+fun ProjectConfiguration.experimental(): ExperimentalProjectConfiguration = ExperimentalProjectConfiguration(custom)

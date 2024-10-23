@@ -41,7 +41,7 @@ internal val faceConfiguration =
         allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
         rankOne = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = 2,
-            qualityThreshold = -1,
+            qualityThreshold = -1f,
             imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
             decisionPolicy = decisionPolicy,
             version = "1.0",
@@ -117,7 +117,8 @@ internal val projectConfiguration = ProjectConfiguration(
     fingerprintConfiguration,
     consentConfiguration,
     identificationConfiguration,
-    synchronizationConfiguration
+    synchronizationConfiguration,
+    null,
 )
 
 internal const val tokenizationJson =

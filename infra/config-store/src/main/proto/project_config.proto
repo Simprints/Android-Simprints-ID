@@ -12,6 +12,7 @@ message ProtoProjectConfiguration {
     ProtoIdentificationConfiguration identification = 6;
     ProtoSynchronizationConfiguration synchronization = 7;
     string updated_at = 8;
+    optional string customJson = 9;
 }
 
 message ProtoGeneralConfiguration {
@@ -49,12 +50,13 @@ message ProtoFaceConfiguration {
 
     message ProtoFaceSdkConfiguration{
         int32 nb_of_images_to_capture = 1;
-        int32 quality_threshold = 2;
+        int32 quality_threshold = 2 [deprecated = true]; // TODO: remove after migration to 2024.2.1
         ImageSavingStrategy image_saving_strategy = 3;
         ProtoDecisionPolicy decision_policy = 4;
         optional ProtoAllowedAgeRange allowed_age_range = 5;
         optional float verification_match_threshold = 6;
         string version = 7;
+        float quality_threshold_precise = 8;
     }
 }
 
@@ -96,6 +98,8 @@ message ProtoFingerprintConfiguration {
         optional ProtoVero1Configuration vero_1 = 5;
         optional ProtoAllowedAgeRange allowed_age_range = 6;
         optional float verification_match_threshold = 7;
+
+        optional string version = 9;
     }
 }
 

@@ -194,6 +194,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             FaceDetection.Status.OFFROLL -> renderFaceNotStraight()
             FaceDetection.Status.TOOCLOSE -> renderFaceTooClose()
             FaceDetection.Status.TOOFAR -> renderFaceTooFar()
+            FaceDetection.Status.BAD_QUALITY -> renderBadQuality()
             FaceDetection.Status.VALID -> renderValidFace()
             FaceDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
         }
@@ -311,6 +312,20 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackTxtTitle.isVisible = true
             captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_look_straight)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_look_straight)
+            captureFeedbackPermissionButton.isGone = true
+
+            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
+        }
+
+        toggleCaptureButtons(false)
+        renderProgressBar(false)
+    }
+
+    private fun renderBadQuality() {
+        binding.apply {
+            captureFeedbackTxtTitle.isVisible = true
+            captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_bad_quality)
+            captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_bad_quality)
             captureFeedbackPermissionButton.isGone = true
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)

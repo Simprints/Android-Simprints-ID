@@ -8,8 +8,9 @@ import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.necwrapper.nec.NEC
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -50,10 +51,10 @@ class SdkInitializerImplTest {
         MockKAnnotations.init(this)
         justRun { nec.init(any(), context) }
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.NEC)
-        } returns License("2133-12-30T17:32:28Z", "license")
+            licenseRepository.getCachedLicense(Vendor.Nec)
+        } returns License("2133-12-30T17:32:28Z", "license", LicenseVersion("1.0"))
 
-        coJustRun { licenseRepository.deleteCachedLicense(Vendor.NEC) }
+        coJustRun { licenseRepository.deleteCachedLicense(Vendor.Nec) }
         sdkInitializer =
             SdkInitializerImpl(context, nec, licenseRepository, saveLicenseCheck)
     }
@@ -62,7 +63,7 @@ class SdkInitializerImplTest {
     fun `test initialize success`() = runTest {
         //Given
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheck(Vendor.NEC, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheck(Vendor.Nec, capture(licenseStatusSlot)) }
 
         // When
         sdkInitializer.initialize(null)
@@ -75,15 +76,15 @@ class SdkInitializerImplTest {
     fun `test initialize with expired license`() = runTest {
         //Given
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.NEC)
-        } returns License("2011-12-30T17:32:28Z", "license")
+            licenseRepository.getCachedLicense(Vendor.Nec)
+        } returns License("2011-12-30T17:32:28Z", "license", LicenseVersion("1.0"))
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheck(Vendor.NEC, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheck(Vendor.Nec, capture(licenseStatusSlot)) }
 
         // When
         sdkInitializer.initialize(null)
         // Then
-        coVerify { licenseRepository.deleteCachedLicense(Vendor.NEC) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.Nec) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.EXPIRED)
     }
 
@@ -92,12 +93,12 @@ class SdkInitializerImplTest {
         //Given
         every { nec.init(any(),context) } throws Exception()
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheck(Vendor.NEC, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheck(Vendor.Nec, capture(licenseStatusSlot)) }
 
         // When
         sdkInitializer.initialize(null)
         // Then
-        coVerify { licenseRepository.deleteCachedLicense(Vendor.NEC) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.Nec) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.ERROR)
     }
 }

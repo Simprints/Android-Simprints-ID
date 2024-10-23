@@ -32,6 +32,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
+    private var qualityThreshold: Float = 0f
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -40,7 +41,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
-    private lateinit var fallbackCapture: FaceDetection
+    private var fallbackCapture: FaceDetection? = null
 
     val userCaptures = mutableListOf<FaceDetection>()
     var sortedQualifyingCaptures = listOf<FaceDetection>()
@@ -85,6 +86,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk().detector
+            qualityThreshold = configManager.getProjectConfiguration().face?.qualityThreshold ?: 0f
         }
     }
 
@@ -97,11 +99,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun finishCapture(attemptNumber: Int) {
         viewModelScope.launch {
-            val projectConfiguration = configManager.getProjectConfiguration()
             sortedQualifyingCaptures = userCaptures
-                .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
+                .filter { it.hasValidStatus() }
                 .sortedByDescending { it.face?.quality }
-                .ifEmpty { listOf(fallbackCapture) }
+                .ifEmpty { listOfNotNull(fallbackCapture) }
 
             sendAllCaptureEvents(attemptNumber)
 
@@ -129,43 +130,22 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private fun getFaceDetection(bitmap: Bitmap, potentialFace: Face): FaceDetection {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
-        return when {
-            areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                bitmap = bitmap,
-                face = potentialFace,
-                status = FaceDetection.Status.TOOFAR,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.TOOCLOSE,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.OFFYAW,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.OFFROLL,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            else -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
+        val status = when {
+            areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
+            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
+            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
+            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
+            potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
+            capturingState.value == CapturingState.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
+            else -> FaceDetection.Status.VALID
         }
+
+        return FaceDetection(
+            bitmap = bitmap, face = potentialFace,
+            status = status,
+            detectionStartTime = timeHelper.now(),
+            detectionEndTime = timeHelper.now(),
+        )
     }
 
     /**
@@ -173,7 +153,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * get any good images, at least one good image will be saved
      */
     private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
-        if (faceDetection.hasValidStatus()) {
+        val fallbackQuality = fallbackCapture?.face?.quality ?: -1f // To ensure that detection is better with defaults
+        val detectionQuality = faceDetection.face?.quality ?: 0f
+
+        if (faceDetection.hasValidStatus() && detectionQuality >= fallbackQuality) {
             fallbackCapture = faceDetection.apply { isFallback = true }
             createFirstFallbackCaptureEvent(faceDetection)
         }
@@ -201,9 +184,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             .awaitAll()
     }
 
-    private suspend fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
-        val qualityThreshold =
-            configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
+    private suspend fun sendCaptureEvent(faceDetection: FaceDetection?, attemptNumber: Int) {
+        if (faceDetection == null) return
         eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
 

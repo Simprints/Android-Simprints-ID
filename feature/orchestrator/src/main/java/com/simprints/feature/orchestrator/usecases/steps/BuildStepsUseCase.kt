@@ -25,6 +25,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.allowedAgeRanges
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.isAgeRestricted
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
@@ -56,7 +57,8 @@ internal class BuildStepsUseCase @Inject constructor(
                 buildValidateIdPoolStep(
                     subjectQuery = subjectQuery,
                     biometricDataSource = action.biometricDataSource,
-                    callerPackageName = action.callerPackageName
+                    callerPackageName = action.callerPackageName,
+                    projectConfiguration = projectConfiguration,
                 ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStep(ConsentType.IDENTIFY),
@@ -263,22 +265,25 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildValidateIdPoolStep(
         subjectQuery: SubjectQuery,
         biometricDataSource: String,
-        callerPackageName: String
-    ) = when (BiometricDataSource.fromString(
-        value = biometricDataSource,
-        callerPackageName = callerPackageName
-    )) {
-        BiometricDataSource.Simprints -> listOf(
-            Step(
-                id = StepId.VALIDATE_ID_POOL,
-                navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
-                destinationId = ValidateSubjectPoolContract.DESTINATION,
-                payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
+        callerPackageName: String,
+        projectConfiguration: ProjectConfiguration,
+    ) = if (projectConfiguration.experimental().idPoolValidationEnabled) {
+        when (BiometricDataSource.fromString(
+            value = biometricDataSource,
+            callerPackageName = callerPackageName
+        )) {
+            BiometricDataSource.Simprints -> listOf(
+                Step(
+                    id = StepId.VALIDATE_ID_POOL,
+                    navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
+                    destinationId = ValidateSubjectPoolContract.DESTINATION,
+                    payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
+                )
             )
-        )
 
-        is BiometricDataSource.CommCare -> emptyList()
-    }
+            is BiometricDataSource.CommCare -> emptyList()
+        }
+    } else emptyList()
 
     private fun buildModalityCaptureSteps(
         projectConfiguration: ProjectConfiguration,
@@ -423,7 +428,7 @@ internal class BuildStepsUseCase @Inject constructor(
 
     private fun ageGroupFromSubjectAge(action: ActionRequest, projectConfiguration: ProjectConfiguration): AgeGroup? {
         return action.getSubjectAgeIfAvailable()?.let { subjectAge ->
-            projectConfiguration.sortedUniqueAgeGroups().firstOrNull{ it.includes(subjectAge) }
+            projectConfiguration.sortedUniqueAgeGroups().firstOrNull { it.includes(subjectAge) }
         }
     }
 }
