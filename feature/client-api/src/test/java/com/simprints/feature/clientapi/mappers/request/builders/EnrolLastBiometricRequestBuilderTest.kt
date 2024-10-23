@@ -31,6 +31,8 @@ internal class EnrolLastBiometricRequestBuilderTest {
             actionIdentifier = ActionRequestIdentifier(
                 actionName = RequestActionFactory.MOCK_PACKAGE,
                 packageName = ActionConstants.ACTION_ENROL_LAST_BIOMETRICS,
+                callerPackageName = "",
+                callerVersion = 1,
             ),
             extractor = extractor,
             project = project,
