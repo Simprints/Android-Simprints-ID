@@ -455,8 +455,8 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun modalitiesForFlowType(projectConfiguration: ProjectConfiguration, flowType: FlowType): List<Modality> {
         return when (flowType) {
             FlowType.ENROL -> projectConfiguration.general.modalities
-            FlowType.IDENTIFY -> projectConfiguration.general.matchingModalities()
-            FlowType.VERIFY -> projectConfiguration.general.matchingModalities()
+            FlowType.IDENTIFY -> projectConfiguration.general.matchingModalities
+            FlowType.VERIFY -> projectConfiguration.general.matchingModalities
         }
     }
 }

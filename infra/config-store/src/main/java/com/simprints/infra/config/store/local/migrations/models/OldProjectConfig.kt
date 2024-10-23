@@ -77,21 +77,24 @@ internal data class OldProjectConfig(
             custom = null,
         )
 
-    private fun generalConfiguration(): GeneralConfiguration =
-        GeneralConfiguration(
-            modalities = modality.split(",")
-                .map { if (it == "FINGER") "FINGERPRINT" else it }
-                .map {
-                    GeneralConfiguration.Modality.valueOf(
-                        it
-                    )
-                },
+    private fun generalConfiguration(): GeneralConfiguration {
+        val modalities = modality.split(",")
+            .map { if (it == "FINGER") "FINGERPRINT" else it }
+            .map {
+                GeneralConfiguration.Modality.valueOf(
+                    it
+                )
+            }
+        return GeneralConfiguration(
+            modalities = modalities,
+            matchingModalities = modalities,
             languageOptions = projectLanguages.split(","),
             defaultLanguage = selectedLanguage,
             collectLocation = locationRequired.toBoolean(),
             duplicateBiometricEnrolmentCheck = enrolmentPlus.toBoolean(),
             settingsPassword = SettingsPasswordConfig.NotSet,
         )
+    }
 
     private fun faceConfiguration(): FaceConfiguration? =
         if (faceQualityThreshold == null) null

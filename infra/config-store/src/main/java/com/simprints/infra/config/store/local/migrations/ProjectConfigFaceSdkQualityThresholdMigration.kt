@@ -6,13 +6,13 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 /**
- * Can be removed once all the devices have been updated to 2022.4.1
+ * Can be removed once all the devices have been updated to 2024.2.1
  */
 internal class ProjectConfigFaceSdkQualityThresholdMigration @Inject constructor(
 ) : DataMigration<ProtoProjectConfiguration> {
 
     override suspend fun cleanUp() {
-        Simber.i("Migration of SDK quality to float numbers")
+        Simber.i("Migration of SDK quality to float numbers done")
     }
 
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration): Boolean =
