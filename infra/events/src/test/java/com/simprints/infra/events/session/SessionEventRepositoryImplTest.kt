@@ -10,8 +10,10 @@ import com.simprints.infra.events.sampledata.createSessionScope
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -190,6 +192,7 @@ internal class SessionEventRepositoryImplTest {
     @Test
     fun `updates cached event on add or update`() = runTest {
         val event = createEventWithSessionId("eventId", "mockId")
+        sessionDataCache.eventScope = mockk { every { id } returns "updatedEventScopeId" }
         sessionDataCache.eventCache[event.id] = event
         coEvery { eventRepository.addOrUpdateEvent(any(), any(), any()) } returns event.apply {
             this.scopeId = "updatedEventScopeId"
