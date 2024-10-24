@@ -84,7 +84,7 @@ internal class BuildStepsUseCase @Inject constructor(
         )
 
         is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
-            buildEnrolLastBiometricStep(action),
+            buildEnrolLastBiometricStep(action, projectConfiguration),
         )
 
         is ActionRequest.ConfirmIdentityActionRequest -> listOf(
@@ -289,7 +289,7 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         flowType: FlowType,
         ageGroup: AgeGroup?,
-    ): List<Step> = projectConfiguration.general.modalities.flatMap { modality ->
+    ): List<Step> = modalitiesForFlowType(projectConfiguration, flowType).flatMap { modality ->
         when (modality) {
             Modality.FINGERPRINT -> {
                 determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
@@ -323,6 +323,8 @@ internal class BuildStepsUseCase @Inject constructor(
                 }
             }
         }
+    }.also {
+        cache.ageGroup = ageGroup
     }
 
     private fun buildModalityMatcherSteps(
@@ -331,7 +333,7 @@ internal class BuildStepsUseCase @Inject constructor(
         ageGroup: AgeGroup?,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
-    ): List<Step> = projectConfiguration.general.modalities.flatMap { modality ->
+    ): List<Step> = modalitiesForFlowType(projectConfiguration, flowType).flatMap { modality ->
         when (modality) {
             Modality.FINGERPRINT -> {
                 determineFingerprintSDKs(projectConfiguration, ageGroup).map { bioSDK ->
@@ -357,8 +359,25 @@ internal class BuildStepsUseCase @Inject constructor(
         }
     }
 
-    private fun buildEnrolLastBiometricStep(action: ActionRequest.EnrolLastBiometricActionRequest) =
-        listOf(
+    private fun buildEnrolLastBiometricStep(
+        action: ActionRequest.EnrolLastBiometricActionRequest,
+        projectConfiguration: ProjectConfiguration,
+    ): List<Step> {
+        // Get capture steps needed for enrolment
+        val enrolCaptureSteps = buildModalityCaptureSteps(
+            projectConfiguration,
+            FlowType.ENROL,
+            cache.ageGroup,
+        )
+
+        // Get a list of the enrolment capture steps that have not been completed yet
+        // e.g. because they were skipped due to matching modalities configuration
+        val missingCaptureSteps = enrolCaptureSteps.filter { enrolCaptureStep ->
+            cache.steps.none { it.id == enrolCaptureStep.id }
+        }
+
+        return (
+            missingCaptureSteps +
             Step(
                 id = StepId.ENROL_LAST_BIOMETRIC,
                 navigationActionId = R.id.action_orchestratorFragment_to_enrolLast,
@@ -371,6 +390,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 ),
             )
         )
+    }
 
     private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest) =
         listOf(
@@ -429,6 +449,14 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun ageGroupFromSubjectAge(action: ActionRequest, projectConfiguration: ProjectConfiguration): AgeGroup? {
         return action.getSubjectAgeIfAvailable()?.let { subjectAge ->
             projectConfiguration.sortedUniqueAgeGroups().firstOrNull { it.includes(subjectAge) }
+        }
+    }
+
+    private fun modalitiesForFlowType(projectConfiguration: ProjectConfiguration, flowType: FlowType): List<Modality> {
+        return when (flowType) {
+            FlowType.ENROL -> projectConfiguration.general.modalities
+            FlowType.IDENTIFY -> projectConfiguration.general.matchingModalities
+            FlowType.VERIFY -> projectConfiguration.general.matchingModalities
         }
     }
 }

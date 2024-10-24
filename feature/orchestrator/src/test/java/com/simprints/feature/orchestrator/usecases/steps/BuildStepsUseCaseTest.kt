@@ -52,6 +52,7 @@ class BuildStepsUseCaseTest {
     private fun mockCommonProjectConfiguration(): ProjectConfiguration {
         val projectConfiguration = mockk<ProjectConfiguration>(relaxed = true)
         every { projectConfiguration.general.modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
+        every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
         every { projectConfiguration.fingerprint?.allowedSDKs } returns listOf(
             SECUGEN_SIM_MATCHER,
             NEC
@@ -215,6 +216,10 @@ class BuildStepsUseCaseTest {
 
         val action = mockk<ActionRequest.EnrolLastBiometricActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
+        every { cache.steps } returns listOf(
+            Step(StepId.FINGERPRINT_CAPTURE, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)),
+            Step(StepId.FACE_CAPTURE, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)),
+        )
 
         val steps = useCase.build(action, projectConfiguration)
 

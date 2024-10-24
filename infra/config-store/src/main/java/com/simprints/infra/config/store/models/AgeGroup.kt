@@ -1,10 +1,13 @@
 package com.simprints.infra.config.store.models
 
+import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
 
+@Keep
 data class AgeGroup(
-    val startInclusive: Int,
-    val endExclusive: Int?,
+    @JsonProperty("startInclusive") val startInclusive: Int,
+    @JsonProperty("endExclusive") val endExclusive: Int?,
 ) : Serializable {
     fun isEmpty() = startInclusive == 0 && (endExclusive == null || endExclusive == 0)
 

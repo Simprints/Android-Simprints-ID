@@ -9,23 +9,32 @@ import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.Serializable
 
 class ShouldCreatePersonUseCaseTest {
 
+    @MockK
+    lateinit var eventRepository: SessionEventRepository
+
     private lateinit var useCase: ShouldCreatePersonUseCase
 
     @Before
     fun setUp() {
-        useCase = ShouldCreatePersonUseCase()
+        MockKAnnotations.init(this, relaxed = true)
+
+        useCase = ShouldCreatePersonUseCase(eventRepository)
     }
 
     @Test
-    fun `Returns false if no action`() {
+    fun `Returns false if no action`() = runTest {
         assertThat(
             useCase(
                 actionRequest = null,
@@ -36,7 +45,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns false if followup action`() {
+    fun `Returns false if followup action`() = runTest {
         assertThat(
             useCase(
                 actionRequest = ActionRequest.ConfirmIdentityActionRequest(
@@ -52,7 +61,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns false if no modalities`() {
+    fun `Returns false if no modalities`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,
@@ -63,7 +72,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns false when only fingerprint required and no results`() {
+    fun `Returns false when only fingerprint required and no results`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,
@@ -74,7 +83,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns false when only face required and no results`() {
+    fun `Returns false when only face required and no results`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,
@@ -85,7 +94,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns true when only fingerprint required and provided`() {
+    fun `Returns true when only fingerprint required and provided`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,
@@ -98,7 +107,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns false when both modalities required and face result missing`() {
+    fun `Returns false when both modalities required and face result missing`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,
@@ -115,7 +124,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns false when both modalities required and fingerprint result missing`() {
+    fun `Returns false when both modalities required and fingerprint result missing`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,
@@ -132,7 +141,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns true when only face required and provided`() {
+    fun `Returns true when only face required and provided`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,
@@ -143,7 +152,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     @Test
-    fun `Returns true when both modalities required and both results provided`() {
+    fun `Returns true when both modalities required and both results provided`() = runTest {
         assertThat(
             useCase(
                 actionRequest = flowAction,

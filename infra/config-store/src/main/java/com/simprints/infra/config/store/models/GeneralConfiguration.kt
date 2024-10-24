@@ -4,6 +4,7 @@ import com.simprints.core.domain.modality.Modes
 
 data class GeneralConfiguration(
     val modalities: List<Modality>,
+    val matchingModalities: List<Modality>,
     val languageOptions: List<String>,
     val defaultLanguage: String,
     val collectLocation: Boolean,

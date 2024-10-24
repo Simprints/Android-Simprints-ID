@@ -166,7 +166,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     private fun observeClientApiVm() {
         clientApiVm.newSessionCreated.observe(viewLifecycleOwner, LiveDataEventObserver {
-            orchestratorCache.clearSteps()
+            orchestratorCache.clearCache()
         })
         clientApiVm.showAlert.observe(
             viewLifecycleOwner,

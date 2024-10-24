@@ -7,6 +7,7 @@ import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 internal fun GeneralConfiguration.toProto(): ProtoGeneralConfiguration =
     ProtoGeneralConfiguration.newBuilder()
         .addAllModalities(modalities.map { it.toProto() })
+        .addAllMatchingModalities(matchingModalities.map { it.toProto() })
         .addAllLanguageOptions(languageOptions)
         .setDefaultLanguage(defaultLanguage)
         .setCollectLocation(collectLocation)
@@ -23,6 +24,7 @@ internal fun GeneralConfiguration.Modality.toProto(): ProtoGeneralConfiguration.
 internal fun ProtoGeneralConfiguration.toDomain(): GeneralConfiguration =
     GeneralConfiguration(
         modalitiesList.map { it.toDomain() },
+        matchingModalitiesList.map { it.toDomain() },
         languageOptionsList,
         defaultLanguage,
         collectLocation,

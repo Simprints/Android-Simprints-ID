@@ -10,6 +10,7 @@ import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefs
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceSdkQualityThresholdMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceBioSdkMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFingerprintBioSdkMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigMatchingModalitiesMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigQualityThresholdMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration
 import com.simprints.infra.config.store.local.migrations.ProjectRealmMigration
@@ -40,7 +41,7 @@ abstract class ConfigManagerModule {
 
 
     @Binds
-    internal abstract fun provideconfigService(service: ConfigRepositoryImpl): ConfigRepository
+    internal abstract fun provideConfigService(service: ConfigRepositoryImpl): ConfigRepository
 
     @Binds
     internal abstract fun provideConfigRemoteDataSource(remoteDataSource: ConfigRemoteDataSourceImpl): ConfigRemoteDataSource
@@ -75,6 +76,7 @@ object DataStoreModule {
         projectConfigFingerprintBioSdkMigration: ProjectConfigFingerprintBioSdkMigration,
         projectConfigFaceBioSdkMigration: ProjectConfigFaceBioSdkMigration,
         projectConfigFaceSdkQualityThresholdMigration: ProjectConfigFaceSdkQualityThresholdMigration,
+        projectConfigMatchingModalitiesMigration: ProjectConfigMatchingModalitiesMigration,
     ): DataStore<ProtoProjectConfiguration> {
         return DataStoreFactory.create(
             serializer = ProjectConfigurationSerializer,
@@ -85,6 +87,7 @@ object DataStoreModule {
                 projectConfigFingerprintBioSdkMigration,
                 projectConfigFaceBioSdkMigration,
                 projectConfigFaceSdkQualityThresholdMigration,
+                projectConfigMatchingModalitiesMigration,
             )
         )
     }

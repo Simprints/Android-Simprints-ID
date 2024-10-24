@@ -48,17 +48,6 @@ internal class CreatePersonEventUseCaseTest {
     }
 
     @Test
-    fun `Does not create event if has person creation in session`() = runTest {
-        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            mockk<PersonCreationEvent>(),
-        )
-
-        useCase(listOf())
-
-        coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
-    }
-
-    @Test
     fun `Does not create event if no biometric data`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
 
