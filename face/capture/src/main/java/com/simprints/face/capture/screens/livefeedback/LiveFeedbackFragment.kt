@@ -203,10 +203,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun renderCapturingStateColors() {
         with(binding) {
             captureOverlay.drawWhiteTarget()
-
-            captureTitle.setTextColor(
-                ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
-            )
             captureFeedbackTxtExplanation.setTextColor(
                 ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
             )
@@ -216,7 +212,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun renderCapturingNotStarted() {
         binding.apply {
             captureOverlay.drawSemiTransparentTarget()
-            captureTitle.setText(IDR.string.face_capture_preparation_title)
             captureFeedbackTxtTitle.isVisible = true
             captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_previewing)
             captureFeedbackPermissionButton.isGone = true
@@ -228,7 +223,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         renderCapturingStateColors()
         binding.apply {
             captureProgress.isVisible = true
-            captureTitle.setText(IDR.string.face_capture_capturing_title)
             captureFeedbackTxtTitle.isVisible = true
             captureFeedbackTxtTitle.setText(IDR.string.face_capture_prep_begin_button_capturing)
             captureFeedbackPermissionButton.isGone = true

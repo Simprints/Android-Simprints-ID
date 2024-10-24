@@ -26,16 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/capture_title"
-        style="@style/Text.Headline5.White"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_default"
-        android:text="@string/face_capture_preparation_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
         android:id="@+id/capture_progress"
@@ -57,11 +47,20 @@
         android:layout_height="match_parent"
         android:layout_margin="@dimen/margin_default"
         android:layout_marginHorizontal="@dimen/margin_default"
-        android:gravity="center"
+        android:gravity="center|bottom"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/capture_progress">
+
+        <TextView
+            android:id="@+id/capture_feedback_txt_explanation"
+            style="@style/Text.Headline5.White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_default"
+            android:gravity="center"
+            tools:text="Move closer" />
 
         <CheckedTextView
             android:id="@+id/capture_feedback_txt_title"
@@ -76,14 +75,6 @@
             android:textAlignment="center"
             android:textColor="@color/feedback_chip_text" />
 
-        <TextView
-            android:id="@+id/capture_feedback_txt_explanation"
-            style="@style/Text.Headline5.White"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_default"
-            android:gravity="center"
-            tools:text="Move closer" />
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
