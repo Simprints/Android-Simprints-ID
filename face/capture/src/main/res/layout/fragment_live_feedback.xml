@@ -15,64 +15,51 @@
         android:layout_height="match_parent"
         android:keepScreenOn="true" />
 
-    <!--
-        Make sure to change the CameraTargetOverlay::percentFromTopPortrait value if any change is
-        made to the layout_constraintGuide_percent value
-    -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/capture_guide_frame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.3" />
+        app:layout_constraintGuide_percent="@dimen/guideline_margin_percent" />
 
     <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
         android:id="@+id/capture_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/capture_title"
-        style="@style/Text.Headline5.White"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/face_capture_preparation_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
         android:id="@+id/capture_progress"
-        android:layout_width="242dp"
-        android:layout_height="242dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:indeterminate="false"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:dcp_color="@color/simprints_green_light"
         app:dcp_max="10"
-        app:layout_constraintBottom_toBottomOf="@id/capture_guide_frame"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/capture_guide_frame" />
+        app:layout_constraintTop_toBottomOf="@id/capture_guide_frame"
+        app:layout_constraintWidth_percent="@dimen/capture_target_size_percent"
+        tools:visibility="visible" />
 
-    <CheckedTextView
-        android:id="@+id/capture_feedback_txt_title"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/capture_feedback_btn"
         style="@style/Text.Headline6.Bold"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginTop="190dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_huge"
         android:background="@drawable/feedback_chip_white"
-        android:drawablePadding="4dp"
-        android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="4dp"
+        android:checkable="true"
+        android:padding="@dimen/padding_default"
         android:text="@string/face_capture_title_previewing"
+        android:textAlignment="center"
         android:textColor="@color/feedback_chip_text"
+        app:backgroundTint="@null"
+        app:iconGravity="textStart"
+        app:iconTint="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/capture_guide_frame" />
+        app:layout_constraintTop_toBottomOf="@id/capture_progress" />
 
     <TextView
         android:id="@+id/capture_feedback_txt_explanation"
@@ -85,7 +72,7 @@
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_title"
+        app:layout_constraintTop_toBottomOf="@id/capture_feedback_btn"
         tools:text="Move closer" />
 
     <com.google.android.material.button.MaterialButton
@@ -95,9 +82,9 @@
         android:layout_marginTop="16dp"
         android:text="@string/face_capture_permission_action"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_explanation" />
+        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_explanation"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

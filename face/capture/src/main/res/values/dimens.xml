@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="preparation_land_max_image_height">141dp</dimen>
+    <item name="guideline_margin_percent" format="float" type="dimen">0.1</item>
+    <item name="capture_target_size_percent" format="float" type="dimen">0.9</item>
 </resources>
