@@ -55,7 +55,6 @@
         android:textAlignment="center"
         android:textColor="@color/feedback_chip_text"
         app:backgroundTint="@null"
-        app:icon="@drawable/ic_checked_white_18dp"
         app:iconGravity="textStart"
         app:iconTint="@null"
         app:layout_constraintEnd_toEndOf="parent"

@@ -94,7 +94,7 @@ internal class CameraTargetOverlay(
         val radius = (min(width, height) * multiplier) / 2
 
         // Calculate the center coordinates and radius
-        val centerX = if (width < height) width / 2 else radius + margin
+        val centerX = width / 2
         val centerY = if (width < height) radius + margin else height / 2
 
         // Set the dimensions of the circle rect
