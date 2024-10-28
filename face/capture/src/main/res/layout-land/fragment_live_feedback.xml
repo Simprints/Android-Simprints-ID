@@ -62,18 +62,23 @@
             android:gravity="center"
             tools:text="Move closer" />
 
-        <CheckedTextView
-            android:id="@+id/capture_feedback_txt_title"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/capture_feedback_btn"
             style="@style/Text.Headline6.Bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_default"
             android:background="@drawable/feedback_chip_white"
             android:gravity="center"
+            android:checkable="true"
             android:padding="@dimen/padding_default"
             android:text="@string/face_capture_title_previewing"
             android:textAlignment="center"
-            android:textColor="@color/feedback_chip_text" />
+            android:textColor="@color/feedback_chip_text"
+            app:backgroundTint="@null"
+            app:icon="@drawable/ic_checked_white_18dp"
+            app:iconGravity="textStart"
+            app:iconTint="@null" />
 
     </LinearLayout>
 

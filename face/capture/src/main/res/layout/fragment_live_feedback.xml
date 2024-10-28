@@ -25,7 +25,7 @@
     <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
         android:id="@+id/capture_overlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
         android:id="@+id/capture_progress"
@@ -42,18 +42,22 @@
         app:layout_constraintWidth_percent="@dimen/capture_target_size_percent"
         tools:visibility="visible" />
 
-    <CheckedTextView
-        android:id="@+id/capture_feedback_txt_title"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/capture_feedback_btn"
         style="@style/Text.Headline6.Bold"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_large"
+        android:layout_margin="@dimen/margin_huge"
         android:background="@drawable/feedback_chip_white"
-        android:drawablePadding="4dp"
-        android:gravity="center"
+        android:checkable="true"
         android:padding="@dimen/padding_default"
         android:text="@string/face_capture_title_previewing"
+        android:textAlignment="center"
         android:textColor="@color/feedback_chip_text"
+        app:backgroundTint="@null"
+        app:icon="@drawable/ic_checked_white_18dp"
+        app:iconGravity="textStart"
+        app:iconTint="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/capture_progress" />
@@ -69,7 +73,7 @@
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_title"
+        app:layout_constraintTop_toBottomOf="@id/capture_feedback_btn"
         tools:text="Move closer" />
 
     <com.google.android.material.button.MaterialButton

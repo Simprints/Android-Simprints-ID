@@ -81,7 +81,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
 
-        binding.captureFeedbackTxtTitle.setOnClickListener { vm.startCapture() }
+        binding.captureFeedbackBtn.setOnClickListener { vm.startCapture() }
         binding.captureProgress.max = mainVm.samplesToCapture
 
         //Wait till the views gets its final size then init frame processor and setup the camera
@@ -212,8 +212,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun renderCapturingNotStarted() {
         binding.apply {
             captureOverlay.drawSemiTransparentTarget()
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_previewing)
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
             captureFeedbackPermissionButton.isGone = true
         }
         toggleCaptureButtons(false)
@@ -223,8 +222,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         renderCapturingStateColors()
         binding.apply {
             captureProgress.isVisible = true
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_prep_begin_button_capturing)
+            captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
             captureFeedbackPermissionButton.isGone = true
         }
         toggleCaptureButtons(false)
@@ -232,12 +230,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderValidFace() {
         binding.apply {
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_begin_button)
+            captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
             captureFeedbackTxtExplanation.text = null
             captureFeedbackPermissionButton.isGone = true
 
-            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
+            captureFeedbackBtn.setCheckedWithLeftDrawable(
                 true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
@@ -246,12 +243,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderValidCapturingFace() {
         binding.apply {
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_prep_begin_button_capturing)
+            captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_hold)
             captureFeedbackPermissionButton.isGone = true
 
-            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
+            captureFeedbackBtn.setCheckedWithLeftDrawable(
                 true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
@@ -261,12 +257,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderFaceTooFar() {
         binding.apply {
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_too_far)
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_too_far)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_too_far)
             captureFeedbackPermissionButton.isGone = true
 
-            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
+            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
 
         toggleCaptureButtons(false)
@@ -275,12 +270,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderFaceTooClose() {
         binding.apply {
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_too_close)
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_too_close)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_too_close)
             captureFeedbackPermissionButton.isInvisible = true
 
-            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
+            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
 
         toggleCaptureButtons(false)
@@ -289,12 +283,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderNoFace() {
         binding.apply {
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_no_face)
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_no_face)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_no_face)
             captureFeedbackPermissionButton.isGone = true
 
-            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
+            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
 
         toggleCaptureButtons(false)
@@ -303,12 +296,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderFaceNotStraight() {
         binding.apply {
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_look_straight)
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_look_straight)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_look_straight)
             captureFeedbackPermissionButton.isGone = true
 
-            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
+            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
 
         toggleCaptureButtons(false)
@@ -317,12 +309,11 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderBadQuality() {
         binding.apply {
-            captureFeedbackTxtTitle.isVisible = true
-            captureFeedbackTxtTitle.setText(IDR.string.face_capture_title_bad_quality)
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_bad_quality)
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_bad_quality)
             captureFeedbackPermissionButton.isGone = true
 
-            captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
+            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
 
         toggleCaptureButtons(false)
@@ -343,13 +334,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun toggleCaptureButtons(valid: Boolean) {
-        binding.captureFeedbackTxtTitle.isClickable = valid
+        binding.captureFeedbackBtn.isClickable = valid
     }
 
     private fun renderNoPermission(shouldOpenSettings: Boolean) {
         binding.apply {
             captureOverlay.drawSemiTransparentTarget()
-            captureFeedbackTxtTitle.isInvisible = true
             captureFeedbackTxtExplanation.setText(IDR.string.face_capture_permission_denied)
 
             captureFeedbackPermissionButton.isVisible = true
