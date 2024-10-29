@@ -54,7 +54,6 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
             is FingerprintScanState.ScanCompleted -> setUiToRemoveFinger()
             is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
             is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
-
         }
     }
 
@@ -79,7 +78,7 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
                 else setUiBadCapture()
 
                 //Wait before turn of the leds
-                longDelay()
+                delay(LONG_DELAY)
                 turnOffSmileLeds()
             }
         }
@@ -96,11 +95,7 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
         }
     }
 
-
-    private suspend fun longDelay() = delay(LONG_DELAY)
-
     private fun isAudioEnabled() = preference.getBoolean(AUDIO_PREFERENCE_KEY, false)
-
 
     companion object {
         const val LONG_DELAY = 3000L

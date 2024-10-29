@@ -89,15 +89,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             R.id.fingerprintCaptureFragment,
             FingerprintConnectContract.DESTINATION
         ) {
-            if (it is FingerprintConnectResult && it.isSuccess) {
-                // Start observing feedback after the scanner is connected
-                observeFingerprintScanStatus(
-                    viewLifecycleOwner.lifecycleScope,
-                    args.params.fingerprintSDK
-                )
-            }
-            if (it !is FingerprintConnectResult || !it.isSuccess)
+            if (it !is FingerprintConnectResult || !it.isSuccess) {
                 findNavController().finishWithResult(this, it)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -114,6 +108,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             args.params.fingerprintsToCapture,
             args.params.fingerprintSDK,
         )
+
         initUI()
     }
 
@@ -251,11 +246,16 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     override fun onResume() {
         super.onResume()
         vm.handleOnResume()
+        observeFingerprintScanStatus(
+            viewLifecycleOwner.lifecycleScope,
+            args.params.fingerprintSDK
+        )
     }
 
     override fun onPause() {
         vm.handleOnPause()
         super.onPause()
+        observeFingerprintScanStatus.stopObserving()
     }
 
     private fun updateConfirmDialog(state: CollectFingerprintsState) {
@@ -297,7 +297,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     override fun onDestroyView() {
-        observeFingerprintScanStatus.stopObserving()
         confirmDialog?.dismiss()
         super.onDestroyView()
     }
