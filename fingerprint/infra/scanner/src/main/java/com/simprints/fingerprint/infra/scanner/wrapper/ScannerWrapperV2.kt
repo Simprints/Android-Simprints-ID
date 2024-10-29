@@ -182,10 +182,7 @@ internal class ScannerWrapperV2(
         }
 
     override suspend fun turnOffSmileLeds(): Unit = withContext(ioDispatcher) {
-        runCatching {
-            scannerV2.setSmileLedState(scannerUiHelper.turnedOffState()).wrapErrorsFromScanner()
-                .await()
-        }
+        scannerV2.setSmileLedState(scannerUiHelper.turnedOffState()).onErrorComplete().await()
     }
 
     private val triggerListenerToObserverMap =
@@ -210,25 +207,16 @@ internal class ScannerWrapperV2(
         }
     }
 
-    private fun Completable.wrapErrorsFromScanner() =
-        onErrorResumeNext { Completable.error(wrapErrorFromScanner(it)) }
-
     override suspend fun turnFlashingOrangeLeds(): Unit = withContext(ioDispatcher) {
-        runCatching {
-            scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()).onErrorComplete()
-                .await()
-        }
+        scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()).onErrorComplete().await()
     }
 
     override suspend fun setUiGoodCapture(): Unit = withContext(ioDispatcher) {
-        runCatching {
-            scannerV2.setSmileLedState(scannerUiHelper.goodScanLedState()).onErrorComplete().await()
-        }
+        scannerV2.setSmileLedState(scannerUiHelper.goodScanLedState()).onErrorComplete().await()
     }
 
+
     override suspend fun setUiBadCapture(): Unit = withContext(ioDispatcher) {
-        runCatching {
-            scannerV2.setSmileLedState(scannerUiHelper.badScanLedState()).onErrorComplete().await()
-        }
+        scannerV2.setSmileLedState(scannerUiHelper.badScanLedState()).onErrorComplete().await()
     }
 }

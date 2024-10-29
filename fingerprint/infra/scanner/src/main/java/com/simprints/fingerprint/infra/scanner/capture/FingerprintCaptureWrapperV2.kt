@@ -54,10 +54,12 @@ internal class FingerprintCaptureWrapperV2(
                 "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
             }
             // Capture fingerprint and ensure it's OK
-            scannerV2.captureFingerprint().ensureCaptureResultOkOrError().await()
-            tracker.completeScan()
-            // Transfer the unprocessed image from the scanner
-            acquireUnprocessedImage().switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire unprocessed image data")))
+            scannerV2.captureFingerprint()
+                .ensureCaptureResultOkOrError()
+                .andThen(Completable.fromAction {
+                    tracker.completeScan()
+                }).andThen(acquireUnprocessedImage())
+                .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire unprocessed image data")))
                 .wrapErrorsFromScanner().await()
 
         }
@@ -102,8 +104,7 @@ internal class FingerprintCaptureWrapperV2(
                         .ifNoFingerDetectedThenSetBadScanLedState()
                         .wrapErrorsFromScanner()
                 }
-            }
-            .await()
+            }.wrapErrorsFromScanner().await()
     }
 
     private fun Single<CaptureFingerprintResult>.ensureCaptureResultOkOrError() =
@@ -167,4 +168,3 @@ internal class FingerprintCaptureWrapperV2(
         onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
 
 }
-
