@@ -1,16 +1,20 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
+import com.simprints.core.DispatcherBG
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.models.NecImage
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ExtractNecTemplateUseCase @Inject constructor(private val nec: NEC) {
-    operator fun invoke(
-        fingerprintImage: FingerprintImage,
-        qualityScore: Int
-    ): TemplateResponse<FingerprintTemplateMetadata> {
+internal class ExtractNecTemplateUseCase @Inject constructor(
+    private val nec: NEC, @DispatcherBG private val dispatcher: CoroutineDispatcher
+) {
+    suspend operator fun invoke(
+        fingerprintImage: FingerprintImage, qualityScore: Int
+    ): TemplateResponse<FingerprintTemplateMetadata> = withContext(dispatcher) {
         try {
             val template = nec.extract(
                 NecImage(
@@ -20,11 +24,9 @@ class ExtractNecTemplateUseCase @Inject constructor(private val nec: NEC) {
                     imageBytes = fingerprintImage.imageBytes
                 )
             )
-            return TemplateResponse(
-                template.bytes,
-                FingerprintTemplateMetadata(
-                    templateFormat = NEC_TEMPLATE_FORMAT,
-                    imageQualityScore = qualityScore
+            TemplateResponse(
+                template.bytes, FingerprintTemplateMetadata(
+                    templateFormat = NEC_TEMPLATE_FORMAT, imageQualityScore = qualityScore
                 )
             )
         } catch (e: Exception) {

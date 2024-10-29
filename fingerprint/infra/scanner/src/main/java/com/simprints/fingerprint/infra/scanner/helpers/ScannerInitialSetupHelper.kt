@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.helpers
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.infra.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
@@ -12,8 +13,10 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -25,6 +28,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
     private val batteryLevelChecker: BatteryLevelChecker,
     private val configManager: ConfigManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) {
 
     private lateinit var scannerVersion: ScannerVersion
@@ -46,10 +50,9 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         macAddress: String,
         withScannerVersion: (ScannerVersion) -> Unit,
         withBatteryInfo: (BatteryInfo) -> Unit,
-    ) {
+    ) = withContext(dispatcher) {
         delay(100) // Speculatively needed
         val unifiedVersionInfo = scanner.getVersionInformation().await()
-
         unifiedVersionInfo.toScannerVersion().also {
             withScannerVersion(it)
             scannerVersion = it

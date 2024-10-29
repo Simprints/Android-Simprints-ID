@@ -8,52 +8,21 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.res.ResourcesCompat
 import com.simprints.core.tools.extentions.dpToPx
-import com.simprints.face.capture.models.ScreenOrientation
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.face.capture.R
+import kotlin.math.max
+import kotlin.math.min
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class CameraTargetOverlay(
-    context: Context,
-    attrs: AttributeSet
+    context: Context, attrs: AttributeSet
 ) : AppCompatImageView(context, attrs) {
     companion object {
         private val SEMI_TRANSPARENT_OVERLAY = Color.argb(102, 0, 0, 0)
         private val WHITE_OVERLAY = Color.argb(242, 255, 255, 255)
-
-        /**
-         * Reference to the guideline's percentage of margin from the top of the screen. Used when
-         * the screen is in the portrait (vertical) mode
-         */
-        private const val percentFromTopPortrait = 0.3f
-
-        /**
-         * Reference to the guideline's percentage of margin from the top of the screen. Used when
-         * the screen is in the landscape (horizontal) mode
-         */
-        private const val percentFromTopLandscape = 0.5f
-
-        fun rectForPlane(
-            width: Int,
-            height: Int,
-            rectSize: Float,
-            screenOrientation: ScreenOrientation
-        ): RectF {
-            val percentFromTop = when (screenOrientation) {
-                ScreenOrientation.Landscape -> percentFromTopLandscape
-                ScreenOrientation.Portrait -> percentFromTopPortrait
-            }
-            val top = (height * percentFromTop) - (rectSize / 2)
-            val bottom = top + rectSize
-
-            val centerWidth = width / 2
-            val left = centerWidth - (rectSize / 2)
-            val right = left + rectSize
-
-            return RectF(left, top, right, bottom)
-        }
     }
 
     private var drawingFunc: (Canvas.() -> Unit)? = null
@@ -62,22 +31,22 @@ internal class CameraTargetOverlay(
             postInvalidate()
         }
 
-    private val rectSize = 240f.dpToPx(context)
-
     private val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.TRANSPARENT
         xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
     }
+
     private val circleBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 2f.dpToPx(context)
         color = Color.argb(80, 255, 255, 255)
         strokeCap = Paint.Cap.ROUND
     }
-    var rectInCanvas = RectF(0f, 0f, 0f, 0f)
+
+    var circleRect = RectF(0f, 0f, 0f, 0f)
 
     init {
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -85,26 +54,52 @@ internal class CameraTargetOverlay(
         drawingFunc?.invoke(canvas)
     }
 
-    fun drawSemiTransparentTarget(screenOrientation: ScreenOrientation) {
+    fun drawSemiTransparentTarget() {
         drawingFunc = {
             drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
             drawColor(SEMI_TRANSPARENT_OVERLAY, PorterDuff.Mode.SRC_OVER)
-            drawTarget(screenOrientation)
+            drawTarget()
         }
     }
 
-    fun drawWhiteTarget(screenOrientation: ScreenOrientation) {
+    fun drawWhiteTarget() {
         drawingFunc = {
             drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
             drawColor(WHITE_OVERLAY, PorterDuff.Mode.SRC_OVER)
-            drawTarget(screenOrientation)
+            drawTarget()
         }
     }
 
-    private fun Canvas.drawTarget(screenOrientation: ScreenOrientation) {
-        rectInCanvas = rectForPlane(width, height, rectSize, screenOrientation)
-
-        drawOval(rectInCanvas, circlePaint)
-        drawOval(rectInCanvas, circleBorderPaint)
+    private fun Canvas.drawTarget() {
+        drawOval(circleRect, circlePaint)
+        drawOval(circleRect, circleBorderPaint)
     }
+
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        // Calculate the circle rect only when the view's size changes
+        calculateCircleRect(w.toFloat(), h.toFloat())
+    }
+
+    private fun calculateCircleRect(width: Float, height: Float) {
+        // Calculate the margin as 10% of the max dimension
+        val guidelineMarginPercent =
+            ResourcesCompat.getFloat(context.resources, R.dimen.guideline_margin_percent)
+        val margin = (max(width, height) * guidelineMarginPercent).toInt()
+
+        val multiplier =
+            ResourcesCompat.getFloat(context.resources, R.dimen.capture_target_size_percent)
+
+        val radius = (min(width, height) * multiplier) / 2
+
+        // Calculate the center coordinates and radius
+        val centerX = width / 2
+        val centerY = if (width < height) radius + margin else height / 2
+
+        // Set the dimensions of the circle rect
+        circleRect.set(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
+    }
+
+
 }
