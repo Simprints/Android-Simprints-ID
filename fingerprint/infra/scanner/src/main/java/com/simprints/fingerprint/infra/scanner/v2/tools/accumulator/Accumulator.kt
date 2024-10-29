@@ -27,12 +27,12 @@ import io.reactivex.Flowable
  */
 abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
     initialFragmentCollection: FragmentCollection,
-    private inline val addFragmentToCollection: FragmentCollection.(Fragment) -> FragmentCollection,
-    private inline val canComputeElementLengthFromCollection: (FragmentCollection) -> Boolean,
-    private inline val computeElementLengthFromCollection: (FragmentCollection) -> Int,
-    private inline val getCollectionLength: FragmentCollection.() -> Int,
-    private inline val sliceCollection: FragmentCollection.(IntRange) -> FragmentCollection,
-    private inline val buildElementFromCompleteCollection: (FragmentCollection) -> Element
+    private val addFragmentToCollection: FragmentCollection.(Fragment) -> FragmentCollection,
+    private val canComputeElementLengthFromCollection: (FragmentCollection) -> Boolean,
+    private val computeElementLengthFromCollection: (FragmentCollection) -> Int,
+    private val getCollectionLength: FragmentCollection.() -> Int,
+    private val sliceCollection: FragmentCollection.(IntRange) -> FragmentCollection,
+    private val buildElementFromCompleteCollection: (FragmentCollection) -> Element
 ) {
 
     private var fragmentCollection: FragmentCollection = initialFragmentCollection

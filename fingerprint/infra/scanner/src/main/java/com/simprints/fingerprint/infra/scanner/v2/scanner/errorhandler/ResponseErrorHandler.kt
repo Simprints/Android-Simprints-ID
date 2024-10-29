@@ -4,9 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.respo
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
+import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.ioScheduler
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -15,8 +15,10 @@ import java.util.concurrent.TimeoutException
  * For use in an Rx chain using [handleErrorsWith]. Adds a timeout and retries for incoming messages
  * in accordance to a supplied [ResponseErrorHandlingStrategy].
  */
-class ResponseErrorHandler(val strategy: ResponseErrorHandlingStrategy,
-                           private val timeOutScheduler: Scheduler = Schedulers.io()) {
+class ResponseErrorHandler(
+    val strategy: ResponseErrorHandlingStrategy,
+    private val timeOutScheduler: Scheduler = ioScheduler
+) {
 
     inline fun <reified T> handle(source: Single<T>): Single<T> {
         val timeOut = when (T::class.java) {
