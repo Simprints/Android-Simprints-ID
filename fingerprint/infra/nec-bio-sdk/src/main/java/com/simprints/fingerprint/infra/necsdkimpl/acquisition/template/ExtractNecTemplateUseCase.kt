@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ExtractNecTemplateUseCase @Inject constructor(
+internal class ExtractNecTemplateUseCase @Inject constructor(
     private val nec: NEC, @DispatcherBG private val dispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(

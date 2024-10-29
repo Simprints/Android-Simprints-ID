@@ -36,4 +36,7 @@ internal class ProcessRawImageUseCase @Inject constructor(
             processedImage.resolution
         )
     }
+    companion object {
+        private const val DEFAULT_RESOLUTION: Short = 500
+    }
 }

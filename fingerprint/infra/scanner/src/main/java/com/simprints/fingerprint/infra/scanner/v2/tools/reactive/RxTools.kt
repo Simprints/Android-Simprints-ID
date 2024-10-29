@@ -6,7 +6,8 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.flowables.ConnectableFlowable
 import io.reactivex.rxkotlin.Singles
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.asScheduler
 
 fun <T : Any> single(function: () -> T): Single<T> = Single.create { emitter ->
     try {
@@ -29,9 +30,8 @@ inline fun <reified R> Flowable<*>.filterCast(
 
 fun Single<*>.completeOnceReceived(): Completable =
     this.ignoreElement()
-
 fun <T> Flowable<T>.subscribeOnIoAndPublish(): ConnectableFlowable<T> =
-    this.subscribeOn(Schedulers.io()).publish()
+    this.subscribeOn(ioScheduler).publish()
 
 fun <T : Any> Completable.doSimultaneously(single: Single<T>): Single<T> =
     Singles.zip(single, this.toSingleDefault(Unit)) { value, _ -> value }
@@ -45,3 +45,5 @@ fun <T, R> Single<T>.mapToMaybeEmptyIfNull(block: (T) -> R?): Maybe<R> =
             Maybe.empty<R>()
         }
     }
+//Todo Make it more generic by injecting scheduler once refactoring the scanner module
+val ioScheduler = Dispatchers.IO.asScheduler()

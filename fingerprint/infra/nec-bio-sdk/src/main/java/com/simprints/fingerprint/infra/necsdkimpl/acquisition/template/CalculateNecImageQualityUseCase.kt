@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class CalculateNecImageQualityUseCase @Inject constructor(
+internal class CalculateNecImageQualityUseCase @Inject constructor(
     private val necInstant: NEC,
     @DispatcherBG private val dispatcher: CoroutineDispatcher
 ) {

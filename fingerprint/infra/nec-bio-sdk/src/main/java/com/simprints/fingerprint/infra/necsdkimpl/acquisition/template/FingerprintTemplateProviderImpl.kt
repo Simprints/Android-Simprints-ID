@@ -16,22 +16,27 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val processImage: ProcessRawImageUseCase,
 ) : FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
 
+
+    /**
+     * Acquires a fingerprint template from the scanner.
+     *
+     * Steps involved:
+     * 1. Acquire an unprocessed image from the scanner.
+     * 2. Decode the WSQ unprocessed image using the SecuGen decoder.
+     * 3. Apply the SecuGen algorithm to correct and upscale the raw image.
+     * 4. Check the image quality using the NEC SDK.
+     * 5. Convert the processed image into a template using the NEC SDK.
+     * 6. Return the generated template and cache the image for future use.
+     *
+     **/
     override suspend fun acquireFingerprintTemplate(
         settings: FingerprintTemplateAcquisitionSettings?
     ): TemplateResponse<FingerprintTemplateMetadata> {
         require(settings != null) { "Settings cannot be null" }
-
-        // 1- Acquire unprocessed image from the scanner
-        // 2- Use secugen image processing to convert it to wsq format
-        // 3- Use wsq sdk to convert it to bitmap
-        // 4- Use nec sdk to check image quality
-        // 5- Use nec sdk to convert it to template
-        // 6- Return the template and cache the image for later use
         val captureWrapper = fingerprintCaptureWrapperFactory.captureWrapper
 
-        // Always require a new image from the scanner using the minimum resolution as we will
-        // process it using secugen image correction
         log("Acquiring unprocessed image")
+        // Always require a new image from the scanner using the minimum resolution it will upsampled latter using secugen image correction
         val rawFingerprintScan = captureWrapper.acquireUnprocessedImage(
             Dpi(MIN_CAPTURE_DPI)
         ).rawUnprocessedImage
