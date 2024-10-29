@@ -16,7 +16,6 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val processImage: ProcessRawImageUseCase,
 ) : FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
 
-
     /**
      * Acquires a fingerprint template from the scanner.
      *
@@ -70,7 +69,6 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
     companion object {
         private const val MIN_CAPTURE_DPI = 500.toShort()
     }
-
 }
 
 const val NEC_TEMPLATE_FORMAT = "NEC_1_5"

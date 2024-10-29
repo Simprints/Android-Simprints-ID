@@ -123,9 +123,9 @@ class ConnectScannerViewModelTest {
             if (connectFailException != null)
                 throw connectFailException
         }
-        coEvery { setScannerInfoAndCheckAvailableOta(fingerprintSdk = SECUGEN_SIM_MATCHER) } answers {}
-        coEvery { sensorWakeUp() } answers {}
-        coEvery { setUiIdle() } answers {}
+        coJustRun { setScannerInfoAndCheckAvailableOta(fingerprintSdk = SECUGEN_SIM_MATCHER) }
+        coJustRun { sensorWakeUp() }
+        coJustRun { turnOffSmileLeds() }
         every { versionInformation() } returns when (scannerGeneration) {
             FingerprintConfiguration.VeroGeneration.VERO_1 -> VERO_1_VERSION
             FingerprintConfiguration.VeroGeneration.VERO_2 -> VERO_2_VERSION
