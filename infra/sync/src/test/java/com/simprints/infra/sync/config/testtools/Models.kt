@@ -21,6 +21,7 @@ import com.simprints.infra.config.store.models.Vero2Configuration
 
 internal val generalConfiguration = GeneralConfiguration(
     listOf(GeneralConfiguration.Modality.FACE),
+    listOf(GeneralConfiguration.Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,

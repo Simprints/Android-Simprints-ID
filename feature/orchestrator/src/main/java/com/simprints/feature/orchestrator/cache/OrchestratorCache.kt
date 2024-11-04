@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.SerializableMixin
 import com.simprints.feature.orchestrator.steps.Step
+import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.security.SecurityManager
 import java.io.Serializable
 import javax.inject.Inject
@@ -25,6 +26,7 @@ internal class OrchestratorCache @Inject constructor(
             jsonHelper.toJson(it, module = stepsModule)
         }.let { "[$it]" }
     }
+
     var steps: List<Step>
         set(value) {
             prefs.edit(commit = true) {
@@ -42,15 +44,27 @@ internal class OrchestratorCache @Inject constructor(
             }
             ?: emptyList()
 
-    fun clearSteps() {
+    // This is the age group (if any) that was resolved (either coming from
+    //  the Intent or from the age selection screen) for the current request
+    var ageGroup: AgeGroup?
+        set(value) {
+            prefs.edit(commit = true) {
+                putString(KEY_AGE_GROUP, value?.let { jsonHelper.toJson(it) })
+            }
+        }
+        get() = prefs.getString(KEY_AGE_GROUP, null)?.let { jsonHelper.fromJson(it, object : TypeReference<AgeGroup>() {}) }
+
+    fun clearCache() {
         prefs.edit(commit = true) {
             remove(KEY_STEPS)
+            remove(KEY_AGE_GROUP)
         }
     }
 
     companion object {
         private const val ORCHESTRATION_CACHE = "ORCHESTRATOR_CACHE"
         private const val KEY_STEPS = "steps"
+        private const val KEY_AGE_GROUP = "age_group"
 
         private val stepsModule = SimpleModule().apply {
             addSerializer(Bundle::class.java, BundleSerializer())

@@ -26,6 +26,7 @@ class SettingsViewModelTest {
 
     private val generalConfiguration = GeneralConfiguration(
         modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
+        matchingModalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
         languageOptions = listOf("en", "fr"),
         defaultLanguage = "fr",
         collectLocation = true,
