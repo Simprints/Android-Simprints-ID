@@ -19,6 +19,12 @@
             android:summary="@string/dashboard_preference_summary_sync_information"
             android:title="@string/dashboard_preference_sync_information_title" />
 
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="@string/preference_enable_audio_on_scan_complete_key"
+            android:summary="@string/dashboard_preference_summary_enable_audio_on_scan_complete"
+            android:title="@string/dashboard_preference_enable_audio_on_scan_complete" />
+
         <Preference
             android:key="@string/preference_update_config_key"
             android:summary="@string/dashboard_preference_summary_update_config"

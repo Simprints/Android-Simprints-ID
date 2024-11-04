@@ -14,6 +14,7 @@ extra.apply {
      * https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+Simprints+ID
      *
      * Dev version >= 2024.2.1 is required for receiving biometric sdk age restrictions
+     * Dev version >= 2024.2.2 is required for float quality thresholds
      * Dev version >= 2024.3.0 is required to receive configuration ID
      */
     set("VERSION_NAME", "2024.3.0")

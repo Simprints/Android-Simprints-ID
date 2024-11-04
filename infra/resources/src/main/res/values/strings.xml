@@ -176,6 +176,8 @@
     <string name="face_capture_title_previewing">Preparing to scan</string>
     <string name="face_capture_title_no_face">No face detected</string>
     <string name="face_capture_error_no_face">Make sure the face fills the circle</string>
+    <string name="face_capture_title_bad_quality">Unclear Image</string>
+    <string name="face_capture_error_bad_quality">Try adjusting the lighting or repositioning the face for a clearer photo</string>
     <string name="face_capture_title_too_far">Too far</string>
     <string name="face_capture_error_too_far">Move closer</string>
     <string name="face_capture_title_too_close">Too close</string>
@@ -370,11 +372,11 @@
     <string name="dashboard_preference_device_id_title">Device ID</string>
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
-    <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
     <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Enable or disable audio alerts when a fingerprint scan is completed, notifying the user to remove their hand from the scanner.</string>
+    <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
-    <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">Audio on Fingerprint Scan Completion</string>
+    <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Sync Information</string>

@@ -96,16 +96,15 @@ internal class ConnectionHelper @Inject constructor(
         }
     }
 
-
     private suspend fun connectScannerObjectWithSocket(
         scanner: Scanner,
         socket: ComponentBluetoothSocket
-    ) {
+    ) = withContext(dispatcher) {
         Simber.d("Socket connected. Setting up scanner...")
         scanner.connect(socket.getInputStream(), socket.getOutputStream()).await()
     }
 
-    suspend fun disconnectScanner(scanner: Scanner) {
+    suspend fun disconnectScanner(scanner: Scanner): Unit = withContext(dispatcher) {
         scanner.disconnect().await()
         socket?.close()
     }
@@ -114,7 +113,7 @@ internal class ConnectionHelper @Inject constructor(
         scanner: Scanner,
         macAddress: String,
         maxRetries: Long = CONNECT_MAX_RETRIES
-    ) {
+    )= withContext(dispatcher) {
         disconnectScanner(scanner)
         delay(RECONNECT_DELAY_MS)
         connectScanner(scanner, macAddress, maxRetries).collect()

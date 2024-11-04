@@ -182,7 +182,7 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     private suspend fun resetVeroUI() {
         _currentStep.postValue(Step.ResetScannerUi)
-        scannerManager.scanner.setUiIdle()
+        scannerManager.scanner.turnOffSmileLeds()
         logMessageForCrashReport("ScannerManager: resetVeroUI")
     }
 

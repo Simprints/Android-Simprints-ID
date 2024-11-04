@@ -24,7 +24,7 @@ internal class FingerprintCaptureWrapperV2(
     private val scannerV2: Scanner,
     private val scannerUiHelper: ScannerUiHelper,
     private val ioDispatcher: CoroutineDispatcher,
-    private val scanningStatusTracker: FingerprintScanningStatusTracker,
+    private val tracker: FingerprintScanningStatusTracker,
 ) : FingerprintCaptureWrapper {
 
     override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray =
@@ -54,10 +54,12 @@ internal class FingerprintCaptureWrapperV2(
                 "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
             }
             // Capture fingerprint and ensure it's OK
-            scannerV2.captureFingerprint().ensureCaptureResultOkOrError().await()
-            scanningStatusTracker.notifyScanCompleted()
-            // Transfer the unprocessed image from the scanner
-            acquireUnprocessedImage().switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire unprocessed image data")))
+            scannerV2.captureFingerprint()
+                .ensureCaptureResultOkOrError()
+                .andThen(Completable.fromAction {
+                    tracker.completeScan()
+                }).andThen(acquireUnprocessedImage())
+                .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire unprocessed image data")))
                 .wrapErrorsFromScanner().await()
 
         }
@@ -86,11 +88,11 @@ internal class FingerprintCaptureWrapperV2(
             .captureFingerprint(captureDpi)
             .ensureCaptureResultOkOrError()
             .andThen(Completable.fromAction {
-                scanningStatusTracker.notifyScanCompleted()
+                tracker.completeScan()
             })
             .andThen(scannerV2.getImageQualityScore())
             .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image quality score")))
-            .setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold)
+            .validateMinimumFingerImageQuality()
             .flatMap { qualityScore ->
                 // If the quality score is below the threshold and we don't allow low quality extraction, return an empty template
                 if (qualityScore < qualityThreshold && !allowLowQualityExtraction) {
@@ -102,8 +104,7 @@ internal class FingerprintCaptureWrapperV2(
                         .ifNoFingerDetectedThenSetBadScanLedState()
                         .wrapErrorsFromScanner()
                 }
-            }
-            .await()
+            }.wrapErrorsFromScanner().await()
     }
 
     private fun Single<CaptureFingerprintResult>.ensureCaptureResultOkOrError() =
@@ -124,18 +125,10 @@ internal class FingerprintCaptureWrapperV2(
             }
         }
 
-    private fun Single<Int>.setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(
-        qualityThreshold: Int
-    ) =
+    private fun Single<Int>.validateMinimumFingerImageQuality() =
         flatMap { qualityScore ->
             if (qualityScore > NO_FINGER_IMAGE_QUALITY_THRESHOLD) {
-                val ledState = if (qualityScore >= qualityThreshold) {
-                    scannerUiHelper.goodScanLedState()
-                } else {
-                    scannerUiHelper.badScanLedState()
-                }
-                scannerV2.setSmileLedState(ledState)
-                    .andThen(Single.just(qualityScore))
+                Single.just(qualityScore)
             } else {
                 Single.error(NoFingerDetectedException("Image quality score below detection threshold"))
             }
@@ -175,4 +168,3 @@ internal class FingerprintCaptureWrapperV2(
         onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
 
 }
-

@@ -47,7 +47,6 @@ import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -64,7 +63,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private var hasSplashScreenBeenTriggered: Boolean = false
 
     @Inject
-    lateinit var fingerprintScanCompletionAudioNotifier: FingerprintScanCompletionAudioNotifier
+    lateinit var observeFingerprintScanStatus: ObserveFingerprintScanStatusUseCase
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -109,9 +108,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             args.params.fingerprintsToCapture,
             args.params.fingerprintSDK,
         )
-        lifecycleScope.launch {
-            fingerprintScanCompletionAudioNotifier.observeScanStatus()
-        }
         initUI()
     }
 
@@ -146,8 +142,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             this,
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
             exitFormConfiguration {
-                titleRes = com.simprints.infra.resources.R.string.exit_form_title_fingerprinting
-                backButtonRes = com.simprints.infra.resources.R.string.exit_form_continue_fingerprints_button
+                titleRes = IDR.string.exit_form_title_fingerprinting
+                backButtonRes =IDR.string.exit_form_continue_fingerprints_button
                 visibleOptions = scannerOptions()
             }.toArgs()
         )
@@ -249,11 +245,16 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     override fun onResume() {
         super.onResume()
         vm.handleOnResume()
+        observeFingerprintScanStatus(
+            viewLifecycleOwner.lifecycleScope,
+            args.params.fingerprintSDK
+        )
     }
 
     override fun onPause() {
         vm.handleOnPause()
         super.onPause()
+        observeFingerprintScanStatus.stopObserving()
     }
 
     private fun updateConfirmDialog(state: CollectFingerprintsState) {
@@ -296,7 +297,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     override fun onDestroyView() {
         confirmDialog?.dismiss()
-        fingerprintScanCompletionAudioNotifier.releaseMediaPlayer()
         super.onDestroyView()
     }
 }

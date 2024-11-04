@@ -23,7 +23,8 @@ class ApiProjectConfigurationTest {
             null,
             apiConsentConfiguration,
             apiIdentificationConfiguration,
-            apiSynchronizationConfiguration
+            apiSynchronizationConfiguration,
+            customKeyMap,
         )
         val projectConfiguration = ProjectConfiguration(
             "id",
@@ -34,7 +35,8 @@ class ApiProjectConfigurationTest {
             null,
             consentConfiguration,
             identificationConfiguration,
-            synchronizationConfiguration
+            synchronizationConfiguration,
+            customKeyMap,
         )
 
         assertThat(apiProjectConfiguration.toDomain()).isEqualTo(projectConfiguration)

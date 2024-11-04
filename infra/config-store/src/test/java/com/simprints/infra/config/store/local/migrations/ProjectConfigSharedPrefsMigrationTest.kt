@@ -650,7 +650,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setRankOne(
                 ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
                     .setNbOfImagesToCapture(2)
-                    .setQualityThreshold(-1)
+                    .setQualityThresholdPrecise(-1f)
                     .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE)
                     .setDecisionPolicy(
                         ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
@@ -666,7 +666,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setRankOne(
                 ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
                     .setNbOfImagesToCapture(2)
-                    .setQualityThreshold(-1)
+                    .setQualityThresholdPrecise(-1f)
                     .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
                     .setDecisionPolicy(
                         ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
@@ -685,7 +685,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setQualityThreshold(60)
             .setCaptureStrategy(ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_500_DPI)
             .setImageSavingStrategy(ProtoVero2Configuration.ImageSavingStrategy.EAGER)
-            .setDisplayLiveFeedback(true)
+            .setLedsMode(ProtoVero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK)
             .putAllFirmwareVersions(
                 mapOf(
                     "E-1" to ProtoVero2Configuration.Vero2FirmwareVersions.newBuilder()

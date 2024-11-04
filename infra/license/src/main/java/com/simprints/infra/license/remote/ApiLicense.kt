@@ -2,18 +2,22 @@ package com.simprints.infra.license.remote
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.license.Vendor
+import com.simprints.infra.license.models.Vendor
 
 /**
  * ApiLicense only populates some fields, based on which vendor was asked when retrieving the license.
  */
 @Keep
-internal data class ApiLicense(val licenses: Map<Vendor, License> = emptyMap()) {
+internal data class ApiLicense(val licenses: Map<Vendor, LicenseValue> = emptyMap()) {
     fun getLicenseBasedOnVendor(vendor: Vendor) = licenses[vendor]
 }
 
 @Keep
-data class License(val expiration: String?, val data: String)
+internal data class LicenseValue(
+    val expiration: String?,
+    val data: String,
+    val version: String,
+)
 
 /**
  * BFSID returns an error in the following format:
@@ -49,7 +53,7 @@ internal data class ApiLicenseError(val error: String)
 internal fun String.parseApiLicense(): ApiLicense = JsonHelper.jackson.readTree(this).let {
     return ApiLicense(
         licenses = it.fields().asSequence().map { entry ->
-            Vendor(entry.key) to JsonHelper.jackson.treeToValue(entry.value, License::class.java)
+            Vendor.fromKey(entry.key) to JsonHelper.jackson.treeToValue(entry.value, LicenseValue::class.java)
         }.toMap()
     )
 }

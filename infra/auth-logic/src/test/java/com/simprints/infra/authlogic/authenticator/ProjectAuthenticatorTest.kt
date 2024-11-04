@@ -174,6 +174,7 @@ class ProjectAuthenticatorTest {
             mockk(),
             mockk(),
             mockk(),
+            mockk(),
         )
         coEvery { configManager.getPrivacyNotice(any(), any()) } returns emptyFlow()
 

@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.local.models
 
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.ProjectConfiguration
 
 internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration =
@@ -15,6 +16,17 @@ internal fun ProjectConfiguration.toProto(): ProtoProjectConfiguration =
             if (face != null) it.face = face.toProto()
             if (fingerprint != null) it.fingerprint = fingerprint.toProto()
         }
+        .also {
+            if (custom != null) {
+                try {
+                    val customJson = JsonHelper.toJson(custom)
+                    it.setCustomJson(customJson)
+                } catch (_: Exception) {
+                    // It is safer to not have custom config, than broken one
+                    it.clearCustomJson()
+                }
+            }
+        }
         .build()
 
 internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration =
@@ -28,4 +40,12 @@ internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration =
         consent.toDomain(),
         identification.toDomain(),
         synchronization.toDomain(),
+        customJson?.takeIf { it.isNotBlank() }?.let {
+            try {
+                JsonHelper.fromJson(it)
+            } catch (_: Exception) {
+                // It is safer to not have custom config, than broken one
+                null
+            }
+        },
     )

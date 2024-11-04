@@ -2,11 +2,12 @@ package com.simprints.infra.config.store.models
 
 import androidx.annotation.Keep
 
+@Keep
 data class Vero2Configuration(
     val qualityThreshold: Int,
     val imageSavingStrategy: ImageSavingStrategy,
     val captureStrategy: CaptureStrategy,
-    val displayLiveFeedback: Boolean,
+    val ledsMode: LedsMode,
     val firmwareVersions: Map<String, Vero2FirmwareVersions>,
 ) {
 
@@ -22,6 +23,12 @@ data class Vero2Configuration(
         SECUGEN_ISO_1000_DPI,
         SECUGEN_ISO_1300_DPI,
         SECUGEN_ISO_1700_DPI;
+    }
+
+    enum class LedsMode {
+        BASIC,
+        LIVE_QUALITY_FEEDBACK,
+        VISUAL_SCAN_FEEDBACK;
     }
 
     @Keep
