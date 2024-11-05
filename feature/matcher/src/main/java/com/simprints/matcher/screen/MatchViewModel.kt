@@ -43,7 +43,6 @@ internal class MatchViewModel @Inject constructor(
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
         timer.postValue(true)
-        isInitialized = true
 
         val startTime = timeHelper.now()
 
