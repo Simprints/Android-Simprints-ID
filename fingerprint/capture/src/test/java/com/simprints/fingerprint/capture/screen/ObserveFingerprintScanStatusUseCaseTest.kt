@@ -28,7 +28,6 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class ObserveFingerprintScanStatusUseCaseTest {
 
-
     private lateinit var tracker: FingerprintScanningStatusTracker
 
     @RelaxedMockK
@@ -49,7 +48,6 @@ class ObserveFingerprintScanStatusUseCaseTest {
     @MockK
     private lateinit var sharedPreferences: SharedPreferences
 
-
     private lateinit var observeFingerprintScanStatus: ObserveFingerprintScanStatusUseCase
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -59,7 +57,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
         mockkStatic(MediaPlayer::class)
         mockkStatic(PreferenceManager::class)
         every { PreferenceManager.getDefaultSharedPreferences(context) } returns sharedPreferences
-        tracker = FingerprintScanningStatusTracker()
+        tracker = FingerprintScanningStatusTracker(testDispatcher)
 
         observeFingerprintScanStatus = ObserveFingerprintScanStatusUseCase(
             tracker, playAudioBeep, configManager, scannerManager, context
@@ -86,7 +84,6 @@ class ObserveFingerprintScanStatusUseCaseTest {
             coVerify { scannerManager.scanner.turnOffSmileLeds() }
 
         }
-
 
     @Test
     fun `playBeep should not be called when scan completes and audio is disabled`() =
@@ -119,39 +116,37 @@ class ObserveFingerprintScanStatusUseCaseTest {
     }
 
     @Test
-    fun `setUiGoodCapture should be called when image quality is good`() =
-        runTest(testDispatcher) {
-            // Given
-            every { sharedPreferences.getBoolean(any(), any()) } returns true
+    fun `setUiGoodCapture should be called when image quality is good`() = runTest(testDispatcher) {
+        // Given
+        every { sharedPreferences.getBoolean(any(), any()) } returns true
 
-            observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
-            // Simulate the previous state as ScanCompleted to allow UI change
-            tracker.completeScan()
+        observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
+        // Simulate the previous state as ScanCompleted to allow UI change
+        tracker.completeScan()
 
-            // When
-            tracker.setImageQualityCheckingResult(true)
-            observeFingerprintScanStatus.stopObserving()
+        // When
+        tracker.setImageQualityCheckingResult(true)
+        observeFingerprintScanStatus.stopObserving()
 
-            // Then
-            coVerify { scannerManager.scanner.setUiGoodCapture() }
-        }
+        // Then
+        coVerify { scannerManager.scanner.setUiGoodCapture() }
+    }
 
     @Test
-    fun `setUiBadCapture should be called when image quality is bad`() =
-        runTest(testDispatcher) {
-            // Given
-            every { sharedPreferences.getBoolean(any(), any()) } returns true
+    fun `setUiBadCapture should be called when image quality is bad`() = runTest(testDispatcher) {
+        // Given
+        every { sharedPreferences.getBoolean(any(), any()) } returns true
 
-            observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
-            // Simulate the previous state as ScanCompleted to allow UI change
-            tracker.completeScan()
+        observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
+        // Simulate the previous state as ScanCompleted to allow UI change
+        tracker.completeScan()
 
-            // When
-            tracker.setImageQualityCheckingResult(false)
-            observeFingerprintScanStatus.stopObserving()
-            // Then
-            coVerify { scannerManager.scanner.setUiBadCapture() }
-        }
+        // When
+        tracker.setImageQualityCheckingResult(false)
+        observeFingerprintScanStatus.stopObserving()
+        // Then
+        coVerify { scannerManager.scanner.setUiBadCapture() }
+    }
 
     @Test
     fun `turnFlashingLedsOn should be called when state is Idle and VISUAL_SCAN_FEEDBACK is enabled`() =
@@ -192,6 +187,5 @@ class ObserveFingerprintScanStatusUseCaseTest {
             // Then
             coVerify(exactly = 0) { scannerManager.scanner.turnFlashingOrangeLeds() }
         }
-
 
 }
