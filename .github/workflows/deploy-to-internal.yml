@@ -5,12 +5,8 @@ name: Deploy to Internal
 on:
     # Manual trigger for workflow dispatch (e.g., when clicking "Run workflow" button)
     workflow_dispatch:
-        branches:
-            - 'release/*'
-    # Triggered when a push occurs on branches starting with 'release/'
-    push:
-        branches:
-            - 'release/*'
+
+
 jobs:
     deploy-to-internal:
 
@@ -62,14 +58,12 @@ jobs:
             -   name: Set up signing properties
                 run: source ci/deployment/signing_properties_setup
 
-            -   name: Build the Release bundle
-                run: ./gradlew id:bundleRelease
+            -   name: Build the Release apk
+                run: ./gradlew id:assembleRelease
             -   name: Upload Release bundle
                 uses: actions/upload-artifact@v4
                 with:
-                    name: release-bundle
-                    path: id/build/outputs/bundle/release/*.aab
+                    name: release-apk
+                    path: id/build/outputs/apk/**
 
-            -   name: Publish Release bundle
-                run: ./gradlew id:publishReleaseBundle
-                continue-on-error: true
+
