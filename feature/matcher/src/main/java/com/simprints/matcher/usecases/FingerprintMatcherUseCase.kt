@@ -17,6 +17,7 @@ import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -54,7 +55,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         onLoadingCandidates(crashReportTag)
         createRanges(totalCandidates)
             .map { range ->
-                async(dispatcher) {
+                // TODO change to dispatcher from class scope
+                async(Dispatchers.IO) {
                     val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource)
                     match(samples, batchCandidates, matchParams.flowType)
                         .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->

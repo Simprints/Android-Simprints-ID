@@ -2,6 +2,8 @@ package com.simprints.matcher.screen
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isGone
@@ -29,6 +31,9 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private val viewModel: MatchViewModel by viewModels()
     private val binding by viewBinding(FragmentMatcherBinding::bind)
     private val args by navArgs<MatchFragmentArgs>()
+    private var startTime: Long = 0
+    private val handler = Handler(Looper.getMainLooper())
+    private var isRunning = false
 
     private val permissionCall = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -89,8 +94,50 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
                 is NoPermission -> renderNoPermission(matchState)
             }
         }
+        viewModel.timer.observe(viewLifecycleOwner) {
+            if(it == true){
+                startTimer()
+            } else {
+                stopTimer()
+            }
+        }
     }
 
+    override fun onPause() {
+        super.onPause()
+        stopTimer()
+    }
+
+    private fun startTimer() {
+        if (!isRunning) {
+            startTime = System.currentTimeMillis()
+            handler.post(updateTimerRunnable)
+            isRunning = true
+        }
+    }
+
+    private fun stopTimer() {
+        isRunning = false
+        handler.removeCallbacks(updateTimerRunnable)
+    }
+    // Runnable to update the timer UI every 10ms
+    private val updateTimerRunnable = object : Runnable {
+        override fun run() {
+            if (isRunning) {
+                val currentTime = System.currentTimeMillis()
+                val elapsedTime = currentTime - startTime
+                binding.timer.text = formatTime(elapsedTime)
+                handler.postDelayed(this, 10) // Update every 10ms
+            }
+        }
+    }
+    // Function to format time in mm:ss:ms
+    private fun formatTime(timeInMillis: Long): String {
+        val minutes = timeInMillis / 60000
+        val seconds = (timeInMillis % 60000) / 1000
+        val milliseconds = (timeInMillis % 1000) / 10
+        return "Time elapsed:" + String.format("%02d:%02d:%02d", minutes, seconds, milliseconds)
+    }
     private fun renderNotStarted() = binding.apply {
         binding.faceMatchPermissionRequestButton.isGone = true
         faceMatchTvMatchingProgressStatus1.isGone = true

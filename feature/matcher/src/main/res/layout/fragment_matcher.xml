@@ -7,6 +7,18 @@
     android:padding="@dimen/margin_large">
 
     <TextView
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/timer"
+        style="@style/Text.Subtitle2"
+        android:textColor="@color/simprints_red_dark"
+        android:textSize="24dp"
+        tools:text="Time lapsed: 01:11"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+    <TextView
         android:id="@+id/face_match_message"
         style="@style/Text.Subtitle2"
         android:layout_width="0dp"

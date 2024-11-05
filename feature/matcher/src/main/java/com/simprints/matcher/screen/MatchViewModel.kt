@@ -39,8 +39,12 @@ internal class MatchViewModel @Inject constructor(
     val matchResponse: LiveData<LiveDataEventWithContent<Serializable>>
         get() = _matchResponse
     private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
+    val timer = MutableLiveData<Boolean>(false)
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
+        timer.postValue(true)
+        isInitialized = true
+
         val startTime = timeHelper.now()
 
         val isFaceMatch = params.isFaceMatch()
@@ -73,6 +77,7 @@ internal class MatchViewModel @Inject constructor(
         // wait a bit for the user to see the results
         delay(matchingEndWaitTimeInMillis)
 
+        timer.postValue(false)
         _matchResponse.send(
             when {
                 isFaceMatch -> FaceMatchResult(sortedResults)

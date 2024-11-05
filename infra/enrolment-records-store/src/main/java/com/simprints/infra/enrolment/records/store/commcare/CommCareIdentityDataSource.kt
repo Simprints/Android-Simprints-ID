@@ -23,6 +23,10 @@ import com.simprints.infra.events.event.domain.models.subject.FingerprintReferen
 import com.simprints.infra.logging.Simber
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class CommCareIdentityDataSource @Inject constructor(
@@ -67,7 +71,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
             )
         }
 
-    private fun loadEnrolmentRecordCreationEvents(
+    private fun loadEnrolmentRecordCreationEvents_old(
         range: IntRange,
         callerPackageName: String,
     ): List<EnrolmentRecordCreationEvent> {
@@ -88,6 +92,38 @@ internal class CommCareIdentityDataSource @Inject constructor(
             Simber.e("Error while querying CommCare", e)
         }
 
+        return enrolmentRecordCreationEvents
+    }
+
+    private suspend fun loadEnrolmentRecordCreationEvents(
+        range: IntRange,
+        callerPackageName: String,
+    ): List<EnrolmentRecordCreationEvent> {
+
+        val ids: MutableList<String> = mutableListOf()
+        try {
+            context.contentResolver.query(
+                getCaseMetadataUri(callerPackageName), null, null, null, null
+            )?.use { caseMetadataCursor ->
+
+                if (caseMetadataCursor.moveToPosition(range.first)) {
+                    do {
+                        caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID)
+                        )?.let { caseId ->
+                            ids.add(caseId)
+                        }
+                    } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
+                }
+            }
+        } catch (e: Exception) {
+            Simber.e("COSYNC: Error while querying CommCare", e)
+        }
+        val enrolmentRecordCreationEvents: List<EnrolmentRecordCreationEvent> = withContext(Dispatchers.IO) {
+            val deferredEvents = ids.map {caseId ->
+                async { loadEnrolmentRecordCreationEvents(caseId, callerPackageName) }
+            }
+            deferredEvents.awaitAll().flatten()
+        }
         return enrolmentRecordCreationEvents
     }
 
@@ -133,28 +169,15 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 }
             }
 
-            val coSyncEnrolmentRecordEvents = subjectActions.takeIf(String::isNotEmpty)?.let {
-                try {
-                    val coSyncSerializationModule = SimpleModule().apply {
-                        addSerializer(
-                            TokenizableString::class.java,
-                            TokenizationClassNameSerializer()
-                        )
-                        addDeserializer(
-                            TokenizableString::class.java,
-                            TokenizationClassNameDeserializer()
-                        )
+            val coSyncEnrolmentRecordEvents: CoSyncEnrolmentRecordEvents? =
+                subjectActions.takeIf(String::isNotEmpty)?.let {
+                    try {
+                        return@let JsonEventParser().getRecordEvents(json = it)
+                    } catch (e: Exception) {
+                        Simber.e("Error while parsing subjectActions", e)
+                        null
                     }
-                    jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
-                        json = it,
-                        module = coSyncSerializationModule,
-                        type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {}
-                    )
-                } catch (e: Exception) {
-                    Simber.e("Error while parsing subjectActions", e)
-                    null
                 }
-            }
             coSyncEnrolmentRecordEvents?.events?.filterIsInstance<EnrolmentRecordCreationEvent>()
                 ?.let { events ->
                     caseEnrolmentRecordCreationEvents.addAll(events)
