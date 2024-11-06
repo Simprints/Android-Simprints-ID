@@ -100,8 +100,14 @@ internal class SyncViewModel @Inject constructor(
         _signOutEventLiveData.addSource(_syncCardLiveData) { cardState ->
             viewModelScope.launch {
                 val isSyncComplete = cardState is SyncComplete
-                val isProjectEnding =
+                val isProjectEnding = try {
                     configManager.getProject(authStore.signedInProjectId).state == ProjectState.PROJECT_ENDING
+                } catch (e: Throwable) {
+                    // When the device is compromised the project data will be deleted and
+                    // attempting to access project state with result in exception.
+                    // For user it is essentially the same as project ending.
+                    true
+                }
 
                 if (isSyncComplete && isProjectEnding) {
                     viewModelScope.launch {
