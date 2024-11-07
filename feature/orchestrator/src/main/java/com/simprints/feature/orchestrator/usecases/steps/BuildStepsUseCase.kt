@@ -45,7 +45,7 @@ internal class BuildStepsUseCase @Inject constructor(
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
-            buildConsentStep(ConsentType.ENROL),
+            buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
             buildCaptureAndMatchStepsForEnrol(action, projectConfiguration)
         )
 
@@ -61,7 +61,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     projectConfiguration = projectConfiguration,
                 ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
-                buildConsentStep(ConsentType.IDENTIFY),
+                buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
                 buildCaptureAndMatchStepsForIdentify(
                     action,
                     projectConfiguration,
@@ -79,7 +79,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 biometricDataSource = action.biometricDataSource,
                 callerPackageName = action.callerPackageName
             ),
-            buildConsentStep(ConsentType.VERIFY),
+            buildConsentStepIfNeeded(ConsentType.VERIFY, projectConfiguration),
             buildCaptureAndMatchStepsForVerify(action, projectConfiguration)
         )
 
@@ -253,14 +253,17 @@ internal class BuildStepsUseCase @Inject constructor(
         is BiometricDataSource.CommCare -> emptyList()
     }
 
-    private fun buildConsentStep(consentType: ConsentType) = listOf(
+    private fun buildConsentStepIfNeeded(
+        consentType: ConsentType,
+        projectConfiguration: ProjectConfiguration,
+    ) = if (projectConfiguration.consent.collectConsent) listOf(
         Step(
             id = StepId.CONSENT,
             navigationActionId = R.id.action_orchestratorFragment_to_consent,
             destinationId = ConsentContract.DESTINATION,
             payload = ConsentContract.getArgs(consentType),
         )
-    )
+    ) else emptyList()
 
     private fun buildValidateIdPoolStep(
         subjectQuery: SubjectQuery,
