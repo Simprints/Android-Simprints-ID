@@ -13,6 +13,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -33,6 +34,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
     private var qualityThreshold: Float = 0f
+    private var singleQualityFallbackCaptureRequired: Boolean = false
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -86,7 +88,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk().detector
-            qualityThreshold = configManager.getProjectConfiguration().face?.qualityThreshold ?: 0f
+
+            val config = configManager.getProjectConfiguration()
+            qualityThreshold = config.face?.qualityThreshold ?: 0f
+            singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
         }
     }
 
@@ -135,7 +140,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
-            potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
+            shouldCheckQuality() && potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
             capturingState.value == CapturingState.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
             else -> FaceDetection.Status.VALID
         }
@@ -147,6 +152,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             detectionEndTime = timeHelper.now(),
         )
     }
+
+    private fun shouldCheckQuality() = !singleQualityFallbackCaptureRequired || fallbackCapture == null
 
     /**
      * While the user has not started the capture flow, we save fallback images. If the capture doesn't
