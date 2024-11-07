@@ -28,7 +28,7 @@ truncate -s 0 build-logic/build_properties.gradle.kts
 #TODO [MS-776] DO NOT COMMIT IN MAIN
 cat <<EOF >>build-logic/build_properties.gradle.kts
 extra.apply {
-    set("VERSION_CODE", "1730973")
+    set("VERSION_CODE", 1730973)
     set("VERSION_NAME", "2024.1.5")
     set("VERSION_SUFFIX", "temp")
     set("DEBUGGABLE", $DEBUGGABLE)
