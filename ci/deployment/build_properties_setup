@@ -25,11 +25,12 @@ VERSION_CODE=$((TIMESTAMP / 1000))
 #overwrite the existing file with an empty file
 truncate -s 0 build-logic/build_properties.gradle.kts
 #Write the build properties
+#TODO [MS-776] DO NOT COMMIT IN MAIN
 cat <<EOF >>build-logic/build_properties.gradle.kts
 extra.apply {
-    set("VERSION_CODE", $VERSION_CODE)
-    set("VERSION_NAME", "$VERSION_NAME")
-    set("VERSION_SUFFIX", "$VERSION_SUFFIX")
+    set("VERSION_CODE", "1730973")
+    set("VERSION_NAME", "2024.1.5")
+    set("VERSION_SUFFIX", "temp")
     set("DEBUGGABLE", $DEBUGGABLE)
     set("DB_ENCRYPTION", $DB_ENCRYPTION)
 }
