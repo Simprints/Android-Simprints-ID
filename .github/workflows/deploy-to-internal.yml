@@ -58,12 +58,10 @@ jobs:
             -   name: Set up signing properties
                 run: source ci/deployment/signing_properties_setup
 
-            -   name: Build the Release apk
-                run: ./gradlew id:assembleRelease
+            -   name: Build the Release bundle
+                run: ./gradlew id:bundleRelease
             -   name: Upload Release bundle
                 uses: actions/upload-artifact@v4
                 with:
-                    name: release-apk
-                    path: id/build/outputs/apk/**
-
-
+                    name: release-bundle
+                    path: id/build/outputs/bundle/release/*.aab
