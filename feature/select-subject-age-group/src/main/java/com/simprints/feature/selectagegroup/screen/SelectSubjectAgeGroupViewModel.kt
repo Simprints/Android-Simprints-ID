@@ -29,10 +29,11 @@ import javax.inject.Inject
 internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    private val buildAgeGroups: BuildAgeGroupsDescriptionUseCase,
     private val configurationRepo: ConfigRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
+
+    private lateinit var buildAgeGroupDescription: BuildAgeGroupsDescriptionUseCase
 
     val finish: LiveData<LiveDataEventWithContent<AgeGroup>>
         get() = _finish
@@ -47,9 +48,13 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     private val _showExitForm =
         MutableLiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>()
 
+    fun init(factory: BuildAgeGroupsDescriptionUseCaseFactory) {
+        buildAgeGroupDescription = factory.create()
+    }
+
     fun start() = viewModelScope.launch {
         startTime = timeHelper.now()
-        val ageGroups = buildAgeGroups()
+        val ageGroups = buildAgeGroupDescription()
         // notify the adapter
         _ageGroupsDisplayModel.value = ageGroups
     }

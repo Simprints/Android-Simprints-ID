@@ -12,6 +12,7 @@ import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,9 @@ class SelectSubjectAgeGroupViewModelTest {
     @MockK
     private lateinit var buildAgeGroups: BuildAgeGroupsDescriptionUseCase
 
+    @MockK
+    private lateinit var buildAgeGroupsDescriptionUseCaseFactory: BuildAgeGroupsDescriptionUseCaseFactory
+
     @RelaxedMockK
     private lateinit var configurationRepo: ConfigRepository
 
@@ -52,13 +56,15 @@ class SelectSubjectAgeGroupViewModelTest {
         MockKAnnotations.init(this)
         coEvery { buildAgeGroups() } returns ageGroupViewModels
 
+        every { buildAgeGroupsDescriptionUseCaseFactory.create() } returns buildAgeGroups
+
         viewModel = SelectSubjectAgeGroupViewModel(
             timeHelper,
             eventRepository,
-            buildAgeGroups,
             configurationRepo,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
+        viewModel.init(buildAgeGroupsDescriptionUseCaseFactory)
     }
 
     @Test
@@ -92,6 +98,7 @@ class SelectSubjectAgeGroupViewModelTest {
         Truth.assertThat(result.titleRes).isEqualTo(R.string.exit_form_title_fingerprinting)
         Truth.assertThat(result.backButtonRes).isEqualTo(R.string.exit_form_continue_fingerprints_button)
     }
+
     @Test
     fun `test onBackPressed face modality`() = runTest {
         coEvery { configurationRepo.getProjectConfiguration().general.modalities } returns listOf(
@@ -102,8 +109,9 @@ class SelectSubjectAgeGroupViewModelTest {
 
         // Assert that the titleRes and backButtonRes are equal to the face modality
         Truth.assertThat(result.titleRes).isEqualTo(R.string.exit_form_title_face)
-        Truth.assertThat( result.backButtonRes).isEqualTo(R.string.exit_form_continue_face_button)
+        Truth.assertThat(result.backButtonRes).isEqualTo(R.string.exit_form_continue_face_button)
     }
+
     @Test
     fun `test onBackPressed multiple modalities`() = runTest {
         coEvery { configurationRepo.getProjectConfiguration().general.modalities } returns listOf(

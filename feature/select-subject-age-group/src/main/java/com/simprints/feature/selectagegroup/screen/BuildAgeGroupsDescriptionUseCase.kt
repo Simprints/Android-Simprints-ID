@@ -4,13 +4,12 @@ import android.content.Context
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
-internal class BuildAgeGroupsDescriptionUseCase @Inject constructor(
+internal class BuildAgeGroupsDescriptionUseCase(
     private val configurationRepo: ConfigRepository,
-    @ApplicationContext private val context: Context,
+    private val context: Context,
 ) {
 
     /**

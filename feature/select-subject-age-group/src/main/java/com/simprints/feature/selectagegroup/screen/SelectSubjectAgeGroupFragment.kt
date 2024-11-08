@@ -20,14 +20,20 @@ import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_group_selection) {
 
     private val viewModel: SelectSubjectAgeGroupViewModel by viewModels()
     private val binding by viewBinding(FragmentAgeGroupSelectionBinding::bind)
+
+    @Inject
+    internal lateinit var descriptionUseCaseFactory: BuildAgeGroupsDescriptionUseCaseFactory
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.init(descriptionUseCaseFactory)
 
         viewModel.ageGroups.observe(viewLifecycleOwner) { ageGroupsList ->
             fillRecyclerView(ageGroupsList)
