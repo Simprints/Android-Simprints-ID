@@ -41,7 +41,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.selectedModulesView.adapter = moduleCountAdapter
         setupClickListeners()
         observeUI()
-        viewModel.refreshInformation()
 
         findNavController().handleResult<LoginResult>(
             viewLifecycleOwner,
