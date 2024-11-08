@@ -5,11 +5,9 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.resources.R
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 
-internal class GeneralConsentTextHelper @Inject constructor(
-    @ApplicationContext val context: Context,
+internal class GeneralConsentTextHelper(
+    private val context: Context,
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed
 
@@ -116,3 +114,4 @@ internal class GeneralConsentTextHelper @Inject constructor(
         GeneralConfiguration.Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
     }
 }
+

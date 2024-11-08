@@ -6,6 +6,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
+import com.simprints.feature.consent.screens.consent.helpers.ConsentTextHelperFactory
 import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
 import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentTextHelper
 import com.simprints.feature.exitform.ExitFormResult
@@ -44,6 +45,9 @@ class ConsentViewModelTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
+    private lateinit var consentTextHelperFactory: ConsentTextHelperFactory
+
+    @MockK
     private lateinit var generalConsentTextHelper: GeneralConsentTextHelper
 
     @MockK
@@ -69,6 +73,9 @@ class ConsentViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns projectConfig
         every { projectConfig.consent } returns mockk()
 
+        every { consentTextHelperFactory.createGeneral() } returns generalConsentTextHelper
+        every { consentTextHelperFactory.createParental() } returns parentalConsentTextHelper
+
         every { timeHelper.now() } returns TIMESTAMP
         every { generalConsentTextHelper.assembleText(any(), any(), any()) } returns GENERAL_CONSENT
         every { parentalConsentTextHelper.assembleText(any(), any(), any()) } returns PARENTAL_CONSENT
@@ -77,10 +84,9 @@ class ConsentViewModelTest {
             timeHelper,
             configManager,
             eventRepository,
-            generalConsentTextHelper,
-            parentalConsentTextHelper,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
+        vm.init(consentTextHelperFactory)
     }
 
     @Test
@@ -210,6 +216,7 @@ class ConsentViewModelTest {
     }
 
     companion object {
+
         private val TIMESTAMP = Timestamp(1L)
         private const val GENERAL_CONSENT = "General consent"
         private const val PARENTAL_CONSENT = "Parental consent"

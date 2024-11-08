@@ -10,6 +10,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
+import com.simprints.feature.consent.screens.consent.helpers.ConsentTextHelperFactory
 import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
 import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentTextHelper
 import com.simprints.feature.exitform.ExitFormConfigurationBuilder
@@ -33,12 +34,13 @@ internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
-    private val generalConsentTextHelper: GeneralConsentTextHelper,
-    private val parentalConsentTextHelper: ParentalConsentTextHelper,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     private val startConsentEventTime = timeHelper.now()
+
+    private lateinit var generalConsentTextHelper: GeneralConsentTextHelper
+    private lateinit var parentalConsentTextHelper: ParentalConsentTextHelper
 
     val viewState: LiveData<ConsentViewState>
         get() = _viewState
@@ -52,6 +54,11 @@ internal class ConsentViewModel @Inject constructor(
     val returnConsentResult: LiveData<LiveDataEventWithContent<Serializable>>
         get() = _returnConsentResult
     private val _returnConsentResult = MutableLiveData<LiveDataEventWithContent<Serializable>>()
+
+    fun init(textHelperFactory: ConsentTextHelperFactory) {
+        generalConsentTextHelper = textHelperFactory.createGeneral()
+        parentalConsentTextHelper = textHelperFactory.createParental()
+    }
 
     fun loadConfiguration(consentType: ConsentType) {
         viewModelScope.launch {
@@ -89,7 +96,7 @@ internal class ConsentViewModel @Inject constructor(
     private fun mapConfigToViewState(
         projectConfig: ProjectConfiguration,
         consentType: ConsentType,
-        selectedTabIndex: Int
+        selectedTabIndex: Int,
     ): ConsentViewState {
         val allowParentalConsent = projectConfig.consent.allowParentalConsent
 
@@ -108,7 +115,7 @@ internal class ConsentViewModel @Inject constructor(
 
     private fun saveConsentEvent(
         currentConsentTab: ConsentTab,
-        result: ConsentEvent.ConsentPayload.Result
+        result: ConsentEvent.ConsentPayload.Result,
     ) = externalScope.launch {
         eventRepository.addOrUpdateEvent(ConsentEvent(
             startConsentEventTime,

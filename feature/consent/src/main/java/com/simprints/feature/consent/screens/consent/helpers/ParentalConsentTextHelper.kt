@@ -5,11 +5,15 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.resources.R
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-internal class ParentalConsentTextHelper @Inject constructor(
-    @ApplicationContext val context: Context
+internal class ParentalConsentTextHelper(
+    private val context: Context
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed
 
