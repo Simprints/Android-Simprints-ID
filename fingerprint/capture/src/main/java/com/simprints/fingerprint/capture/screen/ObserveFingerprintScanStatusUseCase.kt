@@ -65,7 +65,7 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
 
     private suspend fun turnFlashingLedsOn() {
         if (ledsMode == VISUAL_SCAN_FEEDBACK) {
-            scannerManager.scanner.turnFlashingOrangeLeds()
+            scannerManager.scanner.turnFlashingWhiteLeds()
         }
     }
 

@@ -310,7 +310,7 @@ internal class ScannerWrapperV2Test {
     fun `should set smile leds to flashing white when calling turnFlashingOrangeLeds`() = runTest {
         every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
 
-        scannerWrapper.turnFlashingOrangeLeds()
+        scannerWrapper.turnFlashingWhiteLeds()
 
         verify { scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()) }
     }

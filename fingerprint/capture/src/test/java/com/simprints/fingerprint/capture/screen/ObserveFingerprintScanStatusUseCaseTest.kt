@@ -165,7 +165,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
             tracker.resetToIdle()
 
             // Then
-            coVerify { scannerManager.scanner.turnFlashingOrangeLeds() }
+            coVerify { scannerManager.scanner.turnFlashingWhiteLeds() }
         }
 
     @Test
@@ -185,7 +185,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
             tracker.resetToIdle()
 
             // Then
-            coVerify(exactly = 0) { scannerManager.scanner.turnFlashingOrangeLeds() }
+            coVerify(exactly = 0) { scannerManager.scanner.turnFlashingWhiteLeds() }
         }
 
 }
