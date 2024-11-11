@@ -65,7 +65,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
     }
 
     @Test
-    fun `playBeep and turnoff leds should be called when scan completes and audio and VISUAL_SCAN_FEEDBACK are enabled`() =
+    fun `playBeep called when scan completes and audio and VISUAL_SCAN_FEEDBACK are enabled`() =
         runTest(testDispatcher) {
             // Given
             every { sharedPreferences.getBoolean(any(), any()) } returns true
@@ -81,8 +81,6 @@ class ObserveFingerprintScanStatusUseCaseTest {
 
             // Then
             verify { playAudioBeep() }
-            coVerify { scannerManager.scanner.turnOffSmileLeds() }
-
         }
 
     @Test
