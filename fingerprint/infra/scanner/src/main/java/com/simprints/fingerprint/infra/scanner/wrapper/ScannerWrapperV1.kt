@@ -171,7 +171,7 @@ internal class ScannerWrapperV1(
             scannerV1.unregisterButtonListener(it)
         }
     }
-    override suspend fun turnFlashingOrangeLeds(){
+    override suspend fun turnOnFlashingWhiteSmileLeds(){
         // While LED manipulation is supported in Vero1, it is not currently required.
     }
 

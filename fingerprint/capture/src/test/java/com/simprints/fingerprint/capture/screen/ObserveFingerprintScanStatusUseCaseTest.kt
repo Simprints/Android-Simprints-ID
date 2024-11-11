@@ -65,7 +65,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
     }
 
     @Test
-    fun `playBeep and turnoff leds should be called when scan completes and audio and VISUAL_SCAN_FEEDBACK are enabled`() =
+    fun `playBeep called when scan completes and audio and VISUAL_SCAN_FEEDBACK are enabled`() =
         runTest(testDispatcher) {
             // Given
             every { sharedPreferences.getBoolean(any(), any()) } returns true
@@ -81,8 +81,6 @@ class ObserveFingerprintScanStatusUseCaseTest {
 
             // Then
             verify { playAudioBeep() }
-            coVerify { scannerManager.scanner.turnOffSmileLeds() }
-
         }
 
     @Test
@@ -149,7 +147,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
     }
 
     @Test
-    fun `turnFlashingLedsOn should be called when state is Idle and VISUAL_SCAN_FEEDBACK is enabled`() =
+    fun `turnOnFlashingWhiteSmileLeds should be called when state is Idle and VISUAL_SCAN_FEEDBACK is enabled`() =
         runTest(testDispatcher) {
             // Given
             every { sharedPreferences.getBoolean(any(), any()) } returns true
@@ -165,11 +163,11 @@ class ObserveFingerprintScanStatusUseCaseTest {
             tracker.resetToIdle()
 
             // Then
-            coVerify { scannerManager.scanner.turnFlashingOrangeLeds() }
+            coVerify { scannerManager.scanner.turnOnFlashingWhiteSmileLeds() }
         }
 
     @Test
-    fun `turnFlashingLedsOn should not be called when state is Idle and LIVE_QUALITY_FEEDBACK is enabled`() =
+    fun `turnOnFlashingWhiteSmileLeds should not be called when state is Idle and LIVE_QUALITY_FEEDBACK is enabled`() =
         runTest(testDispatcher) {
             // Given
             every { sharedPreferences.getBoolean(any(), any()) } returns true
@@ -185,7 +183,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
             tracker.resetToIdle()
 
             // Then
-            coVerify(exactly = 0) { scannerManager.scanner.turnFlashingOrangeLeds() }
+            coVerify(exactly = 0) { scannerManager.scanner.turnOnFlashingWhiteSmileLeds() }
         }
 
 }

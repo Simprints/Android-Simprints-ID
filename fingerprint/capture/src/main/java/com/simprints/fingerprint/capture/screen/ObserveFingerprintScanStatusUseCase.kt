@@ -49,9 +49,9 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
 
     private suspend fun provideFeedback(state: FingerprintScanState) {
         when (state) {
-            is FingerprintScanState.Idle -> turnFlashingLedsOn()
-            is FingerprintScanState.Scanning -> turnFlashingLedsOn()
-            is FingerprintScanState.ScanCompleted -> setUiToRemoveFinger()
+            is FingerprintScanState.Idle -> turnOnFlashingWhiteSmileLeds()
+            is FingerprintScanState.Scanning -> turnOffSmileLeds()
+            is FingerprintScanState.ScanCompleted -> playRemoveFingerAudio()
             is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
             is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
         }
@@ -63,9 +63,15 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
         observeJob = null
     }
 
-    private suspend fun turnFlashingLedsOn() {
+    private suspend fun turnOnFlashingWhiteSmileLeds() {
         if (ledsMode == VISUAL_SCAN_FEEDBACK) {
-            scannerManager.scanner.turnFlashingOrangeLeds()
+            scannerManager.scanner.turnOnFlashingWhiteSmileLeds()
+        }
+    }
+
+    private suspend fun turnOffSmileLeds() {
+        if (ledsMode == VISUAL_SCAN_FEEDBACK) {
+            scannerManager.scanner.turnOffSmileLeds()
         }
     }
 
@@ -84,15 +90,11 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
         }
     }
 
-    private suspend fun setUiToRemoveFinger() {
+    private fun playRemoveFingerAudio() {
         // Verify that the previous state was not "ScanCompleted" to prevent the sound from playing twice.
         if (previousState == FingerprintScanState.ScanCompleted) return
 
         if (isAudioEnabled()) playAudioBeep()
-
-        if (ledsMode == VISUAL_SCAN_FEEDBACK) {
-            scannerManager.scanner.turnOffSmileLeds()
-        }
     }
 
     private fun isAudioEnabled() = preference.getBoolean(AUDIO_PREFERENCE_KEY, false)
