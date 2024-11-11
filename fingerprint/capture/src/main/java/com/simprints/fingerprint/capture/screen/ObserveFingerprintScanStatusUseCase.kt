@@ -49,7 +49,7 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
 
     private suspend fun provideFeedback(state: FingerprintScanState) {
         when (state) {
-            is FingerprintScanState.Idle -> turnFlashingLedsOn()
+            is FingerprintScanState.Idle -> turnOnFlashingWhiteSmileLeds()
             is FingerprintScanState.Scanning -> turnOffSmileLeds()
             is FingerprintScanState.ScanCompleted -> playRemoveFingerAudio()
             is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
@@ -63,9 +63,9 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
         observeJob = null
     }
 
-    private suspend fun turnFlashingLedsOn() {
+    private suspend fun turnOnFlashingWhiteSmileLeds() {
         if (ledsMode == VISUAL_SCAN_FEEDBACK) {
-            scannerManager.scanner.turnFlashingWhiteLeds()
+            scannerManager.scanner.turnOnFlashingWhiteSmileLeds()
         }
     }
 

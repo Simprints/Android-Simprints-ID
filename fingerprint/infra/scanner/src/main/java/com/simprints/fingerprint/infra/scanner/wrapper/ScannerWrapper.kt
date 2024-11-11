@@ -45,7 +45,7 @@ interface ScannerWrapper {
     fun versionInformation(): ScannerVersion
     fun batteryInformation(): BatteryInfo
 
-    suspend fun turnFlashingWhiteLeds()
+    suspend fun turnOnFlashingWhiteSmileLeds()
     suspend fun setUiGoodCapture()
     suspend fun setUiBadCapture()
 }

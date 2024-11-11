@@ -207,7 +207,7 @@ internal class ScannerWrapperV2(
         }
     }
 
-    override suspend fun turnFlashingWhiteLeds(): Unit = withContext(ioDispatcher) {
+    override suspend fun turnOnFlashingWhiteSmileLeds(): Unit = withContext(ioDispatcher) {
         scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()).onErrorComplete().await()
     }
 
