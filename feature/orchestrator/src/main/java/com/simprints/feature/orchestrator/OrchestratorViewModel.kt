@@ -82,8 +82,11 @@ internal class OrchestratorViewModel @Inject constructor(
         actionRequest = action
 
         try {
-            steps = stepsBuilder.build(action, projectConfiguration)
-        } catch (e: SubjectAgeNotSupportedException) {
+            // In case of a follow-up action, we should restore completed steps from cache
+            // and add new ones to the list. This way all session steps are available throughout
+            // the app for reference (i.e. have we already captured face in this session?)
+            steps = cache.steps + stepsBuilder.build(action, projectConfiguration)
+        } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
             return@launch
         }
@@ -176,8 +179,7 @@ internal class OrchestratorViewModel @Inject constructor(
         if (step.id == StepId.ENROL_LAST_BIOMETRIC) {
             step.payload.getParcelable<EnrolLastBiometricParams>("params")?.let { params ->
                 val updatedParams = params.copy(
-                    //TODO: don't forget to update this when MS-790 is merged
-                    steps = params.steps + mapStepsForLastBiometrics(steps.mapNotNull { it.result })
+                    steps = mapStepsForLastBiometrics(steps.mapNotNull { it.result })
                 )
                 step.payload = EnrolLastBiometricContract.getArgs(
                     projectId = updatedParams.projectId,
