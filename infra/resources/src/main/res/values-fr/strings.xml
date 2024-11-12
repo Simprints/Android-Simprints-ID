@@ -381,7 +381,7 @@
     <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Activer ou désactiver les alertes audio lorsqu\'une analyse d\'empreintes digitales est terminée, avertissant l\'utilisateur de retirer sa main du scanner.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copié dans le presse-papier</string>
     <string name="dashboard_preference_update_config_scheduled">Mise à jour de la configuration démarrée</string>
-    <string name="dashboard_preference_enable_audio_on_scan_complete">Audio sur la fin du scan des empreintes digitales</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">Alerte Sonore</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Informations sur la synchronisation</string>
