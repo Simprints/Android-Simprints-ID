@@ -33,8 +33,6 @@ internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
-    private val generalConsentTextHelper: GeneralConsentTextHelper,
-    private val parentalConsentTextHelper: ParentalConsentTextHelper,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -95,14 +93,18 @@ internal class ConsentViewModel @Inject constructor(
 
         return ConsentViewState(
             showLogo = projectConfig.consent.displaySimprintsLogo,
-            consentText = generalConsentTextHelper
-                .assembleText(projectConfig.consent, projectConfig.general.modalities, consentType),
             showParentalConsent = allowParentalConsent,
-            parentalConsentText = parentalConsentTextHelper
-                .takeIf { allowParentalConsent }
-                ?.assembleText(projectConfig.consent, projectConfig.general.modalities, consentType)
-                .orEmpty(),
-            selectedTab = selectedTabIndex
+            consentTextBuilder = GeneralConsentTextHelper(
+                projectConfig.consent,
+                projectConfig.general.modalities,
+                consentType,
+            ),
+            parentalTextBuilder = if (allowParentalConsent) ParentalConsentTextHelper(
+                projectConfig.consent,
+                projectConfig.general.modalities,
+                consentType,
+            ) else null,
+            selectedTab = selectedTabIndex,
         )
     }
 
@@ -110,12 +112,14 @@ internal class ConsentViewModel @Inject constructor(
         currentConsentTab: ConsentTab,
         result: ConsentEvent.ConsentPayload.Result
     ) = externalScope.launch {
-        eventRepository.addOrUpdateEvent(ConsentEvent(
-            startConsentEventTime,
-            timeHelper.now(),
-            currentConsentTab.asEventPayload(),
-            result
-        ))
+        eventRepository.addOrUpdateEvent(
+            ConsentEvent(
+                startConsentEventTime,
+                timeHelper.now(),
+                currentConsentTab.asEventPayload(),
+                result
+            )
+        )
     }
 
     private fun getExitFormFromModalities(modalities: List<GeneralConfiguration.Modality>) = when {

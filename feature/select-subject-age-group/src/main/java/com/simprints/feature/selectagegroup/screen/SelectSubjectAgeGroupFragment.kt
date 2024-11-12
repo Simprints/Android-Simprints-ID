@@ -62,7 +62,7 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
         }
     }
 
-    private fun fillRecyclerView(ageGroupsList: List<AgeGroupDisplayModel>) {
+    private fun fillRecyclerView(ageGroupsList: List<AgeGroup>) {
         with(binding.ageGroupRecyclerView) {
             layoutManager = LinearLayoutManager(requireContext())
             val dividerItemDecoration = DividerItemDecoration(
@@ -70,7 +70,7 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
             )
             this.addItemDecoration(dividerItemDecoration)
             adapter = AgeGroupAdapter(ageGroupsList) { ageGroup ->
-                viewModel.saveAgeGroupSelection(ageGroup.range)
+                viewModel.saveAgeGroupSelection(ageGroup)
             }
         }
     }
