@@ -31,7 +31,7 @@ class SelectSubjectAgeGroupViewModelTest {
     private lateinit var eventRepository: SessionEventRepository
 
     @MockK
-    private lateinit var buildAgeGroups: BuildAgeGroupsDescriptionUseCase
+    private lateinit var buildAgeGroups: BuildAgeGroupsUseCase
 
     @RelaxedMockK
     private lateinit var configurationRepo: ConfigRepository
@@ -43,8 +43,8 @@ class SelectSubjectAgeGroupViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val ageGroupViewModels = listOf(
-        AgeGroupDisplayModel("0-6 months", AgeGroup(0, 6)),
-        AgeGroupDisplayModel("6-12 months", AgeGroup(6, 12)),
+        AgeGroup(0, 6),
+        AgeGroup(6, 12),
     )
 
     @Before
@@ -72,7 +72,7 @@ class SelectSubjectAgeGroupViewModelTest {
     @Test
     fun `test saveAgeGroupSelection`() = runTest {
         viewModel.start()
-        val selectedAgeGroup = ageGroupViewModels.first().range
+        val selectedAgeGroup = ageGroupViewModels.first()
         viewModel.saveAgeGroupSelection(selectedAgeGroup)
         val result = viewModel.finish.test().value()
         Truth.assertThat(result.peekContent())
