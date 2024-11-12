@@ -3,6 +3,7 @@ package com.simprints.fingerprint.infra.scanner.capture
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -14,7 +15,7 @@ class FingerprintScanningStatusTrackerTest {
 
     @Before
     fun setup() {
-        tracker = FingerprintScanningStatusTracker()
+        tracker = FingerprintScanningStatusTracker(UnconfinedTestDispatcher())
     }
 
     @Test

@@ -237,6 +237,7 @@ internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBu
 
 internal val apiGeneralConfiguration = ApiGeneralConfiguration(
     listOf(ApiGeneralConfiguration.Modality.FACE),
+    listOf(ApiGeneralConfiguration.Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -245,6 +246,7 @@ internal val apiGeneralConfiguration = ApiGeneralConfiguration(
 )
 
 internal val generalConfiguration = GeneralConfiguration(
+    listOf(GeneralConfiguration.Modality.FACE),
     listOf(GeneralConfiguration.Modality.FACE),
     listOf("en"),
     "en",
@@ -255,6 +257,7 @@ internal val generalConfiguration = GeneralConfiguration(
 
 internal val protoGeneralConfiguration = ProtoGeneralConfiguration.newBuilder()
     .addModalities(ProtoGeneralConfiguration.Modality.FACE)
+    .addMatchingModalities(ProtoGeneralConfiguration.Modality.FACE)
     .addLanguageOptions("en")
     .setDefaultLanguage("en")
     .setCollectLocation(true)

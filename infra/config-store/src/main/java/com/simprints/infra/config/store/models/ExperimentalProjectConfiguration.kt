@@ -13,7 +13,13 @@ data class ExperimentalProjectConfiguration(
             ?.let { it as? Boolean }
             .let { it == true }
 
+    val singleQualityFallbackRequired: Boolean
+        get() = customConfig?.get(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED)
+            ?.let { it as? Boolean }
+            .let { it == true }
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
+        internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
     }
 }

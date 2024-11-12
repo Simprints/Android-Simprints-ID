@@ -9,7 +9,7 @@ package com.simprints.fingerprint.infra.scanner.v2.tools.accumulator
  * @param buildElement how to subsequently build an [Element] from a ByteArray
  */
 abstract class ByteArrayAccumulator<in Fragment, Element>(
-    inline val fragmentAsByteArray: (Fragment) -> ByteArray,
+    val fragmentAsByteArray: (Fragment) -> ByteArray,
     canComputeElementLength: (ByteArray) -> Boolean,
     computeElementLength: (ByteArray) -> Int,
     buildElement: (ByteArray) -> Element

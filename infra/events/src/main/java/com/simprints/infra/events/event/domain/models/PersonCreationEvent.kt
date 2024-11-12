@@ -53,6 +53,10 @@ data class PersonCreationEvent(
         override val type: EventType = PERSON_CREATION,
     ) : EventPayload()
 
+    fun hasFingerprintReference() = payload.fingerprintReferenceId != null
+    fun hasFaceReference() = payload.faceReferenceId != null
+    fun hasBiometricData() = hasFingerprintReference() || hasFaceReference()
+
     companion object {
 
         const val EVENT_VERSION = 2

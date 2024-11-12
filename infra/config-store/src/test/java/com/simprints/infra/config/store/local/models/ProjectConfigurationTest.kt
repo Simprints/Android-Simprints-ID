@@ -16,9 +16,9 @@ class ProjectConfigurationTest {
 
     @Test
     fun `should ignore broken custom config model`() {
-        assertThat(protoProjectConfiguration.let {
-            it.toBuilder().setCustomJson("{").build()
-        }.toDomain()).isEqualTo(
+        assertThat(
+            protoProjectConfiguration.toBuilder().setCustomJson("{").build().toDomain()
+        ).isEqualTo(
             projectConfiguration.copy(custom = null)
         )
 
@@ -26,7 +26,7 @@ class ProjectConfigurationTest {
             // custom map contains class that Jackson cannot convert to string
             projectConfiguration.copy(custom = mapOf("test" to InputStream.nullInputStream())).toProto()
         ).isEqualTo(
-            protoProjectConfiguration.let { it.toBuilder().clearCustomJson().build() }
+            protoProjectConfiguration.toBuilder().clearCustomJson().build()
         )
     }
 }

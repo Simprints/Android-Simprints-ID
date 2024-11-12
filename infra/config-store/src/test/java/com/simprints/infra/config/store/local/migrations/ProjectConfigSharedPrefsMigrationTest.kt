@@ -459,6 +459,12 @@ class ProjectConfigSharedPrefsMigrationTest {
                     ProtoGeneralConfiguration.Modality.FINGERPRINT
                 )
             )
+            .addAllMatchingModalities(
+                listOf(
+                    ProtoGeneralConfiguration.Modality.FACE,
+                    ProtoGeneralConfiguration.Modality.FINGERPRINT
+                )
+            )
             .addAllLanguageOptions(listOf("en", "fr", "pt"))
             .setDefaultLanguage("en")
             .setCollectLocation(true)
