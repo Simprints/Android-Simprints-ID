@@ -48,11 +48,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName())
-        .filter { erce -> erce.payload.biometricReferences.any { it is FingerprintReference } }
-        .map {
-            FingerprintIdentity(
-                it.payload.subjectId,
+    ): List<FingerprintIdentity> =
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName()).filter { erce ->
+            erce.payload.biometricReferences.any {
+                it is FingerprintReference && it.format == query.fingerprintSampleFormat
+            }
+        }.map {
+            FingerprintIdentity(it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FingerprintReference>()
                     .flatMap { fingerprintReference ->
                         fingerprintReference.templates.map { fingerprintTemplate ->
@@ -63,27 +65,36 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 format = fingerprintReference.format,
                             )
                         }
-                    }
-            )
+                    })
         }
 
     private fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
         callerPackageName: String,
     ): List<EnrolmentRecordCreationEvent> {
-        val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
+        val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> =
+            mutableListOf()
 
         try {
             context.contentResolver.query(
-                getCaseMetadataUri(callerPackageName), null, null, null, null)?.use { caseMetadataCursor ->
-                    if (caseMetadataCursor.moveToPosition(range.first)) {
-                        do {
-                            caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName))
-                            }
-                        } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
-                    }
+                getCaseMetadataUri(callerPackageName), null, null, null, null
+            )?.use { caseMetadataCursor ->
+                if (caseMetadataCursor.moveToPosition(range.first)) {
+                    do {
+                        caseMetadataCursor.getString(
+                            caseMetadataCursor.getColumnIndexOrThrow(
+                                COLUMN_CASE_ID
+                            )
+                        )?.let { caseId ->
+                            enrolmentRecordCreationEvents.addAll(
+                                loadEnrolmentRecordCreationEvents(
+                                    caseId, callerPackageName
+                                )
+                            )
+                        }
+                    } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
                 }
+            }
         } catch (e: Exception) {
             Simber.e("Error while querying CommCare", e)
         }
@@ -95,11 +106,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName())
-        .filter { erce -> erce.payload.biometricReferences.any { it is FaceReference } }
-        .map {
-            FaceIdentity(
-                it.payload.subjectId,
+    ): List<FaceIdentity> =
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName()).filter { erce ->
+            erce.payload.biometricReferences.any {
+                it is FaceReference && it.format == query.faceSampleFormat
+            }
+        }.map {
+            FaceIdentity(it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FaceReference>()
                     .flatMap { faceReference ->
                         faceReference.templates.map { faceTemplate ->
@@ -108,8 +121,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 format = faceReference.format,
                             )
                         }
-                    }
-            )
+                    })
         }
 
     private fun loadEnrolmentRecordCreationEvents(
@@ -137,19 +149,15 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 try {
                     val coSyncSerializationModule = SimpleModule().apply {
                         addSerializer(
-                            TokenizableString::class.java,
-                            TokenizationClassNameSerializer()
+                            TokenizableString::class.java, TokenizationClassNameSerializer()
                         )
                         addDeserializer(
-                            TokenizableString::class.java,
-                            TokenizationClassNameDeserializer()
+                            TokenizableString::class.java, TokenizationClassNameDeserializer()
                         )
                     }
-                    jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
-                        json = it,
+                    jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(json = it,
                         module = coSyncSerializationModule,
-                        type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {}
-                    )
+                        type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {})
                 } catch (e: Exception) {
                     Simber.e("Error while parsing subjectActions", e)
                     null
@@ -171,9 +179,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
     ): Int {
         var count = 0
-        context.contentResolver
-            .query(getCaseMetadataUri(dataSource.callerPackageName()), null, null, null, null)
-            ?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
+        context.contentResolver.query(
+            getCaseMetadataUri(dataSource.callerPackageName()), null, null, null, null
+        )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
 
         return count
     }
