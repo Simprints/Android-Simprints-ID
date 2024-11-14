@@ -7,6 +7,26 @@
     android:background="@color/simprints_blue">
 
     <TextView
+        android:id="@+id/alertExportButton"
+        style="@style/Text.Caption.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
+        android:drawablePadding="4dp"
+        android:gravity="center"
+        android:maxLines="2"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="16dp"
+        android:textAllCaps="true"
+        android:text="@string/alert_export_data"
+        app:drawableStartCompat="@drawable/ic_copy"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/alertTitle"
         style="@style/Text.Headline5.White.Bold"
         android:layout_width="0dp"
