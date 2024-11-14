@@ -129,6 +129,33 @@ internal class CreatePersonEventUseCaseTest {
             }
         }
 
+    @Test
+    fun `Uses face from latest PersonCreationEvent (if more than one) if missing in current callout captures`() =
+        runTest {
+            coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+                mockk<PersonCreationEvent> {
+                    every { payload.faceCaptureIds } returns listOf(FACE_CAPTURE_ID)
+                    every { payload.faceReferenceId } returns FACE_REFERENCE_ID
+                    every { payload.createdAt } returns Timestamp(2L)
+                },
+                mockk<PersonCreationEvent> {
+                    every { payload.faceCaptureIds } returns listOf("anotherFaceCaptureId")
+                    every { payload.faceReferenceId } returns "anotherFaceReferenceId"
+                    every { payload.createdAt } returns Timestamp(1L)
+                },
+            )
+
+            useCase(listOf(FingerprintCaptureResult(listOf(createFingerprintCaptureResultItem()))))
+
+            coVerify {
+                eventRepository.addOrUpdateEvent(withArg<PersonCreationEvent> {
+                    assertThat(it.payload.fingerprintCaptureIds).isEqualTo(listOf(FINGER_CAPTURE_ID))
+                    assertThat(it.payload.faceCaptureIds).isEqualTo(listOf(FACE_CAPTURE_ID))
+                    assertThat(it.payload.faceReferenceId).isEqualTo(FACE_REFERENCE_ID)
+                })
+            }
+        }
+
     private fun createFingerprintCaptureResultItem() = FingerprintCaptureResult.Item(
         captureEventId = FINGER_CAPTURE_ID,
         identifier = IFingerIdentifier.RIGHT_THUMB,
