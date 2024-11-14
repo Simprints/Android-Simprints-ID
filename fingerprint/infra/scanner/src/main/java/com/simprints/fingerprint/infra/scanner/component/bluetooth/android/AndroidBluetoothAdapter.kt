@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 
-internal class AndroidBluetoothAdapter(private val adapter: BluetoothAdapter?) : ComponentBluetoothAdapter {
+class AndroidBluetoothAdapter(private val adapter: BluetoothAdapter?) : ComponentBluetoothAdapter {
 
     override fun isNull(): Boolean = adapter == null
 
