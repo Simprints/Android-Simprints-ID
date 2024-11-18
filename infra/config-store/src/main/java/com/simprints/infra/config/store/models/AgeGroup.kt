@@ -3,9 +3,11 @@ package com.simprints.infra.config.store.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.io.Serializable
 
 @Keep
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 data class AgeGroup(
     @JsonProperty("startInclusive") val startInclusive: Int,
     @JsonProperty("endExclusive") val endExclusive: Int?,

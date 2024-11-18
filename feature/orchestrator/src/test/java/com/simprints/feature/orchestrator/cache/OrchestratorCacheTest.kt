@@ -117,6 +117,18 @@ class OrchestratorCacheTest {
 
         val json = realJsonHelper.toJson(originalAgeGroup)
 
-        assertThat(json).isEqualTo("{\"startInclusive\":0,\"endExclusive\":1}")
+        assertThat(json).isEqualTo("{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}")
+    }
+
+    @Test
+    fun `AgeGroup is deserialized correctly by Jackson`() {
+        val realJsonHelper = JsonHelper
+        val originalAgeGroup = AgeGroup(startInclusive = 0, endExclusive = 1)
+
+        val json = "{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}"
+
+        val result = realJsonHelper.fromJson(json, object : TypeReference<AgeGroup>() {})
+
+        assertThat(result).isEqualTo(originalAgeGroup)
     }
 }
