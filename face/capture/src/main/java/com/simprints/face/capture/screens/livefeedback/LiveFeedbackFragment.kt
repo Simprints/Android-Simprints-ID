@@ -14,6 +14,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -23,7 +24,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.work.await
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
@@ -117,13 +117,13 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
         // Preview
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
-        val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
+        val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(
             this@LiveFeedbackFragment, DEFAULT_BACK_CAMERA, preview, imageAnalyzer
         )
         // Attach the view's surface provider to preview use case
-        preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
+        preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
     }
 
     override fun onResume() {

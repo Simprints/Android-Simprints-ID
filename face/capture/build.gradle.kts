@@ -33,7 +33,7 @@ dependencies {
     implementation(project(":face:infra:bio-sdk-resolver"))
 
     implementation(libs.androidX.cameraX.core)
-    api(libs.androidX.cameraX.lifecycle)
+    implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)
     implementation(libs.workManager.work)
 

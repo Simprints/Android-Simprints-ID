@@ -157,7 +157,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     }
 
     private fun getLastSyncId(): String? {
-        return syncWorkers.last()?.getUniqueSyncId()
+        return syncWorkers.last().getUniqueSyncId()
     }
 
     private fun isSyncRunning(): Boolean = !getWorkInfoForRunningSyncWorkers().isNullOrEmpty()
