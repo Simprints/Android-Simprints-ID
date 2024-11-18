@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.models
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
 
@@ -9,6 +10,7 @@ data class AgeGroup(
     @JsonProperty("startInclusive") val startInclusive: Int,
     @JsonProperty("endExclusive") val endExclusive: Int?,
 ) : Serializable {
+    @JsonIgnore // prevents Jackson isEmpty unwanted serialization bug, see https://stackoverflow.com/questions/69616587/why-does-jackson-add-an-empty-false-into-the-json
     fun isEmpty() = startInclusive == 0 && (endExclusive == null || endExclusive == 0)
 
     fun includes(age: Int): Boolean {
