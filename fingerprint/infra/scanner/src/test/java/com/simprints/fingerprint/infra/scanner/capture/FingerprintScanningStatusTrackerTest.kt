@@ -3,9 +3,7 @@ package com.simprints.fingerprint.infra.scanner.capture
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -13,13 +11,10 @@ class FingerprintScanningStatusTrackerTest {
 
     private lateinit var tracker: FingerprintScanningStatusTracker
 
-    @Before
-    fun setup() {
-        tracker = FingerprintScanningStatusTracker(UnconfinedTestDispatcher())
-    }
 
     @Test
     fun `startScanning emits Scanning state`() = runTest {
+        tracker = FingerprintScanningStatusTracker(this)
         val job = launch {
             tracker.state.collect { state->
                 assertThat(state).isEqualTo(FingerprintScanState.Scanning)
@@ -31,6 +26,7 @@ class FingerprintScanningStatusTrackerTest {
 
     @Test
     fun `completeScan emits ScanCompleted state`() = runTest {
+        tracker = FingerprintScanningStatusTracker(this)
         val job = launch {
             tracker.state.collect { state->
                 assertThat(state).isEqualTo(FingerprintScanState.ScanCompleted)
@@ -43,6 +39,7 @@ class FingerprintScanningStatusTrackerTest {
 
     @Test
     fun `setImageQualityCheckingResult emits Good state when quality is OK`() = runTest {
+        tracker = FingerprintScanningStatusTracker(this)
         val job = launch {
             tracker.state.collect { state->
                 assertThat(state).isEqualTo(FingerprintScanState.ImageQualityChecking.Good)
@@ -55,6 +52,7 @@ class FingerprintScanningStatusTrackerTest {
 
     @Test
     fun `setImageQualityCheckingResult emits Bad state when quality is not OK`() = runTest {
+        tracker = FingerprintScanningStatusTracker(this)
         val job = launch {
             tracker.state.collect { state->
                 assertThat(state).isEqualTo(FingerprintScanState.ImageQualityChecking.Bad)
@@ -67,6 +65,7 @@ class FingerprintScanningStatusTrackerTest {
 
     @Test
     fun `resetToIdle emits Idle state`() = runTest {
+        tracker = FingerprintScanningStatusTracker(this)
         val job = launch {
             tracker.state.collect { state->
                 assertThat(state).isEqualTo(FingerprintScanState.Idle)

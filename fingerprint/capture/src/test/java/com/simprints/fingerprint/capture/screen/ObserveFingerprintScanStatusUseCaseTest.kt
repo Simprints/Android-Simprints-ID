@@ -19,6 +19,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockkStatic
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -57,7 +58,7 @@ class ObserveFingerprintScanStatusUseCaseTest {
         mockkStatic(MediaPlayer::class)
         mockkStatic(PreferenceManager::class)
         every { PreferenceManager.getDefaultSharedPreferences(context) } returns sharedPreferences
-        tracker = FingerprintScanningStatusTracker(testDispatcher)
+        tracker = FingerprintScanningStatusTracker(CoroutineScope(testDispatcher))
 
         observeFingerprintScanStatus = ObserveFingerprintScanStatusUseCase(
             tracker, playAudioBeep, configManager, scannerManager, context

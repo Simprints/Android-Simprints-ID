@@ -16,7 +16,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.preference.PreferenceManager
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 @Singleton
 class ObserveFingerprintScanStatusUseCase @Inject constructor(
@@ -40,20 +43,22 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
                 fingerprintSdk
             )?.vero2?.ledsMode
             statusTracker.state.collect { state ->
-                provideFeedback(state)
+                runCatching { provideFeedback(state) }.onFailure { Simber.i(it) }
                 previousState = state
             }
         }
     }
 
 
-    private suspend fun provideFeedback(state: FingerprintScanState) {
-        when (state) {
-            is FingerprintScanState.Idle -> turnOnFlashingWhiteSmileLeds()
-            is FingerprintScanState.Scanning -> turnOffSmileLeds()
-            is FingerprintScanState.ScanCompleted -> playRemoveFingerAudio()
-            is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
-            is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
+    private suspend fun provideFeedback(state: FingerprintScanState) = coroutineScope {
+        async {
+            when (state) {
+                is FingerprintScanState.Idle -> turnOnFlashingWhiteSmileLeds()
+                is FingerprintScanState.Scanning -> turnOffSmileLeds()
+                is FingerprintScanState.ScanCompleted -> playRemoveFingerAudio()
+                is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
+                is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
+            }
         }
     }
 
