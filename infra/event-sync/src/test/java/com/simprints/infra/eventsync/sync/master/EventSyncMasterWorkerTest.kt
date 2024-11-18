@@ -1,12 +1,16 @@
 package com.simprints.infra.eventsync.sync.master
 
 import android.content.Context
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.ListenableWorker.Result.Success
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkContinuation
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.testing.WorkManagerTestInitHelper
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
@@ -15,7 +19,6 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
@@ -38,13 +41,16 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
-import io.mockk.mockkStatic
+import io.mockk.mockkObject
+import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 internal class EventSyncMasterWorkerTest {
 
     companion object {
@@ -55,8 +61,7 @@ internal class EventSyncMasterWorkerTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @MockK
-    lateinit var ctx: Context
+    val ctx: Context = getApplicationContext()
 
     @MockK
     lateinit var workContinuation: WorkContinuation
@@ -115,7 +120,11 @@ internal class EventSyncMasterWorkerTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        mockkStatic(WorkManager::class)
+        val config = Configuration.Builder().build()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx, config)
+
+        workManager = spyk( WorkManager.getInstance(ctx))
+        mockkObject(WorkManager.Companion)
 
         every { workContinuation.then(any<OneTimeWorkRequest>()) } returns workContinuation
         every { workContinuation.then(any<List<OneTimeWorkRequest>>()) } returns workContinuation
@@ -313,7 +322,7 @@ internal class EventSyncMasterWorkerTest {
             every { projectId } returns "projectId"
             every { synchronization } returns mockk {
                 every { frequency } returns syncConfig
-                every { up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                every { up.simprints.kind } returns NONE
             }
         }
         return masterWorker.doWork()
