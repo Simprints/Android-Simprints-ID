@@ -17,7 +17,9 @@ internal class EnrolSubjectUseCase @Inject constructor(
 
     suspend operator fun invoke(subject: Subject) {
         val personCreationEvent = eventRepository.getEventsInCurrentSession()
-            .filterIsInstance<PersonCreationEvent>().first()
+            .filterIsInstance<PersonCreationEvent>()
+            .sortedByDescending { it.payload.createdAt }
+            .first()
 
         eventRepository.addOrUpdateEvent(EnrolmentEventV2(
             timeHelper.now(),
