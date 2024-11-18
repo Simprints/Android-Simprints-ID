@@ -8,8 +8,8 @@
     <!-- Consent -->
     <string name="consent_general_title">সাধারন সম্মতি</string>
     <string name="consent_enrol_only">আমি আপনাকে %2$s এ নিবন্ধন করতে চাই %1$s</string>
-    <string name="consent_enrol">আমি আপনাার %2$s আপনাকে %1$s এ নিবন্ধন করতে চাই এবং ভবিষ্যতে তা দিয়ে আপনাকে সনাক্ত করতে চাই।</string>
-    <string name="consent_id_verify">আমি আপনার %2$s ব্যবহার করে %1$s - এর জন্য আপনার তথ্যাদি খুঁজে বের করতে চাই।</string>
+    <string name="consent_enrol">আমি %2$s আপনাকে %1$s এ নিবন্ধন করতে চাই এবং ভবিষ্যতে তাঁকে সনাক্ত করতে চাই।</string>
+    <string name="consent_id_verify">আমি %2$s ব্যবহার করে %1$s আপনার তথ্য খুঁজে বের করতে চাই।</string>
     <string name="consent_share_data_no">সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান, আপনার %1$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
     <string name="consent_share_data_yes">%1$s এবং সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান, আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
     <string name="consent_collect_yes">সিমপ্রিন্টস গবেষণার কাজেও তথ্যগুলো ব্যবহার করবে</string>
@@ -17,8 +17,8 @@
     <string name="consent_confirmation">আমি কি %1$s? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি \", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে।\"</string>
     <string name="consent_parental_title">মাতা-পিতার সম্মতি</string>
     <string name="consent_parental_enrol_only">আমি %2$s তাঁকে %1$s এ নিবন্ধন করতে চাই।</string>
-    <string name="consent_parental_enrol">আমি %2$s তাঁকে %1Ss নিবন্ধন করে, ভবিষ্যতে সনাক্ত করতে চাই।</string>
-    <string name="consent_parental_id_verify">\"আমি %2$s তাঁকে খুঁজে বের করতে চাই %1$s \"</string>
+    <string name="consent_parental_enrol">আমি %2$s তাঁকে নিবন্ধন করতে চাই %1$s এবং ভবিষ্যতে তাঁকে সনাক্ত/যাচাই । </string>
+    <string name="consent_parental_id_verify">আমি %2$s তাঁকে খুঁজে বের করতে চাই %1$s</string>
     <string name="consent_parental_share_data_no">সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক প্রতিষ্ঠানের কাছে তাঁর %1$s এবং বর্তমান ঠিকানা সংরক্ষিত আছে।</string>
     <string name="consent_parental_share_data_yes">%1$s এবং সিমপ্রিন্টস, একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান, আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
     <string name="consent_parental_privacy_rights">আপনি সম্মতি দিলেও যে কোন সময় অনুমতি সরিয়ে নিয়ে আপনার সন্তানের তথ্য মুছে ফেলতে বলতে পারেন।</string>
@@ -28,7 +28,7 @@
     <string name="consent_biometrics_access_fingerprint">আঙ্গুলের ছাপের তথ্য</string>
     <string name="consent_biometrics_access_face">ছবি</string>
     <string name="consent_biometrics_access_fingerprint_face">আঙ্গুলের ছাপের তথ্য, ছবি</string>
-    <string name="consent_biometrics_parental_fingerprint">আপনার সন্তানের আঙ্গুলের ছাপ ব্যবহার</string>
+    <string name="consent_biometrics_parental_fingerprint">আপনার সন্তানের আঙ্গুলের ছাপ দ্বারা</string>
     <string name="consent_biometrics_parental_face">আপানার সন্তানের ছবি</string>
     <string name="consent_biometric_concat_modalities">এবং</string>
     <string name="consent_decline_button">প্রত্যাখ্যান করুন</string>
@@ -67,6 +67,7 @@
     <string name="exit_form_reason_person_not_present">ব্যক্তি উপস্থিত নয়</string>
     <string name="exit_form_reason_too_young">বয়স কম</string>
     <string name="exit_form_reason_wrong_age_group_selected">ভুল বয়সের কোঠা নির্বাচন করা হয়েছে</string>
+    <string name="exit_form_reason_uncooperative_child">অসহযোগি শিশু</string>
     <string name="exit_form_reason_other">অন্যান্য</string>
 
     <!-- Fetch subject -->
@@ -366,12 +367,16 @@
     <string name="dashboard_preference_select_modules_title">মডিউল নির্বাচন করুন</string>
     <string name="dashboard_preference_app_version_title">অ্যাপ সংস্করণ</string>
     <string name="dashboard_preference_sync_information_title">তথ্য সিঙ্ক করুন</string>
+    <string name="dashboard_preference_update_config_title">কনফিগারেশন আপডেট করুন</string>
     <string name="dashboard_preference_scanner_version_title">স্ক্যানার সংস্করণ</string>
     <string name="dashboard_preference_device_id_title">ডিভাইস এর আইডি</string>
     <string name="dashboard_preference_summary_settings_fingers">যে আঙ্গুল গুলো স্ক্যান করবেন সেগুলো সিলেক্ট করুন</string>
     <string name="dashboard_preference_summary_sync_information">সিঙ্ক- এর জন্য আরও তথ্য</string>
+    <string name="dashboard_preference_summary_update_config">ডিভাইস এবং প্রকল্পের কনফিগারেশন রিফ্রেশ করুন</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">একটি ফিঙ্গারপ্রিন্ট স্ক্যান সম্পন্ন হলে ব্যবহারকারীকে স্ক্যানার থেকে তাদের হাত সরানোর জন্য অবহিত করে, এরকম অডিও সতর্কতাগুলি সক্ষম বা অক্ষম করুন৷</string>
     <string name="dashboard_preference_copied_to_clipboard">কপি করা হয়েছে</string>
-
+    <string name="dashboard_preference_update_config_scheduled">কনফিগারেশন আপডেট শুরু হয়েছে</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">ফিঙ্গারপ্রিন্ট স্ক্যান সমাপ্তির অডিও</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">তথ্য সিঙ্ক করুন</string>

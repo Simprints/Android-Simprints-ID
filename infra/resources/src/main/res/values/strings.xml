@@ -371,10 +371,10 @@
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
     <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
-    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Enable or disable audio alerts when a fingerprint scan is completed, notifying the user to remove their hand from the scanner.</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Audio alerts for scan completion, prompting the user to remove the subject’s finger from the scanner.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
     <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
-    <string name="dashboard_preference_enable_audio_on_scan_complete">Audio on Fingerprint Scan Completion</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">Audio Alert</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Sync Information</string>
