@@ -32,7 +32,7 @@ class CommCareIdentityDataSourceTest {
         private const val SUBJECT_ACTIONS_FINGERPRINT_1 =
             """{"events":[{"id":"0dafcd03-96c4-4ca5-b802-292da6d4f799","payload":{"subjectId":"b26c91bc-b307-4131-80c3-55090ba5dbf2","projectId":"nXcj9neYhXP9rFp56uWk","moduleId":{"value":"AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="},"attendantId":{"value":"AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="},"biometricReferences":[{"id":"2b9b4991-29d7-3eee-ac02-191afaa0c1a2","templates":[{"quality":99,"template":"123","finger":"LEFT_THUMB"},{"quality":88,"template":"123","finger":"LEFT_INDEX_FINGER"}],"format":"ISO_19794_2","type":"FINGERPRINT_REFERENCE"}]},"type":"EnrolmentRecordCreation"}]}"""
         private const val SUBJECT_ACTIONS_FINGERPRINT_2 =
-            """{"events":[{"id":"0dafcd03-96c4-4ca5-b802-292da6d4f799","payload":{"subjectId":"a961fcb4-8573-4270-a1b2-088e88275b00","projectId":"nXcj9neYhXP9rFp56uWk","moduleId":{"value":"ePZ3yiWTt9etQAWu+A3H0WGtHI2uod=="},"attendantId":{"value":"r9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzS="},"biometricReferences":[{"id":"2b9b4991-29d7-3eee-ac02-191afaa0c1a2","templates":[{"quality":77,"template":"123","finger":"LEFT_THUMB"},{"quality":66,"template":"123","finger":"LEFT_INDEX_FINGER"}],"format":"NEC_1_5","type":"FINGERPRINT_REFERENCE"}]},"type":"EnrolmentRecordCreation"}]}"""
+            """{"events":[{"id":"0dafcd03-96c4-4ca5-b802-292da6d4f799","payload":{"subjectId":"a961fcb4-8573-4270-a1b2-088e88275b00","projectId":"nXcj9neYhXP9rFp56uWk","moduleId":{"value":"AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="},"attendantId":{"value":"AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="},"biometricReferences":[{"id":"2b9b4991-29d7-3eee-ac02-191afaa0c1a2","templates":[{"quality":77,"template":"123","finger":"LEFT_THUMB"},{"quality":66,"template":"123","finger":"LEFT_INDEX_FINGER"}],"format":"NEC_1_5","type":"FINGERPRINT_REFERENCE"}]},"type":"EnrolmentRecordCreation"}]}"""
         private const val SUBJECT_ACTIONS_FACE_1 =
             """{"events":[{"id":"0dafcd03-96c4-4ca5-b802-292da6d4f799","payload":{"subjectId":"b26c91bc-b307-4131-80c3-55090ba5dbf2","projectId":"nXcj9neYhXP9rFp56uWk","moduleId":{"value":"AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="},"attendantId":{"value":"AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88="},"biometricReferences":[{"id":"2b9b4991-29d7-3eee-ac02-191afaa0c1a2","templates":[{"template":"123"}],"format":"ROC_1_23","type":"FACE_REFERENCE"}]},"type":"EnrolmentRecordCreation"}]}"""
         private const val SUBJECT_ACTIONS_FACE_2 =
@@ -50,8 +50,7 @@ class CommCareIdentityDataSourceTest {
                         templateQualityScore = 99,
                         template = byteArrayOf(),
                         format = "ISO_19794_2"
-                    ),
-                    FingerprintSample(
+                    ), FingerprintSample(
                         fingerIdentifier = LEFT_INDEX_FINGER,
                         templateQualityScore = 88,
                         template = byteArrayOf(),
@@ -66,8 +65,7 @@ class CommCareIdentityDataSourceTest {
                         templateQualityScore = 77,
                         template = byteArrayOf(),
                         format = "ISO_19794_2"
-                    ),
-                    FingerprintSample(
+                    ), FingerprintSample(
                         fingerIdentifier = LEFT_INDEX_FINGER,
                         templateQualityScore = 66,
                         template = byteArrayOf(),
@@ -174,10 +172,12 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.moveToNext() } returns true
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2)
+        every { mockDataCursor.getString(0) } returnsMany listOf(
+            "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
+        )
+        every { mockDataCursor.getString(1) } returnsMany listOf(
+            SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2
+        )
 
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
@@ -188,130 +188,14 @@ class CommCareIdentityDataSourceTest {
         val areContentsEqual =
             expectedFingerprintIdentities.filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
-            expected.subjectId == actual.subjectId &&
-                expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                    expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                        expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
-                        expectedFingerprint.template.contentEquals(actualFingerprint.template
-                        ) &&expectedFingerprint.format == actualFingerprint.format
+                    expected.subjectId == actual.subjectId && expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                        expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier && expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore && expectedFingerprint.template.contentEquals(
+                            actualFingerprint.template
+                        ) && expectedFingerprint.format == actualFingerprint.format
+                    }.all { it }
                 }.all { it }
-        }.all { it }
         assertTrue(areContentsEqual)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
-        coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
-    }
-
-    @Test
-    fun `test loadFingerprintIdentities for specific subject ID`() = runTest {
-        every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size
-        every { mockMetadataCursor.moveToPosition(0) } returns true
-        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
-        every { mockDataCursor.moveToNext() } returns true
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2)
-
-        val query = SubjectQuery(subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00")
-        val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range)
-
-        assertEquals(1, actualIdentities.size)
-        val areContentsEqual = expectedFingerprintIdentities
-            .filter { it.subjectId == "a961fcb4-8573-4270-a1b2-088e88275b00" }
-            .zip(actualIdentities) { expected, actual ->
-                expected.subjectId == actual.subjectId &&
-                    expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                        expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                            expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
-                            expectedFingerprint.template.contentEquals(actualFingerprint.template) &&
-                            expectedFingerprint.format == actualFingerprint.format
-                    }.all { it }
-            }.all { it }
-        assertTrue(areContentsEqual)
-    }
-
-    @Test
-    fun `test loadFingerprintIdentities for specific attendant ID`() = runTest {
-        every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size
-        every { mockMetadataCursor.moveToPosition(0) } returns true
-        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
-        every { mockDataCursor.moveToNext() } returns true
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2)
-
-        val query = SubjectQuery(attendantId = "r9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzS=")
-        val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range)
-
-        assertEquals(1, actualIdentities.size)
-        val areContentsEqual = expectedFingerprintIdentities
-            .filter { it.subjectId == "a961fcb4-8573-4270-a1b2-088e88275b00" }
-            .zip(actualIdentities) { expected, actual ->
-                expected.subjectId == actual.subjectId &&
-                    expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                        expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                            expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
-                            expectedFingerprint.template.contentEquals(actualFingerprint.template) &&
-                            expectedFingerprint.format == actualFingerprint.format
-                    }.all { it }
-            }.all { it }
-        assertTrue(areContentsEqual)
-    }
-
-    @Test
-    fun `test loadFingerprintIdentities for specific module ID`() = runTest {
-        every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size
-        every { mockMetadataCursor.moveToPosition(0) } returns true
-        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
-        every { mockDataCursor.moveToNext() } returns true
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2)
-
-        val query = SubjectQuery(moduleId = "ePZ3yiWTt9etQAWu+A3H0WGtHI2uod==")
-        val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range)
-
-        assertEquals(1, actualIdentities.size)
-        val areContentsEqual = expectedFingerprintIdentities
-            .filter { it.subjectId == "a961fcb4-8573-4270-a1b2-088e88275b00" }
-            .zip(actualIdentities) { expected, actual ->
-                expected.subjectId == actual.subjectId &&
-                    expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                        expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                            expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
-                            expectedFingerprint.template.contentEquals(actualFingerprint.template) &&
-                            expectedFingerprint.format == actualFingerprint.format
-                    }.all { it }
-            }.all { it }
-        assertTrue(areContentsEqual)
-    }
-
-    @Test
-    fun `test load fingerprint fetches case by providedID`() = runTest {
-        every { mockDataCursor.moveToNext() } returns true
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2)
-
-        val query = SubjectQuery(metadata = """{"caseId":"CASE"}""")
-        val range = 0..1
-        dataSource.loadFingerprintIdentities(query, range)
-
-        coVerify(exactly = 0) { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
@@ -323,9 +207,10 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.moveToNext() } returns true
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsManylistOf(
+        every { mockDataCursor.getString(0) } returnsMany listOf(
+            "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
+        )
+        every { mockDataCursor.getString(1) } returnsMany listOf(
             SUBJECT_ACTIONS_FACE_1, SUBJECT_ACTIONS_FACE_2
         )
         val templateFormat = "ROC_1_23"
@@ -337,29 +222,34 @@ class CommCareIdentityDataSourceTest {
         val areContentsEqual =
             expectedFaceIdentities.filter { identity -> identity.faces.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
-            expected.subjectId == actual.subjectId &&
-                expected.faces.zip(actual.faces) { expectedFace, actualFace ->
-                    expectedFace.template.contentEquals(actualFace.template) &&
-                        expectedFace.format == actualFace.format
+                    expected.subjectId == actual.subjectId && expected.faces.zip(actual.faces) { expectedFace, actualFace ->
+                        expectedFace.template.contentEquals(actualFace.template) && expectedFace.format == actualFace.format
+                    }.all { it }
                 }.all { it }
-        }.all { it }
         assertTrue(areContentsEqual)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test
-    fun `test loadFingerprintIdentities returns only identities with fingerprint references`() = runTest {
-        every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size + 1
-        every { mockMetadataCursor.moveToPosition(0) } returns true
-        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, true, false)
-        every { mockDataCursor.moveToNext() } returns true
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
-            )every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2, SUBJECT_ACTIONS_FACE_1
+    fun `test loadFingerprintIdentities returns only identities with fingerprint references`() =
+        runTest {
+            every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size + 1
+            every { mockMetadataCursor.moveToPosition(0) } returns true
+            every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, true, false)
+            every { mockDataCursor.moveToNext() } returns true
+            every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
+            every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
+            every { mockDataCursor.getString(0) } returnsMany listOf(
+                "someOtherDatumId",
+                "subjectActions",
+                "someOtherDatumId",
+                "subjectActions",
+                "someOtherDatumId",
+                "subjectActions"
+            )
+            every { mockDataCursor.getString(1) } returnsMany listOf(
+                SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2, SUBJECT_ACTIONS_FACE_1
             )
             val templateFormat = "NEC_1_5"
             val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
@@ -370,18 +260,16 @@ class CommCareIdentityDataSourceTest {
             val areContentsEqual =
                 expectedFingerprintIdentities.filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
                     .zip(actualIdentities) { expected, actual ->
-            expected.subjectId == actual.subjectId &&
-                expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                    expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                        expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
-                        expectedFingerprint.template.contentEquals(actualFingerprint.template
-                        ) &&expectedFingerprint.format == actualFingerprint.format
-                }.all { it }
-        }.all { it }
-        assertTrue(areContentsEqual)
-        coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
-        coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
-    }
+                        expected.subjectId == actual.subjectId && expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                            expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier && expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore && expectedFingerprint.template.contentEquals(
+                                actualFingerprint.template
+                            ) && expectedFingerprint.format == actualFingerprint.format
+                        }.all { it }
+                    }.all { it }
+            assertTrue(areContentsEqual)
+            coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+            coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
+        }
 
     @Test
     fun `test loadFaceIdentities returns only identities with face references`() = runTest {
@@ -391,8 +279,13 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.moveToNext() } returns true
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
+        every { mockDataCursor.getString(0) } returnsMany listOf(
+            "someOtherDatumId",
+            "subjectActions",
+            "someOtherDatumId",
+            "subjectActions",
+            "someOtherDatumId",
+            "subjectActions"
         )
         every { mockDataCursor.getString(1) } returnsMany listOf(
             SUBJECT_ACTIONS_FACE_1, SUBJECT_ACTIONS_FACE_2, SUBJECT_ACTIONS_FINGERPRINT_1
@@ -407,29 +300,29 @@ class CommCareIdentityDataSourceTest {
         val areContentsEqual =
             expectedFaceIdentities.filter { identity -> identity.faces.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
-            expected.subjectId == actual.subjectId &&
-                expected.faces.zip(actual.faces) { expectedFace, actualFace ->
-                    expectedFace.template.contentEquals(actualFace.template) &&
-                        expectedFace.format == actualFace.format
+                    expected.subjectId == actual.subjectId && expected.faces.zip(actual.faces) { expectedFace, actualFace ->
+                        expectedFace.template.contentEquals(actualFace.template) && expectedFace.format == actualFace.format
+                    }.all { it }
                 }.all { it }
-        }.all { it }
         assertTrue(areContentsEqual)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
     }
 
     @Test
-    fun `test loadFingerprintIdentities returns only fingerprint references for dual modality identities`() = runTest {
-        every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size
-        every { mockMetadataCursor.moveToPosition(0) } returns true
-        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
-        every { mockDataCursor.moveToNext() } returns true
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_1, SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2
+    fun `test loadFingerprintIdentities returns only fingerprint references for dual modality identities`() =
+        runTest {
+            every { mockMetadataCursor.count } returns expectedFingerprintIdentities.size
+            every { mockMetadataCursor.moveToPosition(0) } returns true
+            every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+            every { mockDataCursor.moveToNext() } returns true
+            every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
+            every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
+            every { mockDataCursor.getString(0) } returnsMany listOf(
+                "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
+            )
+            every { mockDataCursor.getString(1) } returnsMany listOf(
+                SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_1, SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2
             )
             val templateFormat = "ISO_19794_2"
             val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
@@ -440,31 +333,31 @@ class CommCareIdentityDataSourceTest {
             val areContentsEqual =
                 expectedFingerprintIdentities.filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
                     .zip(actualIdentities) { expected, actual ->
-            expected.subjectId == actual.subjectId &&
-                expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                    expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                        expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
-                        expectedFingerprint.template.contentEquals(actualFingerprint.template
-                        ) &&expectedFingerprint.format == actualFingerprint.format
-                }.all { it }
-        }.all { it }
-        assertTrue(areContentsEqual)
-        coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
-        coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
-    }
+                        expected.subjectId == actual.subjectId && expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                            expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier && expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore && expectedFingerprint.template.contentEquals(
+                                actualFingerprint.template
+                            ) && expectedFingerprint.format == actualFingerprint.format
+                        }.all { it }
+                    }.all { it }
+            assertTrue(areContentsEqual)
+            coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+            coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
+        }
 
     @Test
-    fun `test loadFaceIdentities returns only face references for dual modality identities`() = runTest {
-        every { mockMetadataCursor.count } returns expectedFaceIdentities.size
-        every { mockMetadataCursor.moveToPosition(0) } returns true
-        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
-        every { mockDataCursor.moveToNext() } returns true
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
-        every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_1, SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2
+    fun `test loadFaceIdentities returns only face references for dual modality identities`() =
+        runTest {
+            every { mockMetadataCursor.count } returns expectedFaceIdentities.size
+            every { mockMetadataCursor.moveToPosition(0) } returns true
+            every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+            every { mockDataCursor.moveToNext() } returns true
+            every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
+            every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
+            every { mockDataCursor.getString(0) } returnsMany listOf(
+                "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
+            )
+            every { mockDataCursor.getString(1) } returnsMany listOf(
+                SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_1, SUBJECT_ACTIONS_FINGERPRINT_AND_FACE_2
             )
             val templateFormat = "ROC_1_23"
             val query = SubjectQuery(faceSampleFormat = templateFormat)
@@ -475,16 +368,14 @@ class CommCareIdentityDataSourceTest {
             val areContentsEqual =
                 expectedFaceIdentities.filter { identity -> identity.faces.any { it.format == templateFormat } }
                     .zip(actualIdentities) { expected, actual ->
-            expected.subjectId == actual.subjectId &&
-                expected.faces.zip(actual.faces) { expectedFace, actualFace ->
-                    expectedFace.template.contentEquals(actualFace.template) &&
-                        expectedFace.format == actualFace.format
-                }.all { it }
-        }.all { it }
-        assertTrue(areContentsEqual)
-        coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
-        coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
-    }
+                        expected.subjectId == actual.subjectId && expected.faces.zip(actual.faces) { expectedFace, actualFace ->
+                            expectedFace.template.contentEquals(actualFace.template) && expectedFace.format == actualFace.format
+                        }.all { it }
+                    }.all { it }
+            assertTrue(areContentsEqual)
+            coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
+            coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
+        }
 
     @Test
     fun testCount() = runTest {
@@ -546,10 +437,12 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.moveToNext() } returns true
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf(SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2)
+        every { mockDataCursor.getString(0) } returnsMany listOf(
+            "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
+        )
+        every { mockDataCursor.getString(1) } returnsMany listOf(
+            SUBJECT_ACTIONS_FINGERPRINT_1, SUBJECT_ACTIONS_FINGERPRINT_2
+        )
 
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
@@ -560,14 +453,12 @@ class CommCareIdentityDataSourceTest {
         val areContentsEqual =
             expectedFingerprintIdentities.filter { identity -> identity.fingerprints.any { it.format == templateFormat } }
                 .zip(actualIdentities) { expected, actual ->
-            expected.subjectId == actual.subjectId &&
-                expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
-                    expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                        expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
-                        expectedFingerprint.template.contentEquals(actualFingerprint.template
-                        ) &&expectedFingerprint.format == actualFingerprint.format
+                    expected.subjectId == actual.subjectId && expected.fingerprints.zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
+                        expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier && expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore && expectedFingerprint.template.contentEquals(
+                            actualFingerprint.template
+                        ) && expectedFingerprint.format == actualFingerprint.format
+                    }.all { it }
                 }.all { it }
-        }.all { it }
         assertTrue(areContentsEqual)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
         coVerify { mockContentResolver.query(mockDataCaseIdUri, any(), any(), any(), any()) }
@@ -600,7 +491,7 @@ class CommCareIdentityDataSourceTest {
             mockContentResolver.query(
                 mockMetadataUri, any(), any(), any(), any()
             )
-           } throws RuntimeException("Some exception")
+        } throws RuntimeException("Some exception")
 
         val query = SubjectQuery()
         val range = 0..2
@@ -664,10 +555,10 @@ class CommCareIdentityDataSourceTest {
         every { mockDataCursor.moveToNext() } returns true
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID) } returns 0
         every { mockDataCursor.getColumnIndexOrThrow(COLUMN_VALUE) } returns 1
-        every { mockDataCursor.getString(0) } returnsMany
-            listOf("someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions")
-        every { mockDataCursor.getString(1) } returnsMany
-            listOf("invalid JSON 1", "invalid JSON 2")
+        every { mockDataCursor.getString(0) } returnsMany listOf(
+            "someOtherDatumId", "subjectActions", "someOtherDatumId", "subjectActions"
+        )
+        every { mockDataCursor.getString(1) } returnsMany listOf("invalid JSON 1", "invalid JSON 2")
 
         val query = SubjectQuery()
         val range = 0..2

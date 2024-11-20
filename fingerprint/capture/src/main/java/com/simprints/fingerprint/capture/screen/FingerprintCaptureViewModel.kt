@@ -58,6 +58,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -167,7 +168,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun start(
         fingerprintsToCapture: List<IFingerIdentifier>,
-        fingerprintSdk: FingerprintConfiguration.BioSdk
+        fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         if (!hasStarted) {
             hasStarted = true
@@ -404,7 +405,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         imageTransferTask = viewModelScope.launch {
             try {
                 val acquiredImage = bioSdkWrapper.acquireFingerprintImage()
-                handleImageTransferSuccess(acquiredImage)
+                if (isActive) {
+                    handleImageTransferSuccess(acquiredImage)
+                }
+            } catch (_: CancellationException) {
+                // No-op - This is expected when job is cancelled manually, i.e. by back press
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
@@ -669,7 +674,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     fun handleOnViewCreated(
         fingerprintsToCapture: List<IFingerIdentifier>,
-        fingerprintSdk: FingerprintConfiguration.BioSdk
+        fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         updateState {
             it.copy(
