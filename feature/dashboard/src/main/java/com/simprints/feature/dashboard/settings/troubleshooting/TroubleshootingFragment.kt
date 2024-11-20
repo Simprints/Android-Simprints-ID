@@ -2,19 +2,17 @@ package com.simprints.feature.dashboard.settings.troubleshooting
 
 import android.os.Bundle
 import android.view.View
-import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.databinding.FragmentTroubleshootingBinding
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
+import com.simprints.feature.dashboard.R
+import com.simprints.feature.dashboard.databinding.FragmentTroubleshootingBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class TroubleshootingFragment : Fragment(R.layout.fragment_troubleshooting) {
 
-    private val viewModel by activityViewModels<TroubleshootingViewModel>()
     private val binding by viewBinding(FragmentTroubleshootingBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

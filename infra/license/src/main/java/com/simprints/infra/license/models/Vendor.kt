@@ -6,12 +6,12 @@ import com.simprints.infra.license.models.comparators.SemanticVersionComparator
 sealed class Vendor(val value: String) {
     abstract val versionComparator: Comparator<String>
 
-    object RankOne : Vendor("RANK_ONE_FACE") {
+    data object RankOne : Vendor("RANK_ONE_FACE") {
         override val versionComparator: Comparator<String>
             get() = SemanticVersionComparator()
     }
 
-    object Nec : Vendor("NEC_FINGERPRINT") {
+    data object Nec : Vendor("NEC_FINGERPRINT") {
         override val versionComparator: Comparator<String>
             get() = DefaultVersionComparator()
     }
@@ -22,5 +22,7 @@ sealed class Vendor(val value: String) {
             Nec.value -> Nec
             else -> error("Invalid licence vendor requested")
         }
+
+        fun listAll() = listOf(RankOne, Nec)
     }
 }

@@ -18,6 +18,8 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:recent-user-activity"))
+    implementation(project(":infra:license"))
+
     implementation(project(":feature:consent"))
     implementation(project(":feature:login"))
 
