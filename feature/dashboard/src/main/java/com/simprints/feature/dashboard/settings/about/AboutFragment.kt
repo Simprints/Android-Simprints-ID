@@ -13,6 +13,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
@@ -55,7 +56,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val settingsView =
             inflater.inflate(R.layout.fragment_settings_about, container, false) as ViewGroup
@@ -89,6 +90,21 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                 }
                 findNavController().navigate(destination)
             })
+        viewModel.openTroubleshooting.observe(viewLifecycleOwner, LiveDataEventObserver {
+            showPasswordIfRequired(ACTION_TROUBLESHOOTING) { openTroubleshooting() }
+        })
+
+        SettingsPasswordDialogFragment.registerForResult(
+            fragmentManager = childFragmentManager,
+            lifecycleOwner = this,
+            onSuccess = { action ->
+                viewModel.unlockSettings()
+                when (action) {
+                    ACTION_LOGOUT -> viewModel.processLogoutRequest()
+                    ACTION_TROUBLESHOOTING -> openTroubleshooting()
+                }
+            },
+        )
     }
 
     private fun initLayout() {
@@ -105,26 +121,26 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                 true
             }
         }
+        getSyncAndSearchConfigurationPreference()?.setOnPreferenceClickListener {
+            viewModel.troubleshootingClick()
+            true
+        }
+
         getLogoutPreference()?.setOnPreferenceClickListener {
             activity?.runOnUiThread {
                 val password = viewModel.settingsLocked.value?.getNullablePassword()
                 if (password != null) {
-                    SettingsPasswordDialogFragment.registerForResult(
-                        fragmentManager = childFragmentManager,
-                        lifecycleOwner = this@AboutFragment,
-                        onSuccess = { viewModel.processLogoutRequest() }
-                    )
-                    SettingsPasswordDialogFragment.newInstance(
-                        title = IDR.string.dashboard_password_lock_title_logout,
-                        passwordToMatch = password,
-
-                    ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+                    showPasswordIfRequired(ACTION_LOGOUT) { viewModel.processLogoutRequest() }
                 } else {
                     confirmationDialogForLogout.show()
                 }
             }
             true
         }
+    }
+
+    private fun openTroubleshooting() {
+        findNavController().navigate(R.id.action_aboutFragment_to_troubleshootingFragment)
     }
 
     private fun getAppVersionPreference(): Preference? =
@@ -144,4 +160,20 @@ internal class AboutFragment : PreferenceFragmentCompat() {
 
     private fun String.lowerCaseCapitalized() =
         lowercase(Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
+    private fun showPasswordIfRequired(action: String, cb: () -> Unit) {
+        val password = viewModel.settingsLocked.value?.getNullablePassword()
+        if (password != null) {
+            SettingsPasswordDialogFragment.newInstance(
+                passwordToMatch = password,
+                action = action,
+            ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+        } else cb()
+    }
+
+    companion object {
+
+        private const val ACTION_LOGOUT = "logout"
+        private const val ACTION_TROUBLESHOOTING = "troubleshooting"
+    }
 }
