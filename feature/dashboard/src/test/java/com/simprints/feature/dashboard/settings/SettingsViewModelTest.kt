@@ -87,6 +87,7 @@ class SettingsViewModelTest {
     fun `trigger device sync when called`() {
         viewModel.scheduleConfigUpdate()
 
+        verify { syncOrchestrator.startProjectSync() }
         verify { syncOrchestrator.startDeviceSync() }
     }
 
