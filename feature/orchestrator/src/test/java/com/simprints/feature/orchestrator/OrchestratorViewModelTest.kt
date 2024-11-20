@@ -8,8 +8,11 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
+import com.simprints.feature.enrollast.EnrolLastBiometricParams
+import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
@@ -19,6 +22,7 @@ import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
+import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
@@ -92,6 +96,9 @@ internal class OrchestratorViewModelTest {
     @MockK
     private lateinit var dailyActivityUseCase: UpdateDailyActivityUseCase
 
+    @MockK
+    private lateinit var mapStepsForLastBiometricEnrolUseCase: MapStepsForLastBiometricEnrolUseCase
+
 
     private lateinit var viewModel: OrchestratorViewModel
 
@@ -110,6 +117,7 @@ internal class OrchestratorViewModelTest {
             appResponseBuilder,
             addCallbackEvent,
             dailyActivityUseCase,
+            mapStepsForLastBiometricEnrolUseCase,
         )
     }
 
@@ -393,6 +401,35 @@ internal class OrchestratorViewModelTest {
         viewModel.restoreModalitiesIfNeeded()
 
         coVerify(exactly = 2) { configManager.getProjectConfiguration() }
+    }
+
+    @Test
+    fun `Adds new steps to Enrol Last Biometric params`() = runTest {
+        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
+        val captureStep = createMockStep(StepId.FINGERPRINT_CAPTURE)
+        val enrolLastStep = createMockStep(StepId.ENROL_LAST_BIOMETRIC)
+        enrolLastStep.payload.putParcelable("params", EnrolLastBiometricParams(
+            "projectId",
+            TokenizableString.Tokenized("userId"),
+            TokenizableString.Tokenized("moduleId"),
+            emptyList()
+        ))
+        every { stepsBuilder.build(any(), any()) } returns listOf(
+            captureStep,
+            enrolLastStep,
+        )
+        val mockEnrolLastStep = mockk<EnrolLastBiometricStepResult>()
+        coEvery { mapStepsForLastBiometricEnrolUseCase(any()) } returns listOf(
+            mockEnrolLastStep
+        )
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(FingerprintCaptureResult(emptyList()))
+
+        viewModel.currentStep.test().value().peekContent()?.let { step ->
+            assertThat(step.payload.getParcelable<EnrolLastBiometricParams>("params")?.steps)
+                .contains(mockEnrolLastStep)
+        }
     }
 
     private fun createMockStep(stepId: Int, payload: Bundle = Bundle()) = Step(

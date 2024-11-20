@@ -52,11 +52,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query)
-        .filter { erce -> erce.payload.biometricReferences.any { it is FingerprintReference } }
-        .map {
-            FingerprintIdentity(
-                it.payload.subjectId,
+    ): List<FingerprintIdentity> =
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query).filter { erce ->
+            erce.payload.biometricReferences.any {
+                it is FingerprintReference && it.format == query.fingerprintSampleFormat
+            }
+        }.map {
+            FingerprintIdentity(it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FingerprintReference>()
                     .flatMap { fingerprintReference ->
                         fingerprintReference.templates.map { fingerprintTemplate ->
@@ -67,8 +69,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 format = fingerprintReference.format,
                             )
                         }
-                    }
-            )
+                    })
         }
 
     private fun loadEnrolmentRecordCreationEvents(
@@ -76,7 +77,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
         callerPackageName: String,
         query: SubjectQuery,
     ): List<EnrolmentRecordCreationEvent> {
-        val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
+        val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> =
+            mutableListOf()
         try {
             val caseId = attemptExtractingCaseId(query.metadata)
             if (caseId != null) {
@@ -115,11 +117,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query)
-        .filter { erce -> erce.payload.biometricReferences.any { it is FaceReference } }
-        .map {
-            FaceIdentity(
-                it.payload.subjectId,
+    ): List<FaceIdentity> =
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query).filter { erce ->
+            erce.payload.biometricReferences.any {
+                it is FaceReference && it.format == query.faceSampleFormat
+            }
+        }.map {
+            FaceIdentity(it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FaceReference>()
                     .flatMap { faceReference ->
                         faceReference.templates.map { faceTemplate ->
@@ -128,8 +132,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 format = faceReference.format,
                             )
                         }
-                    }
-            )
+                    })
         }
 
     private fun loadEnrolmentRecordCreationEvents(
@@ -194,9 +197,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
     ): Int {
         var count = 0
-        context.contentResolver
-            .query(getCaseMetadataUri(dataSource.callerPackageName()), null, null, null, null)
-            ?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
+        context.contentResolver.query(
+            getCaseMetadataUri(dataSource.callerPackageName()), null, null, null, null
+        )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
 
         return count
     }

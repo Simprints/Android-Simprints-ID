@@ -374,11 +374,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             qualityThreshold = qualityThreshold()
         )
         _vibrate.send()
-        tracker.setImageQualityCheckingResult(scanResult.qualityScore >= qualityThreshold())
+
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
             updateCaptureState { it.toTransferringImage(scanResult) }
             proceedToImageTransfer()
         } else {
+            tracker.setImageQualityCheckingResult(scanResult.qualityScore >= qualityThreshold())
             updateCaptureState { it.toCollected(scanResult) }
             handleCaptureFinished()
         }
@@ -412,7 +413,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun handleImageTransferSuccess(acquireFingerprintImageResponse: AcquireFingerprintImageResponse) {
         _vibrate.send()
-        updateCaptureState { it.toCollected(acquireFingerprintImageResponse.imageBytes) }
+        updateCaptureState {
+            it.toCollected(acquireFingerprintImageResponse.imageBytes).also { captureState ->
+                tracker.setImageQualityCheckingResult(captureState.scanResult.qualityScore >= qualityThreshold())
+            }
+        }
         handleCaptureFinished()
     }
 

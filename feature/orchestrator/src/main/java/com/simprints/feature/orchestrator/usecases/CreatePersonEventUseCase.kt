@@ -21,6 +21,7 @@ internal class CreatePersonEventUseCase @Inject constructor(
         val sessionEvents = eventRepository.getEventsInCurrentSession()
         val previousPersonCreationEvent = sessionEvents
             .filterIsInstance<PersonCreationEvent>()
+            .sortedByDescending { it.payload.createdAt }
             .firstOrNull()
 
         val faceCaptures = extractFaceCaptures(results)

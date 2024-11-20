@@ -13,6 +13,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import com.google.common.truth.Truth.assertThat
 
 class OrchestratorCacheTest {
 
@@ -106,5 +107,28 @@ class OrchestratorCacheTest {
 
         verify(exactly = 1) { prefs.edit().remove("steps") }
         verify(exactly = 1) { prefs.edit().remove("age_group") }
+    }
+
+    @Test
+    fun `AgeGroup is serialized by Jackson without addition of phantom attributes`() {
+        // see Jackson unwanted attribute serialization bug https://stackoverflow.com/questions/69616587/why-does-jackson-add-an-empty-false-into-the-json
+        val realJsonHelper = JsonHelper
+        val originalAgeGroup = AgeGroup(startInclusive = 0, endExclusive = 1)
+
+        val json = realJsonHelper.toJson(originalAgeGroup)
+
+        assertThat(json).isEqualTo("{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}")
+    }
+
+    @Test
+    fun `AgeGroup is deserialized correctly by Jackson`() {
+        val realJsonHelper = JsonHelper
+        val originalAgeGroup = AgeGroup(startInclusive = 0, endExclusive = 1)
+
+        val json = "{\"type\":\"AgeGroup\",\"startInclusive\":0,\"endExclusive\":1}"
+
+        val result = realJsonHelper.fromJson(json, object : TypeReference<AgeGroup>() {})
+
+        assertThat(result).isEqualTo(originalAgeGroup)
     }
 }

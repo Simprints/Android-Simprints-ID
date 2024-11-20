@@ -92,6 +92,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         val personCreationEvent = eventRepository.getEventsInCurrentSession()
             .filterIsInstance<PersonCreationEvent>()
+            .sortedByDescending { it.payload.createdAt }
             .first()
 
         eventRepository.addOrUpdateEvent(EnrolmentEventV2(
