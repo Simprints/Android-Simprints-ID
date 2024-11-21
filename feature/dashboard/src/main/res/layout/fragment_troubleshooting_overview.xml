@@ -15,7 +15,7 @@
             style="@style/Text.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.5"
+            android:lineSpacingMultiplier="1.25"
             android:textIsSelectable="true"
             tools:text="Device ID:\nProject ID:\nUser ID:" />
 
@@ -35,6 +35,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lineSpacingMultiplier="1.1"
+            android:textIsSelectable="true"
+            tools:text="@tools:sample/lorem" />
+
+        <TextView
+            style="@style/Text.Headline6.Accented"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:lineSpacingMultiplier="1.5"
+            android:text="Network"
+            android:textIsSelectable="true" />
+
+        <TextView
+            android:id="@+id/troubleshootOverviewNetwork"
+            style="@style/Text.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.25"
             android:textIsSelectable="true"
             tools:text="@tools:sample/lorem" />
 

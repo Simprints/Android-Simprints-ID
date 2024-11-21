@@ -24,6 +24,9 @@ class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_overview) {
         viewModel.licenseStates.observe(viewLifecycleOwner) {
             binding.troubleshootOverviewLicences.text = it.ifBlank { "No licenses found" }
         }
+        viewModel.networkStates.observe(viewLifecycleOwner) {
+            binding.troubleshootOverviewNetwork.text = it.orEmpty()
+        }
 
         viewModel.collectData()
     }
