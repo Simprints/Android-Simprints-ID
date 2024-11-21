@@ -4,6 +4,8 @@
     <!-- Alert -->
     <string name="alert_title_fallback">Alert</string>
     <string name="alert_button_close">Close</string>
+    <string name="alert_export_data">Copy details</string>
+    <string name="alert_export_copied">Copied data to clipboard</string>
 
     <!-- Consent -->
     <string name="consent_general_title">General Consent</string>
