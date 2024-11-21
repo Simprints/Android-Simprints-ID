@@ -3,16 +3,17 @@ package com.simprints.feature.dashboard.settings.troubleshooting.overview
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.PingServerUseCase
+import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.PingServerUseCase.PingResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -35,6 +36,8 @@ class OverviewViewModelTest {
     @MockK
     private lateinit var collectNetworkInformationUseCase: CollectNetworkInformationUseCase
 
+    @MockK
+    private lateinit var pingServerUseCase: PingServerUseCase
 
     private lateinit var viewModel: OverviewViewModel
 
@@ -45,7 +48,8 @@ class OverviewViewModelTest {
         viewModel = OverviewViewModel(
             collectIds = collectIdsUseCase,
             collectLicenseStates = collectLicencesUseCase,
-            collectNetworkInformation = collectNetworkInformationUseCase
+            collectNetworkInformation = collectNetworkInformationUseCase,
+            doServerPing = pingServerUseCase,
         )
     }
 
@@ -58,11 +62,31 @@ class OverviewViewModelTest {
         val idsText = viewModel.projectIds.test()
         val licenceText = viewModel.licenseStates.test()
         val networkText = viewModel.networkStates.test()
+        val pingResult = viewModel.pingResult.test()
 
         viewModel.collectData()
 
         assertThat(idsText.value()).isNotEmpty()
         assertThat(licenceText.value()).isNotEmpty()
         assertThat(networkText.value()).isNotEmpty()
+        assertThat(pingResult.value()).isInstanceOf(PingResult.NotDone::class.java)
+    }
+
+    @Test
+    fun `propagates server ping result`() = runTest {
+        val pingResult = viewModel.pingResult.test()
+
+        every { pingServerUseCase.invoke() } returns flowOf(
+            PingResult.InProgress,
+            PingResult.Success("message"),
+        )
+
+        viewModel.pingServer()
+
+        assertThat(pingResult.valueHistory()).containsExactly(
+            PingResult.NotDone,
+            PingResult.InProgress,
+            PingResult.Success("message"),
+        )
     }
 }
