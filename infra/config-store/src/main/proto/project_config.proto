@@ -12,6 +12,7 @@ message ProtoProjectConfiguration {
     ProtoIdentificationConfiguration identification = 6;
     ProtoSynchronizationConfiguration synchronization = 7;
     string updated_at = 8;
+    optional string customJson = 9;
     string id = 10;
 }
 
@@ -22,6 +23,7 @@ message ProtoGeneralConfiguration {
     bool collect_location = 4;
     bool duplicate_biometric_enrolment_check = 5;
     string settings_password = 6;
+    repeated Modality matching_modalities = 7;
 
     enum Modality {
         FACE = 0;
@@ -50,12 +52,13 @@ message ProtoFaceConfiguration {
 
     message ProtoFaceSdkConfiguration{
         int32 nb_of_images_to_capture = 1;
-        int32 quality_threshold = 2;
+        int32 quality_threshold = 2 [deprecated = true]; // TODO: remove after migration to 2024.2.1
         ImageSavingStrategy image_saving_strategy = 3;
         ProtoDecisionPolicy decision_policy = 4;
         optional ProtoAllowedAgeRange allowed_age_range = 5;
         optional float verification_match_threshold = 6;
         string version = 7;
+        float quality_threshold_precise = 8;
     }
 }
 
@@ -98,6 +101,7 @@ message ProtoFingerprintConfiguration {
         optional ProtoAllowedAgeRange allowed_age_range = 6;
         optional float verification_match_threshold = 7;
         ProtoMaxCaptureAttempts max_capture_attempts = 8;
+        optional string version = 9;
     }
 
     message ProtoMaxCaptureAttempts {
@@ -117,9 +121,10 @@ message ProtoVero1Configuration {
 message ProtoVero2Configuration {
     ImageSavingStrategy image_saving_strategy = 1;
     CaptureStrategy capture_strategy = 2;
-    bool display_live_feedback = 3;
+    bool display_live_feedback = 3; // TODO: remove this field after migration to 2024.2.1
     map<string, Vero2FirmwareVersions> firmware_versions = 4;
     int32 quality_threshold = 5;
+    LedsMode leds_mode = 6;
 
     enum ImageSavingStrategy {
         NEVER = 0;
@@ -135,6 +140,11 @@ message ProtoVero2Configuration {
         SECUGEN_ISO_1700_DPI = 3;
     }
 
+    enum LedsMode{
+        BASIC = 0;
+        LIVE_QUALITY_FEEDBACK = 1;
+        VISUAL_SCAN_FEEDBACK = 2;
+    }
     message Vero2FirmwareVersions {
         string cypress = 1;
         string stm = 2;

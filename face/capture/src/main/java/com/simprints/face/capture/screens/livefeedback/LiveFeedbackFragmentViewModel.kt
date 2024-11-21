@@ -13,6 +13,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -32,15 +33,17 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
+    private var qualityThreshold: Float = 0f
+    private var singleQualityFallbackCaptureRequired: Boolean = false
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
         SymmetricTarget(VALID_ROLL_DELTA),
-        0.25f..0.5f
+        0.20f..0.5f
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
-    private lateinit var fallbackCapture: FaceDetection
+    private var fallbackCapture: FaceDetection? = null
 
     val userCaptures = mutableListOf<FaceDetection>()
     var sortedQualifyingCaptures = listOf<FaceDetection>()
@@ -85,6 +88,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
             faceDetector = resolveFaceBioSdk().detector
+
+            val config = configManager.getProjectConfiguration()
+            qualityThreshold = config.face?.qualityThreshold ?: 0f
+            singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
         }
     }
 
@@ -97,11 +104,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun finishCapture(attemptNumber: Int) {
         viewModelScope.launch {
-            val projectConfiguration = configManager.getProjectConfiguration()
             sortedQualifyingCaptures = userCaptures
-                .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
+                .filter { it.hasValidStatus() }
                 .sortedByDescending { it.face?.quality }
-                .ifEmpty { listOf(fallbackCapture) }
+                .ifEmpty { listOfNotNull(fallbackCapture) }
 
             sendAllCaptureEvents(attemptNumber)
 
@@ -129,51 +135,35 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private fun getFaceDetection(bitmap: Bitmap, potentialFace: Face): FaceDetection {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
-        return when {
-            areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                bitmap = bitmap,
-                face = potentialFace,
-                status = FaceDetection.Status.TOOFAR,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.TOOCLOSE,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.OFFYAW,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = FaceDetection.Status.OFFROLL,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
-
-            else -> FaceDetection(
-                bitmap = bitmap, face = potentialFace,
-                status = if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now(),
-            )
+        val status = when {
+            areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
+            areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection.Status.TOOCLOSE
+            potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection.Status.OFFYAW
+            potentialFace.roll !in faceTarget.rollTarget -> FaceDetection.Status.OFFROLL
+            shouldCheckQuality() && potentialFace.quality < qualityThreshold -> FaceDetection.Status.BAD_QUALITY
+            capturingState.value == CapturingState.CAPTURING -> FaceDetection.Status.VALID_CAPTURING
+            else -> FaceDetection.Status.VALID
         }
+
+        return FaceDetection(
+            bitmap = bitmap, face = potentialFace,
+            status = status,
+            detectionStartTime = timeHelper.now(),
+            detectionEndTime = timeHelper.now(),
+        )
     }
+
+    private fun shouldCheckQuality() = !singleQualityFallbackCaptureRequired || fallbackCapture == null
 
     /**
      * While the user has not started the capture flow, we save fallback images. If the capture doesn't
      * get any good images, at least one good image will be saved
      */
     private fun updateFallbackCaptureIfValid(faceDetection: FaceDetection) {
-        if (faceDetection.hasValidStatus()) {
+        val fallbackQuality = fallbackCapture?.face?.quality ?: -1f // To ensure that detection is better with defaults
+        val detectionQuality = faceDetection.face?.quality ?: 0f
+
+        if (faceDetection.hasValidStatus() && detectionQuality >= fallbackQuality) {
             fallbackCapture = faceDetection.apply { isFallback = true }
             createFirstFallbackCaptureEvent(faceDetection)
         }
@@ -201,9 +191,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             .awaitAll()
     }
 
-    private suspend fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
-        val qualityThreshold =
-            configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
+    private suspend fun sendCaptureEvent(faceDetection: FaceDetection?, attemptNumber: Int) {
+        if (faceDetection == null) return
         eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
 

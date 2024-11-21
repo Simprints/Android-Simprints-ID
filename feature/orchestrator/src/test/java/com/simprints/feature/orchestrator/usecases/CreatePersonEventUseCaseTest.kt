@@ -48,17 +48,6 @@ internal class CreatePersonEventUseCaseTest {
     }
 
     @Test
-    fun `Does not create event if has person creation in session`() = runTest {
-        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            mockk<PersonCreationEvent>(),
-        )
-
-        useCase(listOf())
-
-        coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
-    }
-
-    @Test
     fun `Does not create event if no biometric data`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
 
@@ -75,7 +64,7 @@ internal class CreatePersonEventUseCaseTest {
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<PersonCreationEvent> {
-                assertThat(it.payload.faceCaptureIds).isEqualTo(listOf(FACE_ID))
+                assertThat(it.payload.faceCaptureIds).isEqualTo(listOf(FACE_CAPTURE_ID))
             })
         }
     }
@@ -84,7 +73,7 @@ internal class CreatePersonEventUseCaseTest {
     fun `Create event if there is fingerprint biometric data`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             mockk<FingerprintCaptureBiometricsEvent> {
-                every { payload.id } returns FINGER_ID
+                every { payload.id } returns FINGER_CAPTURE_ID
                 every { payload.fingerprint.template } returns TEMPLATE
             },
         )
@@ -93,13 +82,82 @@ internal class CreatePersonEventUseCaseTest {
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<PersonCreationEvent> {
-                assertThat(it.payload.fingerprintCaptureIds).isEqualTo(listOf(FINGER_ID))
+                assertThat(it.payload.fingerprintCaptureIds).isEqualTo(listOf(FINGER_CAPTURE_ID))
             })
         }
     }
 
+    @Test
+    fun `Gets fingerprint from previous PersonCreationEvent (when present) if missing in current callout captures`() =
+        runTest {
+            coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+                mockk<PersonCreationEvent> {
+                    every { payload.fingerprintCaptureIds } returns listOf(FINGER_CAPTURE_ID)
+                    every { payload.fingerprintReferenceId } returns FINGER_REFERENCE_ID
+                },
+            )
+
+            useCase(listOf(FaceCaptureResult(listOf(createFaceCaptureResultItem()))))
+
+            coVerify {
+                eventRepository.addOrUpdateEvent(withArg<PersonCreationEvent> {
+                    assertThat(it.payload.faceCaptureIds).isEqualTo(listOf(FACE_CAPTURE_ID))
+                    assertThat(it.payload.fingerprintCaptureIds).isEqualTo(listOf(FINGER_CAPTURE_ID))
+                    assertThat(it.payload.fingerprintReferenceId).isEqualTo(FINGER_REFERENCE_ID)
+                })
+            }
+        }
+
+    @Test
+    fun `Gets face from previous PersonCreationEvent (when present) if missing in current callout captures`() =
+        runTest {
+            coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+                mockk<PersonCreationEvent> {
+                    every { payload.faceCaptureIds } returns listOf(FACE_CAPTURE_ID)
+                    every { payload.faceReferenceId } returns FACE_REFERENCE_ID
+                },
+            )
+
+            useCase(listOf(FingerprintCaptureResult(listOf(createFingerprintCaptureResultItem()))))
+
+            coVerify {
+                eventRepository.addOrUpdateEvent(withArg<PersonCreationEvent> {
+                    assertThat(it.payload.fingerprintCaptureIds).isEqualTo(listOf(FINGER_CAPTURE_ID))
+                    assertThat(it.payload.faceCaptureIds).isEqualTo(listOf(FACE_CAPTURE_ID))
+                    assertThat(it.payload.faceReferenceId).isEqualTo(FACE_REFERENCE_ID)
+                })
+            }
+        }
+
+    @Test
+    fun `Uses face from latest PersonCreationEvent (if more than one) if missing in current callout captures`() =
+        runTest {
+            coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+                mockk<PersonCreationEvent> {
+                    every { payload.faceCaptureIds } returns listOf(FACE_CAPTURE_ID)
+                    every { payload.faceReferenceId } returns FACE_REFERENCE_ID
+                    every { payload.createdAt } returns Timestamp(2L)
+                },
+                mockk<PersonCreationEvent> {
+                    every { payload.faceCaptureIds } returns listOf("anotherFaceCaptureId")
+                    every { payload.faceReferenceId } returns "anotherFaceReferenceId"
+                    every { payload.createdAt } returns Timestamp(1L)
+                },
+            )
+
+            useCase(listOf(FingerprintCaptureResult(listOf(createFingerprintCaptureResultItem()))))
+
+            coVerify {
+                eventRepository.addOrUpdateEvent(withArg<PersonCreationEvent> {
+                    assertThat(it.payload.fingerprintCaptureIds).isEqualTo(listOf(FINGER_CAPTURE_ID))
+                    assertThat(it.payload.faceCaptureIds).isEqualTo(listOf(FACE_CAPTURE_ID))
+                    assertThat(it.payload.faceReferenceId).isEqualTo(FACE_REFERENCE_ID)
+                })
+            }
+        }
+
     private fun createFingerprintCaptureResultItem() = FingerprintCaptureResult.Item(
-        captureEventId = FINGER_ID,
+        captureEventId = FINGER_CAPTURE_ID,
         identifier = IFingerIdentifier.RIGHT_THUMB,
         sample = FingerprintCaptureResult.Sample(
             IFingerIdentifier.RIGHT_THUMB,
@@ -113,16 +171,18 @@ internal class CreatePersonEventUseCaseTest {
 
     private fun createFaceCaptureResultItem() =
         FaceCaptureResult.Item(
-            captureEventId = FACE_ID,
+            captureEventId = FACE_CAPTURE_ID,
             index = 0,
-            sample = FaceCaptureResult.Sample(FACE_ID, TEMPLATE.toByteArray(), null, "format")
+            sample = FaceCaptureResult.Sample(FACE_CAPTURE_ID, TEMPLATE.toByteArray(), null, "format")
         )
 
 
     companion object {
 
         private const val TEMPLATE = "template"
-        private const val FINGER_ID = "eventFinger1"
-        private const val FACE_ID = "eventFinger1"
+        private const val FINGER_CAPTURE_ID = "fingerprintCaptureId"
+        private const val FINGER_REFERENCE_ID = "fingerReferenceId"
+        private const val FACE_CAPTURE_ID = "faceCaptureId"
+        private const val FACE_REFERENCE_ID = "faceReferenceId"
     }
 }

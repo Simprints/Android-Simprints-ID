@@ -2,12 +2,14 @@ package com.simprints.infra.license.repository
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.license.LicenseRepositoryImpl
-import com.simprints.infra.license.LicenseState
-import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.local.LicenseLocalDataSource
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.license.remote.ApiLicenseResult
-import com.simprints.infra.license.remote.License
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
+import com.simprints.infra.license.remote.LicenseValue
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -15,10 +17,10 @@ import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.util.UUID
 
 class LicenseRepositoryImplTest {
-    private val license = License( "2023.12.31", UUID.randomUUID().toString())
+    private val license = License("2023.12.31", "d9f57992-42a2-4b73-b5c8-04f6daa2435c", LicenseVersion("1.0"))
+    private val licenseValue = LicenseValue("2023.12.31", "d9f57992-42a2-4b73-b5c8-04f6daa2435c", "1.0")
     private val licenseLocalDataSource: LicenseLocalDataSource = mockk(relaxUnitFun = true)
     private val licenseRemoteDataSource: LicenseRemoteDataSource = mockk()
 
@@ -30,12 +32,14 @@ class LicenseRepositoryImplTest {
             licenseRemoteDataSource.getLicense(
                 "invalidProject",
                 any(),
+                any(),
                 any()
             )
         } returns ApiLicenseResult.Error("001")
         coEvery {
             licenseRemoteDataSource.getLicense(
                 "validProjectBackendErrorTimed",
+                any(),
                 any(),
                 any()
             )
@@ -44,6 +48,7 @@ class LicenseRepositoryImplTest {
             licenseRemoteDataSource.getLicense(
                 "validProjectBackendError",
                 any(),
+                any(),
                 any()
             )
         } returns ApiLicenseResult.BackendMaintenanceError()
@@ -51,9 +56,10 @@ class LicenseRepositoryImplTest {
             licenseRemoteDataSource.getLicense(
                 "validProject",
                 any(),
+                any(),
                 any()
             )
-        } returns ApiLicenseResult.Success(license)
+        } returns ApiLicenseResult.Success(licenseValue)
 
         licenseRepositoryImpl = LicenseRepositoryImpl(
             licenseLocalDataSource,
@@ -66,7 +72,7 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns license
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE)
+        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -81,7 +87,7 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.redownloadLicence("validProject", "deviceId", RANK_ONE_FACE)
+        licenseRepositoryImpl.redownloadLicence("validProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -98,7 +104,7 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.redownloadLicence("invalidProject", "deviceId", RANK_ONE_FACE)
+        licenseRepositoryImpl.redownloadLicence("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -115,7 +121,7 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("validProject", "deviceId", RANK_ONE_FACE)
+        licenseRepositoryImpl.getLicenseStates("validProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -131,7 +137,7 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE)
+        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -150,7 +156,8 @@ class LicenseRepositoryImplTest {
         licenseRepositoryImpl.getLicenseStates(
             "validProjectBackendErrorTimed",
             "deviceId",
-            RANK_ONE_FACE
+            RANK_ONE_FACE,
+            LicenseVersion.UNLIMITED
         )
             .toCollection(licenseStates)
 
@@ -170,7 +177,8 @@ class LicenseRepositoryImplTest {
         licenseRepositoryImpl.getLicenseStates(
             "validProjectBackendError",
             "deviceId",
-            RANK_ONE_FACE
+            RANK_ONE_FACE,
+            LicenseVersion.UNLIMITED
         )
             .toCollection(licenseStates)
 
@@ -197,7 +205,7 @@ class LicenseRepositoryImplTest {
         // Given
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
         // When
-        val license= licenseRepositoryImpl.getCachedLicense(RANK_ONE_FACE)
+        val license = licenseRepositoryImpl.getCachedLicense(RANK_ONE_FACE)
         // Then
         assertThat(license).isNull()
     }
@@ -217,7 +225,6 @@ class LicenseRepositoryImplTest {
     }
 
     companion object {
-        private val RANK_ONE_FACE = Vendor("RANK_ONE_FACE")
-
+        private val RANK_ONE_FACE = Vendor.RankOne
     }
 }

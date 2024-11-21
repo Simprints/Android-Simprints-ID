@@ -1,42 +1,79 @@
 package com.simprints.fingerprint.infra.scanner.capture
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FingerprintScanningStatusTrackerTest {
-    private val tracker = FingerprintScanningStatusTracker()
-    private val testDispatcher = UnconfinedTestDispatcher()
+
+    private lateinit var tracker: FingerprintScanningStatusTracker
+
+    @Before
+    fun setup() {
+        tracker = FingerprintScanningStatusTracker(UnconfinedTestDispatcher())
+    }
 
     @Test
-    fun `test notifyScanCompleted emits Unit`() = runTest(testDispatcher) {
-        var emitted = false
+    fun `startScanning emits Scanning state`() = runTest {
         val job = launch {
-            tracker.scanCompleted.collect {
-                emitted = true
+            tracker.state.collect { state->
+                assertThat(state).isEqualTo(FingerprintScanState.Scanning)
             }
         }
-        tracker.notifyScanCompleted()
-        Truth.assertThat(emitted).isTrue()
+        tracker.startScanning()
         job.cancel()
     }
 
     @Test
-    fun `test scanCompleted flow does not replay past emissions`() = runTest(testDispatcher) {
-        tracker.notifyScanCompleted()
-
-        var emitted = false
+    fun `completeScan emits ScanCompleted state`() = runTest {
         val job = launch {
-            tracker.scanCompleted.collect {
-                emitted = true
+            tracker.state.collect { state->
+                assertThat(state).isEqualTo(FingerprintScanState.ScanCompleted)
             }
         }
-        Truth.assertThat(emitted).isFalse()
+        tracker.completeScan()
         job.cancel()
+
     }
 
+    @Test
+    fun `setImageQualityCheckingResult emits Good state when quality is OK`() = runTest {
+        val job = launch {
+            tracker.state.collect { state->
+                assertThat(state).isEqualTo(FingerprintScanState.ImageQualityChecking.Good)
+            }
+        }
+        tracker.setImageQualityCheckingResult(true)
+        job.cancel()
+
+    }
+
+    @Test
+    fun `setImageQualityCheckingResult emits Bad state when quality is not OK`() = runTest {
+        val job = launch {
+            tracker.state.collect { state->
+                assertThat(state).isEqualTo(FingerprintScanState.ImageQualityChecking.Bad)
+            }
+        }
+        tracker.setImageQualityCheckingResult(false)
+        job.cancel()
+
+    }
+
+    @Test
+    fun `resetToIdle emits Idle state`() = runTest {
+        val job = launch {
+            tracker.state.collect { state->
+                assertThat(state).isEqualTo(FingerprintScanState.Idle)
+            }
+        }
+        tracker.resetToIdle()
+        job.cancel()
+
+    }
 }

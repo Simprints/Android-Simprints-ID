@@ -144,7 +144,7 @@ internal class ScannerWrapperV1(
 
     override fun isLiveFeedbackAvailable(): Boolean = false
 
-    override suspend fun setUiIdle() = withContext(ioDispatcher) {
+    override suspend fun turnOffSmileLeds() = withContext(ioDispatcher) {
         suspendCoroutine { cont ->
             scannerV1.resetUI(ScannerCallbackWrapper(
                 success = {
@@ -170,5 +170,16 @@ internal class ScannerWrapperV1(
         triggerListenerToV1Map[triggerListener]?.let {
             scannerV1.unregisterButtonListener(it)
         }
+    }
+    override suspend fun turnOnFlashingWhiteSmileLeds(){
+        // While LED manipulation is supported in Vero1, it is not currently required.
+    }
+
+    override suspend fun setUiBadCapture() {
+        // While LED manipulation is supported in Vero1, it is not currently required.
+    }
+
+    override suspend fun setUiGoodCapture() {
+        // While LED manipulation is supported in Vero1, it is not currently required.
     }
 }

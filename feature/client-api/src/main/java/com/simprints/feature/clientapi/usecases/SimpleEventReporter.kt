@@ -27,8 +27,10 @@ internal class SimpleEventReporter @Inject constructor(
         }
     }
 
-    suspend fun closeCurrentSessionNormally() {
-        coreEventRepository.closeCurrentSession()
+    fun closeCurrentSessionNormally() {
+        externalScope.launch {
+            coreEventRepository.closeCurrentSession()
+        }
     }
 
 }

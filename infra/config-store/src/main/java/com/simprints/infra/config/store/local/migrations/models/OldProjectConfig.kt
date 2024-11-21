@@ -18,6 +18,8 @@ import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
+import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
 import org.json.JSONObject
 
 
@@ -73,23 +75,27 @@ internal data class OldProjectConfig(
             consent = consentConfiguration(),
             identification = identificationConfiguration(),
             synchronization = synchronizationConfiguration(),
+            custom = null,
         )
 
-    private fun generalConfiguration(): GeneralConfiguration =
-        GeneralConfiguration(
-            modalities = modality.split(",")
-                .map { if (it == "FINGER") "FINGERPRINT" else it }
-                .map {
-                    GeneralConfiguration.Modality.valueOf(
-                        it
-                    )
-                },
+    private fun generalConfiguration(): GeneralConfiguration {
+        val modalities = modality.split(",")
+            .map { if (it == "FINGER") "FINGERPRINT" else it }
+            .map {
+                GeneralConfiguration.Modality.valueOf(
+                    it
+                )
+            }
+        return GeneralConfiguration(
+            modalities = modalities,
+            matchingModalities = modalities,
             languageOptions = projectLanguages.split(","),
             defaultLanguage = selectedLanguage,
             collectLocation = locationRequired.toBoolean(),
             duplicateBiometricEnrolmentCheck = enrolmentPlus.toBoolean(),
             settingsPassword = SettingsPasswordConfig.NotSet,
         )
+    }
 
     private fun faceConfiguration(): FaceConfiguration? =
         if (faceQualityThreshold == null) null
@@ -99,7 +105,7 @@ internal data class OldProjectConfig(
                 rankOne = FaceConfiguration.FaceSdkConfiguration(
                     nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull()
                         ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
-                    qualityThreshold = faceQualityThreshold.toInt(),
+                    qualityThreshold = faceQualityThreshold.toFloat(),
                     imageSavingStrategy = if (saveFaceImages.toBoolean()) {
                         FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
                     } else {
@@ -155,7 +161,7 @@ internal data class OldProjectConfig(
                 captureStrategy = Vero2Configuration.CaptureStrategy.valueOf(
                     captureFingerprintStrategy
                 ),
-                displayLiveFeedback = fingerprintLiveFeedbackOn.toBoolean(),
+                ledsMode = if(fingerprintLiveFeedbackOn.toBoolean()) LIVE_QUALITY_FEEDBACK else BASIC,
                 imageSavingStrategy = when (saveFingerprintImagesStrategy) {
                     "NEVER" -> Vero2Configuration.ImageSavingStrategy.NEVER
                     "WSQ_15" -> Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE

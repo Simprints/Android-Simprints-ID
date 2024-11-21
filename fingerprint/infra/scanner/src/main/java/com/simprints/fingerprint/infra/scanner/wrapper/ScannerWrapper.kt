@@ -38,11 +38,14 @@ interface ScannerWrapper {
     /** @throws UnavailableVero2FeatureException - if UN20 API version is less then 1.1 or if using Vero 1 */
     suspend fun stopLiveFeedback()
 
-    suspend fun setUiIdle()
+    suspend fun turnOffSmileLeds()
 
     fun registerTriggerListener(triggerListener: ScannerTriggerListener)
     fun unregisterTriggerListener(triggerListener: ScannerTriggerListener)
     fun versionInformation(): ScannerVersion
     fun batteryInformation(): BatteryInfo
 
+    suspend fun turnOnFlashingWhiteSmileLeds()
+    suspend fun setUiGoodCapture()
+    suspend fun setUiBadCapture()
 }

@@ -11,9 +11,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -29,11 +29,12 @@ class FingerprintCaptureWrapperV1Test {
     private var captureCallback = slot<ScannerCallback>()
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
         scannerWrapper =
-            FingerprintCaptureWrapperV1(scanner, UnconfinedTestDispatcher(), mockk(relaxed = true))
+            FingerprintCaptureWrapperV1(scanner, UnconfinedTestDispatcher())
     }
 
     @Test(expected = ScannerOperationInterruptedException::class)

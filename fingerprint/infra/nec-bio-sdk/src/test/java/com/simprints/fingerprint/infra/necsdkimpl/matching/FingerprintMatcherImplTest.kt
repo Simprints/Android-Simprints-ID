@@ -5,6 +5,7 @@ import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
+import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
 import com.simprints.necwrapper.nec.NEC
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -136,7 +137,7 @@ class FingerprintMatcherImplTest {
 
     private fun generatePersonIdentity(
         vararg fingers: FingerIdentifier,
-        format: String = "NEC_1"
+        format: String = NEC_TEMPLATE_FORMAT
     ) = FingerprintIdentity(
         "ID",
         fingers.map {

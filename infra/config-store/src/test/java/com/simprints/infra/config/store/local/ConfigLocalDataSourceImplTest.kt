@@ -171,7 +171,8 @@ class ConfigLocalDataSourceImplTest {
                 null,
                 consentConfiguration,
                 identificationConfiguration,
-                synchronizationConfiguration
+                synchronizationConfiguration,
+                null
             )
 
             configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)

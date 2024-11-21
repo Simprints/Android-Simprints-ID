@@ -12,6 +12,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
@@ -63,6 +64,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
+        coEvery { configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns false
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
@@ -111,6 +113,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         val bigFace: Face = getFace(Rect(0, 0, 80, 80))
         val yawedFace: Face = getFace(yaw = 45f)
         val rolledFace: Face = getFace(roll = 45f)
+        val badQuality: Face = getFace(quality = -2f)
         val noFace = null
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
@@ -118,6 +121,7 @@ internal class LiveFeedbackFragmentViewModelTest {
             bigFace,
             yawedFace,
             rolledFace,
+            badQuality,
             noFace,
         )
 
@@ -129,16 +133,44 @@ internal class LiveFeedbackFragmentViewModelTest {
         viewModel.process(frame)
         viewModel.process(frame)
         viewModel.process(frame)
+        viewModel.process(frame)
 
         detections.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
             assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.TOOCLOSE)
             assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.OFFYAW)
             assertThat(it[3]?.status).isEqualTo(FaceDetection.Status.OFFROLL)
-            assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.NOFACE)
+            assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
+            assertThat(it[5]?.status).isEqualTo(FaceDetection.Status.NOFACE)
         }
 
         coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
+    }
+
+    @Test
+    fun `Process invalid faces after single fallback correctly`() = runTest {
+        val validFace: Face = getFace()
+        val badQuality: Face = getFace(quality = -2f)
+
+        coEvery { configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns true
+
+        every { faceDetector.analyze(frame) } returnsMany listOf(
+            badQuality,
+            validFace,
+            badQuality,
+        )
+
+        val detections = viewModel.currentDetection.testObserver()
+        viewModel.initCapture(1, 0)
+        viewModel.process(frame)
+        viewModel.process(frame)
+        viewModel.process(frame)
+
+         detections.observedValues.let {
+            assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
+            assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.VALID)
+            assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.VALID)
+        }
     }
 
     @Test
@@ -199,6 +231,6 @@ internal class LiveFeedbackFragmentViewModelTest {
 
     companion object {
 
-        private const val QUALITY_THRESHOLD = -1
+        private const val QUALITY_THRESHOLD = -1f
     }
 }

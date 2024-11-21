@@ -7,8 +7,11 @@ import androidx.datastore.dataStoreFile
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceSdkQualityThresholdMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceBioSdkMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFingerprintBioSdkMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigLedsModeMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigMatchingModalitiesMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigQualityThresholdMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration
 import com.simprints.infra.config.store.local.migrations.ProjectRealmMigration
@@ -73,6 +76,9 @@ object DataStoreModule {
         projectConfigQualityThresholdMigration: ProjectConfigQualityThresholdMigration,
         projectConfigFingerprintBioSdkMigration: ProjectConfigFingerprintBioSdkMigration,
         projectConfigFaceBioSdkMigration: ProjectConfigFaceBioSdkMigration,
+        projectConfigFaceSdkQualityThresholdMigration: ProjectConfigFaceSdkQualityThresholdMigration,
+        projectConfigLedsModeMigration: ProjectConfigLedsModeMigration,
+        projectConfigMatchingModalitiesMigration: ProjectConfigMatchingModalitiesMigration,
     ): DataStore<ProtoProjectConfiguration> {
         return DataStoreFactory.create(
             serializer = ProjectConfigurationSerializer,
@@ -81,7 +87,10 @@ object DataStoreModule {
                 projectConfigSharedPrefsMigration,
                 projectConfigQualityThresholdMigration,
                 projectConfigFingerprintBioSdkMigration,
-                projectConfigFaceBioSdkMigration
+                projectConfigFaceBioSdkMigration,
+                projectConfigFaceSdkQualityThresholdMigration,
+                projectConfigLedsModeMigration,
+                projectConfigMatchingModalitiesMigration,
             )
         )
     }

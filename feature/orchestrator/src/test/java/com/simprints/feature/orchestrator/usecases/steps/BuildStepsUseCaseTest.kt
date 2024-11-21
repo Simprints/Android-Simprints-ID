@@ -13,6 +13,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.N
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.orchestration.data.ActionRequest
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -51,6 +52,7 @@ class BuildStepsUseCaseTest {
     private fun mockCommonProjectConfiguration(): ProjectConfiguration {
         val projectConfiguration = mockk<ProjectConfiguration>(relaxed = true)
         every { projectConfiguration.general.modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
+        every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
         every { projectConfiguration.consent.collectConsent } returns true
         every { projectConfiguration.fingerprint?.allowedSDKs } returns listOf(
             SECUGEN_SIM_MATCHER,
@@ -158,6 +160,28 @@ class BuildStepsUseCaseTest {
 
         assertStepOrder(steps,
             StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER
+        )
+    }
+
+    @Test
+    fun `build - identify action - no age restriction - id pool validation - returns expected steps`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+
+        val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+        every { projectConfiguration.experimental().idPoolValidationEnabled } returns true
+
+        val steps = useCase.build(action, projectConfiguration)
+
+        assertStepOrder(steps,
+            StepId.SETUP,
             StepId.VALIDATE_ID_POOL,
             StepId.CONSENT,
             StepId.FINGERPRINT_CAPTURE,
@@ -211,6 +235,10 @@ class BuildStepsUseCaseTest {
 
         val action = mockk<ActionRequest.EnrolLastBiometricActionRequest>(relaxed = true)
         every { action.getSubjectAgeIfAvailable() } returns null
+        every { cache.steps } returns listOf(
+            Step(StepId.FINGERPRINT_CAPTURE, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)),
+            Step(StepId.FACE_CAPTURE, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)),
+        )
 
         val steps = useCase.build(action, projectConfiguration)
 
@@ -254,7 +282,6 @@ class BuildStepsUseCaseTest {
 
         assertStepOrder(steps,
             StepId.SETUP,
-            StepId.VALIDATE_ID_POOL,
             StepId.SELECT_SUBJECT_AGE,
             StepId.CONSENT
         )
@@ -344,7 +371,6 @@ class BuildStepsUseCaseTest {
 
         assertStepOrder(steps,
             StepId.SETUP,
-            StepId.VALIDATE_ID_POOL,
             StepId.CONSENT,
             StepId.FINGERPRINT_CAPTURE,
             StepId.FINGERPRINT_CAPTURE,

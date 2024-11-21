@@ -23,6 +23,7 @@ import com.simprints.infra.config.store.models.Vero2Configuration
 
 internal val generalConfiguration = GeneralConfiguration(
     listOf(GeneralConfiguration.Modality.FACE),
+    listOf(GeneralConfiguration.Modality.FACE),
     listOf("en"),
     "en",
     collectLocation = true,
@@ -35,7 +36,7 @@ internal val vero2Configuration = Vero2Configuration(
     30,
     Vero2Configuration.ImageSavingStrategy.EAGER,
     Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI,
-    false,
+    Vero2Configuration.LedsMode.BASIC,
     mapOf("E-1" to Vero2Configuration.Vero2FirmwareVersions("1.1", "1.2", "1.4"))
 )
 internal val faceConfiguration =
@@ -43,7 +44,7 @@ internal val faceConfiguration =
         allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
         rankOne = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = 2,
-            qualityThreshold = -1,
+            qualityThreshold = -1f,
             imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
             decisionPolicy = decisionPolicy,
             version = "1.0",
@@ -124,7 +125,8 @@ internal val projectConfiguration = ProjectConfiguration(
     fingerprintConfiguration,
     consentConfiguration,
     identificationConfiguration,
-    synchronizationConfiguration
+    synchronizationConfiguration,
+    null,
 )
 
 internal const val tokenizationJson =

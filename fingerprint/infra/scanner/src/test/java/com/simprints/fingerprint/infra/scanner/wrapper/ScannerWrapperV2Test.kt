@@ -33,6 +33,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ScannerWrapperV2Test {
 
     @MockK
@@ -140,7 +141,13 @@ internal class ScannerWrapperV2Test {
     fun `should throw UnexpectedScannerException if setupScannerWithOtaCheck throws IllegalStateException`() =
         runTest {
             coEvery {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(any(), any(), any(), any(), any())
+                scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
             } throws IllegalStateException()
             scannerWrapper.setScannerInfoAndCheckAvailableOta(mockk())
         }
@@ -292,10 +299,37 @@ internal class ScannerWrapperV2Test {
 
     @Test
     fun `isConnected() correctly passes scanner connection status`() {
-            every { scannerV2.isConnected() } returns false
-            assertThat(scannerWrapper.isConnected()).isFalse()
+        every { scannerV2.isConnected() } returns false
+        assertThat(scannerWrapper.isConnected()).isFalse()
 
-            every { scannerV2.isConnected() } returns true
-            assertThat(scannerWrapper.isConnected()).isTrue()
-        }
+        every { scannerV2.isConnected() } returns true
+        assertThat(scannerWrapper.isConnected()).isTrue()
+    }
+
+    @Test
+    fun `should set smile leds to flashing white when calling turnFlashingOrangeLeds`() = runTest {
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+
+        scannerWrapper.turnOnFlashingWhiteSmileLeds()
+
+        verify { scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()) }
+    }
+
+    @Test
+    fun `should set smile leds to good scan  when calling setUiBadCapture`() = runTest {
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+
+        scannerWrapper.setUiGoodCapture()
+
+        verify { scannerV2.setSmileLedState(scannerUiHelper.goodScanLedState()) }
+    }
+
+    @Test
+    fun `should set smile leds to bad scan  when calling setUiBadCapture`() = runTest {
+        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
+
+        scannerWrapper.setUiBadCapture()
+
+        verify { scannerV2.setSmileLedState(scannerUiHelper.badScanLedState()) }
+    }
 }
