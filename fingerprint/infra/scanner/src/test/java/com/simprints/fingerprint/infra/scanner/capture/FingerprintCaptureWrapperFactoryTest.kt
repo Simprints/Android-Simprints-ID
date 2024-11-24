@@ -2,7 +2,6 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.google.common.truth.Truth
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.NullScannerException
-import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -18,7 +17,7 @@ class FingerprintCaptureWrapperFactoryTest {
     @Before
     fun setUp() {
         fingerprintCaptureWrapperFactory =
-            FingerprintCaptureWrapperFactory(UnconfinedTestDispatcher(), ScannerUiHelper(), mockk())
+            FingerprintCaptureWrapperFactory(UnconfinedTestDispatcher(), mockk())
     }
 
     @Test(expected = NullScannerException::class)
