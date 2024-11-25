@@ -73,23 +73,18 @@ internal class ScannerWrapperV2(
      */
     override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) =
         executeSafely {
-            try {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(fingerprintSdk,
-                    scannerV2,
-                    macAddress,
-                    { scannerVersion = it },
-                    { batteryInfo = it })
-            } catch (ex: Throwable) {
-                throw wrapErrorFromScanner(ex)
-            }
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                fingerprintSdk,
+                scannerV2,
+                macAddress,
+                { scannerVersion = it },
+                { batteryInfo = it }
+            )
+
         }
 
     override suspend fun disconnect() = executeSafely {
-        try {
-            connectionHelper.disconnectScanner(scannerV2)
-        } catch (ex: Throwable) {
-            throw wrapErrorFromScanner(ex)
-        }
+        connectionHelper.disconnectScanner(scannerV2)
     }
 
     override fun isConnected() = scannerV2.isConnected()
@@ -104,11 +99,7 @@ internal class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      */
     override suspend fun sensorWakeUp() = executeSafely {
-        try {
-            scannerV2.ensureUn20State(true)
-        } catch (ex: Throwable) {
-            throw wrapErrorFromScanner(ex)
-        }
+        scannerV2.ensureUn20State(true)
     }
 
 
@@ -155,7 +146,6 @@ internal class ScannerWrapperV2(
         if (isLiveFeedbackAvailable()) {
             scannerV2.setSmileLedState(scannerUiHelper.turnedOffState())
             scannerV2.setScannerLedStateDefault()
-
         } else {
             throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
         }

@@ -12,12 +12,19 @@ import java.io.IOException
 class ResponseErrorHandler(
     val strategy: ResponseErrorHandlingStrategy
 ) {
-
     /**
-     * Adds a timeout for incoming messages
+     * Handles the execution of a suspending block with a timeout based on the response type.
+     *
+     * This function determines the appropriate timeout for the given response type `T` and executes
+     * the provided suspending block within that timeout. If the block does not complete within the
+     * specified timeout, an `IOException` is thrown.
+     *
+     * @param T The type of the response.
+     * @param block The suspending block to be executed.
+     * @return The result of the suspending block.
+     * @throws IOException If the block does not complete within the specified timeout.
      */
-
-    suspend inline fun < reified T> handle(crossinline block: suspend () -> T): T {
+    suspend inline fun <reified T> handle(crossinline block: suspend () -> T): T {
         val timeOut = when (T::class.java) {
             SetUn20OnResponse::class.java -> strategy.setUn20ResponseTimeOut
             Un20StateChangeEvent::class.java -> strategy.un20StateChangeEventTimeOut

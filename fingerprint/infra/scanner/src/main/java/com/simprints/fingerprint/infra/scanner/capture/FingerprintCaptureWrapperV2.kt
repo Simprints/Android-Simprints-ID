@@ -52,7 +52,10 @@ internal class FingerprintCaptureWrapperV2(
     }
 
     override suspend fun acquireFingerprintTemplate(
-        captureDpi: Dpi?, timeOutMs: Int, qualityThreshold: Int, allowLowQualityExtraction: Boolean
+        captureDpi: Dpi?,
+        timeOutMs: Int,
+        qualityThreshold: Int,
+        allowLowQualityExtraction: Boolean
     ): AcquireFingerprintTemplateResponse = executeSafely {
         require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
@@ -76,7 +79,9 @@ internal class FingerprintCaptureWrapperV2(
     }
 
     private fun CaptureFingerprintResult.ensureCaptureResultOkOrError() = when (this) {
-        CaptureFingerprintResult.OK -> { /* Do nothing */ }
+        CaptureFingerprintResult.OK -> { /* Do nothing */
+        }
+
         CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> throw NoFingerDetectedException("Fingerprint not found")
         CaptureFingerprintResult.DPI_UNSUPPORTED -> throw UnexpectedScannerException("Capture fingerprint DPI unsupported")
         CaptureFingerprintResult.UNKNOWN_ERROR -> throw UnknownScannerIssueException("Unknown error when capturing fingerprint")

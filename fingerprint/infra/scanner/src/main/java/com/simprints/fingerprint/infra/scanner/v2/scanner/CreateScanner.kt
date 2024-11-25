@@ -51,13 +51,23 @@ fun Scanner.Companion.create(dispatcher: CoroutineDispatcher): Scanner {
             VeroResponseAccumulator(VeroResponseParser()),
             VeroEventAccumulator(VeroEventParser()),
             Un20ResponseAccumulator(Un20ResponseParser())
-        ), MainMessageOutputStream(MainMessageSerializer(), OutputStreamDispatcher()), dispatcher
+        ),
+        MainMessageOutputStream(
+            MainMessageSerializer(),
+            OutputStreamDispatcher()
+        ),
+        dispatcher
     )
 
     val rootMessageChannel = RootMessageChannel(
         RootMessageInputStream(
             RootResponseAccumulator(RootResponseParser())
-        ), RootMessageOutputStream(RootMessageSerializer(), OutputStreamDispatcher()), dispatcher
+        ),
+        RootMessageOutputStream(
+            RootMessageSerializer(),
+            OutputStreamDispatcher()
+        ),
+        dispatcher
     )
 
     val scannerInfoReaderHelper = ScannerExtendedInfoReaderHelper(
@@ -72,16 +82,22 @@ fun Scanner.Companion.create(dispatcher: CoroutineDispatcher): Scanner {
         CypressOtaMessageChannel(
             CypressOtaMessageInputStream(
                 CypressOtaResponseParser()
-            ), CypressOtaMessageOutputStream(
-                CypressOtaMessageSerializer(), OutputStreamDispatcher()
-            ), dispatcher
+            ),
+            CypressOtaMessageOutputStream(
+                CypressOtaMessageSerializer(),
+                OutputStreamDispatcher()
+            ),
+            dispatcher
         ),
         StmOtaMessageChannel(
             StmOtaMessageInputStream(
                 StmOtaResponseParser()
-            ), StmOtaMessageOutputStream(
-                StmOtaMessageSerializer(), OutputStreamDispatcher()
-            ), dispatcher
+            ),
+            StmOtaMessageOutputStream(
+                StmOtaMessageSerializer(),
+                OutputStreamDispatcher()
+            ),
+            dispatcher
         ),
         CypressOtaController(Crc32Calculator()),
         StmOtaController(),

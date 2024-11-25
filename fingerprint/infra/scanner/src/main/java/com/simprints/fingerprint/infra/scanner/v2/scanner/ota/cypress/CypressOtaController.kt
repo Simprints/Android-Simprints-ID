@@ -44,27 +44,27 @@ class CypressOtaController(private val crc32Calculator: Crc32Calculator) {
 
     private suspend fun sendPrepareDownloadCommand(
         cypressOtaMessageChannel: CypressOtaMessageChannel
-    ) = cypressOtaMessageChannel.sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(
-        PrepareDownloadCommand()
-    ).verifyResponseIs(CypressOtaResponseType.OK, "PrepareDownloadCommand")
+    ) = cypressOtaMessageChannel
+        .sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(PrepareDownloadCommand())
+        .verifyResponseIs(CypressOtaResponseType.OK, "PrepareDownloadCommand")
 
     private suspend fun sendDownloadCommand(
         cypressOtaMessageChannel: CypressOtaMessageChannel, imageSize: Int
-    ) = cypressOtaMessageChannel.sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(
-        DownloadCommand(imageSize)
-    ).verifyResponseIs(CypressOtaResponseType.OK, "DownloadCommand")
+    ) = cypressOtaMessageChannel
+        .sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(DownloadCommand(imageSize))
+        .verifyResponseIs(CypressOtaResponseType.OK, "DownloadCommand")
 
     private suspend fun sendImageChunk(
         cypressOtaMessageChannel: CypressOtaMessageChannel, chunk: ByteArray
-    ) = cypressOtaMessageChannel.sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(
-        SendImageChunk(chunk)
-    ).verifyResponseIs(CypressOtaResponseType.CONTINUE, "SendImageChunk")
+    ) = cypressOtaMessageChannel
+        .sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(SendImageChunk(chunk))
+        .verifyResponseIs(CypressOtaResponseType.CONTINUE, "SendImageChunk")
 
     private suspend fun sendVerifyImageCommand(
         cypressOtaMessageChannel: CypressOtaMessageChannel, crc32: Int
-    ) = cypressOtaMessageChannel.sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(
-        VerifyImageCommand(crc32)
-    ).verifyResponseIs(CypressOtaResponseType.OK, "VerifyImageCommand")
+    ) = cypressOtaMessageChannel
+        .sendCypressOtaModeCommandAndReceiveResponse<CypressOtaResponse>(VerifyImageCommand(crc32))
+        .verifyResponseIs(CypressOtaResponseType.OK, "VerifyImageCommand")
 
     private fun createFirmwareChunks(firmwareBinFile: ByteArray): List<ByteArray> {
         // For some unknown reason, the first payload can only be 16 bytes
@@ -75,11 +75,11 @@ class CypressOtaController(private val crc32Calculator: Crc32Calculator) {
     }
 
     private fun CypressOtaResponse.verifyResponseIs(
-        type: CypressOtaResponseType, commandName: String
+        type: CypressOtaResponseType,
+        commandName: String
     ) {
         if (this.type != type) {
             throw OtaFailedException("Received unexpected $type response during Cypress OTA in response to $commandName")
         }
     }
-
 }
