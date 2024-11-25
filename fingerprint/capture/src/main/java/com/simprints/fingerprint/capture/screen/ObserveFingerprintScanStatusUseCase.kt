@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.capture.screen
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanState
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
@@ -9,14 +10,17 @@ import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
 import com.simprints.infra.config.sync.ConfigManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.preference.PreferenceManager
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Singleton
 class ObserveFingerprintScanStatusUseCase @Inject constructor(
@@ -39,13 +43,22 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
             ledsMode = configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(
                 fingerprintSdk
             )?.vero2?.ledsMode
-            statusTracker.state.collect { state ->
-                provideFeedback(state)
-                previousState = state
-            }
+
+            statusTracker.state
+                .onEach { state ->
+                    if (state is FingerprintScanState.ScanCompleted) {
+                        provideFeedback(state)// Handle ScanCompleted immediately to let the user know to remove the finger
+                    }
+                }
+                .filterNot { it is FingerprintScanState.ScanCompleted } // Exclude ScanCompleted
+                .flatMapConcat { state ->
+                    flow { emit(provideFeedback(state)) } // Process other states sequentially
+                }
+                .collect {
+                    // Do nothing
+                }
         }
     }
-
 
     private suspend fun provideFeedback(state: FingerprintScanState) {
         when (state) {
@@ -55,6 +68,7 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
             is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
             is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
         }
+        previousState = state
     }
 
     fun stopObserving() {
