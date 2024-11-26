@@ -3,6 +3,7 @@ package com.simprints.face.capture.screens.livefeedback
 import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
+import android.hardware.camera2.CaptureRequest
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -10,6 +11,7 @@ import android.util.Size
 import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
@@ -127,7 +129,15 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         imageAnalyzer.setAnalyzer(cameraExecutor, cropAnalyzer)
 
         // Preview
-        val preview = Preview.Builder().setTargetResolution(targetResolution).build()
+        val previewBuilder = Preview.Builder().setTargetResolution(targetResolution)
+
+        // Enable auto-focus
+        @androidx.camera.camera2.interop.ExperimentalCamera2Interop
+        val camera2Interop = Camera2Interop.Extender(previewBuilder)
+        @androidx.camera.camera2.interop.ExperimentalCamera2Interop
+        camera2Interop.setCaptureRequestOption(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+        val preview = previewBuilder.build()
+
         val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(

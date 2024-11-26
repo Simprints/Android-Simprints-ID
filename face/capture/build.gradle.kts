@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.workManager.work)
 
     implementation(libs.circleImageView)
+    implementation(libs.androidX.cameraX.camera2)
 
     runtimeOnly(libs.androidX.cameraX.core)
 
