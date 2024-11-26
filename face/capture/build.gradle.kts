@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":infra:license"))
     implementation(project(":feature:alert"))
 
-    //BIO SDK
+    // BIO SDK
     implementation(project(":face:infra:bio-sdk-resolver"))
 
     implementation(libs.androidX.cameraX.core)

@@ -1,6 +1,5 @@
 package com.simprints.face.infra.basebiosdk.matching
 
-
 abstract class FaceMatcher {
     /**
      * The matching SDK name
@@ -11,7 +10,10 @@ abstract class FaceMatcher {
     /**
      * Returns a comparison score of two templates  from 0.0 - 100.0
      */
-    abstract suspend fun getComparisonScore(probe: ByteArray, matchAgainst: ByteArray): Float
+    abstract suspend fun getComparisonScore(
+        probe: ByteArray,
+        matchAgainst: ByteArray,
+    ): Float
 
     /**
      * Get highest comparison score for matching candidate template against all probes
@@ -22,7 +24,7 @@ abstract class FaceMatcher {
      */
     suspend fun getHighestComparisonScoreForCandidate(
         probes: List<FaceSample>,
-        candidate: FaceIdentity
+        candidate: FaceIdentity,
     ): Float {
         var highestScore = 0f
         probes.forEach { probe ->

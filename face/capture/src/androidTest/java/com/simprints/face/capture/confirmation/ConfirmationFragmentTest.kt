@@ -30,7 +30,6 @@ import com.simprints.infra.resources.R as IDR
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class ConfirmationFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -52,7 +51,7 @@ class ConfirmationFragmentTest {
     @Test
     fun onLaunchConfirmationFragmentAssertTextAndNavigation() {
         val navController = TestNavHostController(
-            ApplicationProvider.getApplicationContext()
+            ApplicationProvider.getApplicationContext(),
         )
 
         val confirmationScenario =
@@ -66,34 +65,30 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.face_confirm_title),
-                withText(IDR.string.face_capture_confirmation_title)
-            )
-        )
-            .check(matches(isDisplayed()))
+                withText(IDR.string.face_capture_confirmation_title),
+            ),
+        ).check(matches(isDisplayed()))
 
         onView(
             allOf(
                 withId(R.id.confirmation_txt),
-                withText(IDR.string.face_capture_successfully_title)
-            )
-        )
-            .check(matches(isDisplayed()))
+                withText(IDR.string.face_capture_successfully_title),
+            ),
+        ).check(matches(isDisplayed()))
 
         onView(
             allOf(
                 withId(R.id.recapture_btn),
-                withText(IDR.string.face_capture_recapture_button)
-            )
-        )
-            .check(matches(isDisplayed()))
+                withText(IDR.string.face_capture_recapture_button),
+            ),
+        ).check(matches(isDisplayed()))
 
         onView(
             allOf(
                 withId(R.id.confirmation_btn),
-                withText(IDR.string.face_capture_finish_button)
-            )
-        )
-            .check(matches(isDisplayed()))
+                withText(IDR.string.face_capture_finish_button),
+            ),
+        ).check(matches(isDisplayed()))
 
         onView(withId(R.id.confirmation_btn)).perform(click())
         assertThat(navController.currentDestination?.id).isEqualTo(R.id.facePreparationFragment)

@@ -24,16 +24,14 @@ data class Face(
     var roll: Float,
     val quality: Float,
     val template: ByteArray,
-    val format: String
+    val format: String,
 ) {
-
     // Relative = coordinates are fractions of the source image dimensions
     val relativeBoundingBox
         get() = RectF(
             absoluteBoundingBox.left.toFloat() / sourceWidth,
             absoluteBoundingBox.top.toFloat() / sourceHeight,
             absoluteBoundingBox.right.toFloat() / sourceWidth,
-            absoluteBoundingBox.bottom.toFloat() / sourceHeight
+            absoluteBoundingBox.bottom.toFloat() / sourceHeight,
         )
-
 }

@@ -24,7 +24,10 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
  * just the max number of steps you are going to use.
  */
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-internal class DashedCircularProgress(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
+internal class DashedCircularProgress(
+    context: Context,
+    attrs: AttributeSet,
+) : FrameLayout(context, attrs) {
     private var progressPainter: ProgressPainter? = null
     var progressColor = Color.WHITE
         set(value) {
@@ -62,7 +65,7 @@ internal class DashedCircularProgress(context: Context, attrs: AttributeSet) : F
             max,
             12f.dpToPx(context),
             3f.dpToPx(context),
-            1f.dpToPx(context)
+            1f.dpToPx(context),
         )
     }
 
@@ -72,7 +75,12 @@ internal class DashedCircularProgress(context: Context, attrs: AttributeSet) : F
         invalidate()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int,
+    ) {
         super.onSizeChanged(w, h, oldw, oldh)
         progressPainter?.onSizeChanged(h, w)
     }

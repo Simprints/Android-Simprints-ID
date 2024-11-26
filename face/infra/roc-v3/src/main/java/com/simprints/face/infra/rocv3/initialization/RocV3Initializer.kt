@@ -1,6 +1,5 @@
 package com.simprints.face.infra.rocv3.initialization
 
-
 import ai.roc.rocsdk.embedded.roc
 import ai.roc.rocsdk.embedded.roc_embedded_error
 import ai.roc.rocsdk.embedded.roc_log_level
@@ -13,7 +12,6 @@ import javax.inject.Singleton
 
 @Singleton
 class RocV3Initializer @Inject constructor() : FaceBioSdkInitializer {
-
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].
      *
@@ -23,9 +21,12 @@ class RocV3Initializer @Inject constructor() : FaceBioSdkInitializer {
      * @return true if initializing was successful, false otherwise
      */
     @ExcludedFromGeneratedTestCoverageReports(
-        reason = "This function uses roc class that has native functions and can't be mocked"
+        reason = "This function uses roc class that has native functions and can't be mocked",
     )
-    override fun tryInitWithLicense(activity: Activity, license: String): Boolean {
+    override fun tryInitWithLicense(
+        activity: Activity,
+        license: String,
+    ): Boolean {
         // As both V1 and V3 are using the same library name and we can't rename the library name
         // the version number is used to differentiate between the two
         System.loadLibrary("roc_embedded_3_1")

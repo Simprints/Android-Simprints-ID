@@ -9,3 +9,14 @@ max_line_length = 140
 [*.json]
 indent_size = 2
 
+[{*.kt,*.kts}]
+ktlint_code_style = ktlint_official
+# Inject annotation on a constructor causes the whole classes to have extra indent which looks very bad
+ktlint_standard_annotation = disabled
+
+# If enabled, this rules forces any multiline assignment to the new line
+ktlint_standard_multiline-expression-wrapping = disabled
+
+# Default allows the expression body to a single call to a wrapper
+# function (e.g. `runTest{}`) without a line break
+ktlint_function_signature_body_expression_wrapping = default
