@@ -194,7 +194,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         }
 
         capturingStateObserver.observedValues.let {
-            assertThat(it[0]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
+            assertThat(it[0]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.PREPARING)
             assertThat(it[1]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
             assertThat(it[2]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
         }

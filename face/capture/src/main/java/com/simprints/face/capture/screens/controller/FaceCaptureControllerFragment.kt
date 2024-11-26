@@ -94,8 +94,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when (internalNavController?.currentDestination?.id) {
-                R.id.facePreparationFragment,
-                R.id.faceLiveFeedbackFragment -> viewModel.handleBackButton()
+                R.id.facePreparationFragment -> viewModel.handleBackButton()
 
                 else -> findNavController().popBackStack()
             }

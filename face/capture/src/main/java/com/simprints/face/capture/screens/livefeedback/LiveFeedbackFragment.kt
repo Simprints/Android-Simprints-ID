@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Size
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
@@ -89,6 +90,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 vm.initCapture(mainVm.samplesToCapture, mainVm.attemptNumber)
             }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (vm.capturingState.value == LiveFeedbackFragmentViewModel.CapturingState.CAPTURING) {
+                vm.cancelCapture()
+            } else {
+                mainVm.handleBackButton()
+            }
+        }
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
@@ -158,9 +167,13 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
         vm.capturingState.observe(viewLifecycleOwner) {
             @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA") when (it) {
-                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
+                LiveFeedbackFragmentViewModel.CapturingState.PREPARING -> renderPreparing()
+
+                LiveFeedbackFragmentViewModel.CapturingState.READY_TO_CAPTURE ->  renderReadyToCapture()
 
                 LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
+
+                LiveFeedbackFragmentViewModel.CapturingState.PROCESSING -> renderProcessing()
 
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
@@ -187,6 +200,10 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderCurrentDetection(faceDetection: FaceDetection) {
+        if (vm.capturingState.value != LiveFeedbackFragmentViewModel.CapturingState.CAPTURING) {
+            return
+        }
+
         when (faceDetection.status) {
             FaceDetection.Status.NOFACE -> renderNoFace()
             FaceDetection.Status.OFFYAW -> renderFaceNotStraight()
@@ -203,19 +220,34 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         with(binding) {
             captureOverlay.drawWhiteTarget()
             captureFeedbackTxtExplanation.setTextColor(
-                ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
+                ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
             )
         }
     }
 
-    private fun renderCapturingNotStarted() {
+    private fun renderPreparing() {
         binding.apply {
             captureOverlay.drawSemiTransparentTarget()
             captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
         }
-        toggleCaptureButtons(false)
+        setCaptureButtonClickable(false)
+    }
+
+    private fun renderReadyToCapture() {
+        binding.apply {
+            captureOverlay.drawSemiTransparentTarget()
+            captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+            captureFeedbackBtn.isVisible = true
+            captureFeedbackPermissionButton.isGone = true
+
+            captureFeedbackBtn.setCheckedWithLeftDrawable(
+                true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
+            )
+        }
+        setCaptureButtonClickable(true)
+        renderProgressBar(true)
     }
 
     private fun renderCapturing() {
@@ -226,7 +258,18 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
         }
-        toggleCaptureButtons(false)
+        setCaptureButtonClickable(false)
+    }
+
+    private fun renderProcessing() {
+        binding.apply {
+            captureProgress.isVisible = true
+            captureFeedbackBtn.setText(IDR.string.face_capture_button_processing)
+            captureFeedbackBtn.isVisible = true
+            captureFeedbackTxtExplanation.text = null
+            captureFeedbackPermissionButton.isGone = true
+        }
+        setCaptureButtonClickable(false)
     }
 
     private fun renderValidFace() {
@@ -240,7 +283,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
-        toggleCaptureButtons(true)
+        setCaptureButtonClickable(true)
     }
 
     private fun renderValidCapturingFace() {
@@ -267,9 +310,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderFaceTooClose() {
@@ -281,9 +321,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderNoFace() {
@@ -295,9 +332,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderFaceNotStraight() {
@@ -309,9 +343,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderBadQuality() {
@@ -323,9 +354,6 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderProgressBar(valid: Boolean) {
@@ -341,7 +369,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun toggleCaptureButtons(valid: Boolean) {
+    private fun setCaptureButtonClickable(valid: Boolean) {
         binding.captureFeedbackBtn.isClickable = valid
     }
 
@@ -364,7 +392,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 }
             }
         }
-        toggleCaptureButtons(false)
+        setCaptureButtonClickable(false)
     }
 
 }

@@ -188,6 +188,7 @@
     <string name="face_capture_error_look_straight">Make sure the person is looking straight at the camera</string>
     <string name="face_capture_begin_button">Tap to capture</string>
     <string name="face_capture_prep_begin_button_capturing">Capturing…</string>
+    <string name="face_capture_button_processing">Processing...</string>
     <string name="face_capture_permission_denied">Please grant the camera permission</string>
     <string name="face_capture_permission_action">Grant permission</string>
     <string name="face_capture_hold">Hold the position…</string>
