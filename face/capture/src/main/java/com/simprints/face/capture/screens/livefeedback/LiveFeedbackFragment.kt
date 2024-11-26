@@ -39,6 +39,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 
@@ -53,6 +54,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
+
+    @Inject
+    lateinit var playFaceCaptureSounds: PlayFaceCaptureSoundsUseCase
 
     private val mainVm: FaceCaptureViewModel by activityViewModels()
 
@@ -176,6 +180,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 LiveFeedbackFragmentViewModel.CapturingState.PROCESSING -> renderProcessing()
 
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
+                    playFaceCaptureSounds.stopSound()
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
                         currentFragment = this,
@@ -236,6 +241,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderReadyToCapture() {
+        playFaceCaptureSounds.stopSound()
         binding.apply {
             captureOverlay.drawSemiTransparentTarget()
             captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
@@ -252,6 +258,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturing() {
         renderCapturingStateColors()
+        playFaceCaptureSounds.playAttentionSound()
         binding.apply {
             captureProgress.isVisible = true
             captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
@@ -262,6 +269,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun renderProcessing() {
+        playFaceCaptureSounds.playCameraShutterSound()
         binding.apply {
             captureProgress.isVisible = true
             captureFeedbackBtn.setText(IDR.string.face_capture_button_processing)
