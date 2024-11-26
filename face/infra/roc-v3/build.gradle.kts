@@ -1,10 +1,6 @@
-plugins {
-    id("simprints.infra")
-}
+plugins { id("simprints.infra") }
 
-android {
-    namespace = "com.simprints.face.infra.rocv3"
-}
+android { namespace = "com.simprints.face.infra.rocv3" }
 
 dependencies {
     api(project(":face:infra:base-bio-sdk"))

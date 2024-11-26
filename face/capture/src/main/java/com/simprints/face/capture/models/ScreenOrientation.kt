@@ -4,7 +4,8 @@ import android.content.res.Configuration
 import android.content.res.Resources
 
 enum class ScreenOrientation {
-    Landscape, Portrait;
+    Landscape,
+    Portrait;
 
     companion object {
         fun getCurrentOrientation(resources: Resources) =

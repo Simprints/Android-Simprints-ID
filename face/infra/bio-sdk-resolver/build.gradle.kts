@@ -1,10 +1,7 @@
-plugins {
-    id("simprints.infra")
-}
+plugins { id("simprints.infra") }
 
-android {
-    namespace = "com.simprints.face.infra.biosdkresolver"
-}
+android { namespace = "com.simprints.face.infra.biosdkresolver" }
+
 dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":face:infra:base-bio-sdk"))

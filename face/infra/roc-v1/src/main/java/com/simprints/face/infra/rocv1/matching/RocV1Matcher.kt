@@ -16,9 +16,7 @@ class RocV1Matcher @Inject constructor() : FaceMatcher() {
 
     // Ignore this method from test coverage calculations
     // because it uses jni native code which is hard to test
-    @ExcludedFromGeneratedTestCoverageReports(
-        reason = "This function uses roc class that has native functions and can't be mocked"
-    )
+    @ExcludedFromGeneratedTestCoverageReports(reason = "This function uses roc class that has native functions and can't be mocked")
     override suspend fun getComparisonScore(probe: ByteArray, matchAgainst: ByteArray): Float {
         val probeTemplate = roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
         roc.memmove(roc.roc_cast(probeTemplate), probe)
@@ -26,17 +24,11 @@ class RocV1Matcher @Inject constructor() : FaceMatcher() {
         val matchTemplate = roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
         roc.memmove(roc.roc_cast(matchTemplate), matchAgainst)
 
-        val similarity = roc.roc_embedded_compare_templates(
-            probeTemplate,
-            ROC_FAST_FV_SIZE,
-            matchTemplate,
-            ROC_FAST_FV_SIZE
-        )
+        val similarity = roc.roc_embedded_compare_templates(probeTemplate, ROC_FAST_FV_SIZE, matchTemplate, ROC_FAST_FV_SIZE)
 
         roc.delete_uint8_t_array(probeTemplate)
         roc.delete_uint8_t_array(matchTemplate)
 
         return (similarity * 100)
     }
-
 }

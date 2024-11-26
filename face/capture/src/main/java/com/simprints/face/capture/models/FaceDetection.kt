@@ -25,7 +25,7 @@ internal data class FaceDetection(
         OFFYAW,
         OFFROLL,
         TOOCLOSE,
-        TOOFAR
+        TOOFAR,
     }
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING

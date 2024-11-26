@@ -7,10 +7,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RocV1BioSdk @Inject constructor(
-    override val initializer: RocV1Initializer,
-    override val detector: RocV1Detector,
-    override val matcher: RocV1Matcher,
-) : FaceBioSDK {
+class RocV1BioSdk
+@Inject
+constructor(override val initializer: RocV1Initializer, override val detector: RocV1Detector, override val matcher: RocV1Matcher) :
+    FaceBioSDK {
     override val version: String = "1.23"
 }

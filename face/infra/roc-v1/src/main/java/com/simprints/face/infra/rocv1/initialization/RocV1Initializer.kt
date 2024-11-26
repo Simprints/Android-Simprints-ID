@@ -14,12 +14,9 @@ class RocV1Initializer @Inject constructor() : FaceBioSdkInitializer {
      *
      * @param activity Needs to be an Activity instead of Context because ROC ask so
      * @param license The license file as a String
-     *
      * @return true if initializing was successful, false otherwise
      */
-    @ExcludedFromGeneratedTestCoverageReports(
-        reason = "This function uses roc class that has native functions and can't be mocked"
-    )
+    @ExcludedFromGeneratedTestCoverageReports(reason = "This function uses roc class that has native functions and can't be mocked")
     override fun tryInitWithLicense(activity: Activity, license: String): Boolean {
         System.loadLibrary("roc_embedded_1_23")
         System.loadLibrary("_roc_embedded_1_23")

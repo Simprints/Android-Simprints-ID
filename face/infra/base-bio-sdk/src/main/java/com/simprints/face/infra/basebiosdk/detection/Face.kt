@@ -14,7 +14,6 @@ import android.graphics.RectF
  * @property quality image quality
  * @property template
  * @property format
- *
  */
 data class Face(
     private val sourceWidth: Int,
@@ -24,16 +23,16 @@ data class Face(
     var roll: Float,
     val quality: Float,
     val template: ByteArray,
-    val format: String
+    val format: String,
 ) {
 
     // Relative = coordinates are fractions of the source image dimensions
     val relativeBoundingBox
-        get() = RectF(
-            absoluteBoundingBox.left.toFloat() / sourceWidth,
-            absoluteBoundingBox.top.toFloat() / sourceHeight,
-            absoluteBoundingBox.right.toFloat() / sourceWidth,
-            absoluteBoundingBox.bottom.toFloat() / sourceHeight
-        )
-
+        get() =
+            RectF(
+                absoluteBoundingBox.left.toFloat() / sourceWidth,
+                absoluteBoundingBox.top.toFloat() / sourceHeight,
+                absoluteBoundingBox.right.toFloat() / sourceWidth,
+                absoluteBoundingBox.bottom.toFloat() / sourceHeight,
+            )
 }

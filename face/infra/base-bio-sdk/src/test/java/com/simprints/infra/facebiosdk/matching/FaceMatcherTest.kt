@@ -18,12 +18,7 @@ class FaceMatcherTest {
 
     @Test
     fun `Get highest score for a candidate`() = runTest {
-        coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(
-            0.1f,
-            0.2f,
-            0.3f,
-            0.4f
-        )
+        coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(0.1f, 0.2f, 0.3f, 0.4f)
 
         val score = faceMatcher.getHighestComparisonScoreForCandidate(probes, candidate1)
 
@@ -31,13 +26,9 @@ class FaceMatcherTest {
     }
 
     private fun getFaceIdentity(numFaces: Int): FaceIdentity =
-        FaceIdentity(
-            UUID.randomUUID().toString(),
-            generateSequenceN(numFaces) { getFaceSample() }.toList()
-        )
+        FaceIdentity(UUID.randomUUID().toString(), generateSequenceN(numFaces) { getFaceSample() }.toList())
 
-    private fun getFaceSample(): FaceSample =
-        FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
+    private fun getFaceSample(): FaceSample = FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
 
     private fun <T : Any> generateSequenceN(n: Int, f: () -> T) = generateSequence(f).take(n)
 }
