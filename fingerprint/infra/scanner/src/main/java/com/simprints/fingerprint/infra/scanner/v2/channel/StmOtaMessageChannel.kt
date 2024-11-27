@@ -5,14 +5,20 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.stmota.StmOtaMessageOutputStream
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.doSimultaneously
-import io.reactivex.Single
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.rx2.await
 
 class StmOtaMessageChannel(
     incoming: StmOtaMessageInputStream,
-    outgoing: StmOtaMessageOutputStream
-) : MessageChannel<StmOtaMessageInputStream, StmOtaMessageOutputStream>(incoming, outgoing) {
+    outgoing: StmOtaMessageOutputStream,
+    dispatcher: CoroutineDispatcher
+) : MessageChannel<StmOtaMessageInputStream, StmOtaMessageOutputStream>(
+    incoming, outgoing, dispatcher
+) {
 
-    inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(command: StmOtaCommand): Single<R> =
-        outgoing.sendMessage(command)
-            .doSimultaneously(incoming.receiveResponse())
+    suspend inline fun <reified R : StmOtaResponse> sendCommandAndReceiveResponse(command: StmOtaCommand): R =
+        runLockedTask {
+            outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
+        }
+
 }

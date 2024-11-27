@@ -1,128 +1,47 @@
 package com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.DigitalValue
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.OperationResultCode
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMessageException
-import com.simprints.fingerprint.infra.scanner.v2.tools.helpers.SchedulerHelper.INTERVAL
-import com.simprints.fingerprint.infra.scanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import io.reactivex.Single
-import io.reactivex.schedulers.TestScheduler
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.IOException
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 
 class ResponseErrorHandlerTest {
 
     @Test
-    fun handleError_timesOutThenSucceeds_retriesCorrectNumberOfTimesAndSucceeds() {
-        val currentTry = AtomicInteger(0)
-        val shouldSucceedOnTry = 4
-        val successValue = "success!"
-
-        val testScheduler = TestScheduler()
-
-        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy(
-            generalTimeOutMs = 500, retryTimes = 3
-        ), testScheduler)
-
-        val testSubscriber =
-            Single.defer {
-                Single.just(successValue)
-                    .run {
-                        if (currentTry.incrementAndGet() != shouldSucceedOnTry) {
-                            delay(2000, TimeUnit.MILLISECONDS, testScheduler)
-                        } else {
-                            this
-                        }
-                    }
-            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!testSubscriber.isTerminated)
-
-        testSubscriber.awaitAndAssertSuccess()
-        testSubscriber.assertValue(successValue)
-        assertThat(currentTry.get()).isEqualTo(shouldSucceedOnTry)
-    }
-
-    @Test
-    fun handleError_timesOutForAllRetries_failsDespiteRetries() {
-        val currentTry = AtomicInteger(0)
-        val shouldSucceedOnTry = 4
-        val successValue = "success!"
-
-        val testScheduler = TestScheduler()
-
-        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy(
-            generalTimeOutMs = 500, retryTimes = 2
-        ), testScheduler)
-
-        val testSubscriber =
-            Single.defer {
-                Single.just(successValue)
-                    .run {
-                        if (currentTry.incrementAndGet() != shouldSucceedOnTry) {
-                            delay(2000, TimeUnit.MILLISECONDS, testScheduler)
-                        } else {
-                            this
-                        }
-                    }
-            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!testSubscriber.isTerminated)
-
-        testSubscriber.await()
-        testSubscriber.assertError(IOException::class.java)
-    }
-
-    @Test
-    fun handleError_propagatesNonTimeoutErrors() {
-        val thrownException = InvalidMessageException()
-
+    fun handle_succeeds() = runTest {
+        val successValue = Un20StateChangeEvent(DigitalValue.TRUE)
         val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
+        val result = responseErrorHandler.handle { successValue }
 
-        val testSubscriber = Single
-            .error<String>(thrownException)
-            .handleErrorsWith(responseErrorHandler)
-            .timeout(TIMEOUT, TimeUnit.SECONDS)
-            .test()
-
-        testSubscriber.await()
-        testSubscriber.assertError(thrownException)
+        assertThat(result).isEqualTo(successValue)
     }
 
-    @Test
-    fun handleError_givenNoneStrategy_doesNotTimeoutOrRetryAndWaitsUntilSucceeds() {
-        val currentTry = AtomicInteger(0)
-        val shouldSucceedOnTry = 4
-        val successValue = "success!"
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test(expected = IOException::class)
+    fun handle_fails() = runTest {
+        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
+        val delayTimeMilliSeconds = ResponseErrorHandlingStrategy.DEFAULT.generalTimeOutMs + 1000
+        responseErrorHandler.handle {
+            delay(delayTimeMilliSeconds)
+            SetUn20OnResponse(OperationResultCode.OK)
+        }
+        advanceTimeBy(delayTimeMilliSeconds)
+    }
 
-        val testScheduler = TestScheduler()
-
-        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE, testScheduler)
-
-        val testSubscriber =
-            Single.defer {
-                Single.just(successValue)
-                    .run {
-                        if (currentTry.incrementAndGet() != shouldSucceedOnTry) {
-                            delay(2000, TimeUnit.MILLISECONDS, testScheduler)
-                        } else {
-                            this
-                        }
-                    }
-            }.handleErrorsWith(responseErrorHandler).timeout(TIMEOUT, TimeUnit.SECONDS).test()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!testSubscriber.isTerminated)
-
-        testSubscriber.await()
-        testSubscriber.assertValue(successValue)
-        assertThat(currentTry.get()).isEqualTo(1)
+    @Test(expected = InvalidMessageException::class)
+    fun handle_propagatesNonTimeoutErrors() = runTest {
+        val thrownException = InvalidMessageException()
+        val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
+        responseErrorHandler.handle<String> {
+            throw thrownException
+        }
     }
 }

@@ -10,11 +10,8 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.Er
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.OkResponse
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.cypressota.CypressOtaMessageInputStream
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -23,6 +20,10 @@ import io.mockk.verify
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
@@ -30,24 +31,27 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 class CypressOtaControllerTest {
-
-    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE)
-
     @Test
-    fun program_correctlyEmitsProgressValuesAndCompletes() {
+    fun program_correctlyEmitsProgressValuesAndCompletes() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val binFile = generateRandomBinFile()
-        val testObserver = cypressOtaController.program(configureMessageStreamMock(), responseErrorHandler, binFile).testSubscribe()
+        val testObserver = cypressOtaController.program(
+            configureMessageStreamMock(),
+            binFile
+        ).toList()
 
-        testObserver.awaitAndAssertSuccess()
 
-        assertThat(testObserver.values()).containsExactlyElementsIn(generateExpectedProgressValues(binFile)).inOrder()
-        testObserver.assertComplete()
+        assertThat(testObserver.toList()).containsExactlyElementsIn(
+            generateExpectedProgressValues(
+                binFile
+            )
+        ).inOrder()
+
     }
 
     @Test
-    fun program_correctlyCallsComputeCrcAndSendCorrectNumberOfTimes() {
+    fun program_correctlyCallsComputeCrcAndSendCorrectNumberOfTimes() = runTest {
         val binFile = generateRandomBinFile()
         val expectedNumberOfCalls = expectedNumberOfChunks(binFile) + 3
 
@@ -55,67 +59,65 @@ class CypressOtaControllerTest {
         val messageStreamMock = configureMessageStreamMock()
         val cypressOtaController = CypressOtaController(crc32Calculator)
 
-        val testObserver = cypressOtaController.program(messageStreamMock, responseErrorHandler, binFile).testSubscribe()
-
-        testObserver.awaitAndAssertSuccess()
+        cypressOtaController.program(messageStreamMock, binFile).toList()
 
         verify { crc32Calculator.calculateCrc32(any()) }
-        verify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
+        coVerify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
-    @Test
-    fun program_receivesErrorAtPrepareDownload_throwsException() {
+    @Test(expected = OtaFailedException::class)
+    fun program_receivesErrorAtPrepareDownload_throwsException() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
-        val testObserver = cypressOtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(0)), responseErrorHandler, generateRandomBinFile()).testSubscribe()
+        cypressOtaController.program(
+            configureMessageStreamMock(errorPositions = listOf(0)),
+            generateRandomBinFile()
+        )
 
-        testObserver.awaitTerminalEvent()
-        testObserver.assertError(OtaFailedException::class.java)
     }
 
-    @Test
-    fun program_receivesErrorAtDownload_throwsException() {
+    @Test(expected = OtaFailedException::class)
+    fun program_receivesErrorAtDownload_throwsException() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
-
-        val testObserver = cypressOtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(1)), responseErrorHandler, generateRandomBinFile()).testSubscribe()
-
-        testObserver.awaitTerminalEvent()
-        testObserver.assertError(OtaFailedException::class.java)
+        cypressOtaController.program(
+            configureMessageStreamMock(errorPositions = listOf(1)),
+            generateRandomBinFile()
+        )
     }
 
-    @Test
-    fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() {
-        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
+    @Test(expected = OtaFailedException::class)
+    fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() =
+        runTest {
+            val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
-        val binFile = generateRandomBinFile()
-        val progressValues = generateExpectedProgressValues(binFile)
-        val testObserver = cypressOtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(4)), responseErrorHandler, binFile).testSubscribe()
+            val binFile = generateRandomBinFile()
+            val progressValues = generateExpectedProgressValues(binFile)
+            val testObserver = cypressOtaController.program(
+                configureMessageStreamMock(errorPositions = listOf(4)),
+                binFile
+            )
+            assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues.slice(0..1))
+                .inOrder()
 
-        testObserver.awaitTerminalEvent()
-        assertThat(testObserver.values()).containsExactlyElementsIn(progressValues.slice(0..1)).inOrder()
-        testObserver.assertError(OtaFailedException::class.java)
-    }
+        }
 
-    @Test
-    fun program_receivesErrorAtVerify_throwsException() {
+    @Test(expected = OtaFailedException::class)
+    fun program_receivesErrorAtVerify_throwsException() = runTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val binFile = generateRandomBinFile()
         val indexOfVerifyResponse = expectedNumberOfChunks(binFile) + 2
-        val testObserver = cypressOtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(indexOfVerifyResponse)), responseErrorHandler, binFile).testSubscribe()
-
-        testObserver.awaitTerminalEvent()
-        testObserver.assertError(OtaFailedException::class.java)
+        cypressOtaController.program(
+            configureMessageStreamMock(errorPositions = listOf(indexOfVerifyResponse)),
+            binFile
+        ).toList()
     }
 
     private fun configureCrcCalculatorMock() = mockk<Crc32Calculator> {
         every { calculateCrc32(any()) } returns 42
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun configureMessageStreamMock(errorPositions: List<Int> = listOf()): CypressOtaMessageChannel {
         val responseSubject = PublishSubject.create<CypressOtaResponse>()
         val messageIndex = AtomicInteger(0)
@@ -141,7 +143,7 @@ class CypressOtaControllerTest {
                         )
                     }
                 }
-            }
+            }, Dispatchers.IO
         )
     }
 
