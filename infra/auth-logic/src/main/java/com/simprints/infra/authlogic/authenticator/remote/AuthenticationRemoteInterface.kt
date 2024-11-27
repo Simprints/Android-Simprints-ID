@@ -4,7 +4,10 @@ import com.simprints.infra.authlogic.authenticator.remote.models.ApiAuthRequestB
 import com.simprints.infra.authlogic.authenticator.remote.models.ApiAuthenticationData
 import com.simprints.infra.authlogic.authenticator.remote.models.ApiToken
 import com.simprints.infra.network.SimRemoteInterface
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 internal interface AuthenticationRemoteInterface : SimRemoteInterface {
 

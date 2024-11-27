@@ -75,7 +75,7 @@ internal class MatchViewModel @Inject constructor(
         setMatchState(matcherResult.totalCandidates, matcherResult.matchResultItems)
 
         // wait a bit for the user to see the results
-        delay(matchingEndWaitTimeInMillis)
+        delay(MATCHING_END_WAIT_TIME_MS)
 
         _matchResponse.send(
             when {
@@ -86,11 +86,11 @@ internal class MatchViewModel @Inject constructor(
     }
 
     private fun setMatchState(candidatesMatched: Int, results: List<MatchResultItem>) {
-        val veryGoodMatches = results.count { veryGoodMatchThreshold <= it.confidence }
+        val veryGoodMatches = results.count { VERY_GOOD_MATCH_THRESHOLD <= it.confidence }
         val goodMatches =
-            results.count { goodMatchThreshold <= it.confidence && it.confidence < veryGoodMatchThreshold }
+            results.count { GOOD_MATCH_THRESHOLD <= it.confidence && it.confidence < VERY_GOOD_MATCH_THRESHOLD }
         val fairMatches =
-            results.count { fairMatchThreshold <= it.confidence && it.confidence < goodMatchThreshold }
+            results.count { FAIR_MATCH_THRESHOLD <= it.confidence && it.confidence < GOOD_MATCH_THRESHOLD }
 
         _matchState.postValue(
             MatchState.Finished(
@@ -128,9 +128,9 @@ internal class MatchViewModel @Inject constructor(
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
 
-        private const val veryGoodMatchThreshold = 50.0
-        private const val goodMatchThreshold = 35.0
-        private const val fairMatchThreshold = 20.0
-        private const val matchingEndWaitTimeInMillis = 1000L
+        private const val VERY_GOOD_MATCH_THRESHOLD = 50.0
+        private const val GOOD_MATCH_THRESHOLD = 35.0
+        private const val FAIR_MATCH_THRESHOLD = 20.0
+        private const val MATCHING_END_WAIT_TIME_MS = 1000L
     }
 }

@@ -9,8 +9,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getIntWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.events.event.local.EventRoomDatabase
-import com.simprints.infra.events.event.local.migrations.*
-import com.simprints.infra.events.local.migrations.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,8 +16,6 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration4to5Test {
-
-    private val TEST_DB = "test"
 
     @get:Rule
     val helper = MigrationTestHelper(
@@ -77,6 +73,7 @@ class EventMigration4to5Test {
     }
 
     companion object {
+        private const val TEST_DB = "test"
         private const val EVENT_ID = "some-event-id"
     }
 

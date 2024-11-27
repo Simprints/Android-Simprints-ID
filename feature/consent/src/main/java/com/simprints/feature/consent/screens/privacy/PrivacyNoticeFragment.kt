@@ -32,10 +32,10 @@ internal class PrivacyNoticeFragment : Fragment(R.layout.fragment_privacy) {
     }
 
     private fun observeState() {
-        viewModel.showOffline().observe(viewLifecycleOwner) {
+        viewModel.showOffline.observe(viewLifecycleOwner) {
             showToast(IDR.string.login_no_network_error)
         }
-        viewModel.viewState().observe(viewLifecycleOwner) {
+        viewModel.viewState.observe(viewLifecycleOwner) {
             when (it) {
                 is PrivacyNoticeState.ConsentAvailable -> setConsentAvailable(it)
                 is PrivacyNoticeState.ConsentNotAvailable -> setConsentNotAvailable()

@@ -19,7 +19,7 @@ import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.R
 import com.simprints.matcher.databinding.FragmentMatcherBinding
-import com.simprints.matcher.screen.MatchViewModel.MatchState.*
+import com.simprints.matcher.screen.MatchViewModel.MatchState
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -82,11 +82,11 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         })
         viewModel.matchState.observe(viewLifecycleOwner) { matchState ->
             when (matchState) {
-                NotStarted -> renderNotStarted()
-                LoadingCandidates -> renderLoadingCandidates()
-                is Matching -> renderMatching()
-                is Finished -> renderFinished(matchState)
-                is NoPermission -> renderNoPermission(matchState)
+                MatchState.NotStarted -> renderNotStarted()
+                MatchState.LoadingCandidates -> renderLoadingCandidates()
+                is MatchState.Matching -> renderMatching()
+                is MatchState.Finished -> renderFinished(matchState)
+                is MatchState.NoPermission -> renderNoPermission(matchState)
             }
         }
     }
@@ -122,7 +122,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         setIdentificationProgress(MATCHING_PROGRESS)
     }
 
-    private fun renderFinished(matchState: Finished) {
+    private fun renderFinished(matchState: MatchState.Finished) {
         binding.faceMatchPermissionRequestButton.isVisible = false
         binding.faceMatchTvMatchingProgressStatus1.text = resources.getQuantityString(
             IDR.plurals.matcher_matched_candidates,
@@ -165,7 +165,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         setIdentificationProgress(MAX_PROGRESS)
     }
 
-    private fun renderNoPermission(state: NoPermission) = with(binding) {
+    private fun renderNoPermission(state: MatchState.NoPermission) = with(binding) {
         faceMatchMessage.setText(IDR.string.matcher_missing_access_permission)
 
         val name = args.params.biometricDataSource.permissionName()

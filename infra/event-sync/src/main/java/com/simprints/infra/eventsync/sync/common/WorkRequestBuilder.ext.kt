@@ -25,9 +25,10 @@ internal const val MASTER_SYNC_SCHEDULER_ONE_TIME = "TAG_MASTER_SYNC_SCHEDULER_O
 internal const val MASTER_SYNC_SCHEDULER_PERIODIC_TIME = "TAG_MASTER_SYNC_SCHEDULER_PERIODIC_TIME"
 
 
-/**
+/*
  * Add tags
  */
+
 // Common tags
 internal fun WorkRequest.Builder<*, *>.addTagForMasterSyncId(uniqueMasterSyncId: String?): WorkRequest.Builder<*, *> =
     uniqueMasterSyncId?.let { this.addTag("${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}") } ?: this
@@ -65,7 +66,7 @@ internal fun WorkRequest.Builder<*, *>.addTagForEndSyncReporter(): WorkRequest.B
 internal fun WorkRequest.Builder<*, *>.addTagForStartSyncReporter(): WorkRequest.Builder<*, *> =
     this.addTag(tagForType(START_SYNC_REPORTER))
 
-/**
+/*
  * Use tags
  */
 internal fun getUniqueSyncIdTag(syncId: String) = "$TAG_MASTER_SYNC_ID$syncId"

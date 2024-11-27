@@ -5,7 +5,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
-import java.util.*
+import java.util.UUID
 
 @Keep
 @Deprecated("Used only for the migration before 2021.1.0")

@@ -50,7 +50,7 @@ internal class IsNewEnrolmentUseCaseTest {
 
         assertThat(useCase(projectConfiguration, listOf(
             FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore)),
+                listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
                 mockk(),
             ),
         ))).isTrue()
@@ -62,7 +62,7 @@ internal class IsNewEnrolmentUseCaseTest {
 
         assertThat(useCase(projectConfiguration, listOf(
             FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore)),
+                listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
                 mockk(),
             ),
         ))).isFalse()
@@ -73,7 +73,7 @@ internal class IsNewEnrolmentUseCaseTest {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
-            FaceMatchResult(listOf(FaceMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
         ))).isTrue()
     }
 
@@ -82,7 +82,7 @@ internal class IsNewEnrolmentUseCaseTest {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
-            FaceMatchResult(listOf(FaceMatchResult.Item("", higherThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
         ))).isFalse()
     }
 
@@ -92,10 +92,10 @@ internal class IsNewEnrolmentUseCaseTest {
 
         assertThat(useCase(projectConfiguration, listOf(
             FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore)),
+                listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
                 mockk(),
             ),
-            FaceMatchResult(listOf(FaceMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
         ))).isTrue()
     }
 
@@ -105,10 +105,10 @@ internal class IsNewEnrolmentUseCaseTest {
 
         assertThat(useCase(projectConfiguration, listOf(
             FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore)),
+                listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
                 mockk(),
             ),
-            FaceMatchResult(listOf(FaceMatchResult.Item("", higherThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
         ))).isFalse()
     }
 
@@ -118,18 +118,18 @@ internal class IsNewEnrolmentUseCaseTest {
 
         assertThat(useCase(projectConfiguration, listOf(
             FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore)),
+                listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
                 mockk(),
             ),
-            FaceMatchResult(listOf(FaceMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
         ))).isFalse()
     }
 
     companion object {
-        private const val mediumConfidenceScore = 30
-        private const val lowerThanMediumConfidenceScore = mediumConfidenceScore - 1f
-        private const val higherThanMediumConfidenceScore = mediumConfidenceScore + 1f
-        private val fingerprintConfidenceDecisionPolicy = DecisionPolicy(15, mediumConfidenceScore, 40)
-        private val faceConfidenceDecisionPolicy = DecisionPolicy(15, mediumConfidenceScore, 40)
+        private const val MEDIUM_CONFIDENCE_SCORE = 30
+        private const val LOWER_THAN_MEDIUM_SCORE = MEDIUM_CONFIDENCE_SCORE - 1f
+        private const val HIGHER_THAN_MEDIUM_SCORE = MEDIUM_CONFIDENCE_SCORE + 1f
+        private val fingerprintConfidenceDecisionPolicy = DecisionPolicy(15, MEDIUM_CONFIDENCE_SCORE, 40)
+        private val faceConfidenceDecisionPolicy = DecisionPolicy(15, MEDIUM_CONFIDENCE_SCORE, 40)
     }
 }
