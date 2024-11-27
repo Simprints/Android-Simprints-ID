@@ -16,7 +16,7 @@ import com.simprints.fingerprint.infra.scanner.helpers.ScannerInitialSetupHelper
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
-import com.simprints.fingerprint.infra.scanner.v2.tools.executeSafely
+import com.simprints.fingerprint.infra.scanner.v2.tools.runWithErrorWrapping
 import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
 import com.simprints.fingerprint.infra.scanner.v2.tools.wrapErrorFromScanner
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -72,7 +72,7 @@ internal class ScannerWrapperV2(
      * @throws OtaFailedException
      */
     override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) =
-        executeSafely {
+        runWithErrorWrapping {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(
                 fingerprintSdk,
                 scannerV2,
@@ -83,7 +83,7 @@ internal class ScannerWrapperV2(
 
         }
 
-    override suspend fun disconnect() = executeSafely {
+    override suspend fun disconnect() = runWithErrorWrapping {
         connectionHelper.disconnectScanner(scannerV2)
     }
 
@@ -98,7 +98,7 @@ internal class ScannerWrapperV2(
      * @throws ScannerDisconnectedException
      * @throws UnexpectedScannerException
      */
-    override suspend fun sensorWakeUp() = executeSafely {
+    override suspend fun sensorWakeUp() = runWithErrorWrapping {
         scannerV2.ensureUn20State(true)
     }
 
@@ -113,13 +113,13 @@ internal class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      * @throws NotConnectedException
      */
-    override suspend fun sensorShutDown() = executeSafely {
+    override suspend fun sensorShutDown() = runWithErrorWrapping {
         scannerV2.ensureUn20State(false)
     }
 
     override fun isLiveFeedbackAvailable(): Boolean = true
 
-    override suspend fun startLiveFeedback(): Unit = executeSafely {
+    override suspend fun startLiveFeedback(): Unit = runWithErrorWrapping {
         if (isLiveFeedbackAvailable()) {
             scannerV2.setScannerLedStateOn()
             // ignore exceptions from getImageQualityWhileSettingLEDState
@@ -142,7 +142,7 @@ internal class ScannerWrapperV2(
     }
 
     @SuppressLint("CheckResult")
-    override suspend fun stopLiveFeedback(): Unit = executeSafely {
+    override suspend fun stopLiveFeedback(): Unit = runWithErrorWrapping {
         if (isLiveFeedbackAvailable()) {
             scannerV2.setSmileLedState(scannerUiHelper.turnedOffState())
             scannerV2.setScannerLedStateDefault()
@@ -152,7 +152,7 @@ internal class ScannerWrapperV2(
     }
 
 
-    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) = executeSafely {
+    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) = runWithErrorWrapping {
         getUn20Status().let { actualState ->
             when {
                 desiredState && !actualState -> turnUn20On()
@@ -161,7 +161,7 @@ internal class ScannerWrapperV2(
         }
     }
 
-    override suspend fun turnOffSmileLeds(): Unit = executeSafely {
+    override suspend fun turnOffSmileLeds(): Unit = runWithErrorWrapping {
         // No need to handle exceptions while updating the LED state
         runCatching { scannerV2.setSmileLedState(scannerUiHelper.turnedOffState()) }
     }
@@ -188,17 +188,17 @@ internal class ScannerWrapperV2(
         }
     }
 
-    override suspend fun turnOnFlashingWhiteSmileLeds(): Unit = executeSafely {
+    override suspend fun turnOnFlashingWhiteSmileLeds(): Unit = runWithErrorWrapping {
         // No need to handle exceptions while updating the LED state
         runCatching { scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()) }
     }
 
-    override suspend fun setUiGoodCapture(): Unit = executeSafely {
+    override suspend fun setUiGoodCapture(): Unit = runWithErrorWrapping {
         // No need to handle exceptions while updating the LED state
         runCatching { scannerV2.setSmileLedState(scannerUiHelper.goodScanLedState()) }
     }
 
-    override suspend fun setUiBadCapture(): Unit = executeSafely {
+    override suspend fun setUiBadCapture(): Unit = runWithErrorWrapping {
         // No need to handle exceptions while updating the LED state
         runCatching { scannerV2.setSmileLedState(scannerUiHelper.badScanLedState()) }
     }

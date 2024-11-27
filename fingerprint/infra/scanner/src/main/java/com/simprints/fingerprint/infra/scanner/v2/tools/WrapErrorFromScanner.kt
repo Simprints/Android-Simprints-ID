@@ -34,7 +34,7 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     }
 }
 
-suspend fun <T> executeSafely(block: suspend () -> T): T {
+suspend fun <T> runWithErrorWrapping(block: suspend () -> T): T {
     return try {
         block()
     } catch (e: Exception) {

@@ -12,20 +12,20 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormatData
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
-import com.simprints.fingerprint.infra.scanner.v2.tools.executeSafely
+import com.simprints.fingerprint.infra.scanner.v2.tools.runWithErrorWrapping
 
 internal class FingerprintCaptureWrapperV2(
     private val scannerV2: Scanner,
     private val tracker: FingerprintScanningStatusTracker,
 ) : FingerprintCaptureWrapper {
 
-    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray = executeSafely {
+    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray = runWithErrorWrapping {
         scannerV2.acquireImageDistortionConfigurationMatrix()
             ?: throw NoImageDistortionConfigurationMatrixException("Failed to acquire image distortion configuration matrix")
     }
 
     override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse =
-        executeSafely {
+        runWithErrorWrapping {
             scannerV2.acquireImage(IMAGE_FORMAT)?.image?.let { imageBytes ->
                 AcquireFingerprintImageResponse(imageBytes)
             } ?: throw NoFingerDetectedException("Failed to acquire image")
@@ -34,7 +34,7 @@ internal class FingerprintCaptureWrapperV2(
 
     override suspend fun acquireUnprocessedImage(
         captureDpi: Dpi?,
-    ): AcquireUnprocessedImageResponse = executeSafely {
+    ): AcquireUnprocessedImageResponse = runWithErrorWrapping {
         require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
         }
@@ -56,7 +56,7 @@ internal class FingerprintCaptureWrapperV2(
         timeOutMs: Int,
         qualityThreshold: Int,
         allowLowQualityExtraction: Boolean
-    ): AcquireFingerprintTemplateResponse = executeSafely {
+    ): AcquireFingerprintTemplateResponse = runWithErrorWrapping {
         require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
         }
