@@ -60,7 +60,7 @@ class StmOtaController {
     private suspend fun sendInitBootloaderCommand(
         stmOtaMessageChannel: StmOtaMessageChannel,
     ) {
-        stmOtaMessageChannel.sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+        stmOtaMessageChannel.sendCommandAndReceiveResponse<CommandAcknowledgement>(
             InitBootloaderCommand()
         ).verifyResponseIsAck()
     }
@@ -68,10 +68,10 @@ class StmOtaController {
     private suspend fun eraseMemory(
         stmOtaMessageChannel: StmOtaMessageChannel,
     ) {
-        stmOtaMessageChannel.sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+        stmOtaMessageChannel.sendCommandAndReceiveResponse<CommandAcknowledgement>(
             EraseMemoryStartCommand()
         ).verifyResponseIsAck()
-        stmOtaMessageChannel.sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+        stmOtaMessageChannel.sendCommandAndReceiveResponse<CommandAcknowledgement>(
             EraseMemoryAddressCommand(ERASE_ALL_ADDRESS)
         ).verifyResponseIsAck()
     }
@@ -88,13 +88,13 @@ class StmOtaController {
         stmOtaMessageChannel: StmOtaMessageChannel,
         firmwareByteChunk: FirmwareByteChunk
     ) {
-        stmOtaMessageChannel.sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+        stmOtaMessageChannel.sendCommandAndReceiveResponse<CommandAcknowledgement>(
             WriteMemoryStartCommand()
         ).verifyResponseIsAck()
-        stmOtaMessageChannel.sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+        stmOtaMessageChannel.sendCommandAndReceiveResponse<CommandAcknowledgement>(
             WriteMemoryAddressCommand(firmwareByteChunk.address)
         ).verifyResponseIsAck()
-        stmOtaMessageChannel.sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(
+        stmOtaMessageChannel.sendCommandAndReceiveResponse<CommandAcknowledgement>(
             WriteMemoryDataCommand(firmwareByteChunk.data)
         ).verifyResponseIsAck()
     }
@@ -103,7 +103,7 @@ class StmOtaController {
         stmOtaMessageChannel: StmOtaMessageChannel,
     ) {
         stmOtaMessageChannel
-            .sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(GoCommand())
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(GoCommand())
             .verifyResponseIsAck()
         stmOtaMessageChannel.outgoing.sendMessage( // The ACK sometimes doesn't make it back before the Cypress module disconnects
             GoAddressCommand(GO_ADDRESS.toByteArray(StmOtaMessageProtocol.byteOrder))

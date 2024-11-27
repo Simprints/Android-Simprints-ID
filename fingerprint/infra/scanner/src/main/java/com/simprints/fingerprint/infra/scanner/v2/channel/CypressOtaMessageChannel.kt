@@ -16,7 +16,7 @@ class CypressOtaMessageChannel(
     incoming, outgoing, dispatcher
 ) {
 
-    suspend inline fun <reified R : CypressOtaResponse> sendCypressOtaModeCommandAndReceiveResponse(
+    suspend inline fun <reified R : CypressOtaResponse> sendCommandAndReceiveResponse(
         command: CypressOtaCommand
     ): R = runLockedTask {
         outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()

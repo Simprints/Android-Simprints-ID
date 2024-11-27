@@ -16,7 +16,7 @@ class RootMessageChannel(
     incoming, outgoing, dispatcher
 ) {
 
-    suspend inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): R =
+    suspend inline fun <reified R : RootResponse> sendCommandAndReceiveResponse(command: RootCommand): R =
         runLockedTask {
             outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
         }

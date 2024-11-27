@@ -16,7 +16,7 @@ class MainMessageChannel(
     incoming, outgoing, dispatcher
 ) {
 
-    suspend inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(
+    suspend inline fun <reified R : IncomingMainMessage> sendCommandAndReceiveResponse(
         command: OutgoingMainMessage
     ): R = runLockedTask {
         outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()

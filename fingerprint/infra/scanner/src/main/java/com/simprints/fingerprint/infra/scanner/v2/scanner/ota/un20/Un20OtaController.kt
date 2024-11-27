@@ -36,20 +36,20 @@ class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
 
     private suspend fun startOta(
         mainMessageChannel: MainMessageChannel
-    ) = mainMessageChannel.sendMainModeCommandAndReceiveResponse<StartOtaResponse>(
+    ) = mainMessageChannel.sendCommandAndReceiveResponse<StartOtaResponse>(
         StartOtaCommand(UUID.randomUUID().toString())
     ).verifyResultOk()
 
     private suspend fun writeOtaChunk(
         mainMessageChannel: MainMessageChannel,
         chunk: ByteArray
-    ) = mainMessageChannel.sendMainModeCommandAndReceiveResponse<WriteOtaChunkResponse>(
+    ) = mainMessageChannel.sendCommandAndReceiveResponse<WriteOtaChunkResponse>(
         WriteOtaChunkCommand(chunk)
     ).verifyResultOk()
 
     private suspend fun verifyOta(
         mainMessageChannel: MainMessageChannel, crc32: Int
-    ) = mainMessageChannel.sendMainModeCommandAndReceiveResponse<VerifyOtaResponse>(
+    ) = mainMessageChannel.sendCommandAndReceiveResponse<VerifyOtaResponse>(
         VerifyOtaCommand(crc32)
     ).verifyResultOk()
 

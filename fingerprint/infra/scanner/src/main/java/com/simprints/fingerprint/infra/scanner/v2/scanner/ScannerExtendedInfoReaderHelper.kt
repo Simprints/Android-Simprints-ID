@@ -44,33 +44,33 @@ class ScannerExtendedInfoReaderHelper(
 
 
     suspend fun getCypressVersion(): CypressFirmwareVersion =
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<GetCypressVersionResponse>(
+        rootMessageChannel.sendCommandAndReceiveResponse<GetCypressVersionResponse>(
             GetCypressVersionCommand()
         ).version
 
     suspend fun getCypressExtendedVersion(): CypressExtendedFirmwareVersion =
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<GetCypressExtendedVersionResponse>(
+        rootMessageChannel.sendCommandAndReceiveResponse<GetCypressExtendedVersionResponse>(
             GetCypressExtendedVersionCommand()
         ).version
 
     suspend fun getStmExtendedFirmwareVersion(): StmExtendedFirmwareVersion =
-        mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
+        mainMessageChannel.sendCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
             GetStmExtendedFirmwareVersionCommand()
         ).stmFirmwareVersion
 
     suspend fun getUn20ExtendedAppVersion(): Un20ExtendedAppVersion =
-        mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
+        mainMessageChannel.sendCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
             GetUn20ExtendedAppVersionCommand()
         ).un20AppVersion
 
     suspend fun setExtendedVersionInformation(versionInformation: ExtendedVersionInformation): SetVersionResponse =
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse(
+        rootMessageChannel.sendCommandAndReceiveResponse(
             SetExtendedVersionCommand(versionInformation)
         )
 
     private suspend fun getScannerInformationWithLegacyApi(): ScannerInformation {
         val legacyUnifiedVersion =
-            rootMessageChannel.sendRootModeCommandAndReceiveResponse<GetVersionResponse>(
+            rootMessageChannel.sendCommandAndReceiveResponse<GetVersionResponse>(
                 GetVersionCommand()
             )
 
@@ -136,12 +136,12 @@ class ScannerExtendedInfoReaderHelper(
     }
 
     private suspend fun getHardwareVersionInfo(): GetHardwareVersionResponse =
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<GetHardwareVersionResponse>(
+        rootMessageChannel.sendCommandAndReceiveResponse<GetHardwareVersionResponse>(
             GetHardwareVersionCommand()
         )
 
     suspend fun getExtendedVersionInfo(): GetExtendedVersionResponse =
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<GetExtendedVersionResponse>(
+        rootMessageChannel.sendCommandAndReceiveResponse<GetExtendedVersionResponse>(
             GetExtendedVersionCommand()
         )
 

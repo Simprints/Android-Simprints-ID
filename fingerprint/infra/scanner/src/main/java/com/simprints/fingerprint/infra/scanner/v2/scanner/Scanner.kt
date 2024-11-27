@@ -148,7 +148,7 @@ class Scanner(
     suspend fun enterMainMode() {
         assertConnected()
         assertMode(ROOT)
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<EnterMainModeResponse>(
+        rootMessageChannel.sendCommandAndReceiveResponse<EnterMainModeResponse>(
             EnterMainModeCommand()
         )
         handleMainModeEntered()
@@ -157,7 +157,7 @@ class Scanner(
     suspend fun enterCypressOtaMode() {
         assertConnected()
         assertMode(ROOT)
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<EnterCypressOtaModeResponse>(
+        rootMessageChannel.sendCommandAndReceiveResponse<EnterCypressOtaModeResponse>(
             EnterCypressOtaModeCommand()
         )
         handleCypressOtaModeEntered()
@@ -166,7 +166,7 @@ class Scanner(
     suspend fun enterStmOtaMode() {
         assertConnected()
         assertMode(ROOT)
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<EnterStmOtaModeResponse>(
+        rootMessageChannel.sendCommandAndReceiveResponse<EnterStmOtaModeResponse>(
             EnterStmOtaModeCommand()
         )
         handleStmOtaModeEntered()
@@ -210,7 +210,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         val un20Status = mainMessageChannel
-            .sendMainModeCommandAndReceiveResponse<GetUn20OnResponse>(GetUn20OnCommand())
+            .sendCommandAndReceiveResponse<GetUn20OnResponse>(GetUn20OnCommand())
             .value == StmDigitalValue.TRUE
         state.un20On = un20Status
         return un20Status
@@ -220,7 +220,7 @@ class Scanner(
     suspend fun turnUn20On() {
         assertConnected()
         assertMode(MAIN)
-        mainMessageChannel.sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(
+        mainMessageChannel.sendCommandAndReceiveResponse<SetUn20OnResponse>(
             SetUn20OnCommand(StmDigitalValue.TRUE)
         )
         mainMessageChannel.receiveResponse<Un20StateChangeEvent>()
@@ -249,7 +249,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryPercentCharge =
-            mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
+            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
                 GetBatteryPercentChargeCommand()
             ).batteryPercentCharge.percentCharge.unsignedToInt()
         return state.batteryPercentCharge!!
@@ -259,7 +259,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryVoltageMilliVolts =
-            mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetBatteryVoltageResponse>(
+            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryVoltageResponse>(
                 GetBatteryVoltageCommand()
             ).batteryVoltage.milliVolts.unsignedToInt()
 
@@ -270,7 +270,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryCurrentMilliAmps =
-            mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetBatteryCurrentResponse>(
+            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryCurrentResponse>(
                 GetBatteryCurrentCommand()
             ).batteryCurrent.milliAmps.toInt()
         return state.batteryCurrentMilliAmps!!
@@ -280,7 +280,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryTemperatureDeciKelvin =
-            mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetBatteryTemperatureResponse>(
+            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryTemperatureResponse>(
                 GetBatteryTemperatureCommand()
             ).batteryTemperature.deciKelvin.unsignedToInt()
         return state.batteryTemperatureDeciKelvin!!
@@ -299,7 +299,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendMainModeCommandAndReceiveResponse<CaptureFingerprintResponse>(
+        return mainMessageChannel.sendCommandAndReceiveResponse<CaptureFingerprintResponse>(
             CaptureFingerprintCommand(dpi)
         ).captureFingerprintResult
     }
@@ -309,7 +309,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        mainMessageChannel.sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
+        mainMessageChannel.sendCommandAndReceiveResponse<SetScanLedStateResponse>(
             SetScanLedStateCommand(Un20DigitalValue.TRUE)
         )
         state.scanLedState = true
@@ -320,7 +320,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        mainMessageChannel.sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
+        mainMessageChannel.sendCommandAndReceiveResponse<SetScanLedStateResponse>(
             SetScanLedStateCommand(Un20DigitalValue.FALSE)
         )
         state.scanLedState = false
@@ -332,7 +332,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
+        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
             GetImageQualityPreviewCommand()
         ).imageQualityScore
     }
@@ -342,7 +342,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetTemplateResponse>(
+        return mainMessageChannel.sendCommandAndReceiveResponse<GetTemplateResponse>(
             GetTemplateCommand(templateType)
         ).templateData
     }
@@ -353,7 +353,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetImageResponse>(
+        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageResponse>(
             GetImageCommand(imageFormatData)
         ).imageData
     }
@@ -362,7 +362,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetImageResponse>(
+        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageResponse>(
             GetUnprocessedImageCommand(imageFormatData)
         ).imageData
     }
@@ -371,7 +371,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetImageDistortionConfigurationMatrixResponse>(
+        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageDistortionConfigurationMatrixResponse>(
             GetImageDistortionConfigurationMatrixCommand()
         ).imageConfigurationMatrix
     }
@@ -381,7 +381,7 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendMainModeCommandAndReceiveResponse<GetImageQualityResponse>(
+        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageQualityResponse>(
             GetImageQualityCommand()
         ).imageQualityScore
     }

@@ -16,7 +16,7 @@ class StmOtaMessageChannel(
     incoming, outgoing, dispatcher
 ) {
 
-    suspend inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(command: StmOtaCommand): R =
+    suspend inline fun <reified R : StmOtaResponse> sendCommandAndReceiveResponse(command: StmOtaCommand): R =
         runLockedTask {
             outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
         }
