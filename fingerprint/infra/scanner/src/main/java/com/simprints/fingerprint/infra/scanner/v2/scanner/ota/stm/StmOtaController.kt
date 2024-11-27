@@ -105,7 +105,7 @@ class StmOtaController {
         stmOtaMessageChannel
             .sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(GoCommand())
             .verifyResponseIsAck()
-        stmOtaMessageChannel.outgoing.sendMessage( // The ACK sometimes doesn't make it back before the Cypress module disconnects
+        stmOtaMessageChannel.sendStmOtaModeCommand( // The ACK sometimes doesn't make it back before the Cypress module disconnects
             GoAddressCommand(GO_ADDRESS.toByteArray(StmOtaMessageProtocol.byteOrder))
         )
     }
