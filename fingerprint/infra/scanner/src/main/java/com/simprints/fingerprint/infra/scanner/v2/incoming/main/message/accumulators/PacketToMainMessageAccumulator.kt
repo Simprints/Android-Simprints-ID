@@ -11,7 +11,7 @@ abstract class PacketToMainMessageAccumulator<R : MainMessage>(
     private val messageParser: MessageParser<R>
 ) : ByteArrayAccumulator<Packet, R>(
     fragmentAsByteArray = { packet -> packet.payload },
-    canComputeElementLength = { bytes -> bytes.size >= protocol.HEADER_SIZE },
-    computeElementLength = { bytes -> protocol.getTotalLengthFromHeader(bytes.sliceArray(protocol.HEADER_INDICES)) },
+    canComputeElementLength = { bytes -> bytes.size >= protocol.headerSize },
+    computeElementLength = { bytes -> protocol.getTotalLengthFromHeader(bytes.sliceArray(protocol.headerIndices)) },
     buildElement = { bytes -> messageParser.parse(bytes) }
 )

@@ -5,7 +5,7 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import java.util.Date
 
 @Parcelize
 data class Subject(

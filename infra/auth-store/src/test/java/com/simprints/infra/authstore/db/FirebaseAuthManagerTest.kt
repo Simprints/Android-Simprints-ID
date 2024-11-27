@@ -54,7 +54,6 @@ class FirebaseAuthManagerTest {
         every { firebaseOptionsBuilder.setApiKey(any()) } returns firebaseOptionsBuilder
         every { firebaseOptionsBuilder.setProjectId(any()) } returns firebaseOptionsBuilder
         every { firebaseOptionsBuilder.setApplicationId(any()) } returns firebaseOptionsBuilder
-
     }
 
     @Test

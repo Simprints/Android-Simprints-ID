@@ -1,6 +1,8 @@
 package com.simprints.infra.security.keyprovider
 
-import android.util.Base64.*
+import android.util.Base64.DEFAULT
+import android.util.Base64.decode
+import android.util.Base64.encodeToString
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MatchingLocalDatabaseKeyHashesException

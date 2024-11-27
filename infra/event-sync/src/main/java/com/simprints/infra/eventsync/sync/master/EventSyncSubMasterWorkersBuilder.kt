@@ -2,7 +2,11 @@ package com.simprints.infra.eventsync.sync.master
 
 import androidx.work.OneTimeWorkRequest
 import androidx.work.workDataOf
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.addCommonTagForAllSyncWorkers
+import com.simprints.infra.eventsync.sync.common.addTagForEndSyncReporter
+import com.simprints.infra.eventsync.sync.common.addTagForMasterSyncId
+import com.simprints.infra.eventsync.sync.common.addTagForScheduledAtNow
+import com.simprints.infra.eventsync.sync.common.addTagForStartSyncReporter
 import javax.inject.Inject
 
 internal class EventSyncSubMasterWorkersBuilder @Inject constructor() {

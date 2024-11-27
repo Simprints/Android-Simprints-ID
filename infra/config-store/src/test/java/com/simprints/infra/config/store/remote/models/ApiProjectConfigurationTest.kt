@@ -2,7 +2,18 @@ package com.simprints.infra.config.store.remote.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.testtools.*
+import com.simprints.infra.config.store.testtools.apiConsentConfiguration
+import com.simprints.infra.config.store.testtools.apiGeneralConfiguration
+import com.simprints.infra.config.store.testtools.apiIdentificationConfiguration
+import com.simprints.infra.config.store.testtools.apiProjectConfiguration
+import com.simprints.infra.config.store.testtools.apiSynchronizationConfiguration
+import com.simprints.infra.config.store.testtools.consentConfiguration
+import com.simprints.infra.config.store.testtools.customKeyMap
+import com.simprints.infra.config.store.testtools.generalConfiguration
+import com.simprints.infra.config.store.testtools.identificationConfiguration
+import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.testtools.synchronizationConfiguration
+
 import org.junit.Test
 
 class ApiProjectConfigurationTest {

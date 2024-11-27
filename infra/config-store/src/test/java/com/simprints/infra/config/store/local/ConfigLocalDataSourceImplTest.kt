@@ -13,7 +13,13 @@ import com.simprints.infra.config.store.local.serializer.ProjectConfigurationSer
 import com.simprints.infra.config.store.local.serializer.ProjectSerializer
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.testtools.*
+import com.simprints.infra.config.store.testtools.consentConfiguration
+import com.simprints.infra.config.store.testtools.faceConfiguration
+import com.simprints.infra.config.store.testtools.generalConfiguration
+import com.simprints.infra.config.store.testtools.identificationConfiguration
+import com.simprints.infra.config.store.testtools.project
+import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -80,7 +86,7 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `should save the project correctly`() = runTest(UnconfinedTestDispatcher()) {
+    fun `should save the project correctly`() = runTest {
         val projectToSave = project
 
         configLocalDataSourceImpl.saveProject(projectToSave)
@@ -90,7 +96,7 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `should clear the project correctly`() = runTest(UnconfinedTestDispatcher()) {
+    fun `should clear the project correctly`() = runTest {
         configLocalDataSourceImpl.saveProject(project)
         configLocalDataSourceImpl.clearProject()
 
@@ -99,7 +105,7 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should save the project configuration and update the device configuration correctly`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             val projectConfigurationToSave = projectConfiguration
 
             configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
@@ -116,7 +122,7 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should save the project configuration and only update the device configuration fingersToCollect if the device configuration has been overwritten for language`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
                     it.language = "fr"
@@ -139,7 +145,7 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should save the project configuration and only update the device configuration language if the device configuration has been overwritten for fingersToCollect`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
                     it.selectedModules = listOf("module1".asTokenizableEncrypted())
@@ -161,7 +167,7 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should save the project configuration and update the device configuration correctly with an empty list of fingersToCollect if fingerprint config is missing`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             val projectConfigurationToSave = ProjectConfiguration(
                 "id",
                 "projectId",
@@ -189,13 +195,13 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should return the default configuration when there is not configuration saved`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             val projectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
             assertThat(projectConfiguration).isEqualTo(ConfigLocalDataSourceImpl.defaultProjectConfiguration.toDomain())
         }
 
     @Test
-    fun `should clear the project configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
+    fun `should clear the project configuration correctly`() = runTest {
         configLocalDataSourceImpl.saveProjectConfiguration(projectConfiguration)
         configLocalDataSourceImpl.clearProjectConfiguration()
 
@@ -204,7 +210,7 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `should update the device configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
+    fun `should update the device configuration correctly`() = runTest {
         configLocalDataSourceImpl.updateDeviceConfiguration {
             it.apply {
                 it.language = "fr"
@@ -219,7 +225,7 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should update the fingers to collect in the device configuration correctly`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
                     it.language = "fr"
@@ -248,7 +254,7 @@ class ConfigLocalDataSourceImplTest {
         }
 
     @Test
-    fun `should clear the device configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
+    fun `should clear the device configuration correctly`() = runTest {
         configLocalDataSourceImpl.updateDeviceConfiguration { it.apply { it.language = "fr" } }
         configLocalDataSourceImpl.clearDeviceConfiguration()
 

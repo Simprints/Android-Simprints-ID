@@ -7,7 +7,10 @@ import com.google.android.play.core.integrity.IntegrityManager
 import com.google.android.play.core.integrity.IntegrityServiceException
 import com.google.android.play.core.integrity.IntegrityTokenRequest
 import com.google.android.play.core.integrity.IntegrityTokenResponse
-import com.google.android.play.core.integrity.model.IntegrityErrorCode.*
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.CLOUD_PROJECT_NUMBER_IS_INVALID
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.GOOGLE_SERVER_UNAVAILABLE
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.NETWORK_ERROR
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.PLAY_STORE_NOT_FOUND
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authlogic.BuildConfig
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown

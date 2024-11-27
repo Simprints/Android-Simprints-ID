@@ -115,7 +115,7 @@ class PrivacyNoticesFragmentTest {
     }
 
     private fun mockPrivacyNoticeState(state: PrivacyNoticeState) {
-        every { viewModel.viewState() } returns mockk {
+        every { viewModel.viewState } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<PrivacyNoticeState>>().onChanged(state)
             }

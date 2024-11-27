@@ -1,3 +1,6 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+// This class uses entire vero API so import list would be extremely long without wildcards
+
 package com.simprints.fingerprint.infra.scanner.v2.scanner
 
 import com.simprints.core.DispatcherIO

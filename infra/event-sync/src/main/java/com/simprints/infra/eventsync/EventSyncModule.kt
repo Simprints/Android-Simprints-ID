@@ -1,12 +1,9 @@
 package com.simprints.infra.eventsync
 
 import android.content.Context
-import com.simprints.infra.events.event.local.*
-import com.simprints.infra.events.local.*
 import com.simprints.infra.eventsync.status.EventSyncStatusDatabase
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
-import com.simprints.infra.eventsync.sync.down.*
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

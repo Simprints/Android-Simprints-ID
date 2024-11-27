@@ -74,7 +74,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 buildTypes {
-                    getByName(BuildTypes.release) {
+                    getByName(BuildTypes.RELEASE) {
                         isMinifyEnabled = true
                         isShrinkResources = true
                         isDebuggable = false
@@ -83,7 +83,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         buildConfigField("Boolean", "DEBUG_MODE", "false")
                     }
 
-                    create(BuildTypes.staging) {
+                    create(BuildTypes.STAGING) {
                         isMinifyEnabled = true
                         isShrinkResources = true
                         isDebuggable = propDebuggable
@@ -92,7 +92,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         buildConfigField("Boolean", "DEBUG_MODE", "true")
                     }
 
-                    getByName(BuildTypes.debug) {
+                    getByName(BuildTypes.DEBUG) {
                         isMinifyEnabled = false
                         isShrinkResources = false
                         isDebuggable = propDebuggable

@@ -11,7 +11,7 @@ import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.SampleSyncScopes.userDownSyncScope
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.Companion.oldTypes
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class EventDownSyncOperationTest {
 

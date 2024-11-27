@@ -11,12 +11,10 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.events.event.local.*
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.DbEventScope
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
-import com.simprints.infra.events.local.*
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex

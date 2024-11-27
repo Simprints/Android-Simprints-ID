@@ -5,7 +5,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import androidx.camera.core.*
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraControl
+import androidx.camera.core.CameraInfoUnavailableException
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.core.MeteringPoint
+import androidx.camera.core.MeteringPointFactory
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.view.PreviewView
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.logging.Simber

@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v1.tools.ota
 
 class OTAHelper {
-    private val PACKET_BIN_SIZE = 256
 
     fun splitByLines(input: String): List<String> =
         input.split("\n")
@@ -57,4 +56,7 @@ class OTAHelper {
         return linesSplit.map { it[1].toInt() }
     }
 
+    companion object {
+        private const val PACKET_BIN_SIZE = 256
+    }
 }

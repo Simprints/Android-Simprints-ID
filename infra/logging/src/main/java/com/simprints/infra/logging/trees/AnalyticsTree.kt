@@ -10,11 +10,6 @@ import timber.log.Timber
 
 internal class AnalyticsTree(private val analytics: FirebaseAnalytics) : Timber.Tree() {
 
-    companion object {
-        // If for some reason there is no tag for the event
-        internal const val defaultTag = "DEFAULT"
-    }
-
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         if (priority == Log.VERBOSE || priority == Log.DEBUG) return
 
@@ -29,8 +24,13 @@ internal class AnalyticsTree(private val analytics: FirebaseAnalytics) : Timber.
 
         if (priority == Log.INFO) {
             val params = Bundle()
-            params.putString(tag ?: defaultTag, message)
-            analytics.logEvent(tag ?: defaultTag, params)
+            params.putString(tag ?: DEFAULT_TAG, message)
+            analytics.logEvent(tag ?: DEFAULT_TAG, params)
         }
+    }
+
+    companion object {
+        // If for some reason there is no tag for the event
+        internal const val DEFAULT_TAG = "DEFAULT"
     }
 }

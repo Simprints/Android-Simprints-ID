@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import java.util.*
+import java.util.Locale
 
 @ExcludedFromGeneratedTestCoverageReports("Testing this class is more effort than it's worth")
 object LanguageHelper {

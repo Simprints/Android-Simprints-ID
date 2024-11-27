@@ -3,7 +3,7 @@ package com.simprints.feature.consent.screens.consent.helpers
 import android.content.Context
 import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration.*
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.resources.R
 
 internal data class GeneralConsentTextHelper(
@@ -98,11 +98,11 @@ internal data class GeneralConsentTextHelper(
         getConcatenatedModalitiesUseCaseText(context)
     }
 
-    private fun getConcatenatedModalitiesUseCaseText(context: Context) = "%s %s %s".format(
+    private fun getConcatenatedModalitiesUseCaseText(context: Context) = listOf(
         context.getString(R.string.consent_biometrics_general_fingerprint),
         context.getString(R.string.consent_biometric_concat_modalities),
         context.getString(R.string.consent_biometric_general_face)
-    )
+    ).joinToString(" ")
 
     private fun getSingleModalitySpecificUseCaseText(
         context: Context,

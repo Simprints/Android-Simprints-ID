@@ -19,19 +19,41 @@ import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
-import com.simprints.infra.config.store.models.*
-import com.simprints.infra.config.store.remote.models.*
 import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.DeviceState
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.FaceSdkConfiguration
+import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.MaxCaptureAttempts
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Vero1Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.remote.models.ApiAllowedAgeRange
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
+import com.simprints.infra.config.store.remote.models.ApiDeviceState
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration.ApiFaceSdkConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFingerprintConfiguration
 import com.simprints.infra.config.store.remote.models.ApiGeneralConfiguration
 import com.simprints.infra.config.store.remote.models.ApiIdentificationConfiguration
+import com.simprints.infra.config.store.remote.models.ApiMaxCaptureAttempts
 import com.simprints.infra.config.store.remote.models.ApiProject
 import com.simprints.infra.config.store.remote.models.ApiProjectConfiguration
+import com.simprints.infra.config.store.remote.models.ApiProjectState
 import com.simprints.infra.config.store.remote.models.ApiSynchronizationConfiguration
 import com.simprints.infra.config.store.remote.models.ApiVero1Configuration
 import com.simprints.infra.config.store.remote.models.ApiVero2Configuration
@@ -356,7 +378,7 @@ internal val customKeyMap: Map<String, Any>? = mapOf(
     "key3" to false,
     "key4" to "test"
 )
-internal const val protoCustomKeyMapJson = "{\"key1\":7,\"key2\":4.2,\"key3\":false,\"key4\":\"test\"}"
+internal const val PROTO_CUSTOM_KEY_MAP_JSON = "{\"key1\":7,\"key2\":4.2,\"key3\":false,\"key4\":\"test\"}"
 
 internal val apiProjectConfiguration = ApiProjectConfiguration(
     "id",
@@ -394,14 +416,14 @@ internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setConsent(protoConsentConfiguration)
     .setIdentification(protoIdentificationConfiguration)
     .setSynchronization(protoSynchronizationConfiguration)
-    .setCustomJson(protoCustomKeyMapJson)
+    .setCustomJson(PROTO_CUSTOM_KEY_MAP_JSON)
     .build()
 
 
-internal const val tokenizationJson =
+internal const val TOKENIZATION_JSON =
     "{\"primaryKeyId\":12345,\"key\":[{\"keyData\":{\"typeUrl\":\"typeUrl\",\"value\":\"value\",\"keyMaterialType\":\"keyMaterialType\"},\"status\":\"enabled\",\"keyId\":123456789,\"outputPrefixType\":\"outputPrefixType\"}]}"
 
-internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to tokenizationJson)
+internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to TOKENIZATION_JSON)
 internal val tokenizationKeysLocal = tokenizationKeysDomain.mapKeys {
     it.key.toString()
 }

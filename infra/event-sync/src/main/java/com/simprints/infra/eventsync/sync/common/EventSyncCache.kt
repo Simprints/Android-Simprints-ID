@@ -8,7 +8,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 

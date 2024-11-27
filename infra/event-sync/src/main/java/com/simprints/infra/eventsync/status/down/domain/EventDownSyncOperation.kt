@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.status.down.domain
 
 import androidx.annotation.Keep
-import java.util.*
+import java.util.UUID
 
 @Keep
 internal data class EventDownSyncOperation(

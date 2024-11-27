@@ -3,7 +3,8 @@ package com.simprints.infra.config.store.local.migrations
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration
-import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.VeroGeneration.*
+import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.VeroGeneration.VERO_1
+import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.VeroGeneration.VERO_2
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration

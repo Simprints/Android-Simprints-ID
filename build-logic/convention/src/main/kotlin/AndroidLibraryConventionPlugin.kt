@@ -33,13 +33,13 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                         // In a library module, we generally don’t need to
                         // add any specific configurations here because the app module handles shrinking,
                         // obfuscation, and signing. Leaving this block empty means the default behavior is inherited.
-                        getByName(BuildTypes.release) {
+                        getByName(BuildTypes.RELEASE) {
                         }
 
-                        create(BuildTypes.staging) {
+                        create(BuildTypes.STAGING) {
                         }
 
-                        getByName(BuildTypes.debug) {
+                        getByName(BuildTypes.DEBUG) {
                         }
                         configureDebugModeBuildTypes()
                     }
