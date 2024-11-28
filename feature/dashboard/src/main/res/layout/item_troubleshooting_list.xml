@@ -24,21 +24,37 @@
             <TextView
                 android:id="@+id/troubleshootingItemTitle"
                 style="@style/Text.Body1.Bold"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:maxLines="2"
                 android:textIsSelectable="true"
+                app:layout_constraintEnd_toStartOf="@id/troubleshootingItemCopy"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Event scope id" />
 
+            <ImageView
+                android:id="@+id/troubleshootingItemCopy"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                android:src="@drawable/ic_copy"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/simprints_text_grey_light" />
+
             <TextView
                 android:id="@+id/troubleshootingItemSubtitle"
-                style="@style/Text.Body2"
-                android:layout_width="match_parent"
+                style="@style/Text.Body2.Secondary"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:maxLines="4"
                 android:textIsSelectable="true"
+                app:layout_constraintEnd_toStartOf="@id/troubleshootingItemCopy"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/troubleshootingItemTitle"
                 tools:text="Timestamps\nTimestamps" />
 

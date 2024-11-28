@@ -2,10 +2,12 @@ package com.simprints.feature.dashboard.settings.troubleshooting.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.dashboard.databinding.ItemTroubleshootingListBinding
+import com.simprints.infra.uibase.system.Clipboard
 
 
 @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
@@ -31,14 +33,20 @@ internal class TroubleshootingListAdapter(
         private val binding: ItemTroubleshootingListBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(event: TroubleshootingItemViewData) {
-            binding.troubleshootingItemTitle.text = event.title
-            binding.troubleshootingItemSubtitle.text = event.subtitle
-            binding.troubleshootingItemBody.text = event.body
+        fun bind(item: TroubleshootingItemViewData) {
+            binding.troubleshootingItemTitle.text = item.title
+            binding.troubleshootingItemSubtitle.text = item.subtitle
+            binding.troubleshootingItemBody.text = item.body
 
-            binding.troubleshootingItemButton.isVisible = event.navigationId != null
+            binding.troubleshootingItemButton.isVisible = item.navigationId != null
             binding.troubleshootingItemButton.setOnClickListener {
-                event.navigationId?.let(onMoreClick)
+                item.navigationId?.let(onMoreClick)
+            }
+
+            binding.troubleshootingItemCopy.setOnClickListener {
+                val context = binding.root.context
+                Clipboard.copyToClipboard(context, "${item.title}\n${item.subtitle}\n${item.body}")
+                Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
             }
         }
     }
