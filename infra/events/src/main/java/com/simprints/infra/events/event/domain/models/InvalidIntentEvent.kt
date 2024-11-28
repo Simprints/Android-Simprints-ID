@@ -39,7 +39,12 @@ data class InvalidIntentEvent(
         val extras: Map<String, Any?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = INVALID_INTENT,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String {
+            return "action: $action, extras: $extras"
+        }
+    }
 
     companion object {
         const val EVENT_VERSION = 2

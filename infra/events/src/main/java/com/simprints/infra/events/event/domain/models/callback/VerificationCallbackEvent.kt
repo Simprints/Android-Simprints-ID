@@ -40,7 +40,10 @@ data class VerificationCallbackEvent(
         val score: CallbackComparisonScore,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_VERIFICATION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "confidence: ${score.confidence}"
+    }
 
     companion object {
 

@@ -61,7 +61,10 @@ data class EnrolmentCalloutEvent(
         val metadata: String?,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_ENROLMENT,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "module: $moduleId, metadata: $metadata"
+    }
 
     companion object {
 

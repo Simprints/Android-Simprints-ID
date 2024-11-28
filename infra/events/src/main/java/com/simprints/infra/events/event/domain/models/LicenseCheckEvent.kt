@@ -51,7 +51,11 @@ constructor(
         val vendor: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = LICENSE_CHECK,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "vendor: $vendor, status: $status"
+    }
+
     companion object {
         const val EVENT_VERSION = 1
     }

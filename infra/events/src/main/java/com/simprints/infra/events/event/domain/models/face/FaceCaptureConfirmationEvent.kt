@@ -44,6 +44,8 @@ data class FaceCaptureConfirmationEvent(
         override val type: EventType = FACE_CAPTURE_CONFIRMATION,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "result: $result"
+
         enum class Result {
             CONTINUE,
             RECAPTURE

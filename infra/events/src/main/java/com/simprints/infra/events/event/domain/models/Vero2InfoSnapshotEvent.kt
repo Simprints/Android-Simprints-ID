@@ -36,7 +36,8 @@ data class Vero2InfoSnapshotEvent(
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
+        this // No tokenized fields
 
     @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -63,6 +64,11 @@ data class Vero2InfoSnapshotEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = VERO_2_INFO_SNAPSHOT,
     ) : EventPayload() {
+
+        override fun toSafeString(): String = "battery charge: ${battery.charge}, " +
+            version.let { it as? Vero2Version.Vero2NewApiVersion }?.let {
+                "hardware: ${it.hardwareRevision}, cypress: ${it.cypressApp},  stm: ${it.stmApp}, un20: ${it.un20App}"
+            }.orEmpty()
 
         @Keep
         data class Vero2InfoSnapshotPayloadForNewApi(

@@ -43,6 +43,8 @@ data class ErrorCallbackEvent(
         override val type: EventType = CALLBACK_ERROR,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "reason: $reason"
+
         @Keep
         enum class Reason {
 

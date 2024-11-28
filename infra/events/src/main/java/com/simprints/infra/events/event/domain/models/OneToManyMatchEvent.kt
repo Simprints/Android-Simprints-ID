@@ -44,6 +44,9 @@ data class OneToManyMatchEvent(
         override val type: EventType = ONE_TO_MANY_MATCH,
     ) : EventPayload() {
 
+        override fun toSafeString(): String =
+            "matcher: $matcher, pool: ${pool.type}, size: ${pool.count}, results: ${result?.size}"
+
         @Keep
         data class MatchPool(val type: MatchPoolType, val count: Int)
 

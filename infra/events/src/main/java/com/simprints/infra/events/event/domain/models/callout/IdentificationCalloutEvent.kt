@@ -60,7 +60,10 @@ data class IdentificationCalloutEvent(
         val metadata: String?,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_IDENTIFICATION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "module ID: $moduleId, metadata: $metadata"
+    }
 
     companion object {
 

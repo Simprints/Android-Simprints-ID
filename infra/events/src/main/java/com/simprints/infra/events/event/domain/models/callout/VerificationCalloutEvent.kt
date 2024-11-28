@@ -63,7 +63,11 @@ data class VerificationCalloutEvent(
         val metadata: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_VERIFICATION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata"
+    }
 
     companion object {
 

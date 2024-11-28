@@ -64,6 +64,7 @@ internal class EventsLogViewModel @Inject constructor(
                 event.payload.createdAt.ms,
                 event.payload.endedAt?.ms
             ),
+            body = "ID: ${event.id}\n" + event.payload.toSafeString(),
         )
 
     private fun formatTimestampSubtitle(startMs: Long, endMs: Long? = null): String =

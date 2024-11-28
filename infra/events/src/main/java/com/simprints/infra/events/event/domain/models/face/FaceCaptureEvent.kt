@@ -65,6 +65,10 @@ data class FaceCaptureEvent(
         override val type: EventType = FACE_CAPTURE,
     ) : EventPayload() {
 
+        override fun toSafeString(): String =
+            "result: $result, attempt nr: $attemptNb, fallback: $isFallback, " +
+                "quality: ${face?.quality},  format: ${face?.format}"
+
         @Keep
         data class Face(
             val yaw: Float,

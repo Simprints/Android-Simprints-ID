@@ -37,7 +37,10 @@ data class CompletionCheckEvent(
         val completed: Boolean,
         override val endedAt: Timestamp? = null,
         override val type: EventType = COMPLETION_CHECK,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "completed: $completed"
+    }
 
     companion object {
 

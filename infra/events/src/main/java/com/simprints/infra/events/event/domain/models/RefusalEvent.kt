@@ -49,6 +49,8 @@ data class RefusalEvent(
         override val type: EventType = REFUSAL,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "reason: $reason, extra: $otherText"
+
         @Keep
         enum class Answer {
             REFUSED_RELIGION,

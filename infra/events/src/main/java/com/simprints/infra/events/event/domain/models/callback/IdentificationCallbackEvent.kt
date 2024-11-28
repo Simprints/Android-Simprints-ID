@@ -41,7 +41,13 @@ data class IdentificationCallbackEvent(
         val scores: List<CallbackComparisonScore>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = EventType.CALLBACK_IDENTIFICATION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            scores.joinToString(", ", prefix = "[", postfix = "]") {
+                "${it.guid}: ${it.confidence}"
+            }
+    }
 
     companion object {
 

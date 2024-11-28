@@ -50,6 +50,9 @@ data class CandidateReadEvent(
         override val type: EventType = CANDIDATE_READ
     ) : EventPayload() {
 
+        override fun toSafeString(): String =
+            "guid: $candidateId, local: $localResult, remote: $remoteResult"
+
         @Keep
         enum class LocalResult {
             FOUND, NOT_FOUND

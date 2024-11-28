@@ -49,7 +49,12 @@ data class EventUpSyncRequestEvent(
         val errorType: String?,
         override val eventVersion: Int,
         override val type: EventType = EventType.EVENT_UP_SYNC_REQUEST,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            "request ID: $requestId, response: $responseStatus, error: $errorType," +
+                "sessions: ${content.sessionCount}, eventsUp: ${content.eventUpSyncCount}, eventsDown: ${content.eventDownSyncCount}"
+    }
 
     @Keep
     data class UpSyncContent(
