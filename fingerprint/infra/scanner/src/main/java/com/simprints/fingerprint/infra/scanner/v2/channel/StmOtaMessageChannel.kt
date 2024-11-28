@@ -21,4 +21,9 @@ class StmOtaMessageChannel(
             outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
         }
 
+    suspend inline fun sendStmOtaModeCommand(command: StmOtaCommand) =
+        runLockedTask {
+            outgoing.sendMessage(command).await()
+        }
+
 }
