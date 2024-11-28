@@ -26,7 +26,6 @@
                 style="@style/Text.Body1.Bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
                 android:maxLines="2"
                 android:textIsSelectable="true"
                 app:layout_constraintTop_toTopOf="parent"
@@ -37,8 +36,8 @@
                 style="@style/Text.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:maxLines="3"
+                android:layout_marginTop="4dp"
+                android:maxLines="4"
                 android:textIsSelectable="true"
                 app:layout_constraintTop_toBottomOf="@id/troubleshootingItemTitle"
                 tools:text="Timestamps\nTimestamps" />
@@ -48,6 +47,7 @@
                 style="@style/Text.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:maxLines="8"
                 android:textIsSelectable="true"
                 app:layout_constraintBottom_toTopOf="@id/troubleshootingItemButton"
@@ -68,5 +68,4 @@
                 tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
 </FrameLayout>

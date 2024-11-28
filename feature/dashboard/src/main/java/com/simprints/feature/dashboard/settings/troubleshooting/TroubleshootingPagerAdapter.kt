@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.settings.troubleshooting
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.simprints.feature.dashboard.settings.troubleshooting.events.EventScopeLogFragment
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.OverviewFragment
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
@@ -20,10 +21,7 @@ internal class TroubleshootingPagerAdapter(
         val factory: () -> Fragment,
     ) {
 
-        // TODO Replace stub fragments with proper ones
         Overview("Overview", { OverviewFragment() }),
-        Events("Events", { StubFragment() }),
-        Workers("Worker log", { StubFragment() }),
-        ;
+        Events("Event scopes", { EventScopeLogFragment() }),
     }
 }

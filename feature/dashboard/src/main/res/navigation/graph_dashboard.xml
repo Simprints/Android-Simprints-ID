@@ -25,8 +25,7 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_requestLoginFragment_to_troubleshootingFragment"
-            app:destination="@id/troubleshootingFragment"
-            />
+            app:destination="@id/troubleshootingFragment" />
     </fragment>
     <fragment
         android:id="@+id/baseFragment"
@@ -79,7 +78,22 @@
         android:id="@+id/troubleshootingFragment"
         android:name="com.simprints.feature.dashboard.settings.troubleshooting.TroubleshootingFragment"
         android:label="TroubleshootingFragment"
-        tools:layout="@layout/fragment_troubleshooting" />
+        tools:layout="@layout/fragment_troubleshooting">
+        <action
+            android:id="@+id/action_troubleshootingFragment_to_troubleshootingEventLogFragment"
+            app:destination="@id/troubleshootingEventLogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/troubleshootingEventLogFragment"
+        android:name="com.simprints.feature.dashboard.settings.troubleshooting.events.EventLogFragment"
+        android:label="TroubleshootingEventFragment"
+        tools:layout="@layout/fragment_troubleshooting_standalone_list">
+        <argument
+            android:name="scopeId"
+            app:argType="string"
+            app:nullable="false" />
+    </fragment>
+
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.simprints.feature.dashboard.settings.SettingsFragment"

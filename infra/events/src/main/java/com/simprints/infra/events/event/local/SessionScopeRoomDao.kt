@@ -11,6 +11,9 @@ import com.simprints.infra.events.event.local.models.DbEventScope
 @Dao
 internal interface SessionScopeRoomDao {
 
+    @Query("select * from DbEventScope order by start_unixMs desc")
+    suspend fun loadAll(): List<DbEventScope>
+
     @Query("select * from DbEventScope where type = :type AND end_unixMs IS NULL order by start_unixMs desc")
     suspend fun loadOpen(type: EventScopeType): List<DbEventScope>
 
