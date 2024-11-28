@@ -1,6 +1,7 @@
 package com.simprints.infra.authlogic.authenticator
 
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
+import com.simprints.fingerprint.infra.scanner.data.FirmwareRepository
 import com.simprints.infra.authlogic.authenticator.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
@@ -42,6 +43,9 @@ class ProjectAuthenticatorTest {
     @MockK
     private lateinit var integrityTokenRequester: IntegrityTokenRequester
 
+    @MockK
+    private lateinit var firmwareRepository: FirmwareRepository
+
     private lateinit var authenticator: ProjectAuthenticator
 
     @Before
@@ -55,6 +59,7 @@ class ProjectAuthenticatorTest {
             signerManager,
             authenticationRemoteDataSource,
             integrityTokenRequester,
+            firmwareRepository,
         )
     }
 
@@ -135,6 +140,14 @@ class ProjectAuthenticatorTest {
 
             coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
             coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
+        }
+
+    @Test
+    fun `authenticate should fetch the firmware if needed`() =
+        runTest(StandardTestDispatcher()) {
+            authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
+
+            coVerify(exactly = 1) { firmwareRepository.updateStoredFirmwareFilesWithLatest() }
         }
 
     @Test
