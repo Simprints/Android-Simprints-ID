@@ -1,21 +1,23 @@
 # this job downloads all testing reports then does a sonarqube scan
-name: SonarQube Scan
+name: "[Reusable] SonarQube Scan"
+
 on:
     workflow_call:
-    workflow_dispatch:
+
 jobs:
     sonarQube:
 
         env:
             GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
-
         runs-on: ubuntu-latest
         timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
+
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
                 with:
                     fetch-depth: 0 # do full git history checkout as this info needed for the sonar plugin
+
             -   name: Set up JDK 17
                 uses: actions/setup-java@v4
                 with:
@@ -45,6 +47,7 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     path: test-reports
+
             # Move all reports to the root directory
             # Use -f to force the move and || true to prevent failure if the file doesn't exist
             -   name: Move reports
@@ -62,7 +65,6 @@ jobs:
             -   name: list reports
                 run: |
                     ls -l id
-
 
             -   name: run sonar
                 env:

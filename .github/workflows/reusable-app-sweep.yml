@@ -1,8 +1,9 @@
 # Upload release apk to App Sweep
-name: App Sweep Security Scan
+name: "[Reusable] App Sweep Security Scan"
+
 on:
-    workflow_dispatch:
     workflow_call:
+
 jobs:
     app-sweep:
         name: App Sweep Security Scan

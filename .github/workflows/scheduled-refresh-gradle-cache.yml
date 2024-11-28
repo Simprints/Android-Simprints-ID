@@ -1,6 +1,7 @@
 # This workflow refresh all the gradle cached folders.
 # it should be triggered automatically every 5 days, and manually
-name: Refresh Gradle cache
+name: "[Manual][Scheduled] Refresh Gradle cache"
+
 on:
     workflow_dispatch:
     schedule:

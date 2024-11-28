@@ -1,0 +1,12 @@
+name: "[Pipeline] Deploy to Staging"
+
+on:
+    workflow_call:
+
+jobs:
+    deploy-to-staging:
+
+        uses: ./.github/workflows/deploy-to-firebase-distribution.yml
+        secrets: inherit
+        with:
+            buildType: staging

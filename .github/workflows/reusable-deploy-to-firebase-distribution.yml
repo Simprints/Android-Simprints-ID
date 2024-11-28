@@ -1,12 +1,12 @@
 # Deploy APKs to Firebase App Distribution
-name: Deploy to Firebase
+name: "[Reusable] Deploy to Firebase"
+
 on:
     workflow_call:
         inputs:
             buildType:
                 type: string
                 required: true
-
 
 jobs:
     deploy-to-firebase:
@@ -48,18 +48,15 @@ jobs:
             -   name: Write Google Services file
                 run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
 
-
             -   name: Update build properties
                 run: |
                     source ci/deployment/build_properties_setup ${{ inputs.buildType }} $BUILD_IS_DEBUGGABLE $DB_IS_ENCRYPTED
-
 
             -   name: write firebase credentials
                 run: echo "$FIREBASE_DIST_CREDENTIALS" >  id/src/serviceCredentialsFile.json
 
             -   name: Set up signing properties
                 run: source ci/deployment/signing_properties_setup
-
 
             -   name: build and deploy debug apk
                 if: ${{ inputs.buildType == 'dev' }}

@@ -1,5 +1,6 @@
 # This action is used to run the PR checks workflow
-name: PR Checks
+name: "PR: Checks"
+
 on: # this checks should be triggered on pull request, before deployments, and manually
     pull_request:
         paths-ignore:
