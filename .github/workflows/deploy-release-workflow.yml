@@ -2,6 +2,9 @@ name: "Deploy: Release Workflow"
 
 on:
     workflow_dispatch:
+    push:
+        branches:
+            - devops/*
 
 jobs:
 
