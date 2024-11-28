@@ -6,7 +6,7 @@ on:
 
 jobs:
     deploy-to-dev:
-        uses: ./.github/workflows/deploy-to-firebase-distribution.yml
+        uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
         secrets: inherit
         with:
             buildType: dev
