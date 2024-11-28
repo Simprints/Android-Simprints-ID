@@ -19,6 +19,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             val propVersionCode = props["VERSION_CODE"] as Int
             val propVersionName = props["VERSION_NAME"] as String
             val propVersionSuffix = props["VERSION_SUFFIX"] as String
+            val propVersionBuild = props["VERSION_BUILD"] as String
             val propDebuggable = props["DEBUGGABLE"] as Boolean
 
             with(pluginManager) {
@@ -79,7 +80,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         isShrinkResources = true
                         isDebuggable = false
                         lint.fatal += "StopShip"
-                        versionNameSuffix = "+$propVersionCode"
+                        versionNameSuffix = "+$propVersionBuild"
                         buildConfigField("Boolean", "DEBUG_MODE", "false")
                     }
 
@@ -88,7 +89,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         isShrinkResources = true
                         isDebuggable = propDebuggable
                         lint.fatal += "StopShip"
-                        versionNameSuffix = "-$propVersionSuffix+$propVersionCode"
+                        versionNameSuffix = "-$propVersionSuffix+$propVersionBuild"
                         buildConfigField("Boolean", "DEBUG_MODE", "true")
                     }
 
@@ -96,7 +97,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         isMinifyEnabled = false
                         isShrinkResources = false
                         isDebuggable = propDebuggable
-                        versionNameSuffix = "-$propVersionSuffix+$propVersionCode"
+                        versionNameSuffix = "-$propVersionSuffix+$propVersionBuild"
                         buildConfigField("Boolean", "DEBUG_MODE", "true")
 
                         withGroovyBuilder {

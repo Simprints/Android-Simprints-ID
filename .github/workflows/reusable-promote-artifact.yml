@@ -45,7 +45,6 @@ jobs:
             -   name: write Google API key file # This file needed by triplet the google play publishing lib
                 run: echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
 
-
             -   name: Promote to Alpha
                 if: ${{inputs.deployment-track == 'Alpha'}}
                 run: ./gradlew promoteArtifact --from-track internal --promote-track alpha

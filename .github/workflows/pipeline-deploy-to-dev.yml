@@ -5,6 +5,11 @@ on:
     workflow_call:
 
 jobs:
+    build-dev-apk:
+        environment: dev
+        runs-on: ubuntu-latest
+
+
     deploy-to-dev:
         uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
         secrets: inherit

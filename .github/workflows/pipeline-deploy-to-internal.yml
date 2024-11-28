@@ -4,6 +4,10 @@ on:
     workflow_call:
 
 jobs:
+    run-app-sweep:
+        uses: ./.github/workflows/reusable-app-sweep.yml
+        secrets: inherit
+
     deploy-to-internal:
 
         runs-on: ubuntu-latest

@@ -17,8 +17,7 @@ else
 fi
 
 # Get the current timestamp
-TIMESTAMP=$(date +%s)
-
+TIMESTAMP=$(($(date +%s) / 1000))
 # Calculate the VERSION_CODE
 VERSION_CODE=$((TIMESTAMP / 1000))
 

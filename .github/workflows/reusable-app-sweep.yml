@@ -10,6 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
         environment: internal
+
         env:
             BUILD_IS_DEBUGGABLE: ${{ vars.BUILD_IS_DEBUGGABLE }}
             DB_IS_ENCRYPTED: ${{ vars.DB_IS_ENCRYPTED }}
