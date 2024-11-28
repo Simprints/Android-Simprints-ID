@@ -14,10 +14,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,7 +27,6 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     private var observeJob: Job? = null
-    private var previousState: FingerprintScanState = FingerprintScanState.Idle
     private var ledsMode: Vero2Configuration.LedsMode? = BASIC
     private val preference = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -43,32 +38,23 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
             ledsMode = configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(
                 fingerprintSdk
             )?.vero2?.ledsMode
-
-            statusTracker.state
-                .onEach { state ->
-                    if (state is FingerprintScanState.ScanCompleted) {
-                        provideFeedback(state)// Handle ScanCompleted immediately to let the user know to remove the finger
-                    }
+            launch {
+                statusTracker.scanCompleted.collect {
+                    playRemoveFingerAudio()
                 }
-                .filterNot { it is FingerprintScanState.ScanCompleted } // Exclude ScanCompleted
-                .flatMapConcat { state ->
-                    flow { emit(provideFeedback(state)) } // Process other states sequentially
-                }
-                .collect {
-                    // Do nothing
-                }
+            }
+            statusTracker.state.collect {
+                provideFeedback(it)
+            }
         }
     }
 
-    private suspend fun provideFeedback(state: FingerprintScanState) {
-        when (state) {
-            is FingerprintScanState.Idle -> turnOnFlashingWhiteSmileLeds()
-            is FingerprintScanState.Scanning -> turnOffSmileLeds()
-            is FingerprintScanState.ScanCompleted -> playRemoveFingerAudio()
-            is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
-            is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
-        }
-        previousState = state
+    private suspend fun provideFeedback(state: FingerprintScanState) = when (state) {
+        is FingerprintScanState.Idle -> turnOnFlashingWhiteSmileLeds()
+        is FingerprintScanState.Scanning -> turnOffSmileLeds()
+        is FingerprintScanState.ScanCompleted -> playRemoveFingerAudio()
+        is FingerprintScanState.ImageQualityChecking.Good -> setUiAfterScan(true)
+        is FingerprintScanState.ImageQualityChecking.Bad -> setUiAfterScan(false)
     }
 
     fun stopObserving() {
@@ -90,23 +76,19 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
     }
 
     private suspend fun setUiAfterScan(isGoodScan: Boolean) {
-        // Check if the previous state was ScanCompleted to avoid displaying the bad or good scan UI twice
         // There's no need to check the configuration, as the good/bad scan visual notifications apply across all LED modes.
-        if (previousState == FingerprintScanState.ScanCompleted) {
-            with(scannerManager.scanner) {
-                if (isGoodScan) setUiGoodCapture()
-                else setUiBadCapture()
+        with(scannerManager.scanner) {
+            if (isGoodScan) setUiGoodCapture()
+            else setUiBadCapture()
 
-                //Wait before turn of the leds
-                delay(LONG_DELAY)
-                turnOffSmileLeds()
-            }
+            //Wait before turn of the leds
+            delay(LONG_DELAY)
+            turnOffSmileLeds()
         }
+
     }
 
     private fun playRemoveFingerAudio() {
-        // Verify that the previous state was not "ScanCompleted" to prevent the sound from playing twice.
-        if (previousState == FingerprintScanState.ScanCompleted) return
 
         if (isAudioEnabled()) playAudioBeep()
     }
