@@ -16,6 +16,7 @@ internal abstract class ActionRequestExtractor(private val extras: Map<String, A
         Constants.SIMPRINTS_USER_ID,
         Constants.SIMPRINTS_MODULE_ID,
         Constants.SIMPRINTS_METADATA,
+        ClientApiConstants.CALLER_PACKAGE_NAME,
     )
 
     open fun getProjectId(): String = extras.extractString(Constants.SIMPRINTS_PROJECT_ID)
