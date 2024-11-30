@@ -24,13 +24,15 @@ jobs:
                 with:
                     name: ${{ inputs.upload-artifact }}
 
-            -   name: Write mapping text to file
-                run: echo "${{ inputs.mapping-file }}" > mapping.txt
+            -   name: Download mapping file
+                uses: actions/download-artifact@v4
+                with:
+                    name: ${{ inputs.mapping-file }}
 
             -   name: Upload release apk
                 uses: guardsquare/appsweep-action@main
                 with:
                     appsweep_api_key: ${{ secrets.APPSWEEP_API_KEY }}
                     input_file: ${{ inputs.upload-artifact }}
-                    mapping_file: mapping.txt
+                    mapping_file: ${{ inputs.mapping-file }}
                     commit_hash: ${{ github.sha }}
