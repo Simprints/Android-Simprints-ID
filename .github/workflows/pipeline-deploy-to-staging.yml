@@ -4,9 +4,19 @@ on:
     workflow_call:
 
 jobs:
-    deploy-to-staging:
-
-        uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
+    build-staging-apk:
+        uses: ./.github/workflows/reusable-build-apk.yml
         secrets: inherit
         with:
-            buildType: staging
+            build-environment: staging
+
+
+
+    deploy-to-firebase:
+        uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
+        secrets: inherit
+        needs:
+            - build-staging-apk
+        with:
+            build-environment: staging
+            upload-artifact: ${{ needs.build-staging-apk.outputs.build-artifact }}

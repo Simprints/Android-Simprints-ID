@@ -8,8 +8,7 @@ on:
                 required: true
         outputs:
             build-artifact:
-                type: string
-                required: true
+                description: "The artifact file name of the built APK"
                 value: ${{ jobs.build-apk.outputs.build-artifact }}
 
 jobs:
@@ -24,13 +23,15 @@ jobs:
 
         env:
             # VERSION_CODE: Unique version code using the sum of the current timestamp and run number.
-            VERSION_CODE: $(($(date +%s) / 1000 + ${{ github.run_number }}))
+            VERSION_CODE: "set in lower step"
             # VERSION_NAME: Version name derived from the GitHub ref name after the final /.
-            VERSION_NAME: $(echo '${{ github.ref_name }}' | awk -F'/' '{print $NF}')
+            VERSION_NAME: "set in lower step"
             # VERSION_SUFFIX: The build environment (e.g., dev, staging, internal).
             VERSION_SUFFIX: ${{ inputs.build-environment }}
             # VERSION_BUILD: A unique build identifier combining the run number and attempt.
             VERSION_BUILD: ${{ github.run_number }}.${{ github.run_attempt }}
+            # The final output file name.
+            FILE_NAME: "set in lower step"
 
         steps:
             -   name: Checkout
@@ -41,6 +42,15 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
+            -   name: Compute version variables
+                run: |
+                    echo "VERSION_CODE=$(($(date +%s) / 1000 + ${{ github.run_number }}))" >> $GITHUB_ENV
+                    echo "VERSION_NAME=$(echo '${{ github.ref_name }}' | awk -F'/' '{print $NF}')" >> $GITHUB_ENV
+
+            -   name: Compute file name
+                run: |
+                    echo "FILE_NAME=${{ env.VERSION_NAME }}-${{ env.VERSION_SUFFIX }}+${{ env.VERSION_CODE }}.${{ env.VERSION_BUILD }}" >> $GITHUB_ENV
+
             -   name: Set up local.properties
                 run: |
                     #!/bin/bash
@@ -48,11 +58,13 @@ jobs:
                     echo "org.gradle.caching=true" >>gradle.properties
                     echo "org.gradle.jvmargs=-Xmx7g"
                     touch local.properties
-                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
-                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties 
+                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties 
 
             -   name: Write Google Services file
-                run: echo ${{ secrets.GOOGLE_SERVICES_FILE}} > id/src/google-services.json
+                env:
+                    GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
+                run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
 
             -   name: Create build properties
                 run: |
@@ -70,9 +82,6 @@ jobs:
                     }
                     EOF
 
-            -   name: write firebase credentials
-                run: echo "${{ secrets.FIREBASE_DIST_CREDENTIALS}}" >  id/src/serviceCredentialsFile.json
-
             -   name: Set up signing properties
                 run: |
                     #!/bin/bash
@@ -83,7 +92,7 @@ jobs:
                     extra.apply {
                         set("store_file", "\$rootDir/android-signing-keystore.jks")
                         set("store_password", "${{secrets.SIGNING_KEYSTORE_PASSWORD}}")
-                        set("key_alias", "${{secrets.SIGNING_KEY_ALIAS}}")
+                        set("key_alias", "${{vars.SIGNING_KEY_ALIAS}}")
                         set("key_password", "${{secrets.SIGNING_KEY_PASSWORD}}")
                     }
                     EOF
@@ -92,26 +101,29 @@ jobs:
                 if: ${{ inputs.build-environment == 'dev' }}
                 run: |
                     ./gradlew id:packageDebugUniversalApk
+                    mv id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk $FILE_NAME.apk
+                    echo "FILE_NAME=$FILE_NAME.apk" >> $GITHUB_ENV
 
             -   name: build staging apk
-                if: ${{ inputs.build-environment != 'staging' }}
+                if: ${{ inputs.build-environment == 'staging' }}
                 run: |
                     ./gradlew id:packageStagingUniversalApk
+                    mv id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk $FILE_NAME.apk
+                    echo "FILE_NAME=$FILE_NAME.apk" >> $GITHUB_ENV
 
             -   name: build internal apk
-                if: ${{ inputs.build-environment != 'internal' }}
+                if: ${{ inputs.build-environment == 'internal' }}
                 run: |
                     ./gradlew id:bundleRelease
+                    mv id/build/outputs/bundle/release/id-release.aab $FILE_NAME.aab
+                    echo "FILE_NAME=$FILE_NAME.aab" >> $GITHUB_ENV
 
             -   name: Upload artifact
                 uses: actions/upload-artifact@v4
                 with:
-                    name: $VERSION_NAME-$VERSION_SUFFIX+$VERSION_CODE.$VERSION_BUILD
-                    path: |
-                        id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk
-                        id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk
-                        id/build/outputs/bundle/release/*.aab
+                    name: ${{ env.FILE_NAME }}
+                    path: ${{ env.FILE_NAME }}
 
             -   name: Set build-artifact output
                 id: set-build-artifact
-                run: echo "artifact=$VERSION_NAME-$VERSION_SUFFIX+$VERSION_CODE.$VERSION_BUILD" >> $GITHUB_OUTPUT
+                run: echo "artifact=${{ env.FILE_NAME }}" >> $GITHUB_OUTPUT
