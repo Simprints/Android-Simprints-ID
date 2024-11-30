@@ -4,68 +4,80 @@ on:
     workflow_call:
 
 jobs:
+
+    build-internal-aab:
+        uses: ./.github/workflows/reusable-build-apk.yml
+        secrets: inherit
+        with:
+            build-environment: internal
+
     run-app-sweep:
         uses: ./.github/workflows/reusable-app-sweep.yml
+        with:
+            upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
+            mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
         secrets: inherit
+        needs:
+            - build-internal-aab
 
-    deploy-to-internal:
-
-        runs-on: ubuntu-latest
-        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
-
-        concurrency:
-            group: release-internal-workflow #only one instance of this workflow can run at a time
-            cancel-in-progress: true
-
-        environment: internal
-
-        env:
-            BUILD_IS_DEBUGGABLE: ${{ vars.BUILD_IS_DEBUGGABLE }}
-            DB_IS_ENCRYPTED: ${{ vars.DB_IS_ENCRYPTED }}
-            RELEASE_GOOGLE_SERVICES_FILE: ${{ secrets.RELEASE_GOOGLE_SERVICES_FILE}}
-            GOOGLE_API_KEY_JSON: ${{secrets.GOOGLE_API_KEY_JSON}}
-
-            SIGNING_JKS_FILE: ${{secrets.SIGNING_JKS_FILE}}
-            SIGNING_KEYSTORE_PASSWORD: ${{secrets.SIGNING_KEYSTORE_PASSWORD}}
-            SIGNING_KEY_ALIAS: ${{secrets.SIGNING_KEY_ALIAS}}
-            SIGNING_KEY_PASSWORD: ${{secrets.SIGNING_KEY_PASSWORD}}
-
-        steps:
-            -   uses: actions/checkout@v4
-
-            -   name: Set up JDK 17
-                uses: actions/setup-java@v4
-                with:
-                    java-version: 17
-                    distribution: 'temurin'
-
-            -   name: Set up local.properties
-                run: |
-                    source ci/pipeline/setup
-                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
-                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
-
-            -   name: Update build properties
-                run: |
-                    source ci/deployment/build_properties_setup Internal  $BUILD_IS_DEBUGGABLE $DB_IS_ENCRYPTED
-
-            -   name: write Google API key file # This file needed by triplet the google play publishing lib
-                run: echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
-
-            -   name: Write Google Services file
-                run: echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/google-services.json
-
-            -   name: Set up signing properties
-                run: source ci/deployment/signing_properties_setup
-
-            -   name: Build the Release bundle
-                run: ./gradlew id:bundleRelease
-            -   name: Upload Release bundle
-                uses: actions/upload-artifact@v4
-                with:
-                    name: release-bundle
-                    path: id/build/outputs/bundle/release/*.aab
-
-            -   name: Publish Release bundle
-                run: ./gradlew id:publishReleaseBundle
-                continue-on-error: true
+#    deploy-to-internal:
+#
+#        runs-on: ubuntu-latest
+#        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
+#
+#        concurrency:
+#            group: release-internal-workflow #only one instance of this workflow can run at a time
+#            cancel-in-progress: true
+#
+#        environment: internal
+#
+#        env:
+#            BUILD_IS_DEBUGGABLE: ${{ vars.BUILD_IS_DEBUGGABLE }}
+#            DB_IS_ENCRYPTED: ${{ vars.DB_IS_ENCRYPTED }}
+#            RELEASE_GOOGLE_SERVICES_FILE: ${{ secrets.RELEASE_GOOGLE_SERVICES_FILE}}
+#            GOOGLE_API_KEY_JSON: ${{secrets.GOOGLE_API_KEY_JSON}}
+#
+#            SIGNING_JKS_FILE: ${{secrets.SIGNING_JKS_FILE}}
+#            SIGNING_KEYSTORE_PASSWORD: ${{secrets.SIGNING_KEYSTORE_PASSWORD}}
+#            SIGNING_KEY_ALIAS: ${{secrets.SIGNING_KEY_ALIAS}}
+#            SIGNING_KEY_PASSWORD: ${{secrets.SIGNING_KEY_PASSWORD}}
+#
+#        steps:
+#            -   uses: actions/checkout@v4
+#
+#            -   name: Set up JDK 17
+#                uses: actions/setup-java@v4
+#                with:
+#                    java-version: 17
+#                    distribution: 'temurin'
+#
+#            -   name: Set up local.properties
+#                run: |
+#                    source ci/pipeline/setup
+#                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
+#                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+#
+#            -   name: Update build properties
+#                run: |
+#                    source ci/deployment/build_properties_setup Internal  $BUILD_IS_DEBUGGABLE $DB_IS_ENCRYPTED
+#
+#            -   name: write Google API key file # This file needed by triplet the google play publishing lib
+#                run: echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
+#
+#            -   name: Write Google Services file
+#                run: echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/google-services.json
+#
+#            -   name: Set up signing properties
+#                run: source ci/deployment/signing_properties_setup
+#
+#            -   name: Build the Release bundle
+#                run: ./gradlew id:bundleRelease
+#            -   name: Upload Release bundle
+#                uses: actions/upload-artifact@v4
+#                with:
+#                    name: release-bundle
+#                    path: id/build/outputs/bundle/release/*.aab
+#
+#            -   name: Publish Release bundle
+#                run: ./gradlew id:publishReleaseBundle
+#                continue-on-error: true

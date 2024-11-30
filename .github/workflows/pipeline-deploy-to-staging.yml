@@ -10,8 +10,6 @@ jobs:
         with:
             build-environment: staging
 
-
-
     deploy-to-firebase:
         uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
         secrets: inherit

@@ -10,12 +10,16 @@ on:
             build-artifact:
                 description: "The artifact file name of the built APK"
                 value: ${{ jobs.build-apk.outputs.build-artifact }}
+            optional-mapping-file:
+                description: "The mapping file for the built APK"
+                value: ${{ jobs.build-apk.outputs.mapping-file }}
 
 jobs:
     build-apk:
 
         outputs:
             build-artifact: ${{ steps.set-build-artifact.outputs.artifact }}
+            mapping-file: ${{ steps.build-internal-apk.outputs.mapping }}
 
         runs-on: ubuntu-latest
 
@@ -112,11 +116,13 @@ jobs:
                     echo "FILE_NAME=$FILE_NAME.apk" >> $GITHUB_ENV
 
             -   name: build internal apk
+                id: build-internal-apk
                 if: ${{ inputs.build-environment == 'internal' }}
                 run: |
                     ./gradlew id:bundleRelease
                     mv id/build/outputs/bundle/release/id-release.aab $FILE_NAME.aab
                     echo "FILE_NAME=$FILE_NAME.aab" >> $GITHUB_ENV
+                    echo "mapping=$(cat id/build/outputs/mapping/release/mapping.txt)" >> $GITHUB_OUTPUT
 
             -   name: Upload artifact
                 uses: actions/upload-artifact@v4
