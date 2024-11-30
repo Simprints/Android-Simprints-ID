@@ -12,14 +12,14 @@ on:
                 value: ${{ jobs.build-apk.outputs.build-artifact }}
             optional-mapping-file:
                 description: "The mapping file for the built APK"
-                value: ${{ jobs.build-apk.outputs.mapping-file }}
+                value: ${{ jobs.build-apk.outputs.mapping-text }}
 
 jobs:
     build-apk:
 
         outputs:
             build-artifact: ${{ steps.set-build-artifact.outputs.artifact }}
-            mapping-file: ${{ steps.build-internal-apk.outputs.mapping }}
+            mapping-text: ${{ steps.build-internal-apk.outputs.mapping }}
 
         runs-on: ubuntu-latest
 
@@ -122,13 +122,21 @@ jobs:
                     ./gradlew id:bundleRelease
                     mv id/build/outputs/bundle/release/id-release.aab $FILE_NAME.aab
                     echo "FILE_NAME=$FILE_NAME.aab" >> $GITHUB_ENV
-                    echo "mapping=$(cat id/build/outputs/mapping/release/mapping.txt)" >> $GITHUB_OUTPUT
+                    mv id/build/outputs/mapping/release/mapping.txt $FILE_NAME-mapping.txt
+                    echo "mapping=$FILE_NAME-mapping.txt" >> $GITHUB_OUTPUT
 
             -   name: Upload artifact
                 uses: actions/upload-artifact@v4
                 with:
                     name: ${{ env.FILE_NAME }}
                     path: ${{ env.FILE_NAME }}
+
+            -   name: Upload mapping if available
+                if: steps.build-internal-apk.outputs.mapping
+                uses: actions/upload-artifact@v4
+                with:
+                    name: ${{ steps.build-internal-apk.outputs.mapping }}
+                    path: ${{ steps.build-internal-apk.outputs.mapping }}
 
             -   name: Set build-artifact output
                 id: set-build-artifact
