@@ -41,7 +41,7 @@ jobs:
                     key: global-gradle-
                     restore-keys: global-gradle-
 
-            -   name: Set up local.properties
+            -   name: Set up build files
                 uses: ./.github/actions/setup-gradle-build-files
                 with:
                     gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}

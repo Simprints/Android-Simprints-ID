@@ -34,17 +34,12 @@ jobs:
                     key: global-gradle-
                     restore-keys: global-gradle-
 
-            -   name: Set up local.properties
-                run: |
-                    chmod +x gradlew
-                    echo "org.gradle.caching=true" >>gradle.properties
-                    echo "org.gradle.jvmargs=-Xmx7g"
-                    touch local.properties
-                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
-                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
-
-            -   name: Write Google Services file
-                run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
+            -   name: Set up build files
+                uses: ./.github/actions/setup-gradle-build-files
+                with:
+                    gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
+                    gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
 
             -   name: download all artifacts
                 uses: actions/download-artifact@v4

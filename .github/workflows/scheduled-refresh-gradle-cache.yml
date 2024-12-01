@@ -12,9 +12,6 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
-        env:
-            GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
-
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
@@ -34,13 +31,11 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Set up local.properties
-                uses: ./.github/actions/setup-local-properties
+                uses: ./.github/actions/setup-gradle-build-files
                 with:
                     gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
                     gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
-
-            -   name: Write Google Services file
-                run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
+                    google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
 
             -   name: Run all unit tests # To make sure all gradle folders are generated
                 run: ./gradlew testDebugUnitTest --test-dry-run
