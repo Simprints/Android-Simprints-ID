@@ -52,4 +52,4 @@ jobs:
                 run: echo "### Deployed ${{ inputs.upload-artifact}} to Firebase Simprints ID ${{ inputs.build-environment }} :rocket:" >> $GITHUB_STEP_SUMMARY
 
             -   name: Deploy to Firebase App Distribution
-                run: firebase appdistribution:distribute ${{ inputs.upload-artifact }} --app ${{ vars.FIREBASE_DISTRIBUTION_APP_ID}} --groups "pre-release-testers" >> $GITHUB_STEP_SUMMARY
+                run: firebase appdistribution:distribute ${{ inputs.upload-artifact }} --app ${{ vars.FIREBASE_DISTRIBUTION_APP_ID}} --groups "pre-release-testers"

@@ -1,6 +1,5 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.github.triplet.gradle.play.PlayPublisherExtension
-import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -16,7 +15,6 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
 
             with(pluginManager) {
                 apply("com.github.triplet.play")
-                apply("com.google.firebase.appdistribution")
             }
 
             extensions.configure<PlayPublisherExtension> {
@@ -42,23 +40,9 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                     }
                     getByName("staging") {
                         signingConfig = signingConfigs.getByName("config")
-
-                        firebaseAppDistribution {
-                            artifactType = "APK"
-                            serviceCredentialsFile =
-                                "$rootDir/id/src/serviceCredentialsFile.json"
-                            groups = "pre-release-testers"
-                        }
                     }
                     getByName("debug") {
                         signingConfig = signingConfigs.getByName("config")
-                        firebaseAppDistribution {
-                            artifactType = "APK"
-                            serviceCredentialsFile =
-                                "$rootDir/id/src/serviceCredentialsFile.json"
-                            groups = "pre-release-testers"
-                        }
-
                     }
                 }
             }
