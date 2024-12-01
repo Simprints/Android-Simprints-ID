@@ -34,10 +34,10 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Set up local.properties
-                uses: ./.github/actions/setup-local-properties/action.yml
+                uses: ./.github/actions/setup-local-properties
                 with:
-                    github-username: ${{ secrets.GH_PACKAGE_NAME }}
-                    github-token: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
+                    gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
 
             -   name: Write Google Services file
                 run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
