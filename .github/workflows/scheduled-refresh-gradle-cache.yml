@@ -16,8 +16,7 @@ jobs:
             GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
 
         steps:
-            -   name: Checkout
-                uses: actions/checkout@v4
+            -   uses: actions/checkout@v4
 
             -   name: Cache Gradle global directory
                 uses: actions/cache@v4
