@@ -1,6 +1,14 @@
 name: Setup Local Properties
 description: Set up local.properties file for Gradle
 
+inputs:
+    gh-package-name:
+        description: "The GitHub username to use for the Gradle properties."
+        required: true
+    gh-package-token:
+        description: "The GitHub token to use for the Gradle properties."
+        required: true
+
 runs:
     using: "composite"
 
@@ -12,6 +20,6 @@ runs:
                 echo "org.gradle.caching=true" >>gradle.properties
                 echo "org.gradle.jvmargs=-Xmx7g"
                 touch local.properties
-                echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
-                echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+                echo "GITHUB_USERNAME=${{ inputs.gh-package-name }}" >>  local.properties
+                echo "GITHUB_TOKEN=${{ inputs.gh-package-token }}" >>  local.properties
 
