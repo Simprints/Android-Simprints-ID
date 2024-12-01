@@ -6,6 +6,7 @@ runs:
 
     steps:
         -   name: Set up local.properties files
+            shell: bash
             run: |
                 chmod +x gradlew
                 echo "org.gradle.caching=true" >>gradle.properties
