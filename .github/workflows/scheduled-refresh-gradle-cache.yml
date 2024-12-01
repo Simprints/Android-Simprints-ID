@@ -18,6 +18,7 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
+
             -   name: Cache Gradle global directory
                 uses: actions/cache@v4
                 with:
@@ -33,10 +34,7 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Set up local.properties
-                run: |
-                    source ci/pipeline/setup
-                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
-                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+                uses: ./.github/actions/composite-setup-local-properties.yml
 
             -   name: Write Google Services file
                 run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json

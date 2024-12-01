@@ -1,0 +1,16 @@
+name: Setup Local Properties
+description: Set up local.properties file for Gradle
+
+runs:
+    using: "composite"
+
+    steps:
+        -   name: Set up local.properties files
+            run: |
+                chmod +x gradlew
+                echo "org.gradle.caching=true" >>gradle.properties
+                echo "org.gradle.jvmargs=-Xmx7g"
+                touch local.properties
+                echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
+                echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+

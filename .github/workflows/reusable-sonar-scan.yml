@@ -6,11 +6,11 @@ on:
 
 jobs:
     sonarQube:
+        runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         env:
             GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
-        runs-on: ubuntu-latest
-        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
 
         steps:
             -   name: Checkout
@@ -36,7 +36,10 @@ jobs:
 
             -   name: Set up local.properties
                 run: |
-                    source ci/pipeline/setup
+                    chmod +x gradlew
+                    echo "org.gradle.caching=true" >>gradle.properties
+                    echo "org.gradle.jvmargs=-Xmx7g"
+                    touch local.properties
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
                     echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
 
