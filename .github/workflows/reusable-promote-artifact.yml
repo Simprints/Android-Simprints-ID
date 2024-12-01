@@ -66,5 +66,6 @@ jobs:
         if: ${{inputs.deployment-track == 'Prod-25-Percent-Rollout'}}
         runs-on: ubuntu-latest
         steps:
+            -   uses: actions/checkout@v4
             -   name: Set release tag
-                run: bash ci/deployment/release_tag_setup
+                uses: ./.github/actions/set-release-git-tag
