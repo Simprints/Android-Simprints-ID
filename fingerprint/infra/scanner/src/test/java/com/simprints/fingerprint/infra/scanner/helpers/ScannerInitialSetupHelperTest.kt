@@ -19,11 +19,10 @@ import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.reactivex.Completable
-import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -48,13 +47,13 @@ class ScannerInitialSetupHelperTest {
         connectionHelperMock,
         batteryLevelChecker,
         configManager,
-        firmwareLocalDataSource, dispatcher
+        firmwareLocalDataSource
     )
 
     @Before
     fun setup() {
         coEvery { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns LOCAL_SCANNER_VERSION
-        every { scannerMock.enterMainMode() } returns Completable.complete()
+        coJustRun { scannerMock.enterMainMode() }
         coEvery {
             connectionHelperMock.reconnect(
                 eq(scannerMock),
@@ -64,17 +63,17 @@ class ScannerInitialSetupHelperTest {
     }
 
     private fun setupScannerWithBatteryInfo(batteryInfo: BatteryInfo) {
-        every { scannerMock.getBatteryPercentCharge() } returns Single.just(batteryInfo.charge)
-        every { scannerMock.getBatteryVoltageMilliVolts() } returns Single.just(batteryInfo.voltage)
-        every { scannerMock.getBatteryCurrentMilliAmps() } returns Single.just(batteryInfo.current)
-        every { scannerMock.getBatteryTemperatureDeciKelvin() } returns Single.just(batteryInfo.temperature)
+         coEvery { scannerMock.getBatteryPercentCharge() } returns batteryInfo.charge
+         coEvery { scannerMock.getBatteryVoltageMilliVolts() } returns batteryInfo.voltage
+         coEvery { scannerMock.getBatteryCurrentMilliAmps() } returns batteryInfo.current
+         coEvery { scannerMock.getBatteryTemperatureDeciKelvin() } returns batteryInfo.temperature
     }
 
     @Test
     fun ifNoAvailableVersions_completesNormally() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-        every { vero2Configuration.firmwareVersions } returns mapOf()
-        every { batteryLevelChecker.isLowBattery() } returns false
+         coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
+         every { vero2Configuration.firmwareVersions } returns mapOf()
+         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
 
@@ -91,7 +90,7 @@ class ScannerInitialSetupHelperTest {
 
     @Test
     fun ifVersionsContainsUnknowns_throwsCorrectOtaAvailableException() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+         coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
         every { vero2Configuration.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                 CYPRESS_VERSION_STRING, "", ""
@@ -115,7 +114,7 @@ class ScannerInitialSetupHelperTest {
 
     @Test
     fun setupScannerWithOtaCheck_savesVersionAndBatteryInfo() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+         coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
         every { vero2Configuration.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                 "", "", ""
@@ -140,7 +139,7 @@ class ScannerInitialSetupHelperTest {
 
     @Test
     fun ifAvailableVersionMatchesExistingVersion_completesNormally() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+         coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
         every { vero2Configuration.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                 SCANNER_VERSION_LOW.firmwareVersions.cypressFirmwareVersion.versionAsString,
@@ -164,7 +163,7 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun ifAvailableVersionGreaterThanExistingVersion_throwsOtaAvailableExceptionAndReconnects() =
         runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+             coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
             every { vero2Configuration.firmwareVersions } returns mapOf(
                 HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                     CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING
@@ -197,7 +196,7 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun ifAvailableVersionGreaterThanExistingVersion_lowScannerBattery_completesNormally() =
         runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+             coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
             every { vero2Configuration.firmwareVersions } returns mapOf(
                 HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                     CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING
@@ -219,7 +218,7 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun ifAvailableVersionGreaterThanExistingVersion_lowPhoneBattery_completesNormally() =
         runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+             coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
             every { vero2Configuration.firmwareVersions } returns mapOf(
                 HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                     CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING
@@ -241,7 +240,7 @@ class ScannerInitialSetupHelperTest {
     @Test
     fun ifAvailableVersionGreaterThanExistingVersion_stillSavesVersionAndBatteryInfo() =
         runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+             coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
             every { vero2Configuration.firmwareVersions } returns mapOf(
                 HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                     CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING

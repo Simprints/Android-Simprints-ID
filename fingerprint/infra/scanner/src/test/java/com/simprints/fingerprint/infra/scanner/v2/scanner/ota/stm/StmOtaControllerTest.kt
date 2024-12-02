@@ -6,18 +6,18 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.responses.CommandAcknowledgement
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.stmota.StmOtaMessageInputStream
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.spyk
-import io.mockk.verify
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
@@ -26,64 +26,54 @@ import kotlin.random.Random
 
 class StmOtaControllerTest {
 
-    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE)
-
     @Test
-    fun program_correctlyEmitsProgressValuesAndCompletes() {
+    fun program_correctlyEmitsProgressValuesAndCompletes() = runTest {
         val stmOtaController = StmOtaController()
 
         val firmwareBin = generateRandomBinFile()
         val expectedProgress = generateExpectedProgressValues(firmwareBin)
 
-        val testObserver = stmOtaController.program(configureMessageStreamMock(), responseErrorHandler, firmwareBin).testSubscribe()
-
-        testObserver.awaitAndAssertSuccess()
-
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedProgress).inOrder()
-        testObserver.assertComplete()
+        val testObserver =
+            stmOtaController.program(configureMessageStreamMock(), firmwareBin).toList()
+        assertThat(testObserver.toList()).containsExactlyElementsIn(expectedProgress).inOrder()
     }
 
     @Test
-    fun program_correctlyCallsParseAndSendCorrectNumberOfTimes() {
+    fun program_correctlyCallsParseAndSendCorrectNumberOfTimes() = runTest {
         val firmwareBin = generateRandomBinFile()
         val expectedNumberOfCalls = expectedNumberOfChunks(firmwareBin) * 3 + 5
 
         val messageStreamMock = configureMessageStreamMock()
         val stmOtaController = StmOtaController()
-
-        val testObserver = stmOtaController.program(messageStreamMock, responseErrorHandler, firmwareBin).testSubscribe()
-
-        testObserver.awaitAndAssertSuccess()
-
-        verify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
+        stmOtaController.program(messageStreamMock, firmwareBin).toList()
+        coVerify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
-    @Test
-    fun program_receivesNackAtStart_throwsException() {
+    @Test(expected = OtaFailedException::class)
+    fun program_receivesNackAtStart_throwsException() = runTest {
         val stmOtaController = StmOtaController()
-
-        val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(0)), responseErrorHandler, byteArrayOf()).testSubscribe()
-
-        testObserver.awaitTerminalEvent()
-        testObserver.assertError(OtaFailedException::class.java)
+        stmOtaController.program(
+            configureMessageStreamMock(nackPositions = listOf(0)),
+            byteArrayOf()
+        ).toList()
     }
 
-    @Test
-    fun program_receivesNackDuringProcess_emitsValueUntilNackThenThrowsException() {
+    @Test(expected = OtaFailedException::class)
+    fun program_receivesNackDuringProcess_emitsValueUntilNackThenThrowsException() = runTest {
         val stmOtaController = StmOtaController()
 
         val firmwareBin = generateRandomBinFile()
         val expectedProgress = generateExpectedProgressValues(firmwareBin)
 
         val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(10)), responseErrorHandler, firmwareBin).testSubscribe()
-
-        testObserver.awaitTerminalEvent()
-        assertThat(testObserver.values()).containsExactlyElementsIn(expectedProgress.slice(0..1)).inOrder()
-        testObserver.assertError(OtaFailedException::class.java)
+            configureMessageStreamMock(nackPositions = listOf(10)),
+            firmwareBin
+        ).toList()
+        assertThat(testObserver.toList()).containsExactlyElementsIn(expectedProgress.slice(0..1))
+            .inOrder()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun configureMessageStreamMock(nackPositions: List<Int> = listOf()): StmOtaMessageChannel {
         val responseSubject = PublishSubject.create<StmOtaResponse>()
         val messageIndex = AtomicInteger(0)
@@ -91,21 +81,25 @@ class StmOtaControllerTest {
         return StmOtaMessageChannel(
             spyk(StmOtaMessageInputStream(mockk())).apply {
                 justRun { connect(any()) }
-                every { stmOtaResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+                every { stmOtaResponseStream } returns responseSubject.toFlowable(
+                    BackpressureStrategy.BUFFER
+                )
             },
             mockk {
                 every { sendMessage(any()) } answers {
                     Completable.complete().doAfterTerminate {
-                        responseSubject.onNext(CommandAcknowledgement(
-                            if (nackPositions.contains(messageIndex.getAndIncrement())) {
-                                CommandAcknowledgement.Kind.NACK
-                            } else {
-                                CommandAcknowledgement.Kind.ACK
-                            }
-                        ))
+                        responseSubject.onNext(
+                            CommandAcknowledgement(
+                                if (nackPositions.contains(messageIndex.getAndIncrement())) {
+                                    CommandAcknowledgement.Kind.NACK
+                                } else {
+                                    CommandAcknowledgement.Kind.ACK
+                                }
+                            )
+                        )
                     }
                 }
-            }
+            }, Dispatchers.IO
         )
     }
 

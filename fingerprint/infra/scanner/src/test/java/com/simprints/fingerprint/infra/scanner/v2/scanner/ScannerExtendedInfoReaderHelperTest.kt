@@ -18,7 +18,6 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressExte
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ExtendedHardwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ExtendedVersionInformation
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetCypressExtendedVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetCypressVersionResponse
@@ -27,10 +26,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetHardw
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.root.RootMessageOutputStream
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -38,6 +34,7 @@ import io.mockk.spyk
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -46,11 +43,10 @@ class ScannerExtendedInfoReaderHelperTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+    private val ioDispatcher = testCoroutineRule.testCoroutineDispatcher
 
     private val mainMessageChannel: MainMessageChannel = mockk()
     private val rootMessageChannel: RootMessageChannel = getRootMessageChannel()
-    private val responseErrorHandler: ResponseErrorHandler = ResponseErrorHandler(
-        ResponseErrorHandlingStrategy.NONE)
 
     private lateinit var expectedVersionResponse: GetVersionResponse
     private lateinit var expectedHardwareResponse: GetHardwareVersionResponse
@@ -61,12 +57,11 @@ class ScannerExtendedInfoReaderHelperTest {
     private val scannerInfoReader = ScannerExtendedInfoReaderHelper(
         mainMessageChannel,
         rootMessageChannel,
-        responseErrorHandler
     )
 
 
     @Test
-    fun shouldReturn_scannerInformation_withLegacyFirmwareInfo_whenCypressVersion_isOldApi() {
+    fun shouldReturn_scannerInformation_withLegacyFirmwareInfo_whenCypressVersion_isOldApi() = runTest {
         val stmMajorFirmwareVersion: Short = 1
         val stmMinorFirmwareVersion: Short = 2
         val un20MajorFirmwareVersion: Short = 1
@@ -95,22 +90,15 @@ class ScannerExtendedInfoReaderHelperTest {
             un20AppVersion = Un20ExtendedAppVersion(
                 "$un20MajorFirmwareVersion.$expectedHardware.$un20MinorFirmwareVersion")
         )
-
-        val testObserver = scannerInfoReader.readScannerInfo().test()
-        testObserver.awaitAndAssertSuccess()
-
-
-        testObserver.assertValueCount(1)
-        val scannerInformation = testObserver.values().first() as ScannerInformation
+        val scannerInformation = scannerInfoReader.readScannerInfo()
         assertThat(scannerInformation.hardwareVersion).isEqualTo("E-1")
         assertThat(scannerInformation.firmwareVersions).isEqualTo(
             expectedFirmwareVersions
         )
     }
 
-
     @Test
-    fun shouldReturn_scannerInformation_withExtendedFirmwareInfo_whenCypressVersion_isNewApi() {
+    fun shouldReturn_scannerInformation_withExtendedFirmwareInfo_whenCypressVersion_isNewApi() = runTest {
         val expectedCypressVersion = CypressFirmwareVersion(1, 3, 1, 3)
         expectedCypressVersionResponse = GetCypressVersionResponse(expectedCypressVersion)
 
@@ -126,19 +114,13 @@ class ScannerExtendedInfoReaderHelperTest {
         )
         expectedExtendedVersionResponse = GetExtendedVersionResponse(expectedFirmwareVersions)
 
-
-        val testObserver = scannerInfoReader.readScannerInfo().test()
-        testObserver.awaitAndAssertSuccess()
-
-
-        testObserver.assertValueCount(1)
-        val scannerInformation = testObserver.values().first() as ScannerInformation
+        val scannerInformation = scannerInfoReader.readScannerInfo()
         assertThat(scannerInformation.hardwareVersion).isEqualTo(expectedHardware)
         assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
     }
 
     @Test
-    fun shouldReturn_scannerInformation_containingOld_firmwareVersion_wheneverPartial_otaUpdateOccurs() {
+    fun shouldReturn_scannerInformation_containingOld_firmwareVersion_wheneverPartial_otaUpdateOccurs() = runTest {
         val expectedCypressVersion = CypressFirmwareVersion(1, 3, 1, 3)
         expectedCypressVersionResponse = GetCypressVersionResponse(expectedCypressVersion)
 
@@ -168,18 +150,17 @@ class ScannerExtendedInfoReaderHelperTest {
         // for missing version values.
         val expectedFirmwareVersions = firmwareVersions.copy(
             stmFirmwareVersion = StmExtendedFirmwareVersion(
-                expectedUnifiedVersion.stmFirmwareVersion.toNewVersionNamingScheme()),
+                expectedUnifiedVersion.stmFirmwareVersion.toNewVersionNamingScheme()
+            ),
 
             un20AppVersion = Un20ExtendedAppVersion(
-                expectedUnifiedVersion.un20AppVersion.toNewVersionNamingScheme())
+                expectedUnifiedVersion.un20AppVersion.toNewVersionNamingScheme()
+            )
         )
 
 
-        val testObserver = scannerInfoReader.readScannerInfo().test()
-        testObserver.awaitAndAssertSuccess()
+        val scannerInformation = scannerInfoReader.readScannerInfo()
 
-        testObserver.assertValueCount(1)
-        val scannerInformation = testObserver.values().first() as ScannerInformation
         assertThat(scannerInformation.hardwareVersion).isEqualTo(expectedHardware)
         assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
     }
@@ -210,6 +191,6 @@ class ScannerExtendedInfoReaderHelperTest {
             }
         }
 
-        return RootMessageChannel(spyRootMessageInputStream, mockRootMessageOutputStream)
+        return RootMessageChannel(spyRootMessageInputStream, mockRootMessageOutputStream, ioDispatcher)
     }
 }

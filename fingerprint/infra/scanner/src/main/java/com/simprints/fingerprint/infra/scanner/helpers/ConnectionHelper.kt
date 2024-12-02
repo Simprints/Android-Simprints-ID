@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retry
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
@@ -91,29 +90,26 @@ internal class ConnectionHelper @Inject constructor(
             withContext(dispatcher) { socket.connect() }
             this.socket = socket
             return socket
-        } catch (e: IOException) {
+         } catch (_: IOException) {
             throw ScannerDisconnectedException()
         }
     }
 
-    private suspend fun connectScannerObjectWithSocket(
-        scanner: Scanner,
-        socket: ComponentBluetoothSocket
-    ) = withContext(dispatcher) {
+    private fun connectScannerObjectWithSocket(
+        scanner: Scanner, socket: ComponentBluetoothSocket
+    ) {
         Simber.d("Socket connected. Setting up scanner...")
-        scanner.connect(socket.getInputStream(), socket.getOutputStream()).await()
+        scanner.connect(socket.getInputStream(), socket.getOutputStream())
     }
 
-    suspend fun disconnectScanner(scanner: Scanner): Unit = withContext(dispatcher) {
-        scanner.disconnect().await()
+    fun disconnectScanner(scanner: Scanner) {
+        scanner.disconnect()
         socket?.close()
     }
 
     suspend fun reconnect(
-        scanner: Scanner,
-        macAddress: String,
-        maxRetries: Long = CONNECT_MAX_RETRIES
-    )= withContext(dispatcher) {
+        scanner: Scanner, macAddress: String, maxRetries: Long = CONNECT_MAX_RETRIES
+    ) {
         disconnectScanner(scanner)
         delay(RECONNECT_DELAY_MS)
         connectScanner(scanner, macAddress, maxRetries).collect()

@@ -12,9 +12,9 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.Ordering
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
-import io.reactivex.Completable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -39,8 +39,8 @@ class ConnectionHelperTest {
     }
 
     private val mockScanner = mockk<Scanner> {
-        every { connect(any(), any()) } returns Completable.complete()
-        every { disconnect() } returns Completable.complete()
+        justRun { connect(any(), any()) }
+        justRun { disconnect() }
     }
 
     private val connectionHelper = ConnectionHelper(mockAdapter, testCoroutineRule.testCoroutineDispatcher)

@@ -242,7 +242,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             liveFeedbackState = LiveFeedbackState.START
             stopLiveFeedbackTask?.cancel()
             liveFeedbackTask = viewModelScope.launch {
-                scannerManager.scanner.startLiveFeedback()
+                try {
+                    scannerManager.scanner.startLiveFeedback()
+                } catch (e: Throwable) {
+                    handleScannerCommunicationsError(e)
+                }
             }
         }
     }
@@ -357,7 +361,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 )
 
                 handleCaptureSuccess(capturedFingerprint)
-            } catch (ex: CancellationException) {
+            } catch (_: CancellationException) {
                 // ignore cancellation exception, but log behaviour
                 Simber.d("Fingerprint scanning was cancelled")
             } catch (ex: Throwable) {

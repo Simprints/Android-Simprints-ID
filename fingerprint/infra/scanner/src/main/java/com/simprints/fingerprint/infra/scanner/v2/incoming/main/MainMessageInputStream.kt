@@ -59,7 +59,7 @@ class MainMessageInputStream(
         packetRouter.disconnect()
     }
 
-    inline fun <reified R : IncomingMainMessage> receiveResponse(crossinline withPredicate: (R) -> Boolean = { true }): Single<R> =
+    inline fun <reified R : IncomingMainMessage> receiveResponse(): Single<R> =
         Single.defer {
             when {
                 isSubclass<R, VeroResponse>() -> veroResponses
@@ -67,7 +67,7 @@ class MainMessageInputStream(
                 isSubclass<R, Un20Response>() -> un20Responses
                 else -> Flowable.error(IllegalArgumentException("Trying to receive invalid response"))
             }
-                ?.filterCast(withPredicate)
+                ?.filterCast<R>()
                 ?.firstOrError()
                 ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
         }
