@@ -22,6 +22,35 @@ The CI Workflow is triggered by two events:
 The CI Workflow consists of 8 unit testing jobs plus the SonarQube scanning job. The unit testing jobs run in parallel, each responsible for testing a specific module or group of modules. The SonarQube scanning job waits until all the unit testing jobs are completed, the XML test coverage reports are uploaded, and then starts the sonar scan.
 
 ## **CD Workflow**
+Deployment Workflow Diagram:
+```mermaid
+flowchart TD
+    trigger([Manual Trigger]) --> setup(Release Setup)
+    setup --> unit_tests(Run Unit Tests)
+    unit_tests --> sonarqube(Run SonarQube Analysis)
+    sonarqube --> deploy_dev(Build Dev APK)
+    sonarqube --> deploy_stag(Build Staging APK)
+    sonarqube --> deploy_prod(Build Production APK)
+
+    subgraph Production Environment
+        deploy_prod --> run_app_sweep(Perform App Sweep)
+        run_app_sweep --> google_play_internal(Upload to Internal Track)
+        google_play_internal --> google_play_alpha([Promote to Alpha Track])
+        google_play_alpha --> add_release_tag(Add Release Tag)
+        google_play_alpha --> google_play_prod_25([Promote 25% to Production])
+        google_play_prod_25 --> google_play_prod_50([Promote 50% to Production])
+        google_play_prod_50 --> google_play_prod_100([Promote 100% to Production])
+    end
+
+    subgraph Staging Environment
+        deploy_stag --> deploy_firebase_stag(Upload to Firebase Staging)
+    end
+
+    subgraph Dev Environment
+        deploy_dev --> deploy_firebase_dev(Upload to Firebase Dev)
+    end
+```
+
 
 The CD Workflow is responsible for automatically deploying new code changes to different environments. It performs the following tasks:
 
@@ -44,18 +73,3 @@ The CD Workflow consists of several jobs, each responsible for a specific deploy
 ## **Dependency Updates workflow**
 
 Updates project dependencies using Dependabot, an automated dependency management tool, ensuring that the project always uses the latest stable versions of its dependencies.
-
-## **Reusable Workflows**
-
-To promote code reusability and efficiency, two reusable workflows are defined:
-
-1.  **Test Android Modules:** This workflow takes a list of modules and a unique report ID as input and executes unit tests for the specified modules. It then uploads the test coverage reports using the provided report ID.
-
-2.  **Deploy to Firebase:** This workflow takes a build type (dev or staging) as input and uploads the corresponding APK (debug or staging) to the Firebase distribution track.
-
-
-By utilizing reusable workflows, common tasks can be encapsulated and reused across different workflows, reducing code duplication and promoting maintainability.
-
-## **Overall CI/CD Strategy**
-
-The CI/CD strategy implemented in this project emphasizes automation, continuous testing, and controlled deployment. By automating the CI and CD processes, the development team can focus on writing code and delivering new features faster. Continuous testing ensures that code changes are always validated for quality, minimizing the introduction of bugs and regressions. Controlled deployment allows for a phased rollout of new features, enabling gradual testing and feedback before reaching a wider audience. This combination of automation, continuous testing, and controlled deployment contributes to a more efficient and reliable software development process.
