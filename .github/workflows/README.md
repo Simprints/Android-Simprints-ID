@@ -50,7 +50,11 @@ flowchart TD
         deploy_dev --> deploy_firebase_dev(Upload to Firebase Dev)
     end
 ```
+**Trigger**
 
+The CD Workflow can be manually triggered through workflow dispatch on a **release** branch. 
+
+**Environments**
 
 The CD Workflow is responsible for automatically deploying new code changes to different environments. It performs the following tasks:
 
@@ -64,11 +68,23 @@ The CD Workflow is responsible for automatically deploying new code changes to d
 
 
 
-**Workflow Trigger and Jobs**
+**Version Code**
 
-The CD Workflow is triggered by manual trigger through workflow dispatch, allowing developers to initiate the deployment process on demand.
+The version code is generated from the sum of 2 things:
+1. The unix time in seconds / 1000. This ensures a code that is unique to that moment and always incrementing. 
+2. The run number of the workflow. This ensures that if two workflows ran at exactly the same time (somehow) they latest would have the highest build number. 
 
-The CD Workflow consists of several jobs, each responsible for a specific deployment task. For instance, the `deploy-to-dev` job deploys the dev build to Firebase, while the `promote-artifact` job promotes the release build to the specified Google Play track.
+**Version Name**
+
+The version name follows our versioning convention:
+- `year`.`quarter`.`release`-`(optional) deployment`+`(optional) unix timestamp`.`run number`.`run attempt`
+
+The optional params are **only** used on none release builds. We add the unix timestamp so we can compute the `versionCode` from the filename if needed.  
+
+- Ex: `2024.1.0-dev+1733211.15.2`, Quarter 1 of 2024, dev deployment, time, run 15, attempt 2
+- Ex: `2024.1.0+15.2`, Quarter 1 of 2024, release, run 15, attempt 2
+
+Note: The `year`.`quarter`.`release` is take from the branch name. Ex: `release/2024.1.1` would be `2024.1.1`
 
 ## **Dependency Updates workflow**
 
