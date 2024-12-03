@@ -65,7 +65,7 @@ class ScannerFactory @Inject internal constructor(
             }
 
             FingerprintConfiguration.VeroGeneration.VERO_2 -> {
-                scannerV2 = ScannerV2.create()
+                scannerV2 = ScannerV2.create(ioDispatcher)
                 scannerWrapper = createScannerWrapperV2(macAddress)
                 // Create OTA wrapper for V2 scanner only as V1 scanner doesn't support OTA
                 scannerOtaOperationsWrapper = createScannerOtaOperationsWrapper(macAddress)

@@ -12,13 +12,13 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import io.mockk.CapturingSlot
 import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.coVerify
+import io.mockk.just
 import io.mockk.mockk
-import io.mockk.verify
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.mockk.runs
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -38,12 +38,12 @@ class StmOtaHelperTest {
     fun setup() {
         coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
 
-        every { scannerMock.enterStmOtaMode() } returns Completable.complete()
-        every { scannerMock.startStmOta(any()) } returns Observable.fromIterable(OTA_PROGRESS_VALUES)
-        every { scannerMock.getVersionInformation() } returns Single.just(OLD_SCANNER_VERSION)
-        every { scannerMock.setVersionInformation(any()) } returns Completable.complete()
-        every { scannerMock.enterMainMode() } returns Completable.complete()
-        every { scannerMock.getStmFirmwareVersion() } returns Single.just(NEW_STM_VERSION)
+        coEvery { scannerMock.enterStmOtaMode() } just runs
+        coEvery { scannerMock.startStmOta(any()) } returns OTA_PROGRESS_VALUES.asFlow()
+        coEvery { scannerMock.getVersionInformation() } returns OLD_SCANNER_VERSION
+        coEvery { scannerMock.setVersionInformation(any()) } just runs
+        coEvery { scannerMock.enterMainMode() } just runs
+        coEvery { scannerMock.getStmFirmwareVersion() } returns NEW_STM_VERSION
 
         coEvery { firmwareFileManagerMock.loadStmFirmwareBytes(NEW_STM_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
@@ -64,7 +64,7 @@ class StmOtaHelperTest {
             .inOrder()
 
         val sentUnifiedVersion = CapturingSlot<ExtendedVersionInformation>()
-        verify { scannerMock.setVersionInformation(capture(sentUnifiedVersion)) }
+        coVerify { scannerMock.setVersionInformation(capture(sentUnifiedVersion)) }
         assertThat(sentUnifiedVersion.captured.toScannerFirmwareVersions()).isEqualTo(NEW_SCANNER_VERSION.toScannerFirmwareVersions())
     }
 
@@ -76,8 +76,7 @@ class StmOtaHelperTest {
             progressValues.map { StmOtaStep.TransferInProgress(it) }
         val error = ScannerV2OtaFailedException("oops!")
 
-        every { scannerMock.startStmOta(any()) } returns
-            Observable.fromIterable(progressValues).concatWith(Observable.error(error))
+        coEvery { scannerMock.startStmOta(any()) } returns progressValues.asFlow().onCompletion { throw error}
 
         val otaFlow = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING)
         val actualSteps = otaFlow.take(expectedSteps.size).toList()
@@ -120,7 +119,7 @@ class StmOtaHelperTest {
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
             listOf(StmOtaStep.ReconnectingAfterTransfer, StmOtaStep.EnteringMainMode, StmOtaStep.ValidatingNewFirmwareVersion)
 
-        every { scannerMock.getStmFirmwareVersion() } returns Single.just(OLD_STM_VERSION)
+        coEvery {  scannerMock.getStmFirmwareVersion() } returns OLD_STM_VERSION
 
         val otaFlow = stmOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_STM_VERSION_STRING)
         val actualSteps = otaFlow.take(expectedSteps.size).toList()

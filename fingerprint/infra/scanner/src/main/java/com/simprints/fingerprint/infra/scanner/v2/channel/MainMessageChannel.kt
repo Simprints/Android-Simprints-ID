@@ -5,14 +5,28 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.OutgoingMa
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.MainMessageInputStream
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.doSimultaneously
-import io.reactivex.Single
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.rx2.await
 
 class MainMessageChannel(
     incoming: MainMessageInputStream,
-    outgoing: MainMessageOutputStream
-) : MessageChannel<MainMessageInputStream, MainMessageOutputStream>(incoming, outgoing) {
+    outgoing: MainMessageOutputStream,
+    dispatcher: CoroutineDispatcher
+) : MessageChannel<MainMessageInputStream, MainMessageOutputStream>(
+    incoming, outgoing, dispatcher
+) {
 
-    inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        outgoing.sendMessage(command)
-            .doSimultaneously(incoming.receiveResponse())
+    suspend inline fun <reified R : IncomingMainMessage> sendCommandAndReceiveResponse(
+        command: OutgoingMainMessage
+    ): R = runLockedTask {
+        outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
+    }
+
+    suspend fun sendMainModeCommand(command: OutgoingMainMessage) = runLockedTask {
+        outgoing.sendMessage(command).await()
+    }
+
+    suspend inline fun <reified R : IncomingMainMessage> receiveResponse() = runLockedTask {
+        incoming.receiveResponse<R>().await()
+    }
 }
