@@ -70,9 +70,12 @@ The CD Workflow is responsible for automatically deploying new code changes to d
 
 **Version Code**
 
-The version code is generated from the sum of 2 things:
-1. The unix time in seconds / 1000. This ensures a code that is unique to that moment and always incrementing. 
-2. The run number of the workflow. This ensures that if two workflows ran at exactly the same time (somehow) they latest would have the highest build number. 
+The version code is generated from 3 things:
+1. A "base" version code of `10000000`. For a time the version code was derived from unix time / 1000. This created a always increasing number, but was otherwise not so useful. Setting a base allows us to establish a clean "floor" for the version code. If the workflow runs ever exceed the base, first of all go us, and 2nd the base can be removed. 
+2. The `run number` of the workflow. This tells us which run a build came from and is auto incrementing. 
+3. The last two digits are reserved for the `run attempts`. This tells us how many times a specific workflow was run. If more than 99 attempts are made (something is wrong) the build will fail and you need to start a new workflow run. 
+
+- Ex: `100001502` means this build came from workflow 15, run 2. 
 
 **Version Name**
 

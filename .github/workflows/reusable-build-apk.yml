@@ -36,6 +36,8 @@ jobs:
             VERSION_BUILD: ${{ github.run_number }}.${{ github.run_attempt }}
             # The final output file name.
             FILE_NAME: "set in lower step"
+            # The base floor version code. Please check the README for more information.
+            BASE_VERSION_CODE: 10000000
 
         steps:
             -   name: Checkout
@@ -47,9 +49,21 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
+            -   name: Check workflow validity
+                if: ${{ github.run_attempt > 99 }}
+                run: |
+                    echo "Run attempts exceeded 99. Please start a new workflow."
+                    exit 1
+
+            -   name: Check base version code
+                if: ${{ github.run_number >= env.BASE_VERSION_CODE }}
+                run: |
+                    echo "Github workflows now exceeds the base version code. Please remove the BASE_VERSION_CODE"
+                    echo "BASE_VERSION_CODE=0" >> $GITHUB_ENV
+
             -   name: Compute version variables
                 run: |
-                    echo "VERSION_CODE=$(($(date +%s) / 1000 + ${{ github.run_number }}))" >> $GITHUB_ENV
+                    echo "VERSION_CODE=$(($BASE_VERSION_CODE + ${{ github.run_number }} * 100 + ${{ github.run_attempt }}))" >> $GITHUB_ENV
                     echo "VERSION_NAME=$(echo '${{ github.ref_name }}' | awk -F'/' '{print $NF}')" >> $GITHUB_ENV
 
             -   name: Compute file name
