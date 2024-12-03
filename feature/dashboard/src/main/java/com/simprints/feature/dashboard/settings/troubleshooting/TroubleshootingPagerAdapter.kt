@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.simprints.feature.dashboard.settings.troubleshooting.events.EventScopeLogFragment
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.OverviewFragment
+import com.simprints.feature.dashboard.settings.troubleshooting.workers.WorkerLogFragment
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
@@ -23,5 +24,6 @@ internal class TroubleshootingPagerAdapter(
 
         Overview("Overview", { OverviewFragment() }),
         Events("Event scopes", { EventScopeLogFragment() }),
+        Workers("Worker log", { WorkerLogFragment() }),
     }
 }
