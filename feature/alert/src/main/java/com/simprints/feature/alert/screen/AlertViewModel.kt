@@ -2,7 +2,7 @@ package com.simprints.feature.alert.screen
 
 import androidx.lifecycle.ViewModel
 import com.simprints.core.DeviceID
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.SessionEventRepository
@@ -19,13 +19,13 @@ internal class AlertViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
     private val authStore: AuthStore,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
     private lateinit var cachedAlertEvent: AlertScreenEvent
 
     fun saveAlertEvent(type: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType) {
-        externalScope.launch {
+        sessionCoroutineScope.launch {
             val event = AlertScreenEvent(timeHelper.now(), type)
             eventRepository.addOrUpdateEvent(event)
             // Preserving the alert event to be able to export its data if requested by user

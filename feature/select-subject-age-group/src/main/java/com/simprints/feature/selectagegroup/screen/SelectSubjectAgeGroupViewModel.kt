@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -31,7 +31,7 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val buildAgeGroups: BuildAgeGroupsUseCase,
     private val configurationRepo: ConfigRepository,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
     val finish: LiveData<LiveDataEventWithContent<AgeGroup>>
@@ -54,7 +54,7 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
         _ageGroups.value = ageGroups
     }
 
-    fun saveAgeGroupSelection(ageRange: AgeGroup) = externalScope.launch {
+    fun saveAgeGroupSelection(ageRange: AgeGroup) = sessionCoroutineScope.launch {
         val event = AgeGroupSelectionEvent(
             startTime,
             timeHelper.now(),

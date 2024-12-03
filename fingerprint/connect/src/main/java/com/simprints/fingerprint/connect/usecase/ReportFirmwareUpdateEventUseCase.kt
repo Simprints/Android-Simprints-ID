@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.connect.usecase
 
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
@@ -13,7 +13,7 @@ import javax.inject.Inject
 internal class ReportFirmwareUpdateEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
 
     operator fun invoke(
@@ -22,7 +22,7 @@ internal class ReportFirmwareUpdateEventUseCase @Inject constructor(
         targetVersions: String,
         e: Throwable? = null,
     ) {
-        externalScope.launch {
+        sessionCoroutineScope.launch {
             val chipName = when (availableOta) {
                 AvailableOta.CYPRESS -> "cypress"
                 AvailableOta.STM -> "stm"

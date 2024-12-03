@@ -94,12 +94,31 @@ object CoreModule {
         @DispatcherIO dispatcherIO: CoroutineDispatcher
     ): CoroutineContext = dispatcherIO + NonCancellable
 
+    /**
+     * General purpose background scope
+     */
     @ExternalScope
     @Provides
     fun provideExternalScope(
         @DispatcherIO dispatcherIO: CoroutineDispatcher
     ): CoroutineScope = CoroutineScope(
         SupervisorJob() + dispatcherIO + AppCoroutineExceptionHandler()
+    )
+
+    /**
+    * Background scope dedicated to session event management
+    * Guarantees sequential execution to prevent race-conditions
+    * when adding events, closing sessions, etc
+    */
+    @SessionCoroutineScope
+    @Provides
+    @Singleton
+    fun provideSessionCoroutineScope(
+        @DispatcherIO dispatcherIO: CoroutineDispatcher
+    ): CoroutineScope = CoroutineScope(
+        SupervisorJob()
+                + dispatcherIO.limitedParallelism(1, "Single threaded dispatcher for the event system")
+                + AppCoroutineExceptionHandler()
     )
 
     @AppScope
@@ -146,6 +165,10 @@ annotation class AppScope
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class ExternalScope
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class SessionCoroutineScope
 
 /*
 Use this annotation to ignore a class or function from test coverage reports.

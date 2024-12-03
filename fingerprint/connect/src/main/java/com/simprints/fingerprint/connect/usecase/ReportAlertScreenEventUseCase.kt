@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.connect.usecase
 
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
@@ -12,11 +12,11 @@ import javax.inject.Inject
 internal class ReportAlertScreenEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
 
     operator fun invoke(eventType: AlertScreenEventType) {
-        externalScope.launch {
+        sessionCoroutineScope.launch {
             eventRepository.addOrUpdateEvent(AlertScreenEvent(timeHelper.now(), eventType))
         }
     }

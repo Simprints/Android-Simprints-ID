@@ -3,7 +3,7 @@ package com.simprints.feature.selectsubject.screen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -22,7 +22,7 @@ internal class SelectSubjectViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
     private val eventRepository: SessionEventRepository,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
     val finish: LiveData<LiveDataEventWithContent<Boolean>>
@@ -37,7 +37,7 @@ internal class SelectSubjectViewModel @Inject constructor(
         }
     }
 
-    private fun saveSelectionEvent(subjectId: String) = externalScope.launch {
+    private fun saveSelectionEvent(subjectId: String) = sessionCoroutineScope.launch {
         try {
             val event = GuidSelectionEvent(timeHelper.now(), subjectId)
             eventRepository.addOrUpdateEvent(event)

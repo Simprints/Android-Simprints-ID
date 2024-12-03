@@ -1,6 +1,6 @@
 package com.simprints.matcher.usecases
 
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -21,7 +21,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerCo
 internal class SaveMatchEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val configManager: ConfigManager,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
 
     operator fun invoke(
@@ -32,7 +32,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         matcherName: String,
         results: List<MatchResultItem>
     ) {
-        externalScope.launch {
+        sessionCoroutineScope.launch {
             val matchEntries = results.map { MatchEntry(it.subjectId, it.confidence) }
             val event = if (matchParams.flowType == FlowType.VERIFY) {
                 getOneToOneEvent(

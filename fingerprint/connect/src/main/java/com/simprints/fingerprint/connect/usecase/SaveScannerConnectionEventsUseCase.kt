@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.connect.usecase
 
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -16,11 +16,11 @@ internal class SaveScannerConnectionEventsUseCase @Inject constructor(
     private val scannerManager: ScannerManager,
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
 
     operator fun invoke() {
-        externalScope.launch {
+        sessionCoroutineScope.launch {
             val scanner = scannerManager.scanner
 
             eventRepository.addOrUpdateEvent(ScannerConnectionEvent(
