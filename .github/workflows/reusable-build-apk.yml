@@ -56,7 +56,7 @@ jobs:
                     exit 1
 
             -   name: Check base version code
-                if: ${{ github.run_number >= env.BASE_VERSION_CODE }}
+                if: ${{ github.run_number * 100 >= env.BASE_VERSION_CODE }}
                 run: |
                     echo "Github workflows now exceeds the base version code. Please remove the BASE_VERSION_CODE"
                     echo "BASE_VERSION_CODE=0" >> $GITHUB_ENV
