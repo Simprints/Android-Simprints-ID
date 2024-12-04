@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentRequestLoginBinding
+import com.simprints.feature.dashboard.settings.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,6 +37,10 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
     private var wasLogoutReasonDisplayed = false
 
+    // Requires so many clicks in short window to make it less likely to open on accident
+    private val clickCounter = AutoResettingClickCounter(requiredClicks = 10)
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         wasLogoutReasonDisplayed = savedInstanceState?.getBoolean(KEY_WAS_LOGOUT_REASON_DISPLAYED) ?: false
@@ -42,6 +48,12 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
         binding.simprintsIdVersionTextView.text =
             String.format(getString(IDR.string.dashboard_request_login_simprints_version), packageVersionName)
         args.logoutReason?.takeIf { !wasLogoutReasonDisplayed }?.run(::displayLogoutReasonDialog)
+
+        binding.loginImageViewLogo.setOnClickListener {
+            if (clickCounter.handleClick(lifecycleScope)) {
+                findNavController().navigate(R.id.action_requestLoginFragment_to_troubleshootingFragment)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

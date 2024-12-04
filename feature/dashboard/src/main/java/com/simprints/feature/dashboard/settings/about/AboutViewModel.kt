@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.feature.dashboard.settings.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
@@ -43,13 +45,24 @@ internal class AboutViewModel @Inject constructor(
         get() = _settingsLocked
     private val _settingsLocked =
         MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
+
     val logoutDestinationEvent: LiveData<LiveDataEventWithContent<LogoutDestination>>
         get() = _logoutDestinationEvent
     private val _logoutDestinationEvent =
         MutableLiveData<LiveDataEventWithContent<LogoutDestination>>()
 
+    val openTroubleshooting: LiveData<LiveDataEvent>
+        get() = _openTroubleshooting
+    private val _openTroubleshooting = MutableLiveData<LiveDataEvent>()
+
+    private var troubleshootingClickCounter = AutoResettingClickCounter()
+
     init {
         load()
+    }
+
+    fun unlockSettings() {
+        _settingsLocked.postValue(SettingsPasswordConfig.Unlocked)
     }
 
     fun processLogoutRequest() {
@@ -85,4 +98,9 @@ internal class AboutViewModel @Inject constructor(
         _settingsLocked.postValue(configuration.general.settingsPassword)
     }
 
+    fun troubleshootingClick() {
+        if (troubleshootingClickCounter.handleClick(viewModelScope)) {
+            _openTroubleshooting.send()
+        }
+    }
 }
