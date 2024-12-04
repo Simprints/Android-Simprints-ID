@@ -78,6 +78,25 @@
                 android:text="No checks done" />
         </LinearLayout>
 
+        <TextView
+            style="@style/Text.Headline6.Accented"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:lineSpacingMultiplier="1.5"
+            android:text="Vero details"
+            android:textIsSelectable="true" />
+
+        <TextView
+            android:id="@+id/troubleshootOverviewScanner"
+            style="@style/Text.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.1"
+            tools:text="Connecting to scanner..."
+            android:textIsSelectable="true" />
+
     </LinearLayout>
 
 </ScrollView>
