@@ -11,7 +11,7 @@ import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentRequestLoginBinding
-import com.simprints.feature.dashboard.settings.troubleshooting.AutoResettingClickCounter
+import com.simprints.feature.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,7 +51,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
         binding.loginImageViewLogo.setOnClickListener {
             if (clickCounter.handleClick(lifecycleScope)) {
-                findNavController().navigate(R.id.action_requestLoginFragment_to_troubleshootingFragment)
+                findNavController().navigate(R.id.action_aboutFragment_to_troubleshooting)
             }
         }
     }
