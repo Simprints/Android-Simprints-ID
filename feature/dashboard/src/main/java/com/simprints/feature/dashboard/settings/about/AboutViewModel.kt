@@ -8,7 +8,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
-import com.simprints.feature.dashboard.settings.troubleshooting.AutoResettingClickCounter
+import com.simprints.feature.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints

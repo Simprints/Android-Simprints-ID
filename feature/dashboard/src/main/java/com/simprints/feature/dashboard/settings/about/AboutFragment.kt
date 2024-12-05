@@ -140,7 +140,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
     }
 
     private fun openTroubleshooting() {
-        findNavController().navigate(R.id.action_aboutFragment_to_troubleshootingFragment)
+        findNavController().navigate(R.id.action_aboutFragment_to_troubleshooting)
     }
 
     private fun getAppVersionPreference(): Preference? =
