@@ -39,6 +39,10 @@ data class ScannerConnectionEvent(
         override val type: EventType = SCANNER_CONNECTION,
     ) : EventPayload() {
 
+        override fun toSafeString(): String =
+            "scanner: ${scannerInfo.scannerId}, mac: ${scannerInfo.macAddress}, " +
+                "generation: ${scannerInfo.generation}, hardware version: ${scannerInfo.hardwareVersion}"
+
         @Keep
         data class ScannerInfo(
             val scannerId: String,

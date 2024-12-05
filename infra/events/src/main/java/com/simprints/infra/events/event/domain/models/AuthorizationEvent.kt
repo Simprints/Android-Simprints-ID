@@ -50,6 +50,8 @@ data class AuthorizationEvent(
         override val type: EventType = AUTHORIZATION,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "result: $result"
+
         @Keep
         enum class AuthorizationResult {
             AUTHORIZED, NOT_AUTHORIZED

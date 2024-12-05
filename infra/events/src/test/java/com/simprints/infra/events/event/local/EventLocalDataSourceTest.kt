@@ -353,6 +353,20 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
+    fun countClosedEventScopes() = runTest {
+        eventLocalDataSource.countClosedEventScopes(EventScopeType.SESSION)
+
+        coVerify { scopeDao.countClosed(EventScopeType.SESSION) }
+    }
+
+    @Test
+    fun loadAllScopes() = runTest {
+        eventLocalDataSource.loadAllScopes()
+
+        coVerify { scopeDao.loadAll() }
+    }
+
+    @Test
     fun saveEventScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         eventLocalDataSource.saveEventScope(mockk())

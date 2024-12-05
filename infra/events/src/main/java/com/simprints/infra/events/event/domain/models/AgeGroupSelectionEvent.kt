@@ -38,7 +38,10 @@ data class AgeGroupSelectionEvent(
         override val endedAt: Timestamp?,
         val subjectAgeGroup: AgeGroup,
         override val type: EventType = AGE_GROUP_SELECTION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "age group: [${subjectAgeGroup.startInclusive}, ${subjectAgeGroup.endExclusive})"
+    }
 
     @Keep
     data class AgeGroup(

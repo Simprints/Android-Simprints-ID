@@ -40,6 +40,8 @@ data class IntentParsingEvent(
         override val type: EventType = INTENT_PARSING,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "integration: $integration"
+
         @Keep
         enum class IntegrationInfo {
 

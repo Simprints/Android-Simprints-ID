@@ -209,6 +209,10 @@
         <item name="android:textAppearance">@style/TextAppearance.Simprints.Body1</item>
     </style>
 
+    <style name="Text.Body1.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="Text.Body1.White">
         <item name="android:textColor">@color/simprints_text_white</item>
     </style>

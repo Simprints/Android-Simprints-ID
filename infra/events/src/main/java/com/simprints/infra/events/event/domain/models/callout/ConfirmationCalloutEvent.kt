@@ -44,7 +44,10 @@ data class ConfirmationCalloutEvent(
         val sessionId: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_CONFIRMATION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "guid: $selectedGuid, session ID: $sessionId"
+    }
 
     companion object {
 

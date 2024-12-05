@@ -42,6 +42,8 @@ data class ConsentEvent(
         override val type: EventType = CONSENT,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "consent: $consentType, result: $result"
+
         @Keep
         enum class Type {
 

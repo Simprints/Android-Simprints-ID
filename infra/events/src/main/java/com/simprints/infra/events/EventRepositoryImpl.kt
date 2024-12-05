@@ -123,6 +123,8 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun saveEventScope(eventScope: EventScope) {
         eventLocalDataSource.saveEventScope(eventScope)
     }
+    override suspend fun getAllScopes(): List<EventScope> =
+        eventLocalDataSource.loadAllScopes()
 
     override suspend fun getOpenEventScopes(type: EventScopeType): List<EventScope> =
         eventLocalDataSource.loadOpenedScopes(type)

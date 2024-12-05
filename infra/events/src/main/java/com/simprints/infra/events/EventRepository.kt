@@ -18,6 +18,7 @@ interface EventRepository {
     suspend fun closeEventScope(eventScopeId: String, reason: EventScopeEndCause?)
     suspend fun closeAllOpenScopes(type: EventScopeType, reason: EventScopeEndCause?)
     suspend fun saveEventScope(eventScope: EventScope)
+    suspend fun getAllScopes(): List<EventScope>
     suspend fun getOpenEventScopes(type: EventScopeType): List<EventScope>
     suspend fun getClosedEventScopes(type: EventScopeType, limit: Int): List<EventScope>
     suspend fun getClosedEventScopesCount(type: EventScopeType): Int

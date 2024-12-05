@@ -37,7 +37,11 @@ data class SuspiciousIntentEvent(
         val unexpectedExtras: Map<String, Any?>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = SUSPICIOUS_INTENT,
-    ) : EventPayload()
+    ) : EventPayload() {
+        override fun toSafeString(): String = unexpectedExtras.entries.joinToString(", ") {
+            "${it.key}: ${it.value}"
+        }
+    }
 
     companion object {
 

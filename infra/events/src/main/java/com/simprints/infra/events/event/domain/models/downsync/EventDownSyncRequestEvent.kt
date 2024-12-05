@@ -61,7 +61,12 @@ data class EventDownSyncRequestEvent(
         val eventsRead: Int?,
         override val eventVersion: Int,
         override val type: EventType = EventType.EVENT_DOWN_SYNC_REQUEST,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            "request ID: $requestId, status: $responseStatus, error: $errorType, " +
+                "ms to response: $msToFirstResponseByte, events read: $eventsRead"
+    }
 
     @Keep
     data class QueryParameters(
