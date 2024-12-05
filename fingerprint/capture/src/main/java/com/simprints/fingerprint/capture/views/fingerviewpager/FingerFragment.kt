@@ -48,7 +48,6 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
         vm.stateLiveData.observe(viewLifecycleOwner) {
             updateOrHideFingerImageAccordingToSettings()
             updateFingerNameText()
-//            updateFingerCaptureNumberText()
             updateFingerResultText()
             updateFingerDirectionText(it)
             updateTimeoutBars()
@@ -68,7 +67,6 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                 ).apply { if (index != 0) marginStart = PROGRESS_BAR_MARGIN }
             }
         }.map { progressBar ->
-//            binding.progressBarContainer.addView(progressBar)
             ScanCountdownBar(binding.progressBarContainer, vm.progressBarTimeout())
         }
     }
@@ -90,23 +88,6 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     private fun updateFingerNameText() {
         binding.fingerNumberText.text = getString(fingerId.nameTextId())
     }
-
-//    private fun updateFingerCaptureNumberText() = withFingerState {
-//        if (isMultiCapture()) {
-//            binding.fingerCaptureNumberText.setTextColor(
-//                resources.getColor(
-//                    nameTextColour(),
-//                    null
-//                )
-//            )
-//            binding.fingerCaptureNumberText.text =
-//                getString(captureNumberTextId(), currentCaptureIndex + 1, captures.size)
-//            binding.fingerCaptureNumberText.visibility = View.VISIBLE
-//        } else {
-//            binding.fingerCaptureNumberText.visibility = View.GONE
-//        }
-//    }
-
 
     private fun updateFingerResultText() = withFingerState {
         binding.fingerResultText.isVisible = currentCapture() !is CaptureState.ScanProcess.Scanning

@@ -25,7 +25,7 @@ import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScan
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerFactory
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice
+import com.simprints.fingerprint.infra.scannermock.dummy.DummyBluetoothDevice
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
@@ -123,9 +123,9 @@ class ConnectScannerViewModelTest {
             if (connectFailException != null)
                 throw connectFailException
         }
-        coEvery { setScannerInfoAndCheckAvailableOta(fingerprintSdk = SECUGEN_SIM_MATCHER) } answers {}
-        coEvery { sensorWakeUp() } answers {}
-        coEvery { setUiIdle() } answers {}
+        coJustRun { setScannerInfoAndCheckAvailableOta(fingerprintSdk = SECUGEN_SIM_MATCHER) }
+        coJustRun { sensorWakeUp() }
+        coJustRun { turnOffSmileLeds() }
         every { versionInformation() } returns when (scannerGeneration) {
             FingerprintConfiguration.VeroGeneration.VERO_1 -> VERO_1_VERSION
             FingerprintConfiguration.VeroGeneration.VERO_2 -> VERO_2_VERSION

@@ -57,6 +57,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun scheduleConfigUpdate() {
+        syncOrchestrator.startProjectSync()
         syncOrchestrator.startDeviceSync()
     }
 }

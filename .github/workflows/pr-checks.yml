@@ -85,7 +85,9 @@ jobs:
         uses: ./.github/workflows/run-unit-tests.yml
         secrets: inherit
         with:
-            modules: feature:dashboard
+            modules: | 
+                feature:dashboard
+                feature:troubleshooting
             reportsId: dashboard
 
     face-unit-tests:

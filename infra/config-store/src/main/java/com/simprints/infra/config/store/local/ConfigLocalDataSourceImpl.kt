@@ -126,10 +126,12 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
         val defaultProjectConfiguration: ProtoProjectConfiguration =
             ProjectConfiguration(
+                id = "",
                 projectId = "",
                 updatedAt = "",
                 general = GeneralConfiguration(
                     modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
+                    matchingModalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
                     languageOptions = listOf(),
                     defaultLanguage = "en",
                     collectLocation = true,
@@ -155,6 +157,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                         vero1 = Vero1Configuration(60),
                         vero2 = null,
+                        version = "",
                         maxCaptureAttempts = null
                     ),
                     nec = null,
@@ -197,6 +200,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         maxAge = DEFAULT_DOWN_SYNC_MAX_AGE,
                     ),
                 ),
+                custom = null,
             ).toProto()
         val defaultDeviceConfiguration: ProtoDeviceConfiguration = DeviceConfiguration(
             language = "",

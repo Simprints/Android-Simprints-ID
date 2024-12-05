@@ -50,6 +50,8 @@ data class AuthenticationEvent(
         override val type: EventType = AUTHENTICATION,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "result: $result"
+
         @Keep
         data class UserInfo(val projectId: String, val userId: TokenizableString)
 

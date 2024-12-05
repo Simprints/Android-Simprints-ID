@@ -13,7 +13,6 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
 
 /**
@@ -48,14 +47,13 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         withBatteryInfo: (BatteryInfo) -> Unit,
     ) {
         delay(100) // Speculatively needed
-        val unifiedVersionInfo = scanner.getVersionInformation().await()
-
+        val unifiedVersionInfo = scanner.getVersionInformation()
         unifiedVersionInfo.toScannerVersion().also {
             withScannerVersion(it)
             scannerVersion = it
         }
 
-        scanner.enterMainMode().await()
+        scanner.enterMainMode()
         delay(100) // Speculatively needed
         val batteryInfo = getBatteryInfo(scanner, withBatteryInfo)
         ifAvailableOtasPrepareScannerThenThrow(
@@ -71,10 +69,10 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         scanner: Scanner,
         withBatteryInfo: (BatteryInfo) -> Unit,
     ): BatteryInfo {
-        val batteryPercent = scanner.getBatteryPercentCharge().await()
-        val batteryVoltage = scanner.getBatteryVoltageMilliVolts().await()
-        val batteryMilliAmps = scanner.getBatteryCurrentMilliAmps().await()
-        val batteryTemperature = scanner.getBatteryTemperatureDeciKelvin().await()
+        val batteryPercent = scanner.getBatteryPercentCharge()
+        val batteryVoltage = scanner.getBatteryVoltageMilliVolts()
+        val batteryMilliAmps = scanner.getBatteryCurrentMilliAmps()
+        val batteryTemperature = scanner.getBatteryTemperatureDeciKelvin()
 
         return BatteryInfo(
             batteryPercent,

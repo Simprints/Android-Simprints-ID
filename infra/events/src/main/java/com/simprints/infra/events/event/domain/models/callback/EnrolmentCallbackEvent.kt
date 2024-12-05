@@ -40,7 +40,10 @@ data class EnrolmentCallbackEvent(
         val guid: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_ENROLMENT,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "guid: $guid"
+    }
 
 
     companion object {

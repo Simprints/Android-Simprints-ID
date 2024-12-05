@@ -164,6 +164,10 @@
         <item name="android:textColor">@color/simprints_text_grey</item>
     </style>
 
+    <style name="Text.Headline6.Accented">
+        <item name="android:textColor">@color/simprints_text_orange</item>
+    </style>
+
     <!-- Subtitle1 variants -->
 
     <style name="Text.Subtitle1" parent="Widget.MaterialComponents.TextView">
@@ -203,6 +207,10 @@
 
     <style name="Text.Body1" parent="Widget.MaterialComponents.TextView">
         <item name="android:textAppearance">@style/TextAppearance.Simprints.Body1</item>
+    </style>
+
+    <style name="Text.Body1.Bold">
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="Text.Body1.White">

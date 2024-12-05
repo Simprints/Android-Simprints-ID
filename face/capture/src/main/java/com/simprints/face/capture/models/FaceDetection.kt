@@ -20,6 +20,7 @@ internal data class FaceDetection(
     enum class Status {
         VALID,
         VALID_CAPTURING,
+        BAD_QUALITY,
         NOFACE,
         OFFYAW,
         OFFROLL,
@@ -28,6 +29,4 @@ internal data class FaceDetection(
     }
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING
-    fun isAboveQualityThreshold(qualityThreshold: Int): Boolean =
-        face?.let { it.quality > qualityThreshold } ?: false
 }

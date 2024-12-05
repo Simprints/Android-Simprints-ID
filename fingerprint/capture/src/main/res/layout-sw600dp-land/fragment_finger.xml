@@ -64,6 +64,17 @@
         android:gravity="center"
         tools:text="@string/fingerprint_capture_good_scan_message" />
 
+    <!--TODO REVIEW IF fingerCaptureNumberText IS NECESSARY-->
+    <TextView
+        android:id="@+id/fingerCaptureNumberText"
+        style="@style/Text.Subtitle1.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:visibility="gone"
+        tools:text="@string/fingerprint_capture_capture_number_text"
+        tools:visibility="visible" />
     <TextView
         android:id="@+id/fingerDirectionText"
         style="@style/Text.Subtitle1.Secondary"

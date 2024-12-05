@@ -15,6 +15,7 @@ class ApiProjectConfigurationTest {
     @Test
     fun `should map correctly the model when both fingerprint and face are missing`() {
         val apiProjectConfiguration = ApiProjectConfiguration(
+            "id",
             "projectId",
             "updatedAt",
             apiGeneralConfiguration,
@@ -22,9 +23,11 @@ class ApiProjectConfigurationTest {
             null,
             apiConsentConfiguration,
             apiIdentificationConfiguration,
-            apiSynchronizationConfiguration
+            apiSynchronizationConfiguration,
+            customKeyMap,
         )
         val projectConfiguration = ProjectConfiguration(
+            "id",
             "projectId",
             "updatedAt",
             generalConfiguration,
@@ -32,7 +35,8 @@ class ApiProjectConfigurationTest {
             null,
             consentConfiguration,
             identificationConfiguration,
-            synchronizationConfiguration
+            synchronizationConfiguration,
+            customKeyMap,
         )
 
         assertThat(apiProjectConfiguration.toDomain()).isEqualTo(projectConfiguration)

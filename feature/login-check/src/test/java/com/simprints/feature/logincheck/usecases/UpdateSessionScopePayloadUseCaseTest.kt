@@ -74,6 +74,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
             device = Device("deviceId", "deviceModel", "deviceManufacturer"),
             databaseInfo = DatabaseInfo(0, 0),
             projectConfigurationUpdatedAt = "",
+            projectConfigurationId = "",
             location = null,
         ),
     )

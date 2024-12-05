@@ -63,7 +63,10 @@ data class EnrolmentLastBiometricsCalloutEvent(
         val sessionId: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_LAST_BIOMETRICS,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "metadata: $metadata, session ID: $sessionId"
+    }
 
     companion object {
 

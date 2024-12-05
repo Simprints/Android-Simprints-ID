@@ -67,6 +67,7 @@
     <string name="exit_form_reason_person_not_present">ተጠቃሚው አልተገኝም</string>
     <string name="exit_form_reason_too_young">ጨቅላ</string>
     <string name="exit_form_reason_wrong_age_group_selected">ልክ ያልሆነ የእድሜ ክልል ተመርጧል</string>
+    <string name="exit_form_reason_uncooperative_child">የማይተባበር ልጅ</string>
     <string name="exit_form_reason_other">ተጨማሪ</string>
 
     <!-- Fetch subject -->
@@ -369,12 +370,16 @@
     <string name="dashboard_preference_select_modules_title">ሞጅውሎችን ይምረጡ</string>
     <string name="dashboard_preference_app_version_title">የሶፍትዌር ስሪት</string>
     <string name="dashboard_preference_sync_information_title">ሲንክ የተደረገ መረጃ</string>
+    <string name="dashboard_preference_update_config_title">ውቅረትን ያዘምኑ</string>
     <string name="dashboard_preference_scanner_version_title">የእስካነር ስሪት</string>
     <string name="dashboard_preference_device_id_title">የመሳሪያው መለያ</string>
     <string name="dashboard_preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="dashboard_preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
+    <string name="dashboard_preference_summary_update_config">መሣሪያን እና የፕሮጀክት ውቅርን ያድሱ</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">የጣት አሻራ ቅኝት ሲጠናቀቅ የድምጽ ማንቂያዎችን ያንቁ ወይም ያሰናክሉ፣ ተጠቃሚው እጃቸውን ከስካነር እንዲያነሱ ያሳውቁ።</string>
     <string name="dashboard_preference_copied_to_clipboard">ገልብጥ  ወደ clipboard</string>
-
+    <string name="dashboard_preference_update_config_scheduled">የማዋቀር ዝማኔ ተጀምሯል</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">የጣት አሻራ ቅኝት ሲጠናቀቅ ኦዲዮ</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">ሲንክ የተደረገ መረጃ</string>

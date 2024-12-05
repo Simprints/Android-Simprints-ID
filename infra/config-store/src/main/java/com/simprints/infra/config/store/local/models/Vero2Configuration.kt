@@ -2,13 +2,14 @@ package com.simprints.infra.config.store.local.models
 
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode
 
 internal fun Vero2Configuration.toProto(): ProtoVero2Configuration =
     ProtoVero2Configuration.newBuilder()
         .setQualityThreshold(qualityThreshold)
         .setImageSavingStrategy(imageSavingStrategy.toProto())
         .setCaptureStrategy(captureStrategy.toProto())
-        .setDisplayLiveFeedback(displayLiveFeedback)
+        .setLedsMode(ledsMode.toProto())
         .putAllFirmwareVersions(firmwareVersions.mapValues { it.value.toProto() })
         .build()
 
@@ -28,6 +29,12 @@ internal fun Vero2Configuration.CaptureStrategy.toProto(): ProtoVero2Configurati
         Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1700_DPI -> ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_1700_DPI
     }
 
+internal fun LedsMode.toProto() = when (this) {
+    LedsMode.BASIC -> ProtoVero2Configuration.LedsMode.BASIC
+    LedsMode.LIVE_QUALITY_FEEDBACK -> ProtoVero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
+    LedsMode.VISUAL_SCAN_FEEDBACK -> ProtoVero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
+}
+
 internal fun Vero2Configuration.Vero2FirmwareVersions.toProto(): ProtoVero2Configuration.Vero2FirmwareVersions =
     ProtoVero2Configuration.Vero2FirmwareVersions.newBuilder()
         .setCypress(cypress)
@@ -40,7 +47,7 @@ internal fun ProtoVero2Configuration.toDomain(): Vero2Configuration =
         qualityThreshold,
         imageSavingStrategy.toDomain(),
         captureStrategy.toDomain(),
-        displayLiveFeedback,
+        ledsMode.toDomain(),
         firmwareVersionsMap.mapValues { it.value.toDomain() },
     )
 
@@ -63,6 +70,13 @@ internal fun ProtoVero2Configuration.CaptureStrategy.toDomain(): Vero2Configurat
         ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_1700_DPI -> Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1700_DPI
         ProtoVero2Configuration.CaptureStrategy.UNRECOGNIZED -> throw InvalidProtobufEnumException("invalid CaptureStrategy $name")
     }
+
+internal fun ProtoVero2Configuration.LedsMode.toDomain() = when (this) {
+    ProtoVero2Configuration.LedsMode.BASIC -> LedsMode.BASIC
+    ProtoVero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK -> LedsMode.LIVE_QUALITY_FEEDBACK
+    ProtoVero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK -> LedsMode.VISUAL_SCAN_FEEDBACK
+    ProtoVero2Configuration.LedsMode.UNRECOGNIZED -> throw InvalidProtobufEnumException("invalid LedsMode $name")
+}
 
 internal fun ProtoVero2Configuration.Vero2FirmwareVersions.toDomain(): Vero2Configuration.Vero2FirmwareVersions =
     Vero2Configuration.Vero2FirmwareVersions(

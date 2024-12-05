@@ -1,5 +1,6 @@
 package com.simprints.infra.authlogic.authenticator
 
+import com.simprints.fingerprint.infra.scanner.data.FirmwareRepository
 import com.simprints.infra.authlogic.authenticator.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
@@ -21,6 +22,7 @@ internal class ProjectAuthenticator @Inject constructor(
     private val signerManager: SignerManager,
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val integrityTokenRequester: IntegrityTokenRequester,
+    private val firmwareRepository: FirmwareRepository,
 ) {
 
     /**
@@ -41,6 +43,9 @@ internal class ProjectAuthenticator @Inject constructor(
 
         val config = configManager.getProjectConfiguration()
         fetchProjectLongConsentTexts(config.general.languageOptions, config.projectId)
+        
+        // This is safe to call even on face-only projects as it will do nothing in such cases
+        firmwareRepository.updateStoredFirmwareFilesWithLatest()
     }
 
     private suspend fun prepareAuthRequestParameters(

@@ -67,6 +67,7 @@
     <string name="exit_form_reason_person_not_present">Personne non présente</string>
     <string name="exit_form_reason_too_young">Trop jeune</string>
     <string name="exit_form_reason_wrong_age_group_selected">Mauvais groupe d\'age sélectionné.</string>
+    <string name="exit_form_reason_uncooperative_child">Enfant non coopératif</string>
     <string name="exit_form_reason_other">Autre</string>
 
     <!-- Fetch subject -->
@@ -371,12 +372,16 @@
     <string name="dashboard_preference_select_modules_title">Sélectionner les modules</string>
     <string name="dashboard_preference_app_version_title">Version de l\'application</string>
     <string name="dashboard_preference_sync_information_title">Informations sur la synchronisation</string>
+    <string name="dashboard_preference_update_config_title">Mettre à jour la configuration</string>
     <string name="dashboard_preference_scanner_version_title">Version du scanner</string>
     <string name="dashboard_preference_device_id_title">ID de l\'appareil</string>
     <string name="dashboard_preference_summary_settings_fingers">Voir les doigts qui vont être scannés</string>
     <string name="dashboard_preference_summary_sync_information">Plus de détails sur la synchronisation</string>
+    <string name="dashboard_preference_summary_update_config">Actualiser la configuration de l\'appareil et du projet</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Activer ou désactiver les alertes audio lorsqu\'une analyse d\'empreintes digitales est terminée, avertissant l\'utilisateur de retirer sa main du scanner.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copié dans le presse-papier</string>
-
+    <string name="dashboard_preference_update_config_scheduled">Mise à jour de la configuration démarrée</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">Alerte Sonore</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Informations sur la synchronisation</string>

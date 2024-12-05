@@ -243,6 +243,13 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `should delegate all scope fetch`() = runTest {
+        eventRepo.getAllScopes()
+
+        coVerify { eventLocalDataSource.loadAllScopes() }
+    }
+
+    @Test
     fun `should delegate open scope fetch`() = runTest {
         eventRepo.getOpenEventScopes(type = EventScopeType.SESSION)
 
@@ -254,6 +261,13 @@ internal class EventRepositoryImplTest {
         eventRepo.getClosedEventScopes(type = EventScopeType.SESSION, limit = 10)
 
         coVerify { eventLocalDataSource.loadClosedScopes(EventScopeType.SESSION, limit = 10) }
+    }
+
+    @Test
+    fun `should delegate closed scope count fetch`() = runTest {
+        eventRepo.getClosedEventScopesCount(type = EventScopeType.SESSION)
+
+        coVerify { eventLocalDataSource.countClosedEventScopes(EventScopeType.SESSION) }
     }
 
     @Test

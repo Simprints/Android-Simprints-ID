@@ -7,6 +7,7 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 @Keep
 internal data class ApiGeneralConfiguration(
     val modalities: List<Modality>,
+    val matchingModalities: List<Modality>,
     val languageOptions: List<String>,
     val defaultLanguage: String,
     val collectLocation: Boolean,
@@ -17,6 +18,7 @@ internal data class ApiGeneralConfiguration(
     fun toDomain(): GeneralConfiguration =
         GeneralConfiguration(
             modalities.map { it.toDomain() },
+            matchingModalities.map { it.toDomain() },
             languageOptions,
             defaultLanguage,
             collectLocation,

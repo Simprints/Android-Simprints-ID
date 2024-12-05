@@ -107,6 +107,7 @@ include(
     ":feature:select-subject",
     ":feature:enrol-last-biometric",
     ":feature:dashboard",
+    ":feature:troubleshooting",
     ":feature:alert",
     ":feature:exit-form",
     ":feature:consent",

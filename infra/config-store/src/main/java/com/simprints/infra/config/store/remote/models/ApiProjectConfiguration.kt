@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 
 @Keep
 internal data class ApiProjectConfiguration(
+    val id: String,
     val projectId: String,
     val updatedAt: String,
     val general: ApiGeneralConfiguration,
@@ -13,9 +14,11 @@ internal data class ApiProjectConfiguration(
     val consent: ApiConsentConfiguration,
     val identification: ApiIdentificationConfiguration,
     val synchronization: ApiSynchronizationConfiguration,
+    val custom: Map<String, Any>?,
 ) {
 
     fun toDomain(): ProjectConfiguration = ProjectConfiguration(
+        id,
         projectId,
         updatedAt,
         general.toDomain(),
@@ -24,5 +27,6 @@ internal data class ApiProjectConfiguration(
         consent.toDomain(),
         identification.toDomain(),
         synchronization.toDomain(),
+        custom,
     )
 }

@@ -28,6 +28,7 @@ class SettingsViewModelTest {
 
     private val generalConfiguration = GeneralConfiguration(
         modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
+        matchingModalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
         languageOptions = listOf("en", "fr"),
         defaultLanguage = "fr",
         collectLocation = true,
@@ -87,6 +88,7 @@ class SettingsViewModelTest {
     fun `trigger device sync when called`() {
         viewModel.scheduleConfigUpdate()
 
+        verify { syncOrchestrator.startProjectSync() }
         verify { syncOrchestrator.startDeviceSync() }
     }
 

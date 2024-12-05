@@ -60,7 +60,10 @@ data class EnrolmentEventV2(
         val personCreationEventId: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = ENROLMENT_V2,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "subject ID: $subjectId, module ID: $moduleId"
+    }
 
     companion object {
 

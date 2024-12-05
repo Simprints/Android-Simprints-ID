@@ -29,7 +29,7 @@ import javax.inject.Inject
 internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    private val buildAgeGroups: BuildAgeGroupsDescriptionUseCase,
+    private val buildAgeGroups: BuildAgeGroupsUseCase,
     private val configurationRepo: ConfigRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
@@ -37,9 +37,9 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     val finish: LiveData<LiveDataEventWithContent<AgeGroup>>
         get() = _finish
     private var _finish = MutableLiveData<LiveDataEventWithContent<AgeGroup>>()
-    val ageGroups: LiveData<List<AgeGroupDisplayModel>>
-        get() = _ageGroupsDisplayModel
-    private var _ageGroupsDisplayModel = MutableLiveData<List<AgeGroupDisplayModel>>()
+    val ageGroups: LiveData<List<AgeGroup>>
+        get() = _ageGroups
+    private var _ageGroups = MutableLiveData<List<AgeGroup>>()
     private lateinit var startTime: Timestamp
 
     val showExitForm: LiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>
@@ -51,7 +51,7 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
         startTime = timeHelper.now()
         val ageGroups = buildAgeGroups()
         // notify the adapter
-        _ageGroupsDisplayModel.value = ageGroups
+        _ageGroups.value = ageGroups
     }
 
     fun saveAgeGroupSelection(ageRange: AgeGroup) = externalScope.launch {

@@ -52,7 +52,12 @@ data class OneToOneMatchEvent(
         val result: MatchEntry?,
         val fingerComparisonStrategy: FingerComparisonStrategy?,
         override val type: EventType = ONE_TO_ONE_MATCH,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            "matcher: $matcher, candidate ID: $candidateId, " +
+                "result: ${result?.score}, finger strategy: $fingerComparisonStrategy"
+    }
 
     companion object {
 

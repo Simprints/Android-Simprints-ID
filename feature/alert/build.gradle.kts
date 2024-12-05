@@ -9,4 +9,5 @@ android {
 
 dependencies {
     implementation(project(":infra:events"))
+    implementation(project(":infra:auth-store"))
 }

@@ -40,7 +40,10 @@ data class ConfirmationCallbackEvent(
         val identificationOutcome: Boolean,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_CONFIRMATION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "outcome: $identificationOutcome"
+    }
 
     companion object {
 

@@ -31,17 +31,16 @@ import com.simprints.fingerprint.infra.scanner.v2.outgoing.root.RootMessageOutpu
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.root.RootMessageSerializer
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.stmota.StmOtaMessageOutputStream
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.stmota.StmOtaMessageSerializer
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.un20.Un20OtaController
 import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * Helper function to build a new [Scanner] instance with manual dependency injection
  */
-fun Scanner.Companion.create(): Scanner {
+fun Scanner.Companion.create(dispatcher: CoroutineDispatcher): Scanner {
     val mainMessageChannel = MainMessageChannel(
         MainMessageInputStream(
             PacketRouter(
@@ -56,7 +55,8 @@ fun Scanner.Companion.create(): Scanner {
         MainMessageOutputStream(
             MainMessageSerializer(),
             OutputStreamDispatcher()
-        )
+        ),
+        dispatcher
     )
 
     val rootMessageChannel = RootMessageChannel(
@@ -66,14 +66,13 @@ fun Scanner.Companion.create(): Scanner {
         RootMessageOutputStream(
             RootMessageSerializer(),
             OutputStreamDispatcher()
-        )
+        ),
+        dispatcher
     )
 
-    val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.DEFAULT)
     val scannerInfoReaderHelper = ScannerExtendedInfoReaderHelper(
         mainMessageChannel,
         rootMessageChannel,
-        responseErrorHandler
     )
 
     return Scanner(
@@ -87,7 +86,8 @@ fun Scanner.Companion.create(): Scanner {
             CypressOtaMessageOutputStream(
                 CypressOtaMessageSerializer(),
                 OutputStreamDispatcher()
-            )
+            ),
+            dispatcher
         ),
         StmOtaMessageChannel(
             StmOtaMessageInputStream(
@@ -96,12 +96,12 @@ fun Scanner.Companion.create(): Scanner {
             StmOtaMessageOutputStream(
                 StmOtaMessageSerializer(),
                 OutputStreamDispatcher()
-            )
+            ),
+            dispatcher
         ),
         CypressOtaController(Crc32Calculator()),
         StmOtaController(),
         Un20OtaController(Crc32Calculator()),
-        responseErrorHandler
     )
 
 }

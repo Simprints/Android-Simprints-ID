@@ -139,7 +139,7 @@ class LoginCheckViewModel @Inject internal constructor(
         }
     }
 
-    private suspend fun proceedWithAction(actionRequest: ActionRequest) = viewModelScope.launch {
+    private fun proceedWithAction(actionRequest: ActionRequest) = viewModelScope.launch {
         updateProjectInCurrentSession()
         updateStoredUserId(actionRequest.userId)
         awaitAll(

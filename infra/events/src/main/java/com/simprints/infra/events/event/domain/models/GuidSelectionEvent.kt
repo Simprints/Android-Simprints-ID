@@ -36,7 +36,10 @@ data class GuidSelectionEvent(
         val selectedId: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = GUID_SELECTION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "guid: $selectedId"
+    }
 
     companion object {
         const val EVENT_VERSION = 2

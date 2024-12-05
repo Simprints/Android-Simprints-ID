@@ -38,7 +38,11 @@ data class ConnectivitySnapshotEvent(
         val connections: List<SimNetworkUtils.Connection>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CONNECTIVITY_SNAPSHOT,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            connections.joinToString(", ") { "${it.type}: ${it.state}" }
+    }
 
     companion object {
 

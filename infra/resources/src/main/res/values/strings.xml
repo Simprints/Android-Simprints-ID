@@ -4,6 +4,8 @@
     <!-- Alert -->
     <string name="alert_title_fallback">Alert</string>
     <string name="alert_button_close">Close</string>
+    <string name="alert_export_data">Copy details</string>
+    <string name="alert_export_copied">Copied data to clipboard</string>
 
     <!-- Consent -->
     <string name="consent_general_title">General Consent</string>
@@ -176,6 +178,8 @@
     <string name="face_capture_title_previewing">Preparing to scan</string>
     <string name="face_capture_title_no_face">No face detected</string>
     <string name="face_capture_error_no_face">Make sure the face fills the circle</string>
+    <string name="face_capture_title_bad_quality">Unclear Image</string>
+    <string name="face_capture_error_bad_quality">Try adjusting the lighting or repositioning the face for a clearer photo</string>
     <string name="face_capture_title_too_far">Too far</string>
     <string name="face_capture_error_too_far">Move closer</string>
     <string name="face_capture_title_too_close">Too close</string>
@@ -371,9 +375,10 @@
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
     <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Audio alerts for scan completion, prompting the user to remove the subject’s finger from the scanner.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
     <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
-
+    <string name="dashboard_preference_enable_audio_on_scan_complete">Audio Alert</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Sync Information</string>

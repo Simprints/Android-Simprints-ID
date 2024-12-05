@@ -26,7 +26,6 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.ConnectivityTracker
@@ -49,7 +48,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val syncOrchestrator: SyncOrchestrator,
     private val tokenizationProcessor: TokenizationProcessor,
-    private val recentUserActivityManager: RecentUserActivityManager
+    private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -150,9 +149,7 @@ internal class SyncInfoViewModel @Inject constructor(
      */
     fun fetchSyncInformationIfNeeded(eventSyncState: EventSyncState) {
         if (eventSyncState != lastKnownEventSyncState) {
-            val workers = eventSyncState.downSyncWorkersInfo + eventSyncState.upSyncWorkersInfo
-            val unfinishedWorkers = workers.filter { it.state != EventSyncWorkerState.Succeeded }
-            if (unfinishedWorkers.isEmpty()) {
+            if (eventSyncState.isSyncCompleted() && eventSyncState.isSyncReporterCompleted()) {
                 load()
             }
 

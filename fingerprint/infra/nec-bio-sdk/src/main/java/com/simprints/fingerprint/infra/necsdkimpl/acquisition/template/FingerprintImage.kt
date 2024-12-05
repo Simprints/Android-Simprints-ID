@@ -7,7 +7,7 @@ package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
  */
 //Suppressed because there is no need to implement equals and hashcode for this data class
 @Suppress("ArrayInDataClass")
-data class FingerprintImage(
+internal data class FingerprintImage(
     val imageBytes: ByteArray,
     val width: Int,
     val height: Int,

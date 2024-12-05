@@ -38,6 +38,7 @@ dependencies {
 
     // Android X
     implementation(libs.androidX.ui.viewpager2)
+    implementation(libs.androidX.ui.preference)
 
     testImplementation(project(":fingerprint:infra:scannermock"))
 }

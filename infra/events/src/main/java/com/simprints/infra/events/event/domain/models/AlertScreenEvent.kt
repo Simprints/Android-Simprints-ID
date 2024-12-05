@@ -39,6 +39,8 @@ data class AlertScreenEvent(
         override val type: EventType = ALERT_SCREEN,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "type: $alertType"
+
         enum class AlertScreenEventType {
             DIFFERENT_PROJECT_ID,
             DIFFERENT_USER_ID,

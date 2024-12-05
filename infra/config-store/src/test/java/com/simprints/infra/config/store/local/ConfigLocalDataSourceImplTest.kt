@@ -163,6 +163,7 @@ class ConfigLocalDataSourceImplTest {
     fun `should save the project configuration and update the device configuration correctly with an empty list of fingersToCollect if fingerprint config is missing`() =
         runTest(UnconfinedTestDispatcher()) {
             val projectConfigurationToSave = ProjectConfiguration(
+                "id",
                 "projectId",
                 "updatedAt",
                 generalConfiguration,
@@ -170,7 +171,8 @@ class ConfigLocalDataSourceImplTest {
                 null,
                 consentConfiguration,
                 identificationConfiguration,
-                synchronizationConfiguration
+                synchronizationConfiguration,
+                null
             )
 
             configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)

@@ -51,7 +51,15 @@ data class PersonCreationEvent(
         val faceReferenceId: String?,
         override val endedAt: Timestamp? = null,
         override val type: EventType = PERSON_CREATION,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            "face reference: $faceReferenceId, fingerprint reference: $fingerprintReferenceId"
+    }
+
+    fun hasFingerprintReference() = payload.fingerprintReferenceId != null
+    fun hasFaceReference() = payload.faceReferenceId != null
+    fun hasBiometricData() = hasFingerprintReference() || hasFaceReference()
 
     companion object {
 

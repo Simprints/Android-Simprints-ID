@@ -1,14 +1,18 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.models.NecImage
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class ExtractNecTemplateUseCaseTest {
@@ -16,14 +20,19 @@ class ExtractNecTemplateUseCaseTest {
     private lateinit var nec: NEC
     private lateinit var extractNecTemplateUseCase: ExtractNecTemplateUseCase
 
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        extractNecTemplateUseCase = ExtractNecTemplateUseCase(nec)
+        extractNecTemplateUseCase = ExtractNecTemplateUseCase(nec, testCoroutineRule.testCoroutineDispatcher)
     }
 
     @Test
-    fun `test nec template extractor success`() {
+    fun `test nec template extractor success`()= runTest {
         // Given
         val fingerprintImage = FingerprintImage(
             width = 500,
@@ -48,7 +57,7 @@ class ExtractNecTemplateUseCaseTest {
     }
 
     @Test(expected = BioSdkException.TemplateExtractionException::class)
-    fun `test nec template extractor failure`() {
+    fun `test nec template extractor failure`()= runTest {
         // Given
         val fingerprintImage = FingerprintImage(
             width = 500,

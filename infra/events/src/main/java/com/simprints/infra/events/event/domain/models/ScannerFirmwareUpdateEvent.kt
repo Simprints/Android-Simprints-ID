@@ -50,7 +50,11 @@ data class ScannerFirmwareUpdateEvent(
         val targetAppVersion: String,
         var failureReason: String? = null,
         override val type: EventType = SCANNER_FIRMWARE_UPDATE,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String =
+            "chip: $chip, target version: $targetAppVersion, failure reason: $failureReason"
+    }
 
     companion object {
 

@@ -49,6 +49,8 @@ data class FaceCaptureBiometricsEvent(
         override val type: EventType = EventType.FACE_CAPTURE_BIOMETRICS,
     ) : EventPayload() {
 
+        override fun toSafeString(): String = "format: ${face.format}, quality: ${face.quality}"
+
         @Keep
         data class Face(
             val yaw: Float,

@@ -15,7 +15,7 @@ import io.reactivex.flowables.ConnectableFlowable
  * in the map [incomingPacketRoutes].
  */
 class PacketRouter(private val routes: List<Route>,
-                   private inline val packetRouteDesignator: Packet.() -> Byte,
+                   private val packetRouteDesignator: Packet.() -> Byte,
                    private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {
 
     lateinit var incomingPacketRoutes: Map<Route, ConnectableFlowable<Packet>>

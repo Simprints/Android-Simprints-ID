@@ -12,11 +12,12 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
-import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
 import com.simprints.testtools.common.livedata.assertEventReceived
@@ -160,10 +161,10 @@ class FaceCaptureViewModelTest {
         val license = "license"
         every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2133-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
         viewModel.initFaceBioSdk(mockk())
@@ -177,17 +178,17 @@ class FaceCaptureViewModelTest {
         // Given
         val license = "license"
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2133-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
         // Downloading not expired licence
         coEvery {
-            licenseRepository.redownloadLicence(any(), any(), any())
+            licenseRepository.redownloadLicence(any(), any(), any(), any())
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
-            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license))
+            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license,LicenseVersion("1.0")))
         )
         coEvery { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns false
 
@@ -195,8 +196,8 @@ class FaceCaptureViewModelTest {
         viewModel.initFaceBioSdk(mockk())
         // Then
         viewModel.invalidLicense.assertEventReceived()
-        coVerify { licenseRepository.redownloadLicence(any(), any(), any()) }
-        coVerify { licenseRepository.deleteCachedLicense(any()) }
+        coVerify { licenseRepository.redownloadLicence(any(), any(), any(),any()) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.RankOne) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.ERROR)
     }
 
@@ -205,26 +206,26 @@ class FaceCaptureViewModelTest {
         // Given
         val license = "license"
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2011-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2011-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         coEvery {
-            licenseRepository.redownloadLicence(any(), any(), any())
+            licenseRepository.redownloadLicence(any(), any(), any(), any())
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
-            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license))
+            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
+            )
         )
         every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
-
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
         viewModel.initFaceBioSdk(mockk())
 
         // Then
         viewModel.invalidLicense.assertEventNotReceived()
-        coVerify { licenseRepository.redownloadLicence(any(), any(), Vendor.RANK_ONE) }
+        coVerify { licenseRepository.redownloadLicence(any(), any(), Vendor.RankOne, any()) }
         coVerify { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.VALID)
     }
@@ -234,26 +235,27 @@ class FaceCaptureViewModelTest {
         // Given
         val license = "license"
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2133-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2133-12-30T17:32:28Z", license,LicenseVersion("1.0"))
         coEvery {
-            licenseRepository.redownloadLicence(any(), any(), any())
+            licenseRepository.redownloadLicence(any(), any(), any(),any())
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
-            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license))
+            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
+            )
         )
         every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returnsMany listOf(false, true)
 
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
         viewModel.initFaceBioSdk(mockk())
 
         // Then
         viewModel.invalidLicense.assertEventNotReceived()
-        coVerify { licenseRepository.redownloadLicence(any(), any(), Vendor.RANK_ONE) }
+        coVerify { licenseRepository.redownloadLicence(any(), any(), Vendor.RankOne, any()) }
         coVerify(exactly = 2) { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.VALID)
     }
@@ -263,10 +265,10 @@ class FaceCaptureViewModelTest {
         // Given
         val license = "license"
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.RANK_ONE)
-        } returns License("2011-12-30T17:32:28Z", license)
+            licenseRepository.getCachedLicense(Vendor.RankOne)
+        } returns License("2011-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         coEvery {
-            licenseRepository.redownloadLicence(any(), any(), any())
+            licenseRepository.redownloadLicence(any(), any(), any(), any())
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
@@ -274,14 +276,14 @@ class FaceCaptureViewModelTest {
         )
 
         val licenseStatusSlot = slot<LicenseStatus>()
-        coJustRun { saveLicenseCheckEvent(Vendor.RANK_ONE, capture(licenseStatusSlot)) }
+        coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
         viewModel.initFaceBioSdk(mockk())
 
         // Then
         viewModel.invalidLicense.assertEventReceived()
-        coVerify { licenseRepository.redownloadLicence(any(), any(), Vendor.RANK_ONE) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.RankOne) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.MISSING)
     }
 }

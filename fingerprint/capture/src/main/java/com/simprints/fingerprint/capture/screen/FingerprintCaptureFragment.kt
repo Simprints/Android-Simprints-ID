@@ -11,6 +11,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowType
@@ -51,6 +52,7 @@ import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.Serializable
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -63,6 +65,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private var confirmDialog: AlertDialog? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
+
+    @Inject
+    lateinit var observeFingerprintScanStatus: ObserveFingerprintScanStatusUseCase
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -107,7 +112,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             args.params.fingerprintsToCapture,
             args.params.fingerprintSDK,
         )
-
         initUI()
     }
 
@@ -142,8 +146,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             this,
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
             exitFormConfiguration {
-                titleRes = com.simprints.infra.resources.R.string.exit_form_title_fingerprinting
-                backButtonRes = com.simprints.infra.resources.R.string.exit_form_continue_fingerprints_button
+                titleRes = IDR.string.exit_form_title_fingerprinting
+                backButtonRes =IDR.string.exit_form_continue_fingerprints_button
                 visibleOptions = scannerOptions()
             }.toArgs()
         )
@@ -268,6 +272,10 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     override fun onResume() {
         super.onResume()
         vm.handleOnResume()
+        observeFingerprintScanStatus(
+            viewLifecycleOwner.lifecycleScope,
+            args.params.fingerprintSDK
+        )
         val color = vm.stateLiveData.value?.currentCaptureState()?.statusBarColor()
             ?.let { ContextCompat.getColor(requireContext(), it) }
         setCustomStatusBarColor(color = color, activity = requireActivity())
@@ -277,6 +285,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         setCustomStatusBarColor(color = null, activity = requireActivity())
         vm.handleOnPause()
         super.onPause()
+        observeFingerprintScanStatus.stopObserving()
     }
 
     private fun setCustomStatusBarColor(color: Int?, activity: Activity) {

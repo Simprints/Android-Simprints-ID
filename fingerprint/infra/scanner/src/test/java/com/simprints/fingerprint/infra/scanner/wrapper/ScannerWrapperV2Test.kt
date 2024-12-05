@@ -21,9 +21,6 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.reactivex.Completable
-import io.reactivex.Maybe
-import io.reactivex.Single
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -33,6 +30,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ScannerWrapperV2Test {
 
     @MockK
@@ -140,7 +138,13 @@ internal class ScannerWrapperV2Test {
     fun `should throw UnexpectedScannerException if setupScannerWithOtaCheck throws IllegalStateException`() =
         runTest {
             coEvery {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(any(), any(), any(), any(), any())
+                scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
             } throws IllegalStateException()
             scannerWrapper.setScannerInfoAndCheckAvailableOta(mockk())
         }
@@ -173,40 +177,39 @@ internal class ScannerWrapperV2Test {
     @Test
     fun `should not turn off(on) the Un20 sensor when sensorShutdown(sensorWakeup) is called and the sensor's current state is off(on)`() =
         runTest {
-            every { scannerV2.getUn20Status() } returns Single.just(false) andThen Single.just(true)
-            every { scannerV2.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
-            every { scannerV2.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
-
+            coEvery { scannerV2.getUn20Status() } returns false andThen true
+            coJustRun { scannerV2.turnUn20Off() }
+            coJustRun { scannerV2.turnUn20On() }
             scannerWrapper.sensorShutDown()
             scannerWrapper.sensorWakeUp()
 
-            verify(exactly = 0) {
-                scannerV2.turnUn20OffAndAwaitStateChangeEvent()
-                scannerV2.turnUn20OnAndAwaitStateChangeEvent()
+            coVerify(exactly = 0) {
+                scannerV2.turnUn20Off()
+                scannerV2.turnUn20On()
             }
         }
 
     @Test
     fun `should turn on the Un20 sensor when sensorWakeup is called and the sensor's current state is off`() =
         runTest {
-            every { scannerV2.getUn20Status() } returns Single.just(false)
-            every { scannerV2.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
+            coEvery { scannerV2.getUn20Status() } returns false
+            coJustRun { scannerV2.turnUn20On() }
 
             scannerWrapper.sensorWakeUp()
 
-            verify(exactly = 1) { scannerV2.turnUn20OnAndAwaitStateChangeEvent() }
+            coVerify(exactly = 1) { scannerV2.turnUn20On() }
         }
 
     @Test(expected = ScannerDisconnectedException::class)
     fun `should throw ScannerDisconnectedException if getUn20Status throws IO`() = runTest {
-        every { scannerV2.getUn20Status() } throws IOException("")
+        coEvery { scannerV2.getUn20Status() } throws IOException("")
         scannerWrapper.sensorWakeUp()
     }
 
     @Test(expected = ScannerDisconnectedException::class)
     fun `should throw ScannerDisconnectedException if getUn20Status throws NotConnectedException`() =
         runTest {
-            every { scannerV2.getUn20Status() } throws NotConnectedException("")
+            coEvery { scannerV2.getUn20Status() } throws NotConnectedException("")
             scannerWrapper.sensorWakeUp()
         }
 
@@ -214,12 +217,12 @@ internal class ScannerWrapperV2Test {
     @Test
     fun `should turn off the Un20 sensor when sensorShutdown is called and the sensor's current state is on`() =
         runTest {
-            every { scannerV2.getUn20Status() } returns Single.just(true)
-            every { scannerV2.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
+            coEvery { scannerV2.getUn20Status() } returns true
+            coJustRun { scannerV2.turnUn20Off() }
 
             scannerWrapper.sensorShutDown()
 
-            verify(exactly = 1) { scannerV2.turnUn20OffAndAwaitStateChangeEvent() }
+            coVerify(exactly = 1) { scannerV2.turnUn20Off() }
         }
 
     @Test(expected = UnexpectedScannerException::class)
@@ -233,8 +236,8 @@ internal class ScannerWrapperV2Test {
     fun `should complete execution successfully when setting scanner UI to default, when startLiveFeedback is called`() =
         runTest {
             every { scannerWrapper.isLiveFeedbackAvailable() } returns true
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.getImageQualityPreview() } returns Maybe.just(50)
+            coJustRun { scannerV2.setSmileLedState(any()) }
+            coEvery { scannerV2.getImageQualityPreview() } returns 50
 
             // get the job of the continuous feedback
             val job = launch {
@@ -251,8 +254,8 @@ internal class ScannerWrapperV2Test {
     fun `should complete execution successfully when startLiveFeedback is called and scanner disconnects`() =
         runTest {
             every { scannerWrapper.isLiveFeedbackAvailable() } returns true
-            every { scannerV2.setSmileLedState(any()) } throws IOException()
-            every { scannerV2.getImageQualityPreview() } returns Maybe.just(50)
+            coEvery { scannerV2.setSmileLedState(any()) } throws IOException()
+            coEvery { scannerV2.getImageQualityPreview() } returns 50
 
             // get the job of the continuous feedback
             val job = launch {
@@ -269,8 +272,8 @@ internal class ScannerWrapperV2Test {
     fun `should complete execution successfully when setting scanner UI to default, when stopLiveFeedback is called`() =
         runTest {
             every { scannerWrapper.isLiveFeedbackAvailable() } returns true
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.setScannerLedStateDefault() } returns Completable.complete()
+            coJustRun { scannerV2.setSmileLedState(any()) }
+            coJustRun { scannerV2.setScannerLedStateDefault() }
 
             scannerWrapper.stopLiveFeedback()
         }
@@ -292,10 +295,37 @@ internal class ScannerWrapperV2Test {
 
     @Test
     fun `isConnected() correctly passes scanner connection status`() {
-            every { scannerV2.isConnected() } returns false
-            assertThat(scannerWrapper.isConnected()).isFalse()
+        coEvery { scannerV2.isConnected() } returns false
+        assertThat(scannerWrapper.isConnected()).isFalse()
 
-            every { scannerV2.isConnected() } returns true
-            assertThat(scannerWrapper.isConnected()).isTrue()
-        }
+        coEvery { scannerV2.isConnected() } returns true
+        assertThat(scannerWrapper.isConnected()).isTrue()
+    }
+
+    @Test
+    fun `should set smile leds to flashing white when calling turnFlashingOrangeLeds`() = runTest {
+        coJustRun { scannerV2.setSmileLedState(any()) }
+
+        scannerWrapper.turnOnFlashingWhiteSmileLeds()
+
+        coVerify { scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()) }
+    }
+
+    @Test
+    fun `should set smile leds to good scan  when calling setUiBadCapture`() = runTest {
+        coJustRun { scannerV2.setSmileLedState(any()) }
+
+        scannerWrapper.setUiGoodCapture()
+
+        coVerify { scannerV2.setSmileLedState(scannerUiHelper.goodScanLedState()) }
+    }
+
+    @Test
+    fun `should set smile leds to bad scan  when calling setUiBadCapture`() = runTest {
+        coJustRun { scannerV2.setSmileLedState(any()) }
+
+        scannerWrapper.setUiBadCapture()
+
+        coVerify { scannerV2.setSmileLedState(scannerUiHelper.badScanLedState()) }
+    }
 }

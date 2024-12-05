@@ -16,15 +16,17 @@ import com.simprints.fingerprint.infra.scanner.helpers.ScannerInitialSetupHelper
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
+import com.simprints.fingerprint.infra.scanner.v2.tools.runWithErrorWrapping
 import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
 import com.simprints.fingerprint.infra.scanner.v2.tools.wrapErrorFromScanner
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
@@ -46,20 +48,18 @@ internal class ScannerWrapperV2(
      *
      * @see setScannerInfoAndCheckAvailableOta
      */
-    override fun versionInformation(): ScannerVersion =
-        scannerVersion ?: ScannerVersion(
-            hardwareVersion = ScannerExtendedInfoReaderHelper.UNKNOWN_HARDWARE_VERSION,
-            generation = ScannerGeneration.VERO_2,
-            firmware = ScannerFirmwareVersions.UNKNOWN,
-        )
+    override fun versionInformation(): ScannerVersion = scannerVersion ?: ScannerVersion(
+        hardwareVersion = ScannerExtendedInfoReaderHelper.UNKNOWN_HARDWARE_VERSION,
+        generation = ScannerGeneration.VERO_2,
+        firmware = ScannerFirmwareVersions.UNKNOWN,
+    )
 
     override fun batteryInformation(): BatteryInfo = batteryInfo ?: BatteryInfo.UNKNOWN
 
     override fun isImageTransferSupported(): Boolean = true
 
     override suspend fun connect() =
-        connectionHelper.connectScanner(scannerV2, macAddress)
-            .mapPotentialErrorFromScanner()
+        connectionHelper.connectScanner(scannerV2, macAddress).mapPotentialErrorFromScanner()
             .collect()
 
 
@@ -72,26 +72,19 @@ internal class ScannerWrapperV2(
      * @throws OtaFailedException
      */
     override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) =
-        withContext(ioDispatcher) {
-            try {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(
-                    fingerprintSdk,
-                    scannerV2,
-                    macAddress,
-                    { scannerVersion = it },
-                    { batteryInfo = it }
-                )
-            } catch (ex: Throwable) {
-                throw wrapErrorFromScanner(ex)
-            }
-    }
+        runWithErrorWrapping {
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                fingerprintSdk,
+                scannerV2,
+                macAddress,
+                { scannerVersion = it },
+                { batteryInfo = it }
+            )
 
-    override suspend fun disconnect() = withContext(ioDispatcher) {
-        try {
-            connectionHelper.disconnectScanner(scannerV2)
-        } catch (ex: Throwable) {
-            throw wrapErrorFromScanner(ex)
         }
+
+    override suspend fun disconnect() = runWithErrorWrapping {
+        connectionHelper.disconnectScanner(scannerV2)
     }
 
     override fun isConnected() = scannerV2.isConnected()
@@ -105,12 +98,8 @@ internal class ScannerWrapperV2(
      * @throws ScannerDisconnectedException
      * @throws UnexpectedScannerException
      */
-    override suspend fun sensorWakeUp() = withContext(ioDispatcher) {
-        try {
-            scannerV2.ensureUn20State(true)
-        } catch (ex: Throwable) {
-            throw wrapErrorFromScanner(ex)
-        }
+    override suspend fun sensorWakeUp() = runWithErrorWrapping {
+        scannerV2.ensureUn20State(true)
     }
 
 
@@ -124,67 +113,57 @@ internal class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      * @throws NotConnectedException
      */
-    override suspend fun sensorShutDown() = withContext(ioDispatcher) {
-        try {
-            scannerV2.ensureUn20State(false)
-        } catch (ex: Throwable) {
-            throw wrapErrorFromScanner(ex)
-        }
+    override suspend fun sensorShutDown() = runWithErrorWrapping {
+        scannerV2.ensureUn20State(false)
     }
 
     override fun isLiveFeedbackAvailable(): Boolean = true
 
-    override suspend fun startLiveFeedback() = withContext(ioDispatcher) {
-        (if (isLiveFeedbackAvailable()) {
+    override suspend fun startLiveFeedback(): Unit = runWithErrorWrapping {
+        if (isLiveFeedbackAvailable()) {
             scannerV2.setScannerLedStateOn()
-                .andThen(getImageQualityWhileSettingLEDState())
-                .onErrorComplete()
+            // ignore exceptions from getImageQualityWhileSettingLEDState
+            runCatching { withContext(ioDispatcher) { getImageQualityWhileSettingLEDState(this) } }
         } else {
-            Completable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK))
-        })
-            .await()
+            throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
+        }
     }
 
-    private fun getImageQualityWhileSettingLEDState() =
-        scannerV2.getImageQualityPreview().flatMapCompletable { quality ->
-            scannerV2.setSmileLedState(
-                scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(
-                    quality
+    private suspend fun getImageQualityWhileSettingLEDState(scope: CoroutineScope) {
+        while (scope.isActive) {
+            scannerV2.getImageQualityPreview()?.let { quality ->
+                scannerV2.setSmileLedState(
+                    scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality)
                 )
-            )
-        }.repeat()
+            }
+            // add a delay to prevent the scanner from being overwhelmed
+            delay(LIVE_FEEDBACK_DELAY_MS)
+        }
+    }
 
     @SuppressLint("CheckResult")
-    override suspend fun stopLiveFeedback(): Unit = withContext(ioDispatcher) {
+    override suspend fun stopLiveFeedback(): Unit = runWithErrorWrapping {
         if (isLiveFeedbackAvailable()) {
-            scannerV2
-                .setSmileLedState(scannerUiHelper.idleLedState())
-                .onErrorComplete()
-            scannerV2
-                .setScannerLedStateDefault()
-                .onErrorComplete()
+            scannerV2.setSmileLedState(scannerUiHelper.turnedOffState())
+            scannerV2.setScannerLedStateDefault()
         } else {
             throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
         }
     }
 
 
-    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) =
-        withContext(ioDispatcher) {
-            getUn20Status().flatMapCompletable { actualState ->
-                when {
-                    desiredState && !actualState -> turnUn20OnAndAwaitStateChangeEvent()
-                    !desiredState && actualState -> turnUn20OffAndAwaitStateChangeEvent()
-                    else -> Completable.complete()
-                }
-            }.await()
+    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) = runWithErrorWrapping {
+        getUn20Status().let { actualState ->
+            when {
+                desiredState && !actualState -> turnUn20On()
+                !desiredState && actualState -> turnUn20Off()
+            }
         }
+    }
 
-    override suspend fun setUiIdle() = withContext(ioDispatcher) {
-        scannerV2
-            .setSmileLedState(scannerUiHelper.idleLedState())
-            .wrapErrorsFromScanner()
-            .await()
+    override suspend fun turnOffSmileLeds(): Unit = runWithErrorWrapping {
+        // No need to handle exceptions while updating the LED state
+        runCatching { scannerV2.setSmileLedState(scannerUiHelper.turnedOffState()) }
     }
 
     private val triggerListenerToObserverMap =
@@ -209,7 +188,22 @@ internal class ScannerWrapperV2(
         }
     }
 
-    private fun Completable.wrapErrorsFromScanner() =
-        onErrorResumeNext { Completable.error(wrapErrorFromScanner(it)) }
+    override suspend fun turnOnFlashingWhiteSmileLeds(): Unit = runWithErrorWrapping {
+        // No need to handle exceptions while updating the LED state
+        runCatching { scannerV2.setSmileLedState(scannerUiHelper.whiteFlashingLedState()) }
+    }
 
+    override suspend fun setUiGoodCapture(): Unit = runWithErrorWrapping {
+        // No need to handle exceptions while updating the LED state
+        runCatching { scannerV2.setSmileLedState(scannerUiHelper.goodScanLedState()) }
+    }
+
+    override suspend fun setUiBadCapture(): Unit = runWithErrorWrapping {
+        // No need to handle exceptions while updating the LED state
+        runCatching { scannerV2.setSmileLedState(scannerUiHelper.badScanLedState()) }
+    }
+
+    companion object {
+        private const val LIVE_FEEDBACK_DELAY_MS = 200L
+    }
 }

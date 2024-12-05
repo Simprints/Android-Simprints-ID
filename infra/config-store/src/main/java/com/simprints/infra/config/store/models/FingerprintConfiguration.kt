@@ -19,7 +19,8 @@ data class FingerprintConfiguration(
         /**
          * Allowed amount of 'No Finger Detected' scans before proceeding further
          */
-        val maxCaptureAttempts: MaxCaptureAttempts?
+        val maxCaptureAttempts: MaxCaptureAttempts?,
+        val version: String = "",
     )
 
     enum class VeroGeneration {

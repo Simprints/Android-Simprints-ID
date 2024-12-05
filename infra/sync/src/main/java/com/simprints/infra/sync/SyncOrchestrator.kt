@@ -5,6 +5,7 @@ interface SyncOrchestrator {
     suspend fun scheduleBackgroundWork()
     suspend fun cancelBackgroundWork()
 
+    fun startProjectSync()
     fun startDeviceSync()
 
     fun rescheduleEventSync()

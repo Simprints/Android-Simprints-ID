@@ -42,7 +42,10 @@ data class RefusalCallbackEvent(
         val extra: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_REFUSAL,
-    ) : EventPayload()
+    ) : EventPayload() {
+
+        override fun toSafeString(): String = "reason: $reason, extra: $extra"
+    }
 
     companion object {
 

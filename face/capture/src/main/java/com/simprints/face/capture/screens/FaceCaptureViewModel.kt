@@ -19,12 +19,10 @@ import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
-import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.determineLicenseStatus
-import com.simprints.infra.license.remote.License
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +33,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.LicenseVersion
 
 @HiltViewModel
 internal class FaceCaptureViewModel @Inject constructor(
@@ -86,7 +87,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
-        val licenseVendor = Vendor.RANK_ONE
+        val licenseVendor = Vendor.RankOne
         val license = licenseRepository.getCachedLicense(licenseVendor)
         var licenseStatus = license.determineLicenseStatus()
         if (licenseStatus == LicenseStatus.VALID) {
@@ -96,15 +97,19 @@ internal class FaceCaptureViewModel @Inject constructor(
         // In some cases license is invalidated on initialisation attempt
         if (licenseStatus != LicenseStatus.VALID) {
             Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus - attempting download")
-            licenseStatus = refreshLicenceAndRetry(activity, licenseVendor)
+            licenseStatus = refreshLicenceAndRetry(
+                activity,
+                licenseVendor,
+                LicenseVersion(configManager.getProjectConfiguration().face?.rankOne?.version.orEmpty())
+            )
         }
         // Still invalid after attempted refresh
         if (licenseStatus != LicenseStatus.VALID) {
             Simber.tag(CrashReportTag.LICENSE.name).i("Face license is $licenseStatus")
-            licenseRepository.deleteCachedLicense(Vendor.RANK_ONE)
+            licenseRepository.deleteCachedLicense(Vendor.RankOne)
             _invalidLicense.send()
         }
-        saveLicenseCheckEvent(Vendor.RANK_ONE, licenseStatus)
+        saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
 
     private suspend fun initialize(activity: Activity, license: License): LicenseStatus {
@@ -117,8 +122,8 @@ internal class FaceCaptureViewModel @Inject constructor(
         return LicenseStatus.VALID
     }
 
-    private suspend fun refreshLicenceAndRetry(activity: Activity, licenseVendor: Vendor) = licenseRepository
-        .redownloadLicence(authStore.signedInProjectId, deviceID, licenseVendor)
+    private suspend fun refreshLicenceAndRetry(activity: Activity, licenseVendor: Vendor, licenseVersion: LicenseVersion) = licenseRepository
+        .redownloadLicence(authStore.signedInProjectId, deviceID, licenseVendor,licenseVersion)
         .map { state ->
             when (state) {
                 is LicenseState.FinishedWithSuccess -> initialize(activity, state.license)

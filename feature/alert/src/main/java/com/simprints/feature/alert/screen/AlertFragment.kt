@@ -3,6 +3,7 @@ package com.simprints.feature.alert.screen
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -20,6 +21,7 @@ import com.simprints.feature.alert.databinding.FragmentAlertBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ALERT
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.setResult
+import com.simprints.infra.uibase.system.Clipboard
 import com.simprints.infra.uibase.view.setTextWithFallbacks
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,12 +63,18 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
             binding.alertRightButton.setupButton(config.rightButton, config.appErrorReason)
         }
 
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             Simber.tag(ALERT.name).i("Alert back button clicked")
             setPressedButtonResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, config.appErrorReason)
             findNavController().popBackStack()
         }
         config.eventType?.let { vm.saveAlertEvent(it) }
+
+        binding.alertExportButton.setOnClickListener {
+            Clipboard.copyToClipboard(requireContext(), vm.collectExportData())
+            Toast.makeText(requireContext(), IDR.string.alert_export_copied, Toast.LENGTH_SHORT).show()
+        }
 
         Simber.tag(ALERT.name).i("${binding.alertTitle.text}")
     }

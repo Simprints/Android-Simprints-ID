@@ -14,6 +14,8 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.enrollast.EnrolLastBiometricContract
+import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -24,6 +26,7 @@ import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
+import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
@@ -56,6 +59,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val appResponseBuilder: AppResponseBuilderUseCase,
     private val addCallbackEvent: AddCallbackEventUseCase,
     private val updateDailyActivity: UpdateDailyActivityUseCase,
+    private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) : ViewModel() {
 
     var isRequestProcessed = false
@@ -78,8 +82,11 @@ internal class OrchestratorViewModel @Inject constructor(
         actionRequest = action
 
         try {
-            steps = stepsBuilder.build(action, projectConfiguration)
-        } catch (e: SubjectAgeNotSupportedException) {
+            // In case of a follow-up action, we should restore completed steps from cache
+            // and add new ones to the list. This way all session steps are available throughout
+            // the app for reference (i.e. have we already captured face in this session?)
+            steps = cache.steps + stepsBuilder.build(action, projectConfiguration)
+        } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
             return@launch
         }
@@ -151,6 +158,7 @@ internal class OrchestratorViewModel @Inject constructor(
         if (steps.all { it.status != StepStatus.IN_PROGRESS }) {
             val nextStep = steps.firstOrNull { it.status == StepStatus.NOT_STARTED }
             if (nextStep != null) {
+                updateEnrolLastBiometricParamsIfNeeded(nextStep)
                 nextStep.status = StepStatus.IN_PROGRESS
                 cache.steps = steps
                 _currentStep.send(nextStep)
@@ -160,6 +168,25 @@ internal class OrchestratorViewModel @Inject constructor(
                 locationStore.cancelLocationCollection()
                 cache.steps = steps
                 buildAppResponse()
+            }
+        }
+    }
+
+    /**
+     * Update the enrol last biometric params in case there were more steps executed in the current flow.
+     */
+    private fun updateEnrolLastBiometricParamsIfNeeded(step: Step) {
+        if (step.id == StepId.ENROL_LAST_BIOMETRIC) {
+            step.payload.getParcelable<EnrolLastBiometricParams>("params")?.let { params ->
+                val updatedParams = params.copy(
+                    steps = mapStepsForLastBiometrics(steps.mapNotNull { it.result })
+                )
+                step.payload = EnrolLastBiometricContract.getArgs(
+                    projectId = updatedParams.projectId,
+                    userId = updatedParams.userId,
+                    moduleId = updatedParams.moduleId,
+                    steps = updatedParams.steps,
+                )
             }
         }
     }

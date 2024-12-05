@@ -62,6 +62,10 @@ data class FingerprintCaptureEvent(
         override val type: EventType = FINGERPRINT_CAPTURE,
     ) : EventPayload() {
 
+        override fun toSafeString(): String =
+            "finger: ${finger}, result: $result, " +
+                "quality: ${fingerprint?.quality}, format: ${fingerprint?.format}"
+
         @Keep
         data class Fingerprint(
             val finger: IFingerIdentifier,

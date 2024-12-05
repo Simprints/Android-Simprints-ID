@@ -6,12 +6,10 @@ import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
-import io.reactivex.Completable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -72,7 +70,8 @@ internal class StmOtaHelper @Inject constructor(
 
     private suspend fun StmStep.enterStmOtaMode(scanner: Scanner) {
         emit(StmOtaStep.EnteringOtaModeFirstTime)
-        scanner.enterStmOtaMode().onErrorComplete().await()
+        // Ignore exception here, as we will reconnect after this step
+        runCatching {  scanner.enterStmOtaMode()}
     }
 
     private suspend fun StmStep.reconnectAfterEnteringStmOtaMode(
@@ -86,7 +85,7 @@ internal class StmOtaHelper @Inject constructor(
 
     private suspend fun StmStep.reEnterStmOtaMode(scanner: Scanner) {
         emit(StmOtaStep.EnteringOtaModeSecondTime)
-        scanner.enterStmOtaMode().await()
+        scanner.enterStmOtaMode()
         delayForOneSecond()
     }
 
@@ -95,7 +94,6 @@ internal class StmOtaHelper @Inject constructor(
         emit(StmOtaStep.CommencingTransfer)
         scanner.startStmOta(firmwareLocalDataSource.loadStmFirmwareBytes(firmwareVersion))
             .map { StmOtaStep.TransferInProgress(it) }
-            .asFlow()
             .collect { emit(it) }
     }
 
@@ -107,7 +105,7 @@ internal class StmOtaHelper @Inject constructor(
 
     private suspend fun StmStep.enterMainMode(scanner: Scanner) {
         emit(StmOtaStep.EnteringMainMode)
-        scanner.enterMainMode().await()
+        scanner.enterMainMode()
         delayForOneSecond()
     }
 
@@ -133,26 +131,23 @@ internal class StmOtaHelper @Inject constructor(
         updateUnifiedVersionInformation(scanner)
     }
 
-    private suspend fun validateStmFirmwareVersion(scanner: Scanner, firmwareVersion: String) =
-        scanner.getStmFirmwareVersion().flatMapCompletable {
-            val actualFirmwareVersion = it.versionAsString
-            if (firmwareVersion != actualFirmwareVersion) {
-                Completable.error(OtaFailedException("STM OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion"))
-            } else {
-                newFirmwareVersion = it
-                Completable.complete()
-            }
-        }.await()
+    private suspend fun validateStmFirmwareVersion(scanner: Scanner, firmwareVersion: String) {
+        val actualFirmwareVersion = scanner.getStmFirmwareVersion()
+        if (firmwareVersion != actualFirmwareVersion.versionAsString) {
+            throw OtaFailedException("STM OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion")
+        } else {
+            newFirmwareVersion = actualFirmwareVersion
+        }
+    }
 
-    private suspend fun updateUnifiedVersionInformation(scanner: Scanner) =
-        scanner.getVersionInformation().flatMapCompletable {
-            newFirmwareVersion?.let { newFirmwareVersion ->
-                val oldVersion = it.toScannerVersion()
-                val newVersion = oldVersion.updatedWithStmVersion(newFirmwareVersion)
-                scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
-            }
-                ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
-        }.await()
+    private suspend fun updateUnifiedVersionInformation(scanner: Scanner) {
+        val oldVersion = scanner.getVersionInformation().toScannerVersion()
+        newFirmwareVersion?.let { newFirmwareVersion ->
+            val newVersion = oldVersion.updatedWithStmVersion(newFirmwareVersion)
+            scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
+        }
+            ?: throw OtaFailedException("Was not able to determine the appropriate new unified version")
+    }
 
     private fun ScannerVersion.updatedWithStmVersion(stmFirmware: StmExtendedFirmwareVersion) =
         copy(firmware = firmware.copy(stm = stmFirmware.versionAsString))

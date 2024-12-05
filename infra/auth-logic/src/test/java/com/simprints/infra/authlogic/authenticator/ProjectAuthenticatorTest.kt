@@ -1,6 +1,7 @@
 package com.simprints.infra.authlogic.authenticator
 
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
+import com.simprints.fingerprint.infra.scanner.data.FirmwareRepository
 import com.simprints.infra.authlogic.authenticator.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
@@ -42,6 +43,9 @@ class ProjectAuthenticatorTest {
     @MockK
     private lateinit var integrityTokenRequester: IntegrityTokenRequester
 
+    @MockK
+    private lateinit var firmwareRepository: FirmwareRepository
+
     private lateinit var authenticator: ProjectAuthenticator
 
     @Before
@@ -55,6 +59,7 @@ class ProjectAuthenticatorTest {
             signerManager,
             authenticationRemoteDataSource,
             integrityTokenRequester,
+            firmwareRepository,
         )
     }
 
@@ -138,6 +143,14 @@ class ProjectAuthenticatorTest {
         }
 
     @Test
+    fun `authenticate should fetch the firmware if needed`() =
+        runTest(StandardTestDispatcher()) {
+            authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
+
+            coVerify(exactly = 1) { firmwareRepository.updateStoredFirmwareFilesWithLatest() }
+        }
+
+    @Test
     fun integrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
         coEvery { integrityTokenRequester.getToken(any()) } throws RequestingIntegrityTokenException(
             IntegrityErrorCode.API_NOT_AVAILABLE
@@ -158,16 +171,19 @@ class ProjectAuthenticatorTest {
         } returns Token("", "", "", "")
 
         coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
+            "id",
             PROJECT_ID,
             "",
             general = GeneralConfiguration(
                 modalities = mockk(),
+                matchingModalities = mockk(),
                 languageOptions = listOf(LANGUAGE_1, LANGUAGE_2),
                 defaultLanguage = LANGUAGE_1,
                 collectLocation = false,
                 duplicateBiometricEnrolmentCheck = false,
                 settingsPassword = mockk()
             ),
+            mockk(),
             mockk(),
             mockk(),
             mockk(),

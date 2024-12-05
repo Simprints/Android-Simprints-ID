@@ -34,3 +34,7 @@ fun ByteArray.chunked(size: Int) = toList().chunked(size).map { it.toByteArray()
 
 fun ByteArray.xorAll() = reduce { acc, byte -> acc xor byte }
 fun ByteArray.nxorAll() = xorAll().inv()
+
+fun List<ByteArray>.pairWithProgress(): List<Pair<ByteArray, Float>> = mapIndexed { index, chunk ->
+    Pair(chunk, (index + 1).toFloat() / this.size.toFloat())
+}

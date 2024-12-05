@@ -19,18 +19,18 @@ internal class CreatePersonEventUseCase @Inject constructor(
 
     suspend operator fun invoke(results: List<Serializable>) {
         val sessionEvents = eventRepository.getEventsInCurrentSession()
+        val previousPersonCreationEvent = sessionEvents
+            .filterIsInstance<PersonCreationEvent>()
+            .sortedByDescending { it.payload.createdAt }
+            .firstOrNull()
 
-        // If a personCreationEvent is already in the current session,
-        // we don' want to add it again (the capture steps would still be the same)
-        if (sessionEvents.none { it is PersonCreationEvent }) {
-            val faceCaptures = extractFaceCaptures(results)
-            val fingerprintCaptures = extractFingerprintCaptures(results)
+        val faceCaptures = extractFaceCaptures(results)
+        val fingerprintCaptures = extractFingerprintCaptures(results)
 
-            val personCreationEvent = build(faceCaptures, fingerprintCaptures)
+        val personCreationEvent = build(faceCaptures, fingerprintCaptures, previousPersonCreationEvent)
 
-            if (personCreationEvent.hasBiometricData()) {
-                eventRepository.addOrUpdateEvent(personCreationEvent)
-            }
+        if (personCreationEvent.hasBiometricData()) {
+            eventRepository.addOrUpdateEvent(personCreationEvent)
         }
     }
 
@@ -45,6 +45,7 @@ internal class CreatePersonEventUseCase @Inject constructor(
     private fun build(
         faceSamplesForPersonCreation: List<FaceCaptureResult.Item>,
         fingerprintSamplesForPersonCreation: List<FingerprintCaptureResult.Item>,
+        previousPersonCreationEvent: PersonCreationEvent? = null,
     ): PersonCreationEvent {
         val fingerprintCaptureIds = fingerprintSamplesForPersonCreation
             .mapNotNull { it.captureEventId }
@@ -62,15 +63,16 @@ internal class CreatePersonEventUseCase @Inject constructor(
             .map { FaceSample(it.template, it.format) }
             .uniqueId()
 
+        // If the step results of the current callout do not contain a modality but we have a PersonCreationEvent from the
+        // previous callout (of the same session), we use the modality from the previous callout. This happens when the
+        // user skips a modality during identification (due to matching modalities configuration) and then captures the
+        // skipped modality in the following enrol last callout.
         return PersonCreationEvent(
             startTime = timeHelper.now(),
-            fingerprintCaptureIds = fingerprintCaptureIds,
-            fingerprintReferenceId = fingerprintReferenceId,
-            faceCaptureIds = faceCaptureIds,
-            faceReferenceId = faceReferenceId,
+            fingerprintCaptureIds = fingerprintCaptureIds ?: previousPersonCreationEvent?.payload?.fingerprintCaptureIds,
+            fingerprintReferenceId = fingerprintReferenceId ?: previousPersonCreationEvent?.payload?.fingerprintReferenceId,
+            faceCaptureIds = faceCaptureIds ?: previousPersonCreationEvent?.payload?.faceCaptureIds,
+            faceReferenceId = faceReferenceId ?: previousPersonCreationEvent?.payload?.faceReferenceId,
         )
     }
-
-    private fun PersonCreationEvent.hasBiometricData() =
-        payload.fingerprintCaptureIds?.isNotEmpty() == true || payload.faceCaptureIds?.isNotEmpty() == true
 }
