@@ -42,6 +42,22 @@ internal fun CaptureState.buttonBackgroundColour(): Int = when (this) {
         R.color.simprints_red_dark
     }
 }
+@ExcludedFromGeneratedTestCoverageReports("UI code")
+@ColorRes
+internal fun CaptureState.statusBarColor(): Int = when (this) {
+    is CaptureState.NotCollected,
+    is CaptureState.ScanProcess.Scanning,
+    is CaptureState.ScanProcess.TransferringImage -> R.color.simprints_blue
+
+    is CaptureState.Skipped,
+    is CaptureState.ScanProcess.NotDetected -> R.color.simprints_red_dark
+
+    is CaptureState.ScanProcess.Collected -> if (scanResult.isGoodScan()) {
+        R.color.simprints_green
+    } else {
+        R.color.simprints_red_dark
+    }
+}
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes

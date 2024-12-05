@@ -86,6 +86,7 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="android:statusBarColor">@color/simprints_blue_dark</item>
     </style>
 
 </resources>
