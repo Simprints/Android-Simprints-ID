@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
-import com.simprints.fingerprint.capture.databinding.FragmentFingerNewBinding
 import com.simprints.fingerprint.capture.resources.captureNumberTextId
 import com.simprints.fingerprint.capture.resources.directionTextColour
 import com.simprints.fingerprint.capture.resources.directionTextId
@@ -29,9 +28,9 @@ import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-internal class FingerFragment : Fragment(R.layout.fragment_finger_new) {
+internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
-    private val binding by viewBinding(FragmentFingerNewBinding::bind)
+    private val binding by viewBinding(FragmentFingerBinding::bind)
     private val vm: FingerprintCaptureViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
     private lateinit var fingerId: IFingerIdentifier

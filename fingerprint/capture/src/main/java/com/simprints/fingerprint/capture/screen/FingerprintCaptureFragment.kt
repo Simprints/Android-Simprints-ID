@@ -54,7 +54,7 @@ import java.io.Serializable
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerprint_capture_new) {
+internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerprint_capture) {
 
     private val args: FingerprintCaptureFragmentArgs by navArgs()
     private val binding by viewBinding(FragmentFingerprintCaptureBinding::bind)
