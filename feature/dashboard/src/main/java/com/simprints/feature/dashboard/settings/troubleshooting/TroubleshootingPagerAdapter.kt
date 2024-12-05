@@ -22,7 +22,6 @@ internal class TroubleshootingPagerAdapter(
 
         // TODO Replace stub fragments with proper ones
         Overview("Overview", { OverviewFragment() }),
-        Network("Network", { StubFragment() }),
         Events("Events", { StubFragment() }),
         Workers("Worker log", { StubFragment() }),
         ;
