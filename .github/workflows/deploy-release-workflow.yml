@@ -3,6 +3,10 @@ name: "Deploy: Release Workflow"
 on:
     workflow_dispatch:
 
+concurrency:
+    group: release-internal-workflow
+    cancel-in-progress: true
+
 jobs:
 
     run-core-tests:
