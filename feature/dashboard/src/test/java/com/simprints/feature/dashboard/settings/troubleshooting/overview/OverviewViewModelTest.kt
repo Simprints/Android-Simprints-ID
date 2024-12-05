@@ -6,6 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
+import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.CollectScannerStateUseCase
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.PingServerUseCase
 import com.simprints.feature.dashboard.settings.troubleshooting.overview.usecase.PingServerUseCase.PingResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -37,6 +38,9 @@ class OverviewViewModelTest {
     private lateinit var collectNetworkInformationUseCase: CollectNetworkInformationUseCase
 
     @MockK
+    private lateinit var collectScannerState: CollectScannerStateUseCase
+
+    @MockK
     private lateinit var pingServerUseCase: PingServerUseCase
 
     private lateinit var viewModel: OverviewViewModel
@@ -50,6 +54,7 @@ class OverviewViewModelTest {
             collectLicenseStates = collectLicencesUseCase,
             collectNetworkInformation = collectNetworkInformationUseCase,
             doServerPing = pingServerUseCase,
+            collectScannerState = collectScannerState,
         )
     }
 

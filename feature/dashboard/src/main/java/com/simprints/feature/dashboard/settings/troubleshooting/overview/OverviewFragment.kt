@@ -28,6 +28,9 @@ class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_overview) {
         viewModel.networkStates.observe(viewLifecycleOwner) {
             binding.troubleshootOverviewNetwork.text = it.orEmpty()
         }
+        viewModel.scannerState.observe(viewLifecycleOwner) {
+            binding.troubleshootOverviewScanner.text = it.orEmpty()
+        }
 
         viewModel.collectData()
 
@@ -43,7 +46,5 @@ class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_overview) {
         binding.troubleshootOverviewPing.setOnClickListener {
             viewModel.pingServer()
         }
-
     }
-
 }

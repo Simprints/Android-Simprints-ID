@@ -23,6 +23,8 @@ dependencies {
     implementation(project(":feature:consent"))
     implementation(project(":feature:login"))
 
+    implementation(project(":fingerprint:infra:scanner"))
+
     implementation(libs.fuzzywuzzy.core)
 
     // UI
