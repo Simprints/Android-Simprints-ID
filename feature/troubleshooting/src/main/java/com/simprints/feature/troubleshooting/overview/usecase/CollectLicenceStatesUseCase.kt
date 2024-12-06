@@ -4,7 +4,7 @@ import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.models.Vendor
 import javax.inject.Inject
 
-class CollectLicenceStatesUseCase @Inject constructor(
+internal class CollectLicenceStatesUseCase @Inject constructor(
     private val licenseRepository: LicenseRepository,
 ) {
 

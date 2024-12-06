@@ -13,7 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
 
 @AndroidEntryPoint
-class WorkerLogFragment  : Fragment(R.layout.fragment_troubleshooting_list) {
+internal class WorkerLogFragment  : Fragment(R.layout.fragment_troubleshooting_list) {
 
     private val viewModel by viewModels<WorkerLogViewModel>()
     private val binding by viewBinding(FragmentTroubleshootingListBinding::bind)
