@@ -5,13 +5,14 @@ import android.content.DialogInterface
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.gms.common.ConnectionResult.*
+import com.google.android.gms.common.ConnectionResult.INTERNAL_ERROR
+import com.google.android.gms.common.ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED
+import com.google.android.gms.common.ConnectionResult.SUCCESS
 import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.feature.login.LoginError
 import com.simprints.infra.logging.Simber
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

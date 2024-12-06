@@ -14,7 +14,9 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.moveToState
 import com.simprints.testtools.hilt.testNavController
-import dagger.hilt.android.testing.*
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import org.hamcrest.core.StringContains.containsString
 import org.junit.Before

@@ -1,3 +1,6 @@
+// Otherwise there would be an import per test case/event
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package com.simprints.infra.events.event.local.models
 
 import com.google.common.truth.Truth.assertThat

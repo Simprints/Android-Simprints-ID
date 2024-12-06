@@ -1,6 +1,6 @@
 package com.simprints.core.tools.utils
 
-import java.util.*
+import java.util.UUID
 
 private const val REGEX_GUID =
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}"

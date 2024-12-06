@@ -29,10 +29,12 @@ internal class PrivacyNoticeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _viewState = MutableLiveData<PrivacyNoticeState>()
-    fun viewState(): LiveData<PrivacyNoticeState> = _viewState
+    val viewState: LiveData<PrivacyNoticeState>
+        get() = _viewState
 
     private val _showOffline = MutableLiveData<LiveDataEvent>()
-    fun showOffline(): LiveData<LiveDataEvent> = _showOffline
+    val showOffline: LiveData<LiveDataEvent>
+        get() = _showOffline
 
     fun downloadPressed() {
         if (connectivityTracker.isConnected()) {

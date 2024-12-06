@@ -1,7 +1,7 @@
 package com.simprints.core.tools.time
 
 import androidx.annotation.Keep
-import java.util.*
+import java.util.Date
 
 @Keep
 interface TimeHelper {
