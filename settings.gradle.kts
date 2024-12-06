@@ -128,6 +128,7 @@ include(
     ":infra:images",
     ":infra:license",
     ":infra:logging",
+    ":infra:logging-persistent",
     ":infra:auth-store",
     ":infra:auth-logic",
     ":infra:network",

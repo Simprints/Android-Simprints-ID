@@ -18,6 +18,7 @@ jobs:
                 infra:ui-base
                 infra:network
                 infra:logging
+                infra:logging-persistent
                 infra:security
             reportsId: core
 
