@@ -5,12 +5,19 @@ import androidx.core.os.bundleOf
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.RefusalForm
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Tier
-import com.simprints.libsimprints.Verification
+import com.simprints.libsimprints.contracts.VersionsList
+import com.simprints.libsimprints.contracts.data.Enrolment
+import com.simprints.libsimprints.contracts.data.Identification
+import com.simprints.libsimprints.contracts.data.Identification.Companion.toJson
+import com.simprints.libsimprints.contracts.data.RefusalForm
+import com.simprints.libsimprints.contracts.data.Tier
+import com.simprints.libsimprints.contracts.data.Verification
 import javax.inject.Inject
+import com.simprints.libsimprints.Identification as LegacyIdentification
+import com.simprints.libsimprints.RefusalForm as LegacyRefusalForm
+import com.simprints.libsimprints.Registration as LegacyEnrolment
+import com.simprints.libsimprints.Tier as LegacyTier
+import com.simprints.libsimprints.Verification as LegacyVerification
 
 internal class LibSimprintsResponseMapper @Inject constructor() {
 
@@ -19,18 +26,33 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         is ActionResponse.EnrolActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-            Constants.SIMPRINTS_REGISTRATION to Registration(response.enrolledGuid),
-        ).appendCoSyncData(response.subjectActions)
+        ).appendDataPerContractVersion(response) { version ->
+            when {
+                version < VersionsList.INITIAL_REWORK -> putParcelable(Constants.SIMPRINTS_REGISTRATION, LegacyEnrolment(response.enrolledGuid))
+                else -> putString(Constants.SIMPRINTS_ENROLMENT, Enrolment(response.enrolledGuid).toJson())
+            }
+        }.appendCoSyncData(response.subjectActions)
 
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<Identification>(
-                response.identifications.map {
-                    Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
-                }
-            ),
-        )
+        ).appendDataPerContractVersion(response) { version ->
+            when {
+                version < VersionsList.INITIAL_REWORK -> putParcelableArrayList(
+                    Constants.SIMPRINTS_IDENTIFICATIONS,
+                    response.identifications
+                        .map { LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name)) }
+                        .toCollection(ArrayList())
+                )
+
+                else -> putString(
+                    Constants.SIMPRINTS_IDENTIFICATIONS,
+                    response.identifications
+                        .map { Identification(it.guid, it.confidenceScore.toFloat(), Tier.valueOf(it.tier.name)) }
+                        .toJson()
+                )
+            }
+        }
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -40,22 +62,48 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         is ActionResponse.VerifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-            Constants.SIMPRINTS_VERIFICATION to Verification(
-                response.matchResult.confidenceScore,
-                Tier.valueOf(response.matchResult.tier.name),
-                response.matchResult.guid,
-            ),
-        ).also {
-            response.matchResult.verificationSuccess?.let { verificationSuccess ->
-                it.putBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS, verificationSuccess)
+        ).appendDataPerContractVersion(response) { version ->
+            when {
+                version < VersionsList.INITIAL_REWORK -> {
+                    putParcelable(
+                        Constants.SIMPRINTS_VERIFICATION,
+                        LegacyVerification(
+                            confidence = response.matchResult.confidenceScore,
+                            tier = LegacyTier.valueOf(response.matchResult.tier.name),
+                            guid = response.matchResult.guid,
+                        )
+                    )
+                    putBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS, response.matchResult.verificationSuccess == true)
+                }
+
+                else -> putString(
+                    Constants.SIMPRINTS_VERIFICATION,
+                    Verification(
+                        guid = response.matchResult.guid,
+                        confidence = response.matchResult.confidenceScore.toFloat(),
+                        tier = Tier.valueOf(response.matchResult.tier.name),
+                        isSuccess = response.matchResult.verificationSuccess == true,
+                    ).toJson()
+                )
             }
         }
 
         is ActionResponse.ExitFormActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
-            Constants.SIMPRINTS_REFUSAL_FORM to RefusalForm(response.reason, response.extraText),
-        )
+        ).appendDataPerContractVersion(response) { version ->
+            when {
+                version < VersionsList.INITIAL_REWORK -> putParcelable(
+                    Constants.SIMPRINTS_REFUSAL_FORM,
+                    LegacyRefusalForm(response.reason, response.extraText)
+                )
+
+                else -> putString(
+                    Constants.SIMPRINTS_REFUSAL_FORM,
+                    RefusalForm(response.reason, response.extraText).toJson()
+                )
+            }
+        }
 
         is ActionResponse.ErrorActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -63,6 +111,16 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
             RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode()
         )
     }
+
+    private inline fun Bundle.appendDataPerContractVersion(
+        response: ActionResponse,
+        crossinline block: Bundle.(Int) -> Unit,
+    ): Bundle {
+        val version = response.actionIdentifier.contractVersion
+        this.block(version)
+        return this
+    }
+
 
     private fun Bundle.appendCoSyncData(actions: String?) = apply {
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }

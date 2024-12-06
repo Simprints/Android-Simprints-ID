@@ -16,6 +16,7 @@ internal abstract class ActionRequestExtractor(private val extras: Map<String, A
         Constants.SIMPRINTS_USER_ID,
         Constants.SIMPRINTS_MODULE_ID,
         Constants.SIMPRINTS_METADATA,
+        Constants.SIMPRINTS_LIB_VERSION,
         ClientApiConstants.CALLER_PACKAGE_NAME,
     )
 
@@ -26,8 +27,6 @@ internal abstract class ActionRequestExtractor(private val extras: Map<String, A
     open fun getModuleId(): String = extras.extractString(Constants.SIMPRINTS_MODULE_ID)
     
     open fun getBiometricDataSource(): String = extras.extractString(Constants.SIMPRINTS_BIOMETRIC_DATA_SOURCE)
-
-    open fun getCallerPackageName(): String = extras.extractString(ClientApiConstants.CALLER_PACKAGE_NAME)
 
     open fun getMetadata(): String = extras.extractString(Constants.SIMPRINTS_METADATA)
 

@@ -15,6 +15,8 @@ internal object EnrolActionFactory : RequestActionFactory() {
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
         actionName = ActionConstants.ACTION_ENROL,
+        callerPackageName = "",
+        contractVersion = 1,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.EnrolActionRequest(
@@ -24,7 +26,6 @@ internal object EnrolActionFactory : RequestActionFactory() {
         metadata = MOCK_METADATA,
         moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
-        callerPackageName = MOCK_CALLER_PACKAGE_NAME,
         unknownExtras = emptyMap()
     )
 

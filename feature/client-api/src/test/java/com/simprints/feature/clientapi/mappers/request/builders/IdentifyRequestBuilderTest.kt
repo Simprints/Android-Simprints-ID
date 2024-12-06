@@ -29,6 +29,8 @@ internal class IdentifyRequestBuilderTest  {
             actionIdentifier = ActionRequestIdentifier(
                 actionName = RequestActionFactory.MOCK_PACKAGE,
                 packageName = ActionConstants.ACTION_IDENTIFY,
+                callerPackageName = "",
+                contractVersion = 1,
             ),
             extractor = extractor,
             project = project,

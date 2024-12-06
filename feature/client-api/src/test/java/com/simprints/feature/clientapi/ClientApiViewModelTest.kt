@@ -228,6 +228,6 @@ internal class ClientApiViewModelTest {
 
     private fun mockRequest(): ActionRequest = mockk {
         every { projectId } returns "projectId"
-        every { actionIdentifier } returns ActionRequestIdentifier("action", "package")
+        every { actionIdentifier } returns ActionRequestIdentifier("action", "package", "", 1)
     }
 }

@@ -13,13 +13,14 @@ internal object ActionFactory {
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_ENROL,
+            callerPackageName = "",
+            contractVersion = 1,
         ),
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
         unknownExtras = extras,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
-        callerPackageName = "",
         metadata = "",
     )
 
@@ -27,6 +28,8 @@ internal object ActionFactory {
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
+            callerPackageName = "",
+            contractVersion = 1,
         ),
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
