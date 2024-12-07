@@ -2,7 +2,7 @@ package com.simprints.feature.logincheck.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations

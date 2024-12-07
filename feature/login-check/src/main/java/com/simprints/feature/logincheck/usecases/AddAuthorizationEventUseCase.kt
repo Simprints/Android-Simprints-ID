@@ -1,7 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject

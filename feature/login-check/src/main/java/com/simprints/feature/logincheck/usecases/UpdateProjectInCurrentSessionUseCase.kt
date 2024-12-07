@@ -2,7 +2,7 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
 internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(

@@ -11,7 +11,7 @@ import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse

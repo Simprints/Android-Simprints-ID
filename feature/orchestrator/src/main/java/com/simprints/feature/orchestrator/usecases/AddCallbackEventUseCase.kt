@@ -1,10 +1,10 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
@@ -20,7 +20,7 @@ import javax.inject.Inject
 internal class AddCallbackEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
 
     operator fun invoke(result: AppResponse) {
@@ -33,7 +33,7 @@ internal class AddCallbackEventUseCase @Inject constructor(
             is AppErrorResponse -> buildErrorCallbackEvent(result)
         }
 
-        externalScope.launch { eventRepository.addOrUpdateEvent(callbackEvent) }
+        sessionCoroutineScope.launch { eventRepository.addOrUpdateEvent(callbackEvent) }
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) = EnrolmentCallbackEvent(

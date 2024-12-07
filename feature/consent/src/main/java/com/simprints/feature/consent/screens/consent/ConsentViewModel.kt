@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -19,7 +19,7 @@ import com.simprints.feature.exitform.scannerOptions
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.resources.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +33,7 @@ internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
     private val startConsentEventTime = timeHelper.now()
@@ -111,7 +111,7 @@ internal class ConsentViewModel @Inject constructor(
     private fun saveConsentEvent(
         currentConsentTab: ConsentTab,
         result: ConsentEvent.ConsentPayload.Result
-    ) = externalScope.launch {
+    ) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(
             ConsentEvent(
                 startConsentEventTime,
@@ -140,7 +140,7 @@ internal class ConsentViewModel @Inject constructor(
         }
     }
 
-    private fun deleteLocationInfoFromSession() = externalScope.launch {
+    private fun deleteLocationInfoFromSession() = sessionCoroutineScope.launch {
         eventRepository.removeLocationDataFromCurrentSession()
     }
 

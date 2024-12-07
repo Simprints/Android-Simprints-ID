@@ -18,7 +18,7 @@ import com.simprints.infra.events.event.domain.models.callback.VerificationCallb
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs

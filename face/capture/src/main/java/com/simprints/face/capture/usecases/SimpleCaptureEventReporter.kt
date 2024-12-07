@@ -1,11 +1,11 @@
 package com.simprints.face.capture.usecases
 
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
@@ -21,13 +21,13 @@ internal class SimpleCaptureEventReporter @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
     private val encodingUtils: EncodingUtils,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
-    fun addOnboardingCompleteEvent(startTime: Timestamp) = externalScope.launch {
+    fun addOnboardingCompleteEvent(startTime: Timestamp) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(FaceOnboardingCompleteEvent(startTime, timeHelper.now()))
     }
 
-    fun addCaptureConfirmationEvent(startTime: Timestamp, isContinue: Boolean) = externalScope.launch {
+    fun addCaptureConfirmationEvent(startTime: Timestamp, isContinue: Boolean) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(FaceCaptureConfirmationEvent(
             startTime,
             timeHelper.now(),
@@ -35,7 +35,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
         ))
     }
 
-    fun addFallbackCaptureEvent(startTime: Timestamp, endTime: Timestamp) = externalScope.launch {
+    fun addFallbackCaptureEvent(startTime: Timestamp, endTime: Timestamp) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(FaceFallbackCaptureEvent(startTime, endTime))
     }
 

@@ -1,4 +1,4 @@
-package com.simprints.infra.events
+package com.simprints.infra.events.session
 
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope

@@ -2,7 +2,7 @@ package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import javax.inject.Inject
 

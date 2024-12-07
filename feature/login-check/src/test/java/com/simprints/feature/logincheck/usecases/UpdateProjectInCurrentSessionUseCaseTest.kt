@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent

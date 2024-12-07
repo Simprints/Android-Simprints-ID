@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases.response
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult

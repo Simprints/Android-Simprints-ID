@@ -5,6 +5,7 @@ import com.simprints.core.CoreModule
 import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherBG
 import com.simprints.core.DispatcherIO
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.json.JsonHelper
@@ -62,6 +63,10 @@ object FakeCoreModule {
     @ExternalScope
     @Provides
     fun provideExternalScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
+
+    @SessionCoroutineScope
+    @Provides
+    fun provideSessionCoroutineScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     @AppScope
     @Provides

@@ -4,7 +4,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import javax.inject.Inject

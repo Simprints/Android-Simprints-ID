@@ -6,7 +6,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.events.event.domain.models.EventType
@@ -17,7 +17,6 @@ import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

@@ -1,6 +1,6 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

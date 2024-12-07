@@ -1,7 +1,6 @@
 package com.simprints.infra.events
 
-import com.simprints.infra.events.event.local.*
-import com.simprints.infra.events.local.*
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.session.SessionEventRepositoryImpl
 import dagger.Binds
 import dagger.Module
