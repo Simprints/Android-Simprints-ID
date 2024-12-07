@@ -3,7 +3,7 @@ package com.simprints.feature.clientapi.usecases
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.OdkConstants
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber

@@ -4,7 +4,7 @@ import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

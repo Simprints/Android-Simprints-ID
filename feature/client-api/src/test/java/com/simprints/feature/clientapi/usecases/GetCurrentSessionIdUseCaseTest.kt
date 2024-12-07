@@ -1,7 +1,7 @@
 package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

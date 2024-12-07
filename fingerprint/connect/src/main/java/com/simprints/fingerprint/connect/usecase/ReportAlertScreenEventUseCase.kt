@@ -2,7 +2,7 @@ package com.simprints.fingerprint.connect.usecase
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import kotlinx.coroutines.CoroutineScope

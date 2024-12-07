@@ -19,7 +19,7 @@ import com.simprints.feature.exitform.scannerOptions
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.resources.R
 import dagger.hilt.android.lifecycle.HiltViewModel

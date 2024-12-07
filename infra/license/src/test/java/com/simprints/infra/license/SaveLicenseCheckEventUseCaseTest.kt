@@ -3,7 +3,7 @@ package com.simprints.infra.license
 import com.google.common.truth.Truth
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
 import com.simprints.infra.license.models.Vendor
 import io.mockk.MockKAnnotations

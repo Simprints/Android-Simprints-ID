@@ -5,7 +5,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.orchestration.data.ActionConstants
 import io.mockk.MockKAnnotations

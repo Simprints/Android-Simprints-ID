@@ -1,7 +1,6 @@
 package com.simprints.infra.events.session
 
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
