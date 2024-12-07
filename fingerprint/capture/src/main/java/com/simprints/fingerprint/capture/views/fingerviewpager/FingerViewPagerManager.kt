@@ -19,6 +19,7 @@ internal class FingerViewPagerManager(
     private val viewPager: ViewPager2,
     private val indicatorLayout: LinearLayout,
     private val onFingerSelected: (Int) -> Unit,
+    private val onPageScrolled: (Int, Float) -> Unit,
     private val isAbleToSelectNewFinger: () -> Boolean,
 ) {
 
@@ -47,6 +48,13 @@ internal class FingerViewPagerManager(
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 onFingerSelected(position)
+            }
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                this@FingerViewPagerManager.onPageScrolled(position, positionOffset)
             }
         })
     }

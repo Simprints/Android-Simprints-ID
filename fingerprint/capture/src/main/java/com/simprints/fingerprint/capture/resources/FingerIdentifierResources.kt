@@ -37,8 +37,3 @@ internal fun IFingerIdentifier.nameTextId(): Int = when (this) {
     IFingerIdentifier.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
     IFingerIdentifier.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
 }
-
-@ExcludedFromGeneratedTestCoverageReports("UI code")
-@Suppress("unused")
-@ColorRes
-internal fun IFingerIdentifier.nameTextColour(): Int = IDR.color.simprints_blue

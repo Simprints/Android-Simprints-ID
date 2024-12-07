@@ -30,4 +30,9 @@
     <!-- region Vertical spacing -->
     <dimen name="vertical_spacing_dashboard_cards">12dp</dimen>
     <!-- endregion -->
+
+    <!-- region Fingerprint capture sizes -->
+    <dimen name="fingerprint_capture_indicator_size">32dp</dimen>
+    <dimen name="fingerprint_capture_card_height_land">320dp</dimen>
+    <!-- endregion -->
 </resources>

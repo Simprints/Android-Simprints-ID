@@ -1,10 +1,13 @@
 package com.simprints.fingerprint.capture.screen
 
-import android.graphics.Paint
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -30,6 +33,7 @@ import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
+import com.simprints.fingerprint.capture.resources.statusBarColor
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
@@ -164,14 +168,34 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             binding.fingerprintViewPager,
             binding.fingerprintIndicator,
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
-            isAbleToSelectNewFinger = { vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true }
+            isAbleToSelectNewFinger = { vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true },
+            onPageScrolled = { position: Int, positionOffset: Float ->
+                if(positionOffset != 0.0f){
+                    vm.stateLiveData.value?.fingerStates?.let { fingerStates ->
+                        val nextPage = if (positionOffset > 0.0f) {
+                            position + 1
+                        } else {
+                            position
+                        }
+                        val currentColor = fingerStates[position].currentCapture().statusBarColor()
+                        val nextColor = fingerStates[nextPage].currentCapture().statusBarColor()
+                        if (currentColor != nextColor) {
+                            val color =ColorUtils.blendARGB(
+                                ContextCompat.getColor(requireContext(), currentColor),
+                                ContextCompat.getColor(requireContext(), nextColor),
+                                positionOffset
+                            )
+                            binding.toolbar.setBackgroundColor(color)
+                            setCustomStatusBarColor(color, requireActivity())
+                            binding.fingerprintScanButton.setBackgroundColor(color)
+                        }
+                    }
+                }
+            }
         )
     }
 
     private fun initMissingFingerButton() {
-        binding.fingerprintMissingFinger.paintFlags =
-            binding.fingerprintMissingFinger.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-
         binding.fingerprintMissingFinger.setOnClickListener {
             Simber.tag(FINGER_CAPTURE.name).i("Missing finger text clicked")
             vm.handleMissingFingerButtonPressed()
@@ -193,8 +217,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
                 // Update button
                 with(state.currentCaptureState()) {
+                    val statusBarColor = ContextCompat.getColor(requireContext(), statusBarColor())
                     binding.fingerprintScanButton.text = getString(buttonTextId(state.isAskingRescan))
                     binding.fingerprintScanButton.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
+                    binding.toolbar.setBackgroundColor(statusBarColor)
+                    setCustomStatusBarColor(statusBarColor, requireActivity())
                 }
 
                 updateConfirmDialog(state)
@@ -249,12 +276,27 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             viewLifecycleOwner.lifecycleScope,
             args.params.fingerprintSDK
         )
+        val color = vm.stateLiveData.value?.currentCaptureState()?.statusBarColor()
+            ?.let { ContextCompat.getColor(requireContext(), it) }
+        setCustomStatusBarColor(color = color, activity = requireActivity())
     }
 
     override fun onPause() {
+        setCustomStatusBarColor(color = null, activity = requireActivity())
         vm.handleOnPause()
         super.onPause()
         observeFingerprintScanStatus.stopObserving()
+    }
+
+    private fun setCustomStatusBarColor(color: Int?, activity: Activity) {
+        @ColorRes val resolvedColor: Int = when(color) {
+            null -> ContextCompat.getColor(activity, IDR.color.simprints_blue_dark)
+            else -> color
+        }
+        with(activity.window) {
+            if(statusBarColor == resolvedColor) return
+            statusBarColor = resolvedColor
+        }
     }
 
     private fun updateConfirmDialog(state: CollectFingerprintsState) {
