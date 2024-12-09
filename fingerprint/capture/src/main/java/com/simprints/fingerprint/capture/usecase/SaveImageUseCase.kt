@@ -23,6 +23,8 @@ internal class SaveImageUseCase @Inject constructor(
         finger: IFingerIdentifier,
         captureEventId: String?,
         collectedFinger: CaptureState.ScanProcess.Collected,
+        scannerId: String?,
+        un20SerialNumber: String?,
     ) = if (collectedFinger.scanResult.image != null && captureEventId != null) {
         saveImage(
             imageBytes = collectedFinger.scanResult.image,
@@ -30,6 +32,8 @@ internal class SaveImageUseCase @Inject constructor(
             fileExtension = vero2Configuration.imageSavingStrategy.deduceFileExtension(),
             finger = finger,
             dpi = vero2Configuration.captureStrategy.toInt(),
+            scannerId = scannerId,
+            un20SerialNumber = un20SerialNumber,
         )
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
         Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
@@ -42,8 +46,10 @@ internal class SaveImageUseCase @Inject constructor(
         fileExtension: String,
         finger: IFingerIdentifier,
         dpi: Int,
+        scannerId: String?,
+        un20SerialNumber: String?,
     ): SecuredImageRef? = determinePath(captureEventId, fileExtension)?.let { path ->
-        Simber.d("Saving fingerprint image ${path}")
+        Simber.d("Saving fingerprint image $path")
         val currentSession = coreEventRepository.getCurrentSessionScope()
         val projectId = currentSession.projectId
 
@@ -51,10 +57,13 @@ internal class SaveImageUseCase @Inject constructor(
             imageBytes = imageBytes,
             projectId = projectId,
             relativePath = Path(path.parts),
-            metadata = mapOf(
+            metadata = mutableMapOf(
                 META_KEY_FINGER_ID to finger.name,
-                META_KEY_DPI to dpi.toString(),
-            ),
+                META_KEY_DPI to dpi.toString()
+            ).apply {
+                scannerId?.let { this[META_KEY_SCANNER_ID] = it }
+                un20SerialNumber?.let { this[META_KEY_UN20_SERIAL_NUMBER] = it }
+            },
         )
 
         if (securedImageRef != null) {
@@ -88,5 +97,7 @@ internal class SaveImageUseCase @Inject constructor(
 
         private const val META_KEY_DPI = "dpi"
         private const val META_KEY_FINGER_ID = "finger"
+        private const val META_KEY_SCANNER_ID = "scannerID"
+        private const val META_KEY_UN20_SERIAL_NUMBER = "un20SerialNumber"
     }
 }
