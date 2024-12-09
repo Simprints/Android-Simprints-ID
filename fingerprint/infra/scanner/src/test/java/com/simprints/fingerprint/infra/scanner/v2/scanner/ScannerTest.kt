@@ -666,6 +666,14 @@ class ScannerTest {
         scanner.disconnect()
         assertThat(scanner.state).isEqualTo(disconnectedScannerState())
     }
+    @Test
+    fun scanner_connectThenDisconnect_clearScannerInfo() {
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        ScannerInfo.setScannerId("123")
+        scanner.disconnect()
+        assertThat(scanner.state).isEqualTo(disconnectedScannerState())
+        assertThat(ScannerInfo.scannerId).isNull()
+    }
 
     @Test
     fun scanner_getStmVersion_shouldReturnStmExtendedVersion() = runTest {

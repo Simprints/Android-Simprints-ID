@@ -41,6 +41,7 @@ import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerp
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.EAGER
@@ -667,6 +668,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             finger = id.finger,
             captureEventId = captureEventId,
             collectedFinger = collectedFinger,
+            scannerId = ScannerInfo.scannerId,
+            un20SerialNumber = ScannerInfo.un20SerialNumber,
         )
         imageRefs[id] = imageRef
     }

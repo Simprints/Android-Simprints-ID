@@ -91,6 +91,7 @@ class Scanner(
             }
             flowableDisposable.dispose()
             state = disconnectedScannerState()
+            ScannerInfo.clear()
         }
     }
 
