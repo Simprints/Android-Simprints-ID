@@ -48,7 +48,9 @@ class SaveImageUseCaseTest {
             vero2Configuration,
             IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
-            createCollectedStub(null)
+            createCollectedStub(null),
+            null,
+            null,
         )
         assertThat(result).isNull()
     }
@@ -59,13 +61,23 @@ class SaveImageUseCaseTest {
             vero2Configuration,
             IFingerIdentifier.LEFT_3RD_FINGER,
             null,
-            createCollectedStub(byteArrayOf())
+            createCollectedStub(byteArrayOf()),
+            null,
+            null,
         )
         assertThat(result).isNull()
     }
 
     @Test
-    fun `Save image should call the event and image repos`() = runTest {
+    fun `Save image should call the event and image repos with correct metadata`() = runTest {
+        val scannerId = "scannerId"
+        val un20SerialNumber = "un20SerialNumber"
+        val expectedMetadata = mapOf(
+            "finger" to IFingerIdentifier.LEFT_3RD_FINGER.name,
+            "dpi" to "1300",
+            "scannerID" to scannerId,
+            "un20SerialNumber" to un20SerialNumber
+        )
         coEvery { eventRepo.getCurrentSessionScope() } returns mockk {
             every { projectId } returns "projectId"
             every { id } returns "sessionId"
@@ -85,7 +97,9 @@ class SaveImageUseCaseTest {
             vero2Configuration,
             IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
-            createCollectedStub(byteArrayOf())
+            createCollectedStub(byteArrayOf()),
+            scannerId,
+            un20SerialNumber,
         )).isNotNull()
 
         coVerify {
@@ -95,10 +109,11 @@ class SaveImageUseCaseTest {
                 withArg {
                     assert(expectedPath.compose().contains(it.compose()))
                 },
-                any()
+               withArg { assert(it == expectedMetadata) }
             )
         }
     }
+
 
     @Test
     fun `Returns null when no current session event`() = runTest {
@@ -108,7 +123,9 @@ class SaveImageUseCaseTest {
             vero2Configuration,
             IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
-            createCollectedStub(byteArrayOf())
+            createCollectedStub(byteArrayOf()),
+            null,
+            null,
         )).isNull()
     }
 
@@ -126,7 +143,9 @@ class SaveImageUseCaseTest {
             vero2Configuration,
             IFingerIdentifier.LEFT_3RD_FINGER,
             "captureEventId",
-            createCollectedStub(byteArrayOf())
+            createCollectedStub(byteArrayOf()),
+            null,
+            null,
         )).isNull()
 
         coVerify { imageRepo.storeImageSecurely(any(), "projectId", any(), any()) }

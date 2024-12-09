@@ -10,6 +10,7 @@ import com.simprints.fingerprint.infra.scanner.helpers.StmOtaHelper
 import com.simprints.fingerprint.infra.scanner.helpers.Un20OtaHelper
 import com.simprints.fingerprint.infra.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.scanner.create
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -46,11 +47,11 @@ class ScannerFactory @Inject internal constructor(
     suspend fun initScannerOperationWrappers(macAddress: String) {
         val availableScannerGenerations =
             configManager.getProjectConfiguration().fingerprint?.allowedScanners ?: listOf()
-
+        val scannerId = serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
         val scannerGenerationToUse = when (availableScannerGenerations.size) {
             1 -> availableScannerGenerations.single()
             else -> scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(
-                serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
+                scannerId
             )
         }.also {
             Simber.i("Using scanner generation $it")
@@ -71,6 +72,8 @@ class ScannerFactory @Inject internal constructor(
                 scannerOtaOperationsWrapper = createScannerOtaOperationsWrapper(macAddress)
                 //Cache the scannerV2 instance to be used by the FingerprintCaptureWrapperFactory
                 fingerprintCaptureWrapperFactory.createV2(scannerV2!!)
+                // Store the scanner ID
+                ScannerInfo.setScannerId(scannerId)
             }
         }
     }

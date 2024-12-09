@@ -5,6 +5,7 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateRes
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -28,6 +29,7 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
      * 6. Return the generated template and cache the image for future use.
      *
      **/
+    @OptIn(ExperimentalStdlibApi::class)
     override suspend fun acquireFingerprintTemplate(
         settings: FingerprintTemplateAcquisitionSettings?
     ): TemplateResponse<FingerprintTemplateMetadata> {
@@ -39,7 +41,10 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
         val rawFingerprintScan = captureWrapper.acquireUnprocessedImage(
             Dpi(MIN_CAPTURE_DPI)
         ).rawUnprocessedImage
+        // Store the recently captured image in the cache
         captureProcessedImageCache.recentlyCapturedImage = rawFingerprintScan.imageData
+        // Store the serial number of the scanner for future use int the image upload
+        ScannerInfo.setUn20SerialNumber(rawFingerprintScan.un20SerialNumber.toHexString())
         log("processing image using secugen image correction")
         val secugenProcessedImage = processImage(
             settings,

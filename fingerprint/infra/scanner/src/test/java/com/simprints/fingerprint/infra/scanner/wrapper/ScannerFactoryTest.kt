@@ -5,6 +5,7 @@ import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.infra.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -95,6 +96,7 @@ class ScannerFactoryTest {
             scannerFactory.initScannerOperationWrappers(macAddress)
             // Then
             Truth.assertThat(scannerFactory.scannerV2).isNotNull()
+            Truth.assertThat(ScannerInfo.scannerId).isEqualTo(serialNumber)
             Truth.assertThat(scannerFactory.scannerWrapper)
                 .isInstanceOf(ScannerWrapperV2::class.java)
             Truth.assertThat(scannerFactory.scannerOtaOperationsWrapper).isNotNull()
