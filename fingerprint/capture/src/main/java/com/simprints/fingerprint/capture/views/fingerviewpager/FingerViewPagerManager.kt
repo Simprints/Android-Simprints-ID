@@ -30,6 +30,24 @@ internal class FingerViewPagerManager(
         initViewPager()
     }
 
+    @ExcludedFromGeneratedTestCoverageReports("UI code")
+    private class OnPageChangeListener(
+        private val onFingerSelected: (Int) -> Unit,
+        private val onPageScrolled: (Int, Float) -> Unit,
+    ) : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            onFingerSelected(position)
+        }
+
+        override fun onPageScrolled(
+            position: Int,
+            positionOffset: Float,
+            positionOffsetPixels: Int
+        ) {
+            this.onPageScrolled(position, positionOffset)
+        }
+    }
+
     private fun initIndicators() {
         indicatorLayout.removeAllViewsInLayout()
         activeFingers.forEachIndexed { index, _ ->
@@ -45,18 +63,7 @@ internal class FingerViewPagerManager(
         pageAdapter = FingerPageAdapter(parentFragment, activeFingers)
         viewPager.adapter = pageAdapter
         viewPager.offscreenPageLimit = 1
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                onFingerSelected(position)
-            }
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                this@FingerViewPagerManager.onPageScrolled(position, positionOffset)
-            }
-        })
+        viewPager.registerOnPageChangeCallback(OnPageChangeListener(onFingerSelected, onPageScrolled))
     }
 
     fun setCurrentPageAndFingerStates(fingerStates: List<FingerState>, currentFingerIndex: Int) {
