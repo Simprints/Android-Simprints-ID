@@ -6,7 +6,7 @@
         android:right="22dp"
         android:top="22dp">
         <shape android:shape="oval">
-            <solid android:color="@color/simprints_grey" />
+            <solid android:color="@color/simprints_blue" />
             <size
                 android:width="62dp"
                 android:height="62dp" />

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:height="24dp"
+        android:width="24dp"
+        android:drawable="@drawable/ic_fingerprint_dark_red"
+        android:gravity="center"/>
+
+    <item
+        android:height="14dp"
+        android:width="14dp"
+        android:tint="@color/simprints_black"
+        android:drawable="@drawable/ic_warning"
+        android:tintMode="src_in"
+        android:gravity="start|bottom"/>
+</layer-list>

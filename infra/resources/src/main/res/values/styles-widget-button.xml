@@ -94,6 +94,23 @@
         <item name="colorPrimary">@color/simprints_text_blue</item>
     </style>
 
+    <style name="Widget.Simprints.Button.TextButton.Red">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextButton.Red</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.TextButton.Red" parent="">
+        <item name="colorPrimary">@color/simprints_red</item>
+    </style>
+
+    <style name="Widget.Simprints.Button.TextButton.Red.Dark">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextButton.Red.Dark</item>
+        <item name="iconTint">@null</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.TextButton.Red.Dark" parent="">
+        <item name="colorPrimary">@color/simprints_red_dark</item>
+    </style>
+
     <style name="Widget.Simprints.Button.TextButton.White">
         <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextButton.White</item>
     </style>
