@@ -3,6 +3,8 @@ package com.simprints.infra.network.httpclient
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.simprints.infra.network.BuildConfig
+import com.simprints.logging.persistent.LogEntryType
+import com.simprints.logging.persistent.PersistentLogger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -22,6 +24,7 @@ import javax.inject.Inject
 internal class DefaultOkHttpClientBuilder @Inject constructor(
     @ApplicationContext private val ctx: Context,
     private val networkCache: Cache,
+    private val persistentLogger: PersistentLogger,
 ) {
 
     companion object {
@@ -65,6 +68,7 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
                     addInterceptor(buildSimberLoggingInterceptor())
                 }
             }
+            .addInterceptor(buildPersistentLoggerInterceptor())
 
     private fun buildAuthenticationInterceptor(authToken: String) = Interceptor { chain ->
         val newRequest = chain.request().newBuilder()
@@ -111,6 +115,22 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
             .method(originalRequest.method, originalRequest.body?.let { gzip(it) })
             .build()
         return@Interceptor chain.proceed(compressedRequest)
+    }
+
+    private fun buildPersistentLoggerInterceptor() = Interceptor { chain ->
+        val originalRequest = chain.request()
+        chain.proceed(originalRequest).also { response ->
+            persistentLogger.logSync(
+                type = LogEntryType.Network,
+                timestampMs = response.sentRequestAtMillis,
+                title = "${originalRequest.method}: ${originalRequest.url.encodedPath}",
+                body = """
+                        Host: ${originalRequest.url.host}
+                        Request ID: ${originalRequest.header("X-Request-ID")}
+                        Response: ${response.code} - ${response.message}
+                        """.trimIndent(),
+            )
+        }
     }
 
     // First compress the original RequestBody, then wrap it with a new RequestBody to set correct content length

@@ -5,13 +5,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.network.FakeRetrofitInterface
 import com.simprints.infra.network.exceptions.*
 import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
+import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.SpyK
 import io.mockk.mockk
-import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -25,9 +23,14 @@ import org.junit.Test
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 
-@Suppress("BlockingMethodInNonBlockingContext")
 @ExperimentalCoroutinesApi
 class SimApiClientImplTest {
+
+    @MockK
+    lateinit var networkCache: okhttp3.Cache
+
+    @MockK
+    lateinit var persistentLogger: PersistentLogger
 
     private val backendMaintenanceErrorBody =
         jacksonObjectMapper().writeValueAsString(ApiError("002"))
@@ -38,9 +41,15 @@ class SimApiClientImplTest {
 
     @Before
     fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
+
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        httpClientBuilder = DefaultOkHttpClientBuilder(mockk(), mockk(relaxed = true))
+        httpClientBuilder = DefaultOkHttpClientBuilder(
+            mockk(),
+            networkCache,
+            persistentLogger
+        )
 
         simApiClientImpl = SimApiClientImpl(
             FakeRetrofitInterface::class,
