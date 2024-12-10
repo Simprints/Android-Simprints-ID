@@ -27,6 +27,8 @@ import io.mockk.mockk
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.schedulers.TestScheduler
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
@@ -34,7 +36,8 @@ class MainMessageInputStreamTest {
     private val packetRouter = mockk<PacketRouter> {
         justRun { connect(any()) }
     }
-
+@OptIn(ExperimentalCoroutinesApi::class)
+val dispatcher = UnconfinedTestDispatcher()
     @Suppress(
         "Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
             " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
@@ -49,7 +52,8 @@ class MainMessageInputStreamTest {
             packetRouter,
             veroResponseAccumulator,
             veroEventAccumulator,
-            un20ResponseAccumulator
+            un20ResponseAccumulator,
+            dispatcher
         )
 
         val messageBytes = "20 10 01 00 FF".hexToByteArray()
@@ -97,7 +101,8 @@ class MainMessageInputStreamTest {
             packetRouter,
             veroResponseAccumulator,
             veroEventAccumulator,
-            un20ResponseAccumulator
+            un20ResponseAccumulator,
+            dispatcher,
         )
 
         val messageBytes = "30 00 01 00 00 00 10".hexToByteArray()
@@ -142,7 +147,8 @@ class MainMessageInputStreamTest {
             packetRouter,
             veroResponseAccumulator,
             veroEventAccumulator,
-            un20ResponseAccumulator
+            un20ResponseAccumulator,
+            dispatcher,
         )
 
         val numberOfEvents = 5
@@ -187,7 +193,8 @@ class MainMessageInputStreamTest {
             packetRouter,
             veroResponseAccumulator,
             veroEventAccumulator,
-            un20ResponseAccumulator
+            un20ResponseAccumulator,
+            dispatcher,
         )
 
         val messageBytes = "20 10 01 00 FF 20 10 01 00 00".hexToByteArray()
@@ -231,7 +238,8 @@ class MainMessageInputStreamTest {
             packetRouter,
             veroResponseAccumulator,
             veroEventAccumulator,
-            un20ResponseAccumulator
+            un20ResponseAccumulator,
+            dispatcher,
         )
 
         val messageBytes = "20 20 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
@@ -280,7 +288,8 @@ class MainMessageInputStreamTest {
             packetRouter,
             veroResponseAccumulator,
             veroEventAccumulator,
-            un20ResponseAccumulator
+            un20ResponseAccumulator,
+            dispatcher,
         )
 
         val veroResponseBytes = "20 10 01 00 FF".hexToByteArray()

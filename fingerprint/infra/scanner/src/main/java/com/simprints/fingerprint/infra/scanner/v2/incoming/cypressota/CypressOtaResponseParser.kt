@@ -9,8 +9,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.Co
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.ErrorResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.responses.OkResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
+import javax.inject.Inject
 
-class CypressOtaResponseParser : MessageParser<CypressOtaResponse> {
+class CypressOtaResponseParser @Inject constructor() : MessageParser<CypressOtaResponse> {
 
     override fun parse(messageBytes: ByteArray): CypressOtaResponse =
         try {

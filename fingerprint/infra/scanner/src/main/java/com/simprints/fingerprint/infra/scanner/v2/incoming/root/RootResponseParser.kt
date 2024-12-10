@@ -22,8 +22,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetHardw
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.SetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
+import javax.inject.Inject
 
-class RootResponseParser : MessageParser<RootResponse> {
+class RootResponseParser  @Inject constructor(): MessageParser<RootResponse> {
 
     override fun parse(messageBytes: ByteArray): RootResponse =
         try {

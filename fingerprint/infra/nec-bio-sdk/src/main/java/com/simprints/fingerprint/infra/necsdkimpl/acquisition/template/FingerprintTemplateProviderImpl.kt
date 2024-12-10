@@ -15,6 +15,7 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val captureProcessedImageCache: ProcessedImageCache,
     private val extractNecTemplateUseCase: ExtractNecTemplateUseCase,
     private val processImage: ProcessRawImageUseCase,
+    private val scannerInfo: ScannerInfo,
 ) : FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
 
     /**
@@ -44,7 +45,7 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
         // Store the recently captured image in the cache
         captureProcessedImageCache.recentlyCapturedImage = rawFingerprintScan.imageData
         // Store the serial number of the scanner for future use int the image upload
-        ScannerInfo.setUn20SerialNumber(rawFingerprintScan.un20SerialNumber.toHexString())
+        scannerInfo.setUn20SerialNumber(rawFingerprintScan.un20SerialNumber.toHexString())
         log("processing image using secugen image correction")
         val secugenProcessedImage = processImage(
             settings,

@@ -7,8 +7,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.PacketProto
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.common.MessageSerializer
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
+import javax.inject.Inject
 
-class MainMessageSerializer : MessageSerializer<OutgoingMainMessage> {
+class MainMessageSerializer @Inject constructor() : MessageSerializer<OutgoingMainMessage> {
 
     override fun serialize(message: OutgoingMainMessage): List<ByteArray> =
         message

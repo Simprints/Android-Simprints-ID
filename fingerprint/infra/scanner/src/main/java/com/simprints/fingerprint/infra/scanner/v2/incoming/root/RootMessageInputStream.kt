@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v2.incoming.root
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.RootResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.filterCast
@@ -7,12 +8,17 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.subscribeOnIoAn
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
 /**
  * Takes an InputStream and transforms it into a Flowable<RootResponse> for use while the Vero is in
  * Root Mode.
  */
-class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAccumulator) : MessageInputStream {
+class RootMessageInputStream @Inject constructor(
+    private val rootResponseAccumulator: RootResponseAccumulator,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+) : MessageInputStream {
 
     var rootResponseStream: Flowable<RootResponse>? = null
 
@@ -20,7 +26,7 @@ class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAc
 
     override fun connect(flowableInputStream: Flowable<ByteArray>) {
         rootResponseStream = transformToRootResponseStream(flowableInputStream)
-            .subscribeOnIoAndPublish()
+            .subscribeOnIoAndPublish(ioDispatcher)
             .also {
                 rootResponseStreamDisposable = it.connect()
             }

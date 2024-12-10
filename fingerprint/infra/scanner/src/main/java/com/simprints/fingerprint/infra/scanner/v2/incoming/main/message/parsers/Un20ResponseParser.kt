@@ -17,8 +17,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.respo
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.VerifyOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.WriteOtaChunkResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
+import javax.inject.Inject
 
-class Un20ResponseParser : MessageParser<Un20Response> {
+class Un20ResponseParser @Inject constructor() : MessageParser<Un20Response> {
 
     override fun parse(messageBytes: ByteArray): Un20Response =
         try {

@@ -24,9 +24,10 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetExten
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetHardwareVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.SetVersionResponse
+import javax.inject.Inject
 
 
-class ScannerExtendedInfoReaderHelper(
+class ScannerExtendedInfoReaderHelper @Inject constructor(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
 ) {

@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.PacketProtocol
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidPacketException
 import java.nio.BufferUnderflowException
+import javax.inject.Inject
 
-class PacketParser {
+class PacketParser @Inject constructor() {
 
     /** @throws InvalidPacketException */
     fun parse(bytes: ByteArray): Packet =

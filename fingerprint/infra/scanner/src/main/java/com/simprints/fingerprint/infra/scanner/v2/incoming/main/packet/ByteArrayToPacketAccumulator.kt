@@ -5,8 +5,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.PacketProto
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.PacketProtocol.HEADER_SIZE
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.PacketProtocol.getTotalLengthFromHeader
 import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.ByteArrayAccumulator
+import javax.inject.Inject
 
-class ByteArrayToPacketAccumulator(
+class ByteArrayToPacketAccumulator @Inject constructor(
     private val packetParser: PacketParser
 ) : ByteArrayAccumulator<ByteArray, Packet>(
     fragmentAsByteArray = { bytes -> bytes },

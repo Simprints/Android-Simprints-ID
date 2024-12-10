@@ -8,8 +8,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.respo
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import java.io.IOException
+import javax.inject.Inject
 
-class ResponseErrorHandler(
+class ResponseErrorHandler @Inject constructor(
     val strategy: ResponseErrorHandlingStrategy
 ) {
     /**

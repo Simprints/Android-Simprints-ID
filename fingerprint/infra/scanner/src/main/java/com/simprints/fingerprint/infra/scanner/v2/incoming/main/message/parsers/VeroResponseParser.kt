@@ -32,8 +32,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.respo
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
+import javax.inject.Inject
 
-class VeroResponseParser : MessageParser<VeroResponse> {
+class VeroResponseParser @Inject constructor() : MessageParser<VeroResponse> {
 
     override fun parse(messageBytes: ByteArray): VeroResponse =
         try {

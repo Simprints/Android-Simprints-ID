@@ -123,7 +123,7 @@ class CypressOtaControllerTest {
         val messageIndex = AtomicInteger(0)
 
         return CypressOtaMessageChannel(
-            spyk(CypressOtaMessageInputStream(mockk())) {
+            spyk(CypressOtaMessageInputStream(mockk(), mockk())) {
                 justRun { connect(any()) }
                 cypressOtaResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },

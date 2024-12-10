@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v2.incoming.main
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.IncomingMainMessage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20Response
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroEvent
@@ -17,6 +18,8 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.subscribeOnIoAn
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
 /**
  * Transforms each of the Flowable<Packet> streams exposed by [PacketRouter] into a
@@ -25,11 +28,12 @@ import io.reactivex.disposables.Disposable
  * [receiveResponse] can be used to take a message from the [veroResponses] or [un20Responses]
  * streams, while the [veroEvents] stream can be observed directly.
  */
-class MainMessageInputStream(
+class MainMessageInputStream @Inject constructor(
     private val packetRouter: PacketRouter,
     private val veroResponseAccumulator: VeroResponseAccumulator,
     private val veroEventAccumulator: VeroEventAccumulator,
-    private val un20ResponseAccumulator: Un20ResponseAccumulator
+    private val un20ResponseAccumulator: Un20ResponseAccumulator,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : MessageInputStream {
 
     var veroResponses: Flowable<VeroResponse>? = null
@@ -43,12 +47,16 @@ class MainMessageInputStream(
     override fun connect(flowableInputStream: Flowable<ByteArray>) {
         packetRouter.connect(flowableInputStream)
         with(packetRouter.incomingPacketRoutes) {
-            veroResponses = getValue(Route.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
-                .subscribeOnIoAndPublish().also { veroResponsesDisposable = it.connect() }
+            veroResponses =
+                getValue(Route.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
+                    .subscribeOnIoAndPublish(ioDispatcher)
+                    .also { veroResponsesDisposable = it.connect() }
             veroEvents = getValue(Route.Remote.VeroEvent).toMainMessageStream(veroEventAccumulator)
-                .subscribeOnIoAndPublish().also { veroEventsDisposable = it.connect() }
-            un20Responses = getValue(Route.Remote.Un20Server).toMainMessageStream(un20ResponseAccumulator)
-                .subscribeOnIoAndPublish().also { un20ResponsesDisposable = it.connect() }
+                .subscribeOnIoAndPublish(ioDispatcher).also { veroEventsDisposable = it.connect() }
+            un20Responses =
+                getValue(Route.Remote.Un20Server).toMainMessageStream(un20ResponseAccumulator)
+                    .subscribeOnIoAndPublish(ioDispatcher)
+                    .also { un20ResponsesDisposable = it.connect() }
         }
     }
 

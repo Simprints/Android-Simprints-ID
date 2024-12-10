@@ -14,6 +14,8 @@ import io.mockk.verify
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -22,7 +24,11 @@ import java.util.concurrent.TimeUnit
 class CypressOtaMessageInputStreamTest {
 
     private val cypressOtaResponseParser = CypressOtaResponseParser()
-    private val cypressOtaMessageInputStream = CypressOtaMessageInputStream(cypressOtaResponseParser)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val cypressOtaMessageInputStream = CypressOtaMessageInputStream(
+        cypressOtaResponseParser,
+        UnconfinedTestDispatcher()
+    )
 
     @Test
     fun `test disconnect disposes the flowable stream`() {

@@ -169,7 +169,7 @@ class ScannerExtendedInfoReaderHelperTest {
     private fun getRootMessageChannel(): RootMessageChannel {
         val responseSubject = PublishSubject.create<RootResponse>()
 
-        val spyRootMessageInputStream = spyk(RootMessageInputStream(mockk())).apply {
+        val spyRootMessageInputStream = spyk(RootMessageInputStream(mockk(),mockk())).apply {
             justRun { connect(any()) }
             justRun { disconnect() }
             every { rootResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)

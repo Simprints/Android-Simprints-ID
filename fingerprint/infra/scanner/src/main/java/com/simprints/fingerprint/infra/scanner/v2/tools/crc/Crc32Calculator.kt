@@ -1,10 +1,12 @@
 package com.simprints.fingerprint.infra.scanner.v2.tools.crc
 
+import javax.inject.Inject
+
 /**
  * Calculates the CRC checksum for given bytes using a popular standard [CRC32_TABLE].
  * Used for verifying sent firmware for Cypress and UN20 OTA.
  */
-class Crc32Calculator {
+class Crc32Calculator  @Inject constructor(){
 
     fun calculateCrc32(bytes: ByteArray): Int {
 

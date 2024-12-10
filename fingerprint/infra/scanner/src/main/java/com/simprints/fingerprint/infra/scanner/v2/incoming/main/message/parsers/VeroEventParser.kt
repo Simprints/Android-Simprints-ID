@@ -7,8 +7,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.event
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
+import javax.inject.Inject
 
-class VeroEventParser : MessageParser<VeroEvent> {
+class VeroEventParser @Inject constructor() : MessageParser<VeroEvent> {
 
     override fun parse(messageBytes: ByteArray): VeroEvent =
         try {

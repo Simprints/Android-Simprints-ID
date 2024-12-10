@@ -84,6 +84,7 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
@@ -101,7 +102,8 @@ class SimulatedCommandInputStream {
         PacketRouter(
             listOf(Route.Remote.VeroServer, Route.Remote.Un20Server),
             { destination },
-            ByteArrayToPacketAccumulator(PacketParser())
+            ByteArrayToPacketAccumulator(PacketParser()),
+            Dispatchers.IO,
         ).also { it.connect(mainInputStream.toFlowable()) }
 
     val rootCommands: Flowable<RootCommand> =
