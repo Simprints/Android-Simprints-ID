@@ -1,9 +1,9 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
@@ -22,7 +22,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val simNetworkUtils: SimNetworkUtils,
     private val recentUserActivityManager: RecentUserActivityManager,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
 
     suspend operator fun invoke(actionRequest: ActionRequest) {
@@ -39,7 +39,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
 
     private fun reportUnknownExtras(actionRequest: ActionRequest) {
         if (actionRequest.unknownExtras.isNotEmpty()) {
-            externalScope.launch {
+            sessionCoroutineScope.launch {
                 sessionEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
             }
         }
