@@ -1,0 +1,21 @@
+name: "[Pipeline] Deploy to Dev"
+
+on:
+    workflow_call:
+
+jobs:
+    build-dev-apk:
+        uses: ./.github/workflows/reusable-build-apk.yml
+        secrets: inherit
+        with:
+            build-environment: dev
+
+
+    deploy-to-firebase:
+        uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
+        secrets: inherit
+        needs:
+            - build-dev-apk
+        with:
+            build-environment: dev
+            upload-artifact: ${{ needs.build-dev-apk.outputs.build-artifact }}
