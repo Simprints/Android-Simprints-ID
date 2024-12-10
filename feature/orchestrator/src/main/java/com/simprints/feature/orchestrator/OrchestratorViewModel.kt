@@ -82,7 +82,9 @@ internal class OrchestratorViewModel @Inject constructor(
         actionRequest = action
 
         try {
-            steps = stepsBuilder.build(action, projectConfiguration)
+            // We must preserve all of the steps across multiple callouts in to correctly
+            // resolve missing modality capture in enrol last followup call.
+            steps = cache.steps + stepsBuilder.build(action, projectConfiguration)
         } catch (e: SubjectAgeNotSupportedException) {
             sendErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
             return@launch
