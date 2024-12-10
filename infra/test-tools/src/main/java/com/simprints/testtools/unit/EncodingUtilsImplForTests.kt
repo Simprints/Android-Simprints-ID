@@ -2,7 +2,7 @@ package com.simprints.testtools.unit
 
 import android.annotation.SuppressLint
 import com.simprints.core.tools.utils.EncodingUtils
-import java.util.*
+import java.util.Base64
 
 // EncodingUtilsImpl uses android.util.Base64 that is available only with android sdk
 // and that requires Robolectric

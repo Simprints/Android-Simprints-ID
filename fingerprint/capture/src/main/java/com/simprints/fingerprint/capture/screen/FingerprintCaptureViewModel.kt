@@ -581,21 +581,21 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         when (fingerState) {
             is CaptureState.ScanProcess -> fingerState.numberOfBadScans
             else -> 0
-        } >= numberOfBadScansRequiredToAutoAddNewFinger - if (plusBadScan) 1 else 0
+        } >= NUMBER_OF_BAD_SCANS_REQUIRED_TO_AUTO_ADD_NEW_FINGER - if (plusBadScan) 1 else 0
 
     private fun CollectFingerprintsState.haveNotExceedMaximumNumberOfFingersToAutoAdd() =
-        fingerStates.size < maximumTotalNumberOfFingersForAutoAdding
+        fingerStates.size < MAXIMUM_TOTAL_NUMBER_OF_FINGERS_FOR_AUTO_ADDING
 
     private fun CollectFingerprintsState.weHaveTheMinimumNumberOfGoodScans(): Boolean =
         fingerStates.filter {
             val currentCapture = it.currentCapture()
             currentCapture is CaptureState.ScanProcess.Collected && currentCapture.scanResult.isGoodScan()
-        }.size >= min(targetNumberOfGoodScans, numberOfOriginalFingers())
+        }.size >= min(TARGET_NUMBER_OF_GOOD_SCANS, numberOfOriginalFingers())
 
     private fun CollectFingerprintsState.weHaveTheMinimumNumberOfAnyQualityScans() =
         fingerStates.filter {
             captureHasSatisfiedTerminalCondition(it.currentCapture())
-        }.size >= maximumTotalNumberOfFingersForAutoAdding
+        }.size >= MAXIMUM_TOTAL_NUMBER_OF_FINGERS_FOR_AUTO_ADDING
 
     private fun numberOfOriginalFingers() = originalFingerprintsToCapture.toSet().size
 
@@ -734,9 +734,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     companion object {
 
-        const val targetNumberOfGoodScans = 2
-        const val maximumTotalNumberOfFingersForAutoAdding = 4
-        const val numberOfBadScansRequiredToAutoAddNewFinger = 3
+        const val TARGET_NUMBER_OF_GOOD_SCANS = 2
+        const val MAXIMUM_TOTAL_NUMBER_OF_FINGERS_FOR_AUTO_ADDING = 4
+        const val NUMBER_OF_BAD_SCANS_REQUIRED_TO_AUTO_ADD_NEW_FINGER = 3
         const val AUTO_SWIPE_DELAY: Long = 500
 
         const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000

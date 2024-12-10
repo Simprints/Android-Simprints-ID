@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import org.junit.Test
 
-class AuthenticateDataResultKtTest {
+class AuthenticateDataResultTest {
 
     @Test
     fun mapAuthenticatedResult() {

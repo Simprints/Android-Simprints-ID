@@ -12,8 +12,13 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.feature.alert.*
+import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
+import com.simprints.feature.alert.alertConfiguration
+import com.simprints.feature.alert.R
+import com.simprints.feature.alert.alertButton
 import com.simprints.feature.alert.config.AlertColor
+import com.simprints.feature.alert.toArgs
 import com.simprints.infra.uibase.navigation.handleResultDirectly
 import com.simprints.testtools.common.syntax.hasAnyCompoundDrawable
 import com.simprints.testtools.common.syntax.hasBackgroundColor

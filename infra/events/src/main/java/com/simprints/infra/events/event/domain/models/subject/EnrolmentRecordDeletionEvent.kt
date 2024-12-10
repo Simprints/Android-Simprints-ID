@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class EnrolmentRecordDeletionEvent(

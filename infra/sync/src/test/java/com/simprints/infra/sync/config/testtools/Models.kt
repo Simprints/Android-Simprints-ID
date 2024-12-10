@@ -129,10 +129,10 @@ internal val projectConfiguration = ProjectConfiguration(
     null,
 )
 
-internal const val tokenizationJson =
+internal const val TOKENIZATION_JSON =
     "{\"primaryKeyId\":12345,\"key\":[{\"keyData\":{\"typeUrl\":\"typeUrl\",\"value\":\"value\",\"keyMaterialType\":\"keyMaterialType\"},\"status\":\"enabled\",\"keyId\":123456789,\"outputPrefixType\":\"outputPrefixType\"}]}"
 
-internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to tokenizationJson)
+internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to TOKENIZATION_JSON)
 
 internal val project = Project(
     id = "id",
