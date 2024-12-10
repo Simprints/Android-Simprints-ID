@@ -41,9 +41,12 @@ class FingerprintTemplateProviderImplTest {
     @RelaxedMockK
     private lateinit var processRawImage: ProcessRawImageUseCase
 
+    private lateinit var scannerInfo: ScannerInfo
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        scannerInfo = ScannerInfo()
         every { fingerprintCaptureWrapperFactory.captureWrapper } returns captureWrapper
         coEvery {
             captureWrapper.acquireUnprocessedImage(any())
@@ -62,7 +65,8 @@ class FingerprintTemplateProviderImplTest {
             calculateNecImageQualityUseCase = calculateNecImageQualityUseCase,
             captureProcessedImageCache = processedImageCache,
             extractNecTemplateUseCase = extractNecTemplateUseCase,
-            processImage = processRawImage
+            processImage = processRawImage,
+            scannerInfo = scannerInfo
         )
 
     }
@@ -97,7 +101,7 @@ class FingerprintTemplateProviderImplTest {
             calculateNecImageQualityUseCase.invoke(any())
             extractNecTemplateUseCase.invoke(any(), any())
         }
-        Truth.assertThat(ScannerInfo.un20SerialNumber).isEqualTo(UN20_SERIAL_NUMBER.toHexString())
+        Truth.assertThat(scannerInfo.un20SerialNumber).isEqualTo(UN20_SERIAL_NUMBER.toHexString())
     }
 
     @Test
@@ -149,6 +153,7 @@ class FingerprintTemplateProviderImplTest {
             }
             Truth.assertThat(result.template).isNotEmpty()
         }
+
     fun createDummyRawUnprocessedImage(): RawUnprocessedImage {
         // Create a ByteArray of size 50 (header + image data)
         val imageBytes = ByteArray(50)
@@ -167,7 +172,8 @@ class FingerprintTemplateProviderImplTest {
         // Create and return the RawUnprocessedImage instance
         return RawUnprocessedImage(imageBytes)
     }
+
     companion object {
-        private  val UN20_SERIAL_NUMBER = "123456789123456".toByteArray()
+        private val UN20_SERIAL_NUMBER = "123456789123456".toByteArray()
     }
 }

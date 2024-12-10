@@ -5,6 +5,7 @@ import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedExcepti
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.extensions.toInt
 import com.simprints.fingerprint.capture.state.CaptureState
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
@@ -16,6 +17,7 @@ import javax.inject.Inject
 internal class SaveImageUseCase @Inject constructor(
     private val coreImageRepository: ImageRepository,
     private val coreEventRepository: SessionEventRepository,
+    private val scannerInfo: ScannerInfo,
 ) {
 
     suspend operator fun invoke(
@@ -23,8 +25,6 @@ internal class SaveImageUseCase @Inject constructor(
         finger: IFingerIdentifier,
         captureEventId: String?,
         collectedFinger: CaptureState.ScanProcess.Collected,
-        scannerId: String?,
-        un20SerialNumber: String?,
     ) = if (collectedFinger.scanResult.image != null && captureEventId != null) {
         saveImage(
             imageBytes = collectedFinger.scanResult.image,
@@ -32,8 +32,8 @@ internal class SaveImageUseCase @Inject constructor(
             fileExtension = vero2Configuration.imageSavingStrategy.deduceFileExtension(),
             finger = finger,
             dpi = vero2Configuration.captureStrategy.toInt(),
-            scannerId = scannerId,
-            un20SerialNumber = un20SerialNumber,
+            scannerId = scannerInfo.scannerId,
+            un20SerialNumber = scannerInfo.un20SerialNumber,
         )
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
         Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
@@ -74,21 +74,20 @@ internal class SaveImageUseCase @Inject constructor(
         }
     }
 
-    private suspend fun determinePath(captureEventId: String, fileExtension: String): Path? =
-        try {
-            val sessionId = coreEventRepository.getCurrentSessionScope().id
-            Path(
-                arrayOf(
-                    SESSIONS_PATH,
-                    sessionId,
-                    FINGERPRINTS_PATH,
-                    "$captureEventId.$fileExtension"
-                )
+    private suspend fun determinePath(captureEventId: String, fileExtension: String): Path? = try {
+        val sessionId = coreEventRepository.getCurrentSessionScope().id
+        Path(
+            arrayOf(
+                SESSIONS_PATH,
+                sessionId,
+                FINGERPRINTS_PATH,
+                "$captureEventId.$fileExtension"
             )
-        } catch (t: Throwable) {
-            Simber.e(t)
-            null
-        }
+        )
+    } catch (t: Throwable) {
+        Simber.e(t)
+        null
+    }
 
     companion object {
 

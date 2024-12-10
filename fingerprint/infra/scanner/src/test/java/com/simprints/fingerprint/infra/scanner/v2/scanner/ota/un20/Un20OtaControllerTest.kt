@@ -26,6 +26,7 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
@@ -120,7 +121,9 @@ class Un20OtaControllerTest {
         val messageIndex = AtomicInteger(0)
 
         return MainMessageChannel(
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
+            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk(),
+                UnconfinedTestDispatcher()
+            )).apply {
                 justRun { connect(any()) }
                 every { un20Responses } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },

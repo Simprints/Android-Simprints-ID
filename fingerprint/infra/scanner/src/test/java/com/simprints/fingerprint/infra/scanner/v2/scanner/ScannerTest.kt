@@ -97,6 +97,7 @@ class ScannerTest {
     private lateinit var mockkInputStream: InputStream
     private val un20OtaController: Un20OtaController = mockk()
     private val mockkOutputStream = mockk<OutputStream>()
+    private val scannerInfo = ScannerInfo()
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -127,7 +128,7 @@ class ScannerTest {
             MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
             setupRootMessageChannelMock(),
             mockk(), mockk(), mockk(), mockk(), mockk(),
-            un20OtaController,
+            un20OtaController,scannerInfo,dispatcher,
         )
     }
 
@@ -289,6 +290,8 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
         verify { rootMessageChannel.connect(any(), any()) }
@@ -336,6 +339,8 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.disconnect()
         verify(exactly = 0) { mockRootMessageChannel.disconnect() }
@@ -357,6 +362,8 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
         scanner.enterCypressOtaMode()
@@ -380,6 +387,8 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
@@ -415,6 +424,8 @@ class ScannerTest {
                 mockkCypressOtaController,
                 mockk(),
                 mockk(),
+                scannerInfo,
+dispatcher,
             )
             scanner.connect(mockkInputStream, mockkOutputStream)
             scanner.enterCypressOtaMode()
@@ -448,6 +459,8 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
@@ -478,6 +491,8 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
@@ -506,6 +521,8 @@ class ScannerTest {
             mockk(),
             mockkStmOtaController,
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
@@ -669,10 +686,10 @@ class ScannerTest {
     @Test
     fun scanner_connectThenDisconnect_clearScannerInfo() {
         scanner.connect(mockkInputStream, mockkOutputStream)
-        ScannerInfo.setScannerId("123")
+        scannerInfo.setScannerId("123")
         scanner.disconnect()
         assertThat(scanner.state).isEqualTo(disconnectedScannerState())
-        assertThat(ScannerInfo.scannerId).isNull()
+        assertThat(scannerInfo.scannerId).isNull()
     }
 
     @Test
@@ -704,6 +721,8 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
+            scannerInfo,
+dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
@@ -767,6 +786,8 @@ class ScannerTest {
         mockk(),
         mockk(),
         mockk(),
+        scannerInfo,
+dispatcher,
     )
 
     private fun createScanner(scannerInfoReaderMockk: ScannerExtendedInfoReaderHelper) = Scanner(
@@ -778,5 +799,7 @@ class ScannerTest {
         mockk(),
         mockk(),
         mockk(),
+        scannerInfo,
+dispatcher,
     )
 }

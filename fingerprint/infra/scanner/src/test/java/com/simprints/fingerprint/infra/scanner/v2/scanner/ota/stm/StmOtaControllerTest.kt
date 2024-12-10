@@ -79,7 +79,7 @@ class StmOtaControllerTest {
         val messageIndex = AtomicInteger(0)
 
         return StmOtaMessageChannel(
-            spyk(StmOtaMessageInputStream(mockk())).apply {
+            spyk(StmOtaMessageInputStream(mockk(), mockk())).apply {
                 justRun { connect(any()) }
                 every { stmOtaResponseStream } returns responseSubject.toFlowable(
                     BackpressureStrategy.BUFFER

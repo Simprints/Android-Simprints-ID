@@ -1,5 +1,8 @@
 package com.simprints.fingerprint.infra.scanner.v2.scanner
 
+import javax.inject.Inject
+import javax.inject.Singleton
+
 
 /**
  * Singleton class to manage and provide access to scanner-related information.
@@ -10,9 +13,9 @@ package com.simprints.fingerprint.infra.scanner.v2.scanner
  *
  * Both properties can be updated independently based on the scanner's lifecycle and operations.
  *
- * Todo: When refactoring this module to use DI, consider using Hilt annotations (e.g., `@Singleton` and `@Inject`) to manage this class as a singleton within the DI framework.
  */
-object ScannerInfo {
+@Singleton
+class ScannerInfo @Inject constructor() {
 
     /**
      * The unique identifier of the scanner.
