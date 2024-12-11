@@ -33,6 +33,7 @@ internal class ConfirmIdentifyRequestBuilderTest {
                 packageName = ActionConstants.ACTION_CONFIRM_IDENTITY,
                 callerPackageName = "",
                 contractVersion = 1,
+                timestampMs = 0L,
             ),
             extractor = extractor,
             project = project,

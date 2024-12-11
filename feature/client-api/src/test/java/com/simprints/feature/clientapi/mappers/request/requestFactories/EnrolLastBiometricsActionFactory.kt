@@ -18,6 +18,7 @@ internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
         actionName = ActionConstants.ACTION_ENROL_LAST_BIOMETRICS,
         callerPackageName = "",
         contractVersion = 1,
+        timestampMs = 0L,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.EnrolLastBiometricActionRequest(

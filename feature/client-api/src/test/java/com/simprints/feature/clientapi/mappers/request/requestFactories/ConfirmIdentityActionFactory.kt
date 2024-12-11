@@ -18,6 +18,7 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
         actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
         callerPackageName = "",
         contractVersion = 1,
+        timestampMs = 0L,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.ConfirmIdentityActionRequest(

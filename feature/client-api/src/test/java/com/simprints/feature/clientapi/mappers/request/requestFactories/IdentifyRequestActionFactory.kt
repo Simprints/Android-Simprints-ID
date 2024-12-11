@@ -17,6 +17,7 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
         actionName = ActionConstants.ACTION_IDENTIFY,
         callerPackageName = "",
         contractVersion = 1,
+        timestampMs = 0L,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.IdentifyActionRequest(

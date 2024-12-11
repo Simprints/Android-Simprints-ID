@@ -31,6 +31,7 @@ internal class IdentifyRequestBuilderTest  {
                 packageName = ActionConstants.ACTION_IDENTIFY,
                 callerPackageName = "",
                 contractVersion = 1,
+                timestampMs = 0L,
             ),
             extractor = extractor,
             project = project,

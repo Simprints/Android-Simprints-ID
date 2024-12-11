@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers.request
 
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.builders.ConfirmIdentifyRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.builders.EnrolLastBiometricsRequestBuilder
@@ -39,7 +40,8 @@ internal class IntentToActionMapper @Inject constructor(
     private val getCurrentSessionId: GetCurrentSessionIdUseCase,
     private val isCurrentSessionAnIdentificationOrEnrolment: IsCurrentSessionAnIdentificationOrEnrolmentUseCase,
     private val sessionHasIdentificationCallback: SessionHasIdentificationCallbackUseCase,
-    private val tokenizationProcessor: TokenizationProcessor
+    private val tokenizationProcessor: TokenizationProcessor,
+    private val timeHelper: TimeHelper,
 ) {
 
     suspend operator fun invoke(
@@ -48,9 +50,10 @@ internal class IntentToActionMapper @Inject constructor(
         project: Project?
     ): ActionRequest {
         val actionIdentifier = ActionRequestIdentifier.fromIntentAction(
-            action,
-            extras[ClientApiConstants.CALLER_PACKAGE_NAME]?.let { it as? String }.orEmpty(),
-            extras[Constants.SIMPRINTS_LIB_VERSION]?.let { it as? Int } ?: 1,
+            timestampMs = timeHelper.now().ms,
+            action = action,
+            callerPackageName = extras[ClientApiConstants.CALLER_PACKAGE_NAME]?.let { it as? String }.orEmpty(),
+            callerVersion = extras[Constants.SIMPRINTS_LIB_VERSION]?.let { it as? Int } ?: 1,
         )
 
         return when (actionIdentifier.packageName) {

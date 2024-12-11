@@ -1,6 +1,8 @@
 package com.simprints.feature.clientapi.mappers.request
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
@@ -19,6 +21,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -44,6 +47,10 @@ class IntentToActionMapperTest {
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
 
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
+
     private lateinit var mapper: IntentToActionMapper
 
     @Before
@@ -53,12 +60,14 @@ class IntentToActionMapperTest {
         coEvery { getCurrentSessionIdUseCase.invoke() } returns SESSION_ID
         coEvery { sessionHasIdentificationCallback.invoke(any()) } returns true
         coEvery { isCurrentSessionAnIdentificationOrEnrolment.invoke() } returns true
+        every { timeHelper.now() } returns Timestamp(0L)
 
         mapper = IntentToActionMapper(
             getCurrentSessionIdUseCase,
             isCurrentSessionAnIdentificationOrEnrolment,
             sessionHasIdentificationCallback,
-            tokenizationProcessor
+            tokenizationProcessor,
+            timeHelper
         )
     }
 

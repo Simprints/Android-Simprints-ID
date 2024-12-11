@@ -32,6 +32,7 @@ internal class EnrolRequestBuilderTest {
                 packageName = ActionConstants.ACTION_ENROL,
                 callerPackageName = "",
                 contractVersion = 1,
+                timestampMs = 0L,
             ),
             extractor = extractor,
             project = project,

@@ -18,6 +18,7 @@ internal object VerifyActionFactory : RequestActionFactory() {
         actionName = ActionConstants.ACTION_VERIFY,
         callerPackageName = "",
         contractVersion = 1,
+        timestampMs = 0L,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.VerifyActionRequest(
