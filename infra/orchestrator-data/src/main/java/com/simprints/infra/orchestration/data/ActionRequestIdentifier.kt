@@ -9,11 +9,16 @@ data class ActionRequestIdentifier(
     val packageName: String,
     val callerPackageName: String,
     val contractVersion: Int,
+    val timestampMs: Long,
 ) : Parcelable {
+
+    override fun toString(): String =
+        "Intent: $packageName.$actionName\nCaller: $callerPackageName (contract version: $contractVersion)"
 
     companion object {
 
         fun fromIntentAction(
+            timestampMs: Long,
             action: String,
             callerPackageName: String = "",
             callerVersion: Int = 1,
@@ -22,6 +27,7 @@ data class ActionRequestIdentifier(
             packageName = action.substringBeforeLast("."),
             callerPackageName,
             callerVersion,
+            timestampMs,
         )
     }
 }

@@ -40,7 +40,7 @@ internal class EventsLogViewModel @Inject constructor(
             eventRepository.getEventsFromScope(scopeId)
                 .map { event -> formatEventViewData(event) }
                 .reversed()
-                .ifEmpty { listOf(TroubleshootingItemViewData(title = "No events found")) }
+                .ifEmpty { listOf(TroubleshootingItemViewData(title = "No events found (might be already up-synced)")) }
                 .let { _events.postValue(it) }
         }
     }
