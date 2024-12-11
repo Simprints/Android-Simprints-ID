@@ -43,6 +43,7 @@ import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
+import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -340,7 +341,23 @@ internal class OrchestratorViewModelTest {
 
     @Test
     fun `Restores steps if empty`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns emptyList()
+        val savedSteps = listOf(
+            createMockStep(StepId.SETUP),
+            createMockStep(StepId.CONSENT),
+        )
+        every { cache.steps } returns savedSteps
+
+        viewModel.restoreStepsIfNeeded()
+
+        verify { cache.steps }
+    }
+
+    @Test
+    fun `Does not restore steps if not empty`() = runTest {
+        val originalSteps = listOf(
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+        )
+        every { stepsBuilder.build(any(), any()) } returns originalSteps
         val savedSteps = listOf(
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
@@ -348,8 +365,11 @@ internal class OrchestratorViewModelTest {
         every { cache.steps } returns savedSteps
 
         viewModel.handleAction(mockk())
+        // Clear previous interactions with cache resulting from handleAction()
+        clearMocks(cache, answers = false)
+        viewModel.restoreStepsIfNeeded()
 
-        verify { cache.steps }
+        verify(exactly = 0) { cache.steps }
     }
 
     @Test
@@ -393,7 +413,7 @@ internal class OrchestratorViewModelTest {
             "projectId",
             TokenizableString.Tokenized("userId"),
             TokenizableString.Tokenized("moduleId"),
-            emptyList()
+            listOf(mockk<EnrolLastBiometricStepResult>())
         ))
         every { stepsBuilder.build(any(), any()) } returns listOf(
             captureStep,
@@ -409,7 +429,7 @@ internal class OrchestratorViewModelTest {
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.payload.getParcelable<EnrolLastBiometricParams>("params")?.steps)
-                .contains(mockEnrolLastStep)
+                .containsExactly(mockEnrolLastStep)
         }
     }
 
