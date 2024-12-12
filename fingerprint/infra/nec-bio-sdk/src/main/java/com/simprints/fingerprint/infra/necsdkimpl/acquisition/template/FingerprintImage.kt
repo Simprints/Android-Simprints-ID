@@ -10,5 +10,5 @@ internal data class FingerprintImage(
     val imageBytes: ByteArray,
     val width: Int,
     val height: Int,
-    val resolution: Int
+    val resolution: Int,
 )

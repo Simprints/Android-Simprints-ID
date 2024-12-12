@@ -5,24 +5,36 @@ import com.simprints.fingerprint.infra.scannermock.simulated.common.SimulationSp
 import com.simprints.fingerprint.infra.scannermock.simulated.common.SimulationSpeedBehaviour.REALISTIC
 import java.io.OutputStream
 
-abstract class SimulatedScanner(val scannerManager: SimulatedScannerManager) {
+abstract class SimulatedScanner(
+    val scannerManager: SimulatedScannerManager,
+) {
+    abstract fun handleAppToScannerEvent(
+        bytes: ByteArray,
+        returnStream: OutputStream,
+    )
 
-    abstract fun handleAppToScannerEvent(bytes: ByteArray, returnStream: OutputStream)
-
-    protected fun writeResponseToStream(response: ByteArray, returnStream: OutputStream) {
+    protected fun writeResponseToStream(
+        response: ByteArray,
+        returnStream: OutputStream,
+    ) {
         when (scannerManager.simulationSpeedBehaviour) {
             INSTANT -> writeResponseInstantly(response, returnStream)
             REALISTIC -> writeResponseChunkedWithTimeBetweenPackets(response, returnStream)
         }
-
     }
 
-    private fun writeResponseInstantly(response: ByteArray, returnStream: OutputStream) {
+    private fun writeResponseInstantly(
+        response: ByteArray,
+        returnStream: OutputStream,
+    ) {
         returnStream.write(response)
         returnStream.flush()
     }
 
-    private fun writeResponseChunkedWithTimeBetweenPackets(response: ByteArray, returnStream: OutputStream) {
+    private fun writeResponseChunkedWithTimeBetweenPackets(
+        response: ByteArray,
+        returnStream: OutputStream,
+    ) {
         response
             .toList()
             .chunked(RealisticSpeedBehaviour.PACKET_CHUNK_SIZE_BYTES)

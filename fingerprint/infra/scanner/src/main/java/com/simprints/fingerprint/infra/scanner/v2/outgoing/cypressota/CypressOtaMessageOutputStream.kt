@@ -7,5 +7,5 @@ import javax.inject.Inject
 
 class CypressOtaMessageOutputStream @Inject constructor(
     cypressOtaMessageSerializer: CypressOtaMessageSerializer,
-    outputStreamDispatcher: OutputStreamDispatcher
+    outputStreamDispatcher: OutputStreamDispatcher,
 ) : MessageOutputStream<CypressOtaCommand>(cypressOtaMessageSerializer, outputStreamDispatcher)

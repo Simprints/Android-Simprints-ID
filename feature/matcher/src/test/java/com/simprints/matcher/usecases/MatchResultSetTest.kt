@@ -5,7 +5,6 @@ import com.simprints.matcher.FingerprintMatchResult
 import org.junit.Test
 
 class MatchResultSetTest {
-
     @Test
     fun `Stores results sorted descending by confidence up to the limit`() {
         val set = MatchResultSet<FingerprintMatchResult.Item>(3)
@@ -21,7 +20,7 @@ class MatchResultSetTest {
                 FingerprintMatchResult.Item("4", 0.4f),
                 FingerprintMatchResult.Item("3", 0.3f),
                 FingerprintMatchResult.Item("2", 0.2f),
-            )
+            ),
         )
     }
 
@@ -44,7 +43,7 @@ class MatchResultSetTest {
                 FingerprintMatchResult.Item("4", 0.4f),
                 FingerprintMatchResult.Item("3", 0.3f),
                 FingerprintMatchResult.Item("2", 0.2f),
-            )
+            ),
         )
     }
 }

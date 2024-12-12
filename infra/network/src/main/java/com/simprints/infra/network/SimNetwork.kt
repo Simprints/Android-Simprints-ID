@@ -5,9 +5,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlin.reflect.KClass
 
 interface SimNetwork {
-
     interface SimApiClient<T : SimRemoteInterface> {
-
         val api: T
 
         /**
@@ -22,12 +20,14 @@ interface SimNetwork {
         remoteInterface: KClass<T>,
         deviceId: String,
         versionName: String,
-        authToken: String?
+        authToken: String?,
     ): SimApiClient<T>
 
     fun getApiBaseUrl(): String
-    fun getApiBaseUrlPrefix(): String
-    fun setApiBaseUrl(apiBaseUrl: String?)
-    fun resetApiBaseUrl()
 
+    fun getApiBaseUrlPrefix(): String
+
+    fun setApiBaseUrl(apiBaseUrl: String?)
+
+    fun resetApiBaseUrl()
 }

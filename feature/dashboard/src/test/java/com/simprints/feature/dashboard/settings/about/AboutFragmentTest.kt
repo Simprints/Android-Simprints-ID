@@ -17,11 +17,11 @@ import com.simprints.core.PackageVersionName
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
-import com.simprints.testtools.hilt.launchFragmentInHiltContainer
-import com.simprints.testtools.hilt.testNavController
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -41,7 +41,6 @@ import com.simprints.infra.resources.R as IDR
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class AboutFragmentTest {
-
     companion object {
         private const val SCANNER_VERSION = "SP424242"
         private const val SYNC = "PROJECT"
@@ -65,14 +64,14 @@ class AboutFragmentTest {
         every { recentUserActivity } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<RecentUserActivity>>().onChanged(
-                    RecentUserActivity(SCANNER_VERSION, "", "".asTokenizableEncrypted(), 0, 0, 0, 0)
+                    RecentUserActivity(SCANNER_VERSION, "", "".asTokenizableEncrypted(), 0, 0, 0, 0),
                 )
             }
         }
         every { syncAndSearchConfig } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<SyncAndSearchConfig>>().onChanged(
-                    SyncAndSearchConfig(SYNC, SEARCH)
+                    SyncAndSearchConfig(SYNC, SEARCH),
                 )
             }
         }
@@ -143,7 +142,7 @@ class AboutFragmentTest {
     fun `should navigate to logout sync screen when LogoutDestination_LogoutDataSyncScreen is received`() {
         runNavigationTest(
             destination = LogoutDestination.LogoutDataSyncScreen,
-            targetDestinationId = R.id.logOutSyncFragment
+            targetDestinationId = R.id.logOutSyncFragment,
         )
     }
 
@@ -151,11 +150,14 @@ class AboutFragmentTest {
     fun `should navigate to request login screen when LogoutDestination_LoginScreen is received`() {
         runNavigationTest(
             destination = LogoutDestination.LoginScreen,
-            targetDestinationId = R.id.requestLoginFragment
+            targetDestinationId = R.id.requestLoginFragment,
         )
     }
 
-    private fun runNavigationTest(destination: LogoutDestination, @IdRes targetDestinationId: Int) {
+    private fun runNavigationTest(
+        destination: LogoutDestination,
+        @IdRes targetDestinationId: Int,
+    ) {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         mockLogoutDestination(destination)
@@ -170,7 +172,6 @@ class AboutFragmentTest {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
-
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
         onView(withText(IDR.string.dashboard_preference_logout_title)).perform(click())
@@ -189,7 +190,6 @@ class AboutFragmentTest {
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
-
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
         onView(withText(IDR.string.dashboard_preference_logout_title)).perform(click())
         onView(withId(R.id.password_input_field))
@@ -200,13 +200,11 @@ class AboutFragmentTest {
         verify(exactly = 1) { viewModel.processLogoutRequest() }
     }
 
-
     @Test
     fun `should not log out when prompted password and it was incorrect`() {
         mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
-
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
         onView(withText(IDR.string.dashboard_preference_logout_title)).perform(click())
@@ -237,7 +235,7 @@ class AboutFragmentTest {
         every { viewModel.logoutDestinationEvent } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<LiveDataEventWithContent<LogoutDestination>>>().onChanged(
-                    LiveDataEventWithContent(destination)
+                    LiveDataEventWithContent(destination),
                 )
             }
         }

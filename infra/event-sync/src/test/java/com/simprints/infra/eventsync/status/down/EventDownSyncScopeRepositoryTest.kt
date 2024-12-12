@@ -44,9 +44,7 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class EventDownSyncScopeRepositoryTest {
-
     companion object {
-
         private val LAST_EVENT_ID = GUID1
         private val LAST_SYNC_TIME = TIME1
         private val LAST_STATE = DownSyncState.COMPLETE
@@ -96,7 +94,7 @@ internal class EventDownSyncScopeRepositoryTest {
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
             listOf(Modes.FINGERPRINT),
             DEFAULT_MODULES.toList(),
-            Partitioning.GLOBAL
+            Partitioning.GLOBAL,
         )
 
         assertProjectSyncScope(syncScope)
@@ -110,7 +108,7 @@ internal class EventDownSyncScopeRepositoryTest {
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
             listOf(Modes.FINGERPRINT),
             DEFAULT_MODULES.toList(),
-            Partitioning.USER
+            Partitioning.USER,
         )
 
         assertUserSyncScope(syncScope)
@@ -124,7 +122,7 @@ internal class EventDownSyncScopeRepositoryTest {
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
             listOf(Modes.FINGERPRINT),
             DEFAULT_MODULES.toList(),
-            Partitioning.USER
+            Partitioning.USER,
         )
 
         assertUserSyncScope(syncScope)
@@ -137,7 +135,7 @@ internal class EventDownSyncScopeRepositoryTest {
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
             listOf(Modes.FINGERPRINT),
             DEFAULT_MODULES.toList(),
-            Partitioning.USER
+            Partitioning.USER,
         )
 
         assertUserSyncScope(syncScope)
@@ -148,7 +146,7 @@ internal class EventDownSyncScopeRepositoryTest {
         val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
             listOf(Modes.FINGERPRINT),
             DEFAULT_MODULES.toList(),
-            Partitioning.MODULE
+            Partitioning.MODULE,
         )
 
         assertModuleSyncScope(syncScope)
@@ -162,10 +160,9 @@ internal class EventDownSyncScopeRepositoryTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 listOf(Modes.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
-                Partitioning.GLOBAL
+                Partitioning.GLOBAL,
             )
         }
-
     }
 
     @Test
@@ -179,7 +176,7 @@ internal class EventDownSyncScopeRepositoryTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 listOf(Modes.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
-                Partitioning.USER
+                Partitioning.USER,
             )
         }
     }
@@ -204,18 +201,18 @@ internal class EventDownSyncScopeRepositoryTest {
     fun deleteOperations_shouldDeleteOpsFromDb() = runTest {
         eventDownSyncScopeRepository.deleteOperations(
             DEFAULT_MODULES.toList(),
-            listOf(Modes.FINGERPRINT)
+            listOf(Modes.FINGERPRINT),
         )
 
         DEFAULT_MODULES.forEach { moduleId ->
             val scope = SubjectModuleScope(
                 DEFAULT_PROJECT_ID,
                 listOf(moduleId),
-                listOf(Modes.FINGERPRINT)
+                listOf(Modes.FINGERPRINT),
             )
             coVerify(exactly = 1) {
                 downSyncOperationOperationDao.delete(
-                    scope.operations.first().getUniqueKey()
+                    scope.operations.first().getUniqueKey(),
                 )
             }
         }
@@ -228,32 +225,30 @@ internal class EventDownSyncScopeRepositoryTest {
         coVerify { downSyncOperationOperationDao.deleteAll() }
     }
 
-    private fun getSyncOperationsWithLastResult() =
-        projectDownSyncScope.operations.map {
+    private fun getSyncOperationsWithLastResult() = projectDownSyncScope.operations.map {
+        DbEventsDownSyncOperationState(
+            it.getUniqueKey(),
+            LAST_STATE,
+            LAST_EVENT_ID,
+            LAST_SYNC_TIME,
+        )
+    } +
+        userDownSyncScope.operations.map {
             DbEventsDownSyncOperationState(
                 it.getUniqueKey(),
                 LAST_STATE,
                 LAST_EVENT_ID,
-                LAST_SYNC_TIME
+                LAST_SYNC_TIME,
             )
         } +
-            userDownSyncScope.operations.map {
-                DbEventsDownSyncOperationState(
-                    it.getUniqueKey(),
-                    LAST_STATE,
-                    LAST_EVENT_ID,
-                    LAST_SYNC_TIME
-                )
-            } +
-            modulesDownSyncScope.operations.map {
-                DbEventsDownSyncOperationState(
-                    it.getUniqueKey(),
-                    LAST_STATE,
-                    LAST_EVENT_ID,
-                    LAST_SYNC_TIME
-                )
-            }
-
+        modulesDownSyncScope.operations.map {
+            DbEventsDownSyncOperationState(
+                it.getUniqueKey(),
+                LAST_STATE,
+                LAST_EVENT_ID,
+                LAST_SYNC_TIME,
+            )
+        }
 
     private fun assertProjectSyncScope(syncScope: EventDownSyncScope) {
         assertThat(syncScope).isInstanceOf(SubjectProjectScope::class.java)
@@ -278,7 +273,7 @@ internal class EventDownSyncScopeRepositoryTest {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
             assertThat(moduleIds).containsExactly(
                 DEFAULT_MODULE_ID.value,
-                DEFAULT_MODULE_ID_2.value
+                DEFAULT_MODULE_ID_2.value,
             )
             assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
         }

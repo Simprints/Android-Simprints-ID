@@ -17,7 +17,6 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val processImage: ProcessRawImageUseCase,
     private val scannerInfo: ScannerInfo,
 ) : FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
-
     /**
      * Acquires a fingerprint template from the scanner.
      *
@@ -32,16 +31,17 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
      **/
     @OptIn(ExperimentalStdlibApi::class)
     override suspend fun acquireFingerprintTemplate(
-        settings: FingerprintTemplateAcquisitionSettings?
+        settings: FingerprintTemplateAcquisitionSettings?,
     ): TemplateResponse<FingerprintTemplateMetadata> {
         require(settings != null) { "Settings cannot be null" }
         val captureWrapper = fingerprintCaptureWrapperFactory.captureWrapper
 
         log("Acquiring unprocessed image")
         // Always require a new image from the scanner using the minimum resolution it will upsampled latter using secugen image correction
-        val rawFingerprintScan = captureWrapper.acquireUnprocessedImage(
-            Dpi(MIN_CAPTURE_DPI)
-        ).rawUnprocessedImage
+        val rawFingerprintScan = captureWrapper
+            .acquireUnprocessedImage(
+                Dpi(MIN_CAPTURE_DPI),
+            ).rawUnprocessedImage
         // Store the recently captured image in the cache
         captureProcessedImageCache.recentlyCapturedImage = rawFingerprintScan.imageData
         // Store the serial number of the scanner for future use int the image upload
@@ -51,18 +51,21 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
             settings,
             rawFingerprintScan,
             rawFingerprintScan.un20SerialNumber,
-            rawFingerprintScan.brightness
+            rawFingerprintScan.brightness,
         )
         log("quality checking image using nec sdk")
         val qualityScore = calculateNecImageQualityUseCase(secugenProcessedImage)
         log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
-        return if (qualityScore < settings.qualityThreshold && !settings.allowLowQualityExtraction)
-        // if the quality score is less than the threshold return an empty template
+        return if (qualityScore < settings.qualityThreshold && !settings.allowLowQualityExtraction) {
+            // if the quality score is less than the threshold return an empty template
             TemplateResponse(
-                byteArrayOf(), FingerprintTemplateMetadata(
-                    templateFormat = NEC_TEMPLATE_FORMAT, imageQualityScore = qualityScore
-                )
-            ) else {
+                byteArrayOf(),
+                FingerprintTemplateMetadata(
+                    templateFormat = NEC_TEMPLATE_FORMAT,
+                    imageQualityScore = qualityScore,
+                ),
+            )
+        } else {
             log("extracting template using nec sdk")
             extractNecTemplateUseCase(secugenProcessedImage, qualityScore)
         }

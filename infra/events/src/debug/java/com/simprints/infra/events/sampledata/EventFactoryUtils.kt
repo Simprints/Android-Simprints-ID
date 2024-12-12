@@ -95,14 +95,13 @@ fun createSessionScope(
     projectId: String = DEFAULT_PROJECT_ID,
     isClosed: Boolean = false,
 ): EventScope {
-
     val appVersionNameArg = "appVersionName"
     val libSimprintsVersionNameArg = "libSimprintsVersionName"
     val languageArg = "language"
     val deviceArg = Device(
         Build.VERSION.SDK_INT.toString(),
         Build.MANUFACTURER + "_" + Build.MODEL,
-        GUID1
+        GUID1,
     )
 
     val databaseInfoArg = DatabaseInfo(2, 2)
@@ -124,15 +123,19 @@ fun createSessionScope(
             location = locationArg,
             projectConfigurationUpdatedAt = "projectConfigurationUpdatedAt",
             projectConfigurationId = "projectConfigurationId",
-        )
+        ),
     )
 }
 
-fun createEventWithSessionId(eventId: String, sessionId: String): Event = AlertScreenEvent(
+fun createEventWithSessionId(
+    eventId: String,
+    sessionId: String,
+): Event = AlertScreenEvent(
     id = eventId,
     payload = AlertScreenEvent.AlertScreenPayload(
-        CREATED_AT, AlertScreenEvent.EVENT_VERSION,
-        AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+        CREATED_AT,
+        AlertScreenEvent.EVENT_VERSION,
+        AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR,
     ),
     type = EventType.ALERT_SCREEN,
     scopeId = sessionId,
@@ -142,46 +145,46 @@ const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"
 
 fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(
     CREATED_AT,
-    true
+    true,
 )
 
 fun createEnrolmentCallbackEvent() = EnrolmentCallbackEvent(
     CREATED_AT,
-    GUID1
+    GUID1,
 )
 
 fun createErrorCallbackEvent() = ErrorCallbackEvent(
     CREATED_AT,
-    DIFFERENT_PROJECT_ID_SIGNED_IN
+    DIFFERENT_PROJECT_ID_SIGNED_IN,
 )
 
 fun createIdentificationCallbackEvent() = IdentificationCallbackEvent(
     CREATED_AT,
     GUID1,
-    listOf(CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM))
+    listOf(CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)),
 )
 
 fun createRefusalCallbackEvent() = RefusalCallbackEvent(
     CREATED_AT,
     "some_reason",
-    "extra"
+    "extra",
 )
 
 fun createVerificationCallbackEventV1() = VerificationCallbackEvent(
     CREATED_AT,
-    CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
+    CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM),
 )
 
 fun createVerificationCallbackEventV2() = VerificationCallbackEvent(
     CREATED_AT,
-    CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
+    CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM),
 )
 
 fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
     GUID1,
-    GUID2
+    GUID2,
 )
 
 fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(
@@ -190,7 +193,7 @@ fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = Enrolm
     DEFAULT_USER_ID,
     DEFAULT_MODULE_ID,
     DEFAULT_METADATA,
-    projectId
+    projectId,
 )
 
 fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(
@@ -226,14 +229,14 @@ fun createFaceCaptureBiometricsEvent() = FaceCaptureBiometricsEvent(
         roll = 0.0f,
         template = "template",
         quality = 1.0f,
-        format = FACE_TEMPLATE_FORMAT
+        format = FACE_TEMPLATE_FORMAT,
     ),
 )
 
 fun createFaceCaptureConfirmationEvent() = FaceCaptureConfirmationEvent(
     CREATED_AT,
     ENDED_AT,
-    CONTINUE
+    CONTINUE,
 )
 
 fun createFaceCaptureEvent() = FaceCaptureEvent(
@@ -248,17 +251,17 @@ fun createFaceCaptureEvent() = FaceCaptureEvent(
 
 fun createFaceFallbackCaptureEvent() = FaceFallbackCaptureEvent(
     CREATED_AT,
-    ENDED_AT
+    ENDED_AT,
 )
 
 fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(
     CREATED_AT,
-    ENDED_AT
+    ENDED_AT,
 )
 
 fun createAlertScreenEvent() = AlertScreenEvent(
     CREATED_AT,
-    BLUETOOTH_NOT_ENABLED
+    BLUETOOTH_NOT_ENABLED,
 )
 
 fun createAuthenticationEvent() = AuthenticationEvent(
@@ -279,12 +282,12 @@ fun createCandidateReadEvent() = CandidateReadEvent(
     ENDED_AT,
     GUID1,
     FOUND,
-    NOT_FOUND
+    NOT_FOUND,
 )
 
 fun createCompletionCheckEvent() = CompletionCheckEvent(
     CREATED_AT,
-    true
+    true,
 )
 
 fun createConnectivitySnapshotEvent() = ConnectivitySnapshotEvent(
@@ -292,8 +295,8 @@ fun createConnectivitySnapshotEvent() = ConnectivitySnapshotEvent(
     listOf(
         Connection(
             SimNetworkUtils.ConnectionType.MOBILE,
-            SimNetworkUtils.ConnectionState.CONNECTED
-        )
+            SimNetworkUtils.ConnectionState.CONNECTED,
+        ),
     ),
 )
 
@@ -301,7 +304,7 @@ fun createConsentEvent() = ConsentEvent(
     CREATED_AT,
     ENDED_AT,
     INDIVIDUAL,
-    ACCEPTED
+    ACCEPTED,
 )
 
 fun createEnrolmentEventV2() = EnrolmentEventV2(
@@ -315,7 +318,7 @@ fun createEnrolmentEventV2() = EnrolmentEventV2(
 
 fun createEnrolmentEventV1() = EnrolmentEventV1(
     CREATED_AT,
-    GUID1
+    GUID1,
 )
 
 fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(
@@ -327,9 +330,9 @@ fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(
     fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
         LEFT_THUMB,
         8,
-        "ISO_19794_2"
+        "ISO_19794_2",
     ),
-    payloadId = "payloadId"
+    payloadId = "payloadId",
 )
 
 fun createFingerprintCaptureBiometricsEvent() = FingerprintCaptureBiometricsEvent(
@@ -338,9 +341,9 @@ fun createFingerprintCaptureBiometricsEvent() = FingerprintCaptureBiometricsEven
         LEFT_THUMB,
         "sometemplate",
         10,
-        "ISO_19794_2"
+        "ISO_19794_2",
     ),
-    payloadId = "payloadId"
+    payloadId = "payloadId",
 )
 
 fun createGuidSelectionEvent() = GuidSelectionEvent(CREATED_AT, GUID1)
@@ -350,7 +353,7 @@ fun createIntentParsingEvent() = IntentParsingEvent(CREATED_AT, COMMCARE)
 fun createInvalidIntentEvent() = InvalidIntentEvent(
     CREATED_AT,
     "action",
-    mapOf("extra_key" to "extra_value")
+    mapOf("extra_key" to "extra_value"),
 )
 
 fun createOneToManyMatchEvent() = OneToManyMatchEvent(
@@ -358,7 +361,7 @@ fun createOneToManyMatchEvent() = OneToManyMatchEvent(
     ENDED_AT,
     MatchPool(PROJECT, 100),
     "RANK_ONE",
-    listOf(MatchEntry(GUID1, 0F))
+    listOf(MatchEntry(GUID1, 0F)),
 )
 
 fun createOneToOneMatchEvent() = OneToOneMatchEvent(
@@ -382,7 +385,7 @@ fun createRefusalEvent() = RefusalEvent(
     CREATED_AT,
     ENDED_AT,
     OTHER,
-    "other_text"
+    "other_text",
 )
 
 fun createScannerConnectionEvent() = ScannerConnectionEvent(
@@ -400,13 +403,13 @@ fun createScannerFirmwareUpdateEvent() = ScannerFirmwareUpdateEvent(
 
 fun createSuspiciousIntentEvent() = SuspiciousIntentEvent(
     CREATED_AT,
-    mapOf("extra_key" to "extra_value")
+    mapOf("extra_key" to "extra_value"),
 )
 
 fun createVero2InfoSnapshotEvent() = Vero2InfoSnapshotEvent(
     CREATED_AT,
     version = Vero2Version.Vero2NewApiVersion("E-1", "cypressApp", "stmApp", "un20App"),
-    battery = BatteryInfo(0, 1, 2, 3)
+    battery = BatteryInfo(0, 1, 2, 3),
 )
 
 fun createEventDownSyncRequestEvent() = EventDownSyncRequestEvent(
@@ -418,7 +421,7 @@ fun createEventDownSyncRequestEvent() = EventDownSyncRequestEvent(
         attendantId = DEFAULT_USER_ID.value,
         subjectId = GUID2,
         modes = listOf("mode"),
-        lastEventId = GUID1
+        lastEventId = GUID1,
     ),
     responseStatus = 404,
     errorType = "Not found",
@@ -438,15 +441,15 @@ fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
     responseStatus = 200,
     errorType = "OK",
 )
+
 fun createLicenseCheckEvent() = LicenseCheckEvent(
     createdAt = CREATED_AT,
     status = LicenseCheckEvent.LicenseStatus.VALID,
     vendor = "NEC_FINGERPRINT",
-
 )
 
 fun createAgeGroupSelectionEvent() = AgeGroupSelectionEvent(
     createdAt = CREATED_AT,
     endedAt = ENDED_AT,
-    subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2)
+    subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2),
 )

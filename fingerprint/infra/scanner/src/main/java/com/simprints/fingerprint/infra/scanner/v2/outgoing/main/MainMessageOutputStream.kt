@@ -7,5 +7,5 @@ import javax.inject.Inject
 
 class MainMessageOutputStream @Inject constructor(
     mainMessageSerializer: MainMessageSerializer,
-    outputStreamDispatcher: OutputStreamDispatcher
+    outputStreamDispatcher: OutputStreamDispatcher,
 ) : MessageOutputStream<OutgoingMainMessage>(mainMessageSerializer, outputStreamDispatcher)

@@ -18,7 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ImagesModule {
-
     @Binds
     internal abstract fun bindImageRepository(impl: ImageRepositoryImpl): ImageRepository
 
@@ -27,16 +26,16 @@ abstract class ImagesModule {
 
     @Binds
     internal abstract fun bindImageRemoteDataSource(impl: ImageRemoteDataSourceImpl): ImageRemoteDataSource
-
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal class ImageModuleProviders {
-
     @Provides
     @Singleton
-    fun provideImageMetadataDatabase(@ApplicationContext ctx: Context): ImageMetadataDatabase = ImageMetadataDatabase.getDatabase(ctx)
+    fun provideImageMetadataDatabase(
+        @ApplicationContext ctx: Context,
+    ): ImageMetadataDatabase = ImageMetadataDatabase.getDatabase(ctx)
 
     @Provides
     @Singleton

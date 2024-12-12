@@ -22,7 +22,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ProjectConfigDownSyncWorkerTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -77,7 +76,7 @@ class ProjectConfigDownSyncWorkerTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
         coEvery { configManager.refreshProject(PROJECT_ID) } returns ProjectWithConfig(
             project,
-            projectConfiguration
+            projectConfiguration,
         )
 
         val result = projectConfigDownSyncWorker.doWork()
@@ -90,7 +89,6 @@ class ProjectConfigDownSyncWorkerTest {
     }
 
     companion object {
-
         private const val PROJECT_ID = "projectId"
     }
 }

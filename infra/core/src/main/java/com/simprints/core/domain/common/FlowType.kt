@@ -8,5 +8,5 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 enum class FlowType {
     ENROL,
     IDENTIFY,
-    VERIFY
+    VERIFY,
 }

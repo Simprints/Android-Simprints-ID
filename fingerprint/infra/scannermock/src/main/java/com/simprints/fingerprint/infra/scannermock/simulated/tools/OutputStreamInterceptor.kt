@@ -8,7 +8,6 @@ import java.io.OutputStream
  * There is no byte buffer limit so onNext is called on [observers] only when flush() is called.
  */
 class OutputStreamInterceptor : OutputStream() {
-
     val observers = mutableSetOf<Observer<ByteArray>>()
 
     private var buffer = mutableListOf<ByteArray>()
@@ -21,7 +20,11 @@ class OutputStreamInterceptor : OutputStream() {
         if (b != null) buffer.add(b)
     }
 
-    override fun write(b: ByteArray?, off: Int, len: Int) {
+    override fun write(
+        b: ByteArray?,
+        off: Int,
+        len: Int,
+    ) {
         if (b != null) buffer.add(b)
     }
 

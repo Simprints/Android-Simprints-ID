@@ -6,11 +6,11 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 import kotlinx.coroutines.CoroutineScope
@@ -23,20 +23,20 @@ internal class SaveMatchEventUseCase @Inject constructor(
     private val configManager: ConfigManager,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
-
     operator fun invoke(
         startTime: Timestamp,
         endTime: Timestamp,
         matchParams: MatchParams,
         candidatesCount: Int,
         matcherName: String,
-        results: List<MatchResultItem>
+        results: List<MatchResultItem>,
     ) {
         sessionCoroutineScope.launch {
             val matchEntries = results.map { MatchEntry(it.subjectId, it.confidence) }
             val event = if (matchParams.flowType == FlowType.VERIFY) {
                 getOneToOneEvent(
-                    startTime, endTime,
+                    startTime,
+                    endTime,
                     matcherName,
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
@@ -44,19 +44,20 @@ internal class SaveMatchEventUseCase @Inject constructor(
                 )
             } else {
                 getOneToManyEvent(
-                    startTime, endTime,
+                    startTime,
+                    endTime,
                     matcherName,
                     matchParams.queryForCandidates,
                     candidatesCount,
-                    matchEntries
+                    matchEntries,
                 )
             }
             eventRepository.addOrUpdateEvent(event)
         }
     }
 
-    private suspend fun getFingerprintComparisonStrategy(bioSdk: FingerprintConfiguration.BioSdk) =
-        configManager.getProjectConfiguration()
+    private suspend fun getFingerprintComparisonStrategy(bioSdk: FingerprintConfiguration.BioSdk) = configManager
+        .getProjectConfiguration()
         .fingerprint
         ?.getSdkConfiguration(bioSdk)
         ?.comparisonStrategyForVerification
@@ -89,22 +90,21 @@ internal class SaveMatchEventUseCase @Inject constructor(
         matcherName: String,
         queryForCandidates: SubjectQuery,
         candidatesCount: Int,
-        matchEntries: List<MatchEntry>
+        matchEntries: List<MatchEntry>,
     ) = OneToManyMatchEvent(
         startTime,
         endTime,
         OneToManyMatchEvent.OneToManyMatchPayload.MatchPool(
             queryForCandidates.parseQueryAsCoreMatchPoolType(),
-            candidatesCount
+            candidatesCount,
         ),
         matcherName,
         matchEntries,
     )
 
-    private fun SubjectQuery.parseQueryAsCoreMatchPoolType(): OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType =
-        when {
-            this.attendantId != null -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.USER
-            this.moduleId != null -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.MODULE
-            else -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
-        }
+    private fun SubjectQuery.parseQueryAsCoreMatchPoolType(): OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType = when {
+        this.attendantId != null -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.USER
+        this.moduleId != null -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.MODULE
+        else -> OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
+    }
 }

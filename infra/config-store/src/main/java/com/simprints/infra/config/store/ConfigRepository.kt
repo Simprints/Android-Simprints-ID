@@ -9,15 +9,22 @@ import com.simprints.infra.config.store.models.ProjectWithConfig
 import kotlinx.coroutines.flow.Flow
 
 interface ConfigRepository {
-
     suspend fun refreshProject(projectId: String): ProjectWithConfig
+
     suspend fun getProject(): Project
+
     suspend fun getProjectConfiguration(): ProjectConfiguration
 
     suspend fun getDeviceState(): DeviceState
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration
+
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
+
     suspend fun clearData()
-    suspend fun getPrivacyNotice(projectId: String, language: String): Flow<PrivacyNoticeResult>
+
+    suspend fun getPrivacyNotice(
+        projectId: String,
+        language: String,
+    ): Flow<PrivacyNoticeResult>
 }

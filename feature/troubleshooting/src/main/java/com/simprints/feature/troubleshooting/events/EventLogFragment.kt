@@ -8,20 +8,22 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.feature.troubleshooting.R
-import com.simprints.feature.troubleshooting.databinding.FragmentTroubleshootingStandaloneListBinding
 import com.simprints.feature.troubleshooting.adapter.TroubleshootingListAdapter
+import com.simprints.feature.troubleshooting.databinding.FragmentTroubleshootingStandaloneListBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class EventLogFragment : Fragment(R.layout.fragment_troubleshooting_standalone_list) {
-
     private val args by navArgs<EventLogFragmentArgs>()
 
     private val viewModel by viewModels<EventsLogViewModel>()
     private val binding by viewBinding(FragmentTroubleshootingStandaloneListBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.troubleshootingToolbar.title = args.scopeId

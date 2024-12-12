@@ -13,7 +13,6 @@ import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test
 
 class MessageChannelTest {
-
     @Test
     fun packetToMessageAccumulation_messageSpreadOutOverMultiplePackets_succeeds() {
         val packets = listOf("CC DD 08 00", "F0 F1 F2 F3 F4", "F5 F6 F7")

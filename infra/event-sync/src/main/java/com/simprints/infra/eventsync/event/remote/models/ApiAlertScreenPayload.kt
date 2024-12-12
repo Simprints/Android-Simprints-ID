@@ -43,13 +43,11 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.A
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.SERIAL_ENTRY_PAIR
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType.UNEXPECTED_ERROR
 
-
 @Keep
 internal data class ApiAlertScreenPayload(
     override val startTime: ApiTimestamp,
     val alertType: ApiAlertScreenEventType,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: AlertScreenPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.alertType.fromDomainToApi(),
@@ -100,51 +98,48 @@ internal data class ApiAlertScreenPayload(
         PROJECT_PAUSED,
         PROJECT_ENDING,
         MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
-        BLUETOOTH_NO_PERMISSION
+        BLUETOOTH_NO_PERMISSION,
     }
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
 
-
-internal fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
-    when (this) {
-        AlertScreenEventType.DIFFERENT_PROJECT_ID -> DIFFERENT_PROJECT_ID
-        AlertScreenEventType.DIFFERENT_USER_ID -> DIFFERENT_USER_ID
-        AlertScreenEventType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-        AlertScreenEventType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
-        AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
-        AlertScreenEventType.LOW_BATTERY -> LOW_BATTERY
-        AlertScreenEventType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-        AlertScreenEventType.DISCONNECTED -> DISCONNECTED
-        AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS -> MULTIPLE_PAIRED_SCANNERS
-        AlertScreenEventType.NOT_PAIRED -> NOT_PAIRED
-        AlertScreenEventType.BLUETOOTH_NOT_ENABLED -> BLUETOOTH_NOT_ENABLED
-        AlertScreenEventType.NFC_NOT_ENABLED -> NFC_NOT_ENABLED
-        AlertScreenEventType.NFC_PAIR -> NFC_PAIR
-        AlertScreenEventType.SERIAL_ENTRY_PAIR -> SERIAL_ENTRY_PAIR
-        AlertScreenEventType.OTA -> OTA
-        AlertScreenEventType.OTA_RECOVERY -> OTA_RECOVERY
-        AlertScreenEventType.OTA_FAILED -> OTA_FAILED
-        AlertScreenEventType.INVALID_INTENT_ACTION -> INVALID_INTENT_ACTION
-        AlertScreenEventType.INVALID_METADATA -> INVALID_METADATA
-        AlertScreenEventType.INVALID_MODULE_ID -> INVALID_MODULE_ID
-        AlertScreenEventType.INVALID_PROJECT_ID -> INVALID_PROJECT_ID
-        AlertScreenEventType.INVALID_SELECTED_ID -> INVALID_SELECTED_ID
-        AlertScreenEventType.INVALID_SESSION_ID -> INVALID_SESSION_ID
-        AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
-        AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
-        AlertScreenEventType.INTEGRITY_SERVICE_ERROR -> INTEGRITY_SERVICE_ERROR
-        AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
-        AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION -> INVALID_STATE_FOR_INTENT_ACTION
-        AlertScreenEventType.LICENSE_INVALID -> LICENSE_INVALID
-        AlertScreenEventType.LICENSE_MISSING -> LICENSE_MISSING
-        AlertScreenEventType.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
-        AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
-        AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
-        AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
-        AlertScreenEventType.PROJECT_PAUSED -> PROJECT_PAUSED
-        AlertScreenEventType.PROJECT_ENDING -> PROJECT_ENDING
-        AlertScreenEventType.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
-    }
+internal fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType = when (this) {
+    AlertScreenEventType.DIFFERENT_PROJECT_ID -> DIFFERENT_PROJECT_ID
+    AlertScreenEventType.DIFFERENT_USER_ID -> DIFFERENT_USER_ID
+    AlertScreenEventType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
+    AlertScreenEventType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
+    AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
+    AlertScreenEventType.LOW_BATTERY -> LOW_BATTERY
+    AlertScreenEventType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+    AlertScreenEventType.DISCONNECTED -> DISCONNECTED
+    AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS -> MULTIPLE_PAIRED_SCANNERS
+    AlertScreenEventType.NOT_PAIRED -> NOT_PAIRED
+    AlertScreenEventType.BLUETOOTH_NOT_ENABLED -> BLUETOOTH_NOT_ENABLED
+    AlertScreenEventType.NFC_NOT_ENABLED -> NFC_NOT_ENABLED
+    AlertScreenEventType.NFC_PAIR -> NFC_PAIR
+    AlertScreenEventType.SERIAL_ENTRY_PAIR -> SERIAL_ENTRY_PAIR
+    AlertScreenEventType.OTA -> OTA
+    AlertScreenEventType.OTA_RECOVERY -> OTA_RECOVERY
+    AlertScreenEventType.OTA_FAILED -> OTA_FAILED
+    AlertScreenEventType.INVALID_INTENT_ACTION -> INVALID_INTENT_ACTION
+    AlertScreenEventType.INVALID_METADATA -> INVALID_METADATA
+    AlertScreenEventType.INVALID_MODULE_ID -> INVALID_MODULE_ID
+    AlertScreenEventType.INVALID_PROJECT_ID -> INVALID_PROJECT_ID
+    AlertScreenEventType.INVALID_SELECTED_ID -> INVALID_SELECTED_ID
+    AlertScreenEventType.INVALID_SESSION_ID -> INVALID_SESSION_ID
+    AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
+    AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
+    AlertScreenEventType.INTEGRITY_SERVICE_ERROR -> INTEGRITY_SERVICE_ERROR
+    AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+    AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION -> INVALID_STATE_FOR_INTENT_ACTION
+    AlertScreenEventType.LICENSE_INVALID -> LICENSE_INVALID
+    AlertScreenEventType.LICENSE_MISSING -> LICENSE_MISSING
+    AlertScreenEventType.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
+    AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
+    AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
+    AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
+    AlertScreenEventType.PROJECT_PAUSED -> PROJECT_PAUSED
+    AlertScreenEventType.PROJECT_ENDING -> PROJECT_ENDING
+    AlertScreenEventType.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
+}

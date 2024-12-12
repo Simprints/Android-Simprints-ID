@@ -11,7 +11,6 @@ import javax.inject.Singleton
  */
 @Singleton
 internal class ScopeProvider @Inject constructor() {
-
     val dispatcherIO = Dispatchers.IO
 
     val externalScope = CoroutineScope(SupervisorJob() + dispatcherIO)

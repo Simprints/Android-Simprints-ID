@@ -23,7 +23,6 @@ import javax.inject.Inject
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class BaseFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -43,7 +42,7 @@ class BaseFragmentTest {
 
         launchFragmentInHiltContainer<BaseFragment>(
             initialState = Lifecycle.State.STARTED,
-            navController = navController
+            navController = navController,
         ) {
             activity?.moveToState(Lifecycle.State.RESUMED)
 
@@ -59,7 +58,7 @@ class BaseFragmentTest {
 
         launchFragmentInHiltContainer<BaseFragment>(
             initialState = Lifecycle.State.STARTED,
-            navController = navController
+            navController = navController,
         ) {
             activity?.moveToState(Lifecycle.State.RESUMED)
 

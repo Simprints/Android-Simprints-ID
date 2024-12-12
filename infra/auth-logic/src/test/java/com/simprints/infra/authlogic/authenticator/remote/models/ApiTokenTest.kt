@@ -5,7 +5,6 @@ import com.simprints.infra.authstore.domain.models.Token
 import org.junit.Test
 
 class ApiTokenTest {
-
     @Test
     fun `should map the model correctly`() {
         val apiToken = ApiToken(
@@ -17,7 +16,7 @@ class ApiTokenTest {
                 databaseUrl = "databaseUrl",
                 gcmSenderId = "gcmSenderId",
                 storageBucket = "storageBucket",
-            )
+            ),
         )
 
         val token = Token(

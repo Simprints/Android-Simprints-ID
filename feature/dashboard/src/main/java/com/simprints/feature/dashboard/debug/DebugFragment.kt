@@ -15,9 +15,6 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
@@ -33,7 +30,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class DebugFragment : Fragment(R.layout.fragment_debug) {
-
     @Inject
     lateinit var eventSyncManager: EventSyncManager
 
@@ -60,7 +56,10 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     private val wm: WorkManager
         get() = WorkManager.getInstance(requireContext())
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         eventSyncManager.getLastSyncState().observe(viewLifecycleOwner) { state ->
@@ -74,8 +73,8 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             val ssb = SpannableStringBuilder(
                 coloredText(
                     "\n$message",
-                    Color.parseColor(getRandomColor())
-                )
+                    Color.parseColor(getRandomColor()),
+                ),
             )
 
             binding.logs.append(ssb)
@@ -142,32 +141,35 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
     }
 
-    private fun getRandomColor(): String =
-        arrayOf("red", "black", "purple", "green", "blue").random()
+    private fun getRandomColor(): String = arrayOf("red", "black", "purple", "green", "blue").random()
 
-    private fun coloredText(text: String, color: Int): SpannableString {
+    private fun coloredText(
+        text: String,
+        color: Int,
+    ): SpannableString {
         val spannableString = SpannableString(text)
         spannableString.setSpan(
-            ForegroundColorSpan(color), 0,
-            text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            ForegroundColorSpan(color),
+            0,
+            text.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
         return spannableString
     }
 
-    private fun List<EventSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState =
-        when {
-            isEmpty() -> DebugActivitySyncState.NOT_RUNNING
-            this.any { it is EventSyncWorkerState.Running } -> DebugActivitySyncState.RUNNING
-            this.any { it is EventSyncWorkerState.Enqueued } -> DebugActivitySyncState.CONNECTING
-            this.all { it is EventSyncWorkerState.Succeeded } -> DebugActivitySyncState.SUCCESS
-            else -> DebugActivitySyncState.FAILED
-        }
+    private fun List<EventSyncWorkerState>.toDebugActivitySyncState(): DebugActivitySyncState = when {
+        isEmpty() -> DebugActivitySyncState.NOT_RUNNING
+        this.any { it is EventSyncWorkerState.Running } -> DebugActivitySyncState.RUNNING
+        this.any { it is EventSyncWorkerState.Enqueued } -> DebugActivitySyncState.CONNECTING
+        this.all { it is EventSyncWorkerState.Succeeded } -> DebugActivitySyncState.SUCCESS
+        else -> DebugActivitySyncState.FAILED
+    }
 
     enum class DebugActivitySyncState {
         RUNNING,
         NOT_RUNNING,
         CONNECTING,
         SUCCESS,
-        FAILED
+        FAILED,
     }
 }

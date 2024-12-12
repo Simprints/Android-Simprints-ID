@@ -4,7 +4,6 @@ import com.google.firebase.perf.FirebasePerformance
 import com.simprints.infra.logging.performancemonitoring.PerformanceMonitoringTrace
 
 object PerformanceMonitor {
-
     /**
      * Used to track the performance of something inside of the code. Call
      * [PerformanceMonitoringTrace] to get a [PerformanceMonitoringTrace] instance. Call
@@ -16,14 +15,17 @@ object PerformanceMonitor {
      * STAGING: Is sent to Log.i & sent to Firebase Performance Monitoring
      * RELEASE: Is sent to Firebase Performance Monitoring
      */
-    fun trace(traceName: String, simber: Simber = Simber): PerformanceMonitoringTrace =
-        getTrace(traceName, simber)
+    fun trace(
+        traceName: String,
+        simber: Simber = Simber,
+    ): PerformanceMonitoringTrace = getTrace(traceName, simber)
 
-    internal fun getTrace(name: String, simber: Simber): PerformanceMonitoringTrace {
-        return if (BuildConfig.DEBUG)
-            PerformanceMonitoringTrace(name, null, simber)
-        else
-            PerformanceMonitoringTrace(name, FirebasePerformance.getInstance(), simber)
+    internal fun getTrace(
+        name: String,
+        simber: Simber,
+    ): PerformanceMonitoringTrace = if (BuildConfig.DEBUG) {
+        PerformanceMonitoringTrace(name, null, simber)
+    } else {
+        PerformanceMonitoringTrace(name, FirebasePerformance.getInstance(), simber)
     }
-
 }

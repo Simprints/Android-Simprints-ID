@@ -7,7 +7,6 @@ import java.io.FileInputStream
  * Interface for remote image file operations
  */
 internal interface ImageRemoteDataSource {
-
     /**
      * Uploads an image
      *
@@ -23,5 +22,4 @@ internal interface ImageRemoteDataSource {
         imageRef: SecuredImageRef,
         metadata: Map<String, String>,
     ): UploadResult
-
 }

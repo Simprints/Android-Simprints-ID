@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.infra.scanner.wrapper
 
-
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -33,7 +32,6 @@ import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ScannerWrapperV2Test {
-
     @MockK
     lateinit var scannerV2: Scanner
 
@@ -48,7 +46,6 @@ internal class ScannerWrapperV2Test {
 
     private lateinit var scannerWrapper: ScannerWrapperV2
 
-
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -61,20 +58,19 @@ internal class ScannerWrapperV2Test {
                 connectionHelper,
                 UnconfinedTestDispatcher(),
             ),
-            recordPrivateCalls = true
+            recordPrivateCalls = true,
         )
     }
 
     @Test
-    fun `should throw the correct corresponding errors when scanner disconnection fails`() =
-        runTest {
-            coEvery { connectionHelper.disconnectScanner(any()) } answers {
-                throw ScannerDisconnectedException()
-            } andThenThrows (UnexpectedScannerException("Scanner cannot disconnect"))
+    fun `should throw the correct corresponding errors when scanner disconnection fails`() = runTest {
+        coEvery { connectionHelper.disconnectScanner(any()) } answers {
+            throw ScannerDisconnectedException()
+        } andThenThrows (UnexpectedScannerException("Scanner cannot disconnect"))
 
-            assertThrows<ScannerDisconnectedException> { scannerWrapper.disconnect() }
-            assertThrows<UnexpectedScannerException> { scannerWrapper.disconnect() }
-        }
+        assertThrows<ScannerDisconnectedException> { scannerWrapper.disconnect() }
+        assertThrows<UnexpectedScannerException> { scannerWrapper.disconnect() }
+    }
 
     @Test
     fun `should success scanner disconnection completes`() = runTest {
@@ -118,7 +114,7 @@ internal class ScannerWrapperV2Test {
                 any(),
                 any(),
                 any(),
-                any()
+                any(),
             )
         } answers {
             val scannerInfoCallback = args[3] as ((ScannerVersion) -> Unit)
@@ -136,20 +132,18 @@ internal class ScannerWrapperV2Test {
     }
 
     @Test(expected = UnexpectedScannerException::class)
-    fun `should throw UnexpectedScannerException if setupScannerWithOtaCheck throws IllegalStateException`() =
-        runTest {
-            coEvery {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any()
-                )
-            } throws IllegalStateException()
-            scannerWrapper.setScannerInfoAndCheckAvailableOta(mockk())
-        }
-
+    fun `should throw UnexpectedScannerException if setupScannerWithOtaCheck throws IllegalStateException`() = runTest {
+        coEvery {
+            scannerInitialSetupHelper.setupScannerWithOtaCheck(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } throws IllegalStateException()
+        scannerWrapper.setScannerInfoAndCheckAvailableOta(mockk())
+    }
 
     @Test
     fun `should return the unknown scanner info when scanner info hasn't been set`() = runTest {
@@ -164,16 +158,14 @@ internal class ScannerWrapperV2Test {
         assertThat(actualVersion).isEqualTo(expectedVersion)
     }
 
-
     @Test
-    fun `should throw UnavailableVero2FeatureException when startLiveFeedback is called and live feedback is not available`() =
-        runTest {
-            every { scannerWrapper["isLiveFeedbackAvailable"]() } returns false
+    fun `should throw UnavailableVero2FeatureException when startLiveFeedback is called and live feedback is not available`() = runTest {
+        every { scannerWrapper["isLiveFeedbackAvailable"]() } returns false
 
-            assertThrows<UnavailableVero2FeatureException> {
-                scannerWrapper.startLiveFeedback()
-            }
+        assertThrows<UnavailableVero2FeatureException> {
+            scannerWrapper.startLiveFeedback()
         }
+    }
 
     @Test
     fun `should not turn off(on) the Un20 sensor when sensorShutdown(sensorWakeup) is called and the sensor's current state is off(on)`() =
@@ -191,15 +183,14 @@ internal class ScannerWrapperV2Test {
         }
 
     @Test
-    fun `should turn on the Un20 sensor when sensorWakeup is called and the sensor's current state is off`() =
-        runTest {
-            coEvery { scannerV2.getUn20Status() } returns false
-            coJustRun { scannerV2.turnUn20On() }
+    fun `should turn on the Un20 sensor when sensorWakeup is called and the sensor's current state is off`() = runTest {
+        coEvery { scannerV2.getUn20Status() } returns false
+        coJustRun { scannerV2.turnUn20On() }
 
-            scannerWrapper.sensorWakeUp()
+        scannerWrapper.sensorWakeUp()
 
-            coVerify(exactly = 1) { scannerV2.turnUn20On() }
-        }
+        coVerify(exactly = 1) { scannerV2.turnUn20On() }
+    }
 
     @Test(expected = ScannerDisconnectedException::class)
     fun `should throw ScannerDisconnectedException if getUn20Status throws IO`() = runTest {
@@ -208,86 +199,78 @@ internal class ScannerWrapperV2Test {
     }
 
     @Test(expected = ScannerDisconnectedException::class)
-    fun `should throw ScannerDisconnectedException if getUn20Status throws NotConnectedException`() =
-        runTest {
-            coEvery { scannerV2.getUn20Status() } throws NotConnectedException("")
-            scannerWrapper.sensorWakeUp()
-        }
-
+    fun `should throw ScannerDisconnectedException if getUn20Status throws NotConnectedException`() = runTest {
+        coEvery { scannerV2.getUn20Status() } throws NotConnectedException("")
+        scannerWrapper.sensorWakeUp()
+    }
 
     @Test
-    fun `should turn off the Un20 sensor when sensorShutdown is called and the sensor's current state is on`() =
-        runTest {
-            coEvery { scannerV2.getUn20Status() } returns true
-            coJustRun { scannerV2.turnUn20Off() }
+    fun `should turn off the Un20 sensor when sensorShutdown is called and the sensor's current state is on`() = runTest {
+        coEvery { scannerV2.getUn20Status() } returns true
+        coJustRun { scannerV2.turnUn20Off() }
 
-            scannerWrapper.sensorShutDown()
+        scannerWrapper.sensorShutDown()
 
-            coVerify(exactly = 1) { scannerV2.turnUn20Off() }
-        }
+        coVerify(exactly = 1) { scannerV2.turnUn20Off() }
+    }
 
     @Test(expected = UnexpectedScannerException::class)
-    fun `should throw UnexpectedScannerException when sensorShutdown throws IllegalArgumentException`() =
-        runTest {
-            coEvery { scannerV2.getUn20Status() } throws IllegalArgumentException()
-            scannerWrapper.sensorShutDown()
-        }
+    fun `should throw UnexpectedScannerException when sensorShutdown throws IllegalArgumentException`() = runTest {
+        coEvery { scannerV2.getUn20Status() } throws IllegalArgumentException()
+        scannerWrapper.sensorShutDown()
+    }
 
     @Test
-    fun `should complete execution successfully when setting scanner UI to default, when startLiveFeedback is called`() =
-        runTest {
-            every { scannerWrapper.isLiveFeedbackAvailable() } returns true
-            coJustRun { scannerV2.setSmileLedState(any()) }
-            coEvery { scannerV2.getImageQualityPreview() } returns 50
+    fun `should complete execution successfully when setting scanner UI to default, when startLiveFeedback is called`() = runTest {
+        every { scannerWrapper.isLiveFeedbackAvailable() } returns true
+        coJustRun { scannerV2.setSmileLedState(any()) }
+        coEvery { scannerV2.getImageQualityPreview() } returns 50
 
-            // get the job of the continuous feedback
-            val job = launch {
-                scannerWrapper.startLiveFeedback()
-            }
-
-            advanceTimeBy(500)
-
-            // force-stop the continuous live feedback
-            job.cancel()
+        // get the job of the continuous feedback
+        val job = launch {
+            scannerWrapper.startLiveFeedback()
         }
 
+        advanceTimeBy(500)
+
+        // force-stop the continuous live feedback
+        job.cancel()
+    }
+
     @Test
-    fun `should complete execution successfully when startLiveFeedback is called and scanner disconnects`() =
-        runTest {
-            every { scannerWrapper.isLiveFeedbackAvailable() } returns true
-            coEvery { scannerV2.setSmileLedState(any()) } throws IOException()
-            coEvery { scannerV2.getImageQualityPreview() } returns 50
+    fun `should complete execution successfully when startLiveFeedback is called and scanner disconnects`() = runTest {
+        every { scannerWrapper.isLiveFeedbackAvailable() } returns true
+        coEvery { scannerV2.setSmileLedState(any()) } throws IOException()
+        coEvery { scannerV2.getImageQualityPreview() } returns 50
 
-            // get the job of the continuous feedback
-            val job = launch {
-                scannerWrapper.startLiveFeedback()
-            }
-
-            advanceTimeBy(500)
-
-            // force-stop the continuous live feedback
-            job.cancel()
+        // get the job of the continuous feedback
+        val job = launch {
+            scannerWrapper.startLiveFeedback()
         }
 
-    @Test
-    fun `should complete execution successfully when setting scanner UI to default, when stopLiveFeedback is called`() =
-        runTest {
-            every { scannerWrapper.isLiveFeedbackAvailable() } returns true
-            coJustRun { scannerV2.setSmileLedState(any()) }
-            coJustRun { scannerV2.setScannerLedStateDefault() }
+        advanceTimeBy(500)
 
+        // force-stop the continuous live feedback
+        job.cancel()
+    }
+
+    @Test
+    fun `should complete execution successfully when setting scanner UI to default, when stopLiveFeedback is called`() = runTest {
+        every { scannerWrapper.isLiveFeedbackAvailable() } returns true
+        coJustRun { scannerV2.setSmileLedState(any()) }
+        coJustRun { scannerV2.setScannerLedStateDefault() }
+
+        scannerWrapper.stopLiveFeedback()
+    }
+
+    @Test
+    fun `should throw UnavailableVero2FeatureException when stopLiveFeedback is called and live feedback is not available`() = runTest {
+        every { scannerWrapper.isLiveFeedbackAvailable() } returns false
+
+        assertThrows<UnavailableVero2FeatureException> {
             scannerWrapper.stopLiveFeedback()
         }
-
-    @Test
-    fun `should throw UnavailableVero2FeatureException when stopLiveFeedback is called and live feedback is not available`() =
-        runTest {
-            every { scannerWrapper.isLiveFeedbackAvailable() } returns false
-
-            assertThrows<UnavailableVero2FeatureException> {
-                scannerWrapper.stopLiveFeedback()
-            }
-        }
+    }
 
     @Test
     fun `test imageTransfer should be supported in v2 scanners`() {

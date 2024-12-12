@@ -12,7 +12,6 @@ import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
  * check.
  */
 interface ScannerManager {
-
     val scanner: ScannerWrapper
     val otaOperationsWrapper: ScannerOtaOperationsWrapper
     var currentScannerId: String?

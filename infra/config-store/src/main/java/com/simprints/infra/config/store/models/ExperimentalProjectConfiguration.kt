@@ -7,14 +7,15 @@ package com.simprints.infra.config.store.models
 data class ExperimentalProjectConfiguration(
     private val customConfig: Map<String, Any>?,
 ) {
-
     val idPoolValidationEnabled: Boolean
-        get() = customConfig?.get(ENABLE_ID_POOL_VALIDATION)
+        get() = customConfig
+            ?.get(ENABLE_ID_POOL_VALIDATION)
             ?.let { it as? Boolean }
             .let { it == true }
 
     val singleQualityFallbackRequired: Boolean
-        get() = customConfig?.get(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED)
+        get() = customConfig
+            ?.get(SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED)
             ?.let { it as? Boolean }
             .let { it == true }
 

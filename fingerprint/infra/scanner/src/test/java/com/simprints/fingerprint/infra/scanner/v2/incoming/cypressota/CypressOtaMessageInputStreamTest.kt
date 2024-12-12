@@ -22,17 +22,17 @@ import java.io.PipedOutputStream
 import java.util.concurrent.TimeUnit
 
 class CypressOtaMessageInputStreamTest {
-
     private val cypressOtaResponseParser = CypressOtaResponseParser()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val cypressOtaMessageInputStream = CypressOtaMessageInputStream(
         cypressOtaResponseParser,
-        UnconfinedTestDispatcher()
+        UnconfinedTestDispatcher(),
     )
 
     @Test
     fun `test disconnect disposes the flowable stream`() {
-        //Given
+        // Given
         val flowableDisposable = mockk<Disposable>(relaxed = true)
 
         val cypressResponseFlowable: Flowable<CypressOtaResponse> = mockk {
@@ -46,17 +46,19 @@ class CypressOtaMessageInputStreamTest {
             every { map(any<Function<ByteArray, CypressOtaResponse>>()) } returns cypressResponseFlowable
         }
 
-        //When
+        // When
         cypressOtaMessageInputStream.connect(flowable)
         cypressOtaMessageInputStream.disconnect()
 
-        //Then
+        // Then
         verify { flowableDisposable.dispose() }
     }
 
-    @Suppress("Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
-        " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
-        "re-written when the RxJava is finally removed from the scanners SDK.")
+    @Suppress(
+        "Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
+            " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
+            "re-written when the RxJava is finally removed from the scanners SDK.",
+    )
     fun cypressOtaMessageInputStream_receiveCypressOtaResponse_correctlyForwardsResponse() {
         val messageBytes = "39".hexToByteArray()
         val expectedResponse = ContinueResponse()
@@ -67,8 +69,10 @@ class CypressOtaMessageInputStreamTest {
 
         cypressOtaMessageInputStream.connect(inputStream.toFlowable())
 
-        val testSubscriber = cypressOtaMessageInputStream.receiveResponse<CypressOtaResponse>()
-            .timeout(SchedulerHelper.TIMEOUT, TimeUnit.SECONDS).testSubscribe()
+        val testSubscriber = cypressOtaMessageInputStream
+            .receiveResponse<CypressOtaResponse>()
+            .timeout(SchedulerHelper.TIMEOUT, TimeUnit.SECONDS)
+            .testSubscribe()
 
         outputStream.write(messageBytes)
 

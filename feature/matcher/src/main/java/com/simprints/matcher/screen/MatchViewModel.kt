@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
 
-
 @HiltViewModel
 internal class MatchViewModel @Inject constructor(
     private val faceMatcher: FaceMatcherUseCase,
@@ -29,7 +28,6 @@ internal class MatchViewModel @Inject constructor(
     private val saveMatchEvent: SaveMatchEventUseCase,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
-
     var isInitialized = false
         private set
 
@@ -69,7 +67,7 @@ internal class MatchViewModel @Inject constructor(
             params,
             matcherResult.totalCandidates,
             matcherResult.matcherName,
-            matcherResult.matchResultItems
+            matcherResult.matchResultItems,
         )
 
         setMatchState(matcherResult.totalCandidates, matcherResult.matchResultItems)
@@ -81,11 +79,14 @@ internal class MatchViewModel @Inject constructor(
             when {
                 isFaceMatch -> FaceMatchResult(matcherResult.matchResultItems)
                 else -> FingerprintMatchResult(matcherResult.matchResultItems, params.fingerprintSDK!!)
-            }
+            },
         )
     }
 
-    private fun setMatchState(candidatesMatched: Int, results: List<MatchResultItem>) {
+    private fun setMatchState(
+        candidatesMatched: Int,
+        results: List<MatchResultItem>,
+    ) {
         val veryGoodMatches = results.count { VERY_GOOD_MATCH_THRESHOLD <= it.confidence }
         val goodMatches =
             results.count { GOOD_MATCH_THRESHOLD <= it.confidence && it.confidence < VERY_GOOD_MATCH_THRESHOLD }
@@ -98,8 +99,8 @@ internal class MatchViewModel @Inject constructor(
                 results.size,
                 veryGoodMatches,
                 goodMatches,
-                fairMatches
-            )
+                fairMatches,
+            ),
         )
     }
 
@@ -109,8 +110,11 @@ internal class MatchViewModel @Inject constructor(
 
     sealed class MatchState {
         data object NotStarted : MatchState()
+
         data object LoadingCandidates : MatchState()
+
         data object Matching : MatchState()
+
         data class NoPermission(
             val shouldOpenSettings: Boolean,
         ) : MatchState()
@@ -127,7 +131,6 @@ internal class MatchViewModel @Inject constructor(
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
-
         private const val VERY_GOOD_MATCH_THRESHOLD = 50.0
         private const val GOOD_MATCH_THRESHOLD = 35.0
         private const val FAIR_MATCH_THRESHOLD = 20.0

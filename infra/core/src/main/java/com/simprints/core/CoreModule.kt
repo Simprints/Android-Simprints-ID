@@ -28,26 +28,27 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object CoreModule {
-
     @Provides
     @Singleton
-    fun provideTimeHelper(@ApplicationContext context: Context): TimeHelper = KronosTimeHelperImpl(
+    fun provideTimeHelper(
+        @ApplicationContext context: Context,
+    ): TimeHelper = KronosTimeHelperImpl(
         AndroidClockFactory.createKronosClock(
             context,
             requestTimeoutMs = TimeUnit.SECONDS.toMillis(60),
             minWaitTimeBetweenSyncMs = TimeUnit.MINUTES.toMillis(30),
-            cacheExpirationMs = TimeUnit.MINUTES.toMillis(30)
-        )
+            cacheExpirationMs = TimeUnit.MINUTES.toMillis(30),
+        ),
     )
 
     @Provides
     @Singleton
-    fun provideSimNetworkUtils(@ApplicationContext ctx: Context): SimNetworkUtils =
-        SimNetworkUtilsImpl(ctx)
+    fun provideSimNetworkUtils(
+        @ApplicationContext ctx: Context,
+    ): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
     @Singleton
@@ -57,28 +58,25 @@ object CoreModule {
     @Singleton
     fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl
 
-
     @Provides
     @Singleton
-    fun provideStringTokenizer(encodingUtils: EncodingUtils): StringTokenizer =
-        StringTokenizer(encodingUtils = encodingUtils)
+    fun provideStringTokenizer(encodingUtils: EncodingUtils): StringTokenizer = StringTokenizer(encodingUtils = encodingUtils)
 
     @DeviceID
     @Provides
     fun provideDeviceId(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): String = context.deviceHardwareId
 
     @PackageVersionName
     @Provides
     fun providePackageVersionName(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): String = context.packageVersionName
 
     @LibSimprintsVersionName
     @Provides
-    fun provideLibSimprintsVersionName(): String =
-        com.simprints.libsimprints.BuildConfig.LIBRARY_PACKAGE_VERSION
+    fun provideLibSimprintsVersionName(): String = com.simprints.libsimprints.BuildConfig.LIBRARY_PACKAGE_VERSION
 
     @DispatcherIO
     @Provides
@@ -95,7 +93,7 @@ object CoreModule {
     @NonCancellableIO
     @Provides
     fun provideNonCancellableIO(
-        @DispatcherIO dispatcherIO: CoroutineDispatcher
+        @DispatcherIO dispatcherIO: CoroutineDispatcher,
     ): CoroutineContext = dispatcherIO + NonCancellable
 
     /**
@@ -104,33 +102,33 @@ object CoreModule {
     @ExternalScope
     @Provides
     fun provideExternalScope(
-        @DispatcherIO dispatcherIO: CoroutineDispatcher
+        @DispatcherIO dispatcherIO: CoroutineDispatcher,
     ): CoroutineScope = CoroutineScope(
-        SupervisorJob() + dispatcherIO + AppCoroutineExceptionHandler()
+        SupervisorJob() + dispatcherIO + AppCoroutineExceptionHandler(),
     )
 
     /**
-    * Background scope dedicated to session event management
-    * Guarantees sequential execution to prevent race-conditions
-    * when adding events, closing sessions, etc
-    */
+     * Background scope dedicated to session event management
+     * Guarantees sequential execution to prevent race-conditions
+     * when adding events, closing sessions, etc
+     */
     @SessionCoroutineScope
     @Provides
     @Singleton
     fun provideSessionCoroutineScope(
-        @DispatcherIO dispatcherIO: CoroutineDispatcher
+        @DispatcherIO dispatcherIO: CoroutineDispatcher,
     ): CoroutineScope = CoroutineScope(
-        SupervisorJob()
-                + dispatcherIO.limitedParallelism(1, "Single threaded dispatcher for the event system")
-                + AppCoroutineExceptionHandler()
+        SupervisorJob() +
+            dispatcherIO.limitedParallelism(1, "Single threaded dispatcher for the event system") +
+            AppCoroutineExceptionHandler(),
     )
 
     @AppScope
     @Provides
     fun provideAppScope(
-        @DispatcherMain dispatcherMain: CoroutineDispatcher
+        @DispatcherMain dispatcherMain: CoroutineDispatcher,
     ): CoroutineScope = CoroutineScope(
-        SupervisorJob() + dispatcherMain + AppCoroutineExceptionHandler()
+        SupervisorJob() + dispatcherMain + AppCoroutineExceptionHandler(),
     )
 }
 
@@ -179,4 +177,6 @@ Use this annotation to ignore a class or function from test coverage reports.
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
-annotation class ExcludedFromGeneratedTestCoverageReports(val reason: String)
+annotation class ExcludedFromGeneratedTestCoverageReports(
+    val reason: String,
+)

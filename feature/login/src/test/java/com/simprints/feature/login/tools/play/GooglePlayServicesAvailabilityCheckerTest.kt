@@ -19,7 +19,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class GooglePlayServicesAvailabilityCheckerTest {
-
     @MockK
     private lateinit var activity: Activity
 
@@ -34,7 +33,6 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
 
     private lateinit var googlePlayServicesAvailabilityChecker: GooglePlayServicesAvailabilityChecker
 
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -46,16 +44,18 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
 
     @Test
     fun `check does nothing if google play services is installed and updated`() {
-        //Given
+        // Given
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns SUCCESS
-        //When
+        // When
         googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
-        //Then
+        // Then
 
         verify(exactly = 0) {
             googleApiAvailability.showErrorDialogFragment(
-                activity, any(),
-                checkForPlayServicesResultLauncher, any()
+                activity,
+                any(),
+                checkForPlayServicesResultLauncher,
+                any(),
             )
         }
         verify(exactly = 0) { launchCallBack(any()) }
@@ -63,19 +63,21 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
 
     @Test
     fun `check shows alert and logs MissingGooglePlayServices exception for missing google play services`() {
-        //Given
+        // Given
 
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns INTERNAL_ERROR
         every { googleApiAvailability.isUserResolvableError(INTERNAL_ERROR) } returns false
 
-        //When
+        // When
         googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
 
-        //Then
+        // Then
         verify(exactly = 0) {
             googleApiAvailability.showErrorDialogFragment(
-                activity, any(),
-                checkForPlayServicesResultLauncher, any()
+                activity,
+                any(),
+                checkForPlayServicesResultLauncher,
+                any(),
             )
         }
         verify { launchCallBack(LoginError.MissingPlayServices) }
@@ -84,34 +86,37 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
 
     @Test
     fun `check shows errorDialog for outdated google play services`() {
-        //Given
+        // Given
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns SERVICE_VERSION_UPDATE_REQUIRED
         every { googleApiAvailability.isUserResolvableError(SERVICE_VERSION_UPDATE_REQUIRED) } returns true
         every {
             googleApiAvailability.showErrorDialogFragment(
                 activity,
-                SERVICE_VERSION_UPDATE_REQUIRED, checkForPlayServicesResultLauncher, any()
+                SERVICE_VERSION_UPDATE_REQUIRED,
+                checkForPlayServicesResultLauncher,
+                any(),
             )
         } returns true
 
-        //When
+        // When
         googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
 
-        //Then
+        // Then
         verify(exactly = 1) {
             googleApiAvailability.showErrorDialogFragment(
-                activity, SERVICE_VERSION_UPDATE_REQUIRED,
-                checkForPlayServicesResultLauncher, any()
+                activity,
+                SERVICE_VERSION_UPDATE_REQUIRED,
+                checkForPlayServicesResultLauncher,
+                any(),
             )
         }
         verify(exactly = 0) { launchCallBack(any()) }
         verify(exactly = 0) { Simber.e(ofType<OutdatedGooglePlayServices>()) }
     }
 
-
     @Test
     fun `check shows alert and logs OutdatedGooglePlayServices exception for outdated google play services and the user cancels the alert dialog`() {
-        //Given
+        // Given
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns SERVICE_VERSION_UPDATE_REQUIRED
         every { googleApiAvailability.isUserResolvableError(SERVICE_VERSION_UPDATE_REQUIRED) } returns true
         val cancellationListenerSlot = slot<DialogInterface.OnCancelListener>()
@@ -120,24 +125,25 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
                 activity,
                 SERVICE_VERSION_UPDATE_REQUIRED,
                 checkForPlayServicesResultLauncher,
-                capture(cancellationListenerSlot)
+                capture(cancellationListenerSlot),
             )
         } answers {
             cancellationListenerSlot.captured.onCancel(mockk())
             true
         }
-        //When
+        // When
         googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
 
-        //Then
+        // Then
         verify(exactly = 1) {
             googleApiAvailability.showErrorDialogFragment(
-                activity, SERVICE_VERSION_UPDATE_REQUIRED,
-                checkForPlayServicesResultLauncher, any()
+                activity,
+                SERVICE_VERSION_UPDATE_REQUIRED,
+                checkForPlayServicesResultLauncher,
+                any(),
             )
         }
         verify { launchCallBack(LoginError.OutdatedPlayServices) }
         verify { Simber.e(ofType<OutdatedGooglePlayServices>()) }
     }
-
 }

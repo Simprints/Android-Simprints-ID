@@ -12,23 +12,22 @@ import com.simprints.infra.enrolment.records.store.remote.models.fingerprint.Api
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
     property = "type",
-    visible = true
+    visible = true,
 )
 @JsonSubTypes(
     JsonSubTypes.Type(
         value = ApiFaceReference::class,
-        name = FACE_REFERENCE_KEY
+        name = FACE_REFERENCE_KEY,
     ),
-    JsonSubTypes.Type(value = ApiFingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY)
+    JsonSubTypes.Type(value = ApiFingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY),
 )
 @Keep
 internal abstract class ApiBiometricReference(
     val type: ApiBiometricReferenceType,
 ) {
-
     enum class ApiBiometricReferenceType {
         FingerprintReference,
-        FaceReference
+        FaceReference,
     }
 
     companion object {

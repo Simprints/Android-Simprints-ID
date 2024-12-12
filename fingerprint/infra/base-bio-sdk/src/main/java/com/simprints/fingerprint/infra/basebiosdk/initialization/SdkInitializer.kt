@@ -7,5 +7,5 @@ fun interface SdkInitializer<SdkConfig> {
      * @param initializationParams The parameters to initialize the SDK with.
      * throws BioSdkInitializationException if the SDK fails to initialize.
      */
-    suspend fun initialize(initializationParams:SdkConfig?)
+    suspend fun initialize(initializationParams: SdkConfig?)
 }

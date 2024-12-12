@@ -8,7 +8,6 @@ import com.simprints.infra.config.store.testtools.generalConfiguration
 import org.junit.Test
 
 class ApiGeneralConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiGeneralConfiguration.toDomain()).isEqualTo(generalConfiguration)
@@ -29,10 +28,13 @@ class ApiGeneralConfigurationTest {
     @Test
     fun `should map correctly the settings passwords`() {
         assertThat(SettingsPasswordConfig.toDomain(null)).isEqualTo(
-            SettingsPasswordConfig.NotSet)
+            SettingsPasswordConfig.NotSet,
+        )
         assertThat(SettingsPasswordConfig.toDomain("")).isEqualTo(
-            SettingsPasswordConfig.NotSet)
+            SettingsPasswordConfig.NotSet,
+        )
         assertThat(SettingsPasswordConfig.toDomain("123")).isEqualTo(
-            SettingsPasswordConfig.Locked("123"))
+            SettingsPasswordConfig.Locked("123"),
+        )
     }
 }

@@ -35,7 +35,6 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 class Un20OtaControllerTest {
-
     @Test
     fun program_correctlyEmitsProgressValuesAndCompletes() = runTest {
         val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
@@ -43,9 +42,10 @@ class Un20OtaControllerTest {
         val binFile = generateRandomBinFile()
         val testObserver = un20OtaController.program(configureMessageStreamMock(), binFile)
 
-        assertThat(testObserver.toList()).containsExactlyElementsIn(
-            generateExpectedProgressValues(binFile)
-        ).inOrder()
+        assertThat(testObserver.toList())
+            .containsExactlyElementsIn(
+                generateExpectedProgressValues(binFile),
+            ).inOrder()
     }
 
     @Test
@@ -58,7 +58,6 @@ class Un20OtaControllerTest {
         val un20OtaController = Un20OtaController(crc32Calculator)
 
         un20OtaController.program(messageStreamMock, binFile).toList()
-
 
         verify { crc32Calculator.calculateCrc32(any()) }
         coVerify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
@@ -78,26 +77,27 @@ class Un20OtaControllerTest {
     fun program_receivesErrorAtDownload_throwsException() = runTest {
         val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
 
-        un20OtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(1)),
-            generateRandomBinFile(),
-        ).toList()
+        un20OtaController
+            .program(
+                configureMessageStreamMock(errorPositions = listOf(1)),
+                generateRandomBinFile(),
+            ).toList()
     }
 
     @Test(expected = OtaFailedException::class)
-    fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() =
-        runTest {
-            val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
+    fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() = runTest {
+        val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
 
-            val binFile = generateRandomBinFile()
-            val progressValues = generateExpectedProgressValues(binFile)
-            val testObserver = un20OtaController.program(
-                configureMessageStreamMock(errorPositions = listOf(4)),
-                binFile,
-            )
-            assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues.slice(0..1))
-                .inOrder()
-        }
+        val binFile = generateRandomBinFile()
+        val progressValues = generateExpectedProgressValues(binFile)
+        val testObserver = un20OtaController.program(
+            configureMessageStreamMock(errorPositions = listOf(4)),
+            binFile,
+        )
+        assertThat(testObserver.toList())
+            .containsExactlyElementsIn(progressValues.slice(0..1))
+            .inOrder()
+    }
 
     @Test(expected = OtaFailedException::class)
     fun program_receivesErrorAtVerify_throwsException() = runTest {
@@ -105,10 +105,11 @@ class Un20OtaControllerTest {
 
         val binFile = generateRandomBinFile()
         val indexOfVerifyResponse = expectedNumberOfChunks(binFile) + 1
-        un20OtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(indexOfVerifyResponse)),
-            binFile,
-        ).toList()
+        un20OtaController
+            .program(
+                configureMessageStreamMock(errorPositions = listOf(indexOfVerifyResponse)),
+                binFile,
+            ).toList()
     }
 
     private fun configureCrcCalculatorMock() = mockk<Crc32Calculator> {
@@ -121,9 +122,15 @@ class Un20OtaControllerTest {
         val messageIndex = AtomicInteger(0)
 
         return MainMessageChannel(
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk(),
-                UnconfinedTestDispatcher()
-            )).apply {
+            spyk(
+                MainMessageInputStream(
+                    mockk(),
+                    mockk(),
+                    mockk(),
+                    mockk(),
+                    UnconfinedTestDispatcher(),
+                ),
+            ).apply {
                 justRun { connect(any()) }
                 every { un20Responses } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },
@@ -147,7 +154,8 @@ class Un20OtaControllerTest {
                         }
                     } ?: Completable.complete()
                 }
-            }, Dispatchers.IO
+            },
+            Dispatchers.IO,
         )
     }
 

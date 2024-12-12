@@ -14,7 +14,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class SerialEntryPairViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 

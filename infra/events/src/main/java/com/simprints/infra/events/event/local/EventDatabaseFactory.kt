@@ -8,12 +8,10 @@ import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 import javax.inject.Inject
 
-
 internal class EventDatabaseFactory @Inject constructor(
     @ApplicationContext val ctx: Context,
-    private val securityManager: SecurityManager
+    private val securityManager: SecurityManager,
 ) {
-
     fun build(): EventRoomDatabase {
         try {
             val key = getOrCreateKey(DB_NAME)
@@ -22,7 +20,7 @@ internal class EventDatabaseFactory @Inject constructor(
             return EventRoomDatabase.getDatabase(
                 ctx,
                 factory,
-                DB_NAME
+                DB_NAME,
             )
         } catch (t: Throwable) {
             Simber.e(t)
@@ -30,15 +28,15 @@ internal class EventDatabaseFactory @Inject constructor(
         }
     }
 
-    private fun getOrCreateKey(@Suppress("SameParameterValue") dbName: String): CharArray {
-        return try {
-            securityManager.getLocalDbKeyOrThrow(dbName)
-        } catch (t: Throwable) {
-            t.message?.let { Simber.d(it) }
-            securityManager.createLocalDatabaseKeyIfMissing(dbName)
-            securityManager.getLocalDbKeyOrThrow(dbName)
-        }.value.decodeToString().toCharArray()
-    }
+    private fun getOrCreateKey(
+        @Suppress("SameParameterValue") dbName: String,
+    ): CharArray = try {
+        securityManager.getLocalDbKeyOrThrow(dbName)
+    } catch (t: Throwable) {
+        t.message?.let { Simber.d(it) }
+        securityManager.createLocalDatabaseKeyIfMissing(dbName)
+        securityManager.getLocalDbKeyOrThrow(dbName)
+    }.value.decodeToString().toCharArray()
 
     fun deleteDatabase() {
         ctx.deleteDatabase(DB_NAME)
@@ -51,5 +49,4 @@ internal class EventDatabaseFactory @Inject constructor(
     companion object {
         private const val DB_NAME = "dbevents"
     }
-
 }

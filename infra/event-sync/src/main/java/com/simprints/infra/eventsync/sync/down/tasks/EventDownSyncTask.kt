@@ -47,7 +47,6 @@ internal class EventDownSyncTask @Inject constructor(
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val eventRepository: EventRepository,
 ) {
-
     suspend fun downSync(
         scope: CoroutineScope,
         operation: EventDownSyncOperation,
@@ -67,7 +66,7 @@ internal class EventDownSyncTask @Inject constructor(
             result = eventRemoteDataSource.getEvents(
                 requestId,
                 operation.queryEvent.fromDomainToApi(),
-                scope
+                scope,
             )
 
             result.eventStream
@@ -76,11 +75,10 @@ internal class EventDownSyncTask @Inject constructor(
                     // Track a case when event stream is closed due to a parser error,
                     // but the exception is handled gracefully and channel is closed correctly.
                     errorType = it.javaClass.simpleName
-                }
-                .collect {
+                }.collect {
                     batchOfEventsToProcess.add(it)
                     count++
-                    //We immediately process the first event to initialise a progress
+                    // We immediately process the first event to initialise a progress
                     if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
                         if (count == 1) {
                             // Track the moment when the first event is received
@@ -128,14 +126,14 @@ internal class EventDownSyncTask @Inject constructor(
                             query.attendantId,
                             query.subjectId,
                             query.modes.map { it.name },
-                            query.lastEventId
+                            query.lastEventId,
                         )
                     },
                     msToFirstResponseByte = firstEventTimestamp?.let { it.ms - requestStartTime.ms },
                     eventRead = count,
                     errorType = errorType,
                     responseStatus = result?.status,
-                )
+                ),
             )
         }
     }
@@ -154,22 +152,22 @@ internal class EventDownSyncTask @Inject constructor(
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
         lastOperation: EventDownSyncOperation,
     ): EventDownSyncOperation {
+        val actions = batchOfEventsToProcess
+            .map { event ->
+                return@map when (event.type) {
+                    EnrolmentRecordEventType.EnrolmentRecordCreation -> {
+                        handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)
+                    }
 
-        val actions = batchOfEventsToProcess.map { event ->
-            return@map when (event.type) {
-                EnrolmentRecordEventType.EnrolmentRecordCreation -> {
-                    handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)
-                }
+                    EnrolmentRecordEventType.EnrolmentRecordDeletion -> {
+                        handleSubjectDeletionEvent(event as EnrolmentRecordDeletionEvent)
+                    }
 
-                EnrolmentRecordEventType.EnrolmentRecordDeletion -> {
-                    handleSubjectDeletionEvent(event as EnrolmentRecordDeletionEvent)
+                    EnrolmentRecordEventType.EnrolmentRecordMove -> {
+                        handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
+                    }
                 }
-
-                EnrolmentRecordEventType.EnrolmentRecordMove -> {
-                    handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
-                }
-            }
-        }.flatten()
+            }.flatten()
 
         enrolmentRecordRepository.performActions(actions)
 
@@ -208,7 +206,6 @@ internal class EventDownSyncTask @Inject constructor(
         val actions = mutableListOf<SubjectAction>()
         when {
             !modulesIdsUnderSyncing.isNullOrEmpty() -> {
-
                 /**
                  * handleSubjectMoveEvent is executed by each worker to process a new moveEvent.
                  * The deletion part of a move is executed if:
@@ -227,14 +224,13 @@ internal class EventDownSyncTask @Inject constructor(
                 if (enrolmentRecordDeletion.isUnderSyncingByCurrentDownSyncOperation(operation) &&
                     (!enrolmentRecordCreation.isUnderOverallSyncing())
                 ) {
-
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
 
                 if (enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
                         actions.add(
-                            it
+                            it,
                         )
                     }
                 }
@@ -248,7 +244,7 @@ internal class EventDownSyncTask @Inject constructor(
                 if (attendantUnderSyncing == enrolmentRecordCreation.attendantId.value) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
                         actions.add(
-                            it
+                            it,
                         )
                     }
                 }
@@ -258,7 +254,7 @@ internal class EventDownSyncTask @Inject constructor(
                 actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
                     actions.add(
-                        it
+                        it,
                     )
                 }
             }
@@ -277,7 +273,6 @@ internal class EventDownSyncTask @Inject constructor(
             }
         }
 
-
     private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
         op.queryEvent.moduleId == moduleId.value
 
@@ -293,7 +288,6 @@ internal class EventDownSyncTask @Inject constructor(
         listOf(Deletion(event.payload.subjectId))
 
     companion object {
-
         const val EVENTS_BATCH_SIZE = 200
     }
 }

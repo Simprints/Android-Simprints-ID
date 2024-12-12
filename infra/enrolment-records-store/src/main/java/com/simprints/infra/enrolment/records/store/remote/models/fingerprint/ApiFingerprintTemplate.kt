@@ -8,4 +8,3 @@ internal data class ApiFingerprintTemplate(
     val template: String,
     val finger: ApiFinger,
 )
-

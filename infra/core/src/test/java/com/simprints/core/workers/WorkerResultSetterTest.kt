@@ -7,13 +7,12 @@ import org.junit.Before
 import org.junit.Test
 
 class WorkerResultSetterTest {
-
     private val outputData = workDataOf()
 
     private lateinit var setter: WorkerResultSetter
 
     @Before
-    fun setup(){
+    fun setup() {
         setter = WorkerResultSetter()
     }
 

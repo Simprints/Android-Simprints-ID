@@ -21,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class OverviewViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 

@@ -18,7 +18,6 @@ import kotlin.to
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class AgeGroupDisplayModelTest {
-
     private val context = InstrumentationRegistry.getInstrumentation().context
 
     @Before
@@ -40,5 +39,4 @@ class AgeGroupDisplayModelTest {
             Truth.assertThat(age.displayName(context)).isEqualTo(expected)
         }
     }
-
 }

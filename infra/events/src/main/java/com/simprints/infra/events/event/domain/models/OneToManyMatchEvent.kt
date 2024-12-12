@@ -15,7 +15,6 @@ data class OneToManyMatchEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endTime: Timestamp,
@@ -25,13 +24,12 @@ data class OneToManyMatchEvent(
     ) : this(
         UUID.randomUUID().toString(),
         OneToManyMatchPayload(createdAt, EVENT_VERSION, endTime, pool, matcher, result),
-        ONE_TO_MANY_MATCH
+        ONE_TO_MANY_MATCH,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class OneToManyMatchPayload(
@@ -43,24 +41,23 @@ data class OneToManyMatchEvent(
         val result: List<MatchEntry>?,
         override val type: EventType = ONE_TO_MANY_MATCH,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "matcher: $matcher, pool: ${pool.type}, size: ${pool.count}, results: ${result?.size}"
+        override fun toSafeString(): String = "matcher: $matcher, pool: ${pool.type}, size: ${pool.count}, results: ${result?.size}"
 
         @Keep
-        data class MatchPool(val type: MatchPoolType, val count: Int)
+        data class MatchPool(
+            val type: MatchPoolType,
+            val count: Int,
+        )
 
         @Keep
         enum class MatchPoolType {
-
             USER,
             MODULE,
-            PROJECT;
+            PROJECT,
         }
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

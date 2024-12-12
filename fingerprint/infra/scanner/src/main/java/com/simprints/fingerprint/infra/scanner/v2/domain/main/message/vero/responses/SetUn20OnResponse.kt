@@ -4,12 +4,12 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroR
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.OperationResultCode
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
-class SetUn20OnResponse(val operationResultCode: OperationResultCode) : VeroResponse(VeroMessageType.SET_UN20_ON) {
-
+class SetUn20OnResponse(
+    val operationResultCode: OperationResultCode,
+) : VeroResponse(VeroMessageType.SET_UN20_ON) {
     override fun getDataBytes(): ByteArray = byteArrayOf(operationResultCode.byte)
 
     companion object {
-        fun fromBytes(data: ByteArray) =
-            SetUn20OnResponse(OperationResultCode.fromBytes(data))
+        fun fromBytes(data: ByteArray) = SetUn20OnResponse(OperationResultCode.fromBytes(data))
     }
 }

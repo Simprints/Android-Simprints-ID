@@ -29,7 +29,6 @@ import java.io.File
  */
 @RunWith(AndroidJUnit4::class)
 class EventMigrationTest {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -56,36 +55,37 @@ class EventMigrationTest {
                 JsonHelper.fromJson(
                     json = eventJson,
                     type = object : TypeReference<Event>() {},
-                    module = tokenizeSerializationModule
+                    module = tokenizeSerializationModule,
                 )
             }
         }
         helper.closeWhenFinished(db)
     }
 
-    private fun loadAllEvents(): List<ContentValues> =
-        File("src/test/resources/all-events").walk().map {
+    private fun loadAllEvents(): List<ContentValues> = File("src/test/resources/all-events")
+        .walk()
+        .map {
             return@map if (it.isDirectory) null else loadEvent(it)
-        }.toList().filterNotNull()
+        }.toList()
+        .filterNotNull()
 
-    private fun loadEvent(file: File): ContentValues =
-        try {
-            // Some migrations expect that eventJson is a string without spaces or new lines as it is in the real database
-            val eventJsonStr = file.readText().replace("\n", "").replace(" ", "")
-            val eventJson = JSONObject(eventJsonStr)
-            val payload = eventJson.getJSONObject("payload")
+    private fun loadEvent(file: File): ContentValues = try {
+        // Some migrations expect that eventJson is a string without spaces or new lines as it is in the real database
+        val eventJsonStr = file.readText().replace("\n", "").replace(" ", "")
+        val eventJson = JSONObject(eventJsonStr)
+        val payload = eventJson.getJSONObject("payload")
 
-            ContentValues().apply {
-                this.put("id", eventJson.getString("id"))
-                this.put("type", eventJson.getString("type"))
-                this.put("eventJson", eventJsonStr)
-                this.put("createdAt", payload.getLong("createdAt"))
-                this.put("endedAt", payload.getLong("endedAt"))
-            }
-        } catch (e: Exception) {
-            println("Fail to parse $file")
-            throw e
+        ContentValues().apply {
+            this.put("id", eventJson.getString("id"))
+            this.put("type", eventJson.getString("type"))
+            this.put("eventJson", eventJsonStr)
+            this.put("createdAt", payload.getLong("createdAt"))
+            this.put("endedAt", payload.getLong("endedAt"))
         }
+    } catch (e: Exception) {
+        println("Fail to parse $file")
+        throw e
+    }
 
     private fun validateAllEventsArePresent(events: List<ContentValues>) {
         allEventTypes.forEach { eventType ->
@@ -96,7 +96,6 @@ class EventMigrationTest {
     }
 
     companion object {
-
         private const val TEST_DB = "test"
         private const val TABLE_NAME = "DbEvent"
         private val ALL_MIGRATIONS = arrayOf(
@@ -121,4 +120,3 @@ class EventMigrationTest {
         }
     }
 }
-

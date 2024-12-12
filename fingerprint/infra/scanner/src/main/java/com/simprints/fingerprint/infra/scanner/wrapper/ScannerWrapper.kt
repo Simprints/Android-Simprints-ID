@@ -13,11 +13,12 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
  * an [UnavailableVero2FeatureException].
  */
 interface ScannerWrapper {
-
     fun isImageTransferSupported(): Boolean
 
     suspend fun connect()
+
     suspend fun disconnect()
+
     fun isConnected(): Boolean
 
     /**
@@ -28,6 +29,7 @@ interface ScannerWrapper {
     suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk)
 
     suspend fun sensorWakeUp()
+
     suspend fun sensorShutDown()
 
     fun isLiveFeedbackAvailable(): Boolean
@@ -41,11 +43,16 @@ interface ScannerWrapper {
     suspend fun turnOffSmileLeds()
 
     fun registerTriggerListener(triggerListener: ScannerTriggerListener)
+
     fun unregisterTriggerListener(triggerListener: ScannerTriggerListener)
+
     fun versionInformation(): ScannerVersion
+
     fun batteryInformation(): BatteryInfo
 
     suspend fun turnOnFlashingWhiteSmileLeds()
+
     suspend fun setUiGoodCapture()
+
     suspend fun setUiBadCapture()
 }

@@ -7,7 +7,6 @@ import org.junit.Test
 import java.util.UUID
 
 class EventUpSyncOperationTest {
-
     @Test
     fun eventUpSyncOperationForProjectScope_hasAnUniqueKey() {
         val op = projectUpSyncScope.operation

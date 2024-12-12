@@ -31,17 +31,14 @@ abstract class RecentUserActivityModule {
 @Module
 @InstallIn(SingletonComponent::class)
 object RecentUserActivityDataStoreModule {
-
     @Singleton
     @Provides
     internal fun provideProjectProtoDataStore(
         @ApplicationContext appContext: Context,
-        projectRealmMigration: RecentUserActivitySharedPrefsMigration
-    ): DataStore<ProtoRecentUserActivity> {
-        return DataStoreFactory.create(
-            serializer = RecentUserActivitySerializer,
-            produceFile = { appContext.dataStoreFile(RECENT_USER_ACTIVITY_DATA_STORE_FILE_NAME) },
-            migrations = listOf(projectRealmMigration)
-        )
-    }
+        projectRealmMigration: RecentUserActivitySharedPrefsMigration,
+    ): DataStore<ProtoRecentUserActivity> = DataStoreFactory.create(
+        serializer = RecentUserActivitySerializer,
+        produceFile = { appContext.dataStoreFile(RECENT_USER_ACTIVITY_DATA_STORE_FILE_NAME) },
+        migrations = listOf(projectRealmMigration),
+    )
 }

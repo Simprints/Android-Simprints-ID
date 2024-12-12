@@ -13,13 +13,11 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 internal class SessionEventRepositoryImplTest {
-
     @MockK
     private lateinit var eventRepository: EventRepository
 
@@ -150,9 +148,11 @@ internal class SessionEventRepositoryImplTest {
         sessionEventRepository.removeLocationDataFromCurrentSession()
 
         coVerify {
-            eventRepository.saveEventScope(withArg {
-                assertThat(it.payload.location).isNull()
-            })
+            eventRepository.saveEventScope(
+                withArg {
+                    assertThat(it.payload.location).isNull()
+                },
+            )
         }
     }
 
@@ -214,5 +214,4 @@ internal class SessionEventRepositoryImplTest {
         assertThat(sessionDataCache.eventScope).isNull()
         assertThat(sessionDataCache.eventCache).isEmpty()
     }
-
 }

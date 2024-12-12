@@ -18,14 +18,14 @@ internal class ProcessRawImageUseCase @Inject constructor(
         settings: FingerprintTemplateAcquisitionSettings,
         rawImage: RawUnprocessedImage,
         un20SerialNumber: ByteArray,
-        brightness: Byte
+        brightness: Byte,
     ): FingerprintImage = withContext(dispatcher) {
         val decodedImage = wsqConverter.fromWSQToRaw(rawImage.imageData)
         val scannerConfig = SecugenImageCorrection.ScannerConfig(
             acquireImageDistortionConfigurationUseCase(),
             settings.processingResolution?.value ?: DEFAULT_RESOLUTION,
             un20SerialNumber,
-            brightness
+            brightness,
         )
         val processedImage =
             secugenImageCorrection.processRawImage(decodedImage.bytes, scannerConfig)
@@ -33,9 +33,10 @@ internal class ProcessRawImageUseCase @Inject constructor(
             processedImage.imageBytes,
             processedImage.width,
             processedImage.height,
-            processedImage.resolution
+            processedImage.resolution,
         )
     }
+
     companion object {
         private const val DEFAULT_RESOLUTION: Short = 500
     }

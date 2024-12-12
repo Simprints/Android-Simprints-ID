@@ -24,9 +24,7 @@ import javax.inject.Inject
 internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     private val realmWrapper: RealmWrapper,
 ) : EnrolmentRecordLocalDataSource {
-
     companion object {
-
         const val PROJECT_ID_FIELD = "projectId"
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
@@ -39,7 +37,9 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
-        it.query(DbSubject::class).buildRealmQueryForSubject(query)
+        it
+            .query(DbSubject::class)
+            .buildRealmQueryForSubject(query)
             .find()
             .map { dbSubject -> dbSubject.fromDbToDomain() }
     }
@@ -49,13 +49,14 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         range: IntRange,
         dataSource: BiometricDataSource,
     ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
-        realm.query(DbSubject::class)
+        realm
+            .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .find { it.subList(range.first, range.last) }
             .map { subject ->
                 FingerprintIdentity(
                     subject.subjectId.toString(),
-                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain)
+                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
                 )
             }
     }
@@ -65,13 +66,14 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         range: IntRange,
         dataSource: BiometricDataSource,
     ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
-        realm.query(DbSubject::class)
+        realm
+            .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .find { it.subList(range.first, range.last) }
             .map { subject ->
                 FaceIdentity(
                     subject.subjectId.toString(),
-                    subject.faceSamples.map(DbFaceSample::fromDbToDomain)
+                    subject.faceSamples.map(DbFaceSample::fromDbToDomain),
                 )
             }
     }
@@ -94,18 +96,19 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         query: SubjectQuery,
         dataSource: BiometricDataSource,
     ): Int = realmWrapper.readRealm { realm ->
-        realm.query(DbSubject::class)
+        realm
+            .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .count()
             .find()
             .toInt()
     }
 
-
     override suspend fun performActions(actions: List<SubjectAction>) {
         // if there is no actions to perform return to avoid useless realm operations
         if (actions.isEmpty()) {
-            Simber.tag(CrashReportTag.REALM_DB.name)
+            Simber
+                .tag(CrashReportTag.REALM_DB.name)
                 .d("[SubjectLocalDataSourceImpl] No realm actions to perform ")
             return
         }
@@ -115,25 +118,25 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 when (action) {
                     is SubjectAction.Creation -> realm.copyToRealm(
                         action.subject.fromDomainToDb(),
-                        updatePolicy = UpdatePolicy.ALL
+                        updatePolicy = UpdatePolicy.ALL,
                     )
 
                     is SubjectAction.Deletion -> realm.delete(
-                        realm.query(DbSubject::class).buildRealmQueryForSubject(
-                            query = SubjectQuery(
-                                subjectId =
-                                action.subjectId
-                            )
-                        ).find()
+                        realm
+                            .query(DbSubject::class)
+                            .buildRealmQueryForSubject(
+                                query = SubjectQuery(
+                                    subjectId =
+                                        action.subjectId,
+                                ),
+                            ).find(),
                     )
                 }
             }
         }
     }
 
-    private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(
-        query: SubjectQuery,
-    ): RealmQuery<DbSubject> {
+    private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> {
         var realmQuery = this
 
         if (query.projectId != null) {
@@ -142,13 +145,13 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         if (query.subjectId != null) {
             realmQuery = realmQuery.query(
                 "$SUBJECT_ID_FIELD == $0",
-                RealmUUID.from(query.subjectId)
+                RealmUUID.from(query.subjectId),
             )
         }
         if (query.subjectIds != null) {
             realmQuery = realmQuery.query(
                 "$SUBJECT_ID_FIELD IN $0",
-                query.subjectIds.map { RealmUUID.from(it) }
+                query.subjectIds.map { RealmUUID.from(it) },
             )
         }
         if (query.attendantId != null) {
@@ -160,26 +163,26 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         if (query.fingerprintSampleFormat != null) {
             realmQuery = realmQuery.query(
                 "ANY $FINGERPRINT_SAMPLES_FIELD.$FORMAT_FIELD == $0",
-                query.fingerprintSampleFormat
+                query.fingerprintSampleFormat,
             )
         }
         if (query.faceSampleFormat != null) {
             realmQuery = realmQuery.query(
                 "ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $0",
-                query.faceSampleFormat
+                query.faceSampleFormat,
             )
         }
         if (query.afterSubjectId != null) {
             realmQuery = realmQuery.query(
                 "$SUBJECT_ID_FIELD >= $0",
-                RealmUUID.from(query.afterSubjectId)
+                RealmUUID.from(query.afterSubjectId),
             )
         }
         if (query.hasUntokenizedFields != null) {
             realmQuery = realmQuery.query(
                 "$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1",
                 false,
-                false
+                false,
             )
         }
         if (query.sort) {

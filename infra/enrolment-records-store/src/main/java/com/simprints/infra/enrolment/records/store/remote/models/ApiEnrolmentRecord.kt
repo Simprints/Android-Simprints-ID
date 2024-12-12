@@ -13,21 +13,20 @@ internal data class ApiEnrolmentRecord(
     val subjectId: String,
     val moduleId: String,
     val attendantId: String,
-    val biometricReferences: List<ApiBiometricReference>
+    val biometricReferences: List<ApiBiometricReference>,
 )
 
-internal fun Subject.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentRecord =
-    ApiEnrolmentRecord(
-        subjectId,
-        moduleId.value,
-        attendantId.value,
-        buildBiometricReferences(fingerprintSamples, faceSamples, encoder)
-    )
+internal fun Subject.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentRecord = ApiEnrolmentRecord(
+    subjectId,
+    moduleId.value,
+    attendantId.value,
+    buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
+)
 
 internal fun buildBiometricReferences(
     fingerprintSamples: List<FingerprintSample>,
     faceSamples: List<FaceSample>,
-    encoder: EncodingUtils
+    encoder: EncodingUtils,
 ): List<ApiBiometricReference> {
     val biometricReferences = mutableListOf<ApiBiometricReference>()
 

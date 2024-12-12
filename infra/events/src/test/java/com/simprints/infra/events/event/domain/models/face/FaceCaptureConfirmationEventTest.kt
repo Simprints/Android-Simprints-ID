@@ -11,7 +11,6 @@ import org.junit.Test
 
 @Keep
 class FaceCaptureConfirmationEventTest {
-
     @Test
     fun create_FaceCaptureConfirmationEvent() {
         val event = FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE)
@@ -27,4 +26,3 @@ class FaceCaptureConfirmationEventTest {
         }
     }
 }
-

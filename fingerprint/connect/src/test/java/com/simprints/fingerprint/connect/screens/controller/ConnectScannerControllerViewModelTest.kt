@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 
-
 class ConnectScannerControllerViewModelTest {
     private lateinit var viewModel: ConnectScannerControllerViewModel
 

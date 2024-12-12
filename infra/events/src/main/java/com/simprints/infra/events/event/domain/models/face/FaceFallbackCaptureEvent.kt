@@ -18,20 +18,18 @@ data class FaceFallbackCaptureEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         startTime: Timestamp,
         endTime: Timestamp,
     ) : this(
         UUID.randomUUID().toString(),
         FaceFallbackCapturePayload(startTime, endTime, EVENT_VERSION),
-        FACE_FALLBACK_CAPTURE
+        FACE_FALLBACK_CAPTURE,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FaceFallbackCapturePayload(
@@ -42,7 +40,6 @@ data class FaceFallbackCaptureEvent(
     ) : EventPayload()
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

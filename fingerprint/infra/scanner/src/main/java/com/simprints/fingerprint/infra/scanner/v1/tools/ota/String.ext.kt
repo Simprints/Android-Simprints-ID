@@ -8,8 +8,8 @@ fun String.hexStringToIntArray(): IntArray {
 
     val result = IntArray(length / 2)
     for (i in 0 until length step 2) {
-        val firstIndex = HEX_CHARS.indexOf(this[i]);
-        val secondIndex = HEX_CHARS.indexOf(this[i + 1]);
+        val firstIndex = HEX_CHARS.indexOf(this[i])
+        val secondIndex = HEX_CHARS.indexOf(this[i + 1])
         val octet = firstIndex.shl(4).or(secondIndex)
         result[i.shr(1)] = octet.toByte().toPositiveInt()
     }

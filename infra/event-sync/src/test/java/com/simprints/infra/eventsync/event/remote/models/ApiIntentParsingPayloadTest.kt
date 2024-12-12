@@ -6,7 +6,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class ApiIntentParsingPayloadTest {
-
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
         val payload = ApiIntentParsingPayload(domainPayload = mockk(relaxed = true))

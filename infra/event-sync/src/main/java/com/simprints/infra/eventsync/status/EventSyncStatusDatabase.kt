@@ -15,7 +15,6 @@ import com.simprints.infra.eventsync.status.up.local.DbEventsUpSyncOperationStat
 @TypeConverters(Converters::class)
 @Keep
 internal abstract class EventSyncStatusDatabase : RoomDatabase() {
-
     abstract val downSyncOperationsDao: DbEventDownSyncOperationStateDao
 
     abstract val upSyncOperationsDaoDb: DbEventUpSyncOperationStateDao

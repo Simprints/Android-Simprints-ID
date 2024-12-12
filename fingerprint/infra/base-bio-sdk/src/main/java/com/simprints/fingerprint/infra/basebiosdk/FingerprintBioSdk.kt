@@ -16,11 +16,9 @@ class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, 
      * Initialize the SDK with the given parameters
      *
      */
-    suspend fun initialize(initializationParams: SdkConfig? = null) =
-        sdkInitializer.initialize(initializationParams)
+    suspend fun initialize(initializationParams: SdkConfig? = null) = sdkInitializer.initialize(initializationParams)
 
-    suspend fun acquireFingerprintImage(settings: ImageRequestSettings? = null) =
-        fingerprintImageProvider.acquireFingerprintImage(settings)
+    suspend fun acquireFingerprintImage(settings: ImageRequestSettings? = null) = fingerprintImageProvider.acquireFingerprintImage(settings)
 
     suspend fun acquireFingerprintTemplate(settings: TemplateRequestSettings? = null) =
         fingerprintTemplateProvider.acquireFingerprintTemplate(settings)
@@ -28,12 +26,11 @@ class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, 
     suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
-        matchingSettings: MatcherSettings?
+        matchingSettings: MatcherSettings?,
     ) = fingerprintMatcher.match(probe, candidates, matchingSettings)
 
     val supportedTemplateFormat: String
         get() = fingerprintMatcher.supportedTemplateFormat
     val matcherName: String
         get() = fingerprintMatcher.matcherName
-
 }

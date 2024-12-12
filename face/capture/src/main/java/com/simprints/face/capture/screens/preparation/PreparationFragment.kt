@@ -20,7 +20,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
-
     private val binding by viewBinding(FragmentPreparationBinding::bind)
 
     private val mainVm: FaceCaptureViewModel by activityViewModels()
@@ -29,7 +28,10 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
     lateinit var faceTimeHelper: TimeHelper
     private var startTime: Timestamp = Timestamp(0)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         startTime = faceTimeHelper.now()
 
         binding.detectionOnboardingFrame.setOnClickListener {

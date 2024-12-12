@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class RefusalCallbackEventTest {
-
     @Test
     fun create_RefusalCallbackEvent() {
         val event = RefusalCallbackEvent(CREATED_AT, "some_reason", "some_extra")

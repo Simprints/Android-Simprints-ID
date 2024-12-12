@@ -17,7 +17,6 @@ data class FaceCaptureBiometricsEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         startTime: Timestamp,
         face: FaceCaptureBiometricsPayload.Face,
@@ -29,15 +28,14 @@ data class FaceCaptureBiometricsEvent(
             createdAt = startTime,
             eventVersion = EVENT_VERSION,
             face = face,
-            id = payloadId
+            id = payloadId,
         ),
-        EventType.FACE_CAPTURE_BIOMETRICS
+        EventType.FACE_CAPTURE_BIOMETRICS,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FaceCaptureBiometricsPayload(
@@ -48,7 +46,6 @@ data class FaceCaptureBiometricsEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = EventType.FACE_CAPTURE_BIOMETRICS,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "format: ${face.format}, quality: ${face.quality}"
 
         @Keep
@@ -62,7 +59,6 @@ data class FaceCaptureBiometricsEvent(
     }
 
     companion object {
-
         const val EVENT_VERSION = 1
     }
 }

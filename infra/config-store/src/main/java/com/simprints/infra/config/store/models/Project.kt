@@ -12,5 +12,7 @@ data class Project(
 )
 
 enum class TokenKeyType {
-    AttendantId, ModuleId, Unknown
+    AttendantId,
+    ModuleId,
+    Unknown,
 }

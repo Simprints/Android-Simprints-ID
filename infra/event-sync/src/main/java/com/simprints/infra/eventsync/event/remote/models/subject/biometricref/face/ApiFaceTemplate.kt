@@ -3,4 +3,6 @@ package com.simprints.infra.eventsync.event.remote.models.subject.biometricref.f
 import androidx.annotation.Keep
 
 @Keep
-internal data class ApiFaceTemplate(val template: String)
+internal data class ApiFaceTemplate(
+    val template: String,
+)

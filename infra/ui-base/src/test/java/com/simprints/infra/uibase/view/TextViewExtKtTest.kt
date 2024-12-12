@@ -11,7 +11,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TextViewExtKtTest {
-
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val sampleText = context.getString(SAMPLE_TEXT_RESOURCE)
 
@@ -50,5 +49,4 @@ class TextViewExtKtTest {
         private const val RAW_TEXT = "text"
         private const val SAMPLE_TEXT_RESOURCE = android.R.string.ok
     }
-
 }

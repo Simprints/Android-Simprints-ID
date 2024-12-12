@@ -26,7 +26,6 @@ import org.junit.Before
 import org.junit.Test
 
 class EventUpSyncWorkersBuilderTest {
-
     @MockK
     private lateinit var generalConfiguration: GeneralConfiguration
 
@@ -35,7 +34,6 @@ class EventUpSyncWorkersBuilderTest {
 
     @MockK
     private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
-
 
     private lateinit var eventUpSyncWorkersBuilder: EventUpSyncWorkersBuilder
 
@@ -72,7 +70,8 @@ class EventUpSyncWorkersBuilderTest {
         val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain("uniqueSyncId", "scopeId")
 
         chain.assertNumberOfUpSyncUploaderWorkers(1)
-        chain.first { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
+        chain
+            .first { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
             .assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
     }
 
@@ -86,10 +85,10 @@ class EventUpSyncWorkersBuilderTest {
 
         val chain = eventUpSyncWorkersBuilder.buildUpSyncWorkerChain("uniqueSyncId", "scopeId")
         chain.assertNumberOfUpSyncUploaderWorkers(1)
-        chain.first { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
+        chain
+            .first { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
             .assertSubjectsUpSyncDownloaderWorkerTagsForOneTime()
     }
-
 
     private fun WorkRequest.assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic() {
         assertThat(tags.size).isEqualTo(7)
@@ -110,20 +109,15 @@ class EventUpSyncWorkersBuilderTest {
         assertCommonSyncTag()
     }
 
-    private fun WorkRequest.assertUniqueMasterIdTag() =
-        assertThat(tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }).isNotNull()
+    private fun WorkRequest.assertUniqueMasterIdTag() = assertThat(tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }).isNotNull()
 
-    private fun WorkRequest.assertCommonSyncTag() =
-        assertThat(tags).contains(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+    private fun WorkRequest.assertCommonSyncTag() = assertThat(tags).contains(TAG_SUBJECTS_SYNC_ALL_WORKERS)
 
-    private fun WorkRequest.assertCommonUpSyncTag() =
-        assertThat(tags).contains(TAG_SUBJECTS_UP_SYNC_ALL_WORKERS)
+    private fun WorkRequest.assertCommonUpSyncTag() = assertThat(tags).contains(TAG_SUBJECTS_UP_SYNC_ALL_WORKERS)
 
-    private fun WorkRequest.assertScheduleAtTag() =
-        assertThat(tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
+    private fun WorkRequest.assertScheduleAtTag() = assertThat(tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
 
-    private fun WorkRequest.assertUniqueUpSyncMasterTag() =
-        assertThat(tags.firstOrNull { it.contains(TAG_UP_MASTER_SYNC_ID) }).isNotNull()
+    private fun WorkRequest.assertUniqueUpSyncMasterTag() = assertThat(tags.firstOrNull { it.contains(TAG_UP_MASTER_SYNC_ID) }).isNotNull()
 
     private fun List<WorkRequest>.assertNumberOfUpSyncUploaderWorkers(count: Int) =
         assertThat(count { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }).isEqualTo(count)
@@ -132,12 +126,14 @@ class EventUpSyncWorkersBuilderTest {
         val uploaders = filter { it.tags.contains(EventUpSyncUploaderWorker::class.qualifiedName) }
         val jsonHelper = JsonHelper
 
-        assertThat(uploaders.any {
-            it.workSpec.input == workDataOf(
-                INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope),
-                INPUT_EVENT_UP_SYNC_SCOPE_ID to "scopeId"
-            )
-        }).isTrue()
+        assertThat(
+            uploaders.any {
+                it.workSpec.input == workDataOf(
+                    INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope),
+                    INPUT_EVENT_UP_SYNC_SCOPE_ID to "scopeId",
+                )
+            },
+        ).isTrue()
 
         assertThat(uploaders).hasSize(1)
     }

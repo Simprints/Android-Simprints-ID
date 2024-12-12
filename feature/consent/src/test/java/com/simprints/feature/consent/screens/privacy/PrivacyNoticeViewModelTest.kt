@@ -19,7 +19,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-
 internal class PrivacyNoticeViewModelTest {
     companion object {
         private const val PROJECT_ID = "projectId"
@@ -74,7 +73,7 @@ internal class PrivacyNoticeViewModelTest {
     fun `retrievePrivacyNotice should return ContentAvailable when success received`() = runTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(LANGUAGE),
-            PrivacyNoticeResult.Succeed(LANGUAGE, "some long consent")
+            PrivacyNoticeResult.Succeed(LANGUAGE, "some long consent"),
         )
 
         val privacyNoticeLiveData = privacyNoticeViewModel.viewState
@@ -88,7 +87,7 @@ internal class PrivacyNoticeViewModelTest {
     fun `retrievePrivacyNotice should return ConsentNotAvailable when Failed received`() = runTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(LANGUAGE),
-            PrivacyNoticeResult.Failed(LANGUAGE, Throwable())
+            PrivacyNoticeResult.Failed(LANGUAGE, Throwable()),
         )
 
         val privacyNoticeLiveData = privacyNoticeViewModel.viewState
@@ -102,7 +101,7 @@ internal class PrivacyNoticeViewModelTest {
     fun `retrievePrivacyNotice should return BackendMaintenance when FailedBecauseBackendMaintenance received`() = runTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(LANGUAGE),
-            PrivacyNoticeResult.FailedBecauseBackendMaintenance(LANGUAGE, Throwable())
+            PrivacyNoticeResult.FailedBecauseBackendMaintenance(LANGUAGE, Throwable()),
         )
 
         val privacyNoticeLiveData = privacyNoticeViewModel.viewState
@@ -116,7 +115,7 @@ internal class PrivacyNoticeViewModelTest {
     fun `retrievePrivacyNotice should return BackendMaintenance with estimation when FailedBecauseBackendMaintenance received`() = runTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             PrivacyNoticeResult.InProgress(LANGUAGE),
-            PrivacyNoticeResult.FailedBecauseBackendMaintenance(LANGUAGE, Throwable(), 1000L)
+            PrivacyNoticeResult.FailedBecauseBackendMaintenance(LANGUAGE, Throwable(), 1000L),
         )
 
         val privacyNoticeLiveData = privacyNoticeViewModel.viewState

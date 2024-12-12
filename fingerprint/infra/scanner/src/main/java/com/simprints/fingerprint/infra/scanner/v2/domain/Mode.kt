@@ -7,5 +7,5 @@ enum class Mode {
     ROOT,
     MAIN,
     CYPRESS_OTA,
-    STM_OTA
+    STM_OTA,
 }

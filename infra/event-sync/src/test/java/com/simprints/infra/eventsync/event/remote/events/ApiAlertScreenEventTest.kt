@@ -43,8 +43,6 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import org.junit.Test
 
 class ApiAlertScreenEventTest {
-
-
     @Test
     fun `should map domain alert screen event to api correctly`() {
         mapOf(
@@ -84,7 +82,7 @@ class ApiAlertScreenEventTest {
             AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP to MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
             AlertScreenEventType.PROJECT_PAUSED to PROJECT_PAUSED,
             AlertScreenEventType.PROJECT_ENDING to PROJECT_ENDING,
-            AlertScreenEventType.BLUETOOTH_NO_PERMISSION to BLUETOOTH_NO_PERMISSION
+            AlertScreenEventType.BLUETOOTH_NO_PERMISSION to BLUETOOTH_NO_PERMISSION,
         ).forEach {
             assertThat(it.key.fromDomainToApi()).isEqualTo(it.value)
         }

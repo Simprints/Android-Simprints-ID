@@ -12,7 +12,6 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data model definition for Realm table")
 class DbSubject : RealmObject {
-
     @PrimaryKey
     var subjectId: RealmUUID = RealmUUID.random()
     var projectId: String = ""

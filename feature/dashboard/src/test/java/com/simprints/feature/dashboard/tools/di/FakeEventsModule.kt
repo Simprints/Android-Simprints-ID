@@ -13,10 +13,9 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [EventsModule::class]
+    replaces = [EventsModule::class],
 )
 object FakeEventsModule {
-
     @Provides
     @Singleton
     fun provideEventRepository(): EventRepository = mockk()
@@ -24,5 +23,4 @@ object FakeEventsModule {
     @Provides
     @Singleton
     fun provideSessionEventRepository(): SessionEventRepository = mockk()
-
 }

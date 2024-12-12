@@ -50,7 +50,6 @@ internal class SyncInfoViewModel @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
-
     val recordsInLocal: LiveData<Int?>
         get() = _recordsInLocal
     private val _recordsInLocal = MutableLiveData<Int?>(null)
@@ -99,7 +98,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     isSyncRunning = lastSyncStateValue?.isSyncRunning(),
                     isConnected = isConnected.value,
                     syncConfiguration = configuration.value?.synchronization,
-                )
+                ),
             )
         }
         _isSyncAvailable.addSource(isConnected) { isConnectedValue ->
@@ -108,7 +107,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     isSyncRunning = lastSyncState.value?.isSyncRunning(),
                     isConnected = isConnectedValue,
                     syncConfiguration = configuration.value?.synchronization,
-                )
+                ),
             )
         }
         _isSyncAvailable.addSource(_configuration) { config ->
@@ -117,7 +116,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     isSyncRunning = lastSyncState.value?.isSyncRunning(),
                     isConnected = isConnected.value,
                     syncConfiguration = config.synchronization,
-                )
+                ),
             )
         }
         _isReloginRequired.addSource(lastSyncState) { lastSyncStateValue ->
@@ -161,7 +160,7 @@ internal class SyncInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val loginArgs = LoginContract.toArgs(
                 authStore.signedInProjectId,
-                authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed
+                authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
             )
             _loginRequestedEventLiveData.send(loginArgs)
         }
@@ -182,7 +181,7 @@ internal class SyncInfoViewModel @Inject constructor(
             async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
             async { _recordsToDownSync.postValue(fetchRecordsToCreateAndDeleteCount()) },
             async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
-            async { _moduleCounts.postValue(getModuleCounts(projectId)) }
+            async { _moduleCounts.postValue(getModuleCounts(projectId)) },
         )
     }
 
@@ -190,13 +189,14 @@ internal class SyncInfoViewModel @Inject constructor(
         isSyncRunning: Boolean?,
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
-    ) = isConnected == true
-        && isSyncRunning == false
-        && syncConfiguration?.let {
-        !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(
-            it
-        )
-    } == true
+    ) = isConnected == true &&
+        isSyncRunning == false &&
+        syncConfiguration?.let {
+            !isModuleSync(it.down) ||
+                isModuleSyncAndModuleIdOptionsNotEmpty(
+                    it,
+                )
+        } == true
 
     private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
         syncConfiguration.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
@@ -204,13 +204,12 @@ internal class SyncInfoViewModel @Inject constructor(
     fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
         synchronizationConfiguration.down.let { it.moduleOptions.isNotEmpty() && isModuleSync(it) }
 
-    private suspend fun getRecordsInLocal(projectId: String): Int =
-        enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
+    private suspend fun getRecordsInLocal(projectId: String): Int = enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
 
-    private suspend fun getRecordsToUpSync(): Int =
-        eventSyncManager.countEventsToUpload(EventType.ENROLMENT_V2)
-            .firstOrNull()
-            ?: 0
+    private suspend fun getRecordsToUpSync(): Int = eventSyncManager
+        .countEventsToUpload(EventType.ENROLMENT_V2)
+        .firstOrNull()
+        ?: 0
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
         if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
@@ -219,28 +218,26 @@ internal class SyncInfoViewModel @Inject constructor(
             DownSyncCounts(0, isLowerBound = false)
         }
 
-    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts =
-        try {
-            eventSyncManager.countEventsToDownload()
-        } catch (t: Throwable) {
-            Simber.d(t)
-            DownSyncCounts(0, isLowerBound = false)
-        }
+    private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts = try {
+        eventSyncManager.countEventsToDownload()
+    } catch (t: Throwable) {
+        Simber.d(t)
+        DownSyncCounts(0, isLowerBound = false)
+    }
 
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
         configManager.getDeviceConfiguration().selectedModules.map { moduleName ->
             val count = enrolmentRecordRepository.count(
-                SubjectQuery(projectId = projectId, moduleId = moduleName.value)
+                SubjectQuery(projectId = projectId, moduleId = moduleName.value),
             )
             val decryptedName = when (moduleName) {
                 is TokenizableString.Raw -> moduleName
                 is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                     encrypted = moduleName,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    project = configManager.getProject(projectId)
+                    project = configManager.getProject(projectId),
                 )
             }
             return@map ModuleCount(name = decryptedName.value, count = count)
         }
-
 }

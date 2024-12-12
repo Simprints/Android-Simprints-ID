@@ -8,72 +8,74 @@ fun Byte.unsignedToInt() = (this + Byte.MAX_VALUE - Byte.MIN_VALUE + 1) % (Byte.
 /** Interprets negative shorts as if it where an unsigned short (e.g. -0x0001 -> 0xFFFF) */
 fun Short.unsignedToInt() = (this + Short.MAX_VALUE - Short.MIN_VALUE + 1) % (Short.MAX_VALUE - Short.MIN_VALUE + 1)
 
-fun Short.toByteArray(byteOrder: ByteOrder): ByteArray =
-    this.unsignedToInt().let {
-        when (byteOrder) {
-            ByteOrder.LITTLE_ENDIAN -> byteArrayOf(
-                (it and 0xFFFF),
-                ((it ushr 8) and 0xFFFF)
-            )
+fun Short.toByteArray(byteOrder: ByteOrder): ByteArray = this.unsignedToInt().let {
+    when (byteOrder) {
+        ByteOrder.LITTLE_ENDIAN -> byteArrayOf(
+            (it and 0xFFFF),
+            ((it ushr 8) and 0xFFFF),
+        )
 
-            else -> byteArrayOf(
-                ((it ushr 8) and 0xFFFF),
-                (it and 0xFFFF)
-            )
-        }
+        else -> byteArrayOf(
+            ((it ushr 8) and 0xFFFF),
+            (it and 0xFFFF),
+        )
     }
+}
 
-fun Int.toByteArray(byteOrder: ByteOrder): ByteArray =
-    let {
-        when (byteOrder) {
-            ByteOrder.LITTLE_ENDIAN -> byteArrayOf(
-                (it and 0xFFFF),
-                ((it ushr 8) and 0xFFFF),
-                ((it ushr 16) and 0xFFFF),
-                ((it ushr 24) and 0xFFFF)
-            )
+fun Int.toByteArray(byteOrder: ByteOrder): ByteArray = let {
+    when (byteOrder) {
+        ByteOrder.LITTLE_ENDIAN -> byteArrayOf(
+            (it and 0xFFFF),
+            ((it ushr 8) and 0xFFFF),
+            ((it ushr 16) and 0xFFFF),
+            ((it ushr 24) and 0xFFFF),
+        )
 
-            else -> byteArrayOf(
-                ((it ushr 24) and 0xFFFF),
-                ((it ushr 16) and 0xFFFF),
-                ((it ushr 8) and 0xFFFF),
-                (it and 0xFFFF)
-            )
-        }
+        else -> byteArrayOf(
+            ((it ushr 24) and 0xFFFF),
+            ((it ushr 16) and 0xFFFF),
+            ((it ushr 8) and 0xFFFF),
+            (it and 0xFFFF),
+        )
     }
+}
 
-fun Long.toByteArray(byteOrder: ByteOrder): ByteArray =
-    let {
-        when (byteOrder) {
-            ByteOrder.LITTLE_ENDIAN -> byteArrayOf(
-                (it and 0xFFFF).toByte(),
-                ((it ushr 8) and 0xFFFF).toByte(),
-                ((it ushr 16) and 0xFFFF).toByte(),
-                ((it ushr 24) and 0xFFFF).toByte(),
-                ((it ushr 32) and 0xFFFF).toByte(),
-                ((it ushr 40) and 0xFFFF).toByte(),
-                ((it ushr 48) and 0xFFFF).toByte(),
-                ((it ushr 56) and 0xFFFF).toByte()
-            )
+fun Long.toByteArray(byteOrder: ByteOrder): ByteArray = let {
+    when (byteOrder) {
+        ByteOrder.LITTLE_ENDIAN -> byteArrayOf(
+            (it and 0xFFFF).toByte(),
+            ((it ushr 8) and 0xFFFF).toByte(),
+            ((it ushr 16) and 0xFFFF).toByte(),
+            ((it ushr 24) and 0xFFFF).toByte(),
+            ((it ushr 32) and 0xFFFF).toByte(),
+            ((it ushr 40) and 0xFFFF).toByte(),
+            ((it ushr 48) and 0xFFFF).toByte(),
+            ((it ushr 56) and 0xFFFF).toByte(),
+        )
 
-            else -> byteArrayOf(
-                ((it ushr 56) and 0xFFFF).toByte(),
-                ((it ushr 48) and 0xFFFF).toByte(),
-                ((it ushr 40) and 0xFFFF).toByte(),
-                ((it ushr 32) and 0xFFFF).toByte(),
-                ((it ushr 24) and 0xFFFF).toByte(),
-                ((it ushr 16) and 0xFFFF).toByte(),
-                ((it ushr 8) and 0xFFFF).toByte(),
-                (it and 0xFFFF).toByte()
-            )
-        }
+        else -> byteArrayOf(
+            ((it ushr 56) and 0xFFFF).toByte(),
+            ((it ushr 48) and 0xFFFF).toByte(),
+            ((it ushr 40) and 0xFFFF).toByte(),
+            ((it ushr 32) and 0xFFFF).toByte(),
+            ((it ushr 24) and 0xFFFF).toByte(),
+            ((it ushr 16) and 0xFFFF).toByte(),
+            ((it ushr 8) and 0xFFFF).toByte(),
+            (it and 0xFFFF).toByte(),
+        )
     }
+}
 
 /** @throws IllegalArgumentException if odd number of hex characters */
 fun String.hexToByteArray(): ByteArray {
     val s = stripWhiteSpaceToLowercase()
     if (s.length % 2 != 0) throw IllegalArgumentException("String must contain even number of bytes")
-    if ("""([^a-f\d])""".toRegex().containsMatchIn(s)) throw IllegalArgumentException("String must contain only whitespace and hex characters (0-9,a-f,A-F)")
+    if ("""([^a-f\d])""".toRegex().containsMatchIn(
+            s,
+        )
+    ) {
+        throw IllegalArgumentException("String must contain only whitespace and hex characters (0-9,a-f,A-F)")
+    }
     val data = ByteArray(s.length / 2)
     var i = 0
 
@@ -85,14 +87,15 @@ fun String.hexToByteArray(): ByteArray {
     return data
 }
 
-fun ByteArray.toHexString() = StringBuilder().apply {
-    this@toHexString.forEach {
-        var str = Integer.toHexString((it.toInt() + 256) % 256)
-        str = when (str.length) {
-            0 -> "00"
-            1 -> "0$str"
-            else -> str
-        }.toUpperCase() + " "
-        append(str)
-    }
-}.toString()
+fun ByteArray.toHexString() = StringBuilder()
+    .apply {
+        this@toHexString.forEach {
+            var str = Integer.toHexString((it.toInt() + 256) % 256)
+            str = when (str.length) {
+                0 -> "00"
+                1 -> "0$str"
+                else -> str
+            }.toUpperCase() + " "
+            append(str)
+        }
+    }.toString()

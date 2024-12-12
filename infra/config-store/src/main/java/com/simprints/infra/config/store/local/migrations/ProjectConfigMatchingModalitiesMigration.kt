@@ -8,22 +8,21 @@ import javax.inject.Inject
 /**
  * Can be removed once all the devices have been updated to 2024.2.1
  */
-internal class ProjectConfigMatchingModalitiesMigration @Inject constructor(
-) : DataMigration<ProtoProjectConfiguration> {
-
+internal class ProjectConfigMatchingModalitiesMigration @Inject constructor() : DataMigration<ProtoProjectConfiguration> {
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration): Boolean =
         currentData.general.matchingModalitiesList.isEmpty()
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
         Simber.i("Start migration of matching modalities")
 
-        return currentData.toBuilder()
+        return currentData
+            .toBuilder()
             .setGeneral(
-                currentData.general.toBuilder()
+                currentData.general
+                    .toBuilder()
                     .addAllMatchingModalities(currentData.general.modalitiesList)
-                    .build()
-            )
-            .build()
+                    .build(),
+            ).build()
     }
 
     override suspend fun cleanUp() {

@@ -5,7 +5,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration13to14 : Migration(13, 14) {
-
     override fun migrate(database: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 13 to schema 14.")
         updateSessionScopesToEventScopes(database)
@@ -26,12 +25,13 @@ internal class EventMigration13to14 : Migration(13, 14) {
                 |`end_isTrustworthy` INTEGER,
                 |`end_msSinceBoot` INTEGER,
                 |`payloadJson` TEXT NOT NULL,
-                |PRIMARY KEY(`id`))""".trimMargin()
+                |PRIMARY KEY(`id`))
+            """.trimMargin(),
         )
 
         // copy existing data into new table
         database.execSQL(
-            "INSERT INTO $EVENT_SCOPE_TABLE_NAME ($EVENT_SCOPE_COLUMNS) SELECT $SESSION_SCOPE_OLD_COLUMNS FROM $SESSION_SCOPE_TABLE_NAME"
+            "INSERT INTO $EVENT_SCOPE_TABLE_NAME ($EVENT_SCOPE_COLUMNS) SELECT $SESSION_SCOPE_OLD_COLUMNS FROM $SESSION_SCOPE_TABLE_NAME",
         )
 
         // delete the old table
@@ -39,7 +39,6 @@ internal class EventMigration13to14 : Migration(13, 14) {
     }
 
     companion object {
-
         private const val EVENT_SCOPE_TABLE_NAME = "DbEventScope"
         private const val SESSION_SCOPE_TABLE_NAME = "DbSessionScope"
 
@@ -47,7 +46,5 @@ internal class EventMigration13to14 : Migration(13, 14) {
             "id, projectId, type, start_unixMs, start_isTrustworthy, start_msSinceBoot, end_unixMs, end_isTrustworthy, end_msSinceBoot, payloadJson"
         private const val SESSION_SCOPE_OLD_COLUMNS =
             "id, projectId, 'SESSION', start_unixMs, start_isTrustworthy, start_msSinceBoot, end_unixMs, end_isTrustworthy, end_msSinceBoot, payloadJson"
-
     }
 }
-

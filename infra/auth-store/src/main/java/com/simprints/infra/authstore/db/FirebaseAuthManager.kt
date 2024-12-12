@@ -24,9 +24,8 @@ import javax.inject.Inject
 internal class FirebaseAuthManager @Inject constructor(
     private val loginInfoStore: LoginInfoStore,
     @ApplicationContext private val context: Context,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) {
-
     suspend fun signIn(token: Token) {
         cacheTokenClaims(token.value)
         cacheFirebaseOptions(token)
@@ -62,25 +61,25 @@ internal class FirebaseAuthManager @Inject constructor(
         }
     }
 
-    suspend fun getCurrentToken(): String =
-        withContext(dispatcherIO) {
-            // Projects that were signed in and then updated to 2021.2.0 need to check the
-            // previous Firebase project until they login again.
-            val result = try {
-                FirebaseAuth.getInstance(getLegacyAppFallback())
-                    .currentUser
-                    ?.getIdToken(false)
-                    ?.await()
-            } catch (ex: Exception) {
-                Simber.e(ex, "Failed to get access token")
-                throw transformFirebaseExceptionIfNeeded(ex)
-            }
-
-            result?.token
-                ?.also { cacheTokenClaims(it) }
-                ?: throw RemoteDbNotSignedInException()
+    suspend fun getCurrentToken(): String = withContext(dispatcherIO) {
+        // Projects that were signed in and then updated to 2021.2.0 need to check the
+        // previous Firebase project until they login again.
+        val result = try {
+            FirebaseAuth
+                .getInstance(getLegacyAppFallback())
+                .currentUser
+                ?.getIdToken(false)
+                ?.await()
+        } catch (ex: Exception) {
+            Simber.e(ex, "Failed to get access token")
+            throw transformFirebaseExceptionIfNeeded(ex)
         }
 
+        result
+            ?.token
+            ?.also { cacheTokenClaims(it) }
+            ?: throw RemoteDbNotSignedInException()
+    }
 
     private fun cacheTokenClaims(claim: String) {
         extractTokenPayloadAsJson(claim)?.let {
@@ -96,18 +95,22 @@ internal class FirebaseAuthManager @Inject constructor(
         loginInfoStore.coreFirebaseApiKey = token.apiKey
     }
 
-    private fun getFirebaseOptions(token: Token): FirebaseOptions = FirebaseOptions.Builder()
+    private fun getFirebaseOptions(token: Token): FirebaseOptions = FirebaseOptions
+        .Builder()
         .setProjectId(token.projectId)
         .setApplicationId(token.applicationId)
         .setApiKey(token.apiKey)
         .build()
 
-    private fun initializeCoreProject(token: Token, context: Context) {
+    private fun initializeCoreProject(
+        token: Token,
+        context: Context,
+    ) {
         try {
             Firebase.initialize(
                 context.applicationContext,
                 getFirebaseOptions(token),
-                CORE_BACKEND_PROJECT
+                CORE_BACKEND_PROJECT,
             )
         } catch (ex: IllegalStateException) {
             // IllegalStateException = FirebaseApp name coreBackendFirebaseProject already exists!
@@ -116,7 +119,7 @@ internal class FirebaseAuthManager @Inject constructor(
             Firebase.initialize(
                 context.applicationContext,
                 getFirebaseOptions(token),
-                CORE_BACKEND_PROJECT
+                CORE_BACKEND_PROJECT,
             )
         }
     }
@@ -153,12 +156,11 @@ internal class FirebaseAuthManager @Inject constructor(
         // We try to return the core app right away in case there are follow on synchronized requests
         getCoreFirebaseApp()
     } catch (ex: IllegalStateException) {
-
         val token = Token(
             "",
             loginInfoStore.coreFirebaseProjectId,
             loginInfoStore.coreFirebaseApiKey,
-            loginInfoStore.coreFirebaseApplicationId
+            loginInfoStore.coreFirebaseApplicationId,
         )
         check(!(token.projectId.isEmpty() || token.apiKey.isEmpty() || token.applicationId.isEmpty())) {
             "Core Firebase App options are not stored"
@@ -170,7 +172,7 @@ internal class FirebaseAuthManager @Inject constructor(
 
     @Deprecated(
         message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
-        replaceWith = ReplaceWith("getCoreApp()")
+        replaceWith = ReplaceWith("getCoreApp()"),
     )
     fun getLegacyAppFallback() = try {
         getCoreApp()
@@ -179,12 +181,10 @@ internal class FirebaseAuthManager @Inject constructor(
         FirebaseApp.getInstance()
     }
 
-    private fun transformFirebaseExceptionIfNeeded(e: Exception): Exception {
-        return when (e) {
-            // Rethrow as NetworkConnectionException so we handle it properly as connectivity issue
-            is FirebaseNetworkException, is ApiException -> NetworkConnectionException(cause = e)
-            else -> e
-        }
+    private fun transformFirebaseExceptionIfNeeded(e: Exception): Exception = when (e) {
+        // Rethrow as NetworkConnectionException so we handle it properly as connectivity issue
+        is FirebaseNetworkException, is ApiException -> NetworkConnectionException(cause = e)
+        else -> e
     }
 
     companion object {

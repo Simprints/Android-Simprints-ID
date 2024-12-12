@@ -26,31 +26,29 @@ import com.simprints.infra.events.event.local.models.DbEventScope
 import com.simprints.infra.events.local.migrations.EventMigration6to7
 import net.sqlcipher.database.SupportFactory
 
-
 @Database(
     entities = [
         DbEvent::class,
         DbEventScope::class,
     ],
     version = 16,
-    exportSchema = true
+    exportSchema = true,
 )
 @TypeConverters(Converters::class)
 @Keep
 internal abstract class EventRoomDatabase : RoomDatabase() {
-
     abstract val eventDao: EventRoomDao
 
     abstract val scopeDao: SessionScopeRoomDao
 
     companion object {
-
         fun getDatabase(
             context: Context,
             factory: SupportFactory,
             dbName: String,
         ): EventRoomDatabase {
-            val builder = Room.databaseBuilder(context, EventRoomDatabase::class.java, dbName)
+            val builder = Room
+                .databaseBuilder(context, EventRoomDatabase::class.java, dbName)
                 .addMigrations(EventMigration1to2())
                 .addMigrations(EventMigration2to3())
                 .addMigrations(EventMigration3to4())
@@ -67,11 +65,11 @@ internal abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations(EventMigration14to15())
                 .addMigrations(EventMigration15to16())
 
-            if (BuildConfig.DB_ENCRYPTION)
+            if (BuildConfig.DB_ENCRYPTION) {
                 builder.openHelperFactory(factory)
+            }
 
             return builder.build()
         }
-
     }
 }

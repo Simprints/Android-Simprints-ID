@@ -12,7 +12,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class JsonHelperTest {
-
     @Test
     fun validateJson() {
         val json = """{"name": "Test" }"""
@@ -49,12 +48,12 @@ class JsonHelperTest {
         val resultRaw = JsonHelper.fromJson(
             json = jsonRaw,
             module = tokenizableStringModule,
-            type = object : TypeReference<TokenizableString>() {}
+            type = object : TypeReference<TokenizableString>() {},
         )
         val resultEncrypted = JsonHelper.fromJson(
             json = jsonTokenized,
             module = tokenizableStringModule,
-            type = object : TypeReference<TokenizableString>() {}
+            type = object : TypeReference<TokenizableString>() {},
         )
 
         assertThat(resultRaw).isEqualTo(tokenizableRaw.asTokenizableRaw())

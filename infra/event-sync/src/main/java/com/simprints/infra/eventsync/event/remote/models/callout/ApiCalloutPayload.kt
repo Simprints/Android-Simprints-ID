@@ -19,14 +19,15 @@ internal data class ApiCalloutPayload(
     override val startTime: ApiTimestamp,
     val callout: ApiCallout,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         ApiEnrolmentCallout(
             domainPayload.projectId,
             domainPayload.userId.value,
             domainPayload.moduleId.value,
-            domainPayload.metadata))
+            domainPayload.metadata,
+        ),
+    )
 
     constructor(domainPayload: IdentificationCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
@@ -34,7 +35,9 @@ internal data class ApiCalloutPayload(
             domainPayload.projectId,
             domainPayload.userId.value,
             domainPayload.moduleId.value,
-            domainPayload.metadata))
+            domainPayload.metadata,
+        ),
+    )
 
     constructor(domainPayload: VerificationCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
@@ -43,13 +46,17 @@ internal data class ApiCalloutPayload(
             domainPayload.userId.value,
             domainPayload.moduleId.value,
             domainPayload.metadata,
-            domainPayload.verifyGuid))
+            domainPayload.verifyGuid,
+        ),
+    )
 
     constructor(domainPayload: ConfirmationCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         ApiConfirmationCallout(
             domainPayload.selectedGuid,
-            domainPayload.sessionId))
+            domainPayload.sessionId,
+        ),
+    )
 
     constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
@@ -58,9 +65,11 @@ internal data class ApiCalloutPayload(
             domainPayload.userId.value,
             domainPayload.moduleId.value,
             domainPayload.metadata,
-            domainPayload.sessionId))
+            domainPayload.sessionId,
+        ),
+    )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
         TokenKeyType.AttendantId -> "callout.userId"
         TokenKeyType.ModuleId -> "callout.moduleId"
         TokenKeyType.Unknown -> null

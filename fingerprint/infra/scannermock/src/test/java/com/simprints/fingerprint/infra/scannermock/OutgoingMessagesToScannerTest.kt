@@ -22,10 +22,8 @@ import java.util.concurrent.LinkedBlockingQueue
 
 @RunWith(AndroidJUnit4::class)
 class OutgoingMessagesToScannerTest {
-
     private lateinit var testScanner: Scanner
     private lateinit var testObserver: TestObserver<ByteArray>
-
 
     @Before
     fun setup() {
@@ -37,14 +35,13 @@ class OutgoingMessagesToScannerTest {
         val simulatedScannerManager = SimulatedScannerManager(
             SimulationMode.V1,
             outgoingStreamObservers = setOf(testObserver),
-            context = mockk(relaxed = true)
+            context = mockk(relaxed = true),
         )
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(simulatedScannerManager)
         testScanner = Scanner("F0:AC:D7:C0:00:00", simulatedBluetoothAdapter)
 
         assertOnSuccessCallback { testScanner.connect(it) }
     }
-
 
     @Test
     fun outgoing_message_un20wakeup() {
@@ -88,7 +85,6 @@ class OutgoingMessagesToScannerTest {
     fun outgoing_message_connection_setBank() {
         testScanner.connection_setBank(Scanner.BANK_ID.PRODUCTION.id, 1.toChar(), 0.toChar())
         assertOutgoingMessageIs(SET_RUNNING_BANK)
-
     }
 
     @Test
@@ -109,19 +105,24 @@ class OutgoingMessagesToScannerTest {
         assertOutgoingMessageIs(CRASH_VERO_0)
     }
 
-
-    private fun callBlocking(function: (ScannerCallback) -> Unit, scannerCallback: ScannerCallback? = null, wakeUpLooper: Boolean = false): Boolean {
+    private fun callBlocking(
+        function: (ScannerCallback) -> Unit,
+        scannerCallback: ScannerCallback? = null,
+        wakeUpLooper: Boolean = false,
+    ): Boolean {
         val result = LinkedBlockingQueue<Boolean>()
 
-        function(wrappedScannerCallback(onSuccess = {
-            scannerCallback?.onSuccess()
-            result.put(true)
-        }, onFailure = {
-            scannerCallback?.onFailure(it)
-            result.put(false)
-        }))
+        function(
+            wrappedScannerCallback(onSuccess = {
+                scannerCallback?.onSuccess()
+                result.put(true)
+            }, onFailure = {
+                scannerCallback?.onFailure(it)
+                result.put(false)
+            }),
+        )
 
-        //TODO loopers in Scanner.wrapCallback mean we have to wakeUpLooper.
+        // TODO loopers in Scanner.wrapCallback mean we have to wakeUpLooper.
         if (wakeUpLooper) {
             Thread.sleep(100)
             ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
@@ -132,18 +133,31 @@ class OutgoingMessagesToScannerTest {
 
     private fun assertOnSuccessCallback(function: (ScannerCallback) -> Unit) {
         var x = 0
-        callBlocking({ function(it) }, wrappedScannerCallback(
-            onSuccess = { x = 1 },
-            onFailure = {}), true)
+        callBlocking(
+            { function(it) },
+            wrappedScannerCallback(
+                onSuccess = { x = 1 },
+                onFailure = {},
+            ),
+            true,
+        )
         Assert.assertEquals(1, x)
     }
 
-    private fun assertOutgoingMessageIs(msgToScanner: String, position: Int = 0) {
-        assert(testObserver.values()[position]?.contentEquals(byteArrayFromHexString(msgToScanner))
-            ?: false)
+    private fun assertOutgoingMessageIs(
+        msgToScanner: String,
+        position: Int = 0,
+    ) {
+        assert(
+            testObserver.values()[position]?.contentEquals(byteArrayFromHexString(msgToScanner))
+                ?: false,
+        )
     }
 
-    private fun invokePrivateMethod(scannerObject: Scanner, name: String) {
+    private fun invokePrivateMethod(
+        scannerObject: Scanner,
+        name: String,
+    ) {
         val method = Scanner::class.java.getDeclaredMethod(name)
         method.isAccessible = true
         method.invoke(scannerObject)
@@ -217,7 +231,5 @@ class OutgoingMessagesToScannerTest {
             "00000000000000000000000000000000000000000000000000000" +
             "00000000000000000000000000000000000000000000000000000" +
             "000000000f5f5f5f5"
-
     }
-
 }

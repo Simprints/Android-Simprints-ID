@@ -30,7 +30,6 @@ import javax.inject.Inject
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class RequestLoginFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -46,17 +45,17 @@ class RequestLoginFragmentTest {
     fun `should add the text correctly`() {
         launchFragmentInHiltContainer<RequestLoginFragment>(
             initialState = Lifecycle.State.STARTED,
-            fragmentArgs = Bundle()
+            fragmentArgs = Bundle(),
         )
         onView(withId(R.id.tv_device_id)).check(matches(withText(containsString(FakeCoreModule.DEVICE_ID))))
         onView(withId(R.id.simprintsIdVersionTextView)).check(
             matches(
                 withText(
                     containsString(
-                        FakeCoreModule.PACKAGE_VERSION_NAME
-                    )
-                )
-            )
+                        FakeCoreModule.PACKAGE_VERSION_NAME,
+                    ),
+                ),
+            ),
         )
     }
 
@@ -70,7 +69,7 @@ class RequestLoginFragmentTest {
         launchFragmentInHiltContainer<RequestLoginFragment>(
             initialState = Lifecycle.State.STARTED,
             navController = navController,
-            fragmentArgs = Bundle()
+            fragmentArgs = Bundle(),
         ) {
             activity?.moveToState(Lifecycle.State.RESUMED)
             assertThat(navController.currentDestination?.id).isEqualTo(R.id.requestLoginFragment)
@@ -87,12 +86,11 @@ class RequestLoginFragmentTest {
         launchFragmentInHiltContainer<RequestLoginFragment>(
             initialState = Lifecycle.State.STARTED,
             navController = navController,
-            fragmentArgs = Bundle()
+            fragmentArgs = Bundle(),
         ) {
             activity?.moveToState(Lifecycle.State.RESUMED)
 
             assertThat(navController.currentDestination?.id).isEqualTo(R.id.mainFragment)
         }
     }
-
 }

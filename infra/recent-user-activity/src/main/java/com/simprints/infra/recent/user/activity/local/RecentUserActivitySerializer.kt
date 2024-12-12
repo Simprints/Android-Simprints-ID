@@ -19,6 +19,8 @@ internal object RecentUserActivitySerializer : Serializer<ProtoRecentUserActivit
         }
     }
 
-    override suspend fun writeTo(t: ProtoRecentUserActivity, output: OutputStream) =
-        t.writeTo(output)
+    override suspend fun writeTo(
+        t: ProtoRecentUserActivity,
+        output: OutputStream,
+    ) = t.writeTo(output)
 }

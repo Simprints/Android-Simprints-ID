@@ -12,9 +12,7 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
-
 internal class EncryptedSharedPreferencesBuilderImplTest {
-
     @MockK
     lateinit var context: Context
 
@@ -43,7 +41,7 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
             ctx = context,
             masterKeyProvider = masterKeyProvider,
             preferencesProvider = preferencesProvider,
-            buildSdk = buildSdk
+            buildSdk = buildSdk,
         )
         applicationInfo.dataDir = dataDirectory
         every { context.applicationInfo } returns applicationInfo
@@ -61,7 +59,7 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
         verify(exactly = 1) {
             preferencesProvider.provideEncryptedSharedPreferences(
                 filename,
-                masterKey
+                masterKey,
             )
         }
         assertThat(result).isEqualTo(sharedPreferences)
@@ -86,7 +84,7 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
         verify(exactly = 2) {
             preferencesProvider.provideEncryptedSharedPreferences(
                 filename,
-                masterKey
+                masterKey,
             )
         }
         assertThat(result).isEqualTo(sharedPreferences)
@@ -98,7 +96,7 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
             ctx = context,
             masterKeyProvider = masterKeyProvider,
             preferencesProvider = preferencesProvider,
-            buildSdk = Build.VERSION_CODES.M
+            buildSdk = Build.VERSION_CODES.M,
         )
         every {
             preferencesProvider.provideEncryptedSharedPreferences(any(), any())

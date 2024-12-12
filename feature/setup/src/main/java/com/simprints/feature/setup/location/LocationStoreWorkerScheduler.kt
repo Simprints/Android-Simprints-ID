@@ -8,11 +8,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 internal class LocationStoreWorkerScheduler @Inject constructor(
-    @ApplicationContext private val appContext: Context
+    @ApplicationContext private val appContext: Context,
 ) : LocationStore {
-
     override fun collectLocationInBackground() {
-        val request = OneTimeWorkRequest.Builder(StoreUserLocationIntoCurrentSessionWorker::class.java)
+        val request = OneTimeWorkRequest
+            .Builder(StoreUserLocationIntoCurrentSessionWorker::class.java)
             .addTag(STORE_USER_LOCATION_WORKER_TAG)
             .build()
         WorkManager.getInstance(appContext).enqueue(request)

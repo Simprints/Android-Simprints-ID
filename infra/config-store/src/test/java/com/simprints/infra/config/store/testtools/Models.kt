@@ -101,41 +101,51 @@ internal val consentConfiguration = ConsentConfiguration(
         confirmation = true,
     ),
 )
-internal val protoConsentConfiguration = ProtoConsentConfiguration.newBuilder()
+internal val protoConsentConfiguration = ProtoConsentConfiguration
+    .newBuilder()
     .setProgramName("programName")
     .setOrganizationName("organizationName")
     .setCollectConsent(true)
     .setDisplaySimprintsLogo(false)
     .setAllowParentalConsent(false)
     .setGeneralPrompt(
-        ProtoConsentConfiguration.ConsentPromptConfiguration.newBuilder()
+        ProtoConsentConfiguration.ConsentPromptConfiguration
+            .newBuilder()
             .setEnrolmentVariant(ProtoConsentConfiguration.ConsentEnrolmentVariant.STANDARD)
             .setDataSharedWithPartner(true)
             .setDataUsedForRAndD(false)
             .setPrivacyRights(true)
             .setConfirmation(true)
-            .build()
-    )
-    .setParentalPrompt(
-        ProtoConsentConfiguration.ConsentPromptConfiguration.newBuilder()
+            .build(),
+    ).setParentalPrompt(
+        ProtoConsentConfiguration.ConsentPromptConfiguration
+            .newBuilder()
             .setEnrolmentVariant(ProtoConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY)
             .setDataSharedWithPartner(true)
             .setDataUsedForRAndD(false)
             .setPrivacyRights(false)
             .setConfirmation(true)
-            .build()
-    )
-    .build()
+            .build(),
+    ).build()
 
 internal val apiAllowedAgeRange = ApiAllowedAgeRange(2, 10)
 internal val apiMaxCaptureAttempts = ApiMaxCaptureAttempts(noFingerDetected = 17)
 internal val allowedAgeRange = AgeGroup(2, 10)
-internal val protoAllowedAgeRange = ProtoAllowedAgeRange.newBuilder().setStartInclusive(2).setEndExclusive(10).build()
+internal val protoAllowedAgeRange = ProtoAllowedAgeRange
+    .newBuilder()
+    .setStartInclusive(2)
+    .setEndExclusive(10)
+    .build()
 
 internal val apiDecisionPolicy = ApiDecisionPolicy(10, 30, 40)
 internal val decisionPolicy = DecisionPolicy(10, 30, 40)
 internal val protoDecisionPolicy =
-    ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(30).setHigh(40).build()
+    ProtoDecisionPolicy
+        .newBuilder()
+        .setLow(10)
+        .setMedium(30)
+        .setHigh(40)
+        .build()
 internal val rankOneConfiguration = FaceSdkConfiguration(
     nbOfImagesToCapture = 2,
     qualityThreshold = -1f,
@@ -143,45 +153,46 @@ internal val rankOneConfiguration = FaceSdkConfiguration(
     decisionPolicy = decisionPolicy,
     allowedAgeRange = AgeGroup(0, null),
     verificationMatchThreshold = null,
-    version = "1.0"
+    version = "1.0",
 )
 
 internal val apiFaceConfiguration = ApiFaceConfiguration(
-        allowedSDKs = listOf(ApiFaceConfiguration.BioSdk.RANK_ONE),
-        rankOne = ApiFaceSdkConfiguration(
-            nbOfImagesToCapture = 2,
-            qualityThreshold = -1f,
-            decisionPolicy = apiDecisionPolicy,
-            imageSavingStrategy = ApiFaceConfiguration.ImageSavingStrategy.NEVER,
-            allowedAgeRange = null,
-            verificationMatchThreshold = null,
-            version = "1.0"
-        )
-    )
+    allowedSDKs = listOf(ApiFaceConfiguration.BioSdk.RANK_ONE),
+    rankOne = ApiFaceSdkConfiguration(
+        nbOfImagesToCapture = 2,
+        qualityThreshold = -1f,
+        decisionPolicy = apiDecisionPolicy,
+        imageSavingStrategy = ApiFaceConfiguration.ImageSavingStrategy.NEVER,
+        allowedAgeRange = null,
+        verificationMatchThreshold = null,
+        version = "1.0",
+    ),
+)
 internal val faceConfiguration = FaceConfiguration(
     allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
-    rankOne = rankOneConfiguration
+    rankOne = rankOneConfiguration,
 )
-internal val protoFaceConfiguration = ProtoFaceConfiguration.newBuilder()
+internal val protoFaceConfiguration = ProtoFaceConfiguration
+    .newBuilder()
     .addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE)
     .setRankOne(
-        ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder()
+        ProtoFaceConfiguration.ProtoFaceSdkConfiguration
+            .newBuilder()
             .setNbOfImagesToCapture(2)
             .setQualityThresholdPrecise(-1f)
             .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
             .setDecisionPolicy(protoDecisionPolicy)
             .setVersion("1.0")
             .setAllowedAgeRange(ProtoAllowedAgeRange.newBuilder().build())
-            .build()
-    )
-    .build()
+            .build(),
+    ).build()
 
 internal val apiVero2Configuration = ApiVero2Configuration(
     30,
     ApiVero2Configuration.ImageSavingStrategy.EAGER,
     ApiVero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI,
     ApiVero2Configuration.LedsMode.BASIC,
-    mapOf("E-1" to ApiVero2Configuration.ApiVero2FirmwareVersions("1.1", "1.2", "1.4"))
+    mapOf("E-1" to ApiVero2Configuration.ApiVero2FirmwareVersions("1.1", "1.2", "1.4")),
 )
 
 internal val vero2Configuration = Vero2Configuration(
@@ -189,21 +200,25 @@ internal val vero2Configuration = Vero2Configuration(
     Vero2Configuration.ImageSavingStrategy.EAGER,
     Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI,
     Vero2Configuration.LedsMode.BASIC,
-    mapOf("E-1" to Vero2Configuration.Vero2FirmwareVersions("1.1", "1.2", "1.4"))
+    mapOf("E-1" to Vero2Configuration.Vero2FirmwareVersions("1.1", "1.2", "1.4")),
 )
 
-internal val protoVero2Configuration = ProtoVero2Configuration.newBuilder()
+internal val protoVero2Configuration = ProtoVero2Configuration
+    .newBuilder()
     .setQualityThreshold(30)
     .setCaptureStrategy(ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI)
     .setImageSavingStrategy(ProtoVero2Configuration.ImageSavingStrategy.EAGER)
     .setDisplayLiveFeedback(false)
     .putAllFirmwareVersions(
         mapOf(
-            "E-1" to ProtoVero2Configuration.Vero2FirmwareVersions.newBuilder().setCypress("1.1")
-                .setStm("1.2").setUn20("1.4").build()
-        )
-    )
-    .build()
+            "E-1" to ProtoVero2Configuration.Vero2FirmwareVersions
+                .newBuilder()
+                .setCypress("1.1")
+                .setStm("1.2")
+                .setUn20("1.4")
+                .build(),
+        ),
+    ).build()
 
 internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
     allowedScanners = listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
@@ -217,7 +232,7 @@ internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
         vero2 = apiVero2Configuration,
         allowedAgeRange = apiAllowedAgeRange,
         verificationMatchThreshold = 42.0f,
-        maxCaptureAttempts = apiMaxCaptureAttempts
+        maxCaptureAttempts = apiMaxCaptureAttempts,
     ),
     nec = null,
 )
@@ -234,17 +249,19 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
         vero2 = vero2Configuration,
         allowedAgeRange = allowedAgeRange,
         verificationMatchThreshold = 42.0f,
-        maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
+        maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
     ),
     nec = null,
 )
 
-internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBuilder()
+internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration
+    .newBuilder()
     .addAllowedScanners(ProtoFingerprintConfiguration.VeroGeneration.VERO_2)
     .addAllowedSdks(ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER)
     .setDisplayHandIcons(true)
     .setSecugenSimMatcher(
-        ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.newBuilder()
+        ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration
+            .newBuilder()
             .addFingersToCapture(ProtoFinger.LEFT_3RD_FINGER)
             .setDecisionPolicy(protoDecisionPolicy)
             .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
@@ -253,9 +270,8 @@ internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBu
             .setAllowedAgeRange(protoAllowedAgeRange)
             .setVerificationMatchThreshold(42.0f)
             .setMaxCaptureAttempts(ProtoMaxCaptureAttempts.newBuilder().setNoFingerDetected(17))
-            .build()
-    )
-    .build()
+            .build(),
+    ).build()
 
 internal val apiGeneralConfiguration = ApiGeneralConfiguration(
     listOf(ApiGeneralConfiguration.Modality.FACE),
@@ -277,7 +293,8 @@ internal val generalConfiguration = GeneralConfiguration(
     settingsPassword = SettingsPasswordConfig.NotSet,
 )
 
-internal val protoGeneralConfiguration = ProtoGeneralConfiguration.newBuilder()
+internal val protoGeneralConfiguration = ProtoGeneralConfiguration
+    .newBuilder()
     .addModalities(ProtoGeneralConfiguration.Modality.FACE)
     .addMatchingModalities(ProtoGeneralConfiguration.Modality.FACE)
     .addLanguageOptions("en")
@@ -292,8 +309,10 @@ internal val apiIdentificationConfiguration =
 internal val identificationConfiguration =
     IdentificationConfiguration(4, IdentificationConfiguration.PoolType.PROJECT)
 
-internal val protoIdentificationConfiguration = ProtoIdentificationConfiguration.newBuilder()
-    .setMaxNbOfReturnedCandidates(4).setPoolType(ProtoIdentificationConfiguration.PoolType.PROJECT)
+internal val protoIdentificationConfiguration = ProtoIdentificationConfiguration
+    .newBuilder()
+    .setMaxNbOfReturnedCandidates(4)
+    .setPoolType(ProtoIdentificationConfiguration.PoolType.PROJECT)
     .build()
 
 internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
@@ -305,7 +324,7 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
             false,
         ),
         ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
-            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE
+            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE,
         ),
     ),
     ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
@@ -313,13 +332,13 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
         1,
         listOf("module1"),
         "PT24H",
-    )
+    ),
 )
 
 internal val simprintsUpSyncConfigurationConfiguration = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
     UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
     UpSynchronizationConfiguration.UpSyncBatchSizes(1, 2, 3),
-    false
+    false,
 )
 
 internal val synchronizationConfiguration = SynchronizationConfiguration(
@@ -327,7 +346,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     UpSynchronizationConfiguration(
         simprintsUpSyncConfigurationConfiguration,
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+            UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
         ),
     ),
     DownSynchronizationConfiguration(
@@ -335,48 +354,49 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
         1,
         listOf("module1".asTokenizableEncrypted()),
         "PT24H",
-    )
+    ),
 )
 
-internal val protoSynchronizationConfiguration = ProtoSynchronizationConfiguration.newBuilder()
+internal val protoSynchronizationConfiguration = ProtoSynchronizationConfiguration
+    .newBuilder()
     .setFrequency(ProtoSynchronizationConfiguration.Frequency.PERIODICALLY)
     .setUp(
-        ProtoUpSynchronizationConfiguration.newBuilder()
+        ProtoUpSynchronizationConfiguration
+            .newBuilder()
             .setSimprints(
-                ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
+                ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
+                    .newBuilder()
                     .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
                     .setBatchSizes(
-                        ProtoUpSyncBatchSizes.newBuilder()
+                        ProtoUpSyncBatchSizes
+                            .newBuilder()
                             .setSessions(1)
                             .setUpSyncs(2)
                             .setDownSyncs(3)
-                            .build()
-                    )
-                    .build()
-            )
-            .setCoSync(
-                ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.newBuilder()
+                            .build(),
+                    ).build(),
+            ).setCoSync(
+                ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
+                    .newBuilder()
                     .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE)
-                    .build()
-            )
-            .build()
-    )
-    .setDown(
-        ProtoDownSynchronizationConfiguration.newBuilder()
+                    .build(),
+            ).build(),
+    ).setDown(
+        ProtoDownSynchronizationConfiguration
+            .newBuilder()
             .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
             .setMaxNbOfModules(1)
             .setIsTokenized(true)
             .addModuleOptions("module1")
             .setMaxAge("PT24H")
-            .build()
-    )
-    .build()
+            .build(),
+    ).build()
 
 internal val customKeyMap: Map<String, Any>? = mapOf(
     "key1" to 7,
     "key2" to 4.2,
     "key3" to false,
-    "key4" to "test"
+    "key4" to "test",
 )
 internal const val PROTO_CUSTOM_KEY_MAP_JSON = "{\"key1\":7,\"key2\":4.2,\"key3\":false,\"key4\":\"test\"}"
 
@@ -406,7 +426,8 @@ internal val projectConfiguration = ProjectConfiguration(
     customKeyMap,
 )
 
-internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
+internal val protoProjectConfiguration = ProtoProjectConfiguration
+    .newBuilder()
     .setId("id")
     .setProjectId("projectId")
     .setUpdatedAt("updatedAt")
@@ -418,7 +439,6 @@ internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setSynchronization(protoSynchronizationConfiguration)
     .setCustomJson(PROTO_CUSTOM_KEY_MAP_JSON)
     .build()
-
 
 internal const val TOKENIZATION_JSON =
     "{\"primaryKeyId\":12345,\"key\":[{\"keyData\":{\"typeUrl\":\"typeUrl\",\"value\":\"value\",\"keyMaterialType\":\"keyMaterialType\"},\"status\":\"enabled\",\"keyId\":123456789,\"outputPrefixType\":\"outputPrefixType\"}]}"
@@ -437,7 +457,7 @@ internal val apiProject = ApiProject(
     imageBucket = "url",
     baseUrl = "baseUrl",
     configuration = apiProjectConfiguration,
-    tokenizationKeys = tokenizationKeysLocal
+    tokenizationKeys = tokenizationKeysLocal,
 )
 internal val project = Project(
     id = "id",
@@ -447,9 +467,10 @@ internal val project = Project(
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
-    tokenizationKeys = tokenizationKeysDomain
+    tokenizationKeys = tokenizationKeysDomain,
 )
-internal val protoProject = ProtoProject.newBuilder()
+internal val protoProject = ProtoProject
+    .newBuilder()
     .setId("id")
     .setName("name")
     .setDescription("description")
@@ -464,13 +485,16 @@ internal val deviceConfiguration =
     DeviceConfiguration(
         "en",
         listOf("module1".asTokenizableEncrypted(), "module2".asTokenizableEncrypted()),
-        "instruction"
+        "instruction",
     )
-internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
+internal val protoDeviceConfiguration = ProtoDeviceConfiguration
+    .newBuilder()
     .setLanguage(
-        ProtoDeviceConfiguration.Language.newBuilder().setLanguage("en").build()
-    )
-    .setIsTokenized(true)
+        ProtoDeviceConfiguration.Language
+            .newBuilder()
+            .setLanguage("en")
+            .build(),
+    ).setIsTokenized(true)
     .addAllModuleSelected(listOf("module1", "module2"))
     .setLastInstructionId("instruction")
     .build()
@@ -478,10 +502,10 @@ internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
 internal val apiDeviceState = ApiDeviceState(
     "deviceId",
     false,
-    null
+    null,
 )
 internal val deviceState = DeviceState(
     "deviceId",
     false,
-    null
+    null,
 )

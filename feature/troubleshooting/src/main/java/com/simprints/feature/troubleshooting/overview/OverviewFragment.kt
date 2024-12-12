@@ -12,11 +12,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_overview) {
-
     private val viewModel by viewModels<OverviewViewModel>()
     private val binding by viewBinding(FragmentTroubleshootingOverviewBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.projectIds.observe(viewLifecycleOwner) {

@@ -8,15 +8,14 @@ import com.simprints.feature.clientapi.models.ClientApiError
 internal class VerifyValidator(
     private val extractor: VerifyRequestExtractor,
 ) : RequestActionValidator(extractor) {
-
     override fun validate() {
         super.validate()
         validateVerifyGuid(extractor.getVerifyGuid())
     }
 
     private fun validateVerifyGuid(verifyGuid: String?) {
-        if (verifyGuid.isNullOrBlank() || !verifyGuid.isValidGuid())
+        if (verifyGuid.isNullOrBlank() || !verifyGuid.isValidGuid()) {
             throw InvalidRequestException("Invalid verify ID", ClientApiError.INVALID_VERIFY_ID)
+        }
     }
-
 }

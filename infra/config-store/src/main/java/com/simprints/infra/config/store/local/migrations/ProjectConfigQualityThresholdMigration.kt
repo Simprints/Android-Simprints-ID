@@ -11,9 +11,7 @@ import javax.inject.Inject
 /**
  * Can be removed once all the devices have been updated to 2023.3.0
  */
-internal class ProjectConfigQualityThresholdMigration @Inject constructor() :
-    DataMigration<ProtoProjectConfiguration> {
-
+internal class ProjectConfigQualityThresholdMigration @Inject constructor() : DataMigration<ProtoProjectConfiguration> {
     override suspend fun cleanUp() {
         Simber.i("Migration of project configuration quality threshold is done")
     }

@@ -12,12 +12,10 @@ internal class UnauthenticatedClientFactory @Inject constructor(
     @DeviceID private val deviceId: String,
     @PackageVersionName private val versionName: String,
 ) {
-
-    fun <T : SimRemoteInterface> build(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
-        simNetwork.getSimApiClient(
-            remoteInterface,
-            deviceId,
-            versionName,
-            null,
-        )
+    fun <T : SimRemoteInterface> build(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> = simNetwork.getSimApiClient(
+        remoteInterface,
+        deviceId,
+        versionName,
+        null,
+    )
 }

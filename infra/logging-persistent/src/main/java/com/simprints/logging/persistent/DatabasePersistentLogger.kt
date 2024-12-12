@@ -13,14 +13,22 @@ internal class DatabasePersistentLogger @Inject constructor(
     private val timestampProvider: TimestampProvider,
     private val scopeProvider: ScopeProvider,
 ) : PersistentLogger {
-
-    override fun logSync(type: LogEntryType, title: String, body: String) {
+    override fun logSync(
+        type: LogEntryType,
+        title: String,
+        body: String,
+    ) {
         runBlocking(scopeProvider.dispatcherIO) {
             log(type, timestampProvider.nowMs(), title, body)
         }
     }
 
-    override fun logSync(type: LogEntryType, timestampMs: Long, title: String, body: String) {
+    override fun logSync(
+        type: LogEntryType,
+        timestampMs: Long,
+        title: String,
+        body: String,
+    ) {
         runBlocking(scopeProvider.dispatcherIO) {
             log(type, timestampMs, title, body)
         }
@@ -29,14 +37,14 @@ internal class DatabasePersistentLogger @Inject constructor(
     override suspend fun log(
         type: LogEntryType,
         title: String,
-        body: String
+        body: String,
     ) = log(type, timestampProvider.nowMs(), title, body)
 
     override suspend fun log(
         type: LogEntryType,
         timestampMs: Long,
         title: String,
-        body: String
+        body: String,
     ) {
         // Running on external scope to log even if initial scope gets cancelled
         scopeProvider.externalScope.launch {
@@ -50,7 +58,7 @@ internal class DatabasePersistentLogger @Inject constructor(
                         type = type.name,
                         title = title,
                         body = body,
-                    )
+                    ),
                 )
                 prune(now)
             }

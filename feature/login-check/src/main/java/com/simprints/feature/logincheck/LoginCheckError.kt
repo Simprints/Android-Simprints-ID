@@ -1,7 +1,6 @@
 package com.simprints.feature.logincheck
 
 enum class LoginCheckError {
-
     // Sign in check errors
     DIFFERENT_PROJECT_ID,
     PROJECT_PAUSED,
@@ -16,5 +15,4 @@ enum class LoginCheckError {
 
     // Other errores
     ROOTED_DEVICE,
-    ;
 }

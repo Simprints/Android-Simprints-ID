@@ -5,7 +5,6 @@ import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import org.junit.Test
 
 class AuthenticateDataResultTest {
-
     @Test
     fun mapAuthenticatedResult() {
         val result = AuthenticateDataResult.Authenticated.toDomainResult()

@@ -11,7 +11,6 @@ internal class ExtractCrashKeysUseCase @Inject constructor(
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
 ) {
-
     suspend operator fun invoke(action: ActionRequest) {
         val projectConfiguration = configManager.getProjectConfiguration()
         val deviceConfiguration = configManager.getDeviceConfiguration()

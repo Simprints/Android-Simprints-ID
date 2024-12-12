@@ -25,15 +25,15 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
-
     private val viewModel: MatchViewModel by viewModels()
     private val binding by viewBinding(FragmentMatcherBinding::bind)
     private val args by navArgs<MatchFragmentArgs>()
 
     private val permissionCall = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        val status = args.params.biometricDataSource.permissionName()
+        val status = args.params.biometricDataSource
+            .permissionName()
             ?.let { requireActivity().permissionFromResult(it, granted) }
             ?: PermissionStatus.Granted
 
@@ -44,7 +44,10 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
     }
@@ -77,9 +80,12 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     }
 
     private fun observeViewModel() {
-        viewModel.matchResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            findNavController().finishWithResult(this, it)
-        })
+        viewModel.matchResponse.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                findNavController().finishWithResult(this, it)
+            },
+        )
         viewModel.matchState.observe(viewLifecycleOwner) { matchState ->
             when (matchState) {
                 MatchState.NotStarted -> renderNotStarted()
@@ -127,14 +133,14 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         binding.faceMatchTvMatchingProgressStatus1.text = resources.getQuantityString(
             IDR.plurals.matcher_matched_candidates,
             matchState.candidatesMatched,
-            matchState.candidatesMatched
+            matchState.candidatesMatched,
         )
 
         binding.faceMatchTvMatchingProgressStatus2.isVisible = true
         binding.faceMatchTvMatchingProgressStatus2.text = resources.getQuantityString(
             IDR.plurals.matcher_returned_results,
             matchState.returnSize,
-            matchState.returnSize
+            matchState.returnSize,
         )
 
         if (matchState.veryGoodMatches > 0) {
@@ -142,7 +148,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
             binding.faceMatchTvMatchingResultStatus1.text = resources.getQuantityString(
                 IDR.plurals.matcher_tier1or2_matches,
                 matchState.veryGoodMatches,
-                matchState.veryGoodMatches
+                matchState.veryGoodMatches,
             )
         }
         if (matchState.goodMatches > 0) {
@@ -150,7 +156,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
             binding.faceMatchTvMatchingResultStatus2.text = resources.getQuantityString(
                 IDR.plurals.matcher_tier3_matches,
                 matchState.goodMatches,
-                matchState.goodMatches
+                matchState.goodMatches,
             )
         }
         if (matchState.veryGoodMatches < 1 && matchState.goodMatches < 1 || matchState.fairMatches > 1) {
@@ -158,7 +164,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
             binding.faceMatchTvMatchingResultStatus3.text = resources.getQuantityString(
                 IDR.plurals.matcher_tier4_matches,
                 matchState.fairMatches,
-                matchState.fairMatches
+                matchState.fairMatches,
             )
         }
 
@@ -172,13 +178,15 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         faceMatchPermissionRequestButton.isVisible = name != null
 
         faceMatchPermissionRequestButton.setOnClickListener {
-            if (state.shouldOpenSettings) startActivity(requireContext().applicationSettingsIntent)
-            else permissionCall.launch(name)
+            if (state.shouldOpenSettings) {
+                startActivity(requireContext().applicationSettingsIntent)
+            } else {
+                permissionCall.launch(name)
+            }
         }
     }
 
     companion object {
-
         private const val MAX_PROGRESS = 100
         private const val PROGRESS_DURATION_MULTIPLIER = 10L
         private const val LOADING_PROGRESS = 25

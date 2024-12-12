@@ -19,7 +19,6 @@ internal class SaveImageUseCase @Inject constructor(
     private val coreEventRepository: SessionEventRepository,
     private val scannerInfo: ScannerInfo,
 ) {
-
     suspend operator fun invoke(
         vero2Configuration: Vero2Configuration,
         finger: IFingerIdentifier,
@@ -38,7 +37,9 @@ internal class SaveImageUseCase @Inject constructor(
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
         Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
         null
-    } else null
+    } else {
+        null
+    }
 
     private suspend fun saveImage(
         imageBytes: ByteArray,
@@ -59,7 +60,7 @@ internal class SaveImageUseCase @Inject constructor(
             relativePath = Path(path.parts),
             metadata = mutableMapOf(
                 META_KEY_FINGER_ID to finger.name,
-                META_KEY_DPI to dpi.toString()
+                META_KEY_DPI to dpi.toString(),
             ).apply {
                 scannerId?.let { this[META_KEY_SCANNER_ID] = it }
                 un20SerialNumber?.let { this[META_KEY_UN20_SERIAL_NUMBER] = it }
@@ -74,15 +75,18 @@ internal class SaveImageUseCase @Inject constructor(
         }
     }
 
-    private suspend fun determinePath(captureEventId: String, fileExtension: String): Path? = try {
+    private suspend fun determinePath(
+        captureEventId: String,
+        fileExtension: String,
+    ): Path? = try {
         val sessionId = coreEventRepository.getCurrentSessionScope().id
         Path(
             arrayOf(
                 SESSIONS_PATH,
                 sessionId,
                 FINGERPRINTS_PATH,
-                "$captureEventId.$fileExtension"
-            )
+                "$captureEventId.$fileExtension",
+            ),
         )
     } catch (t: Throwable) {
         Simber.e(t)
@@ -90,7 +94,6 @@ internal class SaveImageUseCase @Inject constructor(
     }
 
     companion object {
-
         const val SESSIONS_PATH = "sessions"
         const val FINGERPRINTS_PATH = "fingerprints"
 

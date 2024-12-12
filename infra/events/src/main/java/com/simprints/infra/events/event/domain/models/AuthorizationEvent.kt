@@ -17,7 +17,6 @@ data class AuthorizationEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         result: AuthorizationResult,
@@ -25,19 +24,21 @@ data class AuthorizationEvent(
     ) : this(
         UUID.randomUUID().toString(),
         AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
-        AUTHORIZATION
+        AUTHORIZATION,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> =
-        if (payload.userInfo == null) emptyMap()
-        else mapOf(TokenKeyType.AttendantId to payload.userInfo.userId)
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = if (payload.userInfo == null) {
+        emptyMap()
+    } else {
+        mapOf(TokenKeyType.AttendantId to payload.userInfo.userId)
+    }
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
         payload = payload.copy(
             userInfo = payload.userInfo?.copy(
-                userId = map[TokenKeyType.AttendantId] ?: payload.userInfo.userId
-            )
-        )
+                userId = map[TokenKeyType.AttendantId] ?: payload.userInfo.userId,
+            ),
+        ),
     )
 
     @Keep
@@ -49,16 +50,19 @@ data class AuthorizationEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = AUTHORIZATION,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "result: $result"
 
         @Keep
         enum class AuthorizationResult {
-            AUTHORIZED, NOT_AUTHORIZED
+            AUTHORIZED,
+            NOT_AUTHORIZED,
         }
 
         @Keep
-        data class UserInfo(val projectId: String, val userId: TokenizableString)
+        data class UserInfo(
+            val projectId: String,
+            val userId: TokenizableString,
+        )
     }
 
     companion object {

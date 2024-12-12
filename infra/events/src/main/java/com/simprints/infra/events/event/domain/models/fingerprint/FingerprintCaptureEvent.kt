@@ -19,7 +19,6 @@ data class FingerprintCaptureEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endTime: Timestamp,
@@ -39,15 +38,14 @@ data class FingerprintCaptureEvent(
             qualityThreshold = qualityThreshold,
             result = result,
             fingerprint = fingerprint,
-            id = payloadId
+            id = payloadId,
         ),
-        FINGERPRINT_CAPTURE
+        FINGERPRINT_CAPTURE,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FingerprintCapturePayload(
@@ -61,10 +59,8 @@ data class FingerprintCaptureEvent(
         val id: String,
         override val type: EventType = FINGERPRINT_CAPTURE,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "finger: ${finger}, result: $result, " +
-                "quality: ${fingerprint?.quality}, format: ${fingerprint?.format}"
+        override fun toSafeString(): String = "finger: $finger, result: $result, " +
+            "quality: ${fingerprint?.quality}, format: ${fingerprint?.format}"
 
         @Keep
         data class Fingerprint(
@@ -75,17 +71,15 @@ data class FingerprintCaptureEvent(
 
         @Keep
         enum class Result {
-
             GOOD_SCAN,
             BAD_QUALITY,
             NO_FINGER_DETECTED,
             SKIPPED,
-            FAILURE_TO_ACQUIRE;
+            FAILURE_TO_ACQUIRE,
         }
     }
 
     companion object {
-
         const val EVENT_VERSION = 4
     }
 }

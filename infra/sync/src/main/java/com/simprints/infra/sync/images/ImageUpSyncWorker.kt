@@ -20,7 +20,6 @@ internal class ImageUpSyncWorker @AssistedInject constructor(
     private val authStore: AuthStore,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
-
     override val tag: String = "ImageUpSyncWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {

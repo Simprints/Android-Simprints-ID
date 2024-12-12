@@ -11,16 +11,18 @@ import kotlin.coroutines.cancellation.CancellationException
 fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     is CancellationException -> e // Propagate cancellation
     is NotConnectedException,
-    is IOException -> { // Disconnected or timed-out communications with Scanner
+    is IOException,
+    -> { // Disconnected or timed-out communications with Scanner
         Simber.d(
             e,
-            "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException"
+            "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException",
         )
         ScannerDisconnectedException()
     }
 
     is IllegalStateException, // We're calling scanner methods out of order somehow
-    is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
+    is IllegalArgumentException,
+    -> { // We've received unexpected/invalid bytes from the scanner
         Simber.e(e)
         UnexpectedScannerException(throwable = e)
     }
@@ -34,11 +36,8 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     }
 }
 
-suspend fun <T> runWithErrorWrapping(block: suspend () -> T): T {
-    return try {
-        block()
-    } catch (e: Exception) {
-        throw wrapErrorFromScanner(e)
-    }
-
+suspend fun <T> runWithErrorWrapping(block: suspend () -> T): T = try {
+    block()
+} catch (e: Exception) {
+    throw wrapErrorFromScanner(e)
 }

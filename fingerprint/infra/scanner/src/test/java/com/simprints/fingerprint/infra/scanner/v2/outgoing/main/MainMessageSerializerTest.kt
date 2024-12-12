@@ -9,7 +9,6 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toHexString
 import org.junit.Test
 
 class MainMessageSerializerTest {
-
     @Test
     fun veroCommand_serialized_producesCorrectPackets() {
         val message = SetUn20OnCommand(DigitalValue.TRUE)

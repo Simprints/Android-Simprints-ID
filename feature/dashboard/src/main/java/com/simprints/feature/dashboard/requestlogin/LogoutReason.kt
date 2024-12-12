@@ -6,4 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class LogoutReason(val title: String, val body: String) : Parcelable
+data class LogoutReason(
+    val title: String,
+    val body: String,
+) : Parcelable

@@ -5,9 +5,9 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import java.io.InputStream
 import java.io.OutputStream
 
-
-internal class AndroidBluetoothSocket(private val socket: BluetoothSocket) : ComponentBluetoothSocket {
-
+internal class AndroidBluetoothSocket(
+    private val socket: BluetoothSocket,
+) : ComponentBluetoothSocket {
     override fun connect() = socket.connect()
 
     override fun getInputStream(): InputStream = socket.inputStream

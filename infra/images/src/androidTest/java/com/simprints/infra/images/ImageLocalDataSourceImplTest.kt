@@ -16,7 +16,6 @@ import java.util.UUID
 import kotlin.random.Random
 
 class ImageLocalDataSourceImplTest {
-
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
     private val path = Path("test/$FILE_NAME")
@@ -53,7 +52,7 @@ class ImageLocalDataSourceImplTest {
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(
             emptyArray<Byte>().toByteArray(),
             "projectId",
-            Path("")
+            Path(""),
         )
         assertThat(securedImageRef).isNull()
     }
@@ -104,11 +103,12 @@ class ImageLocalDataSourceImplTest {
 
         for (i in 0 until count) {
             val byteArray = Random.nextBytes(SIZE_IMAGE)
-            imageLocalDataSource.encryptAndStoreImage(
-                byteArray,
-                "projectId",
-                Path("test/${UUID.randomUUID()}")
-            )?.let(createdFiles::add)
+            imageLocalDataSource
+                .encryptAndStoreImage(
+                    byteArray,
+                    "projectId",
+                    Path("test/${UUID.randomUUID()}"),
+                )?.let(createdFiles::add)
         }
 
         return createdFiles
@@ -119,5 +119,4 @@ class ImageLocalDataSourceImplTest {
         private const val SIZE_IMAGE = 100 * 1024 // 100kB
         private const val IMAGES_FOLDER = "images"
     }
-
 }

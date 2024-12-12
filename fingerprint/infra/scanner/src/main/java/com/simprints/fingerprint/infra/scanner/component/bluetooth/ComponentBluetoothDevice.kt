@@ -3,9 +3,7 @@ package com.simprints.fingerprint.infra.scanner.component.bluetooth
 import java.io.IOException
 import java.util.UUID
 
-
 interface ComponentBluetoothDevice {
-
     val name: String?
 
     fun isBonded(): Boolean

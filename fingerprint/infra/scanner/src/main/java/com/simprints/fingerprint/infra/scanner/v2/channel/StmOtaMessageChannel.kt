@@ -15,19 +15,17 @@ import javax.inject.Singleton
 class StmOtaMessageChannel @Inject constructor(
     incoming: StmOtaMessageInputStream,
     outgoing: StmOtaMessageOutputStream,
-    @DispatcherIO dispatcher: CoroutineDispatcher
+    @DispatcherIO dispatcher: CoroutineDispatcher,
 ) : MessageChannel<StmOtaMessageInputStream, StmOtaMessageOutputStream>(
-    incoming, outgoing, dispatcher
-) {
+        incoming,
+        outgoing,
+        dispatcher,
+    ) {
+    suspend inline fun <reified R : StmOtaResponse> sendCommandAndReceiveResponse(command: StmOtaCommand): R = runLockedTask {
+        outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
+    }
 
-    suspend inline fun <reified R : StmOtaResponse> sendCommandAndReceiveResponse(command: StmOtaCommand): R =
-        runLockedTask {
-            outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
-        }
-
-    suspend inline fun sendStmOtaModeCommand(command: StmOtaCommand) =
-        runLockedTask {
-            outgoing.sendMessage(command).await()
-        }
-
+    suspend inline fun sendStmOtaModeCommand(command: StmOtaCommand) = runLockedTask {
+        outgoing.sendMessage(command).await()
+    }
 }

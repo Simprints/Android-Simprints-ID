@@ -27,7 +27,6 @@ internal class PrivacyNoticeViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
 ) : ViewModel() {
-
     private val _viewState = MutableLiveData<PrivacyNoticeState>()
     val viewState: LiveData<PrivacyNoticeState>
         get() = _viewState
@@ -46,16 +45,15 @@ internal class PrivacyNoticeViewModel @Inject constructor(
 
     fun retrievePrivacyNotice() = viewModelScope.launch {
         val deviceConfiguration = configManager.getDeviceConfiguration()
-        configManager.getPrivacyNotice(
-            authStore.signedInProjectId,
-            deviceConfiguration.language
-        )
-            .map { it.toPrivacyNoticeViewState() }
+        configManager
+            .getPrivacyNotice(
+                authStore.signedInProjectId,
+                deviceConfiguration.language,
+            ).map { it.toPrivacyNoticeViewState() }
             .catch {
                 it.printStackTrace()
                 PrivacyNoticeState.ConsentNotAvailable
-            }
-            .collect { _viewState.postValue(it) }
+            }.collect { _viewState.postValue(it) }
     }
 
     private fun PrivacyNoticeResult.toPrivacyNoticeViewState(): PrivacyNoticeState = when (this) {

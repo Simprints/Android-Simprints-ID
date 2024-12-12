@@ -124,7 +124,6 @@ import org.junit.runner.RunWith
 @Suppress("IMPLICIT_CAST_TO_ANY", "KotlinConstantConditions")
 @RunWith(AndroidJUnit4::class)
 class ApiEventTest {
-
     private val jackson = JsonHelper.jackson
 
     @Test
@@ -495,6 +494,7 @@ class ApiEventTest {
 
         validateUpSyncRequestEventApiModel(json)
     }
+
     @Test
     fun validate_ageGroupSelectionEventApiModel() {
         val event = createAgeGroupSelectionEvent()
@@ -523,6 +523,7 @@ class ApiEventTest {
     fun `when event contains raw module id, then tokenizedField in ApiEvent should be empty`() {
         validateModuleIdTokenization(moduleId = "moduleId".asTokenizableRaw())
     }
+
     @Test
     fun validate_licenseCheckEventApiModel() {
         val event = createLicenseCheckEvent()
@@ -533,9 +534,10 @@ class ApiEventTest {
     }
 
     private fun validateLicenseCheckEventApiModel(json: JSONObject) {
-        validateCommonParams(json,"LicenseCheck",1)
+        validateCommonParams(json, "LicenseCheck", 1)
         assertThat(json.getJSONObject("payload").getString("status")).isEqualTo("VALID")
     }
+
     private fun validateModuleIdTokenization(moduleId: TokenizableString) {
         val event = createEnrolmentEventV2().let {
             it.copy(payload = it.payload.copy(moduleId = moduleId))
@@ -550,6 +552,7 @@ class ApiEventTest {
             }
         }
     }
+
     private fun validateUserIdTokenization(attendantId: TokenizableString) {
         val event = createEnrolmentEventV2().let {
             it.copy(payload = it.payload.copy(attendantId = attendantId))
@@ -600,7 +603,7 @@ class ApiEventTest {
             EventDownSyncRequest -> validate_DownSyncRequestEventApiModel()
             EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
             LicenseCheck -> validate_licenseCheckEventApiModel()
-            AgeGroupSelection-> validate_ageGroupSelectionEventApiModel()
+            AgeGroupSelection -> validate_ageGroupSelectionEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

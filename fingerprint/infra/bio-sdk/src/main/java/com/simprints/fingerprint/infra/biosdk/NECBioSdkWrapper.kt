@@ -13,7 +13,8 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import javax.inject.Inject
 
 class NECBioSdkWrapper @Inject constructor(
-    private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, NecMatchingSettings>
+    private val bioSdk:
+        FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, NecMatchingSettings>,
 ) : BioSdkWrapper {
     override val scanningTimeoutMs: Long
         get() = 8000 // 8 seconds = maximum duration for scanning + image transfer + image processing + NEC template extraction
@@ -26,32 +27,28 @@ class NECBioSdkWrapper @Inject constructor(
 
     override suspend fun initialize() = bioSdk.initialize()
 
-
     override suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
-        isCrossFingerMatchingEnabled: Boolean
-    ): List<MatchResult> =
-        bioSdk.match(probe, candidates, NecMatchingSettings(isCrossFingerMatchingEnabled))
-
+        isCrossFingerMatchingEnabled: Boolean,
+    ): List<MatchResult> = bioSdk.match(probe, candidates, NecMatchingSettings(isCrossFingerMatchingEnabled))
 
     override suspend fun acquireFingerprintTemplate(
         capturingResolution: Int?,
         timeOutMs: Int,
         qualityThreshold: Int,
-        allowLowQualityExtraction: Boolean
+        allowLowQualityExtraction: Boolean,
     ): AcquireFingerprintTemplateResponse {
         val settings = FingerprintTemplateAcquisitionSettings(
             capturingResolution?.let { Dpi(it.toShort()) },
             timeOutMs,
             qualityThreshold,
-            allowLowQualityExtraction
+            allowLowQualityExtraction,
         )
         return bioSdk.acquireFingerprintTemplate(settings).toDomain()
     }
 
     override suspend fun acquireFingerprintImage() = bioSdk.acquireFingerprintImage().toDomain()
-
 }
 
 fun TemplateResponse<FingerprintTemplateMetadata>.toDomain(): AcquireFingerprintTemplateResponse {
@@ -61,7 +58,6 @@ fun TemplateResponse<FingerprintTemplateMetadata>.toDomain(): AcquireFingerprint
     return AcquireFingerprintTemplateResponse(
         template,
         templateMetadata!!.templateFormat,
-        templateMetadata!!.imageQualityScore
+        templateMetadata!!.imageQualityScore,
     )
-
 }

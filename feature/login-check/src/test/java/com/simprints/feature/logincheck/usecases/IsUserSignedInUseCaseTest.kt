@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class IsUserSignedInUseCaseTest {
-
     @MockK
     private lateinit var authStore: AuthStore
 

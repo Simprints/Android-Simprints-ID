@@ -9,21 +9,20 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMov
 @Keep
 internal class ApiEnrolmentRecordEvent(
     val id: String,
-    val payload: ApiEnrolmentRecordEventPayload
+    val payload: ApiEnrolmentRecordEventPayload,
 )
 
-internal fun ApiEnrolmentRecordEvent.fromApiToDomain(): EnrolmentRecordEvent =
-    when (payload.type) {
-        ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation -> EnrolmentRecordCreationEvent(
-            id,
-            (payload as ApiEnrolmentRecordCreationPayload).fromApiToDomain()
-        )
-        ApiEnrolmentRecordPayloadType.EnrolmentRecordDeletion -> EnrolmentRecordDeletionEvent(
-            id,
-            (payload as ApiEnrolmentRecordDeletionPayload).fromApiToDomain()
-        )
-        ApiEnrolmentRecordPayloadType.EnrolmentRecordMove -> EnrolmentRecordMoveEvent(
-            id,
-            (payload as ApiEnrolmentRecordMovePayload).fromApiToDomain()
-        )
-    }
+internal fun ApiEnrolmentRecordEvent.fromApiToDomain(): EnrolmentRecordEvent = when (payload.type) {
+    ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation -> EnrolmentRecordCreationEvent(
+        id,
+        (payload as ApiEnrolmentRecordCreationPayload).fromApiToDomain(),
+    )
+    ApiEnrolmentRecordPayloadType.EnrolmentRecordDeletion -> EnrolmentRecordDeletionEvent(
+        id,
+        (payload as ApiEnrolmentRecordDeletionPayload).fromApiToDomain(),
+    )
+    ApiEnrolmentRecordPayloadType.EnrolmentRecordMove -> EnrolmentRecordMoveEvent(
+        id,
+        (payload as ApiEnrolmentRecordMovePayload).fromApiToDomain(),
+    )
+}

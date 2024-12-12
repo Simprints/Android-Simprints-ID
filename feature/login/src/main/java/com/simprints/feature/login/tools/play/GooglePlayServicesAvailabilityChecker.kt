@@ -10,9 +10,8 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
-    private val googleApiAvailability: GoogleApiAvailability
+    private val googleApiAvailability: GoogleApiAvailability,
 ) {
-
     /**
      * Check the availability of the google play services.
      *
@@ -73,9 +72,11 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
         crossinline errorCallback: (LoginError) -> Unit,
     ) {
         errorCallback(LoginError.MissingPlayServices)
-        Simber.e(MissingGooglePlayServices(
-            "Error with GooglePlayServices version. Error code=$statusCode"
-        ))
+        Simber.e(
+            MissingGooglePlayServices(
+                "Error with GooglePlayServices version. Error code=$statusCode",
+            ),
+        )
     }
 
     private inline fun handleCancellation(
@@ -83,8 +84,10 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
         crossinline errorCallback: (LoginError) -> Unit,
     ) {
         errorCallback(LoginError.OutdatedPlayServices)
-        Simber.e(OutdatedGooglePlayServices(
-            "Error with GooglePlayServices version. Error code=$statusCode"
-        ))
+        Simber.e(
+            OutdatedGooglePlayServices(
+                "Error with GooglePlayServices version. Error code=$statusCode",
+            ),
+        )
     }
 }

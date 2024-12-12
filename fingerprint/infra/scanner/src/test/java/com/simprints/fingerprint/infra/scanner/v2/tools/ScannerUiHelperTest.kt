@@ -30,7 +30,6 @@ class ScannerUiHelperTest {
 
     @Test
     fun deduceLedStateFromQualityForLiveFeedback() {
-
         var quality = 90
         var result = scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality)
         assertThat(result).isEqualTo(SmileLedState(G, G, G, G, G))
@@ -50,8 +49,5 @@ class ScannerUiHelperTest {
         quality = 30
         result = scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality)
         assertThat(result).isEqualTo(SmileLedState(G, X, X, X, X))
-
     }
-
-
 }

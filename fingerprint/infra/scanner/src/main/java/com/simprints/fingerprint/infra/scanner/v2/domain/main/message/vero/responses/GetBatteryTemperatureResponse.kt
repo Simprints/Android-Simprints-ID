@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroR
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.BatteryTemperature
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
-class GetBatteryTemperatureResponse(val batteryTemperature: BatteryTemperature) : VeroResponse(VeroMessageType.GET_BATTERY_TEMPERATURE) {
-
+class GetBatteryTemperatureResponse(
+    val batteryTemperature: BatteryTemperature,
+) : VeroResponse(VeroMessageType.GET_BATTERY_TEMPERATURE) {
     override fun getDataBytes(): ByteArray = batteryTemperature.getBytes()
 
     companion object {

@@ -7,8 +7,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
 import com.simprints.core.DispatcherMain
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.scope.Location
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -29,7 +29,6 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     private val locationManager: LocationManager,
     @DispatcherMain private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
-
     override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
@@ -59,8 +58,8 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
             val sessionScope = eventRepository.getCurrentSessionScope()
             val updatesSessionScope = sessionScope.copy(
                 payload = sessionScope.payload.copy(
-                    location = Location(lastLocation.latitude, lastLocation.longitude)
-                )
+                    location = Location(lastLocation.latitude, lastLocation.longitude),
+                ),
             )
             eventRepository.saveSessionScope(updatesSessionScope)
             Simber.d("Saving user's location into the current session")
@@ -68,7 +67,6 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     }
 
     companion object {
-
         // Based on the default value of minUpdateIntervalMillis in LocationRequest
         private const val DEFAULT_INTERVAL = 10 * 60 * 1000L
     }

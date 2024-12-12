@@ -29,26 +29,30 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class AlertFragment : Fragment(R.layout.fragment_alert) {
-
     private val args: AlertFragmentArgs by navArgs()
     private val vm by viewModels<AlertViewModel>()
     private val binding by viewBinding(FragmentAlertBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         val config = args.alertConfiguration
 
-        binding.root.setBackgroundColor(ResourcesCompat.getColor(
-            resources,
-            when (config.color) {
-                AlertColor.Red -> IDR.color.simprints_red
-                AlertColor.Yellow -> IDR.color.simprints_yellow
-                AlertColor.Gray -> IDR.color.simprints_grey
-                AlertColor.Default -> IDR.color.simprints_blue
-            },
-            null
-        ))
+        binding.root.setBackgroundColor(
+            ResourcesCompat.getColor(
+                resources,
+                when (config.color) {
+                    AlertColor.Red -> IDR.color.simprints_red
+                    AlertColor.Yellow -> IDR.color.simprints_yellow
+                    AlertColor.Gray -> IDR.color.simprints_grey
+                    AlertColor.Default -> IDR.color.simprints_blue
+                },
+                null,
+            ),
+        )
         binding.alertTitle.setTextWithFallbacks(config.title, config.titleRes, IDR.string.alert_title_fallback)
 
         binding.alertImage.setImageResource(config.image)
@@ -62,7 +66,6 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         if (config.rightButton != null) {
             binding.alertRightButton.setupButton(config.rightButton, config.appErrorReason)
         }
-
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             Simber.tag(ALERT.name).i("Alert back button clicked")
@@ -79,7 +82,10 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         Simber.tag(ALERT.name).i("${binding.alertTitle.text}")
     }
 
-    private fun TextView.setupButton(config: AlertButtonConfig, appErrorReason: AppErrorReason?) {
+    private fun TextView.setupButton(
+        config: AlertButtonConfig,
+        appErrorReason: AppErrorReason?,
+    ) {
         setTextWithFallbacks(config.text, config.textRes)
         setOnClickListener {
             config.resultKey?.let {
@@ -94,7 +100,10 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         }
     }
 
-    private fun setPressedButtonResult(key: String, appErrorReason: AppErrorReason?) {
+    private fun setPressedButtonResult(
+        key: String,
+        appErrorReason: AppErrorReason?,
+    ) {
         findNavController().setResult(this, AlertResult(key, appErrorReason))
     }
 }

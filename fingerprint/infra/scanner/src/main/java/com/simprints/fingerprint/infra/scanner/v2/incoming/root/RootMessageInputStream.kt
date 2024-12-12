@@ -19,7 +19,6 @@ class RootMessageInputStream @Inject constructor(
     private val rootResponseAccumulator: RootResponseAccumulator,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : MessageInputStream {
-
     var rootResponseStream: Flowable<RootResponse>? = null
 
     private var rootResponseStreamDisposable: Disposable? = null
@@ -39,11 +38,10 @@ class RootMessageInputStream @Inject constructor(
         rootResponseStreamDisposable?.dispose()
     }
 
-    inline fun <reified R : RootResponse> receiveResponse(): Single<R> =
-        Single.defer {
-            rootResponseStream
-                ?.filterCast<R>()
-                ?.firstOrError()
-                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
-        }
+    inline fun <reified R : RootResponse> receiveResponse(): Single<R> = Single.defer {
+        rootResponseStream
+            ?.filterCast<R>()
+            ?.firstOrError()
+            ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
+    }
 }

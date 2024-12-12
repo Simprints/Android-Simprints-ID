@@ -29,7 +29,6 @@ internal class EventRemoteDataSource @Inject constructor(
     private val authStore: AuthStore,
     private val jsonHelper: JsonHelper,
 ) {
-
     suspend fun count(query: ApiRemoteEventQuery) = try {
         val response = executeCall { eventsRemoteInterface ->
             eventsRemoteInterface.countEvents(
@@ -37,15 +36,16 @@ internal class EventRemoteDataSource @Inject constructor(
                 moduleId = query.moduleId,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
-                lastEventId = query.lastEventId
+                lastEventId = query.lastEventId,
             )
         }
         getEventCountFromHeader(response)
     } catch (t: Throwable) {
-        if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS)
+        if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS) {
             throw TooManyRequestsException()
-        else
+        } else {
             throw t
+        }
     }
 
     private fun getEventCountFromHeader(response: Response<*>): EventCount {
@@ -56,7 +56,10 @@ internal class EventRemoteDataSource @Inject constructor(
         return EventCount(totalCount, isTotalLowerBound)
     }
 
-    suspend fun dumpInvalidEvents(projectId: String, events: List<String>) {
+    suspend fun dumpInvalidEvents(
+        projectId: String,
+        events: List<String>,
+    ) {
         executeCall { remoteInterface ->
             remoteInterface.dumpInvalidEvents(projectId = projectId, events = events)
         }
@@ -66,27 +69,25 @@ internal class EventRemoteDataSource @Inject constructor(
         requestId: String,
         query: ApiRemoteEventQuery,
         scope: CoroutineScope,
-    ): EventDownSyncResult {
-        return try {
-            val response = takeStreaming(requestId, query)
-            val eventCount = getEventCountFromHeader(response)
+    ): EventDownSyncResult = try {
+        val response = takeStreaming(requestId, query)
+        val eventCount = getEventCountFromHeader(response)
 
-            val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
-            Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
+        val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
+        Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
 
-            EventDownSyncResult(
-                totalCount = eventCount.exactCount,
-                status = response.code(),
-                eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
-                    parseStreamAndEmitEvents(streaming, this)
-                }
-            )
-        } catch (t: Throwable) {
-            if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS)
-                throw TooManyRequestsException()
-            else
-                throw t
-
+        EventDownSyncResult(
+            totalCount = eventCount.exactCount,
+            status = response.code(),
+            eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
+                parseStreamAndEmitEvents(streaming, this)
+            },
+        )
+    } catch (t: Throwable) {
+        if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS) {
+            throw TooManyRequestsException()
+        } else {
+            throw t
         }
     }
 
@@ -116,17 +117,19 @@ internal class EventRemoteDataSource @Inject constructor(
         }
     }
 
-    private suspend fun takeStreaming(requestId: String, query: ApiRemoteEventQuery) =
-        executeCall { eventsRemoteInterface ->
-            eventsRemoteInterface.downloadEvents(
-                requestId = requestId,
-                projectId = query.projectId,
-                moduleId = query.moduleId,
-                attendantId = query.userId,
-                subjectId = query.subjectId,
-                lastEventId = query.lastEventId
-            )
-        }
+    private suspend fun takeStreaming(
+        requestId: String,
+        query: ApiRemoteEventQuery,
+    ) = executeCall { eventsRemoteInterface ->
+        eventsRemoteInterface.downloadEvents(
+            requestId = requestId,
+            projectId = query.projectId,
+            moduleId = query.moduleId,
+            attendantId = query.userId,
+            subjectId = query.subjectId,
+            lastEventId = query.lastEventId,
+        )
+    }
 
     suspend fun post(
         requestId: String,
@@ -143,14 +146,11 @@ internal class EventRemoteDataSource @Inject constructor(
         )
     }
 
-    private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
-        getEventsApiClient().executeCall { block(it) }
+    private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T = getEventsApiClient().executeCall { block(it) }
 
-    private suspend fun getEventsApiClient(): SimApiClient<EventRemoteInterface> =
-        authStore.buildClient(EventRemoteInterface::class)
+    private suspend fun getEventsApiClient(): SimApiClient<EventRemoteInterface> = authStore.buildClient(EventRemoteInterface::class)
 
     companion object {
-
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000
         private const val TOO_MANY_REQUEST_STATUS = 429
 

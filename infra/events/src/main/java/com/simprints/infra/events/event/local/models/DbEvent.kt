@@ -22,9 +22,7 @@ internal data class DbEvent(
     val scopeId: String? = null,
     var eventJson: String,
 ) {
-
     companion object {
-
         val dbSerializationModule = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
             addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
@@ -32,18 +30,17 @@ internal data class DbEvent(
     }
 }
 
-internal fun Event.fromDomainToDb(): DbEvent {
-    return DbEvent(
-        id = id,
-        scopeId = scopeId,
-        projectId = projectId,
-        type = payload.type,
-        eventJson = JsonHelper.toJson(this, module = dbSerializationModule),
-        createdAt = payload.createdAt.fromDomainToDb(),
-    )
-}
+internal fun Event.fromDomainToDb(): DbEvent = DbEvent(
+    id = id,
+    scopeId = scopeId,
+    projectId = projectId,
+    type = payload.type,
+    eventJson = JsonHelper.toJson(this, module = dbSerializationModule),
+    createdAt = payload.createdAt.fromDomainToDb(),
+)
 
 internal fun DbEvent.fromDbToDomain(): Event = JsonHelper.fromJson(
     json = this.eventJson,
     module = dbSerializationModule,
-    type = object : TypeReference<Event>() {})
+    type = object : TypeReference<Event>() {},
+)

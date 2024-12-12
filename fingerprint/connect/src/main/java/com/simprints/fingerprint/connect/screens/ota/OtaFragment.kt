@@ -25,8 +25,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class OtaFragment : Fragment(R.layout.fragment_ota) {
-
-
     private val viewModel: OtaViewModel by viewModels()
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentOtaBinding::bind)
@@ -36,7 +34,10 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
     @Inject
     lateinit var screenReporter: ReportAlertScreenEventUseCase
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         screenReporter.reportOta()
 
@@ -68,7 +69,8 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
                     0 -> getString(IDR.string.fingerprint_connect_ota_updating)
                     else -> String.format(
                         requireActivity().getString(IDR.string.fingerprint_connect_ota_updating_attempt),
-                        "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"
+                        "${retry + 1}",
+                        "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}",
                     )
                 }
             startUpdateButton.visibility = View.INVISIBLE
@@ -79,7 +81,7 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
         viewModel.startOta(
             fingerprintSdk = args.params.fingerprintSDK,
             availableOtas = args.params.availableOtas,
-            currentRetryAttempt = args.params.currentRetryAttempt
+            currentRetryAttempt = args.params.currentRetryAttempt,
         )
     }
 
@@ -90,26 +92,35 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
     }
 
     private fun listenForRecoveryEvent() {
-        viewModel.otaRecovery.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            findNavController().navigateSafely(this, OtaFragmentDirections.actionOtaFragmentToOtaRecoveryFragment(it))
-        })
+        viewModel.otaRecovery.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                findNavController().navigateSafely(this, OtaFragmentDirections.actionOtaFragmentToOtaRecoveryFragment(it))
+            },
+        )
     }
 
     private fun listenForFailedEvent() {
-        viewModel.otaFailed.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            findNavController().navigateSafely(this, OtaFragmentDirections.actionOtaFragmentToOtaFailedFragment(it))
-        })
+        viewModel.otaFailed.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                findNavController().navigateSafely(this, OtaFragmentDirections.actionOtaFragmentToOtaFailedFragment(it))
+            },
+        )
     }
 
     private fun listenForCompleteEvent() {
-        viewModel.otaComplete.observe(viewLifecycleOwner, LiveDataEventObserver {
-            binding.otaStatusTextView.text = getString(IDR.string.fingerprint_connect_ota_update_complete)
+        viewModel.otaComplete.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                binding.otaStatusTextView.text = getString(IDR.string.fingerprint_connect_ota_update_complete)
 
-            lifecycleScope.launch {
-                delay(FINISHED_TIME_DELAY_MS)
-                finishFragmentAndRetryConnect()
-            }
-        })
+                lifecycleScope.launch {
+                    delay(FINISHED_TIME_DELAY_MS)
+                    finishFragmentAndRetryConnect()
+                }
+            },
+        )
     }
 
     private fun finishFragmentAndRetryConnect() {
@@ -118,7 +129,7 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
         findNavController().navigateSafely(
             this,
             OtaFragmentDirections.actionOtaFragmentToConnectProgressFragment(),
-            navOptions { popUpTo(R.id.connectProgressFragment) }
+            navOptions { popUpTo(R.id.connectProgressFragment) },
         )
         connectScannerViewModel.connect()
     }

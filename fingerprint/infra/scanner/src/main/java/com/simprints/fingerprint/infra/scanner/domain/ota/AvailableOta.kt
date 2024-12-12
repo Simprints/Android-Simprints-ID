@@ -9,5 +9,5 @@ import androidx.annotation.Keep
 enum class AvailableOta {
     CYPRESS,
     STM,
-    UN20
+    UN20,
 }

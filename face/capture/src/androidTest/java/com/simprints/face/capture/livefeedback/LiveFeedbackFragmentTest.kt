@@ -16,9 +16,9 @@ import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiSelector
 import com.simprints.face.capture.R
 import com.simprints.face.capture.screens.FaceCaptureViewModel
-import com.simprints.infra.logging.Simber
 import com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragment
 import com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragmentViewModel
+import com.simprints.infra.logging.Simber
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
@@ -28,7 +28,6 @@ import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
 class LiveFeedbackFragmentTest {
-
     private lateinit var device: UiDevice
     private val faceCaptureViewModel: FaceCaptureViewModel = mockk(relaxed = true)
     private val liveFeedBackVm: LiveFeedbackFragmentViewModel = mockk(relaxed = true)
@@ -41,7 +40,7 @@ class LiveFeedbackFragmentTest {
     @Test
     fun openingLiveFeedBackScreenShowsCorrectText() {
         val navController: NavHostController = TestNavHostController(
-            ApplicationProvider.getApplicationContext()
+            ApplicationProvider.getApplicationContext(),
         )
         val liveFeedBackScenario =
             launchFragmentInContainer<LiveFeedbackFragment>()
@@ -56,10 +55,9 @@ class LiveFeedbackFragmentTest {
         onView(
             allOf(
                 withId(R.id.capture_feedback_txt_title),
-                withText(IDR.string.face_capture_title_previewing)
-            )
-        )
-            .check(matches(isDisplayed()))
+                withText(IDR.string.face_capture_title_previewing),
+            ),
+        ).check(matches(isDisplayed()))
     }
 
     private fun allowPermissionsIfNeeded(text: String) {
@@ -75,4 +73,3 @@ class LiveFeedbackFragmentTest {
         }
     }
 }
-

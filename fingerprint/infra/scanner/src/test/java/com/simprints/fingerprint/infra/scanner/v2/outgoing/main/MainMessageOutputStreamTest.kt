@@ -15,9 +15,7 @@ import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
-
 class MainMessageOutputStreamTest {
-
     private val messageSerializerMock: MainMessageSerializer = mockk()
     private val outputStreamDispatcher: OutputStreamDispatcher = mockk()
 

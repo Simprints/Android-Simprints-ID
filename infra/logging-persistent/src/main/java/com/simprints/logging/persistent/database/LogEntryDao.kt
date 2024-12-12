@@ -7,7 +7,6 @@ import androidx.room.Query
 
 @Dao
 internal interface LogEntryDao {
-
     @Query("SELECT * FROM DbLogEntry WHERE type = :type ORDER BY timestampMs DESC")
     suspend fun getByType(type: String): List<DbLogEntry>
 

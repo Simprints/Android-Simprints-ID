@@ -13,7 +13,6 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class CypressOtaMessageOutputStreamTest {
-
     private val mockCypressOtaMessageSerializer: CypressOtaMessageSerializer = mockk()
 
     @Test

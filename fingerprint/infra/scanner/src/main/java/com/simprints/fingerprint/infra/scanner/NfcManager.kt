@@ -11,20 +11,19 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
-class NfcManager @Inject constructor(private val nfcAdapter: ComponentNfcAdapter) {
-
+class NfcManager @Inject constructor(
+    private val nfcAdapter: ComponentNfcAdapter,
+) {
     val channelTags: Channel<ComponentNfcTag> = Channel()
 
-    fun doesDeviceHaveNfcCapability(): Boolean =
-        !nfcAdapter.isNull()
+    fun doesDeviceHaveNfcCapability(): Boolean = !nfcAdapter.isNull()
 
-    fun isNfcEnabled(): Boolean =
-        !nfcAdapter.isNull() && nfcAdapter.isEnabled()
+    fun isNfcEnabled(): Boolean = !nfcAdapter.isNull() && nfcAdapter.isEnabled()
 
     suspend fun enableReaderMode(
         activity: Activity,
         flags: Int = ComponentNfcAdapter.FLAG_READER_NFC_A or ComponentNfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
-        extras: Bundle? = null
+        extras: Bundle? = null,
     ) {
         if (nfcAdapter.isNull()) return
         nfcAdapter.enableReaderMode(activity, { tag: ComponentNfcTag? ->
@@ -62,20 +61,20 @@ class NfcManager @Inject constructor(private val nfcAdapter: ComponentNfcAdapter
         return interpretDataAsMacAddress(payload)
     }
 
-    private fun interpretDataAsMacAddress(payload: ByteArray): String =
-        try {
-            payload
-                .sliceArray(0..5)
-                .reversedArray()
-                .toHexStringWithColons()
-                .dropLast(1)
-        } catch (e: IndexOutOfBoundsException) {
-            throw IllegalArgumentException("Invalid data on tag")
-        }
+    private fun interpretDataAsMacAddress(payload: ByteArray): String = try {
+        payload
+            .sliceArray(0..5)
+            .reversedArray()
+            .toHexStringWithColons()
+            .dropLast(1)
+    } catch (e: IndexOutOfBoundsException) {
+        throw IllegalArgumentException("Invalid data on tag")
+    }
 
-    private fun ByteArray.toHexStringWithColons(): String = StringBuilder().apply {
-        this@toHexStringWithColons.forEach { append(String.format("%02X:", it)) }
-    }.toString()
+    private fun ByteArray.toHexStringWithColons(): String = StringBuilder()
+        .apply {
+            this@toHexStringWithColons.forEach { append(String.format("%02X:", it)) }
+        }.toString()
 
     companion object {
         private const val BT_EASY_PAIR_MAC_ADDRESS_PAGE_OFFSET_POSITION = 15

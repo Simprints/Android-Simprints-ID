@@ -32,7 +32,6 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class ConfigLocalDataSourceImplTest {
-
     companion object {
         private const val TEST_PROJECT_DATASTORE_NAME: String = "test_project_datastore"
         private const val TEST_CONFIG_DATASTORE_NAME: String = "test_config_datastore"
@@ -46,18 +45,18 @@ class ConfigLocalDataSourceImplTest {
     private val testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private val testProjectDataStore = DataStoreFactory.create(
         serializer = ProjectSerializer,
-        produceFile = { testContext.dataStoreFile(TEST_PROJECT_DATASTORE_NAME) }
+        produceFile = { testContext.dataStoreFile(TEST_PROJECT_DATASTORE_NAME) },
     )
     private val testProjectConfigDataStore = DataStoreFactory.create(
         serializer = ProjectConfigurationSerializer,
-        produceFile = { testContext.dataStoreFile(TEST_CONFIG_DATASTORE_NAME) }
+        produceFile = { testContext.dataStoreFile(TEST_CONFIG_DATASTORE_NAME) },
     )
     private val testDeviceConfigDataStore = DataStoreFactory.create(
         serializer = DeviceConfigurationSerializer,
-        produceFile = { testContext.dataStoreFile(TEST_DEVICE_CONFIG_DATASTORE_NAME) }
+        produceFile = { testContext.dataStoreFile(TEST_DEVICE_CONFIG_DATASTORE_NAME) },
     )
 
-    private lateinit var configLocalDataSourceImpl :ConfigLocalDataSourceImpl
+    private lateinit var configLocalDataSourceImpl: ConfigLocalDataSourceImpl
 
     @Before
     fun setup() {
@@ -78,7 +77,7 @@ class ConfigLocalDataSourceImplTest {
 
     @Test
     fun `should throw a NoSuchElementException when there is no project`() = runTest(
-        UnconfinedTestDispatcher()
+        UnconfinedTestDispatcher(),
     ) {
         assertThrows<NoSuchElementException> {
             configLocalDataSourceImpl.getProject()
@@ -104,21 +103,20 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `should save the project configuration and update the device configuration correctly`() =
-        runTest {
-            val projectConfigurationToSave = projectConfiguration
+    fun `should save the project configuration and update the device configuration correctly`() = runTest {
+        val projectConfigurationToSave = projectConfiguration
 
-            configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
-            val savedProjectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
-            val updatedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
-            val expectedDeviceConfiguration = DeviceConfiguration(
-                language = projectConfiguration.general.defaultLanguage,
-                selectedModules = listOf(),
-                lastInstructionId = ""
-            )
-            assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
-            assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
-        }
+        configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
+        val savedProjectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+        val updatedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+        val expectedDeviceConfiguration = DeviceConfiguration(
+            language = projectConfiguration.general.defaultLanguage,
+            selectedModules = listOf(),
+            lastInstructionId = "",
+        )
+        assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
+        assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
 
     @Test
     fun `should save the project configuration and only update the device configuration fingersToCollect if the device configuration has been overwritten for language`() =
@@ -137,7 +135,7 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = "fr",
                 selectedModules = listOf("module1".asTokenizableEncrypted()),
-                lastInstructionId = ""
+                lastInstructionId = "",
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
             assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
@@ -159,7 +157,7 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = projectConfiguration.general.defaultLanguage,
                 selectedModules = listOf("module1".asTokenizableEncrypted()),
-                lastInstructionId = ""
+                lastInstructionId = "",
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
             assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
@@ -178,7 +176,7 @@ class ConfigLocalDataSourceImplTest {
                 consentConfiguration,
                 identificationConfiguration,
                 synchronizationConfiguration,
-                null
+                null,
             )
 
             configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)
@@ -187,18 +185,17 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = generalConfiguration.defaultLanguage,
                 selectedModules = listOf(),
-                lastInstructionId = ""
+                lastInstructionId = "",
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfigurationToSave)
             assertThat(updatedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
         }
 
     @Test
-    fun `should return the default configuration when there is not configuration saved`() =
-        runTest {
-            val projectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
-            assertThat(projectConfiguration).isEqualTo(ConfigLocalDataSourceImpl.defaultProjectConfiguration.toDomain())
-        }
+    fun `should return the default configuration when there is not configuration saved`() = runTest {
+        val projectConfiguration = configLocalDataSourceImpl.getProjectConfiguration()
+        assertThat(projectConfiguration).isEqualTo(ConfigLocalDataSourceImpl.defaultProjectConfiguration.toDomain())
+    }
 
     @Test
     fun `should clear the project configuration correctly`() = runTest {
@@ -224,34 +221,33 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `should update the fingers to collect in the device configuration correctly`() =
-        runTest {
-            configLocalDataSourceImpl.updateDeviceConfiguration {
-                it.apply {
-                    it.language = "fr"
-                }
+    fun `should update the fingers to collect in the device configuration correctly`() = runTest {
+        configLocalDataSourceImpl.updateDeviceConfiguration {
+            it.apply {
+                it.language = "fr"
             }
-            var savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
-            var expectedDeviceConfiguration =
-                DeviceConfiguration("fr", listOf(), "")
-
-            assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
-
-            configLocalDataSourceImpl.updateDeviceConfiguration {
-                it.apply {
-                    it.language = "fr"
-                }
-            }
-            savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
-            expectedDeviceConfiguration =
-                DeviceConfiguration(
-                    "fr",
-                    listOf(),
-                    ""
-                )
-
-            assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
         }
+        var savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+        var expectedDeviceConfiguration =
+            DeviceConfiguration("fr", listOf(), "")
+
+        assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+
+        configLocalDataSourceImpl.updateDeviceConfiguration {
+            it.apply {
+                it.language = "fr"
+            }
+        }
+        savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+        expectedDeviceConfiguration =
+            DeviceConfiguration(
+                "fr",
+                listOf(),
+                "",
+            )
+
+        assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
 
     @Test
     fun `should clear the device configuration correctly`() = runTest {

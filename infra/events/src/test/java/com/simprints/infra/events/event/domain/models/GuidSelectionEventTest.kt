@@ -8,7 +8,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class GuidSelectionEventTest {
-
     @Test
     fun create_GuidSelectionEvent() {
         val event = GuidSelectionEvent(CREATED_AT, GUID1)

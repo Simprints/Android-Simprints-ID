@@ -19,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class EventEndSyncReporterWorkerTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -94,6 +93,6 @@ internal class EventEndSyncReporterWorkerTest {
         },
         syncCache,
         eventRepository,
-        testCoroutineRule.testCoroutineDispatcher
+        testCoroutineRule.testCoroutineDispatcher,
     )
 }

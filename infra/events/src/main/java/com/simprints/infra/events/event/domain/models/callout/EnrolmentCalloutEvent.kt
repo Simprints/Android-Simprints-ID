@@ -18,7 +18,6 @@ data class EnrolmentCalloutEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         projectId: String,
@@ -34,21 +33,21 @@ data class EnrolmentCalloutEvent(
             projectId = projectId,
             userId = userId,
             moduleId = moduleId,
-            metadata = metadata
+            metadata = metadata,
         ),
-        CALLOUT_ENROLMENT
+        CALLOUT_ENROLMENT,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = mapOf(
         TokenKeyType.AttendantId to payload.userId,
-        TokenKeyType.ModuleId to payload.moduleId
+        TokenKeyType.ModuleId to payload.moduleId,
     )
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
         payload = payload.copy(
             userId = map[TokenKeyType.AttendantId] ?: payload.userId,
-            moduleId = map[TokenKeyType.ModuleId] ?: payload.moduleId
-        )
+            moduleId = map[TokenKeyType.ModuleId] ?: payload.moduleId,
+        ),
     )
 
     @Keep
@@ -62,13 +61,10 @@ data class EnrolmentCalloutEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_ENROLMENT,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "module: $moduleId, metadata: $metadata"
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
-
 }

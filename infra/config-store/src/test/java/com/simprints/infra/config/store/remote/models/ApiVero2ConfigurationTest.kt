@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.testtools.vero2Configuration
 import org.junit.Test
 
 class ApiVero2ConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiVero2Configuration.toDomain()).isEqualTo(vero2Configuration)
@@ -18,7 +17,8 @@ class ApiVero2ConfigurationTest {
         val mapping = mapOf(
             ApiVero2Configuration.ImageSavingStrategy.NEVER to Vero2Configuration.ImageSavingStrategy.NEVER,
             ApiVero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN to Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN,
-            ApiVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE to Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE,
+            ApiVero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE to
+                Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE,
             ApiVero2Configuration.ImageSavingStrategy.EAGER to Vero2Configuration.ImageSavingStrategy.EAGER,
         )
 

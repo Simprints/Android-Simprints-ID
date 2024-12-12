@@ -12,13 +12,10 @@ internal data class ApiSuspiciousIntentPayload(
     override val startTime: ApiTimestamp,
     val unexpectedExtras: Map<String, Any?>,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: SuspiciousIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.unexpectedExtras,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
-

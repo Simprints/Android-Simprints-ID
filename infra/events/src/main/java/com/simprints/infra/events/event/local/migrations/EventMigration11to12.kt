@@ -5,7 +5,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration11to12 : Migration(11, 12) {
-
     override fun migrate(database: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 11 to schema 12.")
         updateTimestampsInSessionScope(database)
@@ -25,12 +24,13 @@ internal class EventMigration11to12 : Migration(11, 12) {
                 |`end_isTrustworthy` INTEGER,
                 |`end_msSinceBoot` INTEGER,
                 |`payloadJson` TEXT NOT NULL,
-                |PRIMARY KEY(`id`))""".trimMargin()
+                |PRIMARY KEY(`id`))
+            """.trimMargin(),
         )
 
         // copy existing data into new table
         database.execSQL(
-            "INSERT INTO $SCOPE_TEMP_TABLE_NAME ($SCOPE_NEW_COLUMNS) SELECT $SCOPE_OLD_COLUMNS FROM $SCOPE_TABLE_NAME"
+            "INSERT INTO $SCOPE_TEMP_TABLE_NAME ($SCOPE_NEW_COLUMNS) SELECT $SCOPE_OLD_COLUMNS FROM $SCOPE_TABLE_NAME",
         )
 
         // delete the old table
@@ -40,7 +40,6 @@ internal class EventMigration11to12 : Migration(11, 12) {
     }
 
     companion object {
-
         private const val SCOPE_TEMP_TABLE_NAME = "DbSession_Temp"
         private const val SCOPE_TABLE_NAME = "DbSessionScope"
         private const val SCOPE_OLD_COLUMNS =
@@ -51,4 +50,3 @@ internal class EventMigration11to12 : Migration(11, 12) {
             "`id`, `projectId`, `start_unixMs`, `start_isTrustworthy`, `start_msSinceBoot`, `end_unixMs`, `end_isTrustworthy`, `end_msSinceBoot`, `payloadJson`"
     }
 }
-

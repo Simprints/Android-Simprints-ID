@@ -32,9 +32,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     private val jsonHelper: JsonHelper,
     @ApplicationContext private val context: Context,
 ) : IdentityDataSource {
-
     companion object {
-
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
@@ -42,24 +40,24 @@ internal class CommCareIdentityDataSource @Inject constructor(
         const val ARG_CASE_ID = "caseId"
     }
 
-    private fun getCaseMetadataUri(packageName: String): Uri =
-        Uri.parse("content://$packageName.case/casedb/case")
+    private fun getCaseMetadataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/case")
 
-    private fun getCaseDataUri(packageName: String): Uri =
-        Uri.parse("content://$packageName.case/casedb/data")
+    private fun getCaseDataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/data")
 
     override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FingerprintIdentity> =
-        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query).filter { erce ->
+    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query)
+        .filter { erce ->
             erce.payload.biometricReferences.any {
                 it is FingerprintReference && it.format == query.fingerprintSampleFormat
             }
         }.map {
-            FingerprintIdentity(it.payload.subjectId,
-                it.payload.biometricReferences.filterIsInstance<FingerprintReference>()
+            FingerprintIdentity(
+                it.payload.subjectId,
+                it.payload.biometricReferences
+                    .filterIsInstance<FingerprintReference>()
                     .flatMap { fingerprintReference ->
                         fingerprintReference.templates.map { fingerprintTemplate ->
                             FingerprintSample(
@@ -69,7 +67,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 format = fingerprintReference.format,
                             )
                         }
-                    })
+                    },
+            )
         }
 
     private fun loadEnrolmentRecordCreationEvents(
@@ -85,17 +84,22 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query)
             }
 
-            context.contentResolver.query(
-                getCaseMetadataUri(callerPackageName), null, null, null, null
-            )?.use { caseMetadataCursor ->
-                if (caseMetadataCursor.moveToPosition(range.first)) {
-                    do {
-                        caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                            enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query))
-                        }
-                    } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
+            context.contentResolver
+                .query(
+                    getCaseMetadataUri(callerPackageName),
+                    null,
+                    null,
+                    null,
+                    null,
+                )?.use { caseMetadataCursor ->
+                    if (caseMetadataCursor.moveToPosition(range.first)) {
+                        do {
+                            caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
+                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query))
+                            }
+                        } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
+                    }
                 }
-            }
         } catch (e: Exception) {
             Simber.e("Error while querying CommCare", e)
         }
@@ -117,14 +121,16 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FaceIdentity> =
-        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query).filter { erce ->
+    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query)
+        .filter { erce ->
             erce.payload.biometricReferences.any {
                 it is FaceReference && it.format == query.faceSampleFormat
             }
         }.map {
-            FaceIdentity(it.payload.subjectId,
-                it.payload.biometricReferences.filterIsInstance<FaceReference>()
+            FaceIdentity(
+                it.payload.subjectId,
+                it.payload.biometricReferences
+                    .filterIsInstance<FaceReference>()
                     .flatMap { faceReference ->
                         faceReference.templates.map { faceTemplate ->
                             FaceSample(
@@ -132,7 +138,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 format = faceReference.format,
                             )
                         }
-                    })
+                    },
+            )
         }
 
     private fun loadEnrolmentRecordCreationEvents(
@@ -140,22 +147,25 @@ internal class CommCareIdentityDataSource @Inject constructor(
         callerPackageName: String,
         query: SubjectQuery,
     ): List<EnrolmentRecordCreationEvent> {
-        //Access Case Data Listing for the caseId
+        // Access Case Data Listing for the caseId
         val caseDataUri = getCaseDataUri(callerPackageName).buildUpon().appendPath(caseId).build()
 
-        return context.contentResolver.query(caseDataUri, null, null, null, null)?.use { caseDataCursor ->
-            var subjectActions = getSubjectActionsValue(caseDataCursor)
-            Simber.d(subjectActions)
-            val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
+        return context.contentResolver
+            .query(caseDataUri, null, null, null, null)
+            ?.use { caseDataCursor ->
+                var subjectActions = getSubjectActionsValue(caseDataCursor)
+                Simber.d(subjectActions)
+                val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
-            coSyncEnrolmentRecordEvents?.events
-                ?.filterIsInstance<EnrolmentRecordCreationEvent>()
-                ?.filterNot { event ->
-                    (query.subjectId != null && query.subjectId != event.payload.subjectId)
-                        || (query.attendantId != null && query.attendantId != event.payload.attendantId.value)
-                        || (query.moduleId != null && query.moduleId != event.payload.moduleId.value)
-                }
-        }.orEmpty()
+                coSyncEnrolmentRecordEvents
+                    ?.events
+                    ?.filterIsInstance<EnrolmentRecordCreationEvent>()
+                    ?.filterNot { event ->
+                        (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
+                            (query.attendantId != null && query.attendantId != event.payload.attendantId.value) ||
+                            (query.moduleId != null && query.moduleId != event.payload.moduleId.value)
+                    }
+            }.orEmpty()
     }
 
     private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
@@ -173,7 +183,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
             jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
                 json = it,
                 module = coSyncSerializationModule,
-                type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {}
+                type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {},
             )
         } catch (e: Exception) {
             Simber.e("Error while parsing subjectActions", e)
@@ -184,11 +194,11 @@ internal class CommCareIdentityDataSource @Inject constructor(
     private val coSyncSerializationModule = SimpleModule().apply {
         addSerializer(
             TokenizableString::class.java,
-            TokenizationClassNameSerializer()
+            TokenizationClassNameSerializer(),
         )
         addDeserializer(
             TokenizableString::class.java,
-            TokenizationClassNameDeserializer()
+            TokenizationClassNameDeserializer(),
         )
     }
 
@@ -197,9 +207,14 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
     ): Int {
         var count = 0
-        context.contentResolver.query(
-            getCaseMetadataUri(dataSource.callerPackageName()), null, null, null, null
-        )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
+        context.contentResolver
+            .query(
+                getCaseMetadataUri(dataSource.callerPackageName()),
+                null,
+                null,
+                null,
+                null,
+            )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
 
         return count
     }

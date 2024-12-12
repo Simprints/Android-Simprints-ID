@@ -14,14 +14,13 @@ import org.junit.Test
 import java.util.UUID
 
 class EventDownSyncOperationTest {
-
     @Test
     fun eventDownSyncOperationForProjectScope_hasAnUniqueKey() {
         val op = projectDownSyncScope.operations.first()
         assertThat(op.getUniqueKey()).isEqualTo(
             uuidFrom(
-                "${DEFAULT_PROJECT_ID}${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
-            )
+                "${DEFAULT_PROJECT_ID}${DEFAULT_MODES.joinToString { it.name }}$oldTypes",
+            ),
         )
     }
 
@@ -30,8 +29,8 @@ class EventDownSyncOperationTest {
         val op = userDownSyncScope.operations.first()
         assertThat(op.getUniqueKey()).isEqualTo(
             uuidFrom(
-                "$DEFAULT_PROJECT_ID${DEFAULT_USER_ID.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
-            )
+                "$DEFAULT_PROJECT_ID${DEFAULT_USER_ID.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes",
+            ),
         )
     }
 
@@ -42,18 +41,16 @@ class EventDownSyncOperationTest {
 
         assertThat(op.getUniqueKey()).isEqualTo(
             uuidFrom(
-                "$DEFAULT_PROJECT_ID${DEFAULT_MODULE_ID.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
-            )
+                "$DEFAULT_PROJECT_ID${DEFAULT_MODULE_ID.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes",
+            ),
         )
 
         assertThat(op1.getUniqueKey()).isEqualTo(
             uuidFrom(
-                "$DEFAULT_PROJECT_ID${DEFAULT_MODULE_ID_2.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
-            )
+                "$DEFAULT_PROJECT_ID${DEFAULT_MODULE_ID_2.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes",
+            ),
         )
-
     }
 
-    private fun uuidFrom(seed: String): String =
-        UUID.nameUUIDFromBytes(seed.toByteArray()).toString()
+    private fun uuidFrom(seed: String): String = UUID.nameUUIDFromBytes(seed.toByteArray()).toString()
 }

@@ -9,7 +9,6 @@ import com.simprints.infra.events.sampledata.*
 import org.junit.Test
 
 class DbEventTest {
-
     @Test
     fun convert_ConfirmationCallbackEvent() {
         val original = createConfirmationCallbackEvent()
@@ -149,7 +148,7 @@ class DbEventTest {
 
         with(transformed) {
             assertThat((payload)).isInstanceOf(AuthenticationPayload::class.java)
-            //These are basically enums so if they are the same instance, we are golden
+            // These are basically enums so if they are the same instance, we are golden
             assertThat((payload as AuthenticationPayload).result).isInstanceOf(original.payload.result::class.java)
         }
     }

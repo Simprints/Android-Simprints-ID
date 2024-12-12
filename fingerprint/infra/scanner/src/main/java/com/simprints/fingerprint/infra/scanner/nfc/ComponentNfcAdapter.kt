@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Bundle
 
 interface ComponentNfcAdapter {
-
     /**
      *  True if the device does not have NFC capability
      */
@@ -12,10 +11,12 @@ interface ComponentNfcAdapter {
 
     fun isEnabled(): Boolean
 
-    fun enableReaderMode(activity: Activity,
-                         callback: (tag: ComponentNfcTag?) -> Unit,
-                         flags: Int,
-                         extras: Bundle?)
+    fun enableReaderMode(
+        activity: Activity,
+        callback: (tag: ComponentNfcTag?) -> Unit,
+        flags: Int,
+        extras: Bundle?,
+    )
 
     fun disableReaderMode(activity: Activity)
 

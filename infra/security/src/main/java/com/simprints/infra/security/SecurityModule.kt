@@ -23,7 +23,6 @@ import javax.inject.Qualifier
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SecurityModule {
-
     companion object {
         @BuildSdk
         @Provides
@@ -31,10 +30,8 @@ abstract class SecurityModule {
 
         @Provides
         internal fun bindEncryptedSharedPreferences(
-            @ApplicationContext context: Context
-        ): EncryptedSharedPreferencesProvider =
-            EncryptedSharedPreferencesProvider(ctx = context)
-
+            @ApplicationContext context: Context,
+        ): EncryptedSharedPreferencesProvider = EncryptedSharedPreferencesProvider(ctx = context)
 
         @Provides
         internal fun bindMasterKeyProvider(): MasterKeyProvider = MasterKeyProvider()
@@ -50,7 +47,9 @@ abstract class SecurityModule {
     internal abstract fun bindRootManager(impl: RootManagerImpl): RootManager
 
     @Binds
-    internal abstract fun bindEncryptedSharedPreferencesBuilder(impl: EncryptedSharedPreferencesBuilderImpl): EncryptedSharedPreferencesBuilder
+    internal abstract fun bindEncryptedSharedPreferencesBuilder(
+        impl: EncryptedSharedPreferencesBuilderImpl,
+    ): EncryptedSharedPreferencesBuilder
 
     @Binds
     internal abstract fun bindSecurityManager(impl: SecurityManagerImpl): SecurityManager
@@ -59,4 +58,3 @@ abstract class SecurityModule {
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class BuildSdk
-

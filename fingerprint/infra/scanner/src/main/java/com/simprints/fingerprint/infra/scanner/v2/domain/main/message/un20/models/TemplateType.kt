@@ -3,8 +3,11 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.mode
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toHexString
 
-enum class TemplateType(val byte: Byte) {
-    ISO_19794_2_2011(0x10);
+enum class TemplateType(
+    val byte: Byte,
+) {
+    ISO_19794_2_2011(0x10),
+    ;
 
     fun getBytes() = byteArrayOf(byte)
 

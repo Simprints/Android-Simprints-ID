@@ -11,8 +11,8 @@ import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayloa
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_RELIGION
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_YOUNG
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.SCANNER_NOT_WORKING
-import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.WRONG_AGE_GROUP_SELECTED
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.UNCOOPERATIVE_CHILD
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.WRONG_AGE_GROUP_SELECTED
 import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload.ApiAnswer
 
 @Keep
@@ -22,10 +22,8 @@ internal data class ApiRefusalPayload(
     val reason: ApiAnswer,
     val otherText: String,
 ) : ApiEventPayload(startTime) {
-
     @Keep
     enum class ApiAnswer {
-
         REFUSED_RELIGION,
         REFUSED_DATA_CONCERNS,
         REFUSED_PERMISSION,
@@ -35,7 +33,7 @@ internal data class ApiRefusalPayload(
         REFUSED_YOUNG,
         WRONG_AGE_GROUP_SELECTED,
         UNCOOPERATIVE_CHILD,
-        OTHER
+        OTHER,
     }
 
     constructor(domainPayload: RefusalPayload) : this(
@@ -45,10 +43,8 @@ internal data class ApiRefusalPayload(
         domainPayload.otherText,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
-
 
 internal fun RefusalPayload.Answer.toApiRefusalEventAnswer() = when (this) {
     REFUSED_RELIGION -> ApiAnswer.REFUSED_RELIGION

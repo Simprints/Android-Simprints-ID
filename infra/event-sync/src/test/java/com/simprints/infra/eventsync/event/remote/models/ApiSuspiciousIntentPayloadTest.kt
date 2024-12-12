@@ -6,7 +6,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class ApiSuspiciousIntentPayloadTest {
-
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
         val payload = ApiSuspiciousIntentPayload(domainPayload = mockk(relaxed = true))

@@ -29,14 +29,12 @@ internal class LoginFormViewModel @Inject constructor(
     private val authManager: AuthManager,
     private val jsonHelper: JsonHelper,
 ) : ViewModel() {
-
     val isProcessingSignIn: LiveData<Boolean>
         get() = _isProcessingSignIn
     private val _isProcessingSignIn = MutableLiveData<Boolean>()
     val signInState: LiveData<LiveDataEventWithContent<SignInState>>
         get() = _signInState
     private val _signInState = MutableLiveData<LiveDataEventWithContent<SignInState>>(null)
-
 
     fun signInClicked(
         loginParams: LoginParams,
@@ -54,7 +52,7 @@ internal class LoginFormViewModel @Inject constructor(
                     userId = loginParams.userId.value,
                     projectId = projectId,
                     projectSecret = projectSecret,
-                    deviceId = deviceId
+                    deviceId = deviceId,
                 )
                 _signInState.send(mapAuthDataResult(result))
                 _isProcessingSignIn.value = false
@@ -72,7 +70,7 @@ internal class LoginFormViewModel @Inject constructor(
         AuthenticateDataResult.TechnicalFailure -> SignInState.TechnicalFailure
         AuthenticateDataResult.Unknown -> SignInState.Unknown
         is AuthenticateDataResult.BackendMaintenanceError -> SignInState.BackendMaintenanceError(
-            result.estimatedOutage?.let { TimeUtils.getFormattedEstimatedOutage(it) }
+            result.estimatedOutage?.let { TimeUtils.getFormattedEstimatedOutage(it) },
         )
     }
 
@@ -82,7 +80,10 @@ internal class LoginFormViewModel @Inject constructor(
         userId: String,
     ) = projectId.isNotEmpty() && projectSecret.isNotEmpty() && userId.isNotEmpty()
 
-    fun handleQrResult(projectId: String, result: QrScannerResult) {
+    fun handleQrResult(
+        projectId: String,
+        result: QrScannerResult,
+    ) {
         if (result.error != null) {
             _signInState.send(mapQrError(result.error))
         } else if (!result.content.isNullOrEmpty()) {
@@ -97,8 +98,8 @@ internal class LoginFormViewModel @Inject constructor(
                     _signInState.send(
                         SignInState.QrCodeValid(
                             qrContent.projectId,
-                            qrContent.projectSecret
-                        )
+                            qrContent.projectSecret,
+                        ),
                     )
                 }
             } catch (e: Exception) {

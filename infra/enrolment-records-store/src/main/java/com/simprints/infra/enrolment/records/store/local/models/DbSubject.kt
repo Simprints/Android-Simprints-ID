@@ -33,18 +33,17 @@ internal fun DbSubject.fromDbToDomain(): Subject {
     )
 }
 
-internal fun Subject.fromDomainToDb(): DbSubject =
-    DbSubject().also { subject ->
-        subject.subjectId = RealmUUID.from(subjectId)
-        subject.projectId = projectId
-        subject.attendantId = attendantId.value
-        subject.moduleId = moduleId.value
-        subject.createdAt = createdAt?.toRealmInstant()
-        subject.updatedAt = updatedAt?.toRealmInstant()
-        subject.toSync = toSync
-        subject.fingerprintSamples =
-            fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList()
-        subject.faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
-        subject.isModuleIdTokenized = moduleId.isTokenized()
-        subject.isAttendantIdTokenized = attendantId.isTokenized()
-    }
+internal fun Subject.fromDomainToDb(): DbSubject = DbSubject().also { subject ->
+    subject.subjectId = RealmUUID.from(subjectId)
+    subject.projectId = projectId
+    subject.attendantId = attendantId.value
+    subject.moduleId = moduleId.value
+    subject.createdAt = createdAt?.toRealmInstant()
+    subject.updatedAt = updatedAt?.toRealmInstant()
+    subject.toSync = toSync
+    subject.fingerprintSamples =
+        fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList()
+    subject.faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
+    subject.isModuleIdTokenized = moduleId.isTokenized()
+    subject.isAttendantIdTokenized = attendantId.isTokenized()
+}

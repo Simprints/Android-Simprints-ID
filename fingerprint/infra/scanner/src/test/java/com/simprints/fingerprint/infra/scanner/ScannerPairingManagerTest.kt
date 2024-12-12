@@ -27,7 +27,6 @@ import kotlin.coroutines.suspendCoroutine
 
 @RunWith(AndroidJUnit4::class)
 class ScannerPairingManagerTest {
-
     private val bluetoothAdapterMock = mockk<ComponentBluetoothAdapter>()
     private val scannerGenerationDeterminerMock = mockk<ScannerGenerationDeterminer> {
         every { determineScannerGenerationFromSerialNumber(eq(CORRECT_SERIAL)) } returns correctGeneration
@@ -56,7 +55,7 @@ class ScannerPairingManagerTest {
         recentUserActivityManager,
         scannerGenerationDeterminerMock,
         serialNumberConverterMock,
-        configRepository
+        configRepository,
     )
 
     @Test
@@ -69,27 +68,27 @@ class ScannerPairingManagerTest {
     fun interpretEnteredTextAsSerialNumber_throwsForInvalidStrings() {
         assertThrows<NumberFormatException> {
             scannerPairingManager.interpretEnteredTextAsSerialNumber(
-                "12345"
+                "12345",
             )
         }
         assertThrows<NumberFormatException> {
             scannerPairingManager.interpretEnteredTextAsSerialNumber(
-                "9876543"
+                "9876543",
             )
         }
         assertThrows<NumberFormatException> {
             scannerPairingManager.interpretEnteredTextAsSerialNumber(
-                "-12345"
+                "-12345",
             )
         }
         assertThrows<NumberFormatException> {
             scannerPairingManager.interpretEnteredTextAsSerialNumber(
-                "1234o2"
+                "1234o2",
             )
         }
         assertThrows<NumberFormatException> {
             scannerPairingManager.interpretEnteredTextAsSerialNumber(
-                "1874.5"
+                "1874.5",
             )
         }
     }
@@ -125,51 +124,49 @@ class ScannerPairingManagerTest {
     }
 
     @Test
-    fun getPairedScannerAddressToUse_multipleDevicesWithOneValidScanner_returnsCorrectly() =
-        runTest {
-            every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
-                DummyBluetoothDevice(address = CORRECT_ADDRESS),
-                DummyBluetoothDevice(address = INCORRECT_ADDRESS),
-                DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS)
-            )
-            every { fingerprintConfiguration.allowedScanners } returns listOf(
-                correctGeneration
-            )
+    fun getPairedScannerAddressToUse_multipleDevicesWithOneValidScanner_returnsCorrectly() = runTest {
+        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
+            DummyBluetoothDevice(address = CORRECT_ADDRESS),
+            DummyBluetoothDevice(address = INCORRECT_ADDRESS),
+            DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS),
+        )
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
+            correctGeneration,
+        )
 
-            assertThat(scannerPairingManager.getPairedScannerAddressToUse()).isEqualTo(
-                CORRECT_ADDRESS
-            )
-        }
+        assertThat(scannerPairingManager.getPairedScannerAddressToUse()).isEqualTo(
+            CORRECT_ADDRESS,
+        )
+    }
 
     @Test
-    fun getPairedScannerAddressToUse_multipleValidDevices_lastScannerUsedExistsAndIsPaired() =
-        runTest {
-            every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
-                DummyBluetoothDevice(address = CORRECT_ADDRESS),
-                DummyBluetoothDevice(address = INCORRECT_ADDRESS),
-                DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS)
-            )
-            every { fingerprintConfiguration.allowedScanners } returns listOf(
-                correctGeneration,
-                incorrectGeneration
-            )
-            every { recentUserActivity.lastScannerUsed } returns CORRECT_SERIAL
+    fun getPairedScannerAddressToUse_multipleValidDevices_lastScannerUsedExistsAndIsPaired() = runTest {
+        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
+            DummyBluetoothDevice(address = CORRECT_ADDRESS),
+            DummyBluetoothDevice(address = INCORRECT_ADDRESS),
+            DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS),
+        )
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
+            correctGeneration,
+            incorrectGeneration,
+        )
+        every { recentUserActivity.lastScannerUsed } returns CORRECT_SERIAL
 
-            assertThat(scannerPairingManager.getPairedScannerAddressToUse()).isEqualTo(
-                CORRECT_ADDRESS
-            )
-        }
+        assertThat(scannerPairingManager.getPairedScannerAddressToUse()).isEqualTo(
+            CORRECT_ADDRESS,
+        )
+    }
 
     @Test
     fun getPairedScannerAddressToUse_multipleValidDevices_noLastScannerUsed_throws() = runTest {
         every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
             DummyBluetoothDevice(address = CORRECT_ADDRESS),
             DummyBluetoothDevice(address = INCORRECT_ADDRESS),
-            DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS)
+            DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS),
         )
         every { fingerprintConfiguration.allowedScanners } returns listOf(
             correctGeneration,
-            incorrectGeneration
+            incorrectGeneration,
         )
         every { recentUserActivity.lastScannerUsed } returns ""
 
@@ -177,28 +174,27 @@ class ScannerPairingManagerTest {
     }
 
     @Test
-    fun getPairedScannerAddressToUse_multipleValidDevices_lastScannerUsedNotPaired_throws() =
-        runTest {
-            every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
-                DummyBluetoothDevice(address = CORRECT_ADDRESS),
-                DummyBluetoothDevice(address = INCORRECT_ADDRESS),
-                DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS)
-            )
-            every { fingerprintConfiguration.allowedScanners } returns listOf(
-                correctGeneration,
-                incorrectGeneration
-            )
-            every { recentUserActivity.lastScannerUsed } returns SOME_OTHER_SERIAL
+    fun getPairedScannerAddressToUse_multipleValidDevices_lastScannerUsedNotPaired_throws() = runTest {
+        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
+            DummyBluetoothDevice(address = CORRECT_ADDRESS),
+            DummyBluetoothDevice(address = INCORRECT_ADDRESS),
+            DummyBluetoothDevice(address = NOT_SCANNER_ADDRESS),
+        )
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
+            correctGeneration,
+            incorrectGeneration,
+        )
+        every { recentUserActivity.lastScannerUsed } returns SOME_OTHER_SERIAL
 
-            assertThrows<MultiplePossibleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
-        }
+        assertThrows<MultiplePossibleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
+    }
 
     @Test
     fun receivedNotBondedIntent_pairStateReceiver_doesNotReact() = runTest {
         suspendCoroutine { continuation ->
             val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
                 onPairSuccess = { fail() },
-                onPairFailed = { fail() }
+                onPairFailed = { fail() },
             )
             receiver.onReceive(mockk(), createReceivedIntent())
             continuation.resume(Unit)
@@ -210,11 +206,14 @@ class ScannerPairingManagerTest {
         suspendCoroutine { continuation ->
             val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
                 onPairSuccess = { fail() },
-                onPairFailed = { fail() }
+                onPairFailed = { fail() },
             )
-            receiver.onReceive(mockk(), createReceivedIntent(
-                failReason = ComponentBluetoothDevice.UNBOND_REASON_REMOVED,
-            ))
+            receiver.onReceive(
+                mockk(),
+                createReceivedIntent(
+                    failReason = ComponentBluetoothDevice.UNBOND_REASON_REMOVED,
+                ),
+            )
             continuation.resume(Unit)
         }
     }
@@ -224,7 +223,7 @@ class ScannerPairingManagerTest {
         suspendCoroutine { continuation ->
             val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
                 onPairSuccess = { continuation.resume(Unit) },
-                onPairFailed = { fail() }
+                onPairFailed = { fail() },
             )
             receiver.onReceive(mockk(), createReceivedIntent(state = ComponentBluetoothDevice.BOND_BONDED))
         }
@@ -238,11 +237,14 @@ class ScannerPairingManagerTest {
                 onPairFailed = {
                     assertThat(it).isFalse()
                     continuation.resume(Unit)
-                }
+                },
             )
-            receiver.onReceive(mockk(), createReceivedIntent(
-                failReason = 5, // Not one of the "rejected" reason codes
-            ))
+            receiver.onReceive(
+                mockk(),
+                createReceivedIntent(
+                    failReason = 5, // Not one of the "rejected" reason codes
+                ),
+            )
         }
     }
 
@@ -260,7 +262,7 @@ class ScannerPairingManagerTest {
                     onPairFailed = {
                         assertThat(it).isTrue()
                         continuation.resume(Unit)
-                    }
+                    },
                 )
                 receiver.onReceive(mockk(), createReceivedIntent(failReason = failReason))
             }

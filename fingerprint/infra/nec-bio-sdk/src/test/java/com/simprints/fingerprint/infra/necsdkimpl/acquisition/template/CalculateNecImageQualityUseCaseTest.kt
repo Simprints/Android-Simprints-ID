@@ -46,11 +46,10 @@ class CalculateNecImageQualityUseCaseTest {
         val result = calculateNecImageQualityUseCase(testImage)
         // Then
         Truth.assertThat(result).isEqualTo(DEFAULT_GOOD_IMAGE_QUALITY)
-
     }
 
     @Test(expected = BioSdkException.ImageQualityCheckingException::class)
-    fun `test isBadScan failure should throw`() = runTest() {
+    fun `test isBadScan failure should throw`() = runTest {
         every {
             nec.qualityCheck(any())
         } throws FingerprintImageQualityCheck.QualityCheckFailedException(-1)

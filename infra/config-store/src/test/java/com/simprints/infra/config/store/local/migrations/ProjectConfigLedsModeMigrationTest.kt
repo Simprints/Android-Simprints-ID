@@ -5,17 +5,14 @@ import com.simprints.infra.config.store.local.models.ProtoFingerprintConfigurati
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
-import io.mockk.mockk
 import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-
-
 class ProjectConfigLedsModeMigrationTest {
-
     private lateinit var migration: ProjectConfigLedsModeMigration
     private lateinit var mockProtoConfig: ProtoProjectConfiguration
     private lateinit var mockFingerprint: ProtoFingerprintConfiguration
@@ -64,27 +61,31 @@ class ProjectConfigLedsModeMigrationTest {
         // Then
         assertThat(result).isFalse()
     }
+
     @Test
     fun `test migration converts display live feedback from boolean to enum LIVE_QUALITY_FEEDBACK `() = runTest {
-        val currentData = ProtoProjectConfiguration.newBuilder().setFingerprint(
-            ProtoFingerprintConfiguration.newBuilder()
-                .setSecugenSimMatcher(
-                    ProtoFingerprintSdkConfiguration.newBuilder()
-                        .setVero2(
-                            ProtoVero2Configuration.newBuilder()
-                                .setDisplayLiveFeedback(true)
-                                .build()
-                        )
-
-                )
-                .build()
-        ).build()
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .setFingerprint(
+                ProtoFingerprintConfiguration
+                    .newBuilder()
+                    .setSecugenSimMatcher(
+                        ProtoFingerprintSdkConfiguration
+                            .newBuilder()
+                            .setVero2(
+                                ProtoVero2Configuration
+                                    .newBuilder()
+                                    .setDisplayLiveFeedback(true)
+                                    .build(),
+                            ),
+                    ).build(),
+            ).build()
 
         val migrated = migration.migrate(currentData)
 
         assertThat(migrated.fingerprint.secugenSimMatcher.vero2.displayLiveFeedback).isFalse()
         assertThat(migrated.fingerprint.secugenSimMatcher.vero2.ledsMode).isEqualTo(
-            ProtoVero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK)
+            ProtoVero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK,
+        )
     }
-
 }

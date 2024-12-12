@@ -16,7 +16,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class FingerprintFileDownloaderTest {
-
     private lateinit var fingerprintFileDownloader: FingerprintFileDownloader
 
     @MockK
@@ -35,7 +34,7 @@ internal class FingerprintFileDownloaderTest {
             FingerprintFileDownloader(
                 fingerprintApiClientFactory,
                 authStore,
-                testCoroutineRule.testCoroutineDispatcher
+                testCoroutineRule.testCoroutineDispatcher,
             )
     }
 

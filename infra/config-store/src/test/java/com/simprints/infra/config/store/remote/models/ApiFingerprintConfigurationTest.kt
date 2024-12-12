@@ -14,7 +14,6 @@ import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import org.junit.Test
 
 class ApiFingerprintConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
@@ -24,13 +23,13 @@ class ApiFingerprintConfigurationTest {
     fun `should map correctly the model with allowedAgeRange null`() {
         val apiFingerprintConfigurationWithAgeRange = apiFingerprintConfiguration.copy(
             secugenSimMatcher = apiFingerprintConfiguration.secugenSimMatcher?.copy(
-                allowedAgeRange = null
-            )
+                allowedAgeRange = null,
+            ),
         )
         val fingerprintConfigurationWithAgeRange = fingerprintConfiguration.copy(
             secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
-                allowedAgeRange = AgeGroup(0, null)
-            )
+                allowedAgeRange = AgeGroup(0, null),
+            ),
         )
         assertThat(apiFingerprintConfigurationWithAgeRange.toDomain()).isEqualTo(fingerprintConfigurationWithAgeRange)
     }
@@ -48,7 +47,7 @@ class ApiFingerprintConfigurationTest {
                 vero1 = null,
                 vero2 = apiFingerprintConfiguration.secugenSimMatcher?.vero2,
                 allowedAgeRange = apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
-                maxCaptureAttempts = apiMaxCaptureAttempts
+                maxCaptureAttempts = apiMaxCaptureAttempts,
             ),
             null,
         )
@@ -64,7 +63,7 @@ class ApiFingerprintConfigurationTest {
                 vero2 = fingerprintConfiguration.secugenSimMatcher?.vero2,
                 allowedAgeRange = fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
                 verificationMatchThreshold = null,
-                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
+                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
             ),
             null,
         )
@@ -86,10 +85,9 @@ class ApiFingerprintConfigurationTest {
                 vero1 = ApiVero1Configuration(10),
                 vero2 = null,
                 allowedAgeRange = apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
-                maxCaptureAttempts = apiMaxCaptureAttempts
+                maxCaptureAttempts = apiMaxCaptureAttempts,
             ),
-
-            )
+        )
         val fingerprintConfiguration = FingerprintConfiguration(
             listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
             listOf(FingerprintConfiguration.BioSdk.NEC),
@@ -103,10 +101,9 @@ class ApiFingerprintConfigurationTest {
                 vero2 = null,
                 allowedAgeRange = fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
                 verificationMatchThreshold = null,
-                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
+                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
             ),
-
-            )
+        )
 
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
     }
@@ -146,8 +143,10 @@ class ApiFingerprintConfigurationTest {
     @Test
     fun `should map correctly the FingerComparisonStrategy enums`() {
         val mapping = mapOf(
-            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER to FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-            ApiFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX to FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
+            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER to
+                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            ApiFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX to
+                FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
         )
 
         mapping.forEach {

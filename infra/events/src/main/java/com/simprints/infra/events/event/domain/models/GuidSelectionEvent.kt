@@ -15,14 +15,13 @@ data class GuidSelectionEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         selectedId: String,
     ) : this(
         UUID.randomUUID().toString(),
         GuidSelectionPayload(createdAt, EVENT_VERSION, selectedId),
-        GUID_SELECTION
+        GUID_SELECTION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
@@ -37,7 +36,6 @@ data class GuidSelectionEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = GUID_SELECTION,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "guid: $selectedId"
     }
 

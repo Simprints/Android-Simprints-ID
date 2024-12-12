@@ -13,11 +13,14 @@ object JNILibAfis : JNILibAfisInterface {
 
     external override fun getNbCores(): Int
 
-    external override fun verify(probe: ByteBuffer, candidate: ByteBuffer): Float
+    external override fun verify(
+        probe: ByteBuffer,
+        candidate: ByteBuffer,
+    ): Float
 
     external override fun identify(
         probe: SimAfisPerson,
         candidates: List<SimAfisPerson>,
-        nbThreads: Int
+        nbThreads: Int,
     ): FloatArray
 }

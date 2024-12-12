@@ -10,7 +10,6 @@ internal class SimNetworkImpl @Inject constructor(
     private val baseUrlProvider: BaseUrlProvider,
     private val okHttpClientBuilder: DefaultOkHttpClientBuilder,
 ) : SimNetwork {
-
     override fun <T : SimRemoteInterface> getSimApiClient(
         remoteInterface: KClass<T>,
         deviceId: String,
@@ -22,16 +21,12 @@ internal class SimNetworkImpl @Inject constructor(
         getApiBaseUrl(),
         deviceId,
         versionName,
-        authToken
+        authToken,
     )
 
-    override fun getApiBaseUrl(): String {
-        return baseUrlProvider.getApiBaseUrl()
-    }
+    override fun getApiBaseUrl(): String = baseUrlProvider.getApiBaseUrl()
 
-    override fun getApiBaseUrlPrefix(): String {
-        return baseUrlProvider.getApiBaseUrlPrefix()
-    }
+    override fun getApiBaseUrlPrefix(): String = baseUrlProvider.getApiBaseUrlPrefix()
 
     override fun setApiBaseUrl(apiBaseUrl: String?) {
         baseUrlProvider.setApiBaseUrl(apiBaseUrl)
@@ -40,5 +35,4 @@ internal class SimNetworkImpl @Inject constructor(
     override fun resetApiBaseUrl() {
         baseUrlProvider.resetApiBaseUrl()
     }
-
 }

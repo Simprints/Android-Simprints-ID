@@ -23,8 +23,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ProjectDetailsViewModelTest {
-
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -60,7 +58,7 @@ class ProjectDetailsViewModelTest {
             tokenizationProcessor.decrypt(
                 RECENT_USER_ACTIVITY.lastUserUsed as TokenizableString.Tokenized,
                 TokenKeyType.AttendantId,
-                PROJECT
+                PROJECT,
             )
         } returns RECENT_USER_ACTIVITY.lastUserUsed
 
@@ -68,7 +66,7 @@ class ProjectDetailsViewModelTest {
             configManager = configManager,
             authStore = authStore,
             recentUserActivityManager = recentUserActivityManager,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
 
         val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER.value, LAST_SCANNER, true)
@@ -83,7 +81,7 @@ class ProjectDetailsViewModelTest {
             configManager = configManager,
             authStore = authStore,
             recentUserActivityManager = recentUserActivityManager,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
 
         val expectedState = DashboardProjectState(isLoaded = false)
@@ -91,7 +89,6 @@ class ProjectDetailsViewModelTest {
     }
 
     companion object {
-
         private const val PROJECT_ID = "projectID"
         private const val PROJECT_NAME = "name"
         private const val LAST_SCANNER = "scanner"
@@ -104,7 +101,7 @@ class ProjectDetailsViewModelTest {
             "creator",
             "bucket",
             "",
-            tokenizationKeys = emptyMap()
+            tokenizationKeys = emptyMap(),
         )
         private val RECENT_USER_ACTIVITY = RecentUserActivity(
             lastScannerVersion = "",
@@ -113,8 +110,7 @@ class ProjectDetailsViewModelTest {
             enrolmentsToday = 0,
             identificationsToday = 0,
             verificationsToday = 0,
-            lastActivityTime = 0
+            lastActivityTime = 0,
         )
     }
-
 }

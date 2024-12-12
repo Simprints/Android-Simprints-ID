@@ -13,11 +13,9 @@ import com.simprints.infra.config.store.testtools.generalConfiguration
 import com.simprints.infra.config.store.testtools.identificationConfiguration
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
-
 import org.junit.Test
 
 class ApiProjectConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiProjectConfiguration.toDomain()).isEqualTo(projectConfiguration)

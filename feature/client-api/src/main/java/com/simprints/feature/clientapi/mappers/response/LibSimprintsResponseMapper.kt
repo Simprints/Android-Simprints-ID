@@ -20,15 +20,16 @@ import com.simprints.libsimprints.Tier as LegacyTier
 import com.simprints.libsimprints.Verification as LegacyVerification
 
 internal class LibSimprintsResponseMapper @Inject constructor() {
-
     operator fun invoke(response: ActionResponse): Bundle = when (response) {
-
         is ActionResponse.EnrolActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to true,
         ).appendDataPerContractVersion(response) { version ->
             when {
-                version < VersionsList.INITIAL_REWORK -> putParcelable(Constants.SIMPRINTS_REGISTRATION, LegacyEnrolment(response.enrolledGuid))
+                version < VersionsList.INITIAL_REWORK -> putParcelable(
+                    Constants.SIMPRINTS_REGISTRATION,
+                    LegacyEnrolment(response.enrolledGuid),
+                )
                 else -> putString(Constants.SIMPRINTS_ENROLMENT, Enrolment(response.enrolledGuid).toJson())
             }
         }.appendCoSyncData(response.subjectActions)
@@ -42,14 +43,14 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                     Constants.SIMPRINTS_IDENTIFICATIONS,
                     response.identifications
                         .map { LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name)) }
-                        .toCollection(ArrayList())
+                        .toCollection(ArrayList()),
                 )
 
                 else -> putString(
                     Constants.SIMPRINTS_IDENTIFICATIONS,
                     response.identifications
                         .map { Identification(it.guid, it.confidenceScore.toFloat(), Tier.valueOf(it.tier.name)) }
-                        .toJson()
+                        .toJson(),
                 )
             }
         }
@@ -71,7 +72,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                             confidence = response.matchResult.confidenceScore,
                             tier = LegacyTier.valueOf(response.matchResult.tier.name),
                             guid = response.matchResult.guid,
-                        )
+                        ),
                     )
                     putBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS, response.matchResult.verificationSuccess == true)
                 }
@@ -83,7 +84,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                         confidence = response.matchResult.confidenceScore.toFloat(),
                         tier = Tier.valueOf(response.matchResult.tier.name),
                         isSuccess = response.matchResult.verificationSuccess == true,
-                    ).toJson()
+                    ).toJson(),
                 )
             }
         }
@@ -95,12 +96,12 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
             when {
                 version < VersionsList.INITIAL_REWORK -> putParcelable(
                     Constants.SIMPRINTS_REFUSAL_FORM,
-                    LegacyRefusalForm(response.reason, response.extraText)
+                    LegacyRefusalForm(response.reason, response.extraText),
                 )
 
                 else -> putString(
                     Constants.SIMPRINTS_REFUSAL_FORM,
-                    RefusalForm(response.reason, response.extraText).toJson()
+                    RefusalForm(response.reason, response.extraText).toJson(),
                 )
             }
         }
@@ -108,7 +109,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         is ActionResponse.ErrorActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to response.flowCompleted,
-            RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode()
+            RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode(),
         )
     }
 
@@ -120,7 +121,6 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         this.block(version)
         return this
     }
-
 
     private fun Bundle.appendCoSyncData(actions: String?) = apply {
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
@@ -157,11 +157,10 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         INVALID_USER_ID -> Constants.SIMPRINTS_INVALID_USER_ID
         INVALID_VERIFY_ID -> Constants.SIMPRINTS_INVALID_VERIFY_GUID
         INVALID_STATE_FOR_INTENT_ACTION -> Constants.SIMPRINTS_INVALID_STATE_FOR_INTENT_ACTION
-        */
+         */
     }
 
     companion object {
-
         internal const val RESULT_CODE_OVERRIDE = "result_code_override"
     }
 }

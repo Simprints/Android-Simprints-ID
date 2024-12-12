@@ -32,7 +32,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SetupFragment : Fragment(R.layout.fragment_setup) {
-
     private val viewModel: SetupViewModel by viewModels()
     private val binding by viewBinding(FragmentSetupBinding::bind)
     private val launchLocationPermissionRequest = registerForActivityResult(
@@ -56,7 +55,10 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     // 3. Download required licenses
     // 4. Return overall setup result
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,
@@ -87,29 +89,27 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         viewModel.start()
     }
 
-    private fun observeOverallSetupResult() =
-        viewModel.overallSetupResult.observe(viewLifecycleOwner) {
-            // if the overall setup result is success, finish the setup flow else an alert will be shown
-            if (it) {
-                findNavController().finishWithResult(this, SetupResult(isSuccess = true))
-            }
+    private fun observeOverallSetupResult() = viewModel.overallSetupResult.observe(viewLifecycleOwner) {
+        // if the overall setup result is success, finish the setup flow else an alert will be shown
+        if (it) {
+            findNavController().finishWithResult(this, SetupResult(isSuccess = true))
         }
+    }
 
-    private fun observeDownloadLicenseState() =
-        viewModel.downloadLicenseState.observe(viewLifecycleOwner) { licenseState ->
-            when (licenseState) {
-                Started -> renderStarted()
-                Downloading -> renderDownloading()
-                is FinishedWithSuccess -> {
-                    // Do nothing
-                }
-
-                is FinishedWithError -> renderFinishedWithError(licenseState.errorCode)
-                is FinishedWithBackendMaintenanceError -> renderFinishedWithBackendMaintenanceError(
-                    licenseState.estimatedOutage
-                )
+    private fun observeDownloadLicenseState() = viewModel.downloadLicenseState.observe(viewLifecycleOwner) { licenseState ->
+        when (licenseState) {
+            Started -> renderStarted()
+            Downloading -> renderDownloading()
+            is FinishedWithSuccess -> {
+                // Do nothing
             }
+
+            is FinishedWithError -> renderFinishedWithError(licenseState.errorCode)
+            is FinishedWithBackendMaintenanceError -> renderFinishedWithBackendMaintenanceError(
+                licenseState.estimatedOutage,
+            )
         }
+    }
 
     private fun renderStarted() {
         binding.configurationTxt.setText(IDR.string.configuration_started)
@@ -122,12 +122,13 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     private fun renderFinishedWithError(errorCode: String) {
         val errorTitle =
             getString(IDR.string.configuration_generic_error_title, errorCode)
-        Simber.tag(LICENSE.name)
+        Simber
+            .tag(LICENSE.name)
             .i("Error with configuration download. Error = $errorTitle")
         findNavController().navigateSafely(
             this,
             R.id.action_global_errorFragment,
-            ErrorType.CONFIGURATION_ERROR.apply { this.customTitle = errorTitle }.toAlertArgs()
+            ErrorType.CONFIGURATION_ERROR.apply { this.customTitle = errorTitle }.toAlertArgs(),
         )
     }
 
@@ -135,19 +136,21 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         val errorMessage = if (estimatedOutage != null && estimatedOutage != 0L) {
             getString(
                 IDR.string.error_backend_maintenance_with_time_message,
-                TimeUtils.getFormattedEstimatedOutage(estimatedOutage)
+                TimeUtils.getFormattedEstimatedOutage(estimatedOutage),
             )
         } else {
             getString(IDR.string.error_backend_maintenance_message)
         }
 
-        Simber.tag(LICENSE.name)
+        Simber
+            .tag(LICENSE.name)
             .i("Error with configuration download. The backend is under maintenance")
         findNavController().navigateSafely(
             this,
             R.id.action_global_errorFragment,
-            ErrorType.BACKEND_MAINTENANCE_ERROR.apply { this.customMessage = errorMessage }
-                .toAlertArgs()
+            ErrorType.BACKEND_MAINTENANCE_ERROR
+                .apply { this.customMessage = errorMessage }
+                .toAlertArgs(),
         )
     }
 }

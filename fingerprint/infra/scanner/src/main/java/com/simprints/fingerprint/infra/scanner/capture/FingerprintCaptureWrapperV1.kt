@@ -24,17 +24,14 @@ internal class FingerprintCaptureWrapperV1(
     private val scannerV1: Scanner,
     private val ioDispatcher: CoroutineDispatcher,
 ) : FingerprintCaptureWrapper {
-    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse {
+    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
-    }
 
-    override suspend fun acquireUnprocessedImage(captureDpi: Dpi?): AcquireUnprocessedImageResponse {
+    override suspend fun acquireUnprocessedImage(captureDpi: Dpi?): AcquireUnprocessedImageResponse =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
-    }
 
-    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray {
+    override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
-    }
 
     override suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
@@ -48,7 +45,7 @@ internal class FingerprintCaptureWrapperV1(
             scannerV1.startContinuousCapture(
                 qualityThreshold,
                 timeOutMs.toLong(),
-                continuousCaptureCallback(qualityThreshold, cont)
+                continuousCaptureCallback(qualityThreshold, cont),
             )
 
             cont.invokeOnCancellation {
@@ -57,72 +54,72 @@ internal class FingerprintCaptureWrapperV1(
         }
     }
 
-
     private fun continuousCaptureCallback(
         qualityThreshold: Int,
-        cont: Continuation<AcquireFingerprintTemplateResponse>
-    ) =
-        ScannerCallbackWrapper(
-            success = {
-                cont.resume(
-                    AcquireFingerprintTemplateResponse(
-                        scannerV1.template!!,
-                        templateFormat,
-                        scannerV1.imageQuality
-                    )
-                )
-            },
-            failure = {
-                if (it == SCANNER_ERROR.TIMEOUT)
-                    scannerV1.forceCapture(qualityThreshold, forceCaptureCallback(cont))
-                else handleFingerprintCaptureError(it, cont)
-            }
-        )
-
-    private fun forceCaptureCallback(cont: Continuation<AcquireFingerprintTemplateResponse>) =
-        ScannerCallbackWrapper(
-            success = {
-                cont.resume(
-                    AcquireFingerprintTemplateResponse(
-                        scannerV1.template!!,
-                        templateFormat,
-                        scannerV1.imageQuality
-                    )
-                )
-            },
-            failure = {
+        cont: Continuation<AcquireFingerprintTemplateResponse>,
+    ) = ScannerCallbackWrapper(
+        success = {
+            cont.resume(
+                AcquireFingerprintTemplateResponse(
+                    scannerV1.template!!,
+                    templateFormat,
+                    scannerV1.imageQuality,
+                ),
+            )
+        },
+        failure = {
+            if (it == SCANNER_ERROR.TIMEOUT) {
+                scannerV1.forceCapture(qualityThreshold, forceCaptureCallback(cont))
+            } else {
                 handleFingerprintCaptureError(it, cont)
             }
-        )
+        },
+    )
+
+    private fun forceCaptureCallback(cont: Continuation<AcquireFingerprintTemplateResponse>) = ScannerCallbackWrapper(
+        success = {
+            cont.resume(
+                AcquireFingerprintTemplateResponse(
+                    scannerV1.template!!,
+                    templateFormat,
+                    scannerV1.imageQuality,
+                ),
+            )
+        },
+        failure = {
+            handleFingerprintCaptureError(it, cont)
+        },
+    )
 
     private fun handleFingerprintCaptureError(
         error: SCANNER_ERROR?,
-        cont: Continuation<AcquireFingerprintTemplateResponse>
+        cont: Continuation<AcquireFingerprintTemplateResponse>,
     ) {
         when (error) {
             SCANNER_ERROR.UN20_SDK_ERROR -> cont.resumeWithException(NoFingerDetectedException("No finger detected on the sensor"))
-            SCANNER_ERROR.INVALID_STATE, SCANNER_ERROR.SCANNER_UNREACHABLE, SCANNER_ERROR.UN20_INVALID_STATE, SCANNER_ERROR.OUTDATED_SCANNER_INFO, SCANNER_ERROR.IO_ERROR -> cont.resumeWithException(
-                ScannerDisconnectedException()
-            )
+            SCANNER_ERROR.INVALID_STATE, SCANNER_ERROR.SCANNER_UNREACHABLE, SCANNER_ERROR.UN20_INVALID_STATE, SCANNER_ERROR.OUTDATED_SCANNER_INFO, SCANNER_ERROR.IO_ERROR ->
+                cont
+                    .resumeWithException(
+                        ScannerDisconnectedException(),
+                    )
 
             SCANNER_ERROR.BUSY, SCANNER_ERROR.INTERRUPTED, SCANNER_ERROR.TIMEOUT -> cont.resumeWithException(
-                ScannerOperationInterruptedException()
+                ScannerOperationInterruptedException(),
             )
 
             else -> cont.resumeWithException(
                 UnexpectedScannerException.forScannerError(
                     error,
-                    "ScannerWrapperV1"
-                )
+                    "ScannerWrapperV1",
+                ),
             )
         }
     }
 
     class ScannerCallbackWrapper(
         val success: () -> Unit,
-        val failure: (scannerError: SCANNER_ERROR?) -> Unit
-    ) :
-        ScannerCallback {
+        val failure: (scannerError: SCANNER_ERROR?) -> Unit,
+    ) : ScannerCallback {
         override fun onSuccess() {
             success()
         }

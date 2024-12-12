@@ -22,7 +22,6 @@ import kotlin.test.Test
 
 @RunWith(AndroidJUnit4::class)
 class DatabasePersistentLoggerTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -34,7 +33,6 @@ class DatabasePersistentLoggerTest {
 
     @MockK
     private lateinit var scopeProvider: ScopeProvider
-
 
     private lateinit var persistentLogger: DatabasePersistentLogger
 
@@ -61,9 +59,11 @@ class DatabasePersistentLoggerTest {
         persistentLogger.log(LogEntryType.Intent, "title", "body")
 
         coVerify {
-            logEntryDao.save(coWithArg {
-                it.timestampMs == 0L && it.title == "title" && it.body == "body"
-            })
+            logEntryDao.save(
+                coWithArg {
+                    it.timestampMs == 0L && it.title == "title" && it.body == "body"
+                },
+            )
         }
         coVerify { logEntryDao.prune(any()) }
     }
@@ -73,9 +73,11 @@ class DatabasePersistentLoggerTest {
         persistentLogger.log(LogEntryType.Intent, 1L, "title", "body")
 
         coVerify {
-            logEntryDao.save(coWithArg {
-                it.timestampMs == 1L && it.title == "title" && it.body == "body"
-            })
+            logEntryDao.save(
+                coWithArg {
+                    it.timestampMs == 1L && it.title == "title" && it.body == "body"
+                },
+            )
         }
         coVerify { logEntryDao.prune(any()) }
     }
@@ -85,9 +87,11 @@ class DatabasePersistentLoggerTest {
         persistentLogger.logSync(LogEntryType.Intent, "title", "body")
 
         coVerify {
-            logEntryDao.save(coWithArg {
-                it.timestampMs == 0L && it.title == "title" && it.body == "body"
-            })
+            logEntryDao.save(
+                coWithArg {
+                    it.timestampMs == 0L && it.title == "title" && it.body == "body"
+                },
+            )
         }
         coVerify { logEntryDao.prune(any()) }
     }
@@ -97,9 +101,11 @@ class DatabasePersistentLoggerTest {
         persistentLogger.logSync(LogEntryType.Intent, 1L, "title", "body")
 
         coVerify {
-            logEntryDao.save(coWithArg {
-                it.timestampMs == 1L && it.title == "title" && it.body == "body"
-            })
+            logEntryDao.save(
+                coWithArg {
+                    it.timestampMs == 1L && it.title == "title" && it.body == "body"
+                },
+            )
         }
         coVerify { logEntryDao.prune(any()) }
     }
@@ -107,12 +113,12 @@ class DatabasePersistentLoggerTest {
     @Test
     fun `delegates fetch to dao`() = runTest {
         coEvery { logEntryDao.getByType(any()) } returns listOf(
-            DbLogEntry(0L, 0L, 1L, "Intent", "title", "body")
+            DbLogEntry(0L, 0L, 1L, "Intent", "title", "body"),
         )
         val result = persistentLogger.get(LogEntryType.Intent)
 
         assertThat(result.first()).isEqualTo(
-            LogEntry(1L, LogEntryType.Intent, "title", "body")
+            LogEntry(1L, LogEntryType.Intent, "title", "body"),
         )
     }
 

@@ -10,9 +10,8 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 class TokenizationProcessor @Inject constructor(
-    private val stringTokenizer: StringTokenizer
+    private val stringTokenizer: StringTokenizer,
 ) {
-
     /**
      * Tries to encrypt [decrypted] value in safely manner.
      *
@@ -26,7 +25,7 @@ class TokenizationProcessor @Inject constructor(
     fun encrypt(
         decrypted: TokenizableString.Raw,
         tokenKeyType: TokenKeyType,
-        project: Project
+        project: Project,
     ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return decrypted
         return try {
@@ -50,7 +49,7 @@ class TokenizationProcessor @Inject constructor(
     fun decrypt(
         encrypted: TokenizableString.Tokenized,
         tokenKeyType: TokenKeyType,
-        project: Project
+        project: Project,
     ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return encrypted
         return try {

@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 
-internal class ModuleAdapter(private val listener: ModuleSelectionListener) :
-    RecyclerView.Adapter<ModuleViewHolder>() {
-
+internal class ModuleAdapter(
+    private val listener: ModuleSelectionListener,
+) : RecyclerView.Adapter<ModuleViewHolder>() {
     private var list = emptyList<Module>()
 
     @SuppressLint("NotifyDataSetChanged")
@@ -18,17 +18,22 @@ internal class ModuleAdapter(private val listener: ModuleSelectionListener) :
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ModuleViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val itemView = inflater.inflate(R.layout.item_module, parent, false)
         return ModuleViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ModuleViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ModuleViewHolder,
+        position: Int,
+    ) {
         val moduleName = list[position]
         holder.bindTo(moduleName, listener)
     }
 
     override fun getItemCount(): Int = list.size
-
 }

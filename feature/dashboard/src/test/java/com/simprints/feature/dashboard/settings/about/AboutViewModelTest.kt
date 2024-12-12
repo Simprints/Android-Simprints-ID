@@ -29,9 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 
 class AboutViewModelTest {
-
     companion object {
-
         private val MODALITIES = listOf(GeneralConfiguration.Modality.FINGERPRINT)
         private val POOL_TYPE = IdentificationConfiguration.PoolType.MODULE
         private val PARTITION_TYPE = DownSynchronizationConfiguration.PartitionType.PROJECT
@@ -74,7 +72,7 @@ class AboutViewModelTest {
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
         assertThat(viewModel.syncAndSearchConfig.value).isEqualTo(
-            SyncAndSearchConfig(PARTITION_TYPE.name, POOL_TYPE.name)
+            SyncAndSearchConfig(PARTITION_TYPE.name, POOL_TYPE.name),
         )
         assertThat(viewModel.recentUserActivity.value).isEqualTo(recentUserActivity)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
@@ -117,7 +115,7 @@ class AboutViewModelTest {
         runTest {
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
-                LogoutDestination.LogoutDataSyncScreen
+                LogoutDestination.LogoutDataSyncScreen,
             )
         }
     }
@@ -129,7 +127,7 @@ class AboutViewModelTest {
         runTest {
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
-                LogoutDestination.LoginScreen
+                LogoutDestination.LoginScreen,
             )
         }
     }
@@ -141,7 +139,7 @@ class AboutViewModelTest {
         runTest {
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
-                LogoutDestination.LoginScreen
+                LogoutDestination.LoginScreen,
             )
         }
     }
@@ -171,29 +169,31 @@ class AboutViewModelTest {
         }
     }
 
-    private fun buildProjectConfigurationMock(upSyncKind: UpSynchronizationConfiguration.UpSynchronizationKind = UpSynchronizationConfiguration.UpSynchronizationKind.ALL): ProjectConfiguration =
-        mockk {
-            every { general } returns mockk {
-                every { modalities } returns MODALITIES
-                every { settingsPassword } returns SettingsPasswordConfig.Locked("1234")
+    private fun buildProjectConfigurationMock(
+        upSyncKind: UpSynchronizationConfiguration.UpSynchronizationKind = UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+    ): ProjectConfiguration = mockk {
+        every { general } returns mockk {
+            every { modalities } returns MODALITIES
+            every { settingsPassword } returns SettingsPasswordConfig.Locked("1234")
+        }
+        every { identification } returns mockk {
+            every { poolType } returns POOL_TYPE
+        }
+        every { synchronization } returns mockk {
+            every { down } returns mockk {
+                every { partitionType } returns PARTITION_TYPE
             }
-            every { identification } returns mockk {
-                every { poolType } returns POOL_TYPE
-            }
-            every { synchronization } returns mockk {
-                every { down } returns mockk {
-                    every { partitionType } returns PARTITION_TYPE
-                }
-                every { up } returns mockk {
-                    every { simprints } returns mockk {
-                        every { kind } returns upSyncKind
-                    }
+            every { up } returns mockk {
+                every { simprints } returns mockk {
+                    every { kind } returns upSyncKind
                 }
             }
         }
+    }
 
     private fun buildAboutViewModel(
-        canSyncDataToSimprints: Boolean, hasEventsToUpload: Boolean,
+        canSyncDataToSimprints: Boolean,
+        hasEventsToUpload: Boolean,
     ): AboutViewModel {
         val upSyncKind = when (canSyncDataToSimprints) {
             true -> UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -204,10 +204,10 @@ class AboutViewModelTest {
             false -> 0
         }
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(
-            countEventsToUpload
+            countEventsToUpload,
         )
         coEvery { configManager.getProjectConfiguration() } returns buildProjectConfigurationMock(
-            upSyncKind
+            upSyncKind,
         )
         return AboutViewModel(
             configManager = configManager,

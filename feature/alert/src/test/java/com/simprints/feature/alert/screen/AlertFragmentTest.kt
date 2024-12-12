@@ -14,9 +14,9 @@ import com.google.common.truth.Truth
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
-import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.R
 import com.simprints.feature.alert.alertButton
+import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.toArgs
 import com.simprints.infra.uibase.navigation.handleResultDirectly
@@ -41,7 +41,6 @@ import com.simprints.infra.resources.R as IDR
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class AlertFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -56,7 +55,7 @@ class AlertFragmentTest {
     fun `should set correct visibility for default values`() {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
-            fragmentArgs = alertConfiguration {}.toArgs()
+            fragmentArgs = alertConfiguration {}.toArgs(),
         )
 
         onView(withChild(withId(R.id.alertTitle))).check(matches(hasBackgroundColor(IDR.color.simprints_blue)))
@@ -76,7 +75,7 @@ class AlertFragmentTest {
     fun `should set correct background`() {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
-            fragmentArgs = alertConfiguration { color = AlertColor.Red }.toArgs()
+            fragmentArgs = alertConfiguration { color = AlertColor.Red }.toArgs(),
         )
 
         onView(withChild(withId(R.id.alertTitle))).check(matches(hasBackgroundColor(IDR.color.simprints_red)))
@@ -91,7 +90,7 @@ class AlertFragmentTest {
                 message = "Custom message"
                 leftButton = alertButton { text = "Custom left" }
                 rightButton = alertButton { text = "Custom right" }
-            }.toArgs()
+            }.toArgs(),
         )
 
         onView(withId(R.id.alertTitle)).check(matches(withText("Custom title")))
@@ -107,7 +106,7 @@ class AlertFragmentTest {
             fragmentArgs = alertConfiguration {
                 message = "Custom message"
                 messageIcon = IDR.drawable.ic_refresh
-            }.toArgs()
+            }.toArgs(),
         )
 
         onView(withId(R.id.alertMessage)).check(matches(withText("Custom message")))
@@ -124,7 +123,7 @@ class AlertFragmentTest {
                 messageRes = IDR.string.alert_title_fallback
                 leftButton = alertButton { textRes = IDR.string.alert_title_fallback }
                 rightButton = alertButton { textRes = IDR.string.alert_title_fallback }
-            }.toArgs()
+            }.toArgs(),
         )
 
         onView(withId(R.id.alertTitle)).check(matches(withText(IDR.string.alert_title_fallback)))
@@ -139,7 +138,7 @@ class AlertFragmentTest {
 
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
-            fragmentArgs = alertConfiguration {}.toArgs()
+            fragmentArgs = alertConfiguration {}.toArgs(),
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 resultKey = result.buttonKey
@@ -158,7 +157,7 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {
                 appErrorReason = AppErrorReason.LICENSE_INVALID
-            }.toArgs()
+            }.toArgs(),
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 payload = result.appErrorReason
@@ -176,7 +175,7 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {
                 appErrorReason = AppErrorReason.LICENSE_INVALID
-            }.toArgs()
+            }.toArgs(),
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 payload = result.appErrorReason
@@ -198,7 +197,7 @@ class AlertFragmentTest {
                     text = "Right"
                     resultKey = "test"
                 }
-            }.toArgs()
+            }.toArgs(),
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 payload = result.appErrorReason
@@ -219,7 +218,7 @@ class AlertFragmentTest {
                     text = "Left"
                     resultKey = "test"
                 }
-            }.toArgs()
+            }.toArgs(),
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 resultKey = result.buttonKey
@@ -240,7 +239,7 @@ class AlertFragmentTest {
                     text = "Right"
                     resultKey = "test"
                 }
-            }.toArgs()
+            }.toArgs(),
         ) {
             handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 resultKey = result.buttonKey
@@ -260,7 +259,7 @@ class AlertFragmentTest {
                     text = "Left"
                     closeOnClick = false
                 }
-            }.toArgs()
+            }.toArgs(),
         ) {
             onView(withId(R.id.alertLeftButton)).perform(click())
         }
@@ -280,7 +279,7 @@ class AlertFragmentTest {
                     text = "Left"
                     closeOnClick = true
                 }
-            }.toArgs()
+            }.toArgs(),
         ) {
             onView(withId(R.id.alertLeftButton)).perform(click())
         }

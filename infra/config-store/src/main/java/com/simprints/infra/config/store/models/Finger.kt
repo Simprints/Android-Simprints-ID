@@ -12,7 +12,7 @@ enum class Finger {
     RIGHT_INDEX_FINGER,
     RIGHT_3RD_FINGER,
     RIGHT_4TH_FINGER,
-    RIGHT_5TH_FINGER;
+    RIGHT_5TH_FINGER,
 }
 
 fun Finger.fromDomainToModuleApi() = when (this) {
@@ -27,7 +27,6 @@ fun Finger.fromDomainToModuleApi() = when (this) {
     Finger.LEFT_4TH_FINGER -> IFingerIdentifier.LEFT_4TH_FINGER
     Finger.LEFT_5TH_FINGER -> IFingerIdentifier.LEFT_5TH_FINGER
 }
-
 
 fun IFingerIdentifier.fromModuleApiToDomain(): Finger = when (this) {
     IFingerIdentifier.RIGHT_5TH_FINGER -> Finger.RIGHT_5TH_FINGER

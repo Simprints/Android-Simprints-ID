@@ -6,10 +6,9 @@ import android.media.MediaPlayer
 import androidx.preference.PreferenceManager
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintScanningStatusTracker
-import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
-import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
-
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
+import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.VISUAL_SCAN_FEEDBACK
 import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -27,7 +26,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ObserveFingerprintScanStatusUseCaseTest {
-
     private lateinit var tracker: FingerprintScanningStatusTracker
 
     @RelaxedMockK
@@ -60,46 +58,52 @@ class ObserveFingerprintScanStatusUseCaseTest {
         tracker = FingerprintScanningStatusTracker(testDispatcher)
 
         observeFingerprintScanStatus = ObserveFingerprintScanStatusUseCase(
-            tracker, playAudioBeep, configManager, scannerManager, context
+            tracker,
+            playAudioBeep,
+            configManager,
+            scannerManager,
+            context,
         )
     }
 
     @Test
-    fun `playBeep called when scan completes and audio and VISUAL_SCAN_FEEDBACK are enabled`() =
-        runTest(testDispatcher) {
-            // Given
-            every { sharedPreferences.getBoolean(any(), any()) } returns true
-            coEvery {
-                configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(
-                    fingerprintSdk
-                )?.vero2?.ledsMode
-            } returns VISUAL_SCAN_FEEDBACK
+    fun `playBeep called when scan completes and audio and VISUAL_SCAN_FEEDBACK are enabled`() = runTest(testDispatcher) {
+        // Given
+        every { sharedPreferences.getBoolean(any(), any()) } returns true
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .fingerprint
+                ?.getSdkConfiguration(
+                    fingerprintSdk,
+                )?.vero2
+                ?.ledsMode
+        } returns VISUAL_SCAN_FEEDBACK
 
-            // When
-            observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
-            tracker.completeScan()
+        // When
+        observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
+        tracker.completeScan()
 
-            // Then
-            verify { playAudioBeep() }
-        }
+        // Then
+        verify { playAudioBeep() }
+    }
 
     @Test
-    fun `playBeep should not be called when scan completes and audio is disabled`() =
-        runTest(testDispatcher) {
-            // Given
-            every { sharedPreferences.getBoolean(any(), any()) } returns false
+    fun `playBeep should not be called when scan completes and audio is disabled`() = runTest(testDispatcher) {
+        // Given
+        every { sharedPreferences.getBoolean(any(), any()) } returns false
 
-            // When
-            observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
-            tracker.completeScan()
+        // When
+        observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
+        tracker.completeScan()
 
-            // Then
-            verify(exactly = 0) { playAudioBeep() }
-        }
+        // Then
+        verify(exactly = 0) { playAudioBeep() }
+    }
 
     @Test
     fun `releaseMediaPlayer should release the media player`() = runTest(testDispatcher) {
-        //Given
+        // Given
         every { sharedPreferences.getBoolean(any(), any()) } returns true
 
         // When
@@ -110,7 +114,6 @@ class ObserveFingerprintScanStatusUseCaseTest {
         // Then
         verify { playAudioBeep() }
         verify { playAudioBeep.releaseMediaPlayer() }
-
     }
 
     @Test
@@ -147,24 +150,27 @@ class ObserveFingerprintScanStatusUseCaseTest {
     }
 
     @Test
-    fun `turnOnFlashingWhiteSmileLeds should be called when state is Idle and VISUAL_SCAN_FEEDBACK is enabled`() =
-        runTest(testDispatcher) {
-            // Given
-            every { sharedPreferences.getBoolean(any(), any()) } returns true
-            coEvery {
-                configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(
-                    fingerprintSdk
-                )?.vero2?.ledsMode
-            } returns VISUAL_SCAN_FEEDBACK
+    fun `turnOnFlashingWhiteSmileLeds should be called when state is Idle and VISUAL_SCAN_FEEDBACK is enabled`() = runTest(testDispatcher) {
+        // Given
+        every { sharedPreferences.getBoolean(any(), any()) } returns true
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .fingerprint
+                ?.getSdkConfiguration(
+                    fingerprintSdk,
+                )?.vero2
+                ?.ledsMode
+        } returns VISUAL_SCAN_FEEDBACK
 
-            observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
+        observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
 
-            // When
-            tracker.resetToIdle()
+        // When
+        tracker.resetToIdle()
 
-            // Then
-            coVerify { scannerManager.scanner.turnOnFlashingWhiteSmileLeds() }
-        }
+        // Then
+        coVerify { scannerManager.scanner.turnOnFlashingWhiteSmileLeds() }
+    }
 
     @Test
     fun `turnOnFlashingWhiteSmileLeds should not be called when state is Idle and LIVE_QUALITY_FEEDBACK is enabled`() =
@@ -172,9 +178,13 @@ class ObserveFingerprintScanStatusUseCaseTest {
             // Given
             every { sharedPreferences.getBoolean(any(), any()) } returns true
             coEvery {
-                configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(
-                    fingerprintSdk
-                )?.vero2?.ledsMode
+                configManager
+                    .getProjectConfiguration()
+                    .fingerprint
+                    ?.getSdkConfiguration(
+                        fingerprintSdk,
+                    )?.vero2
+                    ?.ledsMode
             } returns LIVE_QUALITY_FEEDBACK
 
             observeFingerprintScanStatus(this.backgroundScope, fingerprintSdk)
@@ -185,5 +195,4 @@ class ObserveFingerprintScanStatusUseCaseTest {
             // Then
             coVerify(exactly = 0) { scannerManager.scanner.turnOnFlashingWhiteSmileLeds() }
         }
-
 }

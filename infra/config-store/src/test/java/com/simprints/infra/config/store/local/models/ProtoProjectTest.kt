@@ -5,9 +5,7 @@ import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.protoProject
 import org.junit.Test
 
-
 class ProtoProjectTest {
-
     @Test
     fun `domain project model mapped to proto model correctly`() {
         val result = project.toProto()
@@ -22,7 +20,11 @@ class ProtoProjectTest {
 
     @Test
     fun `proto project model without state mapped to domain model correctly`() {
-        val result = protoProject.toBuilder().clearState().build().toDomain()
+        val result = protoProject
+            .toBuilder()
+            .clearState()
+            .build()
+            .toDomain()
         assertThat(result).isEqualTo(project)
     }
 }

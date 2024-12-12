@@ -13,7 +13,7 @@ internal data class EventUpSyncOperation(
     enum class UpSyncState {
         RUNNING,
         COMPLETE,
-        FAILED
+        FAILED,
     }
 
     fun getUniqueKey() = UUID.nameUUIDFromBytes(projectId.toByteArray()).toString()

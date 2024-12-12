@@ -8,7 +8,6 @@ import com.simprints.infra.logging.trees.CrashReportingTree
 import timber.log.Timber
 
 object SimberBuilder {
-
     /**
      * Simber needs to be initialized with the application context. It can be initialized multiple
      * times without issue. Re-initializing Simber uproots and replants all trees.
@@ -24,5 +23,4 @@ object SimberBuilder {
             Timber.plant(AnalyticsTree(FirebaseAnalytics.getInstance(context)))
         }
     }
-
 }

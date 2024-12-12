@@ -5,7 +5,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class VendorTest {
-
     @Test
     fun `correctly maps keys`() {
         assertThat(Vendor.fromKey("RANK_ONE_FACE")).isEqualTo(Vendor.RankOne)

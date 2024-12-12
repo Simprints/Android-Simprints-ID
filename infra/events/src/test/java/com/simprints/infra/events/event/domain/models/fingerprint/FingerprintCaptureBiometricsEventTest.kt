@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test
 
 class FingerprintCaptureBiometricsEventTest {
-
     @Test
     fun create_FingerprintCaptureBiometricsEvent() {
         val fingerArg =

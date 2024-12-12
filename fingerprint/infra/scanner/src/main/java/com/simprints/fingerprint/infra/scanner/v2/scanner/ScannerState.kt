@@ -20,15 +20,15 @@ data class ScannerState(
     var scanLedState: Boolean?, // FALSE = Default
 )
 
-fun disconnectedScannerState() =
-    ScannerState(
-        connected = false,
-        mode = null,
-        un20On = null,
-        triggerButtonActive = null,
-        smileLedState = null,
-        batteryPercentCharge = null,
-        batteryVoltageMilliVolts = null,
-        batteryCurrentMilliAmps = null,
-        batteryTemperatureDeciKelvin = null,
-        scanLedState = null)
+fun disconnectedScannerState() = ScannerState(
+    connected = false,
+    mode = null,
+    un20On = null,
+    triggerButtonActive = null,
+    smileLedState = null,
+    batteryPercentCharge = null,
+    batteryVoltageMilliVolts = null,
+    batteryCurrentMilliAmps = null,
+    batteryTemperatureDeciKelvin = null,
+    scanLedState = null,
+)

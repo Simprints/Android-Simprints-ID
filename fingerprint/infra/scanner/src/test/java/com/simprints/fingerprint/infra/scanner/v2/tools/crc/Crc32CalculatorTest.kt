@@ -5,7 +5,6 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
 import org.junit.Test
 
 class Crc32CalculatorTest {
-
     private val crc32Calculator = Crc32Calculator()
 
     @Test

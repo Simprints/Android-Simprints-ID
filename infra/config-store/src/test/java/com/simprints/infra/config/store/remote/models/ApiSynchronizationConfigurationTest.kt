@@ -9,20 +9,21 @@ import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test
 
 class ApiSynchronizationConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiSynchronizationConfiguration.toDomain()).isEqualTo(
-            synchronizationConfiguration
+            synchronizationConfiguration,
         )
     }
 
     @Test
     fun `should map correctly the Frequency enums`() {
         val mapping = mapOf(
-            ApiSynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC to SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC,
+            ApiSynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC to
+                SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC,
             ApiSynchronizationConfiguration.Frequency.PERIODICALLY to SynchronizationConfiguration.Frequency.PERIODICALLY,
-            ApiSynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START to SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START,
+            ApiSynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START to
+                SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START,
         )
 
         mapping.forEach {

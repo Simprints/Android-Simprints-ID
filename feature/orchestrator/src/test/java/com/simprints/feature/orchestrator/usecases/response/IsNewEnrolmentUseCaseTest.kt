@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class IsNewEnrolmentUseCaseTest {
-
     @MockK
     lateinit var projectConfiguration: ProjectConfiguration
 
@@ -22,7 +21,6 @@ internal class IsNewEnrolmentUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-
 
         every { projectConfiguration.face?.decisionPolicy } returns faceConfidenceDecisionPolicy
         every { projectConfiguration.fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
@@ -48,81 +46,116 @@ internal class IsNewEnrolmentUseCaseTest {
     fun `Results are new enrolment if fingerprint match results are of lower then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
-        assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
-                mockk(),
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    FingerprintMatchResult(
+                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
+                        mockk(),
+                    ),
+                ),
             ),
-        ))).isTrue()
+        ).isTrue()
     }
 
     @Test
     fun `Results are not new enrolment if fingerprint match results are of higher then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
-        assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
-                mockk(),
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    FingerprintMatchResult(
+                        listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
+                        mockk(),
+                    ),
+                ),
             ),
-        ))).isFalse()
+        ).isFalse()
     }
 
     @Test
     fun `Results are new enrolment if face match results are of lower then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
-        assertThat(useCase(projectConfiguration, listOf(
-            FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
-        ))).isTrue()
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
+                ),
+            ),
+        ).isTrue()
     }
 
     @Test
     fun `Results are not new enrolment if face match results are of higher then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
-        assertThat(useCase(projectConfiguration, listOf(
-            FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
-        ))).isFalse()
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
+                ),
+            ),
+        ).isFalse()
     }
 
     @Test
     fun `Results are new enrolment if all match results are of lower then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
-        assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
-                mockk(),
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    FingerprintMatchResult(
+                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
+                        mockk(),
+                    ),
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
+                ),
             ),
-            FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
-        ))).isTrue()
+        ).isTrue()
     }
 
     @Test
     fun `Results are not new enrolment if one (fingerprint) match results are of higher then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
-        assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
-                mockk(),
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    FingerprintMatchResult(
+                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
+                        mockk(),
+                    ),
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
+                ),
             ),
-            FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
-        ))).isFalse()
+        ).isFalse()
     }
 
     @Test
     fun `Results are not new enrolment if one (face) match results are of higher then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
-        assertThat(useCase(projectConfiguration, listOf(
-            FingerprintMatchResult(
-                listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
-                mockk(),
+        assertThat(
+            useCase(
+                projectConfiguration,
+                listOf(
+                    FingerprintMatchResult(
+                        listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
+                        mockk(),
+                    ),
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
+                ),
             ),
-            FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
-        ))).isFalse()
+        ).isFalse()
     }
 
     companion object {

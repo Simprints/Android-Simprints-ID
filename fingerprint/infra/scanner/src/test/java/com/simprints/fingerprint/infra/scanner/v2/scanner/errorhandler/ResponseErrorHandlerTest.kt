@@ -14,7 +14,6 @@ import org.junit.Test
 import java.io.IOException
 
 class ResponseErrorHandlerTest {
-
     @Test
     fun handle_succeeds() = runTest {
         val successValue = Un20StateChangeEvent(DigitalValue.TRUE)

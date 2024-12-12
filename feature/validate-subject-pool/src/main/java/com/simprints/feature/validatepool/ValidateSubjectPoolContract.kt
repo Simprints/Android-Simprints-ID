@@ -5,9 +5,7 @@ import com.simprints.feature.validatepool.screen.ValidateSubjectPoolFragmentArgs
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 
 object ValidateSubjectPoolContract {
-
-    fun getArgs(subjectQuery: SubjectQuery): Bundle =
-        ValidateSubjectPoolFragmentArgs(subjectQuery).toBundle()
+    fun getArgs(subjectQuery: SubjectQuery): Bundle = ValidateSubjectPoolFragmentArgs(subjectQuery).toBundle()
 
     val DESTINATION = R.id.validateSubjectPoolFragment
 }
