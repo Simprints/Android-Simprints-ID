@@ -16,13 +16,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import javax.inject.Inject
 
 /**
  * Conducts OTA for the Cypress module in accordance to
  * https://cypresssemiconductorco.github.io/btsdk-docs/BT-SDK/WICED-Firmware-Upgrade-Library.pdf
  * Pages 7-9
  */
-class CypressOtaController(private val crc32Calculator: Crc32Calculator) {
+class CypressOtaController @Inject constructor(private val crc32Calculator: Crc32Calculator) {
 
 
     suspend fun program(

@@ -40,6 +40,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 /**
  * Helper function to build a new [Scanner] instance with manual dependency injection
  */
+/*
 fun Scanner.Companion.create(dispatcher: CoroutineDispatcher): Scanner {
     val mainMessageChannel = MainMessageChannel(
         MainMessageInputStream(
@@ -105,3 +106,4 @@ fun Scanner.Companion.create(dispatcher: CoroutineDispatcher): Scanner {
     )
 
 }
+*/

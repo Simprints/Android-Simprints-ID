@@ -5,6 +5,8 @@ import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.infra.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -38,6 +40,9 @@ class ScannerFactoryTest {
 
     @MockK(relaxed = true)
     private lateinit var fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
+    private val scannerInfo = ScannerInfo()
+    @MockK
+    private lateinit var scannerV2: Scanner
 
     @Before
     fun setUp() {
@@ -55,6 +60,8 @@ class ScannerFactoryTest {
             mockk(),
             fingerprintCaptureWrapperFactory,
             mockk(),
+            scannerInfo,
+            scannerV2,
         )
     }
 
@@ -94,7 +101,7 @@ class ScannerFactoryTest {
             // When
             scannerFactory.initScannerOperationWrappers(macAddress)
             // Then
-            Truth.assertThat(scannerFactory.scannerV2).isNotNull()
+            Truth.assertThat(scannerInfo.scannerId).isEqualTo(serialNumber)
             Truth.assertThat(scannerFactory.scannerWrapper)
                 .isInstanceOf(ScannerWrapperV2::class.java)
             Truth.assertThat(scannerFactory.scannerOtaOperationsWrapper).isNotNull()

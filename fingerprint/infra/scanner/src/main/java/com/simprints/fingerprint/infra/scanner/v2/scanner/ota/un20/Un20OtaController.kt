@@ -17,8 +17,9 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import java.util.UUID
+import javax.inject.Inject
 
-class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
+class Un20OtaController @Inject constructor(private val crc32Calculator: Crc32Calculator) {
 
     suspend fun program(
         mainMessageChannel: MainMessageChannel,

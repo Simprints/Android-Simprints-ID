@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v2.scanner
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.RootMessageChannel
@@ -30,10 +31,13 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.*
 import io.reactivex.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.DigitalValue as Un20DigitalValue
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.DigitalValue as StmDigitalValue
 
@@ -43,8 +47,8 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.model
  * @throws IllegalStateException On attempting to call certain methods whilst in an incorrect state
  * @throws IllegalArgumentException On receiving unexpected or invalid bytes from the scanner
  */
-@Suppress("unused")
-class Scanner(
+@Singleton
+class Scanner @Inject constructor(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
     private val scannerInfoReaderHelper: ScannerExtendedInfoReaderHelper,
@@ -53,7 +57,10 @@ class Scanner(
     private val cypressOtaController: CypressOtaController,
     private val stmOtaController: StmOtaController,
     private val un20OtaController: Un20OtaController,
-) {
+    private val scannerInfo: ScannerInfo,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+
+    ) {
     private lateinit var flowableDisposable: Disposable
 
     private lateinit var outputStream: OutputStream
@@ -65,7 +72,7 @@ class Scanner(
     private var scannerTriggerListenerDisposable: Disposable? = null
 
     fun connect(inputStream: InputStream, outputStream: OutputStream) {
-        this.flowableInputStream = inputStream.toFlowable().subscribeOnIoAndPublish()
+        this.flowableInputStream = inputStream.toFlowable().subscribeOnIoAndPublish(ioDispatcher)
             .also { this.flowableDisposable = it.connect() }
         this.outputStream = outputStream
         state.connected = true
@@ -91,6 +98,7 @@ class Scanner(
             }
             flowableDisposable.dispose()
             state = disconnectedScannerState()
+            scannerInfo.clear()
         }
     }
 
@@ -119,13 +127,6 @@ class Scanner(
         assertMode(ROOT)
         return scannerInfoReaderHelper.readScannerInfo()
     }
-
-    suspend fun getExtendedVersionInformation(): ExtendedVersionInformation {
-        assertConnected()
-        assertMode(ROOT)
-        return scannerInfoReaderHelper.getExtendedVersionInfo().version
-    }
-
 
     suspend fun setVersionInformation(versionInformation: ExtendedVersionInformation) {
         assertConnected()

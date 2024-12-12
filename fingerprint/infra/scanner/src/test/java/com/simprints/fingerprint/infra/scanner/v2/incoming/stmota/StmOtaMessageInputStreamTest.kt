@@ -14,6 +14,8 @@ import io.mockk.verify
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -22,7 +24,10 @@ import java.util.concurrent.TimeUnit
 class StmOtaMessageInputStreamTest {
 
     private val stmOtaResponseParser = StmOtaResponseParser()
-    private val stmOtaMessageInputStream = StmOtaMessageInputStream(stmOtaResponseParser)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val stmOtaMessageInputStream = StmOtaMessageInputStream(stmOtaResponseParser,
+        UnconfinedTestDispatcher()
+    )
 
     @Test
     fun `test disconnect disposes the flowable stream`() {

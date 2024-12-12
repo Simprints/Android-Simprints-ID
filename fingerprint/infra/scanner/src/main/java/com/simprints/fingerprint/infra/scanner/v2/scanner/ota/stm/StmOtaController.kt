@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import javax.inject.Inject
 
 
 /**
@@ -31,7 +32,7 @@ import kotlinx.coroutines.flow.onCompletion
  * There are some particular memory address involved which reference specific parts in memory on
  * the STM32 - [START_ADDRESS] and [GO_ADDRESS].
  */
-class StmOtaController {
+class StmOtaController @Inject constructor() {
 
     /**
      * @throws OtaFailedException if received a NACK when communicating with STM

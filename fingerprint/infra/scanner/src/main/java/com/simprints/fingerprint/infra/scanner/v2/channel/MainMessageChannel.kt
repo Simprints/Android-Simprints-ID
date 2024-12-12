@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v2.channel
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.IncomingMainMessage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.OutgoingMainMessage
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.MainMessageInputStream
@@ -7,11 +8,14 @@ import com.simprints.fingerprint.infra.scanner.v2.outgoing.main.MainMessageOutpu
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.doSimultaneously
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.rx2.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MainMessageChannel(
+@Singleton
+class MainMessageChannel @Inject constructor(
     incoming: MainMessageInputStream,
     outgoing: MainMessageOutputStream,
-    dispatcher: CoroutineDispatcher
+    @DispatcherIO dispatcher: CoroutineDispatcher
 ) : MessageChannel<MainMessageInputStream, MainMessageOutputStream>(
     incoming, outgoing, dispatcher
 ) {

@@ -5,7 +5,10 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateRes
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -32,16 +35,24 @@ class FingerprintTemplateProviderImplTest {
     @RelaxedMockK
     private lateinit var processedImageCache: ProcessedImageCache
 
-    @RelaxedMockK
+    @MockK
     private lateinit var captureWrapper: FingerprintCaptureWrapper
 
     @RelaxedMockK
     private lateinit var processRawImage: ProcessRawImageUseCase
 
+    private lateinit var scannerInfo: ScannerInfo
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        scannerInfo = ScannerInfo()
         every { fingerprintCaptureWrapperFactory.captureWrapper } returns captureWrapper
+        coEvery {
+            captureWrapper.acquireUnprocessedImage(any())
+        } returns AcquireUnprocessedImageResponse(
+            rawUnprocessedImage = createDummyRawUnprocessedImage()
+        )
         coEvery {
             extractNecTemplateUseCase.invoke(any(), any())
         } returns TemplateResponse(
@@ -54,7 +65,8 @@ class FingerprintTemplateProviderImplTest {
             calculateNecImageQualityUseCase = calculateNecImageQualityUseCase,
             captureProcessedImageCache = processedImageCache,
             extractNecTemplateUseCase = extractNecTemplateUseCase,
-            processImage = processRawImage
+            processImage = processRawImage,
+            scannerInfo = scannerInfo
         )
 
     }
@@ -69,6 +81,7 @@ class FingerprintTemplateProviderImplTest {
 
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun `test acquireFingerprintTemplate success`() = runTest {
         // Given
@@ -87,8 +100,8 @@ class FingerprintTemplateProviderImplTest {
             processedImageCache.recentlyCapturedImage = any()
             calculateNecImageQualityUseCase.invoke(any())
             extractNecTemplateUseCase.invoke(any(), any())
-
         }
+        Truth.assertThat(scannerInfo.un20SerialNumber).isEqualTo(UN20_SERIAL_NUMBER.toHexString())
     }
 
     @Test
@@ -140,4 +153,27 @@ class FingerprintTemplateProviderImplTest {
             }
             Truth.assertThat(result.template).isNotEmpty()
         }
+
+    fun createDummyRawUnprocessedImage(): RawUnprocessedImage {
+        // Create a ByteArray of size 50 (header + image data)
+        val imageBytes = ByteArray(50)
+
+        val serialNumber = UN20_SERIAL_NUMBER
+        System.arraycopy(serialNumber, 0, imageBytes, 0, 15)
+
+        // Set the brightness value (at index 15)
+        imageBytes[15] = 100.toByte() // Example brightness value
+
+        // Fill dummy image data after the header
+        for (i in 20 until imageBytes.size) {
+            imageBytes[i] = (i % 256).toByte()
+        }
+
+        // Create and return the RawUnprocessedImage instance
+        return RawUnprocessedImage(imageBytes)
+    }
+
+    companion object {
+        private val UN20_SERIAL_NUMBER = "123456789123456".toByteArray()
+    }
 }
