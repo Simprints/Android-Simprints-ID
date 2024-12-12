@@ -7,7 +7,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations

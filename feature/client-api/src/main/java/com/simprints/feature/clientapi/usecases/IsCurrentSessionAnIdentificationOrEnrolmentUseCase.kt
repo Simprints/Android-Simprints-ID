@@ -1,6 +1,6 @@
 package com.simprints.feature.clientapi.usecases
 
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
 import javax.inject.Inject

@@ -1,7 +1,7 @@
 package com.simprints.face.capture.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef

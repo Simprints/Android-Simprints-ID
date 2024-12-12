@@ -1,6 +1,6 @@
 package com.simprints.feature.clientapi.usecases
 
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
 internal class GetCurrentSessionIdUseCase @Inject constructor(

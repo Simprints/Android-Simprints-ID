@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.tools.di
 
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.EventsModule
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent

@@ -5,7 +5,7 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest

@@ -3,14 +3,14 @@ package com.simprints.feature.exitform.screen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.config.ExitFormOption
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ import javax.inject.Inject
 internal class ExitFormViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    @ExternalScope private val externalScope: CoroutineScope
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope
 ) : ViewModel() {
 
     private val exitFormStart: Timestamp = timeHelper.now()
@@ -85,7 +85,7 @@ internal class ExitFormViewModel @Inject constructor(
         }
     }
 
-    private fun logRefusalEvent(option: ExitFormOption, reasonText: String) = externalScope.launch {
+    private fun logRefusalEvent(option: ExitFormOption, reasonText: String) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(RefusalEvent(exitFormStart, timeHelper.now(), option.answer, reasonText))
     }
 }

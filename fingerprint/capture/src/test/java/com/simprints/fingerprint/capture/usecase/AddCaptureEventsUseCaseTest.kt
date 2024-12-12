@@ -7,7 +7,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import io.mockk.MockKAnnotations
