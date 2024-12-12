@@ -27,6 +27,13 @@ extra.apply {
     set("VERSION_SUFFIX", "dev")
 
     /**
+     * Build Information. The build information comes from the github actions run info and allows
+     * us to track down where an exact build comes from. Read more about our versioning here:
+     * https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+Simprints+ID
+     */
+    set("VERSION_BUILD", "local")
+
+    /**
      * Set debuggable, default it true so local staging and release builds can be debugged. NOTE: THE
      * CD WILL OVERWRITE TO FALSE AS THE PLAYSTORE DOES NOT ACCEPT DEBUGGABLE TRUE APPS
      */
