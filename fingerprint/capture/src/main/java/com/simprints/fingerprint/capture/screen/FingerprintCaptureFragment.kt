@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.capture.screen
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -68,6 +69,13 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     @Inject
     lateinit var observeFingerprintScanStatus: ObserveFingerprintScanStatusUseCase
+
+    /**
+     * Cache for resolved colors from the resource lookup.
+     * Key: color resource ID
+     * Value: resolved color value
+     */
+    private val resolvedColorCache = mutableMapOf<Int, Int>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -170,7 +178,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
             isAbleToSelectNewFinger = { vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true },
             onPageScrolled = { position: Int, positionOffset: Float ->
-                if(positionOffset != 0.0f){
+                if (positionOffset != 0.0f) {
                     vm.stateLiveData.value?.fingerStates?.let { fingerStates ->
                         val nextPage = if (positionOffset > 0.0f) {
                             position + 1
@@ -180,9 +188,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                         val currentColor = fingerStates[position].currentCapture().statusBarColor()
                         val nextColor = fingerStates[nextPage].currentCapture().statusBarColor()
                         if (currentColor != nextColor) {
-                            val color =ColorUtils.blendARGB(
-                                ContextCompat.getColor(requireContext(), currentColor),
-                                ContextCompat.getColor(requireContext(), nextColor),
+                            val color = ColorUtils.blendARGB(
+                                getColorFromResId(currentColor, requireContext()),
+                                getColorFromResId(nextColor, requireContext()),
                                 positionOffset
                             )
                             binding.toolbar.setBackgroundColor(color)
@@ -193,6 +201,17 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 }
             }
         )
+    }
+
+    /**
+     * Resolves a color from the [colorResId]. To optimize the color resource lookup, this function
+     * caches all resolved colors and returns cached value for [colorResId] during next invocations
+     */
+    private fun getColorFromResId(colorResId: Int, context: Context): Int {
+        return resolvedColorCache[colorResId] ?: ContextCompat.getColor(context, colorResId)
+            .also { resolvedColor ->
+                resolvedColorCache[colorResId] = resolvedColor
+            }
     }
 
     private fun initMissingFingerButton() {
@@ -217,7 +236,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
                 // Update button
                 with(state.currentCaptureState()) {
-                    val statusBarColor = ContextCompat.getColor(requireContext(), statusBarColor())
+                    val statusBarColor = getColorFromResId(statusBarColor(), requireContext())
                     binding.fingerprintScanButton.text = getString(buttonTextId(state.isAskingRescan))
                     binding.fingerprintScanButton.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
                     binding.toolbar.setBackgroundColor(statusBarColor)
@@ -277,7 +296,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             args.params.fingerprintSDK
         )
         val color = vm.stateLiveData.value?.currentCaptureState()?.statusBarColor()
-            ?.let { ContextCompat.getColor(requireContext(), it) }
+            ?.let { getColorFromResId(it, requireContext()) }
         setCustomStatusBarColor(color = color, activity = requireActivity())
     }
 
