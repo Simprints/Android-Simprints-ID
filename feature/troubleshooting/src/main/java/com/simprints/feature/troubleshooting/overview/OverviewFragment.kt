@@ -11,7 +11,7 @@ import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_overview) {
+internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_overview) {
 
     private val viewModel by viewModels<OverviewViewModel>()
     private val binding by viewBinding(FragmentTroubleshootingOverviewBinding::bind)

@@ -55,7 +55,7 @@ class ShouldCreatePersonUseCaseTest {
         assertThat(
             useCase(
                 actionRequest = ActionRequest.EnrolActionRequest(
-                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(""),
+                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(0L, ""),
                     projectId = "",
                     userId = "".asTokenizableRaw(),
                     moduleId = "".asTokenizableRaw(),
@@ -76,7 +76,7 @@ class ShouldCreatePersonUseCaseTest {
         assertThat(
             useCase(
                 actionRequest = ActionRequest.IdentifyActionRequest(
-                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(""),
+                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(0L, ""),
                     projectId = "",
                     userId = "".asTokenizableRaw(),
                     moduleId = "".asTokenizableRaw(),
@@ -97,7 +97,7 @@ class ShouldCreatePersonUseCaseTest {
         assertThat(
             useCase(
                 actionRequest = ActionRequest.VerifyActionRequest(
-                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(""),
+                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(0L, ""),
                     projectId = "",
                     userId = "".asTokenizableRaw(),
                     moduleId = "".asTokenizableRaw(),
@@ -119,7 +119,7 @@ class ShouldCreatePersonUseCaseTest {
         assertThat(
             useCase(
                 actionRequest = ActionRequest.ConfirmIdentityActionRequest(
-                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(""),
+                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(0L, ""),
                     projectId = "",
                     userId = "".asTokenizableRaw(),
                     sessionId = "",
@@ -140,7 +140,7 @@ class ShouldCreatePersonUseCaseTest {
         assertThat(
             useCase(
                 actionRequest = ActionRequest.EnrolLastBiometricActionRequest(
-                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(""),
+                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(0L, ""),
                     projectId = "",
                     userId = "".asTokenizableRaw(),
                     moduleId = "".asTokenizableRaw(),
@@ -370,7 +370,7 @@ class ShouldCreatePersonUseCaseTest {
     }
 
     private val flowAction = ActionRequest.EnrolActionRequest(
-        actionIdentifier = ActionRequestIdentifier.fromIntentAction(""),
+        actionIdentifier = ActionRequestIdentifier.fromIntentAction(0L, ""),
         projectId = "",
         userId = "".asTokenizableRaw(),
         moduleId = "".asTokenizableRaw(),

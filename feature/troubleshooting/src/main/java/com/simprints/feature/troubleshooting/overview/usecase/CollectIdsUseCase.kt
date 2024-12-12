@@ -4,7 +4,7 @@ import com.simprints.core.DeviceID
 import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
-class CollectIdsUseCase @Inject constructor(
+internal class CollectIdsUseCase @Inject constructor(
     @DeviceID private val deviceID: String,
     private val authStore: AuthStore,
 ) {

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.extensions.toMap
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
@@ -31,6 +32,8 @@ import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
+import com.simprints.logging.persistent.LogEntryType
+import com.simprints.logging.persistent.PersistentLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,6 +50,8 @@ class ClientApiViewModel @Inject internal constructor(
     private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
     private val authStore: AuthStore,
     private val configManager: ConfigManager,
+    private val timeHelper: TimeHelper,
+    private val persistentLogger: PersistentLogger,
 ) : ViewModel() {
 
     val returnResponse: LiveData<LiveDataEventWithContent<Bundle>>
@@ -99,6 +104,8 @@ class ClientApiViewModel @Inject internal constructor(
 
         deleteSessionEventsIfNeeded(currentSessionId)
 
+        logIntent(action, currentSessionId, "Enrolled GUID: ${enrolResponse.guid}}")
+
         _returnResponse.send(
             resultMapper(
                 ActionResponse.EnrolActionResponse(
@@ -117,6 +124,12 @@ class ClientApiViewModel @Inject internal constructor(
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
+
+        logIntent(
+            action,
+            currentSessionId,
+            "Identifications: ${identifyResponse.identifications.size}"
+        )
 
         _returnResponse.send(
             resultMapper(
@@ -137,6 +150,8 @@ class ClientApiViewModel @Inject internal constructor(
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
 
         deleteSessionEventsIfNeeded(currentSessionId)
+
+        logIntent(action, currentSessionId, "Confirmed: ${confirmResponse.identificationOutcome}")
 
         _returnResponse.send(
             resultMapper(
@@ -159,6 +174,12 @@ class ClientApiViewModel @Inject internal constructor(
 
         deleteSessionEventsIfNeeded(currentSessionId)
 
+        logIntent(
+            action,
+            currentSessionId,
+            "GUID: ${verifyResponse.matchResult.guid}\nVerification result: ${verifyResponse.matchResult.matchConfidence}"
+        )
+
         _returnResponse.send(
             resultMapper(
                 ActionResponse.VerifyActionResponse(
@@ -180,6 +201,8 @@ class ClientApiViewModel @Inject internal constructor(
 
         deleteSessionEventsIfNeeded(currentSessionId)
 
+        logIntent(action, currentSessionId, "Refusal: ${exitFormResponse.reason}")
+
         _returnResponse.send(
             resultMapper(
                 ActionResponse.ExitFormActionResponse(
@@ -198,6 +221,7 @@ class ClientApiViewModel @Inject internal constructor(
         action: String,
         errorResponse: AppErrorResponse,
     ) = viewModelScope.launch {
+        val timestampMs = timeHelper.now().ms
         val currentSessionId = getCurrentSessionId()
 
         val flowCompleted = isFlowCompletedWithError(errorResponse)
@@ -205,10 +229,17 @@ class ClientApiViewModel @Inject internal constructor(
         simpleEventReporter.closeCurrentSessionNormally()
         deleteSessionEventsIfNeeded(currentSessionId)
 
+        persistentLogger.log(
+            type = LogEntryType.Intent,
+            timestampMs = timestampMs,
+            title = currentSessionId,
+            body = "${action}\n${errorResponse.reason}",
+        )
+
         _returnResponse.send(
             resultMapper(
                 ActionResponse.ErrorActionResponse(
-                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(action),
+                    actionIdentifier = ActionRequestIdentifier.fromIntentAction(timestampMs, action),
                     sessionId = currentSessionId,
                     reason = errorResponse.reason,
                     flowCompleted = flowCompleted,
@@ -216,5 +247,19 @@ class ClientApiViewModel @Inject internal constructor(
             )
         )
     }
+
+    private suspend fun logIntent(
+        action: ActionRequest,
+        currentSessionId: String,
+        response: String
+    ) {
+        persistentLogger.log(
+            type = LogEntryType.Intent,
+            timestampMs = action.actionIdentifier.timestampMs,
+            title = currentSessionId,
+            body = "${action.actionIdentifier}\n$response",
+        )
+    }
+
 
 }

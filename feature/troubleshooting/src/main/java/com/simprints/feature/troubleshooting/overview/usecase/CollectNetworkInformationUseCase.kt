@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mostly system calls")
-class CollectNetworkInformationUseCase @Inject constructor(
+internal class CollectNetworkInformationUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 

@@ -17,6 +17,7 @@ internal object EnrolActionFactory : RequestActionFactory() {
         actionName = ActionConstants.ACTION_ENROL,
         callerPackageName = "",
         contractVersion = 1,
+        timestampMs = 0L,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.EnrolActionRequest(

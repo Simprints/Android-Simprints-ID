@@ -2,8 +2,9 @@ package com.simprints.infra.network.httpclient
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
+import com.simprints.logging.persistent.PersistentLogger
 import io.mockk.MockKAnnotations
-import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.impl.annotations.MockK
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -20,21 +21,24 @@ class DefaultOkHttpClientBuilderTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var okHttpClient: OkHttpClient
 
-    @RelaxedMockK
+    @MockK
     lateinit var ctx: Context
 
-    @RelaxedMockK
+    @MockK
     lateinit var networkCache: okhttp3.Cache
+
+    @MockK
+    lateinit var persistentLogger: PersistentLogger
 
     private lateinit var okHttpBuilder: DefaultOkHttpClientBuilder
 
     @Before
     fun setup() {
-        MockKAnnotations.init(this)
+        MockKAnnotations.init(this, relaxed = true)
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        okHttpBuilder = DefaultOkHttpClientBuilder(ctx, networkCache)
+        okHttpBuilder = DefaultOkHttpClientBuilder(ctx, networkCache, persistentLogger)
     }
 
     @After

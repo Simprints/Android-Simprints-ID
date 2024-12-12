@@ -33,6 +33,7 @@ internal class VerifyRequestBuilderTest {
                 packageName = ActionConstants.ACTION_VERIFY,
                 callerPackageName = "",
                 contractVersion = 1,
+                timestampMs = 0L,
             ),
             extractor = extractor,
             project = project,

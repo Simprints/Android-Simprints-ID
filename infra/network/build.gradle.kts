@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation(project(":infra:logging"))
+    implementation(project(":infra:logging-persistent"))
 
     debugImplementation(libs.chuck.debug) {
         exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")

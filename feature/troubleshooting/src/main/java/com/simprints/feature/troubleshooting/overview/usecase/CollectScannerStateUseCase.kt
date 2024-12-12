@@ -4,7 +4,7 @@ import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.config.store.ConfigRepository
 import javax.inject.Inject
 
-class CollectScannerStateUseCase @Inject constructor(
+internal class CollectScannerStateUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val scannerManager: ScannerManager,
 ) {
