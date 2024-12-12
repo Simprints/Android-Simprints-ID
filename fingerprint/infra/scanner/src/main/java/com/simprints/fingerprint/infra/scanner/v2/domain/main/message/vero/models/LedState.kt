@@ -1,7 +1,11 @@
 package com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models
 
-data class LedState(val isFlashing: DigitalValue, val red: Byte, val green: Byte, val blue: Byte) {
-
+data class LedState(
+    val isFlashing: DigitalValue,
+    val red: Byte,
+    val green: Byte,
+    val blue: Byte,
+) {
     fun getBytes() = byteArrayOf(blue, green, red, isFlashing.byte)
 
     companion object {
@@ -9,7 +13,7 @@ data class LedState(val isFlashing: DigitalValue, val red: Byte, val green: Byte
             isFlashing = DigitalValue.fromBytes(byteArrayOf(bytes[3])),
             red = bytes[2],
             green = bytes[1],
-            blue = bytes[0]
+            blue = bytes[0],
         )
     }
 }

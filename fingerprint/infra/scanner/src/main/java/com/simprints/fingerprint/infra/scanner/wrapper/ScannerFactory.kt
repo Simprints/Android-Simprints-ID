@@ -36,13 +36,11 @@ class ScannerFactory @Inject internal constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
     private val scannerInfo: ScannerInfo,
-    private val scannerV2 : ScannerV2
+    private val scannerV2: ScannerV2,
 ) {
-
     var scannerV1: ScannerV1? = null
     var scannerOtaOperationsWrapper: ScannerOtaOperationsWrapper? = null
     var scannerWrapper: ScannerWrapper? = null
-
 
     suspend fun initScannerOperationWrappers(macAddress: String) {
         val availableScannerGenerations =
@@ -51,7 +49,7 @@ class ScannerFactory @Inject internal constructor(
         val scannerGenerationToUse = when (availableScannerGenerations.size) {
             1 -> availableScannerGenerations.single()
             else -> scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(
-                scannerId
+                scannerId,
             )
         }.also {
             Simber.i("Using scanner generation $it")
@@ -61,7 +59,7 @@ class ScannerFactory @Inject internal constructor(
             FingerprintConfiguration.VeroGeneration.VERO_1 -> {
                 scannerV1 = ScannerV1(macAddress, bluetoothAdapter)
                 scannerWrapper = createScannerWrapperV1()
-                //Cache the scannerV1 instance to be used by the FingerprintCaptureWrapperFactory
+                // Cache the scannerV1 instance to be used by the FingerprintCaptureWrapperFactory
                 fingerprintCaptureWrapperFactory.createV1(scannerV1!!)
             }
 
@@ -69,7 +67,7 @@ class ScannerFactory @Inject internal constructor(
                 scannerWrapper = createScannerWrapperV2(macAddress)
                 // Create OTA wrapper for V2 scanner only as V1 scanner doesn't support OTA
                 scannerOtaOperationsWrapper = createScannerOtaOperationsWrapper(macAddress)
-                //Cache the scannerV2 instance to be used by the FingerprintCaptureWrapperFactory
+                // Cache the scannerV2 instance to be used by the FingerprintCaptureWrapperFactory
                 fingerprintCaptureWrapperFactory.createV2(scannerV2)
                 // Store the scanner ID
                 scannerInfo.setScannerId(scannerId)
@@ -77,31 +75,26 @@ class ScannerFactory @Inject internal constructor(
         }
     }
 
-    private fun createScannerOtaOperationsWrapper(macAddress: String): ScannerOtaOperationsWrapper =
-        ScannerOtaOperationsWrapper(
-            macAddress,
-            scannerV2,
-            cypressOtaHelper,
-            stmOtaHelper,
-            un20OtaHelper,
-            ioDispatcher,
-        )
+    private fun createScannerOtaOperationsWrapper(macAddress: String): ScannerOtaOperationsWrapper = ScannerOtaOperationsWrapper(
+        macAddress,
+        scannerV2,
+        cypressOtaHelper,
+        stmOtaHelper,
+        un20OtaHelper,
+        ioDispatcher,
+    )
 
-    private fun createScannerWrapperV1(): ScannerWrapper {
-        return ScannerWrapperV1(
-            scannerV1!!,
-            ioDispatcher,
-        )
-    }
+    private fun createScannerWrapperV1(): ScannerWrapper = ScannerWrapperV1(
+        scannerV1!!,
+        ioDispatcher,
+    )
 
-    private fun createScannerWrapperV2(macAddress: String): ScannerWrapper {
-        return ScannerWrapperV2(
-            scannerV2,
-            scannerUiHelper,
-            macAddress,
-            scannerInitialSetupHelper,
-            connectionHelper,
-            ioDispatcher,
-        )
-    }
+    private fun createScannerWrapperV2(macAddress: String): ScannerWrapper = ScannerWrapperV2(
+        scannerV2,
+        scannerUiHelper,
+        macAddress,
+        scannerInitialSetupHelper,
+        connectionHelper,
+        ioDispatcher,
+    )
 }

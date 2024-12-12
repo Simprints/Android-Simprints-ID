@@ -21,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ModuleRepositoryImplTest {
-
     @MockK
     lateinit var downSynchronizationConfiguration: DownSynchronizationConfiguration
 
@@ -36,7 +35,6 @@ class ModuleRepositoryImplTest {
 
     @MockK
     lateinit var eventSyncManager: EventSyncManager
-
 
     private lateinit var repository: ModuleRepositoryImpl
 
@@ -53,11 +51,10 @@ class ModuleRepositoryImplTest {
             configManager.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c").map(TokenizableString::Tokenized), "")
 
-
         repository = ModuleRepositoryImpl(
             configManager,
             enrolmentRecordRepository,
-            eventSyncManager
+            eventSyncManager,
         )
     }
 
@@ -70,7 +67,7 @@ class ModuleRepositoryImplTest {
             Module("2".asTokenizableRaw(), true),
             Module("3".asTokenizableRaw(), false),
             Module("4".asTokenizableRaw(), true),
-            Module("5".asTokenizableRaw(), false)
+            Module("5".asTokenizableRaw(), false),
         )
 
         val selectedModuleNames = modules.filter { it.isSelected }.map { it.name }.toSet()
@@ -91,7 +88,7 @@ class ModuleRepositoryImplTest {
             Module("2".asTokenizableRaw(), true),
             Module("3".asTokenizableRaw(), false),
             Module("4".asTokenizableRaw(), true),
-            Module("5".asTokenizableRaw(), false)
+            Module("5".asTokenizableRaw(), false),
         )
 
         repository.saveModules(modules)
@@ -105,7 +102,7 @@ class ModuleRepositoryImplTest {
             Module("a".asTokenizableRaw(), true),
             Module("b".asTokenizableRaw(), false),
             Module("c".asTokenizableRaw(), false),
-            Module("d".asTokenizableRaw(), true)
+            Module("d".asTokenizableRaw(), true),
         )
 
         val unselectedModules = listOf("b", "c")
@@ -123,7 +120,7 @@ class ModuleRepositoryImplTest {
             Module("a".asTokenizableRaw(), false),
             Module("b".asTokenizableRaw(), true),
             Module("c".asTokenizableRaw(), true),
-            Module("d".asTokenizableRaw(), false)
+            Module("d".asTokenizableRaw(), false),
         )
 
         val actual = repository.getModules()

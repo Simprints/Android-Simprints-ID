@@ -11,13 +11,11 @@ import com.simprints.infra.network.SimRemoteInterface
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-
 internal class AuthStoreImpl @Inject constructor(
     private val loginInfoStore: LoginInfoStore,
     private val firebaseAuthManager: FirebaseAuthManager,
     private val simApiClientFactory: SimApiClientFactory,
 ) : AuthStore {
-
     override var signedInUserId: TokenizableString?
         get() = loginInfoStore.signedInUserId
         set(value) {
@@ -30,8 +28,7 @@ internal class AuthStoreImpl @Inject constructor(
             loginInfoStore.signedInProjectId = value
         }
 
-    override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
-        loginInfoStore.isProjectIdSignedIn(possibleProjectId)
+    override fun isProjectIdSignedIn(possibleProjectId: String): Boolean = loginInfoStore.isProjectIdSignedIn(possibleProjectId)
 
     override fun cleanCredentials() {
         loginInfoStore.cleanCredentials()
@@ -45,16 +42,12 @@ internal class AuthStoreImpl @Inject constructor(
         firebaseAuthManager.signOut()
     }
 
-    override fun isFirebaseSignedIn(projectId: String): Boolean =
-        firebaseAuthManager.isSignedIn(projectId)
+    override fun isFirebaseSignedIn(projectId: String): Boolean = firebaseAuthManager.isSignedIn(projectId)
 
-    override fun getCoreApp(): FirebaseApp =
-        firebaseAuthManager.getCoreApp()
+    override fun getCoreApp(): FirebaseApp = firebaseAuthManager.getCoreApp()
 
-    override fun getLegacyAppFallback(): FirebaseApp =
-        firebaseAuthManager.getLegacyAppFallback()
+    override fun getLegacyAppFallback(): FirebaseApp = firebaseAuthManager.getLegacyAppFallback()
 
     override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
         simApiClientFactory.buildClient(remoteInterface)
-
 }

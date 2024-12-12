@@ -7,7 +7,6 @@ import org.junit.Before
 import org.junit.Test
 
 class FingerprintImageProviderImplTest {
-
     private lateinit var fingerprintImageProvider: FingerprintImageProviderImpl
     private val imageCache = ProcessedImageCache()
 
@@ -17,17 +16,17 @@ class FingerprintImageProviderImplTest {
     }
 
     @Test
-    fun `test acquireFingerprintImage success`()= runTest {
+    fun `test acquireFingerprintImage success`() = runTest {
         // Given
         imageCache.recentlyCapturedImage = byteArrayOf(1, 2, 3)
         // When
         val result = fingerprintImageProvider.acquireFingerprintImage(null)
         // Then
         Truth.assertThat(result.imageBytes).isEqualTo(imageCache.recentlyCapturedImage)
-
     }
+
     @Test(expected = BioSdkException.CannotAcquireFingerprintImageException::class)
-    fun `test acquireFingerprintImage failure`()= runTest {
+    fun `test acquireFingerprintImage failure`() = runTest {
         // Given
         imageCache.recentlyCapturedImage = null
         // When

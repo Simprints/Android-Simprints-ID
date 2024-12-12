@@ -11,6 +11,7 @@ internal data class ApiFingerprintReference(
     override val id: String = UUID.randomUUID().toString(),
     val templates: List<ApiFingerprintTemplate>,
     val format: String,
-    val metadata: HashMap<String, String>? = null) : ApiBiometricReference {
+    val metadata: HashMap<String, String>? = null,
+) : ApiBiometricReference {
     override val type: ApiBiometricReferenceType = FingerprintReference
 }

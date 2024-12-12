@@ -8,7 +8,6 @@ import com.simprints.infra.eventsync.status.up.local.DbEventsUpSyncOperationStat
 import org.junit.Test
 
 class DbEventsUpSyncOperationStateTest {
-
     @Test
     fun buildDbState_fromEventUpSyncOperation() {
         val op = projectUpSyncScope.operation.copy(lastSyncTime = TIME1, lastState = COMPLETE)

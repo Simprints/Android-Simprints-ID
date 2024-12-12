@@ -3,6 +3,7 @@ package com.simprints.infra.enrolment.records.store.remote
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.authstore.AuthStore
@@ -17,7 +18,6 @@ import com.simprints.infra.enrolment.records.store.remote.models.fingerprint.Api
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
@@ -29,7 +29,6 @@ import org.junit.Before
 import org.junit.Test
 
 class EnrolmentRecordRemoteDataSourceImplTest {
-
     companion object {
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
@@ -60,7 +59,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
             val args = this.args
             @Suppress("UNCHECKED_CAST")
             (args[0] as InterfaceInvocation<EnrolmentRecordApiInterface, Unit>).invoke(
-                remoteInterface
+                remoteInterface,
             )
         }
     }
@@ -77,10 +76,10 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     IFingerIdentifier.LEFT_3RD_FINGER,
                     FINGERPRINT_TEMPLATE,
                     50,
-                    "ISO_19794_2"
-                )
+                    "ISO_19794_2",
+                ),
             ),
-            faceSamples = listOf(FaceSample(FACE_TEMPLATE, "faceTemplateFormat"))
+            faceSamples = listOf(FaceSample(FACE_TEMPLATE, "faceTemplateFormat")),
         )
         val expectedRecord = ApiEnrolmentRecord(
             subjectId = SUBJECT_ID,
@@ -94,7 +93,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                             quality = 50,
                             template = BASE64_FINGERPRINT_TEMPLATE,
                             finger = ApiFinger.LEFT_3RD_FINGER,
-                        )
+                        ),
                     ),
                     format = "ISO_19794_2",
                 ),
@@ -102,15 +101,15 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     id = "b4a3ba90-6413-32b4-a4ea-a841a5a400ec",
                     templates = listOf(ApiFaceTemplate(template = BASE64_FACE_TEMPLATE)),
                     format = "faceTemplateFormat",
-                )
-            )
+                ),
+            ),
         )
         enrolmentRecordRemoteDataSourceImpl.uploadRecords(listOf(subject))
 
         coVerify(exactly = 1) {
             remoteInterface.uploadRecords(
                 PROJECT_ID,
-                ApiEnrolmentRecords(listOf(expectedRecord))
+                ApiEnrolmentRecords(listOf(expectedRecord)),
             )
         }
     }
@@ -136,6 +135,4 @@ class EnrolmentRecordRemoteDataSourceImplTest {
         }
         assertThat(receivedException).isEqualTo(exception)
     }
-
-
 }

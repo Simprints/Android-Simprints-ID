@@ -17,7 +17,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class FetchSubjectUseCaseTest {
-
     @MockK
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
@@ -30,9 +29,7 @@ internal class FetchSubjectUseCaseTest {
     @MockK
     lateinit var subject: Subject
 
-
     private lateinit var useCase: FetchSubjectUseCase
-
 
     @Before
     fun setUp() {
@@ -120,10 +117,8 @@ internal class FetchSubjectUseCaseTest {
         assertThat(result).isInstanceOf(FetchSubjectState.ConnectionError::class.java)
     }
 
-
     companion object {
         private const val DEFAULT_PROJECT_ID = "projectId"
         private const val DEFAULT_SUBJECT_ID = "subject"
     }
-
 }

@@ -5,11 +5,11 @@ import com.simprints.infra.config.store.models.ProjectState
 
 @Keep
 enum class ApiProjectState {
-
     RUNNING,
     PAUSED,
     ENDING,
-    ENDED;
+    ENDED,
+    ;
 
     fun toDomain(): ProjectState = when (this) {
         RUNNING -> ProjectState.RUNNING

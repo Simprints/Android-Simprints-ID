@@ -21,11 +21,13 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
-
     private val viewModel by viewModels<SyncViewModel>()
     private val binding by viewBinding(FragmentDashboardCardSyncBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
         observeLiveData()
@@ -59,18 +61,21 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         viewModel.signOutEventLiveData.observe(viewLifecycleOwner) {
             val logoutReason = LogoutReason(
                 title = getString(IDR.string.dashboard_sync_project_ending_alert_title),
-                body = getString(IDR.string.dashboard_sync_project_ending_message)
+                body = getString(IDR.string.dashboard_sync_project_ending_message),
             )
             findNavController().navigate(
                 R.id.action_mainFragment_to_requestLoginFragment,
-                RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle()
+                RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle(),
             )
         }
-        viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
-            findNavController().navigate(
-                R.id.action_mainFragment_to_login,
-                loginArgs
-            )
-        })
+        viewModel.loginRequestedEventLiveData.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { loginArgs ->
+                findNavController().navigate(
+                    R.id.action_mainFragment_to_login,
+                    loginArgs,
+                )
+            },
+        )
     }
 }

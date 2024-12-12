@@ -10,7 +10,6 @@ import com.simprints.feature.alert.AlertResult
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class AlertActivityHelper {
-
     private val settingsOpenedForPairing = AtomicBoolean(false)
     private val appSettingsOpened = AtomicBoolean(false)
 
@@ -56,8 +55,8 @@ internal class AlertActivityHelper {
         startActivity(
             Intent(
                 Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.parse("package:$packageName")
-            )
+                Uri.parse("package:$packageName"),
+            ),
         )
     }
 }

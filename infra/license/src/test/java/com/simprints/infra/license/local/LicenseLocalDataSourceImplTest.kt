@@ -21,7 +21,6 @@ import org.junit.Test
 import java.io.File
 
 class LicenseLocalDataSourceImplTest {
-
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
@@ -99,9 +98,12 @@ class LicenseLocalDataSourceImplTest {
         localSource.getLicense(licenseVendor)
 
         verify(exactly = 1) {
-            securityManager.getEncryptedFileBuilder(withArg {
-                assertThat(it.name).isEqualTo("1.2")
-            }, any())
+            securityManager.getEncryptedFileBuilder(
+                withArg {
+                    assertThat(it.name).isEqualTo("1.2")
+                },
+                any(),
+            )
         }
         verify(exactly = 1) { encryptedFile.openFileInput() }
     }
@@ -118,20 +120,20 @@ class LicenseLocalDataSourceImplTest {
     fun `check file delete deletes the dir`() = runTest {
         localSource.deleteCachedLicense(licenseVendor)
 
-        assertThat(File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists()).isFalse()
+        assertThat(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists()).isFalse()
     }
 
     @Test
     fun `check delete all deletes the dir`() = runTest {
         localSource.deleteCachedLicenses()
 
-        assertThat(File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists()).isFalse()
+        assertThat(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists()).isFalse()
     }
 
     @Test
     fun `check getting the file renames old Roc license file to RANK_ONE_FACE `() = runTest {
         // Create the license folder and the old ROC.lic file
-        val licenceFolderPath = "${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}"
+        val licenceFolderPath = "$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}"
         File(licenceFolderPath).mkdirs()
         val oldRocLicenseFile = File("$licenceFolderPath/ROC.lic")
         oldRocLicenseFile.createNewFile()

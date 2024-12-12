@@ -51,7 +51,6 @@ internal enum class AlertError(
     val leftButton: AlertButtonConfig,
     val rightButton: AlertButtonConfig? = null,
 ) {
-
     // Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(
         title = IDR.string.fingerprint_connect_error_title,
@@ -100,7 +99,7 @@ internal enum class AlertError(
         hintDrawable = R.drawable.multiple_scanners_found,
         eventType = AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS,
         leftButton = Buttons.tryAgainButton(),
-        rightButton = Buttons.bluetoothSettingsButton()
+        rightButton = Buttons.bluetoothSettingsButton(),
     ),
 
     // Scanner errors
@@ -120,10 +119,10 @@ internal enum class AlertError(
         mainDrawable = R.drawable.scanner_error_icon,
         hintDrawable = IDR.drawable.ic_alert_hint_battery,
         eventType = AlertScreenEventType.LOW_BATTERY,
-        leftButton = Buttons.closeWithRefusalButton()
+        leftButton = Buttons.closeWithRefusalButton(),
     ),
 
-    //Unexpected errors
+    // Unexpected errors
     UNEXPECTED_ERROR(
         title = IDR.string.fingerprint_connect_error_title,
         message = IDR.string.fingerprint_connect_unexpected_error_message,
@@ -132,10 +131,10 @@ internal enum class AlertError(
         eventType = AlertScreenEventType.UNEXPECTED_ERROR,
         appErrorReason = AppErrorReason.UNEXPECTED_ERROR,
         leftButton = Buttons.closeButton(),
-    );
+    ),
+    ;
 
     private object Buttons {
-
         fun closeButton() = alertButton {
             textRes = IDR.string.fingerprint_connect_error_close_button
             closeOnClick = true
@@ -187,7 +186,6 @@ internal enum class AlertError(
     }
 
     companion object {
-
         internal const val ACTION_CLOSE = "action_close"
         internal const val ACTION_RETRY = "action_retry"
         internal const val ACTION_REFUSAL = "action_refusal"
@@ -195,5 +193,4 @@ internal enum class AlertError(
         internal const val ACTION_APP_SETTINGS = "action_app_settings"
         internal const val ACTION_PAIR = "action_pair"
     }
-
 }

@@ -4,11 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import java.util.*
+import java.util.Locale
 
 @ExcludedFromGeneratedTestCoverageReports("Testing this class is more effort than it's worth")
 object LanguageHelper {
-
     private const val SHARED_PREFS_LANGUAGE_KEY = "SelectedLanguage"
     private const val SHARED_PREFS_LANGUAGE_DEFAULT = "en"
     private const val PREF_FILE_NAME = "language"
@@ -27,13 +26,11 @@ object LanguageHelper {
         prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
     }
 
-    private fun configurationWithSpecificLocale(languageString: String): Configuration =
-        Configuration().apply {
-            val locale = localeFor(languageString)
-            Locale.setDefault(locale)
-            setLocale(locale)
-        }
-
+    private fun configurationWithSpecificLocale(languageString: String): Configuration = Configuration().apply {
+        val locale = localeFor(languageString)
+        Locale.setDefault(locale)
+        setLocale(locale)
+    }
 
     /*
      * Languages are usually two  or three characters, except if they also contain a region.
@@ -43,10 +40,11 @@ object LanguageHelper {
         val localeParts = languageString.split("-r")
         val language = localeParts[0]
         return if (localeParts.size > 1) {
-            Locale.Builder()
+            Locale
+                .Builder()
                 .setLanguage(language)
-                .setRegion(localeParts[1]).build()
-
+                .setRegion(localeParts[1])
+                .build()
         } else {
             Locale(localeParts[0])
         }

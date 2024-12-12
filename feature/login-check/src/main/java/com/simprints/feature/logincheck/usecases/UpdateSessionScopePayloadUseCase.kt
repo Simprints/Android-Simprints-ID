@@ -10,7 +10,6 @@ internal class UpdateSessionScopePayloadUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configManager: ConfigManager,
 ) {
-
     suspend operator fun invoke() {
         val configUpdatedAt = configManager.getProjectConfiguration().updatedAt
         val recordCount = enrolmentRecordRepository.count()
@@ -20,9 +19,9 @@ internal class UpdateSessionScopePayloadUseCase @Inject constructor(
             payload = sessionScope.payload.copy(
                 projectConfigurationUpdatedAt = configUpdatedAt,
                 databaseInfo = sessionScope.payload.databaseInfo.copy(
-                    recordCount = recordCount
-                )
-            )
+                    recordCount = recordCount,
+                ),
+            ),
         )
 
         eventRepository.saveSessionScope(updatedScope)

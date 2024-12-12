@@ -7,9 +7,9 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 
-
-internal abstract class ActionRequestBuilder(private val validator: RequestActionValidator) {
-
+internal abstract class ActionRequestBuilder(
+    private val validator: RequestActionValidator,
+) {
     protected abstract fun buildAction(): ActionRequest
 
     protected abstract fun encryptIfNecessary(actionRequest: ActionRequest): ActionRequest
@@ -18,16 +18,19 @@ internal abstract class ActionRequestBuilder(private val validator: RequestActio
         value: TokenizableString,
         project: Project?,
         tokenKeyType: TokenKeyType,
-        tokenizationProcessor: TokenizationProcessor
-    ): TokenizableString =
-        if (project != null && value is TokenizableString.Raw) tokenizationProcessor.encrypt(
+        tokenizationProcessor: TokenizationProcessor,
+    ): TokenizableString = if (project != null && value is TokenizableString.Raw) {
+        tokenizationProcessor.encrypt(
             decrypted = value,
             tokenKeyType = tokenKeyType,
-            project = project
-        ) else value
+            project = project,
+        )
+    } else {
+        value
+    }
+
     fun build(): ActionRequest {
         validator.validate()
         return buildAction().run(::encryptIfNecessary)
     }
-
 }

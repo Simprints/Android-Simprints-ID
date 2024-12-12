@@ -13,7 +13,6 @@ internal class DeleteSessionEventsIfNeededUseCase @Inject constructor(
     private val eventRepository: EventRepository,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) {
-
     operator fun invoke(sessionId: String) = sessionCoroutineScope.launch {
         if (!configManager.getProjectConfiguration().canSyncDataToSimprints()) {
             eventRepository.deleteEventScope(sessionId)

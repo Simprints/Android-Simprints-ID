@@ -5,5 +5,5 @@ import com.simprints.infra.orchestration.data.responses.AppResponse
 
 internal data class OrchestratorResult(
     val request: ActionRequest?,
-    val response: AppResponse
+    val response: AppResponse,
 )

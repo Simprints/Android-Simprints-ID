@@ -6,7 +6,5 @@ internal class OdkEnrolRequestExtractor(
     extras: Map<String, Any>,
     acceptableExtras: List<String>,
 ) : EnrolRequestExtractor(extras) {
-
     override val expectedKeys: List<String> = super.expectedKeys + acceptableExtras
-
 }

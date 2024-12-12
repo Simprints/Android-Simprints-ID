@@ -16,15 +16,12 @@ internal class LogoutSyncViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
-
     val settingsLocked: LiveData<LiveDataEventWithContent<SettingsPasswordConfig>>
         get() = liveData(context = viewModelScope.coroutineContext) {
             emit(LiveDataEventWithContent(configManager.getProjectConfiguration().general.settingsPassword))
         }
 
-
     fun logout() {
         logoutUseCase()
     }
 }
-

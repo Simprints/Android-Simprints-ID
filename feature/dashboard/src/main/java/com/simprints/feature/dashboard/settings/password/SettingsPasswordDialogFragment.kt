@@ -15,23 +15,22 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class SettingsPasswordDialogFragment : DialogFragment() {
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = MaterialAlertDialogBuilder(requireContext())
         .setTitle(arguments?.getInt(ARG_TITLE) ?: IDR.string.dashboard_password_lock_title_default)
         .setView(inflateInputView())
         .setNegativeButton(IDR.string.dashboard_password_lock_cancel) { _, _ -> dismiss() }
         .create()
 
-    private fun inflateInputView() = FragmentSettingsPasswordInputBinding.inflate(layoutInflater)
+    private fun inflateInputView() = FragmentSettingsPasswordInputBinding
+        .inflate(layoutInflater)
         .apply {
             passwordInputField.addTextChangedListener(
                 afterTextChanged = { text ->
                     resetErrorText(text)
                     checkPassword(text)
-                }
+                },
             )
-        }
-        .root
+        }.root
 
     private fun FragmentSettingsPasswordInputBinding.resetErrorText(text: Editable?) {
         if (passwordInputLayout.error != null && text?.isNotEmpty() == true) {
@@ -49,7 +48,7 @@ class SettingsPasswordDialogFragment : DialogFragment() {
                         RESULT_SUCCESS to true,
                         // Pass-through the action argument to resolve action on call side
                         ARG_ACTION to arguments?.getString(ARG_ACTION),
-                    )
+                    ),
                 )
                 dismiss()
             } else {

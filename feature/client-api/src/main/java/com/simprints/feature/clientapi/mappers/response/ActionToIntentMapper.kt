@@ -12,9 +12,8 @@ import javax.inject.Inject
 internal class ActionToIntentMapper @Inject constructor(
     private val mapOdkResponse: OdkResponseMapper,
     private val mapCommCareResponse: CommCareResponseMapper,
-    private val mapLibSimprintsResponse: LibSimprintsResponseMapper
+    private val mapLibSimprintsResponse: LibSimprintsResponseMapper,
 ) {
-
     operator fun invoke(response: ActionResponse): Bundle = when (response.actionIdentifier.packageName) {
         OdkConstants.PACKAGE_NAME -> mapOdkResponse(response)
         CommCareConstants.PACKAGE_NAME -> mapCommCareResponse(response)

@@ -11,7 +11,6 @@ class AutoResettingClickCounter(
     private val requiredClicks: Int = DEFAULT_CLICKS_FOR_TROUBLESHOOTING,
     private val resetDelayMs: Long = DEFAULT_CLICK_COUNTER_RESET_MS,
 ) {
-
     private var counterReset: Job? = null
     private var counter: AtomicInteger = AtomicInteger(0)
 
@@ -35,7 +34,6 @@ class AutoResettingClickCounter(
     }
 
     companion object {
-
         private const val DEFAULT_CLICKS_FOR_TROUBLESHOOTING = 5
         private const val DEFAULT_CLICK_COUNTER_RESET_MS = 1000L
     }

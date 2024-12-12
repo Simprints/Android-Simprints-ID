@@ -30,9 +30,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-
 class SetupViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -68,7 +66,7 @@ class SetupViewModelTest {
                 licenseRepository,
                 deviceID,
                 authStore,
-                saveLicenseCheckEvent
+                saveLicenseCheckEvent,
             )
     }
 
@@ -82,7 +80,6 @@ class SetupViewModelTest {
 
         // Then
         viewModel.requestLocationPermission.test().assertHasValue()
-
     }
 
     @Test
@@ -95,23 +92,19 @@ class SetupViewModelTest {
 
         // Then
         viewModel.requestLocationPermission.test().assertNoValue()
-
     }
 
-
     @Test
-    fun `should call locationStore collectLocationInBackground if collectLocation is called`() =
-        runTest {
-            // Given
-            justRun { locationStore.collectLocationInBackground() }
+    fun `should call locationStore collectLocationInBackground if collectLocation is called`() = runTest {
+        // Given
+        justRun { locationStore.collectLocationInBackground() }
 
-            // when
-            viewModel.collectLocation()
+        // when
+        viewModel.collectLocation()
 
-            // Then
-            verify { locationStore.collectLocationInBackground() }
-
-        }
+        // Then
+        verify { locationStore.collectLocationInBackground() }
+    }
 
     @Test
     fun `should request notification permission if collectLocation is disabled`() = runTest {
@@ -123,7 +116,6 @@ class SetupViewModelTest {
 
         // Then
         viewModel.requestNotificationPermission.test().assertHasValue()
-
     }
 
     @Test
@@ -136,7 +128,6 @@ class SetupViewModelTest {
 
         // Then
         viewModel.requestNotificationPermission.test().assertNoValue()
-
     }
 
     @Test
@@ -155,7 +146,7 @@ class SetupViewModelTest {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE
+                    GeneralConfiguration.Modality.FACE,
                 )
             }
             every { fingerprint } returns mockk {
@@ -183,7 +174,7 @@ class SetupViewModelTest {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE
+                    GeneralConfiguration.Modality.FACE,
                 )
                 every { fingerprint } returns mockk {
                     every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
@@ -203,7 +194,6 @@ class SetupViewModelTest {
         verify(exactly = 2) { licenseRepository.getLicenseStates(any(), any(), any(), any()) }
         viewModel.overallSetupResult.test().assertValue(true)
     }
-
 
     @Test
     fun `should not download required licenses if there are no required licenses`() = runTest {
@@ -228,7 +218,7 @@ class SetupViewModelTest {
             every { general } returns mockk {
                 every { modalities } returns listOf(
                     GeneralConfiguration.Modality.FINGERPRINT,
-                    GeneralConfiguration.Modality.FACE
+                    GeneralConfiguration.Modality.FACE,
                 )
             }
             every { fingerprint } returns mockk {

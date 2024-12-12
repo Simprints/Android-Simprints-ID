@@ -25,7 +25,7 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "android/**/*.*"
+        "android/**/*.*",
     )
 
     private fun Project.createJacocoTask() {
@@ -41,12 +41,14 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
 
             sourceDirectories.setFrom(files("${project.projectDir}/src/main/java"))
 
-            executionData.setFrom(fileTree("$buildDir") {
-                include(
-                    "jacoco/testDebugUnitTest.exec",
-                    "outputs/code-coverage/connected/*coverage.ec",
-                )
-            })
+            executionData.setFrom(
+                fileTree("$buildDir") {
+                    include(
+                        "jacoco/testDebugUnitTest.exec",
+                        "outputs/code-coverage/connected/*coverage.ec",
+                    )
+                },
+            )
         }
     }
 
@@ -74,7 +76,7 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
                     "**/*\$inlined$*.*", // Kotlin specific, Jacoco can not handle several "$" in class name.
                     "**/*\$Icepick.*", // Icepick auto-generated code.
                     "**/*\$StateSaver.*", // android-state auto-generated code.
-                    "**/*AutoValue_*.*" // AutoValue auto-generated code.
+                    "**/*AutoValue_*.*", // AutoValue auto-generated code.
                 )
             }
         }

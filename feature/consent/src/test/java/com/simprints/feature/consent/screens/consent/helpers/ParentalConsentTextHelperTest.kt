@@ -13,12 +13,12 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ParentalConsentTextHelperTest {
-
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val modalitiesUseCaseText = String.format(
-        "%s %s %s", context.getString(R.string.consent_biometrics_parental_fingerprint),
+        "%s %s %s",
+        context.getString(R.string.consent_biometrics_parental_fingerprint),
         context.getString(R.string.consent_biometric_concat_modalities),
-        context.getString(R.string.consent_biometrics_parental_face)
+        context.getString(R.string.consent_biometrics_parental_face),
     )
 
     companion object {
@@ -36,7 +36,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.ENROL,
@@ -59,7 +59,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
@@ -82,7 +82,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
@@ -105,7 +105,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
@@ -128,7 +128,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.VERIFY,
@@ -151,7 +151,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -174,7 +174,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
@@ -197,7 +197,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -221,7 +221,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
@@ -245,7 +245,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
@@ -269,7 +269,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -292,7 +292,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = true,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -314,7 +314,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -336,7 +336,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = true,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -358,7 +358,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -380,7 +380,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = true,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -403,7 +403,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = false,
                     privacyRights = false,
                     confirmation = false,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -425,7 +425,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = true,
                     privacyRights = true,
                     confirmation = true,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -444,7 +444,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = true,
                     privacyRights = true,
                     confirmation = true,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
@@ -463,7 +463,7 @@ class ParentalConsentTextHelperTest {
                     dataUsedForRAndD = true,
                     privacyRights = true,
                     confirmation = true,
-                )
+                ),
             ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,

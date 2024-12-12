@@ -6,7 +6,6 @@ import com.simprints.core.tools.time.Timestamp
 import java.util.UUID
 
 object SampleDefaults {
-
     const val DEFAULT_PROJECT_ID = "DVXF1mu4CAa5FmiPWHXr"
     val DEFAULT_MODULE_ID = "0".asTokenizableRaw()
     val DEFAULT_MODULE_ID_2 = "1".asTokenizableRaw()

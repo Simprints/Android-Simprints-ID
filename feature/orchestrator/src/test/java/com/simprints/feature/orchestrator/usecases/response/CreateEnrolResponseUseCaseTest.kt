@@ -4,11 +4,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
-import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
-import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import io.mockk.MockKAnnotations
 import io.mockk.coJustRun
 import io.mockk.every
@@ -19,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class CreateEnrolResponseUseCaseTest {
-
     @MockK
     lateinit var subjectFactory: SubjectFactory
 
@@ -49,12 +48,16 @@ internal class CreateEnrolResponseUseCaseTest {
             subjectFactory.buildSubjectFromCaptureResults(any(), any(), any(), any(), any())
         } returns mockk { every { subjectId } returns "guid" }
 
-
-        assertThat(useCase(action, listOf(
-            FingerprintCaptureResult(emptyList()),
-            FaceCaptureResult(emptyList()),
-            mockk(),
-        ))).isInstanceOf(AppEnrolResponse::class.java)
+        assertThat(
+            useCase(
+                action,
+                listOf(
+                    FingerprintCaptureResult(emptyList()),
+                    FaceCaptureResult(emptyList()),
+                    mockk(),
+                ),
+            ),
+        ).isInstanceOf(AppEnrolResponse::class.java)
     }
 
     @Test

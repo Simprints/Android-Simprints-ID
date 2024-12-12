@@ -9,7 +9,6 @@ internal class LogoutUseCase @Inject constructor(
     private val syncOrchestrator: SyncOrchestrator,
     private val authManager: AuthManager,
 ) {
-
     operator fun invoke() = runBlocking {
         // Cancel all background sync
         syncOrchestrator.cancelBackgroundWork()
@@ -17,5 +16,4 @@ internal class LogoutUseCase @Inject constructor(
         // sign out the user
         authManager.signOut()
     }
-
 }

@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration12to13Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -45,7 +44,6 @@ class EventMigration12to13Test {
         assertThat(EventMigration12to13().convertEventJson(OLD_EVENT)).isEqualTo(NEW_EVENT)
     }
 
-
     private fun createEvent(id: String) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "CALLBACK_ENROLMENT")
@@ -56,16 +54,16 @@ class EventMigration12to13Test {
     }
 
     companion object {
-
         private const val TEST_DB = "migration-test"
 
-        private val OLD_EVENT = """
+        private val OLD_EVENT =
+            """
             {"id":"d256e644-ce5b-4ec5-8909-3a372a930206","labels":{"projectId":"9WNCAbWVNrxttDe5hgwb","sessionId":"2bdc1145-cbec-4e6a-ac8a-61c1e5b53bb4","deviceId":"d294a268b0d54f58"},"payload":{"createdAt":1706534485916,"eventVersion":1,"integration":"STANDARD","type":"INTENT_PARSING","endedAt":0,"endedAt":1706534528165},"type":"INTENT_PARSING"}
-        """.trimIndent()
+            """.trimIndent()
 
-        private val NEW_EVENT = """
+        private val NEW_EVENT =
+            """
             {"id":"d256e644-ce5b-4ec5-8909-3a372a930206","projectId":"9WNCAbWVNrxttDe5hgwb","sessionId":"2bdc1145-cbec-4e6a-ac8a-61c1e5b53bb4","payload":{"createdAt":{"ms":1706534485916,"isTrustworthy":false,"msSinceBoot":null},"eventVersion":2,"integration":"STANDARD","type":"INTENT_PARSING","endedAt":null,"endedAt":{"ms":1706534528165,"isTrustworthy":false,"msSinceBoot":null}},"type":"INTENT_PARSING"}
-        """.trimIndent()
+            """.trimIndent()
     }
-
 }

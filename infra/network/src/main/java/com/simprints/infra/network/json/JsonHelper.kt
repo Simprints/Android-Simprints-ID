@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 internal object JsonHelper {
-
     val jackson: ObjectMapper by lazy {
         ObjectMapper()
             .registerKotlinModule()
@@ -14,7 +13,5 @@ internal object JsonHelper {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 
-    inline fun <reified T> fromJson(json: String): T {
-        return jackson.readValue(json, T::class.java)
-    }
+    inline fun <reified T> fromJson(json: String): T = jackson.readValue(json, T::class.java)
 }

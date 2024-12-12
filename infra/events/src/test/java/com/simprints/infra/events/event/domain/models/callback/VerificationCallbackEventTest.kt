@@ -10,7 +10,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class VerificationCallbackEventTest {
-
     @Test
     fun create_VerificationCallbackEvent() {
         val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE)

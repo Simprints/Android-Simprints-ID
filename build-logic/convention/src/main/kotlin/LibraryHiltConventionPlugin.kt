@@ -28,5 +28,4 @@ class LibraryHiltConventionPlugin : Plugin<Project> {
             }
         }
     }
-
 }

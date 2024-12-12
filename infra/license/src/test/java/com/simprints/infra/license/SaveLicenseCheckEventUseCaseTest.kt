@@ -3,8 +3,8 @@ package com.simprints.infra.license
 import com.google.common.truth.Truth
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.license.models.Vendor
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -17,7 +17,6 @@ import org.junit.Before
 import kotlin.test.Test
 
 class SaveLicenseCheckEventUseCaseTest {
-
     @RelaxedMockK
     private lateinit var eventRepository: SessionEventRepository
 
@@ -36,7 +35,6 @@ class SaveLicenseCheckEventUseCaseTest {
         every { timeHelper.now() } returns now
     }
 
-
     @Test
     fun `invoke adds LicenseCheckEvent with VALID status to eventRepository`() = runTest {
         val vendor = Vendor.RankOne
@@ -47,9 +45,7 @@ class SaveLicenseCheckEventUseCaseTest {
         val expectedEvent =
             LicenseCheckEvent(now, LicenseCheckEvent.LicenseStatus.VALID, vendor.value)
         verifyExpectedEvent(expectedEvent)
-
     }
-
 
     @Test
     fun `invoke adds LicenseCheckEvent with INVALID status to eventRepository`() = runTest {
@@ -71,5 +67,4 @@ class SaveLicenseCheckEventUseCaseTest {
         Truth.assertThat(actualPayload.status).isEqualTo(expectedPayload.status)
         Truth.assertThat(actualPayload.vendor).isEqualTo(expectedPayload.vendor)
     }
-
 }

@@ -13,7 +13,6 @@ import javax.net.ssl.SSLProtocolException
  * @see <a href="URL#https://github.com/JakeWharton/timber">Timber</a>
  */
 object Simber {
-
     internal const val USER_PROPERTY_TAG = "zzUserPropertyTag"
     private const val FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH = 100
     private const val FIREBASE_ANALYTICS_MAX_TAG_LENGTH = 24
@@ -29,9 +28,16 @@ object Simber {
      */
     fun v(t: Throwable) = Timber.v(t)
 
-    fun v(message: String, vararg args: Any?) = Timber.v(message, *args)
+    fun v(
+        message: String,
+        vararg args: Any?,
+    ) = Timber.v(message, *args)
 
-    fun v(t: Throwable, message: String, args: Any? = null) = Timber.v(t, message, args)
+    fun v(
+        t: Throwable,
+        message: String,
+        args: Any? = null,
+    ) = Timber.v(t, message, args)
 
     /**
      * Use this for debugging purposes. If you want to print out a bunch of messages so you can log
@@ -44,9 +50,16 @@ object Simber {
     @JvmStatic
     fun d(t: Throwable) = Timber.d(t)
 
-    fun d(message: String, vararg args: Any?) = Timber.d(message, *args)
+    fun d(
+        message: String,
+        vararg args: Any?,
+    ) = Timber.d(message, *args)
 
-    fun d(t: Throwable, message: String, args: Any? = null) = Timber.d(t, message, args)
+    fun d(
+        t: Throwable,
+        message: String,
+        args: Any? = null,
+    ) = Timber.d(t, message, args)
 
     /**
      * Use this to post useful information to the log. For example: that you have successfully
@@ -58,11 +71,16 @@ object Simber {
      */
     fun i(t: Throwable) = Timber.i(t)
 
-    fun i(message: String, vararg args: Any?) =
-        Timber.i(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+    fun i(
+        message: String,
+        vararg args: Any?,
+    ) = Timber.i(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
 
-    fun i(t: Throwable, message: String, args: Any? = null) =
-        Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+    fun i(
+        t: Throwable,
+        message: String,
+        args: Any? = null,
+    ) = Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -79,18 +97,28 @@ object Simber {
      * RELEASE: Is sent to Firebase Crashlytics
      */
     fun w(t: Throwable) {
-        if (shouldSkipThrowableReporting(t)) Timber.i(t)
-        else Timber.w(t)
+        if (shouldSkipThrowableReporting(t)) {
+            Timber.i(t)
+        } else {
+            Timber.w(t)
+        }
     }
 
-    fun w(message: String, vararg args: Any?) =
-        Timber.w(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+    fun w(
+        message: String,
+        vararg args: Any?,
+    ) = Timber.w(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
 
-    fun w(t: Throwable, message: String, args: Any? = null) {
-        if (shouldSkipThrowableReporting(t))
+    fun w(
+        t: Throwable,
+        message: String,
+        args: Any? = null,
+    ) {
+        if (shouldSkipThrowableReporting(t)) {
             Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
-        else
+        } else {
             Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        }
     }
 
     /**
@@ -108,20 +136,28 @@ object Simber {
      * RELEASE: Is sent to Firebase Crashlytics
      */
     fun e(t: Throwable) {
-        if (shouldSkipThrowableReporting(t))
+        if (shouldSkipThrowableReporting(t)) {
             Timber.i(t)
-        else
+        } else {
             Timber.e(t)
+        }
     }
 
-    fun e(message: String, vararg args: Any?) =
-        Timber.e(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+    fun e(
+        message: String,
+        vararg args: Any?,
+    ) = Timber.e(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
 
-    fun e(t: Throwable, message: String, args: Any? = null) {
-        if (shouldSkipThrowableReporting(t))
+    fun e(
+        t: Throwable,
+        message: String,
+        args: Any? = null,
+    ) {
+        if (shouldSkipThrowableReporting(t)) {
             Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
-        else
+        } else {
             Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        }
     }
 
     /**
@@ -140,7 +176,10 @@ object Simber {
      * you reach this threshold, additional values are not saved. Each key/value pair can be up to
      * 1 kB in size."
      */
-    fun tag(tag: String, isUserProperty: Boolean = false): Simber {
+    fun tag(
+        tag: String,
+        isUserProperty: Boolean = false,
+    ): Simber {
         var conformingTag = ensureCharactersAreValid(tag)
 
         conformingTag = if (isUserProperty) {
@@ -154,8 +193,8 @@ object Simber {
     }
 
     /*
-    * Check that tag complies with Firebase Analytics requirements:
-    * Name must consist of letters, digits or _ (underscores).
+     * Check that tag complies with Firebase Analytics requirements:
+     * Name must consist of letters, digits or _ (underscores).
      */
     private fun ensureCharactersAreValid(tag: String): String {
         if (tag.contains(firebaseInvalidCharactersRegex)) {
@@ -169,7 +208,10 @@ object Simber {
         return tag
     }
 
-    private fun limitLength(message: String, max: Int): String {
+    private fun limitLength(
+        message: String,
+        max: Int,
+    ): String {
         if (message.length > max) {
             if (BuildConfig.DEBUG) {
                 throw IllegalArgumentException("String must be less than $max characters.")
@@ -182,13 +224,11 @@ object Simber {
 
     // Some exception do not provide any value when logged into crashlytics,
     // e.g. issues due to bad network
-    private fun shouldSkipThrowableReporting(t: Throwable) =
-        isSkippableException(t) || isSkippableException(t.cause)
+    private fun shouldSkipThrowableReporting(t: Throwable) = isSkippableException(t) || isSkippableException(t.cause)
 
-    private fun isSkippableException(it: Throwable?) = it is SocketTimeoutException
-        || it is UnknownHostException
-        || it is SSLProtocolException
-        || it is SSLHandshakeException
-        || it is FirebaseNetworkException
-
+    private fun isSkippableException(it: Throwable?) = it is SocketTimeoutException ||
+        it is UnknownHostException ||
+        it is SSLProtocolException ||
+        it is SSLHandshakeException ||
+        it is FirebaseNetworkException
 }

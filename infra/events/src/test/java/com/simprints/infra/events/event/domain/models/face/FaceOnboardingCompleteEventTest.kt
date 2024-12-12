@@ -10,7 +10,6 @@ import org.junit.Test
 
 @Keep
 class FaceOnboardingCompleteEventTest {
-
     @Test
     fun create_FaceOnboardingCompleteEvent() {
         val event = FaceOnboardingCompleteEvent(CREATED_AT, ENDED_AT)
@@ -25,4 +24,3 @@ class FaceOnboardingCompleteEventTest {
         }
     }
 }
-

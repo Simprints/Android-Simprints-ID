@@ -5,9 +5,9 @@ import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 
 @Keep
-sealed class BiometricDataSource: Parcelable {
-
+sealed class BiometricDataSource : Parcelable {
     open fun callerPackageName(): String = ""
+
     open fun permissionName(): String? = null
 
     @Parcelize
@@ -16,14 +16,14 @@ sealed class BiometricDataSource: Parcelable {
     @Parcelize
     data class CommCare(
         private val callerPackageName: String,
-    ) : BiometricDataSource(), Parcelable {
-
+    ) : BiometricDataSource(),
+        Parcelable {
         override fun callerPackageName() = callerPackageName
+
         override fun permissionName() = "$callerPackageName.provider.cases.read"
     }
 
     companion object {
-
         fun fromString(
             value: String,
             callerPackageName: String,
@@ -31,6 +31,5 @@ sealed class BiometricDataSource: Parcelable {
             "COMMCARE" -> CommCare(callerPackageName)
             else -> Simprints
         }
-
     }
 }

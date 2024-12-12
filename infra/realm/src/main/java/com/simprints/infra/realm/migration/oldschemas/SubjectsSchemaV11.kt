@@ -11,5 +11,4 @@ internal object SubjectsSchemaV11 {
 
     const val ISO_19794_2_FORMAT = "ISO_19794_2"
     const val RANK_ONE_1_23_FORMAT = "RANK_ONE"
-
 }

@@ -6,7 +6,6 @@ import com.simprints.infra.config.store.testtools.protoDecisionPolicy
 import org.junit.Test
 
 class DecisionPolicyTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoDecisionPolicy.toDomain()).isEqualTo(decisionPolicy)

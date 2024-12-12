@@ -22,7 +22,6 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
     private val shouldSuggestSync: ShouldSuggestSyncUseCase,
     private val runBlockingSync: RunBlockingEventSyncUseCase,
 ) : ViewModel() {
-
     val state: LiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>
         get() = _state
     private var _state = MutableLiveData<LiveDataEventWithContent<ValidateSubjectPoolState>>()
@@ -52,6 +51,4 @@ internal class ValidateSubjectPoolViewModel @Inject constructor(
         isSyncing = false
         checkIdentificationPool(subjectQuery)
     }
-
 }
-

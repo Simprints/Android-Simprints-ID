@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20R
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.OperationResultCode
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 
-class SetScanLedStateResponse(val operationResultCode: OperationResultCode) : Un20Response(Un20MessageType.SetScanLedState) {
-
+class SetScanLedStateResponse(
+    val operationResultCode: OperationResultCode,
+) : Un20Response(Un20MessageType.SetScanLedState) {
     override fun getDataBytes(): ByteArray = byteArrayOf(operationResultCode.byte)
 
     companion object {

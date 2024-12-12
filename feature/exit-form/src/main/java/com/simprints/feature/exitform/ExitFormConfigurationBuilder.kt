@@ -54,13 +54,14 @@ fun scannerOptions() = setOf(
  * visibleOptions - Set of visible form option items, default - all items are visible.
  * ```
  */
-fun exitFormConfiguration(block: ExitFormConfigurationBuilder.() -> Unit) =
-    ExitFormConfigurationBuilder().apply(block)
+fun exitFormConfiguration(block: ExitFormConfigurationBuilder.() -> Unit) = ExitFormConfigurationBuilder().apply(block)
 
-fun ExitFormConfigurationBuilder.toArgs() = ExitFormFragmentArgs(ExitFormConfiguration(
-    title = this.title,
-    titleRes = this.titleRes,
-    backButton = this.backButton,
-    backButtonRes = this.backButtonRes,
-    visibleOptions = this.visibleOptions,
-)).toBundle()
+fun ExitFormConfigurationBuilder.toArgs() = ExitFormFragmentArgs(
+    ExitFormConfiguration(
+        title = this.title,
+        titleRes = this.titleRes,
+        backButton = this.backButton,
+        backButtonRes = this.backButtonRes,
+        visibleOptions = this.visibleOptions,
+    ),
+).toBundle()

@@ -14,7 +14,6 @@ data class EnrolmentRecordCreationEvent(
     override val id: String,
     val payload: EnrolmentRecordCreationPayload,
 ) : EnrolmentRecordEvent(id, EnrolmentRecordEventType.EnrolmentRecordCreation) {
-
     constructor(
         subjectId: String,
         projectId: String,
@@ -28,8 +27,8 @@ data class EnrolmentRecordCreationEvent(
             projectId,
             moduleId,
             attendantId,
-            biometricReferences
-        )
+            biometricReferences,
+        ),
     )
 
     @Keep
@@ -42,11 +41,10 @@ data class EnrolmentRecordCreationEvent(
     )
 
     companion object {
-
         fun buildBiometricReferences(
             fingerprintSamples: List<FingerprintSample>,
             faceSamples: List<FaceSample>,
-            encoder: EncodingUtils
+            encoder: EncodingUtils,
         ): List<BiometricReference> {
             val biometricReferences = mutableListOf<BiometricReference>()
 
@@ -63,40 +61,38 @@ data class EnrolmentRecordCreationEvent(
 
         private fun buildFingerprintReference(
             fingerprintSamples: List<FingerprintSample>,
-            encoder: EncodingUtils
-        ) =
-            if (fingerprintSamples.isNotEmpty()) {
-                FingerprintReference(
-                    fingerprintSamples.uniqueId() ?: "",
-                    fingerprintSamples.map {
-                        FingerprintTemplate(
-                            it.templateQualityScore,
-                            encoder.byteArrayToBase64(it.template),
-                            it.fingerIdentifier
-                        )
-                    },
-                    fingerprintSamples.first().format
-                )
-            } else {
-                null
-            }
+            encoder: EncodingUtils,
+        ) = if (fingerprintSamples.isNotEmpty()) {
+            FingerprintReference(
+                fingerprintSamples.uniqueId() ?: "",
+                fingerprintSamples.map {
+                    FingerprintTemplate(
+                        it.templateQualityScore,
+                        encoder.byteArrayToBase64(it.template),
+                        it.fingerIdentifier,
+                    )
+                },
+                fingerprintSamples.first().format,
+            )
+        } else {
+            null
+        }
 
         private fun buildFaceReference(
             faceSamples: List<FaceSample>,
-            encoder: EncodingUtils
-        ) =
-            if (faceSamples.isNotEmpty()) {
-                FaceReference(
-                    faceSamples.uniqueId() ?: "",
-                    faceSamples.map {
-                        FaceTemplate(
-                            encoder.byteArrayToBase64(it.template)
-                        )
-                    },
-                    faceSamples.first().format
-                )
-            } else {
-                null
-            }
+            encoder: EncodingUtils,
+        ) = if (faceSamples.isNotEmpty()) {
+            FaceReference(
+                faceSamples.uniqueId() ?: "",
+                faceSamples.map {
+                    FaceTemplate(
+                        encoder.byteArrayToBase64(it.template),
+                    )
+                },
+                faceSamples.first().format,
+            )
+        } else {
+            null
+        }
     }
 }

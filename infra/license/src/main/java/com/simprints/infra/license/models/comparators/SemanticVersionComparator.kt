@@ -11,8 +11,11 @@ import kotlin.text.toIntOrNull
  * Both compared versions must have same amount of segments.
  * Any differences in version format short-circuit the comparison to return 0.
  */
-internal class SemanticVersionComparator() : Comparator<String> {
-    override fun compare(leftVersion: String, rightVersion: String): Int {
+internal class SemanticVersionComparator : Comparator<String> {
+    override fun compare(
+        leftVersion: String,
+        rightVersion: String,
+    ): Int {
         val leftParts = leftVersion.split(".").mapNotNull { it.toIntOrNull() }
         val rightParts = rightVersion.split(".").mapNotNull { it.toIntOrNull() }
 

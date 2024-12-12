@@ -44,9 +44,7 @@ import org.junit.Rule
 import org.junit.Test
 
 class SyncInfoViewModelTest {
-
     companion object {
-
         private const val PROJECT_ID = "projectId"
     }
 
@@ -112,7 +110,7 @@ class SyncInfoViewModelTest {
             eventSyncManager = eventSyncManager,
             syncOrchestrator = syncOrchestrator,
             tokenizationProcessor = tokenizationProcessor,
-            recentUserActivityManager = recentUserActivityManager
+            recentUserActivityManager = recentUserActivityManager,
         )
     }
 
@@ -171,16 +169,16 @@ class SyncInfoViewModelTest {
             enrolmentRecordRepository.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
-                    moduleId = module1.value
-                )
+                    moduleId = module1.value,
+                ),
             )
         } returns numberForModule1
         coEvery {
             enrolmentRecordRepository.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
-                    moduleId = module2.value
-                )
+                    moduleId = module2.value,
+                ),
             )
         } returns numberForModule2
         listOf(module1, module2).forEach { moduleName ->
@@ -188,7 +186,7 @@ class SyncInfoViewModelTest {
                 tokenizationProcessor.decrypt(
                     encrypted = moduleName,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    project = project
+                    project = project,
                 )
             } returns moduleName
         }
@@ -199,47 +197,45 @@ class SyncInfoViewModelTest {
             listOf(
                 ModuleCount(module1.value, numberForModule1),
                 ModuleCount(module2.value, numberForModule2),
-            )
+            ),
         )
     }
 
     @Test
-    fun `should initialize the recordsToDownSync live data to the count otherwise`() =
-        runTest {
-            val module1 = "module1".asTokenizableEncrypted()
-            coEvery { configManager.getDeviceConfiguration() } returns mockk {
-                every { selectedModules } returns listOf(module1)
-            }
-            coEvery {
-                eventSyncManager.countEventsToDownload()
-            } returns DownSyncCounts(15, isLowerBound = false)
-
-            viewModel.refreshInformation()
-
-            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(15)
+    fun `should initialize the recordsToDownSync live data to the count otherwise`() = runTest {
+        val module1 = "module1".asTokenizableEncrypted()
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(module1)
         }
+        coEvery {
+            eventSyncManager.countEventsToDownload()
+        } returns DownSyncCounts(15, isLowerBound = false)
+
+        viewModel.refreshInformation()
+
+        assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(15)
+    }
 
     @Test
-    fun `should initialize the recordsToDownSync live data to the default count value if fetch fails`() =
-        runTest {
-            val module1 = "module1".asTokenizableEncrypted()
-            coEvery { configManager.getDeviceConfiguration() } returns mockk {
-                every { selectedModules } returns listOf(module1)
-            }
-            coEvery {
-                eventSyncManager.countEventsToDownload()
-            } throws Exception()
-
-            viewModel.refreshInformation()
-
-            assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(0)
+    fun `should initialize the recordsToDownSync live data to the default count value if fetch fails`() = runTest {
+        val module1 = "module1".asTokenizableEncrypted()
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(module1)
         }
+        coEvery {
+            eventSyncManager.countEventsToDownload()
+        } throws Exception()
+
+        viewModel.refreshInformation()
+
+        assertThat(viewModel.recordsToDownSync.getOrAwaitValue()?.count).isEqualTo(0)
+    }
 
     @Test
     fun `refreshInformation should first reset the information and then reload`() = runTest {
         coEvery { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) } returnsMany listOf(
             2,
-            4
+            4,
         )
         viewModel.refreshInformation()
 
@@ -252,53 +248,9 @@ class SyncInfoViewModelTest {
     }
 
     @Test
-    fun `fetchSyncInformationIfNeeded should not fetch the information if there is a non succeeded worker`() =
-        runTest {
-            viewModel.fetchSyncInformationIfNeeded(
-                EventSyncState(
-                    syncId = "",
-                    progress = 0,
-                    total = 0,
-                    upSyncWorkersInfo = listOf(),
-                    downSyncWorkersInfo = listOf(
-                        EventSyncState.SyncWorkerInfo(
-                            EventSyncWorkerType.DOWNLOADER,
-                            EventSyncWorkerState.Running
-                        )
-                    ),
-                    reporterStates = listOf(),
-                )
-            )
-
-            coVerify(exactly = 0) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
-        }
-
-    @Test
-    fun `fetchSyncInformationIfNeeded should fetch the information if there is only succeeded worker`() =
-        runTest {
-            viewModel.fetchSyncInformationIfNeeded(
-                EventSyncState(
-                    syncId = "",
-                    progress = 0,
-                    total = 0,
-                    upSyncWorkersInfo = listOf(),
-                    downSyncWorkersInfo = listOf(
-                        EventSyncState.SyncWorkerInfo(
-                            EventSyncWorkerType.DOWNLOADER,
-                            EventSyncWorkerState.Succeeded
-                        )
-                    ),
-                    reporterStates = listOf(),
-                )
-            )
-
-            coVerify(exactly = 1) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
-        }
-
-    @Test
-    fun `fetchSyncInformationIfNeeded should not fetch the information if the state hasn't changed`() =
-        runTest {
-            val state = EventSyncState(
+    fun `fetchSyncInformationIfNeeded should not fetch the information if there is a non succeeded worker`() = runTest {
+        viewModel.fetchSyncInformationIfNeeded(
+            EventSyncState(
                 syncId = "",
                 progress = 0,
                 total = 0,
@@ -306,17 +258,58 @@ class SyncInfoViewModelTest {
                 downSyncWorkersInfo = listOf(
                     EventSyncState.SyncWorkerInfo(
                         EventSyncWorkerType.DOWNLOADER,
-                        EventSyncWorkerState.Succeeded
-                    )
+                        EventSyncWorkerState.Running,
+                    ),
                 ),
                 reporterStates = listOf(),
-            )
+            ),
+        )
 
-            viewModel.fetchSyncInformationIfNeeded(state)
-            viewModel.fetchSyncInformationIfNeeded(state)
+        coVerify(exactly = 0) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
+    }
 
-            coVerify(exactly = 1) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
-        }
+    @Test
+    fun `fetchSyncInformationIfNeeded should fetch the information if there is only succeeded worker`() = runTest {
+        viewModel.fetchSyncInformationIfNeeded(
+            EventSyncState(
+                syncId = "",
+                progress = 0,
+                total = 0,
+                upSyncWorkersInfo = listOf(),
+                downSyncWorkersInfo = listOf(
+                    EventSyncState.SyncWorkerInfo(
+                        EventSyncWorkerType.DOWNLOADER,
+                        EventSyncWorkerState.Succeeded,
+                    ),
+                ),
+                reporterStates = listOf(),
+            ),
+        )
+
+        coVerify(exactly = 1) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
+    }
+
+    @Test
+    fun `fetchSyncInformationIfNeeded should not fetch the information if the state hasn't changed`() = runTest {
+        val state = EventSyncState(
+            syncId = "",
+            progress = 0,
+            total = 0,
+            upSyncWorkersInfo = listOf(),
+            downSyncWorkersInfo = listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Succeeded,
+                ),
+            ),
+            reporterStates = listOf(),
+        )
+
+        viewModel.fetchSyncInformationIfNeeded(state)
+        viewModel.fetchSyncInformationIfNeeded(state)
+
+        coVerify(exactly = 1) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
+    }
 
     @Test
     fun `should invoke sync manager when sync is requested`() = runTest {
@@ -327,41 +320,40 @@ class SyncInfoViewModelTest {
     }
 
     @Test
-    fun `isModuleSyncAndModuleIdOptionsNotEmpty returns true only if module sync and has modules`() =
-        runTest {
-            // Not module sync
-            assertThat(
-                viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
-                    createMockDownSyncConfig(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.USER,
-                    )
-                )
-            ).isFalse()
-            // Module sync + no modules
-            assertThat(
-                viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
-                    createMockDownSyncConfig(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                    )
-                )
-            ).isFalse()
-            // Module sync + has modules
-            assertThat(
-                viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
-                    createMockDownSyncConfig(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                        modules = listOf("module")
-                    )
-                )
-            ).isTrue()
-        }
+    fun `isModuleSyncAndModuleIdOptionsNotEmpty returns true only if module sync and has modules`() = runTest {
+        // Not module sync
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
+                createMockDownSyncConfig(
+                    partitionType = DownSynchronizationConfiguration.PartitionType.USER,
+                ),
+            ),
+        ).isFalse()
+        // Module sync + no modules
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
+                createMockDownSyncConfig(
+                    partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                ),
+            ),
+        ).isFalse()
+        // Module sync + has modules
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
+                createMockDownSyncConfig(
+                    partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                    modules = listOf("module"),
+                ),
+            ),
+        ).isTrue()
+    }
 
     @Test
     fun `emit correct sync availability when connection status changes`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns createMockDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                modules = listOf("module")
+                modules = listOf("module"),
             )
         }
         viewModel.refreshInformation()
@@ -379,7 +371,7 @@ class SyncInfoViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns createMockDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                modules = listOf("module")
+                modules = listOf("module"),
             )
         }
         viewModel.refreshInformation()
@@ -396,8 +388,8 @@ class SyncInfoViewModelTest {
             downSyncWorkersInfo = listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Running
-                )
+                    EventSyncWorkerState.Running,
+                ),
             ),
             reporterStates = listOf(),
         )
@@ -411,8 +403,8 @@ class SyncInfoViewModelTest {
             downSyncWorkersInfo = listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Succeeded
-                )
+                    EventSyncWorkerState.Succeeded,
+                ),
             ),
             reporterStates = listOf(),
         )
@@ -438,7 +430,7 @@ class SyncInfoViewModelTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns createMockDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                modules = emptyList()
+                modules = emptyList(),
             )
         }
         viewModel.refreshInformation()
@@ -449,31 +441,36 @@ class SyncInfoViewModelTest {
     }
 
     @Test
-    fun `emit ReloginRequired = false when lastSyncState updates with different status`() =
-        runTest {
-            stateLiveData.value = EventSyncState(
-                "", 0, 0, listOf(),
-                listOf(
-                    EventSyncState.SyncWorkerInfo(
-                        EventSyncWorkerType.DOWNLOADER,
-                        EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
-                    )
+    fun `emit ReloginRequired = false when lastSyncState updates with different status`() = runTest {
+        stateLiveData.value = EventSyncState(
+            "",
+            0,
+            0,
+            listOf(),
+            listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true),
                 ),
-                reporterStates = listOf(),
-            )
+            ),
+            reporterStates = listOf(),
+        )
 
-            assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isFalse()
-        }
+        assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isFalse()
+    }
 
     @Test
     fun `emit ReloginRequired = true when lastSyncState updates with such status`() = runTest {
         stateLiveData.value = EventSyncState(
-            "", 0, 0, listOf(),
+            "",
+            0,
+            0,
+            listOf(),
             listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
-                )
+                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true),
+                ),
             ),
             reporterStates = listOf(),
         )
@@ -514,7 +511,7 @@ class SyncInfoViewModelTest {
                 moduleOptions = modules.map(String::asTokenizableRaw),
                 maxNbOfModules = 0,
                 maxAge = "PT24H",
-            )
+            ),
         )
     }
 }

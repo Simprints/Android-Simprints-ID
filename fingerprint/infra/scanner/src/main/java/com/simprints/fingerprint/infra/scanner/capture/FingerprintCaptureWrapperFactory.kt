@@ -11,7 +11,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 @Singleton
 class FingerprintCaptureWrapperFactory @Inject constructor(
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
-    private val scanningStatusTracker: FingerprintScanningStatusTracker
+    private val scanningStatusTracker: FingerprintScanningStatusTracker,
 ) {
     private var _captureWrapper: FingerprintCaptureWrapper? = null
 

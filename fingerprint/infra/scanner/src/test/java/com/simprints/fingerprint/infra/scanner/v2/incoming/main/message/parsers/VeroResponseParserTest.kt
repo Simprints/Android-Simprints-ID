@@ -8,19 +8,18 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.respo
 import org.junit.Test
 
 class VeroResponseParserTest {
-
     val messageParser = VeroResponseParser()
 
     @Test
     fun shouldParse_stmExtendedVersionResponse_successfully() {
         // given
         val expectedResponse = GetStmExtendedFirmwareVersionResponse(
-            StmExtendedFirmwareVersion("1.E-1.4")
+            StmExtendedFirmwareVersion("1.E-1.4"),
         )
         val payload = byteArrayOf(0x31, 0x2E, 0x45, 0x2D, 0x31, 0x2E, 0x34)
         val messageBytes = VeroMessageProtocol.buildMessageBytes(
             veroMessageType = VeroMessageType.GET_STM_EXTENDED_FIRMWARE_VERSION,
-            data = payload
+            data = payload,
         )
 
         // when

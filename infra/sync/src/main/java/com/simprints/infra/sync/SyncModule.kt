@@ -12,19 +12,15 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object SyncModule {
-
     @Provides
     fun provideWorkManager(
         @ApplicationContext context: Context,
     ): WorkManager = WorkManager.getInstance(context)
-
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SyncOrchestratorModule {
-
     @Binds
     internal abstract fun provideSyncOrchestrator(syncOrchestratorImpl: SyncOrchestratorImpl): SyncOrchestrator
-
 }

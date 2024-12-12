@@ -8,10 +8,9 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
 
-
 internal class IsNoFingerDetectedLimitReachedUseCaseTest {
     private val isNoFingerDetectedLimitReachedUseCase = IsNoFingerDetectedLimitReachedUseCase()
-    
+
     @Test
     fun `when capture state is not ScanProcess, then returns false`() {
         val fingerStateNotCollected = mockk<CaptureState.NotCollected>()
@@ -22,8 +21,8 @@ internal class IsNoFingerDetectedLimitReachedUseCaseTest {
             assertThat(
                 isNoFingerDetectedLimitReachedUseCase(
                     fingerState = fingerState,
-                    sdkConfiguration = sdkConfiguration
-                )
+                    sdkConfiguration = sdkConfiguration,
+                ),
             ).isFalse()
         }
     }
@@ -39,8 +38,8 @@ internal class IsNoFingerDetectedLimitReachedUseCaseTest {
         assertThat(
             isNoFingerDetectedLimitReachedUseCase(
                 fingerState = fingerState,
-                sdkConfiguration = sdkConfiguration
-            )
+                sdkConfiguration = sdkConfiguration,
+            ),
         ).isTrue()
     }
 
@@ -59,8 +58,8 @@ internal class IsNoFingerDetectedLimitReachedUseCaseTest {
         assertThat(
             isNoFingerDetectedLimitReachedUseCase(
                 fingerState = fingerState,
-                sdkConfiguration = sdkConfiguration
-            )
+                sdkConfiguration = sdkConfiguration,
+            ),
         ).isTrue()
     }
 
@@ -73,15 +72,15 @@ internal class IsNoFingerDetectedLimitReachedUseCaseTest {
             every { numberOfNoFingerDetectedScans } returns noFingerDetectedScans
         }
         val sdkConfiguration = mockk<FingerprintSdkConfiguration> {
-                every { maxCaptureAttempts } returns mockk<MaxCaptureAttempts> {
-                    every { noFingerDetected } returns 1
-                }
+            every { maxCaptureAttempts } returns mockk<MaxCaptureAttempts> {
+                every { noFingerDetected } returns 1
+            }
         }
         assertThat(
             isNoFingerDetectedLimitReachedUseCase(
                 fingerState = fingerState,
-                sdkConfiguration = sdkConfiguration
-            )
+                sdkConfiguration = sdkConfiguration,
+            ),
         ).isFalse()
     }
 }

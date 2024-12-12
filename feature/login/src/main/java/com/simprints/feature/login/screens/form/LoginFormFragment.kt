@@ -51,7 +51,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
-
     private val args by navArgs<LoginFormFragmentArgs>()
     private val binding by viewBinding(FragmentLoginFormBinding::bind)
     private val viewModel by viewModels<LoginFormViewModel>()
@@ -71,7 +70,10 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     @Inject
     lateinit var playServicesChecker: GooglePlayServicesAvailabilityChecker
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -81,7 +83,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         findNavController().handleResult<QrScannerResult>(
             viewLifecycleOwner,
             R.id.loginFormFragment,
-            R.id.loginQrScanner
+            R.id.loginQrScanner,
         ) { viewModel.handleQrResult(args.loginParams.projectId, it) }
 
         initUi()
@@ -166,19 +168,22 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             ?.let {
                 getString(
                     IDR.string.error_backend_maintenance_with_time_message,
-                    estimatedOutage
+                    estimatedOutage,
                 )
             }
             ?: getString(IDR.string.error_backend_maintenance_message)
         binding.loginErrorCard.isVisible = true
     }
 
-    private fun showToast(@StringRes messageId: Int) {
+    private fun showToast(
+        @StringRes messageId: Int,
+    ) {
         Toast.makeText(requireContext(), getString(messageId), Toast.LENGTH_LONG).show()
     }
 
     private fun createChangeUrlDialog(result: ShowUrlChangeDialog): AlertDialog {
-        val binding = ViewUrlChangeInputBinding.inflate(layoutInflater)
+        val binding = ViewUrlChangeInputBinding
+            .inflate(layoutInflater)
             .apply { loginUrlChangeInput.setText(result.currentUrl) }
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(IDR.string.login_change_url)
@@ -186,12 +191,10 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             .setNeutralButton(IDR.string.login_change_url_reset) { di, _ ->
                 viewModel.saveNewUrl(null)
                 di.dismiss()
-            }
-            .setPositiveButton(IDR.string.login_change_url_save) { di, _ ->
+            }.setPositiveButton(IDR.string.login_change_url_save) { di, _ ->
                 viewModel.saveNewUrl(binding.loginUrlChangeInput.text.toString())
                 di.dismiss()
-            }
-            .setNegativeButton(IDR.string.login_change_url_cancel) { di, _ -> di.dismiss() }
+            }.setNegativeButton(IDR.string.login_change_url_cancel) { di, _ -> di.dismiss() }
             .create()
     }
 
@@ -202,5 +205,4 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private fun finishWithError(error: LoginError) {
         findNavController().finishWithResult(this, LoginResult(false, error))
     }
-
 }

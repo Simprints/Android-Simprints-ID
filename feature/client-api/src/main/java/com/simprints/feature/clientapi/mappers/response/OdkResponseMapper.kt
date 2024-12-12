@@ -2,16 +2,15 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.feature.clientapi.models.OdkConstants
+import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
-import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import javax.inject.Inject
 
 internal class OdkResponseMapper @Inject constructor() {
-
     operator fun invoke(response: ActionResponse): Bundle = when (response) {
         is ActionResponse.EnrolActionResponse -> bundleOf(
             OdkConstants.ODK_REGISTRATION_ID_KEY to response.enrolledGuid,
@@ -53,7 +52,10 @@ internal class OdkResponseMapper @Inject constructor() {
         ).addFlowCompletedCheckBasedOnAction(response.actionIdentifier, response.flowCompleted)
     }
 
-    private fun Bundle.addFlowCompletedCheckBasedOnAction(action: ActionRequestIdentifier, flowCompletedCheck: Boolean) = apply {
+    private fun Bundle.addFlowCompletedCheckBasedOnAction(
+        action: ActionRequestIdentifier,
+        flowCompletedCheck: Boolean,
+    ) = apply {
         when (action.actionName) {
             ActionConstants.ACTION_ENROL -> putBoolean(OdkConstants.ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
             ActionConstants.ACTION_ENROL_LAST_BIOMETRICS -> putBoolean(OdkConstants.ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)

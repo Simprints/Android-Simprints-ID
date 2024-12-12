@@ -15,7 +15,6 @@ data class ScannerFirmwareUpdateEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endTime: Timestamp,
@@ -30,16 +29,14 @@ data class ScannerFirmwareUpdateEvent(
             endedAt = endTime,
             chip = chip,
             targetAppVersion = targetAppVersion,
-            failureReason = failureReason
+            failureReason = failureReason,
         ),
-        SCANNER_FIRMWARE_UPDATE
+        SCANNER_FIRMWARE_UPDATE,
     )
-
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ScannerFirmwareUpdatePayload(
@@ -51,13 +48,10 @@ data class ScannerFirmwareUpdateEvent(
         var failureReason: String? = null,
         override val type: EventType = SCANNER_FIRMWARE_UPDATE,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "chip: $chip, target version: $targetAppVersion, failure reason: $failureReason"
+        override fun toSafeString(): String = "chip: $chip, target version: $targetAppVersion, failure reason: $failureReason"
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

@@ -11,11 +11,11 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
     private val syncManager: EventSyncManager,
     private val configRepository: ConfigRepository,
 ) {
-
     suspend operator fun invoke(): Boolean = syncManager
         .getLastSyncTime()
         ?.let {
-            val thresholdMs = configRepository.getProjectConfiguration()
+            val thresholdMs = configRepository
+                .getProjectConfiguration()
                 .synchronization
                 .down
                 .maxAge

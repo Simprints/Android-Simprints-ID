@@ -16,7 +16,6 @@ import java.util.Date
 import java.util.UUID
 
 internal class RealmMigrations : AutomaticSchemaMigration {
-
     override fun migrate(migrationContext: AutomaticSchemaMigration.MigrationContext) {
         val oldVersion = migrationContext.oldRealm.schemaVersion()
         val newVersion = migrationContext.newRealm.schemaVersion()
@@ -49,8 +48,8 @@ internal class RealmMigrations : AutomaticSchemaMigration {
                         PERSON_TO_SYNC to oldObject.getValue(PERSON_TO_SYNC),
                         PERSON_FINGERPRINT_SAMPLES to oldObject.getValueList(PERSON_FINGERPRINT_SAMPLES, DbFingerprintSample::class),
                         PERSON_FACE_SAMPLES to oldObject.getValueList(PERSON_FACE_SAMPLES, DbFaceSample::class),
-                    )
-                )
+                    ),
+                ),
             )
         }
     }
@@ -74,7 +73,6 @@ internal class RealmMigrations : AutomaticSchemaMigration {
         updateDuplicatedSampleIds(migrationContext)
     }
 
-
     // In some projects there are duplicate records that are not orphans. Reason is still unclear
     // but probably two subjects point to the same sample id which is inserted twice in the table
     // For such cases we scan the two tables for duplicate ids and change them before making id
@@ -83,7 +81,13 @@ internal class RealmMigrations : AutomaticSchemaMigration {
         val oldRealm = migrationContext.oldRealm
         migrationContext.enumerate(SubjectsSchemaV11.FINGERPRINT_TABLE) { oldObject, newObject ->
             val id = oldObject.getValue<String>(SubjectsSchemaV12.FINGERPRINT_FIELD_ID)
-            val count = oldRealm.query(SubjectsSchemaV11.FINGERPRINT_TABLE, "${SubjectsSchemaV12.FINGERPRINT_FIELD_ID} == $0", id).count().find()
+            val count = oldRealm
+                .query(
+                    SubjectsSchemaV11.FINGERPRINT_TABLE,
+                    "${SubjectsSchemaV12.FINGERPRINT_FIELD_ID} == $0",
+                    id,
+                ).count()
+                .find()
             if (count > 1) {
                 newObject?.set(SubjectsSchemaV12.FINGERPRINT_FIELD_ID, UUID.randomUUID().toString())
             }

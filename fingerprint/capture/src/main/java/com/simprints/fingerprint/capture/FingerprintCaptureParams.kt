@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
 @Keep
 @Parcelize
 data class FingerprintCaptureParams(
-  val flowType: FlowType,
-  val fingerprintsToCapture: List<IFingerIdentifier>,
-  val fingerprintSDK: FingerprintConfiguration.BioSdk,
+    val flowType: FlowType,
+    val fingerprintsToCapture: List<IFingerIdentifier>,
+    val fingerprintSDK: FingerprintConfiguration.BioSdk,
 ) : Parcelable

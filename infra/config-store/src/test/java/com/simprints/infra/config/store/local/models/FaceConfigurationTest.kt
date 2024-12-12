@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.testtools.protoFaceConfiguration
 import org.junit.Test
 
 class FaceConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoFaceConfiguration.toDomain()).isEqualTo(faceConfiguration)
@@ -16,7 +15,8 @@ class FaceConfigurationTest {
 
     @Test
     fun `should map correctly the model with allowedAgeRange missing`() {
-        val protoFaceConfigurationWithoutAgeRange = protoFaceConfiguration.toBuilder()
+        val protoFaceConfigurationWithoutAgeRange = protoFaceConfiguration
+            .toBuilder()
             .setRankOne(protoFaceConfiguration.rankOne.toBuilder().clearAllowedAgeRange())
             .build()
 
@@ -27,7 +27,8 @@ class FaceConfigurationTest {
     fun `should map correctly the ImageSavingStrategy enums`() {
         val mapping = mapOf(
             ProtoFaceConfiguration.ImageSavingStrategy.NEVER to FaceConfiguration.ImageSavingStrategy.NEVER,
-            ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE to FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE,
+            ProtoFaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE to
+                FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE,
             ProtoFaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN to FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN,
         )
 

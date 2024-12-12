@@ -19,7 +19,6 @@ class StmOtaMessageInputStream @Inject constructor(
     private val stmOtaResponseParser: StmOtaResponseParser,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : MessageInputStream {
-
     var stmOtaResponseStream: Flowable<StmOtaResponse>? = null
 
     private var stmOtaResponseStreamDisposable: Disposable? = null
@@ -39,11 +38,10 @@ class StmOtaMessageInputStream @Inject constructor(
         stmOtaResponseStreamDisposable?.dispose()
     }
 
-    inline fun <reified R : StmOtaResponse> receiveResponse(): Single<R> =
-        Single.defer {
-            stmOtaResponseStream
-                ?.filterCast<R>()
-                ?.firstOrError()
-                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
-        }
+    inline fun <reified R : StmOtaResponse> receiveResponse(): Single<R> = Single.defer {
+        stmOtaResponseStream
+            ?.filterCast<R>()
+            ?.firstOrError()
+            ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
+    }
 }

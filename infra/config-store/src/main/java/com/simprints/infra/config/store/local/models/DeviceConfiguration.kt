@@ -8,23 +8,23 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 
 internal fun DeviceConfiguration.toProto(): ProtoDeviceConfiguration {
     val isTokenized = selectedModules.any { it is TokenizableString.Tokenized }
-    return ProtoDeviceConfiguration.newBuilder()
+    return ProtoDeviceConfiguration
+        .newBuilder()
         .setLanguage(
-            ProtoDeviceConfiguration.Language.newBuilder()
+            ProtoDeviceConfiguration.Language
+                .newBuilder()
                 .setLanguage(language)
-                .build()
-        )
-        .addAllModuleSelected(selectedModules.values())
+                .build(),
+        ).addAllModuleSelected(selectedModules.values())
         .setLastInstructionId(lastInstructionId)
         .setIsTokenized(isTokenized)
         .build()
 }
 
-internal fun ProtoDeviceConfiguration.toDomain(): DeviceConfiguration =
-    DeviceConfiguration(
-        language = language.language,
-        selectedModules = moduleSelectedList.map {
-            if (isTokenized) it.asTokenizableEncrypted() else it.asTokenizableRaw()
-        },
-        lastInstructionId = lastInstructionId
-    )
+internal fun ProtoDeviceConfiguration.toDomain(): DeviceConfiguration = DeviceConfiguration(
+    language = language.language,
+    selectedModules = moduleSelectedList.map {
+        if (isTokenized) it.asTokenizableEncrypted() else it.asTokenizableRaw()
+    },
+    lastInstructionId = lastInstructionId,
+)

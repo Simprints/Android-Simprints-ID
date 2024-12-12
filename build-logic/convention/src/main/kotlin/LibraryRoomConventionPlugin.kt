@@ -1,3 +1,4 @@
+import androidx.room.gradle.RoomExtension
 import com.android.build.api.dsl.LibraryExtension
 import common.configureDbEncryptionBuild
 import common.getLibs
@@ -8,7 +9,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import androidx.room.gradle.RoomExtension
 
 class LibraryRoomConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -21,7 +21,7 @@ class LibraryRoomConventionPlugin : Plugin<Project> {
             configureDbEncryptionBuild()
 
             extensions.configure<RoomExtension> {
-                //Required by Room to be able to export the db schemas
+                // Required by Room to be able to export the db schemas
                 schemaDirectory("$projectDir/schemas")
             }
 
@@ -48,5 +48,4 @@ class LibraryRoomConventionPlugin : Plugin<Project> {
             }
         }
     }
-
 }

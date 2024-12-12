@@ -12,19 +12,17 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInfo
 internal fun ScannerInformation.toScannerVersion() = ScannerVersion(
     hardwareVersion = hardwareVersion,
     generation = ScannerGeneration.VERO_2,
-    firmware = this.firmwareVersions.toScannerFirmwareVersions()
+    firmware = this.firmwareVersions.toScannerFirmwareVersions(),
 )
 
-internal fun ExtendedVersionInformation.toScannerFirmwareVersions() =
-    ScannerFirmwareVersions(
-        cypress = cypressFirmwareVersion.versionAsString,
-        stm = stmFirmwareVersion.versionAsString,
-        un20 = un20AppVersion.versionAsString
-    )
+internal fun ExtendedVersionInformation.toScannerFirmwareVersions() = ScannerFirmwareVersions(
+    cypress = cypressFirmwareVersion.versionAsString,
+    stm = stmFirmwareVersion.versionAsString,
+    un20 = un20AppVersion.versionAsString,
+)
 
-internal fun ScannerVersion.toExtendedVersionInformation() =
-    ExtendedVersionInformation(
-        cypressFirmwareVersion = CypressExtendedFirmwareVersion(firmware.cypress),
-        stmFirmwareVersion = StmExtendedFirmwareVersion(firmware.stm),
-        un20AppVersion = Un20ExtendedAppVersion(firmware.un20)
-    )
+internal fun ScannerVersion.toExtendedVersionInformation() = ExtendedVersionInformation(
+    cypressFirmwareVersion = CypressExtendedFirmwareVersion(firmware.cypress),
+    stmFirmwareVersion = StmExtendedFirmwareVersion(firmware.stm),
+    un20AppVersion = Un20ExtendedAppVersion(firmware.un20),
+)

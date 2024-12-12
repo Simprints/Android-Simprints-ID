@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class InvalidIntentEventTest {
-
     @Test
     fun create_InvalidIntentEvent() {
         val extras = mapOf("extra_key" to "value")

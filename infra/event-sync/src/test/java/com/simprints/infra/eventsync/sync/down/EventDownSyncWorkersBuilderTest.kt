@@ -34,9 +34,7 @@ import org.junit.Before
 import org.junit.Test
 
 class EventDownSyncWorkersBuilderTest {
-
     companion object {
-
         private val SELECTED_MODULE = listOf("MODULE_1".asTokenizableEncrypted())
     }
 
@@ -61,7 +59,7 @@ class EventDownSyncWorkersBuilderTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             SELECTED_MODULE,
-            ""
+            "",
         )
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
@@ -73,7 +71,7 @@ class EventDownSyncWorkersBuilderTest {
         eventDownSyncWorkersBuilder = EventDownSyncWorkersBuilder(
             eventDownSyncScopeRepository,
             JsonHelper,
-            configManager
+            configManager,
         )
     }
 
@@ -104,7 +102,7 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncPartitioning = Partitioning.USER
+                syncPartitioning = Partitioning.USER,
             )
         } returns SampleSyncScopes.userDownSyncScope
 
@@ -122,7 +120,7 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncPartitioning = Partitioning.MODULE
+                syncPartitioning = Partitioning.MODULE,
             )
         } returns SampleSyncScopes.modulesDownSyncScope
 
@@ -140,13 +138,14 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FACE),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncPartitioning = Partitioning.GLOBAL
+                syncPartitioning = Partitioning.GLOBAL,
             )
         } returns SampleSyncScopes.projectDownSyncScope
         val uniqueSyncId = "uniqueSyncId"
         val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain(uniqueSyncId, "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
-        chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+        chain
+            .first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
             .assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
     }
 
@@ -158,13 +157,14 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncPartitioning = Partitioning.GLOBAL
+                syncPartitioning = Partitioning.GLOBAL,
             )
         } returns SampleSyncScopes.projectDownSyncScope
 
         val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("", "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
-        chain.first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+        chain
+            .first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
             .assertSubjectsDownSyncDownloaderWorkerTagsForOneTime()
     }
 
@@ -192,24 +192,20 @@ class EventDownSyncWorkersBuilderTest {
     private fun WorkRequest.assertCommonDownSyncDownloadersWorkersTag() =
         assertThat(tags).contains(EventSyncWorkerType.tagForType(EventSyncWorkerType.DOWNLOADER))
 
-    private fun WorkRequest.assertUniqueMasterIdTag() =
-        assertThat(tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }).isNotNull()
+    private fun WorkRequest.assertUniqueMasterIdTag() = assertThat(tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }).isNotNull()
 
-    private fun WorkRequest.assertCommonSyncTag() =
-        assertThat(tags).contains(TAG_SUBJECTS_SYNC_ALL_WORKERS)
+    private fun WorkRequest.assertCommonSyncTag() = assertThat(tags).contains(TAG_SUBJECTS_SYNC_ALL_WORKERS)
 
-    private fun WorkRequest.assertCommonDownSyncTag() =
-        assertThat(tags).contains(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
+    private fun WorkRequest.assertCommonDownSyncTag() = assertThat(tags).contains(TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS)
 
-    private fun WorkRequest.assertScheduleAtTag() =
-        assertThat(tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
+    private fun WorkRequest.assertScheduleAtTag() = assertThat(tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
 
     private fun WorkRequest.assertUniqueDownSyncMasterTag() =
         assertThat(tags.firstOrNull { it.contains(TAG_DOWN_MASTER_SYNC_ID) }).isNotNull()
 
     private fun List<WorkRequest>.assertNumberOfDownSyncDownloaderWorkers(count: Int) =
         assertThat(count { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }).isEqualTo(
-            count
+            count,
         )
 
     private fun List<WorkRequest>.assertDownSyncDownloaderWorkerInput(
@@ -221,14 +217,15 @@ class EventDownSyncWorkersBuilderTest {
         val jsonHelper = JsonHelper
         val ops = downSyncScope.operations
         ops.forEach { op ->
-            assertThat(downloaders.any {
-                it.workSpec.input == workDataOf(
-                    INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(op),
-                    INPUT_EVENT_DOWN_SYNC_SCOPE_ID to scopeId
-                )
-            }).isTrue()
+            assertThat(
+                downloaders.any {
+                    it.workSpec.input == workDataOf(
+                        INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(op),
+                        INPUT_EVENT_DOWN_SYNC_SCOPE_ID to scopeId,
+                    )
+                },
+            ).isTrue()
         }
         assertThat(downloaders).hasSize(ops.size)
     }
-
 }

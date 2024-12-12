@@ -13,18 +13,17 @@ data class ParentalConsentOptions(
     @JsonProperty("consent_parent_share_data_yes") var consentParentShareDataYes: Boolean = false,
     @JsonProperty("consent_parent_collect_yes") var consentParentCollectYes: Boolean = false,
     @JsonProperty("consent_parent_privacy_rights") var consentParentPrivacyRights: Boolean = true,
-    @JsonProperty("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
+    @JsonProperty("consent_parent_confirmation") var consentParentConfirmation: Boolean = true,
 ) {
-    fun toDomain(): ConsentConfiguration.ConsentPromptConfiguration =
-        ConsentConfiguration.ConsentPromptConfiguration(
-            enrolmentVariant = if (consentParentEnrolOnly) {
-                ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY
-            } else {
-                ConsentConfiguration.ConsentEnrolmentVariant.STANDARD
-            },
-            dataSharedWithPartner = consentParentShareDataYes,
-            dataUsedForRAndD = consentParentCollectYes,
-            privacyRights = consentParentPrivacyRights,
-            confirmation = consentParentConfirmation,
-        )
+    fun toDomain(): ConsentConfiguration.ConsentPromptConfiguration = ConsentConfiguration.ConsentPromptConfiguration(
+        enrolmentVariant = if (consentParentEnrolOnly) {
+            ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY
+        } else {
+            ConsentConfiguration.ConsentEnrolmentVariant.STANDARD
+        },
+        dataSharedWithPartner = consentParentShareDataYes,
+        dataUsedForRAndD = consentParentCollectYes,
+        privacyRights = consentParentPrivacyRights,
+        confirmation = consentParentConfirmation,
+    )
 }

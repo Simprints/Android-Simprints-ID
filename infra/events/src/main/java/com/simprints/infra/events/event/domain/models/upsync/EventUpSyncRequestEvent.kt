@@ -17,7 +17,6 @@ data class EventUpSyncRequestEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endedAt: Timestamp,
@@ -36,7 +35,7 @@ data class EventUpSyncRequestEvent(
             errorType,
             EVENT_VERSION,
         ),
-        EventType.EVENT_UP_SYNC_REQUEST
+        EventType.EVENT_UP_SYNC_REQUEST,
     )
 
     @Keep
@@ -50,10 +49,8 @@ data class EventUpSyncRequestEvent(
         override val eventVersion: Int,
         override val type: EventType = EventType.EVENT_UP_SYNC_REQUEST,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "request ID: $requestId, response: $responseStatus, error: $errorType," +
-                "sessions: ${content.sessionCount}, eventsUp: ${content.eventUpSyncCount}, eventsDown: ${content.eventDownSyncCount}"
+        override fun toSafeString(): String = "request ID: $requestId, response: $responseStatus, error: $errorType," +
+            "sessions: ${content.sessionCount}, eventsUp: ${content.eventUpSyncCount}, eventsDown: ${content.eventDownSyncCount}"
     }
 
     @Keep
@@ -64,11 +61,10 @@ data class EventUpSyncRequestEvent(
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
-
     companion object {
-
         const val EVENT_VERSION = 0
     }
 }

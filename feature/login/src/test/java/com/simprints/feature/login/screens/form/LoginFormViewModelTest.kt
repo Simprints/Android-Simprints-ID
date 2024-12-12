@@ -28,7 +28,6 @@ import org.junit.Test
 import org.junit.rules.TestRule
 
 internal class LoginFormViewModelTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -44,7 +43,6 @@ internal class LoginFormViewModelTest {
     @MockK
     private lateinit var jsonHelper: JsonHelper
 
-
     private lateinit var viewModel: LoginFormViewModel
 
     @Before
@@ -58,7 +56,6 @@ internal class LoginFormViewModelTest {
             jsonHelper,
         )
     }
-
 
     @Test
     fun `returns MissingCredentials when empty user id`() {
@@ -235,8 +232,6 @@ internal class LoginFormViewModelTest {
     }
 
     companion object {
-
-
         private const val DEVICE_ID = "deviceId"
         private const val PROJECT_ID = "projectId"
         private val USER_ID = "userId".asTokenizableRaw()

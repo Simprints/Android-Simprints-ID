@@ -20,7 +20,6 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     @ApplicationContext ctx: Context,
     private val authStore: AuthStore,
 ) : DataMigration<ProtoProjectConfiguration> {
-
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     override suspend fun cleanUp() {
@@ -37,7 +36,8 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
         return try {
-            JsonHelper.fromJson<OldProjectConfig>(projectSettingsJson)
+            JsonHelper
+                .fromJson<OldProjectConfig>(projectSettingsJson)
                 .toDomain(authStore.signedInProjectId)
                 .toProto()
         } catch (e: Exception) {
@@ -52,9 +52,10 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         }
     }
 
-    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration): Boolean =
-        prefs.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
-            ?.isNotEmpty() == true && currentData.projectId.isEmpty()
+    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration): Boolean = prefs
+        .getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
+        ?.isNotEmpty() == true &&
+        currentData.projectId.isEmpty()
 
     companion object {
         @VisibleForTesting

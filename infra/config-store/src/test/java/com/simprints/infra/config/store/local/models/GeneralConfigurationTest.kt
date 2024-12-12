@@ -9,7 +9,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class GeneralConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoGeneralConfiguration.toDomain()).isEqualTo(generalConfiguration)
@@ -33,7 +32,7 @@ class GeneralConfigurationTest {
     fun `should map correctly the settings password`() {
         val mapping = mapOf(
             SettingsPasswordConfig.NotSet to "",
-            SettingsPasswordConfig.Locked("123") to "123"
+            SettingsPasswordConfig.Locked("123") to "123",
         )
 
         mapping.forEach { assertThat(it.key.toProto()).isEqualTo(it.value) }

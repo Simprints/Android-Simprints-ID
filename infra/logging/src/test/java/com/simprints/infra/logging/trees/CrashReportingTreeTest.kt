@@ -9,7 +9,6 @@ import org.junit.Test
 import timber.log.Timber
 
 class CrashReportingTreeTest {
-
     @Test
     fun `should return on VERBOSE priority`() {
         val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
@@ -52,9 +51,11 @@ class CrashReportingTreeTest {
         Simber.w("Test Message")
 
         verify {
-            crashMock.recordException(withArg {
-                it is Exception && it.message.contentEquals("Test Message")
-            })
+            crashMock.recordException(
+                withArg {
+                    it is Exception && it.message.contentEquals("Test Message")
+                },
+            )
         }
     }
 
@@ -85,9 +86,11 @@ class CrashReportingTreeTest {
         Simber.e("Test Message")
 
         verify {
-            crashMock.recordException(withArg {
-                it is Exception && it.message.contentEquals("Test Message")
-            })
+            crashMock.recordException(
+                withArg {
+                    it is Exception && it.message.contentEquals("Test Message")
+                },
+            )
         }
     }
 
@@ -121,6 +124,4 @@ class CrashReportingTreeTest {
             crashMock.setCustomKey("Custom_Tag", "Test Message")
         }
     }
-
-
 }

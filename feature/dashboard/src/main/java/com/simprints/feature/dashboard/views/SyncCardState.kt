@@ -1,7 +1,8 @@
 package com.simprints.feature.dashboard.views
 
-internal sealed class SyncCardState(open val lastTimeSyncSucceed: String?) {
-
+internal sealed class SyncCardState(
+    open val lastTimeSyncSucceed: String?,
+) {
     data class SyncDefault(
         override val lastTimeSyncSucceed: String?,
     ) : SyncCardState(lastTimeSyncSucceed)
@@ -14,13 +15,13 @@ internal sealed class SyncCardState(open val lastTimeSyncSucceed: String?) {
     data class SyncProgress(
         override val lastTimeSyncSucceed: String?,
         val progress: Int?,
-        val total: Int?
+        val total: Int?,
     ) : SyncCardState(lastTimeSyncSucceed)
 
     data class SyncConnecting(
         override val lastTimeSyncSucceed: String?,
         val progress: Int?,
-        val total: Int?
+        val total: Int?,
     ) : SyncCardState(lastTimeSyncSucceed)
 
     data class SyncFailed(
@@ -33,7 +34,7 @@ internal sealed class SyncCardState(open val lastTimeSyncSucceed: String?) {
 
     data class SyncFailedBackendMaintenance(
         override val lastTimeSyncSucceed: String?,
-        val estimatedOutage: Long? = null
+        val estimatedOutage: Long? = null,
     ) : SyncCardState(lastTimeSyncSucceed)
 
     data class SyncTooManyRequests(
@@ -56,4 +57,3 @@ internal sealed class SyncCardState(open val lastTimeSyncSucceed: String?) {
         override val lastTimeSyncSucceed: String?,
     ) : SyncCardState(lastTimeSyncSucceed)
 }
-

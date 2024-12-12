@@ -14,7 +14,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration15to16Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -34,12 +33,12 @@ class EventMigration15to16Test {
             insert(
                 EventMigration15to16.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_NONE,
-                eventWithFaceLicenseMissing
+                eventWithFaceLicenseMissing,
             )
             insert(
                 EventMigration15to16.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_NONE,
-                eventWithFaceLicenseInvalid
+                eventWithFaceLicenseInvalid,
             )
             close()
         }
@@ -47,19 +46,18 @@ class EventMigration15to16Test {
             EventMigration15to16.TABLE_NAME,
             16,
             true,
-            EventMigration15to16()
+            EventMigration15to16(),
         )
         MigrationTestingTools.retrieveCursorWithEventById(db, missingLicenseEventId).use { event ->
             // the event json doesn't contain FACE_LICENSE_MISSING
             assertThat(event.getStringWithColumnName("eventJson")).contains(
-                "\"type\":\"LICENSE_MISSING\""
+                "\"type\":\"LICENSE_MISSING\"",
             )
-
         }
         MigrationTestingTools.retrieveCursorWithEventById(db, invalidLicenseEventId).use { event ->
             // the event json doesn't contain FACE_LICENSE_INVALID
             assertThat(event.getStringWithColumnName("eventJson")).contains(
-                "\"type\":\"LICENSE_INVALID\""
+                "\"type\":\"LICENSE_INVALID\"",
             )
         }
         helper.closeWhenFinished(db)
@@ -73,7 +71,7 @@ class EventMigration15to16Test {
             insert(
                 EventMigration15to16.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_NONE,
-                eventWithDifferentError
+                eventWithDifferentError,
             )
             close()
         }
@@ -81,24 +79,25 @@ class EventMigration15to16Test {
             EventMigration15to16.TABLE_NAME,
             16,
             true,
-            EventMigration15to16()
+            EventMigration15to16(),
         )
         MigrationTestingTools.retrieveCursorWithEventById(db, "event-id-different").use { event ->
             // the event json doesn't contain FACE_LICENSE_MISSING or FACE_LICENSE_INVALID
             assertThat(event.getStringWithColumnName("eventJson")).contains(
-                "\"type\":\"DIFFERENT_ERROR\""
+                "\"type\":\"DIFFERENT_ERROR\"",
             )
         }
         helper.closeWhenFinished(db)
     }
 
-    private fun createEvent(id: String, errorType: String): ContentValues {
-        return ContentValues().apply {
-            put("id", id)
-            put("createdAt_unixMs", 0)
-            put("createdAt_isTrustworthy", 0)
-            put("type", "ALERT_SCREEN")
-            put("eventJson", "{\"type\":\"$errorType\"}")
-        }
+    private fun createEvent(
+        id: String,
+        errorType: String,
+    ): ContentValues = ContentValues().apply {
+        put("id", id)
+        put("createdAt_unixMs", 0)
+        put("createdAt_isTrustworthy", 0)
+        put("type", "ALERT_SCREEN")
+        put("eventJson", "{\"type\":\"$errorType\"}")
     }
 }

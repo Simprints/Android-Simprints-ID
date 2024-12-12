@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 class ProjectConfigurationSerializerTest {
-
     @Test
     fun `readFrom should return the ProtoProjectConfiguration when it's valid proto`() = runTest {
         val outputStream = ByteArrayOutputStream()

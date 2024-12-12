@@ -9,13 +9,12 @@ data class EnrolmentRecordMoveEvent(
     override val id: String,
     val payload: EnrolmentRecordMovePayload,
 ) : EnrolmentRecordEvent(id, EnrolmentRecordEventType.EnrolmentRecordMove) {
-
     constructor(
         enrolmentRecordCreation: EnrolmentRecordCreationInMove,
         enrolmentRecordDeletion: EnrolmentRecordDeletionInMove,
     ) : this(
         UUID.randomUUID().toString(),
-        EnrolmentRecordMovePayload(enrolmentRecordCreation, enrolmentRecordDeletion)
+        EnrolmentRecordMovePayload(enrolmentRecordCreation, enrolmentRecordDeletion),
     )
 
     data class EnrolmentRecordMovePayload(
@@ -24,7 +23,10 @@ data class EnrolmentRecordMoveEvent(
     )
 
     data class EnrolmentRecordDeletionInMove(
-        val subjectId: String, val projectId: String, val moduleId: TokenizableString, val attendantId: TokenizableString
+        val subjectId: String,
+        val projectId: String,
+        val moduleId: TokenizableString,
+        val attendantId: TokenizableString,
     )
 
     data class EnrolmentRecordCreationInMove(
@@ -32,6 +34,6 @@ data class EnrolmentRecordMoveEvent(
         val projectId: String,
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
-        val biometricReferences: List<BiometricReference>?
+        val biometricReferences: List<BiometricReference>?,
     )
 }

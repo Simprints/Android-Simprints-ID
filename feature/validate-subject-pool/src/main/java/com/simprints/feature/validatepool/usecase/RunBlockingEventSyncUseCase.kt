@@ -10,14 +10,18 @@ internal class RunBlockingEventSyncUseCase @Inject constructor(
     private val syncManager: EventSyncManager,
     private val syncOrchestrator: SyncOrchestrator,
 ) {
-
     suspend operator fun invoke() {
         // First item in the flow is the state of last sync,
         // so it can be used to as a filter out old sync states
-        val lastSyncId = syncManager.getLastSyncState().asFlow().firstOrNull()?.syncId
+        val lastSyncId = syncManager
+            .getLastSyncState()
+            .asFlow()
+            .firstOrNull()
+            ?.syncId
 
         syncOrchestrator.startEventSync()
-        syncManager.getLastSyncState()
+        syncManager
+            .getLastSyncState()
             .asFlow()
             .firstOrNull { it.syncId != lastSyncId && it.isSyncReporterCompleted() }
     }

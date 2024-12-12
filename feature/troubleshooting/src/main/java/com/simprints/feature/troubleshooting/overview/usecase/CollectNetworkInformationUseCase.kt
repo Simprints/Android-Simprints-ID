@@ -12,7 +12,6 @@ import javax.inject.Inject
 internal class CollectNetworkInformationUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
-
     operator fun invoke(): String {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
@@ -32,19 +31,19 @@ internal class CollectNetworkInformationUseCase @Inject constructor(
             Internet access: $connectionValidated)}
             Bandwidth up (kbps): ${networkCapabilities.linkUpstreamBandwidthKbps}
             Bandwidth down (kbps): ${networkCapabilities.linkDownstreamBandwidthKbps}
-        """.trimIndent()
+            """.trimIndent()
     }
 
-    private fun getSignalStrength(networkCapabilities: NetworkCapabilities): String =
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) "N/A"
-        else {
-            val strength = networkCapabilities.signalStrength
-            val description = when {
-                strength >= -50 -> "Excellent"
-                strength >= -70 -> "Good"
-                strength >= -80 -> "Fair"
-                else -> "Weak"
-            }
-            "$strength ($description)"
+    private fun getSignalStrength(networkCapabilities: NetworkCapabilities): String = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        "N/A"
+    } else {
+        val strength = networkCapabilities.signalStrength
+        val description = when {
+            strength >= -50 -> "Excellent"
+            strength >= -70 -> "Good"
+            strength >= -80 -> "Fair"
+            else -> "Weak"
         }
+        "$strength ($description)"
+    }
 }

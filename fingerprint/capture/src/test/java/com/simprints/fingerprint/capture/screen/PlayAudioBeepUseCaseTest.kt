@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.capture.screen
 
-
 import android.content.Context
 import android.media.MediaPlayer
 import io.mockk.*
@@ -8,7 +7,6 @@ import org.junit.Before
 import org.junit.Test
 
 class PlayAudioBeepUseCaseTest {
-
     private lateinit var playAudioBeepUseCase: PlayAudioBeepUseCase
     private val mockContext = mockk<Context>()
     private val mockMediaPlayer = mockk<MediaPlayer>(relaxed = true)
@@ -16,7 +14,7 @@ class PlayAudioBeepUseCaseTest {
     @Before
     fun setUp() {
         mockkStatic(MediaPlayer::class)
-        every { MediaPlayer.create(mockContext,any<Int>()) } returns mockMediaPlayer
+        every { MediaPlayer.create(mockContext, any<Int>()) } returns mockMediaPlayer
         playAudioBeepUseCase = PlayAudioBeepUseCase(mockContext)
     }
 
@@ -26,7 +24,7 @@ class PlayAudioBeepUseCaseTest {
         playAudioBeepUseCase()
 
         // Then
-        verify { MediaPlayer.create(mockContext,any<Int>()) }
+        verify { MediaPlayer.create(mockContext, any<Int>()) }
         verify { mockMediaPlayer.start() }
     }
 

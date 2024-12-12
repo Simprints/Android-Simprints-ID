@@ -4,9 +4,9 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.infra.scannermock.simulated.SimulatedScannerManager
 
-
-class SimulatedBluetoothAdapter(private val simulatedScannerManager: SimulatedScannerManager) : ComponentBluetoothAdapter {
-
+class SimulatedBluetoothAdapter(
+    private val simulatedScannerManager: SimulatedScannerManager,
+) : ComponentBluetoothAdapter {
     override fun isNull(): Boolean = simulatedScannerManager.isAdapterNull
 
     override fun isEnabled(): Boolean = simulatedScannerManager.isAdapterEnabled
@@ -16,5 +16,4 @@ class SimulatedBluetoothAdapter(private val simulatedScannerManager: SimulatedSc
     override fun cancelDiscovery(): Boolean = true
 
     override fun getBondedDevices(): Set<ComponentBluetoothDevice> = simulatedScannerManager.pairedScanners
-
 }

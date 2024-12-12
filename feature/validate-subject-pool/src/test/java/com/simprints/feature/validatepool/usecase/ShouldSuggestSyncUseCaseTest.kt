@@ -13,7 +13,6 @@ import org.junit.Test
 import java.util.Date
 
 class ShouldSuggestSyncUseCaseTest {
-
     @MockK
     lateinit var timeHelper: TimeHelper
 
@@ -44,7 +43,9 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery { syncManager.getLastSyncTime() } returns Date()
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns WEEK_MS
         coEvery {
-            configRepository.getProjectConfiguration().synchronization.down.maxAge
+            configRepository
+                .getProjectConfiguration()
+                .synchronization.down.maxAge
         } returns "PT24H"
 
         assertThat(usecase()).isTrue()
@@ -55,7 +56,9 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery { syncManager.getLastSyncTime() } returns Date()
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns WEEK_MS
         coEvery {
-            configRepository.getProjectConfiguration().synchronization.down.maxAge
+            configRepository
+                .getProjectConfiguration()
+                .synchronization.down.maxAge
         } returns "24h0m0s"
 
         assertThat(usecase()).isTrue()
@@ -66,14 +69,15 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery { syncManager.getLastSyncTime() } returns Date()
         coEvery { timeHelper.msBetweenNowAndTime(any()) } returns HOUR_MS
         coEvery {
-            configRepository.getProjectConfiguration().synchronization.down.maxAge
+            configRepository
+                .getProjectConfiguration()
+                .synchronization.down.maxAge
         } returns "PT24H"
 
         assertThat(usecase()).isFalse()
     }
 
     companion object {
-
         private const val HOUR_MS = 60 * 60 * 1000L
         private const val WEEK_MS = 7 * 24 * HOUR_MS
     }

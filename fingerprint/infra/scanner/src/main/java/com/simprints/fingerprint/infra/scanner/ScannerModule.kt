@@ -19,29 +19,27 @@ import dagger.hilt.components.SingletonComponent
 @Module(
     includes = [
         FingerprintDependenciesModule::class,
-    ]
+    ],
 )
 @InstallIn(SingletonComponent::class)
 abstract class ScannerModule {
-
     @Binds
     internal abstract fun provideScannerManager(impl: ScannerManagerImpl): ScannerManager
-
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 object FingerprintDependenciesModule {
-
     @Provides
-    fun provideNfcAdapter(@ApplicationContext context: Context): ComponentNfcAdapter =
-        AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(context))
+    fun provideNfcAdapter(
+        @ApplicationContext context: Context,
+    ): ComponentNfcAdapter = AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(context))
 
     @Provides
     fun providePacketRouter(): PacketRouter = PacketRouter(
         listOf(Route.Remote.VeroServer, Route.Remote.VeroEvent, Route.Remote.Un20Server),
         { source },
         ByteArrayToPacketAccumulator(PacketParser()),
-        provideDispatcherIo()
+        provideDispatcherIo(),
     )
 }

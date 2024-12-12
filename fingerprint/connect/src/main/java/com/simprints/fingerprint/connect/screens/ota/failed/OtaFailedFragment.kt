@@ -18,14 +18,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
-
 /**
  * This fragment is show when an Over The Air update fails,
  * have a look at the readme for more details - /connect/README.md
  */
 @AndroidEntryPoint
 internal class OtaFailedFragment : Fragment(R.layout.fragment_ota_failed) {
-
     private val args by navArgs<OtaFailedFragmentArgs>()
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentOtaFailedBinding::bind)
@@ -36,11 +34,13 @@ internal class OtaFailedFragment : Fragment(R.layout.fragment_ota_failed) {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_ota_failed, container, false)
+        savedInstanceState: Bundle?,
+    ): View? = inflater.inflate(R.layout.fragment_ota_failed, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         screenReporter.reportOtaFailed()
         connectScannerViewModel.setBackButtonToExitWithError()
@@ -57,11 +57,13 @@ internal class OtaFailedFragment : Fragment(R.layout.fragment_ota_failed) {
             if (fetchOtaResult.estimatedOutage != null && fetchOtaResult.estimatedOutage != 0L) {
                 getString(
                     IDR.string.error_backend_maintenance_with_time_message,
-                    getFormattedEstimatedOutage(fetchOtaResult.estimatedOutage)
+                    getFormattedEstimatedOutage(fetchOtaResult.estimatedOutage),
                 )
             } else {
                 getString(IDR.string.error_backend_maintenance_message)
             }
-        } else getString(IDR.string.fingerprint_connect_ota_failed_instructions)
+        } else {
+            getString(IDR.string.fingerprint_connect_ota_failed_instructions)
+        }
     }
 }

@@ -11,5 +11,4 @@ import javax.inject.Singleton
 @Singleton
 internal class ProcessedImageCache @Inject constructor() {
     var recentlyCapturedImage: ByteArray? = null
-
 }

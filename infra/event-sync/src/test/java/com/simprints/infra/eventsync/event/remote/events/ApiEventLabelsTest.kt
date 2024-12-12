@@ -10,7 +10,6 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import org.junit.Test
 
 class ApiEventLabelsTest {
-
     @Test
     fun create_ApiEventLabels() {
         val apiEventLabels = ApiEventLabels().apply {

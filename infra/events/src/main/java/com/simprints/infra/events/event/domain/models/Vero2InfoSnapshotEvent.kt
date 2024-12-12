@@ -17,7 +17,6 @@ data class Vero2InfoSnapshotEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         version: Vero2Version.Vero2NewApiVersion,
@@ -28,31 +27,29 @@ data class Vero2InfoSnapshotEvent(
             createdAt = createdAt,
             eventVersion = NEW_EVENT_VERSION,
             battery = battery,
-            version = version
+            version = version,
         ),
-        VERO_2_INFO_SNAPSHOT
+        VERO_2_INFO_SNAPSHOT,
     )
-
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "eventVersion",
-        visible = true
+        visible = true,
     )
     @JsonSubTypes(
         JsonSubTypes.Type(
             value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi::class,
-            name = NEW_EVENT_VERSION.toString()
+            name = NEW_EVENT_VERSION.toString(),
         ),
         JsonSubTypes.Type(
             value = Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi::class,
-            name = OLD_EVENT_VERSION.toString()
+            name = OLD_EVENT_VERSION.toString(),
         ),
     )
     @Keep
@@ -64,25 +61,25 @@ data class Vero2InfoSnapshotEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = VERO_2_INFO_SNAPSHOT,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "battery charge: ${battery.charge}, " +
-            version.let { it as? Vero2Version.Vero2NewApiVersion }?.let {
-                "hardware: ${it.hardwareRevision}, cypress: ${it.cypressApp},  stm: ${it.stmApp}, un20: ${it.un20App}"
-            }.orEmpty()
+            version
+                .let { it as? Vero2Version.Vero2NewApiVersion }
+                ?.let {
+                    "hardware: ${it.hardwareRevision}, cypress: ${it.cypressApp},  stm: ${it.stmApp}, un20: ${it.un20App}"
+                }.orEmpty()
 
         @Keep
         data class Vero2InfoSnapshotPayloadForNewApi(
             override val createdAt: Timestamp,
             override val eventVersion: Int,
             override val battery: BatteryInfo,
-            override val version: Vero2Version.Vero2NewApiVersion
+            override val version: Vero2Version.Vero2NewApiVersion,
         ) : Vero2InfoSnapshotPayload(
-            createdAt,
-            eventVersion,
-            battery,
-            version
-        )
-
+                createdAt,
+                eventVersion,
+                battery,
+                version,
+            )
 
         @Deprecated(message = "Only used for backwards compatibility")
         @Keep
@@ -90,14 +87,13 @@ data class Vero2InfoSnapshotEvent(
             override val createdAt: Timestamp,
             override val eventVersion: Int,
             override val battery: BatteryInfo,
-            override val version: Vero2Version.Vero2OldApiVersion
+            override val version: Vero2Version.Vero2OldApiVersion,
         ) : Vero2InfoSnapshotPayload(
-            createdAt,
-            eventVersion,
-            battery,
-            version
-        )
-
+                createdAt,
+                eventVersion,
+                battery,
+                version,
+            )
     }
 
     sealed class Vero2Version {
@@ -107,9 +103,8 @@ data class Vero2InfoSnapshotEvent(
             val cypressApp: String,
             val stmApp: String,
             val un20App: String,
-            val master: Long = 0
+            val master: Long = 0,
         ) : Vero2Version()
-
 
         @Deprecated(message = "Only used for backwards compatibility")
         @Keep
@@ -120,7 +115,7 @@ data class Vero2InfoSnapshotEvent(
             val stmApi: String,
             val un20App: String,
             val un20Api: String,
-            val master: Long
+            val master: Long,
         ) : Vero2Version()
     }
 
@@ -129,7 +124,7 @@ data class Vero2InfoSnapshotEvent(
         val charge: Int,
         val voltage: Int,
         val current: Int,
-        val temperature: Int
+        val temperature: Int,
     )
 
     companion object {
@@ -137,4 +132,3 @@ data class Vero2InfoSnapshotEvent(
         const val OLD_EVENT_VERSION = 2
     }
 }
-

@@ -21,17 +21,17 @@ internal data class ApiAuthenticationPayload(
     val userInfo: ApiUserInfo,
     val result: ApiResult,
 ) : ApiEventPayload(startTime) {
-
     @Keep
-    data class ApiUserInfo(val projectId: String, val userId: String) {
-
+    data class ApiUserInfo(
+        val projectId: String,
+        val userId: String,
+    ) {
         constructor(userInfoDomain: AuthenticationPayload.UserInfo) :
             this(userInfoDomain.projectId, userInfoDomain.userId.value)
     }
 
     @Keep
     enum class ApiResult {
-
         AUTHENTICATED,
         BAD_CREDENTIALS,
         OFFLINE,
@@ -39,33 +39,30 @@ internal data class ApiAuthenticationPayload(
         TECHNICAL_FAILURE,
         INTEGRITY_SERVICE_ERROR,
         INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR,
-        MISSING_OR_OUTDATED_PLAY_STORE_ERROR
+        MISSING_OR_OUTDATED_PLAY_STORE_ERROR,
     }
 
     constructor(domainPayload: AuthenticationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
         ApiUserInfo(domainPayload.userInfo),
-        domainPayload.result.fromDomainToApi()
+        domainPayload.result.fromDomainToApi(),
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        when (tokenKeyType) {
-            TokenKeyType.AttendantId -> "userInfo.userId"
-            else -> null
-        }
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
+        TokenKeyType.AttendantId -> "userInfo.userId"
+        else -> null
+    }
 }
 
-
-internal fun AuthenticationPayload.Result.fromDomainToApi() =
-    when (this) {
-        AUTHENTICATED -> ApiResult.AUTHENTICATED
-        BAD_CREDENTIALS -> ApiResult.BAD_CREDENTIALS
-        OFFLINE -> ApiResult.OFFLINE
-        TECHNICAL_FAILURE -> ApiResult.TECHNICAL_FAILURE
-        INTEGRITY_SERVICE_ERROR -> ApiResult.INTEGRITY_SERVICE_ERROR
-        INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR -> ApiResult.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR
-        MISSING_OR_OUTDATED_PLAY_STORE_ERROR -> ApiResult.MISSING_OR_OUTDATED_PLAY_STORE_ERROR
-        BACKEND_MAINTENANCE_ERROR -> ApiResult.BACKEND_MAINTENANCE_ERROR
-        UNKNOWN -> ApiResult.TECHNICAL_FAILURE
-    }
+internal fun AuthenticationPayload.Result.fromDomainToApi() = when (this) {
+    AUTHENTICATED -> ApiResult.AUTHENTICATED
+    BAD_CREDENTIALS -> ApiResult.BAD_CREDENTIALS
+    OFFLINE -> ApiResult.OFFLINE
+    TECHNICAL_FAILURE -> ApiResult.TECHNICAL_FAILURE
+    INTEGRITY_SERVICE_ERROR -> ApiResult.INTEGRITY_SERVICE_ERROR
+    INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR -> ApiResult.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR
+    MISSING_OR_OUTDATED_PLAY_STORE_ERROR -> ApiResult.MISSING_OR_OUTDATED_PLAY_STORE_ERROR
+    BACKEND_MAINTENANCE_ERROR -> ApiResult.BACKEND_MAINTENANCE_ERROR
+    UNKNOWN -> ApiResult.TECHNICAL_FAILURE
+}

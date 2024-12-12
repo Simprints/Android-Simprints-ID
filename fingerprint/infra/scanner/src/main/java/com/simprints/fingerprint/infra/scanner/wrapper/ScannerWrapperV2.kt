@@ -16,8 +16,8 @@ import com.simprints.fingerprint.infra.scanner.helpers.ScannerInitialSetupHelper
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
-import com.simprints.fingerprint.infra.scanner.v2.tools.runWithErrorWrapping
 import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
+import com.simprints.fingerprint.infra.scanner.v2.tools.runWithErrorWrapping
 import com.simprints.fingerprint.infra.scanner.v2.tools.wrapErrorFromScanner
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import io.reactivex.Observer
@@ -38,7 +38,6 @@ internal class ScannerWrapperV2(
     private val connectionHelper: ConnectionHelper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ScannerWrapper {
-
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null
 
@@ -58,10 +57,10 @@ internal class ScannerWrapperV2(
 
     override fun isImageTransferSupported(): Boolean = true
 
-    override suspend fun connect() =
-        connectionHelper.connectScanner(scannerV2, macAddress).mapPotentialErrorFromScanner()
-            .collect()
-
+    override suspend fun connect() = connectionHelper
+        .connectScanner(scannerV2, macAddress)
+        .mapPotentialErrorFromScanner()
+        .collect()
 
     /**
      * This function runs check of available firmware updates, and in turn reads and sets the
@@ -71,17 +70,15 @@ internal class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      * @throws OtaFailedException
      */
-    override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) =
-        runWithErrorWrapping {
-            scannerInitialSetupHelper.setupScannerWithOtaCheck(
-                fingerprintSdk,
-                scannerV2,
-                macAddress,
-                { scannerVersion = it },
-                { batteryInfo = it }
-            )
-
-        }
+    override suspend fun setScannerInfoAndCheckAvailableOta(fingerprintSdk: FingerprintConfiguration.BioSdk) = runWithErrorWrapping {
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(
+            fingerprintSdk,
+            scannerV2,
+            macAddress,
+            { scannerVersion = it },
+            { batteryInfo = it },
+        )
+    }
 
     override suspend fun disconnect() = runWithErrorWrapping {
         connectionHelper.disconnectScanner(scannerV2)
@@ -101,7 +98,6 @@ internal class ScannerWrapperV2(
     override suspend fun sensorWakeUp() = runWithErrorWrapping {
         scannerV2.ensureUn20State(true)
     }
-
 
     /**
      * This function turns off the Un20 sensor (fingerprint sensor), by specifying what state it
@@ -133,7 +129,7 @@ internal class ScannerWrapperV2(
         while (scope.isActive) {
             scannerV2.getImageQualityPreview()?.let { quality ->
                 scannerV2.setSmileLedState(
-                    scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality)
+                    scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality),
                 )
             }
             // add a delay to prevent the scanner from being overwhelmed
@@ -150,7 +146,6 @@ internal class ScannerWrapperV2(
             throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
         }
     }
-
 
     private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) = runWithErrorWrapping {
         getUn20Status().let { actualState ->
@@ -172,13 +167,12 @@ internal class ScannerWrapperV2(
     override fun registerTriggerListener(triggerListener: ScannerTriggerListener) {
         triggerListenerToObserverMap[triggerListener] = object : DisposableObserver<Unit>() {
             override fun onComplete() {}
+
             override fun onNext(t: Unit) {
                 triggerListener.onTrigger()
             }
 
-            override fun onError(e: Throwable) {
-                throw wrapErrorFromScanner(e)
-            }
+            override fun onError(e: Throwable): Unit = throw wrapErrorFromScanner(e)
         }.also { scannerV2.triggerButtonListeners.add(it) }
     }
 

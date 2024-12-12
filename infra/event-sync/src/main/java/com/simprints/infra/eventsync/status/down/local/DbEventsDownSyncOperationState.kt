@@ -12,16 +12,14 @@ internal data class DbEventsDownSyncOperationState(
     @PrimaryKey var id: String,
     val lastState: DownSyncState?,
     val lastEventId: String?,
-    val lastUpdatedTime: Long?
+    val lastUpdatedTime: Long?,
 ) {
-
     companion object {
-        fun buildFromEventsDownSyncOperationState(op: EventDownSyncOperation) =
-            DbEventsDownSyncOperationState(
-                op.getUniqueKey(),
-                op.state,
-                op.lastEventId,
-                op.lastSyncTime
-            )
+        fun buildFromEventsDownSyncOperationState(op: EventDownSyncOperation) = DbEventsDownSyncOperationState(
+            op.getUniqueKey(),
+            op.state,
+            op.lastEventId,
+            op.lastSyncTime,
+        )
     }
 }

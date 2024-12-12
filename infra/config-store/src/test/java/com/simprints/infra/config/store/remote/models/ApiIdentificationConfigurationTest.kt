@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.testtools.identificationConfiguration
 import org.junit.Test
 
 class ApiIdentificationConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiIdentificationConfiguration.toDomain()).isEqualTo(identificationConfiguration)

@@ -11,13 +11,14 @@ import javax.inject.Inject
 /**
  * Can be removed once all the devices have been updated to 2022.3.0
  */
-internal class RecentUserActivitySharedPrefsMigration @Inject constructor(@ApplicationContext ctx: Context) :
-    DataMigration<ProtoRecentUserActivity> {
-
+internal class RecentUserActivitySharedPrefsMigration @Inject constructor(
+    @ApplicationContext ctx: Context,
+) : DataMigration<ProtoRecentUserActivity> {
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     override suspend fun cleanUp() {
-        prefs.edit()
+        prefs
+            .edit()
             .remove(ENROLMENTS_KEY)
             .remove(IDENTIFICATIONS_KEY)
             .remove(VERIFICATIONS_KEY)
@@ -31,7 +32,8 @@ internal class RecentUserActivitySharedPrefsMigration @Inject constructor(@Appli
 
     override suspend fun migrate(currentData: ProtoRecentUserActivity): ProtoRecentUserActivity {
         Simber.i("Start migration of recent user activity to Datastore")
-        return currentData.toBuilder()
+        return currentData
+            .toBuilder()
             .setEnrolmentsToday(prefs.getInt(ENROLMENTS_KEY, 0))
             .setIdentificationsToday(prefs.getInt(IDENTIFICATIONS_KEY, 0))
             .setVerificationsToday(prefs.getInt(VERIFICATIONS_KEY, 0))

@@ -7,9 +7,8 @@ import javax.inject.Singleton
 
 @Singleton
 internal class ConnectivityTrackerImpl @Inject constructor(
-    private val connectivityManagerWrapper: ConnectivityManagerWrapper
+    private val connectivityManagerWrapper: ConnectivityManagerWrapper,
 ) : ConnectivityTracker {
-
     private val isConnectedLiveData by lazy { ConnectivityLiveData(connectivityManagerWrapper) }
 
     override fun observeIsConnected(): LiveData<Boolean> = isConnectedLiveData

@@ -8,10 +8,9 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 
 class PipelineDeployConventionPlugin : Plugin<Project> {
-
     override fun apply(target: Project) {
         with(target) {
-            apply(from = "${rootDir}/build-logic/signing_info.gradle.kts")
+            apply(from = "$rootDir/build-logic/signing_info.gradle.kts")
             val props = extra.properties
 
             with(pluginManager) {
@@ -32,7 +31,6 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         storeFile = file(props["store_file"] as String)
                         storePassword = props["store_password"] as String
                     }
-
                 }
 
                 buildFeatures.buildConfig = true
@@ -58,7 +56,6 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                                 "$rootDir/id/src/serviceCredentialsFile.json"
                             groups = "pre-release-testers"
                         }
-
                     }
                 }
             }

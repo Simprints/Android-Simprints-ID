@@ -9,7 +9,6 @@ import java.io.OutputStream
  * for connect, reading & writing to a Bluetooth Socket.
  */
 interface ComponentBluetoothSocket {
-
     @Throws(IOException::class)
     fun connect()
 

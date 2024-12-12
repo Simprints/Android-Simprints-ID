@@ -22,7 +22,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
-
     private var handlingNfcEnabled = false
 
     private val binding by viewBinding(FragmentNfcOffBinding::bind)
@@ -39,7 +38,10 @@ internal class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         screenReporter.reportNfcNotEnabled()
 
@@ -66,8 +68,8 @@ internal class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
         binding.turnOnNfcButton.setBackgroundColor(
             resources.getColor(
                 IDR.color.simprints_green,
-                null
-            )
+                null,
+            ),
         )
         lifecycleScope.launch {
             delay(FINISHED_TIME_DELAY_MS)

@@ -5,7 +5,7 @@ internal data class ScanResult(
     val template: ByteArray,
     val templateFormat: String,
     val image: ByteArray?,
-    private val qualityThreshold: Int
+    private val qualityThreshold: Int,
 ) {
     fun isGoodScan() = qualityScore >= qualityThreshold
 
@@ -27,7 +27,9 @@ internal data class ScanResult(
         if (image != null) {
             if (other.image == null) return false
             if (!image.contentEquals(other.image)) return false
-        } else if (other.image != null) return false
+        } else if (other.image != null) {
+            return false
+        }
 
         return true
     }

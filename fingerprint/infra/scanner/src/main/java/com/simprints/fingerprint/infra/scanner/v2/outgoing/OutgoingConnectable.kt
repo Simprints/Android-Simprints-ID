@@ -8,7 +8,7 @@ import java.io.OutputStream
  * are to be used for setting-up and releasing resources appropriately.
  */
 interface OutgoingConnectable {
-
     fun connect(outputStream: OutputStream)
+
     fun disconnect()
 }

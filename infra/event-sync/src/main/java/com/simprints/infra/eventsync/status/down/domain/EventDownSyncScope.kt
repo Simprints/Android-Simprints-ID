@@ -12,30 +12,30 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope.ProjectSc
     use = JsonTypeInfo.Id.CLASS,
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
-    visible = true
+    visible = true,
 )
 @JsonSubTypes(
     JsonSubTypes.Type(value = ProjectScope::class),
     JsonSubTypes.Type(value = SubjectUserScope::class),
-    JsonSubTypes.Type(value = SubjectModuleScope::class)
+    JsonSubTypes.Type(value = SubjectModuleScope::class),
 )
 @Keep
-internal sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation> = mutableListOf()) {
-
+internal sealed class EventDownSyncScope(
+    open var operations: List<EventDownSyncOperation> = mutableListOf(),
+) {
     @Keep
     data class SubjectProjectScope(
         val projectId: String,
-        val modes: List<Modes>
+        val modes: List<Modes>,
     ) : EventDownSyncScope() {
-
         override var operations =
             listOf(
                 EventDownSyncOperation(
                     RemoteEventQuery(
                         projectId,
                         modes = modes,
-                    )
-                )
+                    ),
+                ),
             )
     }
 
@@ -43,9 +43,8 @@ internal sealed class EventDownSyncScope(open var operations: List<EventDownSync
     data class SubjectUserScope(
         val projectId: String,
         val attendantId: String,
-        val modes: List<Modes>
+        val modes: List<Modes>,
     ) : EventDownSyncScope() {
-
         override var operations =
             listOf(
                 EventDownSyncOperation(
@@ -53,8 +52,8 @@ internal sealed class EventDownSyncScope(open var operations: List<EventDownSync
                         projectId,
                         attendantId = attendantId,
                         modes = modes,
-                    )
-                )
+                    ),
+                ),
             )
     }
 
@@ -62,9 +61,8 @@ internal sealed class EventDownSyncScope(open var operations: List<EventDownSync
     data class SubjectModuleScope(
         val projectId: String,
         val moduleIds: List<String>,
-        val modes: List<Modes>
+        val modes: List<Modes>,
     ) : EventDownSyncScope() {
-
         override var operations =
             moduleIds.map {
                 EventDownSyncOperation(
@@ -72,9 +70,8 @@ internal sealed class EventDownSyncScope(open var operations: List<EventDownSync
                         projectId,
                         moduleId = it,
                         modes = modes,
-                    )
+                    ),
                 )
             }
-
     }
 }

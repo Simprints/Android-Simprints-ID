@@ -2,5 +2,5 @@ package com.simprints.fingerprint.capture.exceptions
 
 internal class FingerprintUnexpectedException(
     message: String,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : RuntimeException(message, cause)

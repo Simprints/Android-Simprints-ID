@@ -15,9 +15,7 @@ data class AlertButtonConfig(
     val resultKey: String?,
     val closeOnClick: Boolean,
 ) : Parcelable {
-
     companion object {
-
         val Close = AlertButtonConfig(
             text = null,
             textRes = IDR.string.alert_button_close,

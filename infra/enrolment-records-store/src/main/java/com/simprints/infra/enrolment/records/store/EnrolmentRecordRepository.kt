@@ -11,6 +11,7 @@ import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDat
 @ExcludedFromGeneratedTestCoverageReports("This is an interface with no logic")
 interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
     suspend fun uploadRecords(subjectIds: List<String>)
+
     suspend fun tokenizeExistingRecords(project: Project)
 
     override suspend fun count(
@@ -18,13 +19,13 @@ interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
         dataSource: BiometricDataSource,
     ): Int
 
-    override  suspend fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
     ): List<FingerprintIdentity>
 
-    override  suspend fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,

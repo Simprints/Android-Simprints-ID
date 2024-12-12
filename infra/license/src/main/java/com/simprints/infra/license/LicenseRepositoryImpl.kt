@@ -17,7 +17,6 @@ internal class LicenseRepositoryImpl @Inject constructor(
     private val licenseLocalDataSource: LicenseLocalDataSource,
     private val licenseRemoteDataSource: LicenseRemoteDataSource,
 ) : LicenseRepository {
-
     override fun redownloadLicence(
         projectId: String,
         deviceId: String,
@@ -39,7 +38,8 @@ internal class LicenseRepositoryImpl @Inject constructor(
         val license = licenseLocalDataSource.getLicense(licenseVendor)
         if (license == null || licenseVendor.versionComparator.compare(license.version.value, requiredVersion.value) < 0) {
             emit(LicenseState.Downloading)
-            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor, requiredVersion)
+            licenseRemoteDataSource
+                .getLicense(projectId, deviceId, licenseVendor, requiredVersion)
                 .let { result ->
                     when (result) {
                         is ApiLicenseResult.Success -> handleLicenseResultSuccess(
@@ -48,12 +48,12 @@ internal class LicenseRepositoryImpl @Inject constructor(
                                 result.license.expiration,
                                 result.license.data,
                                 LicenseVersion(result.license.version),
-                            )
+                            ),
                         )
 
                         is ApiLicenseResult.Error -> handleLicenseResultError(result)
                         is ApiLicenseResult.BackendMaintenanceError -> handleLicenseResultBackendMaintenanceError(
-                            result
+                            result,
                         )
                     }
                 }
@@ -68,13 +68,11 @@ internal class LicenseRepositoryImpl @Inject constructor(
      * @param licenseVendor
      * @return cached license as [String]
      */
-    override suspend fun getCachedLicense(licenseVendor: Vendor) =
-        licenseLocalDataSource.getLicense(licenseVendor)
-
+    override suspend fun getCachedLicense(licenseVendor: Vendor) = licenseLocalDataSource.getLicense(licenseVendor)
 
     private suspend fun FlowCollector<LicenseState>.handleLicenseResultSuccess(
         licenseVendor: Vendor,
-        apiLicenseResult: License
+        apiLicenseResult: License,
     ) {
         licenseLocalDataSource.saveLicense(licenseVendor, apiLicenseResult)
         emit(LicenseState.FinishedWithSuccess(apiLicenseResult))
@@ -85,7 +83,7 @@ internal class LicenseRepositoryImpl @Inject constructor(
     }
 
     private suspend fun FlowCollector<LicenseState>.handleLicenseResultBackendMaintenanceError(
-        apiLicenseResult: ApiLicenseResult.BackendMaintenanceError
+        apiLicenseResult: ApiLicenseResult.BackendMaintenanceError,
     ) {
         emit(LicenseState.FinishedWithBackendMaintenanceError(apiLicenseResult.estimatedOutage))
     }

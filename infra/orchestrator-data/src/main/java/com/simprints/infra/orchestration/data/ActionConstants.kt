@@ -1,7 +1,6 @@
 package com.simprints.infra.orchestration.data
 
 object ActionConstants {
-
     const val ACTION_ENROL = "REGISTER"
     const val ACTION_IDENTIFY = "IDENTIFY"
     const val ACTION_VERIFY = "VERIFY"

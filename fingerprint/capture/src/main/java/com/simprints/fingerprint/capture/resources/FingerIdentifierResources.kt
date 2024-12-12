@@ -1,12 +1,11 @@
 package com.simprints.fingerprint.capture.resources
 
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.simprints.infra.resources.R as IDR
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes

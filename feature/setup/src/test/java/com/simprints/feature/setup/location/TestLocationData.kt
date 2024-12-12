@@ -3,7 +3,6 @@ package com.simprints.feature.setup.location
 import android.location.Location
 
 internal object TestLocationData {
-
     fun buildFakeLocation() = Location(PROVIDER).apply {
         longitude = LNG
         latitude = LAT

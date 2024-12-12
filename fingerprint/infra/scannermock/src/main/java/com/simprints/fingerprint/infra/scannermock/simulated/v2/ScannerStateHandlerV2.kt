@@ -33,7 +33,7 @@ fun SimulatedScannerStateV2.updateStateAccordingToOutgoingMessage(command: Outgo
                     versionInfo = command.version
                 }
                 else -> {
-                    /* do nothing */
+                    // do nothing
                 }
             }
         }
@@ -55,7 +55,7 @@ fun SimulatedScannerStateV2.updateStateAccordingToOutgoingMessage(command: Outgo
                     smileLedState = command.smileLedState
                 }
                 else -> {
-                    /* do nothing */
+                    // do nothing
                 }
             }
         }
@@ -67,7 +67,7 @@ fun SimulatedScannerStateV2.updateStateAccordingToOutgoingMessage(command: Outgo
             }
         }
         else -> {
-            /* do nothing */
+            // do nothing
         }
     }
 }

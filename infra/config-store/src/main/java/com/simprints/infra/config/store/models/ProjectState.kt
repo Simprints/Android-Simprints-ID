@@ -4,5 +4,5 @@ enum class ProjectState {
     RUNNING,
     PROJECT_PAUSED,
     PROJECT_ENDING,
-    PROJECT_ENDED;
+    PROJECT_ENDED,
 }

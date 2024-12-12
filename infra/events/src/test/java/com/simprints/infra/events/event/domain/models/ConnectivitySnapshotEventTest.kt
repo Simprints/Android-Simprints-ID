@@ -9,14 +9,13 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class ConnectivitySnapshotEventTest {
-
     @Test
     fun create_ConnectivitySnapshotEvent() {
         val connectionState = listOf(
             Connection(
                 SimNetworkUtils.ConnectionType.MOBILE,
-                SimNetworkUtils.ConnectionState.CONNECTED
-            )
+                SimNetworkUtils.ConnectionState.CONNECTED,
+            ),
         )
         val event = ConnectivitySnapshotEvent(
             CREATED_AT,
@@ -32,5 +31,4 @@ class ConnectivitySnapshotEventTest {
             assertThat(connections).isEqualTo(connectionState)
         }
     }
-
 }

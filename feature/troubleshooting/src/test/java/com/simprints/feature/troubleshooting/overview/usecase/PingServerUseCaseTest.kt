@@ -18,7 +18,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class PingServerUseCaseTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -33,7 +32,6 @@ class PingServerUseCaseTest {
 
     @MockK
     private lateinit var urlFactory: PingServerUseCase.UrlFactory
-
 
     private lateinit var useCase: PingServerUseCase
 
@@ -79,5 +77,4 @@ class PingServerUseCaseTest {
         assertThat(result.first()).isInstanceOf(PingResult.InProgress::class.java)
         assertThat(result.last()).isInstanceOf(PingResult.Failure::class.java)
     }
-
 }

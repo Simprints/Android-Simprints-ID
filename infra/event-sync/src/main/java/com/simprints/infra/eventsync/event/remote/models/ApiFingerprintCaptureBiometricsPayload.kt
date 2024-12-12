@@ -11,7 +11,6 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
     val fingerprint: Fingerprint,
     val id: String,
 ) : ApiEventPayload(startTime) {
-
     @Keep
     data class Fingerprint(
         val finger: IFingerIdentifier,
@@ -19,22 +18,19 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
         val quality: Int,
         val format: String,
     ) {
-
         constructor(finger: FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint) : this(
             finger.finger,
             finger.template,
             finger.quality,
-            finger.format
+            finger.format,
         )
     }
 
     constructor(domainPayload: FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         Fingerprint(domainPayload.fingerprint),
-        domainPayload.id
+        domainPayload.id,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
-

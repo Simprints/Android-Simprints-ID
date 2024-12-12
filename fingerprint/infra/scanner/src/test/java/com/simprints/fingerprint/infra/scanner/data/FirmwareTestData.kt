@@ -21,11 +21,9 @@ object FirmwareTestData {
         HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
             CYPRESS_VERSION_HIGH,
             STM_VERSION_HIGH,
-            UN20_VERSION_HIGH
-        )
+            UN20_VERSION_HIGH,
+        ),
     )
 
     internal const val SOME_URL = "some.url.com"
 }
-
-

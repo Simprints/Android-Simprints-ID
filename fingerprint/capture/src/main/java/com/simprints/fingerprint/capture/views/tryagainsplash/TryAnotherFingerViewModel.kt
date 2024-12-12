@@ -12,7 +12,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class TryAnotherFingerViewModel @Inject constructor() : ViewModel() {
-
     val dismiss: LiveData<Boolean> get() = _dismiss
     private val _dismiss = MutableLiveData(false)
 

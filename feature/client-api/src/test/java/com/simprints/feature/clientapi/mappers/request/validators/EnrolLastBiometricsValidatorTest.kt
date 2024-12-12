@@ -8,7 +8,6 @@ import io.mockk.every
 import org.junit.Test
 
 internal class EnrolLastBiometricsValidatorTest : ActionRequestValidatorTest(EnrolLastBiometricsActionFactory) {
-
     private val mockExtractor = EnrolLastBiometricsActionFactory.getMockExtractor()
 
     @Test

@@ -8,7 +8,6 @@ import io.rankone.rocsdk.embedded.roc_embedded_error
 import javax.inject.Inject
 
 class RocV1Initializer @Inject constructor() : FaceBioSdkInitializer {
-
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].
      *
@@ -18,9 +17,12 @@ class RocV1Initializer @Inject constructor() : FaceBioSdkInitializer {
      * @return true if initializing was successful, false otherwise
      */
     @ExcludedFromGeneratedTestCoverageReports(
-        reason = "This function uses roc class that has native functions and can't be mocked"
+        reason = "This function uses roc class that has native functions and can't be mocked",
     )
-    override fun tryInitWithLicense(activity: Activity, license: String): Boolean {
+    override fun tryInitWithLicense(
+        activity: Activity,
+        license: String,
+    ): Boolean {
         System.loadLibrary("roc_embedded_1_23")
         System.loadLibrary("_roc_embedded_1_23")
         roc.roc_preinitialize_android(activity)

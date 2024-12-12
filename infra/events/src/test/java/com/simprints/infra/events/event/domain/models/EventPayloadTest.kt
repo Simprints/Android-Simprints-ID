@@ -56,13 +56,12 @@ import com.simprints.infra.events.event.domain.models.AuthenticationEvent.Authen
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo as AuthorizationUserInfo
 
 class EventPayloadTest {
-
     @Test
     fun `safe string does not include sensitive data`() {
         val sensitiveInfoList = listOf(
             DEFAULT_USER_ID.value,
             DEFAULT_PROJECT_ID,
-            "template"
+            "template",
         )
 
         allEventsList().forEach {
@@ -78,12 +77,12 @@ class EventPayloadTest {
         IdentificationCallbackEvent(
             createdAt = CREATED_AT,
             sessionId = GUID1,
-            scores = listOf(CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE))
+            scores = listOf(CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE)),
         ),
         RefusalCallbackEvent(CREATED_AT, "some_reason", "some_extra"),
         VerificationCallbackEvent(
             createdAt = CREATED_AT,
-            score = CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE)
+            score = CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE),
         ),
         ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2),
         EnrolmentCalloutEvent(
@@ -132,7 +131,7 @@ class EventPayloadTest {
                 roll = 1.0f,
                 template = "template",
                 quality = 1.0f,
-                format = FACE_TEMPLATE_FORMAT
+                format = FACE_TEMPLATE_FORMAT,
             ),
         ),
         FaceCaptureConfirmationEvent(CREATED_AT, ENDED_AT, CONTINUE),
@@ -141,7 +140,8 @@ class EventPayloadTest {
             endTime = ENDED_AT,
             attemptNb = 0,
             qualityThreshold = 1F,
-            result = FaceCaptureEvent.FaceCapturePayload.Result.VALID, isFallback = true,
+            result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
+            isFallback = true,
             face = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT),
         ),
         FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT),
@@ -165,7 +165,7 @@ class EventPayloadTest {
             fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
                 finger = IFingerIdentifier.LEFT_THUMB,
                 quality = 8,
-                format = "ISO_19794_2"
+                format = "ISO_19794_2",
             ),
         ),
         AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED),
@@ -178,7 +178,7 @@ class EventPayloadTest {
         AuthorizationEvent(
             createdAt = CREATED_AT,
             result = AUTHORIZED,
-            userInfo = AuthorizationUserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)
+            userInfo = AuthorizationUserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
         ),
         CandidateReadEvent(CREATED_AT, ENDED_AT, GUID1, LocalResult.NOT_FOUND, NOT_FOUND),
         CompletionCheckEvent(CREATED_AT, true),
@@ -187,8 +187,8 @@ class EventPayloadTest {
             connections = listOf(
                 Connection(
                     SimNetworkUtils.ConnectionType.MOBILE,
-                    SimNetworkUtils.ConnectionState.CONNECTED
-                )
+                    SimNetworkUtils.ConnectionState.CONNECTED,
+                ),
             ),
         ),
         ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED),
@@ -209,7 +209,7 @@ class EventPayloadTest {
             endTime = ENDED_AT,
             pool = MatchPool(PROJECT, 100),
             matcher = "MATCHER_NAME",
-            result = listOf(MatchEntry(GUID1, 0F))
+            result = listOf(MatchEntry(GUID1, 0F)),
         ),
         OneToOneMatchEvent(
             createdAt = CREATED_AT,
@@ -217,7 +217,7 @@ class EventPayloadTest {
             candidateId = GUID1,
             matcher = "MATCHER_NAME",
             result = MatchEntry(GUID1, 0F),
-            fingerComparisonStrategy = FingerComparisonStrategy.SAME_FINGER
+            fingerComparisonStrategy = FingerComparisonStrategy.SAME_FINGER,
         ),
         PersonCreationEvent(
             startTime = CREATED_AT,
@@ -233,8 +233,8 @@ class EventPayloadTest {
                 scannerId = "scanner_id",
                 macAddress = "mac_address",
                 generation = ScannerGeneration.VERO_1,
-                hardwareVersion = "hardware_version"
-            )
+                hardwareVersion = "hardware_version",
+            ),
         ),
         ScannerFirmwareUpdateEvent(CREATED_AT, ENDED_AT, "chip", "v1", "error"),
         SuspiciousIntentEvent(CREATED_AT, mapOf("extra_key" to "value")),

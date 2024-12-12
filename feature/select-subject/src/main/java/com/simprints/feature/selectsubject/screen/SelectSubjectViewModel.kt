@@ -8,8 +8,8 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,12 +24,14 @@ internal class SelectSubjectViewModel @Inject constructor(
     private val eventRepository: SessionEventRepository,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
-
     val finish: LiveData<LiveDataEventWithContent<Boolean>>
         get() = _finish
     private var _finish = MutableLiveData<LiveDataEventWithContent<Boolean>>()
 
-    fun saveGuidSelection(projectId: String, subjectId: String) {
+    fun saveGuidSelection(
+        projectId: String,
+        subjectId: String,
+    ) {
         if (authStore.isProjectIdSignedIn(projectId)) {
             saveSelectionEvent(subjectId)
         } else {

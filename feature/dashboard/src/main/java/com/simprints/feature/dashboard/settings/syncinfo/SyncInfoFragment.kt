@@ -25,9 +25,7 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
-
     companion object {
-
         private const val TOTAL_RECORDS_INDEX = 0
     }
 
@@ -35,7 +33,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     private val binding by viewBinding(FragmentSyncInfoBinding::bind)
     private val moduleCountAdapter by lazy { ModuleCountAdapter() }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.selectedModulesView.adapter = moduleCountAdapter
@@ -116,18 +117,24 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
                 binding.syncButton.visibility = View.VISIBLE
             }
         }
-        viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
-            findNavController().navigate(
-                R.id.action_syncInfoFragment_to_login,
-                loginArgs
-            )
-        })
+        viewModel.loginRequestedEventLiveData.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { loginArgs ->
+                findNavController().navigate(
+                    R.id.action_syncInfoFragment_to_login,
+                    loginArgs,
+                )
+            },
+        )
     }
 
     private fun updateSyncButton(isSyncInProgress: Boolean) {
         binding.syncButton.text = getString(
-            if (isSyncInProgress) IDR.string.dashboard_sync_info_sync_in_progress
-            else IDR.string.dashboard_sync_info_sync_now_button
+            if (isSyncInProgress) {
+                IDR.string.dashboard_sync_info_sync_in_progress
+            } else {
+                IDR.string.dashboard_sync_info_sync_now_button
+            },
         )
     }
 
@@ -152,7 +159,11 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
     }
 
-    private fun setProgressBar(value: Int?, tv: TextView, pb: ProgressBar) {
+    private fun setProgressBar(
+        value: Int?,
+        tv: TextView,
+        pb: ProgressBar,
+    ) {
         if (value == null) {
             pb.visibility = View.VISIBLE
             tv.visibility = View.GONE
@@ -169,7 +180,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         val totalRecordsEntry = ModuleCount(
             getString(IDR.string.dashboard_sync_info_total_records),
-            moduleCounts.sumOf { it.count }
+            moduleCounts.sumOf { it.count },
         )
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 

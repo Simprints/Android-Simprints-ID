@@ -29,7 +29,6 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
     private val jsonHelper: JsonHelper,
     private val configManager: ConfigManager,
 ) {
-
     suspend fun buildDownSyncWorkerChain(
         uniqueSyncId: String,
         uniqueDownSyncId: String,
@@ -40,7 +39,8 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = projectConfiguration.general.modalities.map { it.toMode() },
             selectedModuleIDs = deviceConfiguration.selectedModules.values(),
-            syncPartitioning = projectConfiguration.synchronization.down.partitionType.toDomain()
+            syncPartitioning = projectConfiguration.synchronization.down.partitionType
+                .toDomain(),
         )
 
         return downSyncScope.operations.map {
@@ -58,13 +58,13 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
             workDataOf(
                 INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(downSyncOperation),
                 INPUT_EVENT_DOWN_SYNC_SCOPE_ID to uniqueDownSyncID,
-            )
-        )
-        .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
+            ),
+        ).setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
         .addCommonTagForDownloaders()
         .build() as OneTimeWorkRequest
 
-    private fun getDownSyncWorkerConstraints() = Constraints.Builder()
+    private fun getDownSyncWorkerConstraints() = Constraints
+        .Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
@@ -72,12 +72,12 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
         uniqueMasterSyncId: String,
         uniqueDownMasterSyncId: String,
         constraints: Constraints,
-    ) = this.setConstraints(constraints)
+    ) = this
+        .setConstraints(constraints)
         .addTagForMasterSyncId(uniqueMasterSyncId)
         .addTagForDownSyncId(uniqueDownMasterSyncId)
         .addTagForScheduledAtNow()
         .addCommonTagForDownWorkers()
         .addCommonTagForAllSyncWorkers()
         .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_SECS, TimeUnit.SECONDS)
-
 }

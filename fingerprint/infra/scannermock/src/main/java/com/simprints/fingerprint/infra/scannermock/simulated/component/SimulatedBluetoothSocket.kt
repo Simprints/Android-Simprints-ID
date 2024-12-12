@@ -5,9 +5,9 @@ import com.simprints.fingerprint.infra.scannermock.simulated.SimulatedScannerMan
 import java.io.InputStream
 import java.io.OutputStream
 
-
-class SimulatedBluetoothSocket(private val simulatedScannerManager: SimulatedScannerManager) : ComponentBluetoothSocket {
-
+class SimulatedBluetoothSocket(
+    private val simulatedScannerManager: SimulatedScannerManager,
+) : ComponentBluetoothSocket {
     override fun connect() = simulatedScannerManager.connect()
 
     override fun getInputStream(): InputStream = simulatedScannerManager.streamFromScannerToApp

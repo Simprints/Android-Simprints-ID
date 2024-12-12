@@ -6,7 +6,6 @@ import com.simprints.infra.config.store.testtools.protoProject
 import org.junit.Test
 
 class ProjectTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoProject.toDomain()).isEqualTo(project)

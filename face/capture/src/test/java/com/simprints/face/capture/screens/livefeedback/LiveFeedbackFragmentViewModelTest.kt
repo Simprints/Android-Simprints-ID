@@ -32,7 +32,6 @@ import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
 internal class LiveFeedbackFragmentViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -73,9 +72,11 @@ internal class LiveFeedbackFragmentViewModelTest {
             }
         }
 
-
         viewModel = LiveFeedbackFragmentViewModel(
-            resolveFaceBioSdkUseCase, configManager, eventReporter, timeHelper
+            resolveFaceBioSdkUseCase,
+            configManager,
+            eventReporter,
+            timeHelper,
         )
     }
 
@@ -166,7 +167,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         viewModel.process(frame)
         viewModel.process(frame)
 
-         detections.observedValues.let {
+        detections.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
             assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.VALID)
             assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -230,7 +231,6 @@ internal class LiveFeedbackFragmentViewModelTest {
     ) = Face(100, 100, rect, yaw, roll, quality, Random.nextBytes(20), "format")
 
     companion object {
-
         private const val QUALITY_THRESHOLD = -1f
     }
 }

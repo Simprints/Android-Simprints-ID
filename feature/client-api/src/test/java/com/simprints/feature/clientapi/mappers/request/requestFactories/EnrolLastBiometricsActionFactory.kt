@@ -12,7 +12,6 @@ import io.mockk.every
 import io.mockk.mockk
 
 internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
-
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
         actionName = ActionConstants.ACTION_ENROL_LAST_BIOMETRICS,
@@ -28,24 +27,22 @@ internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
         moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         sessionId = MOCK_SESSION_ID,
-        unknownExtras = emptyMap()
+        unknownExtras = emptyMap(),
     )
 
-    override fun getValidator(extractor: ActionRequestExtractor): EnrolLastBiometricsValidator =
-        EnrolLastBiometricsValidator(
-            extractor as EnrolLastBiometricsRequestExtractor,
-            MOCK_SESSION_ID,
-            true
-        )
+    override fun getValidator(extractor: ActionRequestExtractor): EnrolLastBiometricsValidator = EnrolLastBiometricsValidator(
+        extractor as EnrolLastBiometricsRequestExtractor,
+        MOCK_SESSION_ID,
+        true,
+    )
 
-    override fun getBuilder(extractor: ActionRequestExtractor): EnrolLastBiometricsRequestBuilder =
-        EnrolLastBiometricsRequestBuilder(
-            actionIdentifier = getIdentifier(),
-            extractor = extractor as EnrolLastBiometricsRequestExtractor,
-            project = mockk(),
-            tokenizationProcessor = mockk(),
-            validator = getValidator(extractor)
-        )
+    override fun getBuilder(extractor: ActionRequestExtractor): EnrolLastBiometricsRequestBuilder = EnrolLastBiometricsRequestBuilder(
+        actionIdentifier = getIdentifier(),
+        extractor = extractor as EnrolLastBiometricsRequestExtractor,
+        project = mockk(),
+        tokenizationProcessor = mockk(),
+        validator = getValidator(extractor),
+    )
 
     override fun getMockExtractor(): EnrolLastBiometricsRequestExtractor {
         val mockEnrolLastBiometricsExtractor = mockk<EnrolLastBiometricsRequestExtractor>()

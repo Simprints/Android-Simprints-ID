@@ -8,7 +8,6 @@ internal class LogoutUseCase @Inject constructor(
     private val syncOrchestrator: SyncOrchestrator,
     private val authManager: AuthManager,
 ) {
-
     suspend operator fun invoke() {
         syncOrchestrator.cancelBackgroundWork()
         syncOrchestrator.deleteEventSyncInfo()

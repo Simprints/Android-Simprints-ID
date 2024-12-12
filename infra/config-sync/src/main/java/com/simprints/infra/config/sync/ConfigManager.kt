@@ -13,12 +13,10 @@ import javax.inject.Inject
 
 class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {
-    suspend fun refreshProject(projectId: String): ProjectWithConfig {
-        return configRepository.refreshProject(projectId).also {
-            enrolmentRecordRepository.tokenizeExistingRecords(it.project)
-        }
+    suspend fun refreshProject(projectId: String): ProjectWithConfig = configRepository.refreshProject(projectId).also {
+        enrolmentRecordRepository.tokenizeExistingRecords(it.project)
     }
 
     suspend fun getProject(projectId: String): Project = try {
@@ -45,20 +43,20 @@ class ConfigManager @Inject constructor(
         }
     }
 
-    suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        configRepository.getDeviceConfiguration()
+    suspend fun getDeviceConfiguration(): DeviceConfiguration = configRepository.getDeviceConfiguration()
 
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
         configRepository.updateDeviceConfiguration(update)
 
-    suspend fun getPrivacyNotice(projectId: String, language: String): Flow<PrivacyNoticeResult> =
-        configRepository.getPrivacyNotice(
-            projectId = projectId,
-            language = language
-        )
+    suspend fun getPrivacyNotice(
+        projectId: String,
+        language: String,
+    ): Flow<PrivacyNoticeResult> = configRepository.getPrivacyNotice(
+        projectId = projectId,
+        language = language,
+    )
 
     suspend fun clearData() = configRepository.clearData()
 
     suspend fun getDeviceState(): DeviceState = configRepository.getDeviceState()
-
 }

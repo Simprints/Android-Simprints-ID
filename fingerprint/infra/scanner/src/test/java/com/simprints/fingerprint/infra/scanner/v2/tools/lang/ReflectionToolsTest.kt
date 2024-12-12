@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class ReflectionToolsTest {
-
     @Test
     fun isSubclass_forDirectSubclasses_succeedsCheck() {
         assertThat(isSubclass<TestSubclass, TestOpenMiddleClass>()).isTrue()
@@ -25,11 +24,13 @@ class ReflectionToolsTest {
     @Test
     fun sealedClassWithObjectsOnly_retrieveObjects_returnsAllObjects() {
         assertThat(TestSealedClassObjectsOnly::class.objects())
-            .containsExactlyElementsIn(listOf(
-                TestSealedClassObjectsOnly.ObjectA,
-                TestSealedClassObjectsOnly.ObjectB,
-                TestSealedClassObjectsOnly.ObjectC
-            ))
+            .containsExactlyElementsIn(
+                listOf(
+                    TestSealedClassObjectsOnly.ObjectA,
+                    TestSealedClassObjectsOnly.ObjectB,
+                    TestSealedClassObjectsOnly.ObjectC,
+                ),
+            )
     }
 
     @Test
@@ -41,49 +42,68 @@ class ReflectionToolsTest {
     @Test
     fun sealedClassWithMixedObjectsAndClasses_retrieveObjects_returnsOnlyObjectsAndIgnoresClasses() {
         assertThat(TestSealedClassMixedClassesAndObjects::class.objects())
-            .containsExactlyElementsIn(listOf(
-                TestSealedClassMixedClassesAndObjects.ObjectA,
-                TestSealedClassMixedClassesAndObjects.ObjectC,
-                TestSealedClassMixedClassesAndObjects.ObjectE
-            ))
+            .containsExactlyElementsIn(
+                listOf(
+                    TestSealedClassMixedClassesAndObjects.ObjectA,
+                    TestSealedClassMixedClassesAndObjects.ObjectC,
+                    TestSealedClassMixedClassesAndObjects.ObjectE,
+                ),
+            )
     }
 
     private open class TestOpenBaseClass
+
     private open class TestOpenMiddleClass : TestOpenBaseClass()
+
     private class TestSubclass : TestOpenMiddleClass()
+
     private class TestNotSubclass
 
     private sealed class TestSealedClassObjectsOnly {
         object ObjectA : TestSealedClassObjectsOnly()
+
         object ObjectB : TestSealedClassObjectsOnly()
+
         object ObjectC : TestSealedClassObjectsOnly()
     }
 
     private sealed class TestSealedClassNoObjects {
         @Suppress("unused")
-        class ClassA(val i: Int) : TestSealedClassNoObjects()
+        class ClassA(
+            val i: Int,
+        ) : TestSealedClassNoObjects()
 
         @Suppress("unused")
-        class ClassB(val i: Int) : TestSealedClassNoObjects()
+        class ClassB(
+            val i: Int,
+        ) : TestSealedClassNoObjects()
 
         @Suppress("unused")
-        class ClassC(val i: Int) : TestSealedClassNoObjects()
+        class ClassC(
+            val i: Int,
+        ) : TestSealedClassNoObjects()
     }
 
     private sealed class TestSealedClassMixedClassesAndObjects {
         object ObjectA : TestSealedClassMixedClassesAndObjects()
 
         @Suppress("unused")
-        class ObjectB(val i: Int) : TestSealedClassMixedClassesAndObjects()
+        class ObjectB(
+            val i: Int,
+        ) : TestSealedClassMixedClassesAndObjects()
 
         object ObjectC : TestSealedClassMixedClassesAndObjects()
 
         @Suppress("unused")
-        class ClassD(val i: Int) : TestSealedClassMixedClassesAndObjects()
+        class ClassD(
+            val i: Int,
+        ) : TestSealedClassMixedClassesAndObjects()
 
         object ObjectE : TestSealedClassMixedClassesAndObjects()
 
         @Suppress("unused")
-        class ClassF(val i: Int) : TestSealedClassMixedClassesAndObjects()
+        class ClassF(
+            val i: Int,
+        ) : TestSealedClassMixedClassesAndObjects()
     }
 }

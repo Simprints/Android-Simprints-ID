@@ -12,7 +12,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class EventStartSyncReporterWorkerTest {
-
     companion object {
         private val INPUT_DATA = workDataOf(SYNC_ID_STARTED to "SYNC_ID")
     }
@@ -25,7 +24,7 @@ class EventStartSyncReporterWorkerTest {
         mockk(relaxed = true) {
             every { inputData } returns INPUT_DATA
         },
-        testCoroutineRule.testCoroutineDispatcher
+        testCoroutineRule.testCoroutineDispatcher,
     )
 
     @Test

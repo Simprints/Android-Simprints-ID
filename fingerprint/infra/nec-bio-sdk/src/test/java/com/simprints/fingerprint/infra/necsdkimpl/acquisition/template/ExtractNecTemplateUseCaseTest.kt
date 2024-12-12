@@ -25,6 +25,7 @@ class ExtractNecTemplateUseCaseTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -32,13 +33,13 @@ class ExtractNecTemplateUseCaseTest {
     }
 
     @Test
-    fun `test nec template extractor success`()= runTest {
+    fun `test nec template extractor success`() = runTest {
         // Given
         val fingerprintImage = FingerprintImage(
             width = 500,
             height = 500,
             resolution = 500,
-            imageBytes = ByteArray(0)
+            imageBytes = ByteArray(0),
         )
         // When
         val result = extractNecTemplateUseCase(fingerprintImage, 100)
@@ -49,26 +50,25 @@ class ExtractNecTemplateUseCaseTest {
                     width = fingerprintImage.width,
                     height = fingerprintImage.height,
                     resolution = fingerprintImage.resolution,
-                    imageBytes = fingerprintImage.imageBytes
-                )
+                    imageBytes = fingerprintImage.imageBytes,
+                ),
             )
         }
         Truth.assertThat(result.templateMetadata?.imageQualityScore).isEqualTo(100)
     }
 
     @Test(expected = BioSdkException.TemplateExtractionException::class)
-    fun `test nec template extractor failure`()= runTest {
+    fun `test nec template extractor failure`() = runTest {
         // Given
         val fingerprintImage = FingerprintImage(
             width = 500,
             height = 500,
             resolution = 500,
-            imageBytes = ByteArray(0)
+            imageBytes = ByteArray(0),
         )
         every { nec.extract(any()) } throws Exception()
         // When
         extractNecTemplateUseCase(fingerprintImage, 100)
         // Then throw exception
     }
-
 }

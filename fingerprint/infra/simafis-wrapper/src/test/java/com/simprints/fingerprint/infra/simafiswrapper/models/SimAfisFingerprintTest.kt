@@ -17,7 +17,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SimAfisFingerprintTest {
-
     @Test(expected = Test.None::class)
     fun testCheckTemplateValidity_ValidTemplate() {
         val template = validTemplate
@@ -68,7 +67,7 @@ class SimAfisFingerprintTest {
         }
         assertEquals(
             "Invalid template: only single fingerprint templates are supported",
-            exception.message
+            exception.message,
         )
     }
 
@@ -147,6 +146,4 @@ class SimAfisFingerprintTest {
 
         assertEquals(fingerprint, fingerprintFromParcel)
     }
-
-
 }

@@ -28,9 +28,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.Date
 
-
 class RealmMigrationsTest {
-
     @MockK
     private lateinit var migrationContext: AutomaticSchemaMigration.MigrationContext
 
@@ -41,7 +39,6 @@ class RealmMigrationsTest {
     private lateinit var newRealm: DynamicMutableRealm
 
     private lateinit var realmMigrations: RealmMigrations
-
 
     @Before
     fun setUp() {
@@ -69,7 +66,7 @@ class RealmMigrationsTest {
                 SubjectsSchemaV10.PERSON_TO_SYNC to true,
                 SubjectsSchemaV10.PERSON_FINGERPRINT_SAMPLES to realmListOf<DbFingerprintSample>(),
                 SubjectsSchemaV10.PERSON_FACE_SAMPLES to realmListOf<DbFaceSample>(),
-            )
+            ),
         )
 
         val newObjectSlot = slot<DynamicMutableRealmObject>()
@@ -108,6 +105,7 @@ class RealmMigrationsTest {
         verify { newFingerprintObject.set(eq(SubjectsSchemaV11.FIELD_FORMAT), any<String>()) }
         verify { newFaceObject.set(eq(SubjectsSchemaV11.FIELD_FORMAT), any<String>()) }
     }
+
     @Test
     fun `when migrating 11 to 12 deduplicate samples`() {
         setVersions(11L, 12L)
@@ -129,7 +127,6 @@ class RealmMigrationsTest {
         verify(exactly = 1) { newFaceObject.set(eq(SubjectsSchemaV12.FACE_FIELD_ID), eq(NOT_UNIQUE_ID, inverse = true)) }
     }
 
-
     @Test
     fun `when migrating 12 to 13 ensures that subject ID is UUID in subjects table`() {
         setVersions(12L, 13L)
@@ -150,7 +147,10 @@ class RealmMigrationsTest {
         verify { newObject.set(eq(SubjectsSchemaV13.SUBJECT_ID_FIELD), eq(RealmUUID.from(GUID))) }
     }
 
-    private fun setVersions(old: Long, new: Long) {
+    private fun setVersions(
+        old: Long,
+        new: Long,
+    ) {
         every { oldRealm.schemaVersion() } returns old
         every { newRealm.schemaVersion() } returns new
     }
@@ -166,12 +166,16 @@ class RealmMigrationsTest {
     }
 
     private fun setupSubjectQueryResponse(subjects: List<DynamicMutableRealmObject>) {
-        every { oldRealm.query(eq(SubjectsSchemaV10.SUBJECT_TABLE)).find() } returns mockk<RealmResults<DynamicRealmObject>>(relaxed = true) {
-            every { iterator() } returns subjects.iterator()
-        }
+        every { oldRealm.query(eq(SubjectsSchemaV10.SUBJECT_TABLE)).find() } returns
+            mockk<RealmResults<DynamicRealmObject>>(relaxed = true) {
+                every { iterator() } returns subjects.iterator()
+            }
     }
 
-    private fun setupDeduplicationTestForTable(table: String, idField: String): DynamicMutableRealmObject {
+    private fun setupDeduplicationTestForTable(
+        table: String,
+        idField: String,
+    ): DynamicMutableRealmObject {
         val newObject = mockk<DynamicMutableRealmObject>()
         val enumeratorSlot = slot<(DynamicRealmObject, DynamicMutableRealmObject?) -> Unit>()
         every { migrationContext.enumerate(eq(table), capture(enumeratorSlot)) } answers {
@@ -186,7 +190,6 @@ class RealmMigrationsTest {
         return newObject
     }
 
-
     companion object {
         private const val GUID = "2fd19445-c094-43d9-b231-df1abdb4ae6d"
         private const val USER_ID = "userId"
@@ -195,6 +198,5 @@ class RealmMigrationsTest {
 
         private const val UNIQUE_ID = "uniqueId"
         private const val NOT_UNIQUE_ID = "nonUniqueId"
-
     }
 }

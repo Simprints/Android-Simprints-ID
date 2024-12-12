@@ -9,7 +9,6 @@ import org.junit.Test
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 
 class ApiErrorCallbackTest {
-
     @Test
     fun `ApiReason correctly mapped to domain`() {
         mapOf(

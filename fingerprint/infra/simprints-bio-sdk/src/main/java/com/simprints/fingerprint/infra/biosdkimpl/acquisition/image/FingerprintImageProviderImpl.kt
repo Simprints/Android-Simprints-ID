@@ -6,9 +6,8 @@ import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper
 import javax.inject.Inject
 
 internal class FingerprintImageProviderImpl @Inject constructor(
-    private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
+    private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
 ) : FingerprintImageProvider<Unit, Unit> {
-
     override suspend fun acquireFingerprintImage(settings: Unit?): ImageResponse<Unit> =
         ImageResponse(fingerprintCaptureWrapperFactory.captureWrapper.acquireFingerprintImage().imageBytes)
 }

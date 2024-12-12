@@ -13,7 +13,9 @@ import com.simprints.core.tools.utils.LanguageHelper
 @ExcludedFromGeneratedTestCoverageReports("Abstract base class")
 abstract class BaseActivity : AppCompatActivity {
     constructor() : super()
-    constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId)
+    constructor(
+        @LayoutRes contentLayoutId: Int,
+    ) : super(contentLayoutId)
 
     override fun attachBaseContext(newBase: Context) {
         val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)

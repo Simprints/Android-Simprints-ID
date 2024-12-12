@@ -6,7 +6,6 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposit
 import org.junit.Test
 
 class ModuleQueryFilterTest {
-
     private val items = listOf(
         Module("Abama".asTokenizableRaw(), false),
         Module("Abama Dawet".asTokenizableRaw(), false),
@@ -19,7 +18,7 @@ class ModuleQueryFilterTest {
         Module("Legama".asTokenizableRaw(), false),
         Module("Madagascar".asTokenizableRaw(), false),
         Module("Tadisa".asTokenizableRaw(), false),
-        Module("Wakanda".asTokenizableRaw(), false)
+        Module("Wakanda".asTokenizableRaw(), false),
     )
     private val filter = ModuleQueryFilter()
 
@@ -63,7 +62,7 @@ class ModuleQueryFilterTest {
         val expected = listOf(
             Module(name = "Legama".asTokenizableRaw(), isSelected = false),
             Module(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
-            Module(name = "Abama".asTokenizableRaw(), isSelected = false)
+            Module(name = "Abama".asTokenizableRaw(), isSelected = false),
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -76,7 +75,7 @@ class ModuleQueryFilterTest {
         val expected = listOf(
             Module(name = "Legama".asTokenizableRaw(), isSelected = false),
             Module(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
-            Module(name = "Abama".asTokenizableRaw(), isSelected = false)
+            Module(name = "Abama".asTokenizableRaw(), isSelected = false),
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -92,7 +91,7 @@ class ModuleQueryFilterTest {
             Module("Legama".asTokenizableRaw(), false),
             Module("Achura Mazegaja".asTokenizableRaw(), false),
             Module("Hajo Salata".asTokenizableRaw(), false),
-            Module("Wakanda".asTokenizableRaw(), false)
+            Module("Wakanda".asTokenizableRaw(), false),
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -103,12 +102,11 @@ class ModuleQueryFilterTest {
     fun withFuzzyQuery_shouldReturnAllPossibleResults() {
         val query = "binglodosh"
         val expected = listOf(
-            Module("Bangladesh rocks".asTokenizableRaw(), false)
+            Module("Bangladesh rocks".asTokenizableRaw(), false),
         )
 
         val actual = filter.getFilteredList(items, query)
 
         assertThat(actual).isEqualTo(expected)
     }
-
 }

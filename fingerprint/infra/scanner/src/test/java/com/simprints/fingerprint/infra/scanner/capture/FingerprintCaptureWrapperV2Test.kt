@@ -53,10 +53,32 @@ class FingerprintCaptureWrapperV2Test {
         // Given
         val imageData = ImageData(
             byteArrayOf(
-                0x05, 0x06, 0x07, 0x08, 0x05, 0x06, 0x07, 0x08,
-                0x05, 0x06, 0x07, 0x08, 0x05, 0x06, 0x07, 0x08,
-                0x05, 0x06, 0x07, 0x08, 0x05, 0x06, 0x07, 0x08
-            ), 1
+                0x05,
+                0x06,
+                0x07,
+                0x08,
+                0x05,
+                0x06,
+                0x07,
+                0x08,
+                0x05,
+                0x06,
+                0x07,
+                0x08,
+                0x05,
+                0x06,
+                0x07,
+                0x08,
+                0x05,
+                0x06,
+                0x07,
+                0x08,
+                0x05,
+                0x06,
+                0x07,
+                0x08,
+            ),
+            1,
         )
         coEvery { scannerV2.captureFingerprint(any()) } returns CaptureFingerprintResult.OK
         coEvery { scannerV2.acquireUnprocessedImage(any()) } returns imageData
@@ -65,22 +87,20 @@ class FingerprintCaptureWrapperV2Test {
         // Then
         assertThat(actualResponse.rawUnprocessedImage.imageData).isEqualTo(
             RawUnprocessedImage(
-                imageData.image
-            ).imageData
+                imageData.image,
+            ).imageData,
         )
     }
 
     @Test(expected = NoFingerDetectedException::class)
-    fun `test acquireUnprocessedImage throws NoFingerDetectedException when scanner returns empty`() =
-        runTest {
-            // Given
-            coEvery { scannerV2.acquireUnprocessedImage(any()) } returns null
-            coEvery { scannerV2.captureFingerprint(any()) } returns CaptureFingerprintResult.OK
-            // When
-            scannerWrapper.acquireUnprocessedImage(Dpi(500))
-            // Then throw NoFingerDetectedException
-
-        }
+    fun `test acquireUnprocessedImage throws NoFingerDetectedException when scanner returns empty`() = runTest {
+        // Given
+        coEvery { scannerV2.acquireUnprocessedImage(any()) } returns null
+        coEvery { scannerV2.captureFingerprint(any()) } returns CaptureFingerprintResult.OK
+        // When
+        scannerWrapper.acquireUnprocessedImage(Dpi(500))
+        // Then throw NoFingerDetectedException
+    }
 
     @Test
     fun `should throw illegal argument exception when capture DPI is null`() = runTest {
@@ -97,12 +117,11 @@ class FingerprintCaptureWrapperV2Test {
     }
 
     @Test
-    fun `should throw illegal argument exception when capture DPI is greater than 1700`() =
-        runTest {
-            assertThrows<UnexpectedScannerException> {
-                scannerWrapper.acquireFingerprintTemplate(Dpi(1701), 1000, 50, false)
-            }
+    fun `should throw illegal argument exception when capture DPI is greater than 1700`() = runTest {
+        assertThrows<UnexpectedScannerException> {
+            scannerWrapper.acquireFingerprintTemplate(Dpi(1701), 1000, 50, false)
         }
+    }
 
     @Test
     fun `should throw corresponding errors when capture fingerprint result is not OK`() = runTest {
@@ -119,30 +138,39 @@ class FingerprintCaptureWrapperV2Test {
         // first throws NoFingerDetectedException
         assertThrows<NoFingerDetectedException> {
             scannerWrapper.acquireFingerprintTemplate(
-                Dpi(1300), 1000, 50, false
+                Dpi(1300),
+                1000,
+                50,
+                false,
             )
         }
         // and then throws UnexpectedScannerException
         assertThrows<UnexpectedScannerException> {
             scannerWrapper.acquireFingerprintTemplate(
-                Dpi(1300), 1000, 50, false
+                Dpi(1300),
+                1000,
+                50,
+                false,
             )
         }
         // and then throws UnknownScannerIssueException
         assertThrows<UnknownScannerIssueException> {
             scannerWrapper.acquireFingerprintTemplate(
-                Dpi(1300), 1000, 50, false
+                Dpi(1300),
+                1000,
+                50,
+                false,
             )
         }
     }
-
 
     @Test
     fun `should return actual image data in ImageResponse when appropriate image-save strategy is provided and image data is returned from scanner`() =
         runTest {
             val expectedImageResponse = AcquireFingerprintImageResponse(imageBytes = byteArrayOf())
             coEvery { scannerV2.acquireImage(any()) } returns ImageData(
-                expectedImageResponse.imageBytes, 128
+                expectedImageResponse.imageBytes,
+                128,
             )
 
             val actualImageResponse = scannerWrapper.acquireFingerprintImage()
@@ -150,68 +178,74 @@ class FingerprintCaptureWrapperV2Test {
         }
 
     @Test
-    fun `should throw NoFingerDetectedException when trying to acquire fingerprint image and scanner returns a null ImageData`() =
-        runTest {
-            coEvery { scannerV2.acquireImage(any()) } returns null
-            assertThrows<NoFingerDetectedException> { scannerWrapper.acquireFingerprintImage() }
-        }
+    fun `should throw NoFingerDetectedException when trying to acquire fingerprint image and scanner returns a null ImageData`() = runTest {
+        coEvery { scannerV2.acquireImage(any()) } returns null
+        assertThrows<NoFingerDetectedException> { scannerWrapper.acquireFingerprintImage() }
+    }
 
     @Test(expected = UnexpectedScannerException::class)
-    fun `should throw UnexpectedScannerException when DPI_UNSUPPORTED error is returned during capture`() =
-        runTest {
-            coEvery {
-                scannerV2.captureFingerprint(any())
-            } returns CaptureFingerprintResult.DPI_UNSUPPORTED
-            coJustRun { scannerV2.setSmileLedState(any()) }
-            coEvery { scannerV2.getImageQualityScore() } returns null
-            // When
+    fun `should throw UnexpectedScannerException when DPI_UNSUPPORTED error is returned during capture`() = runTest {
+        coEvery {
+            scannerV2.captureFingerprint(any())
+        } returns CaptureFingerprintResult.DPI_UNSUPPORTED
+        coJustRun { scannerV2.setSmileLedState(any()) }
+        coEvery { scannerV2.getImageQualityScore() } returns null
+        // When
+        scannerWrapper.acquireFingerprintTemplate(
+            Dpi(1300),
+            timeOutMs = 30000,
+            qualityThreshold = 7,
+            false,
+        )
+    }
+
+    @Test
+    fun `should return correct capture response when capture result and image quality are OK`() = runTest {
+        val qualityThreshold = 50
+        val expectedCaptureResponse = AcquireFingerprintTemplateResponse(
+            template = byteArrayOf(),
+            "ISO_19794_2",
+            imageQualityScore = qualityThreshold,
+        )
+        coEvery { scannerV2.getImageQualityScore() } returns qualityThreshold
+        coJustRun { scannerV2.setSmileLedState(any()) }
+        coEvery { scannerV2.captureFingerprint(any()) } answers {
+            CaptureFingerprintResult.OK
+        }
+        coEvery { scannerV2.acquireTemplate(any()) } returns TemplateData(
+            expectedCaptureResponse.template,
+        )
+
+        val actualResponse = scannerWrapper.acquireFingerprintTemplate(
+            Dpi(1300),
+            1000,
+            qualityThreshold,
+            false,
+        )
+
+        assertThat(expectedCaptureResponse.template).isEqualTo(actualResponse.template)
+        assertThat(expectedCaptureResponse.imageQualityScore).isEqualTo(actualResponse.imageQualityScore)
+    }
+
+    @Test
+    fun `should throw NoFingerDetectedException when no fingerprint template is returned after fingerprint is captured`() = runTest {
+        val qualityThreshold = 50
+        coEvery { scannerV2.getImageQualityScore() } returns qualityThreshold
+        coJustRun { scannerV2.setSmileLedState(any()) }
+        coEvery { scannerV2.captureFingerprint(any()) } answers {
+            (CaptureFingerprintResult.OK)
+        }
+        coEvery { scannerV2.acquireTemplate(any()) } returns null
+
+        assertThrows<NoFingerDetectedException> {
             scannerWrapper.acquireFingerprintTemplate(
-                Dpi(1300), timeOutMs = 30000, qualityThreshold = 7, false
+                Dpi(1300),
+                1000,
+                qualityThreshold,
+                false,
             )
         }
-
-
-    @Test
-    fun `should return correct capture response when capture result and image quality are OK`() =
-        runTest {
-            val qualityThreshold = 50
-            val expectedCaptureResponse = AcquireFingerprintTemplateResponse(
-                template = byteArrayOf(), "ISO_19794_2", imageQualityScore = qualityThreshold
-            )
-            coEvery { scannerV2.getImageQualityScore() } returns qualityThreshold
-            coJustRun { scannerV2.setSmileLedState(any()) }
-            coEvery { scannerV2.captureFingerprint(any()) } answers {
-                CaptureFingerprintResult.OK
-            }
-            coEvery { scannerV2.acquireTemplate(any()) } returns TemplateData(
-                expectedCaptureResponse.template
-            )
-
-            val actualResponse = scannerWrapper.acquireFingerprintTemplate(
-                Dpi(1300), 1000, qualityThreshold, false
-            )
-
-            assertThat(expectedCaptureResponse.template).isEqualTo(actualResponse.template)
-            assertThat(expectedCaptureResponse.imageQualityScore).isEqualTo(actualResponse.imageQualityScore)
-        }
-
-    @Test
-    fun `should throw NoFingerDetectedException when no fingerprint template is returned after fingerprint is captured`() =
-        runTest {
-            val qualityThreshold = 50
-            coEvery { scannerV2.getImageQualityScore() } returns qualityThreshold
-            coJustRun { scannerV2.setSmileLedState(any()) }
-            coEvery { scannerV2.captureFingerprint(any()) } answers {
-                (CaptureFingerprintResult.OK)
-            }
-            coEvery { scannerV2.acquireTemplate(any()) } returns null
-
-            assertThrows<NoFingerDetectedException> {
-                scannerWrapper.acquireFingerprintTemplate(
-                    Dpi(1300), 1000, qualityThreshold, false
-                )
-            }
-        }
+    }
 
     @Test
     fun `should extract template when captured fingerprint's image quality score is less than specified image quality_threshold and allowLowQualityExtraction is true`() =
@@ -225,7 +259,10 @@ class FingerprintCaptureWrapperV2Test {
             coEvery { scannerV2.acquireTemplate(any()) } returns TemplateData(byteArrayOf())
 
             scannerWrapper.acquireFingerprintTemplate(
-                Dpi(1300), 1000, qualityThreshold, true
+                Dpi(1300),
+                1000,
+                qualityThreshold,
+                true,
             )
 
             coVerify(exactly = 1) { scannerV2.acquireTemplate(any()) }
@@ -240,9 +277,11 @@ class FingerprintCaptureWrapperV2Test {
 
             assertThrows<NoFingerDetectedException> {
                 scannerWrapper.acquireFingerprintTemplate(
-                    Dpi(1300), 1000, 50, false
+                    Dpi(1300),
+                    1000,
+                    50,
+                    false,
                 )
             }
         }
-
 }

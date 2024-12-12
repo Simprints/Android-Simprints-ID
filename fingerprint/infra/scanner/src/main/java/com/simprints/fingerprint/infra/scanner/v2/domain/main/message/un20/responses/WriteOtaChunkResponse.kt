@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20R
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.OperationResultCode
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 
-class WriteOtaChunkResponse(val operationResultCode: OperationResultCode) : Un20Response(Un20MessageType.WriteOtaChunk) {
-
+class WriteOtaChunkResponse(
+    val operationResultCode: OperationResultCode,
+) : Un20Response(Un20MessageType.WriteOtaChunk) {
     companion object {
         fun fromBytes(data: ByteArray) = WriteOtaChunkResponse(OperationResultCode.fromBytes(data))
     }

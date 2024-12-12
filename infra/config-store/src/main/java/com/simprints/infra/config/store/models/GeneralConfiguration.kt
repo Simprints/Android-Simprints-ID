@@ -11,10 +11,10 @@ data class GeneralConfiguration(
     val duplicateBiometricEnrolmentCheck: Boolean,
     val settingsPassword: SettingsPasswordConfig,
 ) {
-
     enum class Modality {
         FACE,
-        FINGERPRINT;
+        FINGERPRINT,
+        ;
 
         fun toMode(): Modes = when (this) {
             FACE -> Modes.FACE

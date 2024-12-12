@@ -14,7 +14,6 @@ import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class AlertConfigurationMapper @Inject constructor() {
-
     fun buildAlertConfig(clientApiError: ClientApiError): AlertConfigurationBuilder = alertConfiguration {
         color = AlertColor.Yellow
         titleRes = IDR.string.orchestrator_configuration_error_title
@@ -36,7 +35,6 @@ internal class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.INVALID_VERIFY_ID -> IDR.string.orchestrator_invalid_verify_id_error_message
     }
 
-
     fun buildAlertConfig(loginCheckError: LoginCheckError): AlertConfigurationBuilder = alertConfiguration {
         color = getBackgroundColor(loginCheckError)
         titleRes = getTitle(loginCheckError)
@@ -54,7 +52,8 @@ internal class AlertConfigurationMapper @Inject constructor() {
         LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES,
         LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
         LoginCheckError.INTEGRITY_SERVICE_ERROR,
-        LoginCheckError.ROOTED_DEVICE -> AlertColor.Red
+        LoginCheckError.ROOTED_DEVICE,
+        -> AlertColor.Red
 
         else -> AlertColor.Yellow
     }
@@ -109,7 +108,8 @@ internal class AlertConfigurationMapper @Inject constructor() {
         LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
         LoginCheckError.INTEGRITY_SERVICE_ERROR,
         LoginCheckError.UNEXPECTED_LOGIN_ERROR,
-        LoginCheckError.ROOTED_DEVICE -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+        LoginCheckError.ROOTED_DEVICE,
+        -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
     }
 
     private fun getAppReason(loginCheckError: LoginCheckError) = when (loginCheckError) {
@@ -126,4 +126,3 @@ internal class AlertConfigurationMapper @Inject constructor() {
         LoginCheckError.ROOTED_DEVICE -> AppErrorReason.ROOTED_DEVICE
     }
 }
-

@@ -38,9 +38,8 @@ internal class OtaViewModel @Inject constructor(
     private val reportFirmwareUpdate: ReportFirmwareUpdateEventUseCase,
     private val timeHelper: TimeHelper,
     private val recentUserActivityManager: RecentUserActivityManager,
-    private val configManager: ConfigManager
+    private val configManager: ConfigManager,
 ) : ViewModel() {
-
     val progress: LiveData<Float>
         get() = _progress
     private val _progress = MutableLiveData(0f)
@@ -65,32 +64,31 @@ internal class OtaViewModel @Inject constructor(
     fun startOta(
         fingerprintSdk: FingerprintConfiguration.BioSdk,
         availableOtas: List<AvailableOta>,
-        currentRetryAttempt: Int
+        currentRetryAttempt: Int,
     ) {
         remainingOtas.addAll(availableOtas)
         this.fingerprintSdk = fingerprintSdk
 
         viewModelScope.launch {
             try {
-                availableOtas.asFlow()
+                availableOtas
+                    .asFlow()
                     .flatMapConcat {
                         it.toFlowOfSteps().onCompletion { error ->
                             if (error == null) {
                                 remainingOtas.remove(it)
                             }
                         }
-                    }
-                    .onCompletion { error ->
+                    }.onCompletion { error ->
                         if (error == null) {
                             _progress.postValue(1f)
                             _otaComplete.send()
                         }
-                    }
-                    .collect { otaStep ->
+                    }.collect { otaStep ->
                         Simber.d(otaStep.toString())
                         currentStep = otaStep
                         _progress.postValue(
-                            otaStep.totalProgress.mapToTotalProgress(remainingOtas.size, availableOtas.size)
+                            otaStep.totalProgress.mapToTotalProgress(remainingOtas.size, availableOtas.size),
                         )
                     }
             } catch (ex: Throwable) {
@@ -102,7 +100,12 @@ internal class OtaViewModel @Inject constructor(
     private suspend fun targetVersions(availableOta: AvailableOta): String {
         val scannerVersion = recentUserActivityManager.getRecentUserActivity().lastScannerVersion
         val availableFirmwareVersions =
-            configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(fingerprintSdk)?.vero2?.firmwareVersions
+            configManager
+                .getProjectConfiguration()
+                .fingerprint
+                ?.getSdkConfiguration(fingerprintSdk)
+                ?.vero2
+                ?.firmwareVersions
         return when (availableOta) {
             AvailableOta.CYPRESS -> availableFirmwareVersions?.get(scannerVersion)?.cypress ?: ""
             AvailableOta.STM -> availableFirmwareVersions?.get(scannerVersion)?.stm ?: ""
@@ -126,34 +129,41 @@ internal class OtaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleScannerError(e: Throwable, currentRetryAttempt: Int) {
+    private suspend fun handleScannerError(
+        e: Throwable,
+        currentRetryAttempt: Int,
+    ) {
         Simber.e(e)
         if (e is BackendMaintenanceException) {
             _otaFailed.send(
                 FetchOtaResult(
                     isMaintenanceMode = true,
-                    estimatedOutage = e.estimatedOutage
-                )
+                    estimatedOutage = e.estimatedOutage,
+                ),
             )
         } else if (currentRetryAttempt >= MAX_RETRY_ATTEMPTS) {
             _otaFailed.send(FetchOtaResult(isMaintenanceMode = false))
         } else {
             when (val strategy = currentStep?.recoveryStrategy) {
-                HARD_RESET, SOFT_RESET -> _otaRecovery.send(OtaRecoveryParams(
-                    fingerprintSDK = fingerprintSdk,
-                    remainingOtas = remainingOtas,
-                    currentRetryAttempt = currentRetryAttempt,
-                    recoveryStrategy = strategy,
-                ))
-
-                SOFT_RESET_AFTER_DELAY -> {
-                    delay(OtaRecoveryStrategy.DELAY_TIME_MS)
-                    _otaRecovery.send(OtaRecoveryParams(
+                HARD_RESET, SOFT_RESET -> _otaRecovery.send(
+                    OtaRecoveryParams(
                         fingerprintSDK = fingerprintSdk,
                         remainingOtas = remainingOtas,
                         currentRetryAttempt = currentRetryAttempt,
-                        recoveryStrategy = SOFT_RESET,
-                    ))
+                        recoveryStrategy = strategy,
+                    ),
+                )
+
+                SOFT_RESET_AFTER_DELAY -> {
+                    delay(OtaRecoveryStrategy.DELAY_TIME_MS)
+                    _otaRecovery.send(
+                        OtaRecoveryParams(
+                            fingerprintSDK = fingerprintSdk,
+                            remainingOtas = remainingOtas,
+                            currentRetryAttempt = currentRetryAttempt,
+                            recoveryStrategy = SOFT_RESET,
+                        ),
+                    )
                 }
 
                 null -> _otaFailed.send(FetchOtaResult(isMaintenanceMode = false))
@@ -161,7 +171,10 @@ internal class OtaViewModel @Inject constructor(
         }
     }
 
-    private fun Float.mapToTotalProgress(nRemainingOtas: Int, nTotalOtas: Int): Float {
+    private fun Float.mapToTotalProgress(
+        nRemainingOtas: Int,
+        nTotalOtas: Int,
+    ): Float {
         val baseProgress = (nTotalOtas.toFloat() - nRemainingOtas.toFloat()) / nTotalOtas.toFloat()
         return baseProgress + this / nTotalOtas.toFloat()
     }

@@ -9,9 +9,8 @@ internal fun DbFaceSample.fromDbToDomain(): FaceSample = FaceSample(
     format = format,
 )
 
-internal fun FaceSample.fromDomainToDb(): DbFaceSample =
-    DbFaceSample().also { sample ->
-        sample.id = id
-        sample.template = template
-        sample.format = format
-    }
+internal fun FaceSample.fromDomainToDb(): DbFaceSample = DbFaceSample().also { sample ->
+    sample.id = id
+    sample.template = template
+    sample.format = format
+}

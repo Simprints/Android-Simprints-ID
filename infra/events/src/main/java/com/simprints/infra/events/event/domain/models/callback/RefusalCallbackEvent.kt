@@ -18,7 +18,6 @@ data class RefusalCallbackEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         reason: String,
@@ -26,13 +25,12 @@ data class RefusalCallbackEvent(
     ) : this(
         UUID.randomUUID().toString(),
         RefusalCallbackPayload(createdAt, EVENT_VERSION, reason, extra),
-        CALLBACK_REFUSAL
+        CALLBACK_REFUSAL,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class RefusalCallbackPayload(
@@ -43,12 +41,10 @@ data class RefusalCallbackEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_REFUSAL,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "reason: $reason, extra: $extra"
     }
 
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

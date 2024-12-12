@@ -13,7 +13,6 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class StmOtaMessageOutputStreamTest {
-
     private val mockStmOtaMessageSerializer: StmOtaMessageSerializer = mockk()
 
     @Test

@@ -15,7 +15,6 @@ data class InvalidIntentEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         creationTime: Timestamp,
         action: String,
@@ -23,9 +22,8 @@ data class InvalidIntentEvent(
     ) : this(
         UUID.randomUUID().toString(),
         InvalidIntentPayload(creationTime, EVENT_VERSION, action, extras),
-        INVALID_INTENT
+        INVALID_INTENT,
     )
-
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
@@ -40,10 +38,7 @@ data class InvalidIntentEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = INVALID_INTENT,
     ) : EventPayload() {
-
-        override fun toSafeString(): String {
-            return "action: $action, extras: $extras"
-        }
+        override fun toSafeString(): String = "action: $action, extras: $extras"
     }
 
     companion object {

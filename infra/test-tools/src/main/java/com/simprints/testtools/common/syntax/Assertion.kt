@@ -5,7 +5,6 @@ import io.reactivex.observers.TestObserver
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert
 
-
 inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
     try {
         executable()
@@ -18,7 +17,10 @@ inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
     failTest("Expected an ${T::class.java.simpleName} to be thrown")
 }
 
-inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
+inline fun <reified T : Throwable> assertThrows(
+    throwable: T,
+    executable: () -> Unit,
+): T {
     val thrown = assertThrows<T>(executable)
     Assert.assertEquals(throwable, thrown)
     return thrown

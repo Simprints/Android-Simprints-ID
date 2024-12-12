@@ -19,13 +19,11 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ExitFormViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -129,5 +127,4 @@ internal class ExitFormViewModelTest {
         val optionDoesNotRequiresInfo = ExitFormOption.ReligiousConcerns
         val optionRequiresInfo = ExitFormOption.Other
     }
-
 }

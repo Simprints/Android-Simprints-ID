@@ -10,8 +10,9 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
-class KronosTimeHelperImpl @Inject constructor(private val clock: KronosClock) : TimeHelper {
-
+class KronosTimeHelperImpl @Inject constructor(
+    private val clock: KronosClock,
+) : TimeHelper {
     init {
         clock.syncInBackground()
     }
@@ -24,7 +25,7 @@ class KronosTimeHelperImpl @Inject constructor(private val clock: KronosClock) :
         Timestamp(
             ms = it.posixTimeMs,
             isTrustworthy = it.timeSinceLastNtpSyncMs != null,
-            msSinceBoot = clock.getElapsedTimeMs()
+            msSinceBoot = clock.getElapsedTimeMs(),
         )
     }
 
@@ -58,5 +59,4 @@ class KronosTimeHelperImpl @Inject constructor(private val clock: KronosClock) :
 
         timeInMillis
     }
-
 }

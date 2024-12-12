@@ -25,11 +25,13 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) {
-
     private val viewModel: FetchSubjectViewModel by viewModels()
     private val args: FetchSubjectFragmentArgs by navArgs()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         with(findNavController()) {
@@ -60,7 +62,8 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
 
     private fun handleFetchState(state: FetchSubjectState) = when (state) {
         FetchSubjectState.FoundLocal,
-        FetchSubjectState.FoundRemote -> finishWithResult(true)
+        FetchSubjectState.FoundRemote,
+        -> finishWithResult(true)
 
         FetchSubjectState.NotFound -> openAlert(FetchSubjectAlerts.subjectNotFoundOnline().toArgs())
         FetchSubjectState.ConnectionError -> openAlert(FetchSubjectAlerts.subjectNotFoundOffline().toArgs())
@@ -94,12 +97,14 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
         findNavController().navigateSafely(this, R.id.action_fetchSubjectFragment_to_exitFormFragment, exitFormArgs)
     }
 
-    private fun finishWithResult(found: Boolean, wasOnline: Boolean = false) {
+    private fun finishWithResult(
+        found: Boolean,
+        wasOnline: Boolean = false,
+    ) {
         findNavController().finishWithResult(this, FetchSubjectResult(found, wasOnline))
     }
 
     private fun handleExitFormResult(exiFormResult: ExitFormResult) {
         findNavController().finishWithResult(this, exiFormResult)
     }
-
 }

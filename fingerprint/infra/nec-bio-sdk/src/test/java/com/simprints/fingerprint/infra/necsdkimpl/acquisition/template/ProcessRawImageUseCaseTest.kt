@@ -19,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ProcessRawImageUseCaseTest {
-
     @MockK
     private lateinit var secugenImageCorrection: SecugenImageCorrection
 
@@ -45,7 +44,7 @@ class ProcessRawImageUseCaseTest {
             secugenImageCorrection,
             acquireImageDistortionConfigurationUseCase,
             wsqConverter,
-            testCoroutineRule.testCoroutineDispatcher
+            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
@@ -56,7 +55,7 @@ class ProcessRawImageUseCaseTest {
             processingResolution = Dpi(500),
             qualityThreshold = 0,
             timeOutMs = 0,
-            allowLowQualityExtraction = true
+            allowLowQualityExtraction = true,
         )
         val rawImage = RawUnprocessedImage(
             byteArrayOf(
@@ -83,16 +82,18 @@ class ProcessRawImageUseCaseTest {
                 0x05,
                 0x06,
                 0x07,
-                0x08
-            )
+                0x08,
+            ),
         )
 
         val decodedImage: RawImage =
             RawImage(width = 400, height = 300, ppi = 500, depth = 1, bytes = ByteArray(20))
 
-
         val expectedProcessedImage: ProcessedImage = ProcessedImage(
-            imageBytes = ByteArray(20), width = 400, height = 300, resolution = 500
+            imageBytes = ByteArray(20),
+            width = 400,
+            height = 300,
+            resolution = 500,
         )
 
         coEvery { wsqConverter.fromWSQToRaw(rawImage.imageData) } returns decodedImage
@@ -113,5 +114,4 @@ class ProcessRawImageUseCaseTest {
             secugenImageCorrection.processRawImage(decodedImage.bytes, any())
         }
     }
-
 }

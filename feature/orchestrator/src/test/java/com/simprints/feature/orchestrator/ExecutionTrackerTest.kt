@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ExecutionTrackerTest {
-
     private lateinit var executionTracker: ExecutionTracker
     private lateinit var timeHelper: TimeHelper
     private val executionTimeLimitSec: Int = 1
@@ -24,7 +23,7 @@ class ExecutionTrackerTest {
 
         executionTracker = ExecutionTracker(
             timeHelper = timeHelper,
-            executionTimeLimitSec = executionTimeLimitSec
+            executionTimeLimitSec = executionTimeLimitSec,
         )
     }
 

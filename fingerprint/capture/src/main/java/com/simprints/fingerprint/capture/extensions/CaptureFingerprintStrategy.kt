@@ -3,9 +3,8 @@ package com.simprints.fingerprint.capture.extensions
 /**
  * This enum represents the image quality of the fingerprint image to be captured
  */
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.Vero2Configuration
-
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 @ExcludedFromGeneratedTestCoverageReports("Not worth testing")
 internal fun Vero2Configuration.CaptureStrategy.toInt(): Int = when (this) {

@@ -3,9 +3,7 @@ package com.simprints.core.domain.tokenization
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-
 class TokenizableStringTest {
-
     @Test
     fun `given two different TokenizableString objects with equal values, when compared, should be equal`() {
         val value = "value"
@@ -64,6 +62,7 @@ class TokenizableStringTest {
         assertThat(value.asTokenizable(isTokenized = true)).isEqualTo(TokenizableString.Tokenized(value))
         assertThat(value.asTokenizable(isTokenized = false)).isEqualTo(TokenizableString.Raw(value))
     }
+
     @Test
     fun `when takeIfTokenized is invoked, the value is not null only if it is tokenized`() {
         val value = "value"

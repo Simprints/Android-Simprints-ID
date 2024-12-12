@@ -20,7 +20,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class DeviceConfigDownSyncWorkerTest {
-
     @MockK
     private lateinit var configManager: ConfigManager
 
@@ -68,7 +67,7 @@ class DeviceConfigDownSyncWorkerTest {
         coEvery { configManager.getDeviceState() } returns DeviceState(
             "deviceId",
             true,
-            UpSyncEnrolmentRecords("id", listOf("subjectId"))
+            UpSyncEnrolmentRecords("id", listOf("subjectId")),
         )
 
         val result = deviceConfigWorker.doWork()
@@ -83,7 +82,7 @@ class DeviceConfigDownSyncWorkerTest {
         coEvery { configManager.getDeviceState() } returns DeviceState(
             "deviceId",
             false,
-            UpSyncEnrolmentRecords("id", listOf("subjectId"))
+            UpSyncEnrolmentRecords("id", listOf("subjectId")),
         )
 
         val result = deviceConfigWorker.doWork()

@@ -28,12 +28,14 @@ class SimulatedScannerManager(
     var isDeviceBonded: Boolean = true,
     var deviceName: String = "",
     var outgoingStreamObservers: Set<Observer<ByteArray>> = setOf(),
-    var context: Context?,) {
-
+    var context: Context?,
+) {
     private var simulatedScanner: SimulatedScanner? = null
 
     private val mockFingerIndex = AtomicInteger(0)
+
     fun currentMockFinger() = simulatedFingers[mockFingerIndex.get()]
+
     fun cycleToNextFinger() = mockFingerIndex.set((mockFingerIndex.get() + 1) % simulatedFingers.size)
 
     private lateinit var fakeScannerStream: PipedOutputStream
@@ -47,14 +49,12 @@ class SimulatedScannerManager(
         refreshStreams()
     }
 
-    private fun createScannersFromAddresses(): Set<SimulatedBluetoothDevice> =
-        pairedScannerAddresses
-            .map { SimulatedBluetoothDevice(this, it) }
-            .toSet()
+    private fun createScannersFromAddresses(): Set<SimulatedBluetoothDevice> = pairedScannerAddresses
+        .map { SimulatedBluetoothDevice(this, it) }
+        .toSet()
 
-    fun getScannerWithAddress(address: String): SimulatedBluetoothDevice =
-        pairedScanners.firstOrNull { address == it.address }
-            ?: SimulatedBluetoothDevice(this, address)
+    fun getScannerWithAddress(address: String): SimulatedBluetoothDevice = pairedScanners.firstOrNull { address == it.address }
+        ?: SimulatedBluetoothDevice(this, address)
 
     private fun refreshStreams() {
         this.fakeScannerStream = PipedOutputStream()
@@ -69,15 +69,22 @@ class SimulatedScannerManager(
         streamFromAppToScanner.observers.add(appToScannerObserver)
         outgoingStreamObservers.forEach { streamFromAppToScanner.observers.add(it) }
         simulatedScanner = when (simulationMode) {
-            SimulationMode.V1 -> SimulatedScannerV1(this, initialScannerState as? SimulatedScannerStateV1
-                ?: SimulatedScannerStateV1())
-            SimulationMode.V2 -> SimulatedScannerV2(this, initialScannerState as? SimulatedScannerStateV2
-                ?: SimulatedScannerStateV2())
+            SimulationMode.V1 -> SimulatedScannerV1(
+                this,
+                initialScannerState as? SimulatedScannerStateV1
+                    ?: SimulatedScannerStateV1(),
+            )
+            SimulationMode.V2 -> SimulatedScannerV2(
+                this,
+                initialScannerState as? SimulatedScannerStateV2
+                    ?: SimulatedScannerStateV2(),
+            )
         }
     }
 
     private val appToScannerObserver = object : DisposableObserver<ByteArray>() {
         override fun onComplete() {}
+
         override fun onNext(bytes: ByteArray) {
             handleAppToScannerEvent(bytes)
         }

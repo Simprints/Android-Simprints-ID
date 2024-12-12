@@ -37,7 +37,7 @@ internal val vero2Configuration = Vero2Configuration(
     Vero2Configuration.ImageSavingStrategy.EAGER,
     Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI,
     Vero2Configuration.LedsMode.BASIC,
-    mapOf("E-1" to Vero2Configuration.Vero2FirmwareVersions("1.1", "1.2", "1.4"))
+    mapOf("E-1" to Vero2Configuration.Vero2FirmwareVersions("1.1", "1.2", "1.4")),
 )
 internal val faceConfiguration =
     FaceConfiguration(
@@ -48,7 +48,7 @@ internal val faceConfiguration =
             imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
             decisionPolicy = decisionPolicy,
             version = "1.0",
-        )
+        ),
     )
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
@@ -63,8 +63,7 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
         vero2 = vero2Configuration,
         allowedAgeRange = AgeGroup(0, null),
         verificationMatchThreshold = 42.0f,
-        maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17)
-
+        maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
     ),
     nec = null,
 )
@@ -102,7 +101,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     UpSynchronizationConfiguration(
         simprintsUpSyncConfigurationConfiguration,
         UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
-            UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+            UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
         ),
     ),
     DownSynchronizationConfiguration(
@@ -110,7 +109,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
         1,
         listOf("module1".asTokenizableEncrypted()),
         "PT24H",
-    )
+    ),
 )
 
 internal val identificationConfiguration =
@@ -129,10 +128,10 @@ internal val projectConfiguration = ProjectConfiguration(
     null,
 )
 
-internal const val tokenizationJson =
+internal const val TOKENIZATION_JSON =
     "{\"primaryKeyId\":12345,\"key\":[{\"keyData\":{\"typeUrl\":\"typeUrl\",\"value\":\"value\",\"keyMaterialType\":\"keyMaterialType\"},\"status\":\"enabled\",\"keyId\":123456789,\"outputPrefixType\":\"outputPrefixType\"}]}"
 
-internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to tokenizationJson)
+internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to TOKENIZATION_JSON)
 
 internal val project = Project(
     id = "id",
@@ -142,5 +141,5 @@ internal val project = Project(
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
-    tokenizationKeys = tokenizationKeysDomain
+    tokenizationKeys = tokenizationKeysDomain,
 )

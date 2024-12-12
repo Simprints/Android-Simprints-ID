@@ -18,7 +18,10 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
 ) {
-    suspend operator fun invoke(projectId: String, subjectId: String): String? {
+    suspend operator fun invoke(
+        projectId: String,
+        subjectId: String,
+    ): String? {
         val config = configManager.getProjectConfiguration()
 
         if (!config.canCoSyncAllData() && !config.canCoSyncBiometricData()) {
@@ -39,6 +42,6 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         projectId,
         moduleId,
         attendantId,
-        EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder)
+        EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
     )
 }

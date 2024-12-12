@@ -19,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class GetEnrolmentCreationEventForSubjectUseCaseTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -47,7 +46,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
             configManager,
             enrolmentRecordRepository,
             encoder,
-            jsonHelper
+            jsonHelper,
         )
     }
 

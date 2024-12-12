@@ -13,12 +13,12 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class GeneralConsentTextHelperTest {
-
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val modalitiesUseCaseText = String.format(
-        "%s %s %s", context.getString(R.string.consent_biometrics_general_fingerprint),
+        "%s %s %s",
+        context.getString(R.string.consent_biometrics_general_fingerprint),
         context.getString(R.string.consent_biometric_concat_modalities),
-        context.getString(R.string.consent_biometric_general_face)
+        context.getString(R.string.consent_biometric_general_face),
     )
 
     companion object {
@@ -29,13 +29,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return the correct consent for an enrol only with one modality`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.ENROL,
         ).assembleText(context)
@@ -50,13 +52,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return the correct consent for an enrol only with two modalities`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
         ).assembleText(context)
@@ -71,13 +75,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return the correct consent for a standard enrol with one modality`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
         ).assembleText(context)
@@ -92,13 +98,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return the correct consent for a standard enrol with two modalities`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.ENROL,
         ).assembleText(context)
@@ -113,13 +121,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return the correct consent for a verification`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.VERIFY,
         ).assembleText(context)
@@ -136,12 +146,13 @@ class GeneralConsentTextHelperTest {
         val generalConsentText = GeneralConsentTextHelper(
             configWithPrompt(
                 ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -156,13 +167,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return the correct consent for an identification with two modalities`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -177,13 +190,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should add the correct string when the data is not shared with partner for fingerprint`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -199,13 +214,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should add the correct string when the data is not shared with partner for face`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -221,13 +238,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should add the correct string when the data is not shared with partner for face and fingerprint`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT, GeneralConfiguration.Modality.FACE),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -243,13 +262,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should add the correct string when the data is shared with partner for fingerprint`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = true,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = true,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -264,13 +285,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should add the correct string when the data is used for R&D`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = true,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = true,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -284,13 +307,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should not add the string when the data is not used for R&D`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -304,13 +329,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should add the correct string when the privacy right is required`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = true,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = true,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -324,13 +351,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should not add the string when the privacy right is not required`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -344,13 +373,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should add the correct string when the confirmation is required`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = true,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = true,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -365,13 +396,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should not add the string when the confirmation is not required`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = false,
-                dataUsedForRAndD = false,
-                privacyRights = false,
-                confirmation = false,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = false,
+                    dataUsedForRAndD = false,
+                    privacyRights = false,
+                    confirmation = false,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -385,13 +418,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should not start a new sentence after a period without a following space`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = true,
-                dataUsedForRAndD = true,
-                privacyRights = true,
-                confirmation = true,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = true,
+                    dataUsedForRAndD = true,
+                    privacyRights = true,
+                    confirmation = true,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -402,13 +437,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should not start with a space`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = true,
-                dataUsedForRAndD = true,
-                privacyRights = true,
-                confirmation = true,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = true,
+                    dataUsedForRAndD = true,
+                    privacyRights = true,
+                    confirmation = true,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)
@@ -419,13 +456,15 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should not contain double spaces`() {
         val generalConsentText = GeneralConsentTextHelper(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
-                enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
-                dataSharedWithPartner = true,
-                dataUsedForRAndD = true,
-                privacyRights = true,
-                confirmation = true,
-            )),
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
+                    enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
+                    dataSharedWithPartner = true,
+                    dataUsedForRAndD = true,
+                    privacyRights = true,
+                    confirmation = true,
+                ),
+            ),
             listOf(GeneralConfiguration.Modality.FINGERPRINT),
             ConsentType.IDENTIFY,
         ).assembleText(context)

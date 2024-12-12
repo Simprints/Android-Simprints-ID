@@ -10,8 +10,8 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.config.ExitFormOption
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.RefusalEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -22,9 +22,8 @@ import javax.inject.Inject
 internal class ExitFormViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
-    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
-
     private val exitFormStart: Timestamp = timeHelper.now()
 
     private var selectedOption: ExitFormOption? = null
@@ -65,8 +64,10 @@ internal class ExitFormViewModel @Inject constructor(
         _submitEnabled.postValue(canSubmit(selectedOption, newReason))
     }
 
-    private fun canSubmit(option: ExitFormOption?, reason: String?) =
-        option != null && !(option.requiresInfo && reason.isNullOrBlank())
+    private fun canSubmit(
+        option: ExitFormOption?,
+        reason: String?,
+    ) = option != null && !(option.requiresInfo && reason.isNullOrBlank())
 
     fun handleBackButton() {
         if (selectedOption == null) {
@@ -85,7 +86,10 @@ internal class ExitFormViewModel @Inject constructor(
         }
     }
 
-    private fun logRefusalEvent(option: ExitFormOption, reasonText: String) = sessionCoroutineScope.launch {
+    private fun logRefusalEvent(
+        option: ExitFormOption,
+        reasonText: String,
+    ) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(RefusalEvent(exitFormStart, timeHelper.now(), option.answer, reasonText))
     }
 }

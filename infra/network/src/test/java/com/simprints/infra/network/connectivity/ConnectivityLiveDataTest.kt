@@ -15,7 +15,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ConnectivityLiveDataTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 

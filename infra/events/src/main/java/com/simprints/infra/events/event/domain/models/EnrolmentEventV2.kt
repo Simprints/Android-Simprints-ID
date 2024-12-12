@@ -15,7 +15,6 @@ data class EnrolmentEventV2(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         subjectId: String,
@@ -32,21 +31,21 @@ data class EnrolmentEventV2(
             projectId = projectId,
             moduleId = moduleId,
             attendantId = attendantId,
-            personCreationEventId = personCreationEventId
+            personCreationEventId = personCreationEventId,
         ),
-        ENROLMENT_V2
+        ENROLMENT_V2,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = mapOf(
         TokenKeyType.AttendantId to payload.attendantId,
-        TokenKeyType.ModuleId to payload.moduleId
+        TokenKeyType.ModuleId to payload.moduleId,
     )
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
         payload = payload.copy(
             attendantId = map[TokenKeyType.AttendantId] ?: payload.attendantId,
-            moduleId = map[TokenKeyType.ModuleId] ?: payload.moduleId
-        )
+            moduleId = map[TokenKeyType.ModuleId] ?: payload.moduleId,
+        ),
     )
 
     @Keep
@@ -61,12 +60,10 @@ data class EnrolmentEventV2(
         override val endedAt: Timestamp? = null,
         override val type: EventType = ENROLMENT_V2,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "subject ID: $subjectId, module ID: $moduleId"
     }
 
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

@@ -6,7 +6,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class ApiConsentPayloadTest {
-
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
         val payload = ApiConsentPayload(domainPayload = mockk(relaxed = true))

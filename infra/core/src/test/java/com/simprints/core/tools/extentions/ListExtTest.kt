@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class ListExtTest {
-
     @Test
     fun `Correctly updates items at index`() {
         val list = listOf(1, 2, 3)

@@ -7,7 +7,6 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class RandomGeneratorImplTest {
-
     @Test
     fun `it should generate bytes everytime`() {
         val generatedKey1 = RandomGeneratorImpl().generateByteArray(64)

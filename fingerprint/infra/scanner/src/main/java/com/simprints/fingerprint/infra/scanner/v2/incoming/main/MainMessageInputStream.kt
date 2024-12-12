@@ -35,7 +35,6 @@ class MainMessageInputStream @Inject constructor(
     private val un20ResponseAccumulator: Un20ResponseAccumulator,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : MessageInputStream {
-
     var veroResponses: Flowable<VeroResponse>? = null
     var veroEvents: Flowable<VeroEvent>? = null
     var un20Responses: Flowable<Un20Response>? = null
@@ -48,13 +47,17 @@ class MainMessageInputStream @Inject constructor(
         packetRouter.connect(flowableInputStream)
         with(packetRouter.incomingPacketRoutes) {
             veroResponses =
-                getValue(Route.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
+                getValue(Route.Remote.VeroServer)
+                    .toMainMessageStream(veroResponseAccumulator)
                     .subscribeOnIoAndPublish(ioDispatcher)
                     .also { veroResponsesDisposable = it.connect() }
-            veroEvents = getValue(Route.Remote.VeroEvent).toMainMessageStream(veroEventAccumulator)
-                .subscribeOnIoAndPublish(ioDispatcher).also { veroEventsDisposable = it.connect() }
+            veroEvents = getValue(Route.Remote.VeroEvent)
+                .toMainMessageStream(veroEventAccumulator)
+                .subscribeOnIoAndPublish(ioDispatcher)
+                .also { veroEventsDisposable = it.connect() }
             un20Responses =
-                getValue(Route.Remote.Un20Server).toMainMessageStream(un20ResponseAccumulator)
+                getValue(Route.Remote.Un20Server)
+                    .toMainMessageStream(un20ResponseAccumulator)
                     .subscribeOnIoAndPublish(ioDispatcher)
                     .also { un20ResponsesDisposable = it.connect() }
         }
@@ -67,16 +70,14 @@ class MainMessageInputStream @Inject constructor(
         packetRouter.disconnect()
     }
 
-    inline fun <reified R : IncomingMainMessage> receiveResponse(): Single<R> =
-        Single.defer {
-            when {
-                isSubclass<R, VeroResponse>() -> veroResponses
-                isSubclass<R, VeroEvent>() -> veroEvents
-                isSubclass<R, Un20Response>() -> un20Responses
-                else -> Flowable.error(IllegalArgumentException("Trying to receive invalid response"))
-            }
-                ?.filterCast<R>()
-                ?.firstOrError()
-                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
-        }
+    inline fun <reified R : IncomingMainMessage> receiveResponse(): Single<R> = Single.defer {
+        when {
+            isSubclass<R, VeroResponse>() -> veroResponses
+            isSubclass<R, VeroEvent>() -> veroEvents
+            isSubclass<R, Un20Response>() -> un20Responses
+            else -> Flowable.error(IllegalArgumentException("Trying to receive invalid response"))
+        }?.filterCast<R>()
+            ?.firstOrError()
+            ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
+    }
 }

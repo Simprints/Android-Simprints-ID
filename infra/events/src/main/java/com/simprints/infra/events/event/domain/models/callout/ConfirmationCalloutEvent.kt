@@ -18,7 +18,6 @@ data class ConfirmationCalloutEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         projectId: String,
@@ -27,13 +26,12 @@ data class ConfirmationCalloutEvent(
     ) : this(
         UUID.randomUUID().toString(),
         ConfirmationCalloutPayload(createdAt, EVENT_VERSION, projectId, selectedGuid, sessionId),
-        CALLOUT_CONFIRMATION
+        CALLOUT_CONFIRMATION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ConfirmationCalloutPayload(
@@ -45,12 +43,10 @@ data class ConfirmationCalloutEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_CONFIRMATION,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "guid: $selectedGuid, session ID: $sessionId"
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

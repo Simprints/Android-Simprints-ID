@@ -4,17 +4,19 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20R
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.unsignedToInt
 
-class GetImageQualityResponse(val imageQualityScore: Int?) : Un20Response(Un20MessageType.GetImageQuality) {
-
+class GetImageQualityResponse(
+    val imageQualityScore: Int?,
+) : Un20Response(Un20MessageType.GetImageQuality) {
     override fun getDataBytes(): ByteArray = imageQualityScore?.let { byteArrayOf(it.toByte()) }
         ?: byteArrayOf()
 
     companion object {
-        fun fromBytes(data: ByteArray) =
-            GetImageQualityResponse(
-                if (data.isNotEmpty())
-                    data[0].unsignedToInt()
-                else null
-            )
+        fun fromBytes(data: ByteArray) = GetImageQualityResponse(
+            if (data.isNotEmpty()) {
+                data[0].unsignedToInt()
+            } else {
+                null
+            },
+        )
     }
 }

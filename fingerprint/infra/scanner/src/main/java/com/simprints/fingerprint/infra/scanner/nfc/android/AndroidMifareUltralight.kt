@@ -5,13 +5,12 @@ import com.simprints.fingerprint.infra.scanner.nfc.ComponentMifareUltralight
 import java.io.Closeable
 
 internal class AndroidMifareUltralight(
-    private val mifare: MifareUltralight
-) : ComponentMifareUltralight, Closeable by mifare {
-
+    private val mifare: MifareUltralight,
+) : ComponentMifareUltralight,
+    Closeable by mifare {
     override fun connect() {
         mifare.connect()
     }
 
-    override fun readPages(pageOffset: Int): ByteArray =
-        mifare.readPages(pageOffset)
+    override fun readPages(pageOffset: Int): ByteArray = mifare.readPages(pageOffset)
 }

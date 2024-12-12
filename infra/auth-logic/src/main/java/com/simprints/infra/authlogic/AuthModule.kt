@@ -12,16 +12,15 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AuthModule {
-
     @Binds
     internal abstract fun provideAuthenticator(authManager: AuthManagerImpl): AuthManager
-
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 object IntegrityModule {
-
     @Provides
-    fun provideIntegrityManager(@ApplicationContext context: Context) = IntegrityManagerFactory.create(context)
+    fun provideIntegrityManager(
+        @ApplicationContext context: Context,
+    ) = IntegrityManagerFactory.create(context)
 }

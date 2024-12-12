@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scannermock.simulated
 
 enum class SimulationMode {
-    V1, V2
+    V1,
+    V2,
 }

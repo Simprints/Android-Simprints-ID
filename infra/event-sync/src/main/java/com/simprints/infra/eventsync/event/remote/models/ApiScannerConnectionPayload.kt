@@ -16,7 +16,6 @@ internal data class ApiScannerConnectionPayload(
     override val startTime: ApiTimestamp,
     val scannerInfo: ApiScannerInfo,
 ) : ApiEventPayload(startTime) {
-
     @Keep
     @JsonInclude(Include.NON_NULL)
     data class ApiScannerInfo(
@@ -38,16 +37,13 @@ internal data class ApiScannerConnectionPayload(
 
     enum class ApiScannerGeneration {
         VERO_1,
-        VERO_2
+        VERO_2,
     }
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
 
-
-internal fun ScannerGeneration.toApiScannerGeneration() =
-    when (this) {
-        VERO_1 -> ApiScannerGeneration.VERO_1
-        VERO_2 -> ApiScannerGeneration.VERO_2
-    }
+internal fun ScannerGeneration.toApiScannerGeneration() = when (this) {
+    VERO_1 -> ApiScannerGeneration.VERO_1
+    VERO_2 -> ApiScannerGeneration.VERO_2
+}

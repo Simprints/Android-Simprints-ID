@@ -9,7 +9,6 @@ import com.simprints.infra.config.store.testtools.protoFingerprintConfiguration
 import org.junit.Test
 
 class FingerprintConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
@@ -18,13 +17,14 @@ class FingerprintConfigurationTest {
 
     @Test
     fun `should map correctly the model with allowedAgeRange missing`() {
-        val protoFingerprintConfigurationWithoutAgeRange = protoFingerprintConfiguration.toBuilder()
+        val protoFingerprintConfigurationWithoutAgeRange = protoFingerprintConfiguration
+            .toBuilder()
             .setSecugenSimMatcher(protoFingerprintConfiguration.secugenSimMatcher.toBuilder().clearAllowedAgeRange())
             .build()
         val fingerprintConfigurationWithoutAgeRange = fingerprintConfiguration.copy(
             secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
-                allowedAgeRange = AgeGroup(0, null)
-            )
+                allowedAgeRange = AgeGroup(0, null),
+            ),
         )
 
         assertThat(protoFingerprintConfigurationWithoutAgeRange.toDomain()).isEqualTo(fingerprintConfigurationWithoutAgeRange)
@@ -32,7 +32,8 @@ class FingerprintConfigurationTest {
 
     @Test
     fun `should map correctly the old model to new model`() {
-        val proto = protoFingerprintConfiguration.toBuilder()
+        val proto = protoFingerprintConfiguration
+            .toBuilder()
             .clearNec()
             .clearSecugenSimMatcher()
             .addAllowedVeroGenerations(ProtoFingerprintConfiguration.VeroGeneration.VERO_2)
@@ -77,8 +78,10 @@ class FingerprintConfigurationTest {
     @Test
     fun `should map correctly the FingerComparisonStrategy enums`() {
         val mapping = mapOf(
-            ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER to FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-            ProtoFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX to FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
+            ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER to
+                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            ProtoFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX to
+                FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
         )
 
         mapping.forEach {

@@ -6,7 +6,6 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
 object RootMessageProtocol : Protocol {
-
     override val byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN
 
     const val MAX_PAYLOAD_SIZE = 1020
@@ -18,21 +17,22 @@ object RootMessageProtocol : Protocol {
 
     const val START_BYTE = 0xF4.toByte()
 
-    fun getDataLengthFromHeader(header: ByteArray): Int =
-        header.extract({ short },
-            LENGTH_INDICES_IN_HEADER
+    fun getDataLengthFromHeader(header: ByteArray): Int = header
+        .extract(
+            { short },
+            LENGTH_INDICES_IN_HEADER,
         ).unsignedToInt()
 
-    fun getTotalLengthFromHeader(header: ByteArray): Int =
-        getDataLengthFromHeader(header) + HEADER_SIZE
+    fun getTotalLengthFromHeader(header: ByteArray): Int = getDataLengthFromHeader(header) + HEADER_SIZE
 
-    fun getDataBytes(messageBytes: ByteArray): ByteArray =
-        messageBytes.sliceArray(HEADER_SIZE until messageBytes.size)
+    fun getDataBytes(messageBytes: ByteArray): ByteArray = messageBytes.sliceArray(HEADER_SIZE until messageBytes.size)
 
-    fun getMessageType(messageBytes: ByteArray): RootMessageType =
-        RootMessageType.fromByte(messageBytes[MESSAGE_TYPE_INDEX_IN_HEADER])
+    fun getMessageType(messageBytes: ByteArray): RootMessageType = RootMessageType.fromByte(messageBytes[MESSAGE_TYPE_INDEX_IN_HEADER])
 
-    fun buildMessageBytes(rootMessageType: RootMessageType, data: ByteArray): ByteArray {
+    fun buildMessageBytes(
+        rootMessageType: RootMessageType,
+        data: ByteArray,
+    ): ByteArray {
         val length = data.size
         val header = byteArrayOf(START_BYTE, rootMessageType.byte, length.toShort().toByteArray())
         return header + data

@@ -25,7 +25,6 @@ internal class ScannerInitialSetupHelper @Inject constructor(
     private val configManager: ConfigManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
 ) {
-
     private lateinit var scannerVersion: ScannerVersion
 
     /**
@@ -61,7 +60,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
             scannerVersion.hardwareVersion,
             scanner,
             macAddress,
-            batteryInfo
+            batteryInfo,
         )
     }
 
@@ -78,7 +77,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
             batteryPercent,
             batteryVoltage,
             batteryMilliAmps,
-            batteryTemperature
+            batteryTemperature,
         ).also {
             withBatteryInfo(it)
         }
@@ -91,15 +90,17 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         macAddress: String,
         batteryInfo: BatteryInfo,
     ) {
-        val configuredVersions =  configManager.getProjectConfiguration().fingerprint
-                ?.getSdkConfiguration(fingerprintSdk)
-                ?.vero2
-                ?.firmwareVersions
-                ?.get(hardwareVersion)
+        val configuredVersions = configManager
+            .getProjectConfiguration()
+            .fingerprint
+            ?.getSdkConfiguration(fingerprintSdk)
+            ?.vero2
+            ?.firmwareVersions
+            ?.get(hardwareVersion)
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, configuredVersions)
-        val requiresOtaUpdate = availableOtas.isNotEmpty()
-            && !batteryInfo.isLowBattery()
-            && !batteryLevelChecker.isLowBattery()
+        val requiresOtaUpdate = availableOtas.isNotEmpty() &&
+            !batteryInfo.isLowBattery() &&
+            !batteryLevelChecker.isLowBattery()
 
         if (requiresOtaUpdate) {
             connectionHelper.reconnect(scanner, macAddress)
@@ -117,15 +118,27 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         val localFiles = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         return listOfNotNull(
             if (
-                localFiles[Chip.CYPRESS]?.contains(configured.cypress) == true
-                && current.cypress != configured.cypress
-            ) AvailableOta.CYPRESS else null,
+                localFiles[Chip.CYPRESS]?.contains(configured.cypress) == true &&
+                current.cypress != configured.cypress
+            ) {
+                AvailableOta.CYPRESS
+            } else {
+                null
+            },
             if (localFiles[Chip.STM]?.contains(configured.stm) == true &&
                 current.stm != configured.stm
-            ) AvailableOta.STM else null,
+            ) {
+                AvailableOta.STM
+            } else {
+                null
+            },
             if (localFiles[Chip.UN20]?.contains(configured.un20) == true &&
                 current.un20 != configured.un20
-            ) AvailableOta.UN20 else null
+            ) {
+                AvailableOta.UN20
+            } else {
+                null
+            },
         )
     }
 }

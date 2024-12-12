@@ -3,7 +3,6 @@ import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSo
 import org.junit.Test
 
 class BiometricDataSourceTest {
-
     @Test
     fun `should return SIMPRINTS when value is not SIMPRINTS`() {
         val result = BiometricDataSource.fromString("SIMPRINTS", "")

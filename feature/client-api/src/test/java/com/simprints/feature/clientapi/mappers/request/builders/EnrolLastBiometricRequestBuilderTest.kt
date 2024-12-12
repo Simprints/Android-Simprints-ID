@@ -17,7 +17,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 internal class EnrolLastBiometricRequestBuilderTest {
-
     @Test
     fun `EnrolLastBiometricActionRequest should contain mandatory fields`() {
         val extractor = EnrolLastBiometricsActionFactory.getMockExtractor()
@@ -38,7 +37,7 @@ internal class EnrolLastBiometricRequestBuilderTest {
             extractor = extractor,
             project = project,
             tokenizationProcessor = tokenizationProcessor,
-            validator = validator
+            validator = validator,
         ).build() as ActionRequest.EnrolLastBiometricActionRequest
 
         assertThat(action.projectId).isEqualTo(MOCK_PROJECT_ID)

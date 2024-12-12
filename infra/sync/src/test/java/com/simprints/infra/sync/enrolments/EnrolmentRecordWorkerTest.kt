@@ -17,7 +17,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class EnrolmentRecordWorkerTest {
-
     companion object {
         private const val INSTRUCTION_ID = "id"
         private const val SUBJECT_ID = "subjectId"
@@ -38,7 +37,6 @@ class EnrolmentRecordWorkerTest {
         configManager,
         UnconfinedTestDispatcher(),
     )
-
 
     @Test
     fun `should do work correctly`() = runTest {

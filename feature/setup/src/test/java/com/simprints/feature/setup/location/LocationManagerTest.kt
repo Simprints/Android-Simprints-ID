@@ -21,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class LocationManagerTest {
-
     @MockK
     private lateinit var locationManager: LocationManager
 
@@ -35,7 +34,6 @@ internal class LocationManagerTest {
     private lateinit var locationResponseTask: Task<Location>
 
     private var captureCallback = slot<OnCompleteListener<Location>>()
-
 
     @Before
     fun setUp() {
@@ -56,7 +54,6 @@ internal class LocationManagerTest {
 
         locationManager = LocationManager(mockk())
     }
-
 
     @Test
     fun `test requestLocation success`() = runTest {
@@ -80,4 +77,3 @@ internal class LocationManagerTest {
         Truth.assertThat(flow.firstOrNull()).isEqualTo(null)
     }
 }
-

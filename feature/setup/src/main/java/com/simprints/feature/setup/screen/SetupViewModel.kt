@@ -21,7 +21,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 internal class SetupViewModel @Inject constructor(
     private val locationStore: LocationStore,
@@ -29,9 +28,8 @@ internal class SetupViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
     @DeviceID private val deviceID: String,
     private val authStore: AuthStore,
-    private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
+    private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
 ) : ViewModel() {
-
     val requestLocationPermission: LiveData<Unit>
         get() = _requestLocationPermission
     private val _requestLocationPermission = MutableLiveData<Unit>()
@@ -72,25 +70,26 @@ internal class SetupViewModel @Inject constructor(
                 return@launch
             }
             requiredLicenses.forEachIndexed { i, (licenseVendor, version) ->
-                licenseRepository.getLicenseStates(
-                    authStore.signedInProjectId,
-                    deviceID,
-                    licenseVendor,
-                    version
-                ).collect { licenceState ->
-                    _downloadLicenseState.postValue(licenceState)
-                    if (licenceState is LicenseState.FinishedWithError
-                        || licenceState is LicenseState.FinishedWithBackendMaintenanceError
-                    ) {
-                        // Save the license state event
-                        saveLicenseCheckEvent(licenseVendor, LicenseStatus.MISSING)
-                        _overallSetupResult.postValue(false)
+                licenseRepository
+                    .getLicenseStates(
+                        authStore.signedInProjectId,
+                        deviceID,
+                        licenseVendor,
+                        version,
+                    ).collect { licenceState ->
+                        _downloadLicenseState.postValue(licenceState)
+                        if (licenceState is LicenseState.FinishedWithError ||
+                            licenceState is LicenseState.FinishedWithBackendMaintenanceError
+                        ) {
+                            // Save the license state event
+                            saveLicenseCheckEvent(licenseVendor, LicenseStatus.MISSING)
+                            _overallSetupResult.postValue(false)
+                        }
+                        // if this is the last license to download, then update the overall setup result
+                        if (i == requiredLicenses.lastIndex && licenceState is LicenseState.FinishedWithSuccess) {
+                            _overallSetupResult.postValue(true)
+                        }
                     }
-                    // if this is the last license to download, then update the overall setup result
-                    if (i == requiredLicenses.lastIndex && licenceState is LicenseState.FinishedWithSuccess) {
-                        _overallSetupResult.postValue(true)
-                    }
-                }
             }
         }
     }
@@ -103,9 +102,7 @@ internal class SetupViewModel @Inject constructor(
         locationStore.collectLocationInBackground()
     }
 
-    private suspend fun shouldCollectLocation() =
-        configManager.getProjectConfiguration().general.collectLocation
-
+    private suspend fun shouldCollectLocation() = configManager.getProjectConfiguration().general.collectLocation
 }
 
 private val ProjectConfiguration.requiredLicenses: List<Pair<Vendor, LicenseVersion>>

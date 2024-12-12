@@ -10,13 +10,13 @@ import com.simprints.feature.clientapi.usecases.IsCurrentSessionAnIdentification
 import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.libsimprints.Constants.SIMPRINTS_LIB_VERSION
 import com.simprints.libsimprints.Constants.SIMPRINTS_MODULE_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_PROJECT_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID
 import com.simprints.libsimprints.Constants.SIMPRINTS_SESSION_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_USER_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID
-import com.simprints.libsimprints.Constants.SIMPRINTS_LIB_VERSION
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -29,9 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 
-
 class IntentToActionMapperTest {
-
     @get:Rule
     val coroutinesTestRule = TestCoroutineRule()
 
@@ -50,7 +48,6 @@ class IntentToActionMapperTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
-
     private lateinit var mapper: IntentToActionMapper
 
     @Before
@@ -67,7 +64,7 @@ class IntentToActionMapperTest {
             isCurrentSessionAnIdentificationOrEnrolment,
             sessionHasIdentificationCallback,
             tokenizationProcessor,
-            timeHelper
+            timeHelper,
         )
     }
 
@@ -217,4 +214,3 @@ class IntentToActionMapperTest {
         )
     }
 }
-

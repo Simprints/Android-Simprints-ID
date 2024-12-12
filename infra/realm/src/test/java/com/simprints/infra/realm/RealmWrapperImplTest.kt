@@ -13,7 +13,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.exceptions.RealmException
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -22,7 +21,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RealmWrapperImplTest {
-
     companion object {
         private const val PROJECT_ID = "projectId"
     }
@@ -44,7 +42,6 @@ class RealmWrapperImplTest {
 
     @MockK
     private lateinit var realm: Realm
-
 
     private lateinit var realmWrapper: RealmWrapperImpl
 
@@ -94,13 +91,18 @@ class RealmWrapperImplTest {
 
     @Test
     fun `test recreate db if it is corrupted`() = runTest {
-        //Given
-        every { Realm.open(configuration) } throws IllegalStateException("[RLM_ERR_INVALID_DATABASE]: Failed to open Realm file at path") andThen mockk<Realm>(relaxed = true)
+        // Given
+        every {
+            Realm.open(
+                configuration,
+            )
+        } throws IllegalStateException("[RLM_ERR_INVALID_DATABASE]: Failed to open Realm file at path") andThen
+            mockk<Realm>(relaxed = true)
         every { Realm.deleteRealm(configuration) } just Runs
 
-        //When
+        // When
         realmWrapper.writeRealm { }
-        //Then
+        // Then
         verify {
             Realm.deleteRealm(configuration)
             secureLocalDbKeyProviderMock.recreateLocalDatabaseKey(PROJECT_ID)

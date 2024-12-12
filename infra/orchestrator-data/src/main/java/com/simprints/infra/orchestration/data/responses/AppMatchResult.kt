@@ -16,12 +16,11 @@ data class AppMatchResult(
     val matchConfidence: AppMatchConfidence,
     val verificationSuccess: Boolean? = null,
 ) : Parcelable {
-
     constructor(
         guid: String,
         confidenceScore: Float,
         decisionPolicy: DecisionPolicy,
-        verificationMatchThreshold: Float? = null
+        verificationMatchThreshold: Float? = null,
     ) : this(
         guid = guid,
         confidenceScore = confidenceScore.toInt(),
@@ -31,7 +30,6 @@ data class AppMatchResult(
     )
 
     companion object {
-
         fun computeTier(score: Float) = when {
             score < 20f -> AppResponseTier.TIER_5
             score < 35f -> AppResponseTier.TIER_4
@@ -40,14 +38,20 @@ data class AppMatchResult(
             else -> AppResponseTier.TIER_1
         }
 
-        fun computeMatchConfidence(confidenceScore: Int, policy: DecisionPolicy) = when {
+        fun computeMatchConfidence(
+            confidenceScore: Int,
+            policy: DecisionPolicy,
+        ) = when {
             confidenceScore < policy.low -> AppMatchConfidence.NONE
             confidenceScore < policy.medium -> AppMatchConfidence.LOW
             confidenceScore < policy.high -> AppMatchConfidence.MEDIUM
             else -> AppMatchConfidence.HIGH
         }
 
-        fun computeVerificationSuccess(confidenceScore: Int, verificationMatchThreshold: Float?) = when {
+        fun computeVerificationSuccess(
+            confidenceScore: Int,
+            verificationMatchThreshold: Float?,
+        ) = when {
             verificationMatchThreshold == null -> null
             else -> confidenceScore >= verificationMatchThreshold
         }

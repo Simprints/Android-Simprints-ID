@@ -19,11 +19,10 @@ import javax.inject.Qualifier
 @Module(
     includes = [
         IdentityDataSourceModule::class,
-    ]
+    ],
 )
 @InstallIn(SingletonComponent::class)
 abstract class EnrolmentRecordsStoreModule {
-
     @Binds
     internal abstract fun bindEnrolmentRecordRepository(impl: EnrolmentRecordRepositoryImpl): EnrolmentRecordRepository
 

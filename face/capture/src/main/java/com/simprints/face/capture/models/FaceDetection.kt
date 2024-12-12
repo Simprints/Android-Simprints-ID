@@ -16,7 +16,6 @@ internal data class FaceDetection(
     var id: String = UUID.randomUUID().toString(),
     var detectionEndTime: Timestamp,
 ) {
-
     enum class Status {
         VALID,
         VALID_CAPTURING,
@@ -25,7 +24,7 @@ internal data class FaceDetection(
         OFFYAW,
         OFFROLL,
         TOOCLOSE,
-        TOOFAR
+        TOOFAR,
     }
 
     fun hasValidStatus(): Boolean = status == Status.VALID || status == Status.VALID_CAPTURING

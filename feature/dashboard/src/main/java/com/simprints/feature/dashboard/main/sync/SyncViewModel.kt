@@ -58,9 +58,7 @@ internal class SyncViewModel @Inject constructor(
     private val logout: LogoutUseCase,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
-
     companion object {
-
         private const val ONE_MINUTE = 1000 * 60L
         private const val MAX_TIME_BEFORE_SYNC_AGAIN = 5 * ONE_MINUTE
     }
@@ -84,7 +82,8 @@ internal class SyncViewModel @Inject constructor(
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
 
     private suspend fun lastTimeSyncSucceed() = runBlocking {
-        eventSyncManager.getLastSyncTime()
+        eventSyncManager
+            .getLastSyncTime()
             ?.let { timeHelper.readableBetweenNowAndTime(it) }
     }
 
@@ -132,7 +131,7 @@ internal class SyncViewModel @Inject constructor(
             val loginArgs = LoginContract.toArgs(
                 authStore.signedInProjectId,
                 authStore.signedInUserId
-                    ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed
+                    ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
             )
             _loginRequestedEventLiveData.send(loginArgs)
         }
@@ -156,45 +155,44 @@ internal class SyncViewModel @Inject constructor(
         }
     }
 
-    private fun load() =
-        viewModelScope.launch {
-            _syncCardLiveData.addSource(connectivityTracker.observeIsConnected()) {
-                CoroutineScope(coroutineContext + SupervisorJob()).launch {
-                    emitNewCardState(
-                        it,
-                        isModuleSelectionRequired(),
-                        syncStateLiveData.value,
-                        upSyncCountLiveData.value ?: 0,
-                    )
-                }
+    private fun load() = viewModelScope.launch {
+        _syncCardLiveData.addSource(connectivityTracker.observeIsConnected()) {
+            CoroutineScope(coroutineContext + SupervisorJob()).launch {
+                emitNewCardState(
+                    it,
+                    isModuleSelectionRequired(),
+                    syncStateLiveData.value,
+                    upSyncCountLiveData.value ?: 0,
+                )
             }
-            _syncCardLiveData.addSource(syncStateLiveData) {
-                CoroutineScope(coroutineContext + SupervisorJob()).launch {
-                    emitNewCardState(
-                        isConnected(),
-                        isModuleSelectionRequired(),
-                        it,
-                        upSyncCountLiveData.value ?: 0,
-                    )
-                }
-            }
-            _syncCardLiveData.addSource(upSyncCountLiveData) {
-                CoroutineScope(coroutineContext + SupervisorJob()).launch {
-                    emitNewCardState(
-                        isConnected(),
-                        isModuleSelectionRequired(),
-                        syncStateLiveData.value,
-                        it
-                    )
-                }
-            }
-            configManager.getProjectConfiguration().also { configuration ->
-                _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
-            }
-            eventSyncManager
-                .countEventsToUpload(EventType.ENROLMENT_V2)
-                .collect { upSyncCountLiveData.postValue(it) }
         }
+        _syncCardLiveData.addSource(syncStateLiveData) {
+            CoroutineScope(coroutineContext + SupervisorJob()).launch {
+                emitNewCardState(
+                    isConnected(),
+                    isModuleSelectionRequired(),
+                    it,
+                    upSyncCountLiveData.value ?: 0,
+                )
+            }
+        }
+        _syncCardLiveData.addSource(upSyncCountLiveData) {
+            CoroutineScope(coroutineContext + SupervisorJob()).launch {
+                emitNewCardState(
+                    isConnected(),
+                    isModuleSelectionRequired(),
+                    syncStateLiveData.value,
+                    it,
+                )
+            }
+        }
+        configManager.getProjectConfiguration().also { configuration ->
+            _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
+        }
+        eventSyncManager
+            .countEventsToUpload(EventType.ENROLMENT_V2)
+            .collect { upSyncCountLiveData.postValue(it) }
+    }
 
     private suspend fun emitNewCardState(
         isConnected: Boolean,
@@ -212,7 +210,7 @@ internal class SyncViewModel @Inject constructor(
             !isConnected -> SyncOffline(lastTimeSyncSucceed())
             syncRunningAndInfoNotReadyYet -> SyncConnecting(lastTimeSyncSucceed(), 0, null)
             syncNotRunningAndInfoNotReadyYet -> SyncDefault(lastTimeSyncSucceed())
-            syncState == null -> SyncDefault(null) //Useless after the 2 above - just to satisfy nullability in the else
+            syncState == null -> SyncDefault(null) // Useless after the 2 above - just to satisfy nullability in the else
             else -> processRecentSyncState(syncState, itemsToUpSync)
         }.let {
             _syncCardLiveData.postValue(it)
@@ -225,60 +223,56 @@ internal class SyncViewModel @Inject constructor(
     private suspend fun processRecentSyncState(
         syncState: EventSyncState,
         itemsToUpSync: Int,
-    ): SyncCardState {
-
-        return when {
-            syncState.isThereNotSyncHistory() -> SyncDefault(lastTimeSyncSucceed())
-            syncState.isSyncCompleted() -> {
-                if (itemsToUpSync == 0) SyncComplete(lastTimeSyncSucceed())
-                else SyncPendingUpload(lastTimeSyncSucceed(), itemsToUpSync)
+    ): SyncCardState = when {
+        syncState.isThereNotSyncHistory() -> SyncDefault(lastTimeSyncSucceed())
+        syncState.isSyncCompleted() -> {
+            if (itemsToUpSync == 0) {
+                SyncComplete(lastTimeSyncSucceed())
+            } else {
+                SyncPendingUpload(lastTimeSyncSucceed(), itemsToUpSync)
             }
-
-            syncState.isSyncInProgress() -> SyncProgress(
-                lastTimeSyncSucceed(),
-                syncState.progress,
-                syncState.total
-            )
-
-            syncState.isSyncConnecting() -> SyncConnecting(
-                lastTimeSyncSucceed(),
-                syncState.progress,
-                syncState.total
-            )
-
-            syncState.isSyncFailedBecauseReloginRequired() -> SyncFailedReloginRequired(
-                lastTimeSyncSucceed()
-            )
-
-            syncState.isSyncFailedBecauseTooManyRequests() -> SyncTooManyRequests(
-                lastTimeSyncSucceed()
-            )
-
-            syncState.isSyncFailedBecauseCloudIntegration() -> SyncFailed(lastTimeSyncSucceed())
-            syncState.isSyncFailedBecauseBackendMaintenance() -> SyncFailedBackendMaintenance(
-                lastTimeSyncSucceed(),
-                syncState.getEstimatedBackendMaintenanceOutage()
-            )
-
-            syncState.isSyncFailed() -> SyncTryAgain(lastTimeSyncSucceed())
-            else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
         }
+
+        syncState.isSyncInProgress() -> SyncProgress(
+            lastTimeSyncSucceed(),
+            syncState.progress,
+            syncState.total,
+        )
+
+        syncState.isSyncConnecting() -> SyncConnecting(
+            lastTimeSyncSucceed(),
+            syncState.progress,
+            syncState.total,
+        )
+
+        syncState.isSyncFailedBecauseReloginRequired() -> SyncFailedReloginRequired(
+            lastTimeSyncSucceed(),
+        )
+
+        syncState.isSyncFailedBecauseTooManyRequests() -> SyncTooManyRequests(
+            lastTimeSyncSucceed(),
+        )
+
+        syncState.isSyncFailedBecauseCloudIntegration() -> SyncFailed(lastTimeSyncSucceed())
+        syncState.isSyncFailedBecauseBackendMaintenance() -> SyncFailedBackendMaintenance(
+            lastTimeSyncSucceed(),
+            syncState.getEstimatedBackendMaintenanceOutage(),
+        )
+
+        syncState.isSyncFailed() -> SyncTryAgain(lastTimeSyncSucceed())
+        else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
     }
 
+    private suspend fun isModuleSelectionRequired() = isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
-    private suspend fun isModuleSelectionRequired() =
-        isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
+    private suspend fun isDownSyncAllowed() = configManager.getProjectConfiguration().synchronization.frequency !=
+        SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 
-    private suspend fun isDownSyncAllowed() =
-        configManager.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+    private suspend fun isSelectedModulesEmpty() = configManager.getDeviceConfiguration().selectedModules.isEmpty()
 
-    private suspend fun isSelectedModulesEmpty() =
-        configManager.getDeviceConfiguration().selectedModules.isEmpty()
-
-    private suspend fun isModuleSync() =
-        configManager.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+    private suspend fun isModuleSync() = configManager
+        .getProjectConfiguration()
+        .synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
-
 }
-

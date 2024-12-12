@@ -10,13 +10,11 @@ import io.reactivex.Completable
  */
 abstract class MessageOutputStream<in T : Message>(
     private val messageSerializer: MessageSerializer<T>,
-    private val outputStreamDispatcher: OutputStreamDispatcher
+    private val outputStreamDispatcher: OutputStreamDispatcher,
 ) : OutgoingConnectable by outputStreamDispatcher {
-
-    fun sendMessage(message: T): Completable =
-        single {
-            messageSerializer.serialize(message)
-        }.flatMapCompletable {
-            outputStreamDispatcher.dispatch(it)
-        }
+    fun sendMessage(message: T): Completable = single {
+        messageSerializer.serialize(message)
+    }.flatMapCompletable {
+        outputStreamDispatcher.dispatch(it)
+    }
 }

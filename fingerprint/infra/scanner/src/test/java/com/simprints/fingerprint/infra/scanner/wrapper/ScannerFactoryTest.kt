@@ -20,7 +20,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ScannerFactoryTest {
-
     private lateinit var scannerFactory: ScannerFactory
 
     @MockK
@@ -41,6 +40,7 @@ class ScannerFactoryTest {
     @MockK(relaxed = true)
     private lateinit var fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
     private val scannerInfo = ScannerInfo()
+
     @MockK
     private lateinit var scannerV2: Scanner
 
@@ -66,45 +66,44 @@ class ScannerFactoryTest {
     }
 
     @Test
-    fun `initScannerOperationWrappers should call creates the correct V1 wrappers`() =
-        runTest {
-            // Given
-            val macAddress = "F0:AC:D7:C0:01:00"
-            val serialNumber = "serialNumber"
-            every { serialNumberConverter.convertMacAddressToSerialNumber(macAddress) } returns serialNumber
-            every {
-                scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(serialNumber)
-            } returns FingerprintConfiguration.VeroGeneration.VERO_1
+    fun `initScannerOperationWrappers should call creates the correct V1 wrappers`() = runTest {
+        // Given
+        val macAddress = "F0:AC:D7:C0:01:00"
+        val serialNumber = "serialNumber"
+        every { serialNumberConverter.convertMacAddressToSerialNumber(macAddress) } returns serialNumber
+        every {
+            scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(serialNumber)
+        } returns FingerprintConfiguration.VeroGeneration.VERO_1
 
-            // When
-            scannerFactory.initScannerOperationWrappers(macAddress)
-            // Then
-            Truth.assertThat(scannerFactory.scannerV1).isNotNull()
-            Truth.assertThat(scannerFactory.scannerWrapper)
-                .isInstanceOf(ScannerWrapperV1::class.java)
-            Truth.assertThat(scannerFactory.scannerOtaOperationsWrapper).isNull()
-            verify { fingerprintCaptureWrapperFactory.createV1(any()) }
-
-        }
+        // When
+        scannerFactory.initScannerOperationWrappers(macAddress)
+        // Then
+        Truth.assertThat(scannerFactory.scannerV1).isNotNull()
+        Truth
+            .assertThat(scannerFactory.scannerWrapper)
+            .isInstanceOf(ScannerWrapperV1::class.java)
+        Truth.assertThat(scannerFactory.scannerOtaOperationsWrapper).isNull()
+        verify { fingerprintCaptureWrapperFactory.createV1(any()) }
+    }
 
     @Test
-    fun `initScannerOperationWrappers should call creates the correct V2 wrappers`() =
-        runTest {
-            // Given
-            val macAddress = "F0:AC:D7:C0:01:00"
-            val serialNumber = "serialNumber"
-            every { serialNumberConverter.convertMacAddressToSerialNumber(macAddress) } returns serialNumber
-            every {
-                scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(serialNumber)
-            } returns FingerprintConfiguration.VeroGeneration.VERO_2
+    fun `initScannerOperationWrappers should call creates the correct V2 wrappers`() = runTest {
+        // Given
+        val macAddress = "F0:AC:D7:C0:01:00"
+        val serialNumber = "serialNumber"
+        every { serialNumberConverter.convertMacAddressToSerialNumber(macAddress) } returns serialNumber
+        every {
+            scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(serialNumber)
+        } returns FingerprintConfiguration.VeroGeneration.VERO_2
 
-            // When
-            scannerFactory.initScannerOperationWrappers(macAddress)
-            // Then
-            Truth.assertThat(scannerInfo.scannerId).isEqualTo(serialNumber)
-            Truth.assertThat(scannerFactory.scannerWrapper)
-                .isInstanceOf(ScannerWrapperV2::class.java)
-            Truth.assertThat(scannerFactory.scannerOtaOperationsWrapper).isNotNull()
-            verify { fingerprintCaptureWrapperFactory.createV2(any()) }
-        }
+        // When
+        scannerFactory.initScannerOperationWrappers(macAddress)
+        // Then
+        Truth.assertThat(scannerInfo.scannerId).isEqualTo(serialNumber)
+        Truth
+            .assertThat(scannerFactory.scannerWrapper)
+            .isInstanceOf(ScannerWrapperV2::class.java)
+        Truth.assertThat(scannerFactory.scannerOtaOperationsWrapper).isNotNull()
+        verify { fingerprintCaptureWrapperFactory.createV2(any()) }
+    }
 }

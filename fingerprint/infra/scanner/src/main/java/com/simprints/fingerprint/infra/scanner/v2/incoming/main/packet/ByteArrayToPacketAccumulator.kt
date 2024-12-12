@@ -8,10 +8,10 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.ByteArrayAcc
 import javax.inject.Inject
 
 class ByteArrayToPacketAccumulator @Inject constructor(
-    private val packetParser: PacketParser
+    private val packetParser: PacketParser,
 ) : ByteArrayAccumulator<ByteArray, Packet>(
-    fragmentAsByteArray = { bytes -> bytes },
-    canComputeElementLength = { bytes -> bytes.size >= HEADER_SIZE },
-    computeElementLength = { bytes -> getTotalLengthFromHeader(bytes.sliceArray(HEADER_INDICES)) },
-    buildElement = { bytes -> packetParser.parse(bytes) }
-)
+        fragmentAsByteArray = { bytes -> bytes },
+        canComputeElementLength = { bytes -> bytes.size >= HEADER_SIZE },
+        computeElementLength = { bytes -> getTotalLengthFromHeader(bytes.sliceArray(HEADER_INDICES)) },
+        buildElement = { bytes -> packetParser.parse(bytes) },
+    )

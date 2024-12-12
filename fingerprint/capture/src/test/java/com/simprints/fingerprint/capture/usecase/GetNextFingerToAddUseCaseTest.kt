@@ -5,7 +5,6 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class GetNextFingerToAddUseCaseTest {
-
     private val useCase = GetNextFingerToAddUseCase()
 
     @Test
@@ -15,9 +14,13 @@ class GetNextFingerToAddUseCaseTest {
 
     @Test
     fun `Returns right thumb as if left thumb and index fingers already taken`() {
-        assertThat(useCase(listOf(
-            IFingerIdentifier.LEFT_THUMB,
-            IFingerIdentifier.LEFT_INDEX_FINGER,
-        ))).isEqualTo(IFingerIdentifier.RIGHT_THUMB)
+        assertThat(
+            useCase(
+                listOf(
+                    IFingerIdentifier.LEFT_THUMB,
+                    IFingerIdentifier.LEFT_INDEX_FINGER,
+                ),
+            ),
+        ).isEqualTo(IFingerIdentifier.RIGHT_THUMB)
     }
 }

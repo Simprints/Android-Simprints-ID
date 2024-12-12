@@ -17,7 +17,6 @@ import org.junit.Before
 import kotlin.test.Test
 
 class CollectScannerStateUseCaseTest {
-
     @MockK
     private lateinit var configRepository: ConfigRepository
 

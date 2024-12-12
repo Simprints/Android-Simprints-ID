@@ -21,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class EventUpSyncScopeRepositoryTest {
-
     @MockK
     lateinit var authStore: AuthStore
 
@@ -48,7 +47,7 @@ internal class EventUpSyncScopeRepositoryTest {
 
     @Test
     fun `test delete all`() = runTest {
-        //when
+        // when
         eventUpSyncScopeRepository.deleteAll()
         // Then
         coVerify { upSyncOperationOperationDao.deleteAll() }
@@ -60,7 +59,6 @@ internal class EventUpSyncScopeRepositoryTest {
 
         coVerify { upSyncOperationOperationDao.insertOrUpdate(any()) }
     }
-
 
     @Test
     fun buildProjectUpSyncScope() {
@@ -80,8 +78,8 @@ internal class EventUpSyncScopeRepositoryTest {
             DbEventsUpSyncOperationState(
                 op.getUniqueKey(),
                 COMPLETE,
-                TIME1
-            )
+                TIME1,
+            ),
         )
     }
 }

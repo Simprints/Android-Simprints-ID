@@ -8,7 +8,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class EnrolmentCallbackEventTest {
-
     @Test
     fun create_EnrolmentCallbackEvent() {
         val event = EnrolmentCallbackEvent(CREATED_AT, GUID1)

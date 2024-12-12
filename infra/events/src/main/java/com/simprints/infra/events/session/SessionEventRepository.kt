@@ -9,7 +9,6 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
  * features such as caching and pre-filled event fields.
  */
 interface SessionEventRepository {
-
     suspend fun createSession(): EventScope
 
     suspend fun saveSessionScope(eventScope: EventScope)
@@ -25,6 +24,4 @@ interface SessionEventRepository {
     suspend fun addOrUpdateEvent(event: Event)
 
     suspend fun closeCurrentSession(reason: EventScopeEndCause? = null)
-
 }
-

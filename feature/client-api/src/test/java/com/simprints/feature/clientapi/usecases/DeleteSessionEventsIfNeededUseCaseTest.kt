@@ -16,7 +16,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class DeleteSessionEventsIfNeededUseCaseTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -50,10 +49,8 @@ class DeleteSessionEventsIfNeededUseCaseTest {
         coVerify { eventRepository.deleteEventScope("sessionId") }
     }
 
-
     @Test
     fun `does not delete session events if data sync enabled`() = runTest {
-
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             coEvery { synchronization.up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
         }

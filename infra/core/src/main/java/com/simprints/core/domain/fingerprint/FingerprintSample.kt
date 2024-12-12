@@ -4,8 +4,6 @@ import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
-import javax.annotation.processing.Generated
-
 
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
@@ -16,7 +14,6 @@ data class FingerprintSample(
     val format: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -46,8 +43,6 @@ fun List<FingerprintSample>.uniqueId(): String? = if (this.isNotEmpty()) {
     null
 }
 
-fun List<FingerprintSample>.concatTemplates(): ByteArray {
-    return this.sortedBy { it.templateQualityScore }.fold(byteArrayOf()) { acc, sample ->
-        acc + sample.template
-    }
+fun List<FingerprintSample>.concatTemplates(): ByteArray = this.sortedBy { it.templateQualityScore }.fold(byteArrayOf()) { acc, sample ->
+    acc + sample.template
 }

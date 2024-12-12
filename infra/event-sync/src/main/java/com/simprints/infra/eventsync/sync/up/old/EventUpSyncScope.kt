@@ -7,30 +7,34 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope as NewEve
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = EventUpSyncScope.ProjectScope::class)
+    JsonSubTypes.Type(value = EventUpSyncScope.ProjectScope::class),
 )
 @Keep
-@Deprecated(message = "This is used to support old data-upload format, should be replaced with EventUpSyncScope",
+@Deprecated(
+    message = "This is used to support old data-upload format, should be replaced with EventUpSyncScope",
     replaceWith = ReplaceWith(
         expression = "EventUpSyncScope(input)",
-        imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope"))
+        imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope"),
+    ),
 )
-internal abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
-
+internal abstract class EventUpSyncScope(
+    var operation: EventUpSyncOperation,
+) {
     @Keep
-    @Deprecated(message = "This is used to support old data-upload format, should be replaced with new ProjectScope",
+    @Deprecated(
+        message = "This is used to support old data-upload format, should be replaced with new ProjectScope",
         replaceWith = ReplaceWith(
             expression = "EventUpSyncScope.ProjectScope(input)",
-            imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.ProjectScope"))
+            imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope.ProjectScope"),
+        ),
     )
-    data class ProjectScope(val projectId: String) :
-        EventUpSyncScope(EventUpSyncOperation(LocalEventQuery(projectId = projectId))) {
-    }
-
+    data class ProjectScope(
+        val projectId: String,
+    ) : EventUpSyncScope(EventUpSyncOperation(LocalEventQuery(projectId = projectId)))
 
     internal fun toNewScope(): NewEventUpSyncScope {
         val newScope = NewEventUpSyncScope.ProjectScope(
-            operation.queryEvent.projectId ?: ""
+            operation.queryEvent.projectId ?: "",
         )
 
         newScope.operation.lastState = this.operation.lastState

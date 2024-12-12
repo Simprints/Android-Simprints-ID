@@ -26,7 +26,6 @@ internal class EventUpSyncWorkersBuilder @Inject constructor(
     private val upSyncScopeRepository: EventUpSyncScopeRepository,
     private val jsonHelper: JsonHelper,
 ) {
-
     suspend fun buildUpSyncWorkerChain(
         uniqueSyncId: String,
         uniqueUpSyncId: String,
@@ -40,39 +39,40 @@ internal class EventUpSyncWorkersBuilder @Inject constructor(
         uniqueSyncID: String?,
         uniqueUpSyncId: String,
         upSyncScope: EventUpSyncScope,
-    ): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(EventUpSyncUploaderWorker::class.java)
-            .setInputData(workDataOf(
+    ): OneTimeWorkRequest = OneTimeWorkRequest
+        .Builder(EventUpSyncUploaderWorker::class.java)
+        .setInputData(
+            workDataOf(
                 INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope),
                 INPUT_EVENT_UP_SYNC_SCOPE_ID to uniqueUpSyncId,
-            ))
-            .upSyncWorker(uniqueSyncID, uniqueUpSyncId, getUpSyncWorkerConstraints())
-            .addCommonTagForUploaders()
-            .build() as OneTimeWorkRequest
+            ),
+        ).upSyncWorker(uniqueSyncID, uniqueUpSyncId, getUpSyncWorkerConstraints())
+        .addCommonTagForUploaders()
+        .build() as OneTimeWorkRequest
 
-    private fun getUpSyncWorkerConstraints() =
-        Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+    private fun getUpSyncWorkerConstraints() = Constraints
+        .Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
 
     private fun WorkRequest.Builder<*, *>.upSyncWorker(
         uniqueMasterSyncId: String?,
         uniqueUpMasterSyncId: String,
         constraints: Constraints = Constraints.Builder().build(),
-    ) =
-        this.setConstraints(constraints)
-            .addTagForMasterSyncId(uniqueMasterSyncId)
-            .addTagFoUpSyncId(uniqueUpMasterSyncId)
-            .addTagForScheduledAtNow()
-            .addCommonTagForUpWorkers()
-            .addCommonTagForAllSyncWorkers()
-            .also { builder ->
-                uniqueMasterSyncId?.let {
-                    builder.setBackoffCriteria(
-                        BackoffPolicy.LINEAR,
-                        MIN_BACKOFF_SECS,
-                        TimeUnit.SECONDS
-                    )
-                }
+    ) = this
+        .setConstraints(constraints)
+        .addTagForMasterSyncId(uniqueMasterSyncId)
+        .addTagFoUpSyncId(uniqueUpMasterSyncId)
+        .addTagForScheduledAtNow()
+        .addCommonTagForUpWorkers()
+        .addCommonTagForAllSyncWorkers()
+        .also { builder ->
+            uniqueMasterSyncId?.let {
+                builder.setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    MIN_BACKOFF_SECS,
+                    TimeUnit.SECONDS,
+                )
             }
+        }
 }

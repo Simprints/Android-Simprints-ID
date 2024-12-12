@@ -28,8 +28,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.IsNot.not
-import org.junit.Ignore
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,10 +40,11 @@ import com.simprints.infra.resources.R as IDR
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
-@Ignore("This test always fails in the Sonar pipeline. This results in a need to run the otherwise " +
-    "successful pipeline more than once")
+@Ignore(
+    "This test always fails in the Sonar pipeline. This results in a need to run the otherwise " +
+        "successful pipeline more than once",
+)
 class ModuleSelectionFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -56,8 +57,8 @@ class ModuleSelectionFragmentTest {
                     listOf(
                         Module("module12".asTokenizableRaw(), true),
                         Module("module2".asTokenizableRaw(), false),
-                        Module("module3".asTokenizableRaw(), false)
-                    )
+                        Module("module3".asTokenizableRaw(), false),
+                    ),
                 )
             }
         }
@@ -94,7 +95,7 @@ class ModuleSelectionFragmentTest {
     @Test
     fun `should display a toast message if the updateModules throw a TooManyModulesSelectedException`() {
         every { viewModel.updateModuleSelection(any()) } throws TooManyModulesSelectedException(
-            maxNumberOfModules = 2
+            maxNumberOfModules = 2,
         )
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
@@ -108,7 +109,7 @@ class ModuleSelectionFragmentTest {
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
         onView(allOf(withParent(withId(R.id.chipGroup)), withParentIndex(0))).perform(
-            clickCloseChipIcon()
+            clickCloseChipIcon(),
         )
 
         verify(exactly = 1) {
@@ -122,7 +123,7 @@ class ModuleSelectionFragmentTest {
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
         onView(allOf(withParent(withId(R.id.chipGroup)), withParentIndex(0))).perform(
-            clickCloseChipIcon()
+            clickCloseChipIcon(),
         )
 
         ShadowToast.showedToast(context?.getString(IDR.string.dashboard_select_modules_no_modules))
@@ -254,13 +255,15 @@ class ModuleSelectionFragmentTest {
 
     @Test
     fun `should not show overlay if screen is not locked`() {
-        every { viewModel.screenLocked }.returns(mockk {
-            every { observe(any(), any()) } answers {
-                secondArg<Observer<SettingsPasswordConfig>>().onChanged(
-                    SettingsPasswordConfig.Unlocked
-                )
-            }
-        })
+        every { viewModel.screenLocked }.returns(
+            mockk {
+                every { observe(any(), any()) } answers {
+                    secondArg<Observer<SettingsPasswordConfig>>().onChanged(
+                        SettingsPasswordConfig.Unlocked,
+                    )
+                }
+            },
+        )
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
         onView(withId(R.id.modulesLockOverlay)).check(matches(not(isDisplayed())))
@@ -268,13 +271,15 @@ class ModuleSelectionFragmentTest {
 
     @Test
     fun `should show overlay if screen is locked`() {
-        every { viewModel.screenLocked }.returns(mockk {
-            every { observe(any(), any()) } answers {
-                secondArg<Observer<SettingsPasswordConfig>>().onChanged(
-                    SettingsPasswordConfig.Locked("1234")
-                )
-            }
-        })
+        every { viewModel.screenLocked }.returns(
+            mockk {
+                every { observe(any(), any()) } answers {
+                    secondArg<Observer<SettingsPasswordConfig>>().onChanged(
+                        SettingsPasswordConfig.Locked("1234"),
+                    )
+                }
+            },
+        )
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
         onView(withId(R.id.modulesLockOverlay)).check(matches(isDisplayed()))
@@ -282,18 +287,21 @@ class ModuleSelectionFragmentTest {
 
     @Test
     fun `should show password dialog when overlay clicked`() {
-        every { viewModel.screenLocked }.returns(mockk {
-            every { observe(any(), any()) } answers {
-                secondArg<Observer<SettingsPasswordConfig>>().onChanged(
-                    SettingsPasswordConfig.Locked("1234")
-                )
-            }
-            every { value } returns SettingsPasswordConfig.Locked("1234")
-        })
+        every { viewModel.screenLocked }.returns(
+            mockk {
+                every { observe(any(), any()) } answers {
+                    secondArg<Observer<SettingsPasswordConfig>>().onChanged(
+                        SettingsPasswordConfig.Locked("1234"),
+                    )
+                }
+                every { value } returns SettingsPasswordConfig.Locked("1234")
+            },
+        )
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
         onView(withId(R.id.modulesLockOverlayClickableArea)).perform(click())
     }
+
     @After
     fun tearDown() {
         resetThemeResources()

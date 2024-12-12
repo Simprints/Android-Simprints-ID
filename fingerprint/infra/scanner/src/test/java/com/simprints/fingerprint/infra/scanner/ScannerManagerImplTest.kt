@@ -16,11 +16,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-
 import org.junit.Test
 
 class ScannerManagerImplTest {
-
     @MockK
     private lateinit var bluetoothAdapter: ComponentBluetoothAdapter
 

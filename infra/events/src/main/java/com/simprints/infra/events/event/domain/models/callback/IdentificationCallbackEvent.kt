@@ -17,7 +17,6 @@ data class IdentificationCallbackEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         sessionId: String,
@@ -25,13 +24,12 @@ data class IdentificationCallbackEvent(
     ) : this(
         UUID.randomUUID().toString(),
         IdentificationCallbackPayload(createdAt, EVENT_VERSION, sessionId, scores),
-        EventType.CALLBACK_IDENTIFICATION
+        EventType.CALLBACK_IDENTIFICATION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class IdentificationCallbackPayload(
@@ -42,15 +40,12 @@ data class IdentificationCallbackEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = EventType.CALLBACK_IDENTIFICATION,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            scores.joinToString(", ", prefix = "[", postfix = "]") {
-                "${it.guid}: ${it.confidence}"
-            }
+        override fun toSafeString(): String = scores.joinToString(", ", prefix = "[", postfix = "]") {
+            "${it.guid}: ${it.confidence}"
+        }
     }
 
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

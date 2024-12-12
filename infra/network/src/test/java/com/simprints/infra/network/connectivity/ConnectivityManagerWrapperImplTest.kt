@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class ConnectivityManagerWrapperImplTest {
-
     @MockK
     lateinit var context: Context
 
@@ -32,46 +31,46 @@ internal class ConnectivityManagerWrapperImplTest {
 
     @Test
     fun `test isNetworkAvailable should be false if capabilities is null`() {
-        //Given
+        // Given
         setupNetworkCapabilities(null)
-        //When
+        // When
         val actual = connectivityManagerWrapper.isNetworkAvailable()
-        //Then
+        // Then
         assertThat(actual).isEqualTo(false)
     }
 
     @Test
     fun `test isNetworkAvailable should be false if network can't reach internet`() {
-        //Given
+        // Given
         every { networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET) } returns false
         setupNetworkCapabilities(networkCapabilities)
-        //When
+        // When
         val actual = connectivityManagerWrapper.isNetworkAvailable()
-        //Then
+        // Then
         assertThat(actual).isEqualTo(false)
     }
 
     @Test
     fun `test isNetworkAvailable should be false if network connection not yet validated`() {
-        //Given
+        // Given
         every { networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET) } returns true
         every { networkCapabilities.hasCapability(NET_CAPABILITY_VALIDATED) } returns false
         setupNetworkCapabilities(networkCapabilities)
-        //When
+        // When
         val actual = connectivityManagerWrapper.isNetworkAvailable()
-        //Then
+        // Then
         assertThat(actual).isEqualTo(false)
     }
 
     @Test
     fun `test isNetworkAvailable success`() {
-        //Given
+        // Given
         every { networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET) } returns true
         every { networkCapabilities.hasCapability(NET_CAPABILITY_VALIDATED) } returns true
         setupNetworkCapabilities(networkCapabilities)
-        //When
+        // When
         val actual = connectivityManagerWrapper.isNetworkAvailable()
-        //Then
+        // Then
         assertThat(actual).isEqualTo(true)
     }
 

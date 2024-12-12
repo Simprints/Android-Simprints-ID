@@ -9,7 +9,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import org.junit.Test
 
 class PersonCreationEventTest {
-
     @Test
     fun create_PersonCreationEvent() {
         val fingerprintCaptureEventIds = listOf(GUID1)

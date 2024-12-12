@@ -26,10 +26,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class SdkInitializerImplTest {
-
     @MockK
     lateinit var context: Context
 
@@ -43,8 +41,6 @@ class SdkInitializerImplTest {
     lateinit var saveLicenseCheck: SaveLicenseCheckEventUseCase
 
     private lateinit var sdkInitializer: SdkInitializer<Unit>
-
-
 
     @Before
     fun setUp() {
@@ -61,7 +57,7 @@ class SdkInitializerImplTest {
 
     @Test
     fun `test initialize success`() = runTest {
-        //Given
+        // Given
         val licenseStatusSlot = slot<LicenseStatus>()
         coJustRun { saveLicenseCheck(Vendor.Nec, capture(licenseStatusSlot)) }
 
@@ -74,7 +70,7 @@ class SdkInitializerImplTest {
 
     @Test(expected = BioSdkException.BioSdkInitializationException::class)
     fun `test initialize with expired license`() = runTest {
-        //Given
+        // Given
         coEvery {
             licenseRepository.getCachedLicense(Vendor.Nec)
         } returns License("2011-12-30T17:32:28Z", "license", LicenseVersion("1.0"))
@@ -90,8 +86,8 @@ class SdkInitializerImplTest {
 
     @Test(expected = BioSdkException.BioSdkInitializationException::class)
     fun `test error during initialization`() = runTest {
-        //Given
-        every { nec.init(any(),context) } throws Exception()
+        // Given
+        every { nec.init(any(), context) } throws Exception()
         val licenseStatusSlot = slot<LicenseStatus>()
         coJustRun { saveLicenseCheck(Vendor.Nec, capture(licenseStatusSlot)) }
 

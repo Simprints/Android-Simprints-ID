@@ -4,13 +4,11 @@ import com.google.firebase.perf.FirebasePerformance
 import com.simprints.infra.logging.BuildConfig
 import com.simprints.infra.logging.Simber
 
-
 class PerformanceMonitoringTrace(
     val name: String,
     performanceMonitor: FirebasePerformance?,
-    val simber: Simber
+    val simber: Simber,
 ) {
-
     private var startTime: Long? = null
     internal val newTrace = performanceMonitor?.newTrace(name)
 
@@ -29,14 +27,10 @@ class PerformanceMonitoringTrace(
     fun stop() {
         newTrace?.stop()
 
-        if (BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG) {
             startTime?.let {
                 simber.i("Trace time for $name = ${System.currentTimeMillis() - it} ms")
             }
+        }
     }
-
 }
-
-
-
-

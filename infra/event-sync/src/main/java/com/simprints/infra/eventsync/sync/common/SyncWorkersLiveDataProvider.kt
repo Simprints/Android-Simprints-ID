@@ -9,8 +9,9 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-internal class SyncWorkersLiveDataProvider @Inject constructor(@ApplicationContext ctx: Context) {
-
+internal class SyncWorkersLiveDataProvider @Inject constructor(
+    @ApplicationContext ctx: Context,
+) {
     private val wm = WorkManager.getInstance(ctx)
 
     fun getStartSyncReportersLiveData(): LiveData<List<WorkInfo>> =

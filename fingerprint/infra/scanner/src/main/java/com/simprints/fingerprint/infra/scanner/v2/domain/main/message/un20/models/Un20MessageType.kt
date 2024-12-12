@@ -4,8 +4,10 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMess
 import com.simprints.fingerprint.infra.scanner.v2.tools.lang.objects
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toHexString
 
-sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
-
+sealed class Un20MessageType(
+    val majorByte: Byte,
+    val minorByte: Byte,
+) {
     // 0x1_ : Versioning & OTA
     data object GetUn20ExtendedAppVersion : Un20MessageType(Un20MessageMajorType.GET_UN20_EXTENDED_APP_VERSION.majorByte, 0X01)
 
@@ -25,35 +27,46 @@ sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
     // 0x3_ : Template commands
     data object GetSupportedTemplateTypes : Un20MessageType(Un20MessageMajorType.GET_SUPPORTED_TEMPLATE_TYPES.majorByte, IGNORED)
 
-    class GetTemplate(minorByte: Byte) : Un20MessageType(Un20MessageMajorType.GET_TEMPLATE.majorByte, minorByte)
+    class GetTemplate(
+        minorByte: Byte,
+    ) : Un20MessageType(Un20MessageMajorType.GET_TEMPLATE.majorByte, minorByte)
 
     // 0x4_ : Image commands
     data object GetSupportedImageFormats : Un20MessageType(Un20MessageMajorType.GET_SUPPORTED_IMAGE_FORMATS.majorByte, IGNORED)
 
-    class GetImage(minorByte: Byte) : Un20MessageType(Un20MessageMajorType.GET_IMAGE.majorByte, minorByte)
+    class GetImage(
+        minorByte: Byte,
+    ) : Un20MessageType(Un20MessageMajorType.GET_IMAGE.majorByte, minorByte)
 
     data object GetImageQuality : Un20MessageType(Un20MessageMajorType.GET_IMAGE_QUALITY.majorByte, IGNORED)
 
-    class GetUnprocessedImage(minorByte: Byte) : Un20MessageType(Un20MessageMajorType.GET_UNPROCESSED_IMAGE.majorByte, minorByte)
-    data object GetImageDistortionConfigurationMatrix : Un20MessageType(Un20MessageMajorType.GET_IMAGE_DISTORTION_CONFIGURATION_MATRIX.majorByte, IGNORED)
+    class GetUnprocessedImage(
+        minorByte: Byte,
+    ) : Un20MessageType(Un20MessageMajorType.GET_UNPROCESSED_IMAGE.majorByte, minorByte)
+
+    data object GetImageDistortionConfigurationMatrix : Un20MessageType(
+        Un20MessageMajorType.GET_IMAGE_DISTORTION_CONFIGURATION_MATRIX.majorByte,
+        IGNORED,
+    )
+
     fun getBytes() = byteArrayOf(majorByte, minorByte)
 
     companion object {
         const val IGNORED = 0x00.toByte()
 
-        fun fromBytes(bytes: ByteArray): Un20MessageType =
-            Pair(bytes[0], bytes[1]).let { (receivedMajorByte, receivedMinorByte) ->
+        fun fromBytes(bytes: ByteArray): Un20MessageType = Pair(bytes[0], bytes[1]).let { (receivedMajorByte, receivedMinorByte) ->
 
-                Un20MessageType::class.objects()
-                    .firstOrNull {
-                        it.majorByte == receivedMajorByte && it.minorByte == receivedMinorByte
-                    }
-                    ?: when (receivedMajorByte) {
-                        Un20MessageMajorType.GET_TEMPLATE.majorByte -> GetTemplate(receivedMinorByte)
-                        Un20MessageMajorType.GET_IMAGE.majorByte -> GetImage(receivedMinorByte)
-                        Un20MessageMajorType.GET_UNPROCESSED_IMAGE.majorByte -> GetUnprocessedImage(receivedMinorByte)
-                        else -> throw InvalidMessageException("Invalid Un20MessageType received with bytes: ${bytes.toHexString()}")
-                    }
-            }
+            Un20MessageType::class
+                .objects()
+                .firstOrNull {
+                    it.majorByte == receivedMajorByte && it.minorByte == receivedMinorByte
+                }
+                ?: when (receivedMajorByte) {
+                    Un20MessageMajorType.GET_TEMPLATE.majorByte -> GetTemplate(receivedMinorByte)
+                    Un20MessageMajorType.GET_IMAGE.majorByte -> GetImage(receivedMinorByte)
+                    Un20MessageMajorType.GET_UNPROCESSED_IMAGE.majorByte -> GetUnprocessedImage(receivedMinorByte)
+                    else -> throw InvalidMessageException("Invalid Un20MessageType received with bytes: ${bytes.toHexString()}")
+                }
+        }
     }
 }

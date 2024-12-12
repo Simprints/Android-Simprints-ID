@@ -14,13 +14,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-
 internal class EventDatabaseFactoryTest {
-
     private val dbName = "dbevents"
     private val localDbKey = LocalDbKey(
         "project1",
-        "byte".toByteArray()
+        "byte".toByteArray(),
     )
     private val context: Context = mockk()
     private val securityManager: SecurityManager = mockk()
@@ -34,60 +32,57 @@ internal class EventDatabaseFactoryTest {
 
     @Test
     fun `test build db success`() = runTest {
-        //Given
+        // Given
         coEvery { securityManager.getLocalDbKeyOrThrow(dbName) } returns localDbKey
         mockkObject(EventRoomDatabase)
         val db: EventRoomDatabase = mockk()
         every { EventRoomDatabase.getDatabase(context, any(), dbName) } returns db
-        //When
+        // When
         Truth.assertThat(dbEventDatabaseFactory.build()).isEqualTo(db)
         verify { securityManager.getLocalDbKeyOrThrow(dbName) }
-
     }
 
     @Test
     fun `test build db creates key if not exist`() = runTest {
-        //Given
+        // Given
         coEvery { securityManager.getLocalDbKeyOrThrow(dbName) } throws Exception() andThen localDbKey
         justRun { securityManager.createLocalDatabaseKeyIfMissing(dbName) }
         mockkObject(EventRoomDatabase)
         val db: EventRoomDatabase = mockk()
         every { EventRoomDatabase.getDatabase(context, any(), dbName) } returns db
-        //When and Then
+        // When and Then
         Truth.assertThat(dbEventDatabaseFactory.build()).isEqualTo(db)
         verify(exactly = 2) { securityManager.getLocalDbKeyOrThrow(dbName) }
-
     }
 
     @Test(expected = Exception::class)
     fun `test build db falure`() = runTest {
-        //Given
+        // Given
         coEvery { securityManager.getLocalDbKeyOrThrow(dbName) } throws Exception()
         justRun { securityManager.createLocalDatabaseKeyIfMissing(dbName) }
         mockkObject(EventRoomDatabase)
         val db: EventRoomDatabase = mockk()
         every { EventRoomDatabase.getDatabase(context, any(), dbName) } returns db
-        //When calling build it should throw exception
+        // When calling build it should throw exception
         dbEventDatabaseFactory.build()
-
     }
 
     @Test
     fun deleteDatabase() {
-        //When
+        // When
         dbEventDatabaseFactory.deleteDatabase()
 
-        //Then
+        // Then
         verify { context.deleteDatabase(dbName) }
     }
 
     @Test
     fun recreateDatabaseKey() {
-        //Given
+        // Given
         justRun { securityManager.recreateLocalDatabaseKey(dbName) }
-        //When
+        // When
         dbEventDatabaseFactory.recreateDatabaseKey()
-        //Then
+        // Then
         verify { securityManager.recreateLocalDatabaseKey(dbName) }
     }
 }

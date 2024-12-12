@@ -3,7 +3,6 @@ package com.simprints.matcher.usecases
 import javax.inject.Inject
 
 internal class CreateRangesUseCase @Inject constructor() {
-
     /**
      * Creates a list of ranges to be used for batch processing.
      * Range size is increased dynamically to ensure that first couple of batches are small
@@ -11,7 +10,10 @@ internal class CreateRangesUseCase @Inject constructor() {
      *
      * For example with minBatchSize = 10, returned batches will be 10, 10, 20, 30, 40, 50, 50 in size (if the total allows).
      */
-    operator fun invoke(totalCount: Int, minBatchSize: Int = DEFAULT_BATCH_SIZE): List<IntRange> {
+    operator fun invoke(
+        totalCount: Int,
+        minBatchSize: Int = DEFAULT_BATCH_SIZE,
+    ): List<IntRange> {
         val ranges = mutableListOf<IntRange>()
         var index = 1
 
@@ -35,7 +37,6 @@ internal class CreateRangesUseCase @Inject constructor() {
     }
 
     companion object {
-
         /**
          * Experimentally determined batch size that works well for most cases.
          */

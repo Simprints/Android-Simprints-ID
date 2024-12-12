@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RecentUserActivityLocalSourceImplTest {
-
     companion object {
         private const val TEST_DATASTORE_NAME: String = "test_datastore"
     }
@@ -25,7 +24,7 @@ class RecentUserActivityLocalSourceImplTest {
 
     private val testDataStore = DataStoreFactory.create(
         serializer = RecentUserActivitySerializer,
-        produceFile = { testContext.dataStoreFile(TEST_DATASTORE_NAME) }
+        produceFile = { testContext.dataStoreFile(TEST_DATASTORE_NAME) },
     )
     private val timeHelper = mockk<TimeHelper>(relaxed = true)
     private val recentUserActivityLocalSourceImpl =

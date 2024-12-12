@@ -4,10 +4,9 @@ import com.google.common.truth.Truth
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.SampleSyncScopes.projectUpSyncScope
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class EventUpSyncOperationTest {
-
     @Test
     fun eventUpSyncOperationForProjectScope_hasAnUniqueKey() {
         val op = projectUpSyncScope.operation

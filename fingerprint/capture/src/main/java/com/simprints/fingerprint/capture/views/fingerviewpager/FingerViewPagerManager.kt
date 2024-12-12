@@ -7,10 +7,10 @@ import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.resources.indicatorDrawableId
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class FingerViewPagerManager(
@@ -22,7 +22,6 @@ internal class FingerViewPagerManager(
     private val onPageScrolled: (Int, Float) -> Unit,
     private val isAbleToSelectNewFinger: () -> Boolean,
 ) {
-
     private lateinit var pageAdapter: FingerPageAdapter
 
     init {
@@ -42,7 +41,7 @@ internal class FingerViewPagerManager(
         override fun onPageScrolled(
             position: Int,
             positionOffset: Float,
-            positionOffsetPixels: Int
+            positionOffsetPixels: Int,
         ) {
             this.onPageScrolled(position, positionOffset)
         }
@@ -66,7 +65,10 @@ internal class FingerViewPagerManager(
         viewPager.registerOnPageChangeCallback(OnPageChangeListener(onFingerSelected, onPageScrolled))
     }
 
-    fun setCurrentPageAndFingerStates(fingerStates: List<FingerState>, currentFingerIndex: Int) {
+    fun setCurrentPageAndFingerStates(
+        fingerStates: List<FingerState>,
+        currentFingerIndex: Int,
+    ) {
         refreshActiveFingersIfChanged(fingerStates)
         updateIndicatorImages(fingerStates, currentFingerIndex)
         viewPager.currentItem = currentFingerIndex
@@ -84,7 +86,10 @@ internal class FingerViewPagerManager(
         }
     }
 
-    private fun updateIndicatorImages(fingerStates: List<FingerState>, currentFingerIndex: Int) {
+    private fun updateIndicatorImages(
+        fingerStates: List<FingerState>,
+        currentFingerIndex: Int,
+    ) {
         fingerStates.forEachIndexed { index, fingerState ->
             val selected = currentFingerIndex == index
             indicatorLayout.children.iterator().withIndex().forEach { (i, view) ->

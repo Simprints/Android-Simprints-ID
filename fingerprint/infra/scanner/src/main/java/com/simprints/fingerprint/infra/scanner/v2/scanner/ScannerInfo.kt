@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.scanner.v2.scanner
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 /**
  * Singleton class to manage and provide access to scanner-related information.
  *
@@ -16,7 +15,6 @@ import javax.inject.Singleton
  */
 @Singleton
 class ScannerInfo @Inject constructor() {
-
     /**
      * The unique identifier of the scanner.
      * This property is set after successfully connecting to the scanner.

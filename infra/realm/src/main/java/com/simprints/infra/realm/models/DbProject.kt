@@ -8,7 +8,6 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Data model definition for Realm table")
 class DbProject : RealmObject {
-
     @PrimaryKey
     var id: String = ""
     var name: String = ""

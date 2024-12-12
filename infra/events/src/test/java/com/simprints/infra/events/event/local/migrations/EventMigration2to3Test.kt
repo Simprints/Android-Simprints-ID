@@ -18,7 +18,6 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration2to3Test {
-
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -43,7 +42,10 @@ class EventMigration2to3Test {
         }
 
         db = helper.runMigrationsAndValidate(
-            TEST_DB, 3, true, EventMigration2to3()
+            TEST_DB,
+            3,
+            true,
+            EventMigration2to3(),
         )
 
         validateColumnCreation(db, openSessionCaptureEventId)
@@ -51,11 +53,15 @@ class EventMigration2to3Test {
         validateClosedSessionIsStillClosed(db, closedSessionCaptureEventId)
     }
 
-    private fun createSessionCaptureEvent(id: String, endedAt: Long) = ContentValues().apply {
+    private fun createSessionCaptureEvent(
+        id: String,
+        endedAt: Long,
+    ) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "SESSION_CAPTURE")
         this.put(
-            "eventJson", """
+            "eventJson",
+            """
             {
                 "id": "$id",
                 "type": "SESSION_CAPTURE",
@@ -83,30 +89,37 @@ class EventMigration2to3Test {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
         this.put("createdAt", 1611584017198)
         this.put("endedAt", endedAt)
     }
 
-    private fun validateColumnCreation(db: SupportSQLiteDatabase, id: String) {
+    private fun validateColumnCreation(
+        db: SupportSQLiteDatabase,
+        id: String,
+    ) {
         val cursor = retrieveCursorWithEventById(db, id)
         Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isNotNull()
     }
 
-    private fun validateOpenSessionIsStillOpen(db: SupportSQLiteDatabase, openId: String) {
+    private fun validateOpenSessionIsStillOpen(
+        db: SupportSQLiteDatabase,
+        openId: String,
+    ) {
         val cursor = retrieveCursorWithEventById(db, openId)
         Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isEqualTo(0)
     }
 
-    private fun validateClosedSessionIsStillClosed(db: SupportSQLiteDatabase, closedId: String) {
+    private fun validateClosedSessionIsStillClosed(
+        db: SupportSQLiteDatabase,
+        closedId: String,
+    ) {
         val cursor = retrieveCursorWithEventById(db, closedId)
         Truth.assertThat(cursor.getIntWithColumnName("sessionIsClosed")).isEqualTo(1)
     }
 
     companion object {
-
         private const val TEST_DB = "test"
     }
-
 }

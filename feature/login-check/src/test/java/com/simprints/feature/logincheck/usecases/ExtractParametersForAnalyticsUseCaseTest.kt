@@ -16,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class ExtractParametersForAnalyticsUseCaseTest {
-
     @MockK
     private lateinit var eventRepository: SessionEventRepository
 
@@ -52,7 +51,6 @@ internal class ExtractParametersForAnalyticsUseCaseTest {
             Simber.i("sessionId")
         }
     }
-
 
     @Test
     fun `Does not log analytics keys in follow up actions`() = runTest {

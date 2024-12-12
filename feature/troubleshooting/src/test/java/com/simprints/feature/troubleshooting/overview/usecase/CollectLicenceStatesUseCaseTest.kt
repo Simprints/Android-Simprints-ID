@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 class CollectLicenceStatesUseCaseTest {
-
     @MockK
     private lateinit var licenseRepository: LicenseRepository
 
@@ -48,5 +47,4 @@ class CollectLicenceStatesUseCaseTest {
         coVerify(exactly = 2) { licenseRepository.getCachedLicense(any()) }
         assertThat(licenseText).isNotEmpty()
     }
-
 }

@@ -18,7 +18,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class AuthStoreImplTest {
-
     private val loginInfoStore = mockk<LoginInfoStore>(relaxed = true)
     private val firebaseAuthManager = mockk<FirebaseAuthManager>(relaxed = true)
     private val simApiClientFactory = mockk<SimApiClientFactory>(relaxed = true)
@@ -26,7 +25,7 @@ class AuthStoreImplTest {
     private val loginManagerManagerImpl = AuthStoreImpl(
         loginInfoStore,
         firebaseAuthManager,
-        simApiClientFactory
+        simApiClientFactory,
     )
 
     @Test

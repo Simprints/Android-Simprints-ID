@@ -8,7 +8,9 @@ import com.simprints.infra.license.models.Vendor
  * ApiLicense only populates some fields, based on which vendor was asked when retrieving the license.
  */
 @Keep
-internal data class ApiLicense(val licenses: Map<Vendor, LicenseValue> = emptyMap()) {
+internal data class ApiLicense(
+    val licenses: Map<Vendor, LicenseValue> = emptyMap(),
+) {
     fun getLicenseBasedOnVendor(vendor: Vendor) = licenses[vendor]
 }
 
@@ -26,8 +28,9 @@ internal data class LicenseValue(
  * ```
  */
 @Keep
-internal data class ApiLicenseError(val error: String)
-
+internal data class ApiLicenseError(
+    val error: String,
+)
 
 /**
  * Parse api license
@@ -52,9 +55,11 @@ internal data class ApiLicenseError(val error: String)
  */
 internal fun String.parseApiLicense(): ApiLicense = JsonHelper.jackson.readTree(this).let {
     return ApiLicense(
-        licenses = it.fields().asSequence().map { entry ->
-            Vendor.fromKey(entry.key) to JsonHelper.jackson.treeToValue(entry.value, LicenseValue::class.java)
-        }.toMap()
+        licenses = it
+            .fields()
+            .asSequence()
+            .map { entry ->
+                Vendor.fromKey(entry.key) to JsonHelper.jackson.treeToValue(entry.value, LicenseValue::class.java)
+            }.toMap(),
     )
 }
-

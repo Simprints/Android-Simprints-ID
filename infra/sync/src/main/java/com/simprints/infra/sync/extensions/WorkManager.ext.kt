@@ -14,8 +14,8 @@ import androidx.work.WorkManager
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.sync.SyncConstants
 
-
-internal fun defaultWorkerConstraints() = Constraints.Builder()
+internal fun defaultWorkerConstraints() = Constraints
+    .Builder()
     .setRequiredNetworkType(NetworkType.CONNECTED)
     .build()
 
@@ -38,7 +38,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.schedulePeriodicW
         .setBackoffCriteria(BackoffPolicy.LINEAR, backoffInterval, SyncConstants.SYNC_TIME_UNIT)
         .let { if (inputData != null) it.setInputData(inputData) else it }
         .let { tags.fold(it) { builder, tag -> builder.addTag(tag) } }
-        .build()
+        .build(),
 )
 
 @ExcludedFromGeneratedTestCoverageReports("Basic API wrapper to provide default values for most parameters")
@@ -59,7 +59,7 @@ internal inline fun <reified T : ListenableWorker> WorkManager.startWorker(
         .setBackoffCriteria(BackoffPolicy.LINEAR, backoffInterval, SyncConstants.SYNC_TIME_UNIT)
         .let { if (inputData != null) it.setInputData(inputData) else it }
         .let { tags.fold(it) { builder, tag -> builder.addTag(tag) } }
-        .build()
+        .build(),
 )
 
 internal fun WorkManager.cancelWorkers(vararg workNames: String) {

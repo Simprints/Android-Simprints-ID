@@ -15,7 +15,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test
 
 class AuthenticationEventTest {
-
     @Test
     fun create_AuthenticationEvent() {
         createAuthenticationEvent(AUTHENTICATED)
@@ -66,5 +65,4 @@ class AuthenticationEventTest {
             assertThat(result).isEqualTo(result)
         }
     }
-
 }

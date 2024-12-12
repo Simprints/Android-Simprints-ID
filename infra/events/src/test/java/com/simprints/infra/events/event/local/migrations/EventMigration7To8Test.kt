@@ -21,7 +21,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration7To8Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -35,10 +34,12 @@ class EventMigration7To8Test {
         setupV7DbWithEvents(events = listOf(createFingerprintCaptureEvent(eventId)))
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .use { validateFingerprintCapture(it, eventId, "GOOD_SCAN", true) }
 
-        MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
+        MigrationTestingTools
+            .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
             .use { validateFingerprintBiometricCapture(it, eventId) }
 
         helper.closeWhenFinished(db)
@@ -51,15 +52,17 @@ class EventMigration7To8Test {
         setupV7DbWithEvents(
             events = listOf(
                 createFingerprintCaptureEvent(eventId, "BAD_QUALITY"),
-                createPersonCreationEvent(eventId)
-            )
+                createPersonCreationEvent(eventId),
+            ),
         )
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .use { validateFingerprintCapture(it, eventId, "BAD_QUALITY", true) }
 
-        MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
+        MigrationTestingTools
+            .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
             .use { validateFingerprintBiometricCapture(it, eventId) }
 
         helper.closeWhenFinished(db)
@@ -72,16 +75,18 @@ class EventMigration7To8Test {
         setupV7DbWithEvents(
             events = listOf(
                 createFingerprintCaptureEvent(eventId, "BAD_QUALITY"),
-                createPersonCreationEvent("someId")
-            )
+                createPersonCreationEvent("someId"),
+            ),
         )
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .use { validateFingerprintCapture(it, eventId, "BAD_QUALITY", true) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
-            MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
+            MigrationTestingTools
+                .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
         helper.closeWhenFinished(db)
@@ -94,17 +99,21 @@ class EventMigration7To8Test {
         setupV7DbWithEvents(
             events = listOf(
                 createFingerprintCaptureEvent(
-                    eventId, "SKIPPED", false
-                )
-            )
+                    eventId,
+                    "SKIPPED",
+                    false,
+                ),
+            ),
         )
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .use { validateFingerprintCapture(it, eventId, "SKIPPED", false) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
-            MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
+            MigrationTestingTools
+                .retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
         helper.closeWhenFinished(db)
@@ -117,10 +126,12 @@ class EventMigration7To8Test {
         setupV7DbWithEvents(events = listOf(createFaceCaptureEvent(eventId)))
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .use { validateFaceCapture(it, eventId, "VALID", true) }
 
-        MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
+        MigrationTestingTools
+            .retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
             .use { validateFaceBiometricCapture(it, eventId) }
 
         helper.closeWhenFinished(db)
@@ -133,11 +144,13 @@ class EventMigration7To8Test {
         setupV7DbWithEvents(events = listOf(createFaceCaptureEvent(eventId, "INVALID")))
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .use { validateFaceCapture(it, eventId, "INVALID", true) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
-            MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
+            MigrationTestingTools
+                .retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
 
@@ -152,12 +165,13 @@ class EventMigration7To8Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-
-        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .use { validateFaceCapture(it, eventId, "INVALID", false) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
-            MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
+            MigrationTestingTools
+                .retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
 
@@ -165,9 +179,9 @@ class EventMigration7To8Test {
     }
 
     private fun setupV7DbWithEvents(
-        close: Boolean = true, events: List<ContentValues>,
+        close: Boolean = true,
+        events: List<ContentValues>,
     ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 7).apply {
-
         events.forEach { event ->
             this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
         }
@@ -183,16 +197,21 @@ class EventMigration7To8Test {
         this.put("id", id)
         this.put("type", OLD_FINGERPRINT_CAPTURE_EVENT)
 
-        val fingerprintBlock = if (withFingerprint) """
+        val fingerprintBlock = if (withFingerprint) {
+            """
             ,"fingerprint":{
                 "finger":"${FINGER.name}",
                 "quality":$QUALITY,
                 "template":"$TEMPLATE",
                 "format":"ISO_19794_2"
-            },""".trimIndent()
-        else ","
+            },
+            """.trimIndent()
+        } else {
+            ","
+        }
 
-        val event = """
+        val event =
+            """
             {
                 "id":"$id",
                 "labels":{
@@ -224,7 +243,8 @@ class EventMigration7To8Test {
     private fun createPersonCreationEvent(fingerprintCaptureId: String) = ContentValues().apply {
         put("id", randomUUID())
         put("type", PERSON_CREATION_EVENT)
-        val event = """
+        val event =
+            """
             {
                 "id":"cd088b0e-bd15-4b81-a7eb-161e565e1687",
                 "labels":{
@@ -244,7 +264,7 @@ class EventMigration7To8Test {
                 },
                 "type":"PERSON_CREATION"
             }
-        """.trimIndent()
+            """.trimIndent()
 
         put("eventJson", event)
         put("createdAt", CREATED_AT)
@@ -261,7 +281,8 @@ class EventMigration7To8Test {
         put("id", id)
         put("type", OLD_FACE_CAPTURE_EVENT)
 
-        val faceBlock = if (withFace) """
+        val faceBlock = if (withFace) {
+            """
             ,"face":{
                 "yaw":$YAW,
                 "roll":$ROLL,
@@ -269,9 +290,12 @@ class EventMigration7To8Test {
                 "template":"$TEMPLATE",
                 "format":"$FORMAT"
             },"""
-        else ","
+        } else {
+            ","
+        }
 
-        val event = """
+        val event =
+            """
             {
                 "id":"$id",
                 "labels":{
@@ -293,7 +317,7 @@ class EventMigration7To8Test {
                 },
                 "type":"FACE_CAPTURE"
             }
-        """.trimIndent()
+            """.trimIndent()
 
         put("eventJson", event)
         put("createdAt", 1611584017198)
@@ -306,37 +330,41 @@ class EventMigration7To8Test {
         result: String,
         withFingerprint: Boolean,
     ): JSONObject {
-        val fingerprintBlock = if (withFingerprint) """
-                ,"fingerprint":{
-                    "finger":"${FINGER.name}",
-                    "quality":$QUALITY,
-                    "format":"ISO_19794_2"
-                },""".trimIndent()
-        else ","
+        val fingerprintBlock = if (withFingerprint) {
+            """
+            ,"fingerprint":{
+                "finger":"${FINGER.name}",
+                "quality":$QUALITY,
+                "format":"ISO_19794_2"
+            },
+            """.trimIndent()
+        } else {
+            ","
+        }
 
         return JSONObject(
             """
-                {
+            {
+                "id":"$eventId",
+                "labels":{
+                    "projectId":"$PROJECT_ID",
+                    "sessionId": "$SESSION_ID",
+                    "deviceId": "$DEVICE_ID"
+                },
+                "payload":{
                     "id":"$eventId",
-                    "labels":{
-                        "projectId":"$PROJECT_ID",
-                        "sessionId": "$SESSION_ID",
-                        "deviceId": "$DEVICE_ID"
-                    },
-                    "payload":{
-                        "id":"$eventId",
-                        "createdAt":$CREATED_AT,
-                        "eventVersion":3,
-                        "endedAt":$ENDED_AT,
-                        "finger":"${FINGER.name}",
-                        "qualityThreshold":$QUALITY_THRESHOLD,
-                        "result":"$result"
-                        $fingerprintBlock
-                        "type":"FINGERPRINT_CAPTURE"
-                    },
+                    "createdAt":$CREATED_AT,
+                    "eventVersion":3,
+                    "endedAt":$ENDED_AT,
+                    "finger":"${FINGER.name}",
+                    "qualityThreshold":$QUALITY_THRESHOLD,
+                    "result":"$result"
+                    $fingerprintBlock
                     "type":"FINGERPRINT_CAPTURE"
-                }
-            """.trimIndent()
+                },
+                "type":"FINGERPRINT_CAPTURE"
+            }
+            """.trimIndent(),
         )
     }
 
@@ -352,14 +380,17 @@ class EventMigration7To8Test {
         assertThat(eventJson.toString()).isEqualTo(expectedJson.toString())
     }
 
-    private fun validateFingerprintBiometricCapture(it: Cursor, eventId: String) {
+    private fun validateFingerprintBiometricCapture(
+        it: Cursor,
+        eventId: String,
+    ) {
         val eventJsonPayload = JSONObject(it.getStringWithColumnName("eventJson")!!)
             .getJSONObject("payload")
 
         assertThat(eventJsonPayload.getString("id")).isEqualTo(eventId)
         assertThat(eventJsonPayload.getString("type")).isEqualTo("FINGERPRINT_CAPTURE_BIOMETRICS")
         assertThat(
-            eventJsonPayload.getJSONObject("fingerprint").getString("template")
+            eventJsonPayload.getJSONObject("fingerprint").getString("template"),
         ).isEqualTo(TEMPLATE)
     }
 
@@ -368,14 +399,18 @@ class EventMigration7To8Test {
         result: String = "VALID",
         withFace: Boolean,
     ): JSONObject {
-        val faceBlock = if (withFace) """
+        val faceBlock = if (withFace) {
+            """
             ,"face":{
                 "yaw":$YAW,
                 "roll":$ROLL,
                 "quality":$QUALITY,
                 "format":"$FORMAT"
-            },""".trimIndent()
-        else ","
+            },
+            """.trimIndent()
+        } else {
+            ","
+        }
 
         return JSONObject(
             """
@@ -400,10 +435,9 @@ class EventMigration7To8Test {
                 },
                 "type":"FACE_CAPTURE"
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
-
 
     private fun validateFaceCapture(
         cursor: Cursor,
@@ -417,7 +451,10 @@ class EventMigration7To8Test {
         assertThat(eventJson.toString()).isEqualTo(expectedJson.toString())
     }
 
-    private fun validateFaceBiometricCapture(cursor: Cursor, eventId: String) {
+    private fun validateFaceBiometricCapture(
+        cursor: Cursor,
+        eventId: String,
+    ) {
         val eventJsonPayload = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
             .getJSONObject("payload")
 
@@ -427,9 +464,7 @@ class EventMigration7To8Test {
             .isEqualTo(TEMPLATE)
     }
 
-
     companion object {
-
         private const val TEST_DB = "some_db"
         private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE"
         private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
@@ -450,5 +485,3 @@ class EventMigration7To8Test {
         private const val FORMAT = "ISO_19794_2"
     }
 }
-
-

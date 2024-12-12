@@ -9,9 +9,7 @@ import com.simprints.core.tools.extentions.getLongWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.logging.Simber
 
-
 internal class EventMigration12to13 : Migration(12, 13) {
-
     override fun migrate(db: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 12 to schema 13.")
         migrateEventJson(db)
@@ -21,18 +19,18 @@ internal class EventMigration12to13 : Migration(12, 13) {
     private fun migrateEventJson(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
-                CREATE TABLE IF NOT EXISTS `${TEMP_EVENT_TABLE_NAME}` (
-                    `id` TEXT NOT NULL,
-                    `createdAt_unixMs` INTEGER NOT NULL,
-                    `createdAt_isTrustworthy` INTEGER NOT NULL,
-                    `createdAt_msSinceBoot` INTEGER,
-                    `type` TEXT NOT NULL,
-                    `projectId` TEXT,
-                    `sessionId` TEXT,
-                    `eventJson` TEXT NOT NULL,
-                    PRIMARY KEY(`id`)
-                )
-            """.trimIndent()
+            CREATE TABLE IF NOT EXISTS `${TEMP_EVENT_TABLE_NAME}` (
+                `id` TEXT NOT NULL,
+                `createdAt_unixMs` INTEGER NOT NULL,
+                `createdAt_isTrustworthy` INTEGER NOT NULL,
+                `createdAt_msSinceBoot` INTEGER,
+                `type` TEXT NOT NULL,
+                `projectId` TEXT,
+                `sessionId` TEXT,
+                `eventJson` TEXT NOT NULL,
+                PRIMARY KEY(`id`)
+            )
+            """.trimIndent(),
         )
 
         // Get all events
@@ -57,7 +55,7 @@ internal class EventMigration12to13 : Migration(12, 13) {
                         put("projectId", projectId)
                         put("sessionId", sessionId)
                         put("eventJson", convertEventJson(jsonData))
-                    }
+                    },
                 )
             }
         }
@@ -78,8 +76,7 @@ internal class EventMigration12to13 : Migration(12, 13) {
             } else {
                 "\"endedAt\":{\"ms\":${matchResult.groupValues[1]},\"isTrustworthy\":false,\"msSinceBoot\":null}"
             }
-        }
-        .replace(versionRegex) { matchResult ->
+        }.replace(versionRegex) { matchResult ->
             "\"eventVersion\":${matchResult.groupValues[1].toInt().plus(1)}"
         }
 
@@ -95,9 +92,7 @@ internal class EventMigration12to13 : Migration(12, 13) {
     private val versionRegex = "\"eventVersion\":(\\d+)".toRegex()
 
     companion object {
-
         private const val EVENT_TABLE_NAME = "DbEvent"
         private const val TEMP_EVENT_TABLE_NAME = "DbEvent_temp"
     }
 }
-

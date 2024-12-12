@@ -43,11 +43,9 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val configRepository: ConfigRepository,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
-
     override suspend fun getLastSyncTime(): Date? = eventSyncCache.readLastSuccessfulSyncTime()
 
-    override fun getLastSyncState(): LiveData<EventSyncState> =
-        eventSyncStateProcessor.getLastSyncState()
+    override fun getLastSyncState(): LiveData<EventSyncState> = eventSyncStateProcessor.getLastSyncState()
 
     override fun getPeriodicWorkTags(): List<String> = listOf(
         MASTER_SYNC_SCHEDULERS,
@@ -63,8 +61,7 @@ internal class EventSyncManagerImpl @Inject constructor(
 
     override fun getAllWorkerTag(): String = TAG_SUBJECTS_SYNC_ALL_WORKERS
 
-    override suspend fun countEventsToUpload(type: EventType?): Flow<Int> =
-        eventRepository.observeEventCount(type)
+    override suspend fun countEventsToUpload(type: EventType?): Flow<Int> = eventRepository.observeEventCount(type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
         val projectConfig = configRepository.getProjectConfiguration()
@@ -73,7 +70,8 @@ internal class EventSyncManagerImpl @Inject constructor(
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = getProjectModes(projectConfig),
             selectedModuleIDs = deviceConfig.selectedModules.values(),
-            syncPartitioning = projectConfig.synchronization.down.partitionType.toDomain()
+            syncPartitioning = projectConfig.synchronization.down.partitionType
+                .toDomain(),
         )
 
         val counts = downSyncScope.operations
@@ -81,7 +79,7 @@ internal class EventSyncManagerImpl @Inject constructor(
 
         return DownSyncCounts(
             count = counts.sumOf { it.count },
-            isLowerBound = counts.any { it.isLowerBound }
+            isLowerBound = counts.any { it.isLowerBound },
         )
     }
 
@@ -95,13 +93,12 @@ internal class EventSyncManagerImpl @Inject constructor(
                 projectId = projectId,
                 subjectId = subjectId,
                 modes = getProjectModes(configRepository.getProjectConfiguration()),
-            )
+            ),
         )
         downSyncTask.downSync(this, op, eventScope).toList()
     }
 
-    private fun getProjectModes(projectConfiguration: ProjectConfiguration) =
-        projectConfiguration.general.modalities.map { it.toMode() }
+    private fun getProjectModes(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities.map { it.toMode() }
 
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(

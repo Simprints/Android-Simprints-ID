@@ -22,8 +22,7 @@ class PacketRouter @Inject constructor(
     private val packetRouteDesignator: Packet.() -> Byte,
     private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
-    ) : IncomingConnectable {
-
+) : IncomingConnectable {
     lateinit var incomingPacketRoutes: Map<Route, ConnectableFlowable<Packet>>
 
     private lateinit var incomingPacketsDisposable: Disposable

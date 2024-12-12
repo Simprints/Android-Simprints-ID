@@ -24,13 +24,13 @@ internal class EnrolLastBiometricsRequestBuilder(
             value = request.userId,
             project = project,
             tokenKeyType = TokenKeyType.AttendantId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         val encryptedModuleId = encryptField(
             value = request.moduleId,
             project = project,
             tokenKeyType = TokenKeyType.ModuleId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }
@@ -42,7 +42,6 @@ internal class EnrolLastBiometricsRequestBuilder(
         moduleId = extractor.getModuleId().asTokenizableRaw(),
         metadata = extractor.getMetadata(),
         sessionId = extractor.getSessionId(),
-        unknownExtras = extractor.getUnknownExtras()
+        unknownExtras = extractor.getUnknownExtras(),
     )
 }
-

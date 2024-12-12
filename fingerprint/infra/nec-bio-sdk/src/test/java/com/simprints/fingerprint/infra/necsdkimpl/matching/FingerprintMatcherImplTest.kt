@@ -15,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 
 class FingerprintMatcherImplTest {
-
     @MockK
     private lateinit var nec: NEC
 
@@ -37,7 +36,7 @@ class FingerprintMatcherImplTest {
             listOf(
                 generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB),
                 generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB),
-                generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
+                generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB),
             )
         // When
         val result = matcher.match(probe, candidates, NecMatchingSettings(false))
@@ -53,7 +52,7 @@ class FingerprintMatcherImplTest {
         val probe =
             generatePersonIdentity(
                 FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER
+                FingerIdentifier.RIGHT_INDEX_FINGER,
             )
         val candidate =
             generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
@@ -65,23 +64,22 @@ class FingerprintMatcherImplTest {
     }
 
     @Test
-    fun `test match FingerprintIdentities  with different fingerprint IDs and crossFingerComparison`() =
-        runTest {
-            // Given
-            every { nec.match(any(), any(), any()) } returns 3
-            val probe =
-                generatePersonIdentity(
-                    FingerIdentifier.LEFT_INDEX_FINGER,
-                    FingerIdentifier.RIGHT_INDEX_FINGER
-                )
-            val candidate =
-                generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
-            // When
-            val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(true))
-            // Then
-            Truth.assertThat(result.size).isEqualTo(1)
-            Truth.assertThat(result[0].score).isEqualTo(3)
-        }
+    fun `test match FingerprintIdentities  with different fingerprint IDs and crossFingerComparison`() = runTest {
+        // Given
+        every { nec.match(any(), any(), any()) } returns 3
+        val probe =
+            generatePersonIdentity(
+                FingerIdentifier.LEFT_INDEX_FINGER,
+                FingerIdentifier.RIGHT_INDEX_FINGER,
+            )
+        val candidate =
+            generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
+        // When
+        val result = matcher.match(probe, listOf(candidate), NecMatchingSettings(true))
+        // Then
+        Truth.assertThat(result.size).isEqualTo(1)
+        Truth.assertThat(result[0].score).isEqualTo(3)
+    }
 
     @Test
     fun `test match FingerprintIdentities  with only one equal fingerprint IDs`() = runTest {
@@ -90,7 +88,7 @@ class FingerprintMatcherImplTest {
         val probe =
             generatePersonIdentity(
                 FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER
+                FingerIdentifier.RIGHT_INDEX_FINGER,
             )
         val candidate =
             generatePersonIdentity(FingerIdentifier.LEFT_INDEX_FINGER, FingerIdentifier.RIGHT_THUMB)
@@ -110,13 +108,12 @@ class FingerprintMatcherImplTest {
         val probe =
             generatePersonIdentity(
                 FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER
+                FingerIdentifier.RIGHT_INDEX_FINGER,
             )
         val candidate =
             generatePersonIdentity(FingerIdentifier.LEFT_INDEX_FINGER, FingerIdentifier.RIGHT_THUMB)
         // When
         matcher.match(probe, listOf(candidate), NecMatchingSettings(false))
-
     }
 
     @Test
@@ -125,7 +122,8 @@ class FingerprintMatcherImplTest {
         val probe =
             generatePersonIdentity(
                 FingerIdentifier.LEFT_INDEX_FINGER,
-                FingerIdentifier.RIGHT_INDEX_FINGER, format = "Unsupported"
+                FingerIdentifier.RIGHT_INDEX_FINGER,
+                format = "Unsupported",
             )
         val candidate =
             generatePersonIdentity(FingerIdentifier.LEFT_THUMB, FingerIdentifier.RIGHT_THUMB)
@@ -137,13 +135,11 @@ class FingerprintMatcherImplTest {
 
     private fun generatePersonIdentity(
         vararg fingers: FingerIdentifier,
-        format: String = NEC_TEMPLATE_FORMAT
+        format: String = NEC_TEMPLATE_FORMAT,
     ) = FingerprintIdentity(
         "ID",
         fingers.map {
             Fingerprint(it, ByteArray(0), format)
-        }
+        },
     )
-
 }
-

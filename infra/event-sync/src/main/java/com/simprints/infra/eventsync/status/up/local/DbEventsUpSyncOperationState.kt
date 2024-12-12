@@ -11,14 +11,13 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyn
 internal data class DbEventsUpSyncOperationState(
     @PrimaryKey var id: String,
     val lastState: UpSyncState?,
-    val lastUpdatedTime: Long?
+    val lastUpdatedTime: Long?,
 ) {
     companion object {
-        fun buildFromEventsUpSyncOperationState(op: EventUpSyncOperation) =
-            DbEventsUpSyncOperationState(
-                op.getUniqueKey(),
-                op.lastState,
-                op.lastSyncTime
-            )
+        fun buildFromEventsUpSyncOperationState(op: EventUpSyncOperation) = DbEventsUpSyncOperationState(
+            op.getUniqueKey(),
+            op.lastState,
+            op.lastSyncTime,
+        )
     }
 }

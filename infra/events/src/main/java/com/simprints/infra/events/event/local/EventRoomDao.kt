@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface EventRoomDao {
-
     @Query("select * from DbEvent order by createdAt_unixMs desc")
     suspend fun loadAll(): List<DbEvent>
 
@@ -37,5 +36,4 @@ internal interface EventRoomDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(dbEvent: DbEvent)
-
 }

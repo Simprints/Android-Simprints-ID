@@ -24,7 +24,6 @@ import com.simprints.libsimprints.Verification as LegacyVerification
 
 @RunWith(AndroidJUnit4::class)
 class LibSimprintsResponseMapperTest {
-
     private val mapper = LibSimprintsResponseMapper()
 
     @Test
@@ -34,13 +33,13 @@ class LibSimprintsResponseMapperTest {
                 actionIdentifier = EnrolActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
-                subjectActions = "subjects"
-            )
+                subjectActions = "subjects",
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getParcelable<LegacyEnrolment>(Constants.SIMPRINTS_REGISTRATION)).isEqualTo(
-            LegacyEnrolment("guid")
+            LegacyEnrolment("guid"),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
@@ -54,8 +53,8 @@ class LibSimprintsResponseMapperTest {
                     .copy(contractVersion = VersionsList.INITIAL_REWORK),
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
-                subjectActions = "subjects"
-            )
+                subjectActions = "subjects",
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
@@ -82,8 +81,8 @@ class LibSimprintsResponseMapperTest {
                         tier = AppResponseTier.TIER_3,
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
-                )
-            )
+                ),
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
@@ -108,15 +107,15 @@ class LibSimprintsResponseMapperTest {
                         tier = AppResponseTier.TIER_5,
                         matchConfidence = AppMatchConfidence.MEDIUM,
                     ),
-                )
-            )
+                ),
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
             """
             [{"guid":"guid-1","tier":"TIER_5","confidence":100}]
-        """.trimIndent()
+            """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
@@ -128,7 +127,7 @@ class LibSimprintsResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
@@ -148,7 +147,7 @@ class LibSimprintsResponseMapperTest {
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = null,
                 ),
-            )
+            ),
         )
 
         // Verification does not implement equals, so we have to check each field individually
@@ -175,7 +174,7 @@ class LibSimprintsResponseMapperTest {
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = false,
                 ),
-            )
+            ),
         )
 
         // Verification does not implement equals, so we have to check each field individually
@@ -202,7 +201,7 @@ class LibSimprintsResponseMapperTest {
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = true,
                 ),
-            )
+            ),
         )
 
         // Verification does not implement equals, so we have to check each field individually
@@ -232,14 +231,14 @@ class LibSimprintsResponseMapperTest {
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = true,
                 ),
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
             """
             {"guid":"guid","tier":"TIER_2","confidence":50,"isSuccess":true}
-        """.trimIndent()
+            """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
@@ -252,12 +251,12 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 reason = "reason",
                 extraText = "extra",
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getParcelable<LegacyRefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
-            LegacyRefusalForm("reason", "extra")
+            LegacyRefusalForm("reason", "extra"),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
@@ -272,14 +271,14 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 reason = "reason",
                 extraText = "extra",
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
             """
             {"reason":"reason","extra":"extra"}
-        """.trimIndent()
+            """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
@@ -292,13 +291,13 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 reason = AppErrorReason.UNEXPECTED_ERROR,
                 flowCompleted = true,
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(
-            Constants.SIMPRINTS_UNEXPECTED_ERROR
+            Constants.SIMPRINTS_UNEXPECTED_ERROR,
         )
     }
 
@@ -330,11 +329,11 @@ class LibSimprintsResponseMapperTest {
                     sessionId = "sessionId",
                     reason = reason,
                     flowCompleted = true,
-                )
+                ),
             )
 
             assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(
-                expectedCode
+                expectedCode,
             )
         }
     }

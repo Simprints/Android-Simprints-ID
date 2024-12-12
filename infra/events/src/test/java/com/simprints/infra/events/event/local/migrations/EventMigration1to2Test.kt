@@ -9,7 +9,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
@@ -25,7 +24,6 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 @Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration1to2Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -69,11 +67,15 @@ class EventMigration1to2Test {
         this.put("endedAt", 0)
     }
 
-    private fun createSessionCaptureEvent(id: String, endedAt: Long) = ContentValues().apply {
+    private fun createSessionCaptureEvent(
+        id: String,
+        endedAt: Long,
+    ) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "SESSION_CAPTURE")
         this.put(
-            "eventJson", """
+            "eventJson",
+            """
             {
                 "id": "$id",
                 "labels": {
@@ -97,13 +99,16 @@ class EventMigration1to2Test {
                 },
                 "type": "SESSION_CAPTURE"
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
         this.put("createdAt", 1611584017198)
         this.put("endedAt", endedAt)
     }
 
-    private fun validateEnrolmentMigration(db: SupportSQLiteDatabase, id: String) {
+    private fun validateEnrolmentMigration(
+        db: SupportSQLiteDatabase,
+        id: String,
+    ) {
         val cursor = retrieveCursorWithEventById(db, id)
         assertThat(cursor.getStringWithColumnName("type")).isEqualTo(ENROLMENT_V1.toString())
 
@@ -132,7 +137,6 @@ class EventMigration1to2Test {
     }
 
     companion object {
-
         private const val TEST_DB = "test"
     }
 }

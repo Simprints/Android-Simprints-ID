@@ -6,7 +6,6 @@ import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIden
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 
 interface IdentityDataSource {
-
     suspend fun count(
         query: SubjectQuery = SubjectQuery(),
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,

@@ -19,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 
 class RecentUserActivitySharedPrefsMigrationTest {
-
     private val ctx = mockk<Context>()
     private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
     private val preferences = mockk<SharedPreferences>(relaxed = true) {
@@ -34,20 +33,18 @@ class RecentUserActivitySharedPrefsMigrationTest {
     }
 
     @Test
-    fun `should migrate should return true if the recent user activity is the one by default`() =
-        runTest {
-            val shouldMigrate =
-                recentUserActivitySharedPrefsMigration.shouldMigrate(ProtoRecentUserActivity.getDefaultInstance())
-            assertThat(shouldMigrate).isTrue()
-        }
+    fun `should migrate should return true if the recent user activity is the one by default`() = runTest {
+        val shouldMigrate =
+            recentUserActivitySharedPrefsMigration.shouldMigrate(ProtoRecentUserActivity.getDefaultInstance())
+        assertThat(shouldMigrate).isTrue()
+    }
 
     @Test
-    fun `should migrate should return false if the recent user activity is not the one by default`() =
-        runTest {
-            val proto = ProtoRecentUserActivity.newBuilder().setLastActivityTime(10).build()
-            val shouldMigrate = recentUserActivitySharedPrefsMigration.shouldMigrate(proto)
-            assertThat(shouldMigrate).isFalse()
-        }
+    fun `should migrate should return false if the recent user activity is not the one by default`() = runTest {
+        val proto = ProtoRecentUserActivity.newBuilder().setLastActivityTime(10).build()
+        val shouldMigrate = recentUserActivitySharedPrefsMigration.shouldMigrate(proto)
+        assertThat(shouldMigrate).isFalse()
+    }
 
     @Test
     fun `migrate should work correctly`() = runTest {
@@ -59,7 +56,8 @@ class RecentUserActivitySharedPrefsMigrationTest {
         every { preferences.getInt(IDENTIFICATIONS_KEY, 0) } returns 20
         every { preferences.getInt(VERIFICATIONS_KEY, 0) } returns 30
 
-        val expectedMigratedActivity = ProtoRecentUserActivity.newBuilder()
+        val expectedMigratedActivity = ProtoRecentUserActivity
+            .newBuilder()
             .setLastUserUsed("user")
             .setLastScannerUsed("scanner")
             .setLastScannerVersion("version")

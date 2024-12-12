@@ -24,7 +24,6 @@ import org.robolectric.annotation.Config
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class DailyActivityFragmentTest {
-
     companion object {
         private const val DATE = "2022-11-15"
     }
@@ -45,7 +44,7 @@ class DailyActivityFragmentTest {
         launchFragmentInHiltContainer<DailyActivityFragment>()
 
         onView(withId(R.id.dashboard_daily_activity_card)).check(
-            matches(not(isDisplayed()))
+            matches(not(isDisplayed())),
         )
     }
 
@@ -67,9 +66,9 @@ class DailyActivityFragmentTest {
         onView(withId(R.id.dashboard_daily_activity_card_title)).check(
             matches(
                 withText(
-                    containsString(DATE)
-                )
-            )
+                    containsString(DATE),
+                ),
+            ),
         )
     }
 
@@ -110,8 +109,8 @@ class DailyActivityFragmentTest {
         onView(withId(R.id.group_identifications)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
         onView(withId(R.id.dashboard_daily_activity_card_identifications_count)).check(
             matches(
-                withText("2")
-            )
+                withText("2"),
+            ),
         )
     }
 
@@ -133,8 +132,8 @@ class DailyActivityFragmentTest {
         onView(withId(R.id.group_verifications)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
         onView(withId(R.id.dashboard_daily_activity_card_verifications_count)).check(
             matches(
-                withText("2")
-            )
+                withText("2"),
+            ),
         )
     }
 
@@ -211,12 +210,12 @@ class DailyActivityFragmentTest {
     private fun mockDailyActivity(
         enrolments: Int = 0,
         identifications: Int = 0,
-        verifications: Int = 0
+        verifications: Int = 0,
     ) {
         every { viewModel.dailyActivity } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<DashboardDailyActivityState>>().onChanged(
-                    DashboardDailyActivityState(enrolments, identifications, verifications)
+                    DashboardDailyActivityState(enrolments, identifications, verifications),
                 )
             }
         }

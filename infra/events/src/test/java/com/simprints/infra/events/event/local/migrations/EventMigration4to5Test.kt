@@ -9,8 +9,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getIntWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.events.event.local.EventRoomDatabase
-import com.simprints.infra.events.event.local.migrations.*
-import com.simprints.infra.events.local.migrations.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,9 +16,6 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration4to5Test {
-
-    private val TEST_DB = "test"
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -41,7 +36,10 @@ class EventMigration4to5Test {
 
         // re-open the database with version 5 and initiate MIGRATION 4 to 5
         val db = helper.runMigrationsAndValidate(
-            TEST_DB, 5, true, EventMigration4to5()
+            TEST_DB,
+            5,
+            true,
+            EventMigration4to5(),
         )
 
         // validate that the data was migrated properly.
@@ -59,8 +57,7 @@ class EventMigration4to5Test {
         }
     }
 
-    private fun
-        createEvent() = ContentValues().apply {
+    private fun createEvent() = ContentValues().apply {
         put("id", EVENT_ID)
         put("type", "some-event-type")
         put("eventJson", "some-event-json")
@@ -77,7 +74,7 @@ class EventMigration4to5Test {
     }
 
     companion object {
+        private const val TEST_DB = "test"
         private const val EVENT_ID = "some-event-id"
     }
-
 }

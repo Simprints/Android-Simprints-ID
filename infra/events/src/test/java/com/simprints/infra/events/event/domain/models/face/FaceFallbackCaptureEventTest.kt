@@ -10,7 +10,6 @@ import org.junit.Test
 
 @Keep
 class FaceFallbackCaptureEventTest {
-
     @Test
     fun create_FaceFallbackCaptureEvent() {
         val event = FaceFallbackCaptureEvent(CREATED_AT, ENDED_AT)
@@ -25,4 +24,3 @@ class FaceFallbackCaptureEventTest {
         }
     }
 }
-

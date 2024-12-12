@@ -8,10 +8,9 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVe
 import org.junit.Test
 
 class ScannerHardwareRevisionsTest {
-
     @Test
     fun `test getDownloadableFirmwares with empty local ScannerFirmwareVersions `() {
-        //Given
+        // Given
         val scannerHardwareRevisions = FirmwareTestData.RESPONSE_HARDWARE_REVISIONS_MAP
         val local = emptyMap<DownloadableFirmwareVersion.Chip, Set<String>>()
         // When
@@ -22,7 +21,7 @@ class ScannerHardwareRevisionsTest {
 
     @Test
     fun `test getDownloadableFirmwares with all firmware versions are available locally`() {
-        //Given
+        // Given
         val scannerHardwareRevisions = FirmwareTestData.RESPONSE_HARDWARE_REVISIONS_MAP
         val local = SCANNER_VERSIONS_HIGH
         // When

@@ -1,28 +1,28 @@
 package com.simprints.infra.config.store.local.migrations
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration
 import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration.ProtoFaceSdkConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.testtools.protoDecisionPolicy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class ProjectConfigFaceSdkQualityThresholdMigrationTest {
     @Test
     fun `should migrate if face has quality threshold`() = runTest {
-        val currentData = ProtoProjectConfiguration.newBuilder().setFace(
-            ProtoFaceConfiguration.newBuilder()
-                .setRankOne(
-                    ProtoFaceSdkConfiguration.newBuilder()
-                        .setQualityThresholdPrecise(0f)
-                        .setQualityThreshold(1)
-                        .build()
-                )
-                .build()
-        ).build()
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .setFace(
+                ProtoFaceConfiguration
+                    .newBuilder()
+                    .setRankOne(
+                        ProtoFaceSdkConfiguration
+                            .newBuilder()
+                            .setQualityThresholdPrecise(0f)
+                            .setQualityThreshold(1)
+                            .build(),
+                    ).build(),
+            ).build()
 
         val shouldMigrate = ProjectConfigFaceSdkQualityThresholdMigration().shouldMigrate(currentData)
 
@@ -31,15 +31,18 @@ class ProjectConfigFaceSdkQualityThresholdMigrationTest {
 
     @Test
     fun `should not migrate if face has quality threshold`() = runTest {
-        val currentData = ProtoProjectConfiguration.newBuilder().setFace(
-            ProtoFaceConfiguration.newBuilder()
-                .setRankOne(
-                    ProtoFaceSdkConfiguration.newBuilder()
-                        .setQualityThreshold(0)
-                        .build()
-                )
-                .build()
-        ).build()
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .setFace(
+                ProtoFaceConfiguration
+                    .newBuilder()
+                    .setRankOne(
+                        ProtoFaceSdkConfiguration
+                            .newBuilder()
+                            .setQualityThreshold(0)
+                            .build(),
+                    ).build(),
+            ).build()
 
         val shouldMigrate = ProjectConfigFaceSdkQualityThresholdMigration().shouldMigrate(currentData)
 
@@ -48,16 +51,19 @@ class ProjectConfigFaceSdkQualityThresholdMigrationTest {
 
     @Test
     fun `migration converts quality threshold to float`() = runTest {
-        val currentData = ProtoProjectConfiguration.newBuilder().setFace(
-            ProtoFaceConfiguration.newBuilder()
-                .setRankOne(
-                    ProtoFaceSdkConfiguration.newBuilder()
-                        .setQualityThreshold(1)
-                        .setQualityThresholdPrecise(0f)
-                        .build()
-                )
-                .build()
-        ).build()
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .setFace(
+                ProtoFaceConfiguration
+                    .newBuilder()
+                    .setRankOne(
+                        ProtoFaceSdkConfiguration
+                            .newBuilder()
+                            .setQualityThreshold(1)
+                            .setQualityThresholdPrecise(0f)
+                            .build(),
+                    ).build(),
+            ).build()
 
         val migrated = ProjectConfigFaceSdkQualityThresholdMigration().migrate(currentData)
 

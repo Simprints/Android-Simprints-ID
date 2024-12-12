@@ -13,7 +13,6 @@ import org.junit.Test
 import java.io.Serializable
 
 class CreateVerifyResponseUseCaseTest {
-
     private lateinit var useCase: CreateVerifyResponseUseCase
 
     @Before
@@ -28,7 +27,7 @@ class CreateVerifyResponseUseCaseTest {
                 every { face } returns null
                 every { fingerprint?.getSdkConfiguration((any())) } returns null
             },
-            results = listOf(createFaceMatchResult(10f, 20f, 30f))
+            results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
 
         assertThat(result).isInstanceOf(AppErrorResponse::class.java)
@@ -43,7 +42,7 @@ class CreateVerifyResponseUseCaseTest {
                 every { face?.verificationMatchThreshold } returns null
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns null
             },
-            results = listOf(createFaceMatchResult(10f, 50f, 100f))
+            results = listOf(createFaceMatchResult(10f, 50f, 100f)),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.confidenceScore).isEqualTo(100)
@@ -57,11 +56,11 @@ class CreateVerifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
-                    30
+                    30,
                 )
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
             },
-            results = listOf(createFingerprintMatchResult(10f, 50f, 100f))
+            results = listOf(createFingerprintMatchResult(10f, 50f, 100f)),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.confidenceScore).isEqualTo(100)
@@ -75,7 +74,7 @@ class CreateVerifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
-                    30
+                    30,
                 )
                 every { face?.verificationMatchThreshold } returns 50f
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
@@ -83,7 +82,7 @@ class CreateVerifyResponseUseCaseTest {
             results = listOf(
                 createFaceMatchResult(10f, 50f, 105f),
                 createFingerprintMatchResult(10f, 50f, 100f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.confidenceScore).isEqualTo(105)
@@ -97,7 +96,7 @@ class CreateVerifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
-                    30
+                    30,
                 )
                 every { face?.verificationMatchThreshold } returns 50f
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
@@ -105,7 +104,7 @@ class CreateVerifyResponseUseCaseTest {
             results = listOf(
                 createFaceMatchResult(10f, 50f, 100f),
                 createFingerprintMatchResult(10f, 50f, 105f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.confidenceScore).isEqualTo(105)
@@ -120,7 +119,7 @@ class CreateVerifyResponseUseCaseTest {
             },
             results = listOf(
                 createFaceMatchResult(10f, 50f, 100f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isNull()
@@ -133,13 +132,13 @@ class CreateVerifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
-                    30
+                    30,
                 )
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns null
             },
             results = listOf(
                 createFingerprintMatchResult(10f, 50f, 100f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isNull()
@@ -154,7 +153,7 @@ class CreateVerifyResponseUseCaseTest {
             },
             results = listOf(
                 createFaceMatchResult(51f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(true)
@@ -167,13 +166,13 @@ class CreateVerifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
-                    30
+                    30,
                 )
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFingerprintMatchResult(51f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(true)
@@ -188,7 +187,7 @@ class CreateVerifyResponseUseCaseTest {
             },
             results = listOf(
                 createFaceMatchResult(50f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(true)
@@ -201,13 +200,13 @@ class CreateVerifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
-                    30
+                    30,
                 )
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFingerprintMatchResult(50f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(true)
@@ -222,7 +221,7 @@ class CreateVerifyResponseUseCaseTest {
             },
             results = listOf(
                 createFaceMatchResult(49f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(false)
@@ -235,13 +234,13 @@ class CreateVerifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     10,
                     20,
-                    30
+                    30,
                 )
                 every { fingerprint?.getSdkConfiguration((any()))?.verificationMatchThreshold } returns 50f
             },
             results = listOf(
                 createFingerprintMatchResult(49f),
-            )
+            ),
         )
 
         assertThat((result as AppVerifyResponse).matchResult.verificationSuccess).isEqualTo(false)
@@ -253,6 +252,6 @@ class CreateVerifyResponseUseCaseTest {
     )
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) }
+        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) },
     )
 }

@@ -16,22 +16,21 @@ import javax.inject.Inject
 internal class NetworkingLogViewModel @Inject constructor(
     private val persistentLogger: PersistentLogger,
 ) : ViewModel() {
-
     private val _logs = MutableLiveData<List<TroubleshootingItemViewData>>(emptyList())
     val logs: LiveData<List<TroubleshootingItemViewData>>
         get() = _logs
 
     fun collectData() {
         viewModelScope.launch {
-            persistentLogger.get(LogEntryType.Network)
+            persistentLogger
+                .get(LogEntryType.Network)
                 .map {
                     TroubleshootingItemViewData(
                         title = it.title,
                         subtitle = Date(it.timestampMs).toString(),
                         body = it.body,
                     )
-                }
-                .ifEmpty { listOf(TroubleshootingItemViewData(title = "No data")) }
+                }.ifEmpty { listOf(TroubleshootingItemViewData(title = "No data")) }
                 .let { _logs.postValue(it) }
         }
     }

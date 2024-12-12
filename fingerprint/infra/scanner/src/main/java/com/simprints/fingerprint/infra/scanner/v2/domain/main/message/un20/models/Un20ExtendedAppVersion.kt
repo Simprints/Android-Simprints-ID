@@ -2,8 +2,9 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.mode
 
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf as byteArrayOfAny
 
-data class Un20ExtendedAppVersion(val versionAsString: String) {
-
+data class Un20ExtendedAppVersion(
+    val versionAsString: String,
+) {
     fun getBytes(): ByteArray {
         val bytes = versionAsString.toByteArray()
         return byteArrayOfAny(bytes.size, bytes)
@@ -11,11 +12,11 @@ data class Un20ExtendedAppVersion(val versionAsString: String) {
 
     companion object {
         fun fromString(version: String) = Un20ExtendedAppVersion(
-            versionAsString = version
+            versionAsString = version,
         )
 
         fun fromBytes(bytes: ByteArray) = Un20ExtendedAppVersion(
-            versionAsString = String(bytes)
+            versionAsString = String(bytes),
         )
     }
 }

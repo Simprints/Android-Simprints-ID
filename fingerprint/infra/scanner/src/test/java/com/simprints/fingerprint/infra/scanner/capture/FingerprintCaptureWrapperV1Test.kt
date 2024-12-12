@@ -20,14 +20,12 @@ import org.junit.Before
 import org.junit.Test
 
 class FingerprintCaptureWrapperV1Test {
-
     private lateinit var scannerWrapper: FingerprintCaptureWrapperV1
 
     @MockK
     lateinit var scanner: Scanner
 
     private var captureCallback = slot<ScannerCallback>()
-
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -87,7 +85,6 @@ class FingerprintCaptureWrapperV1Test {
     private fun mockScannerError(scannerError: SCANNER_ERROR) {
         every { scanner.startContinuousCapture(any(), any(), capture(captureCallback)) } answers {
             captureCallback.captured.onFailure(scannerError)
-
         }
     }
 
@@ -95,7 +92,6 @@ class FingerprintCaptureWrapperV1Test {
         Dpi(1000),
         3000,
         60,
-        false
+        false,
     )
-
 }

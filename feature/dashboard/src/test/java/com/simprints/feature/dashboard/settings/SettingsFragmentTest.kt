@@ -12,9 +12,9 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
-import com.simprints.infra.config.store.models.GeneralConfiguration
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -31,7 +31,6 @@ import com.simprints.infra.resources.R as IDR
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class SettingsFragmentTest {
-
     companion object {
         private val LANGUAGE_OPTIONS = listOf("en", "fr", "pt")
         private const val LANGUAGE = "en"
@@ -58,7 +57,6 @@ class SettingsFragmentTest {
             }
         }
     }
-
 
     @Test
     fun `should display the toolbar`() {
@@ -121,7 +119,7 @@ class SettingsFragmentTest {
 
         onView(withId(androidx.preference.R.id.recycler_view)).perform(
             RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
-                hasDescendant(withText(IDR.string.dashboard_preference_app_details_title))
+                hasDescendant(withText(IDR.string.dashboard_preference_app_details_title)),
             ),
         )
         onView(withText(IDR.string.dashboard_preference_app_details_title)).perform(click())

@@ -5,7 +5,6 @@ import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import org.junit.Test
 
 class TimeUtilKtTest {
-
     @Test
     fun `given a time in seconds with minutes and seconds format it properly`() {
         val formattedTime = getFormattedEstimatedOutage(180L)
@@ -24,7 +23,7 @@ class TimeUtilKtTest {
     fun `given 0 time in seconds format it properly`() {
         val formattedTime = getFormattedEstimatedOutage(0L)
 
-       assertThat(formattedTime).isEqualTo("00 seconds")
+        assertThat(formattedTime).isEqualTo("00 seconds")
     }
 
     @Test

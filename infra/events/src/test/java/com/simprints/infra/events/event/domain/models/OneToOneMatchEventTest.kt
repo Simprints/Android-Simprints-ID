@@ -9,7 +9,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class OneToOneMatchEventTest {
-
     @Test
     fun create_OneToOneMatchEvent() {
         val resultArg = MatchEntry(GUID1, 0F)
@@ -19,7 +18,7 @@ class OneToOneMatchEventTest {
             GUID1,
             "MATCHER_NAME",
             resultArg,
-            FingerComparisonStrategy.SAME_FINGER
+            FingerComparisonStrategy.SAME_FINGER,
         )
 
         assertThat(event.id).isNotNull()
@@ -36,4 +35,3 @@ class OneToOneMatchEventTest {
         }
     }
 }
-

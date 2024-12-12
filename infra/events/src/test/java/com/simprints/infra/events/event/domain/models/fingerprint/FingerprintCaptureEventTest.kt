@@ -7,13 +7,12 @@ import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test
 
 class FingerprintCaptureEventTest {
-
     @Test
     fun create_FingerprintCaptureEvent() {
         val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
             IFingerIdentifier.LEFT_THUMB,
             8,
-            "ISO_19794_2"
+            "ISO_19794_2",
         )
         val event = FingerprintCaptureEvent(
             SampleDefaults.CREATED_AT,

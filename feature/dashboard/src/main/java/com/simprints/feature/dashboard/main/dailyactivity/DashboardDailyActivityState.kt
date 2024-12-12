@@ -3,7 +3,7 @@ package com.simprints.feature.dashboard.main.dailyactivity
 internal data class DashboardDailyActivityState(
     val enrolments: Int,
     val identifications: Int,
-    val verifications: Int
+    val verifications: Int,
 ) {
     fun hasNoActivity() = !hasEnrolments() && !hasIdentifications() && !hasVerifications()
 

@@ -16,7 +16,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class EventsLogViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 

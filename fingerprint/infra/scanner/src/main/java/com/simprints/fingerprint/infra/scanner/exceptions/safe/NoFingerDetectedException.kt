@@ -1,5 +1,5 @@
 package com.simprints.fingerprint.infra.scanner.exceptions.safe
 
 class NoFingerDetectedException(
-    message: String
+    message: String,
 ) : ScannerSafeException("NoFingerDetectedException: $message")

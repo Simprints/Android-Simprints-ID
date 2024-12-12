@@ -16,7 +16,6 @@ import javax.inject.Singleton
 @Singleton
 @ExcludedFromGeneratedTestCoverageReports("Realm SDK configuration doesn't need to be covered")
 class RealmConfig @Inject constructor() {
-
     fun get(
         databaseName: String,
         key: ByteArray,
@@ -27,19 +26,16 @@ class RealmConfig @Inject constructor() {
                 DbFaceSample::class,
                 DbSubject::class,
                 DbProject::class,
-            )
-        )
-        .name("$databaseName.realm")
+            ),
+        ).name("$databaseName.realm")
         .schemaVersion(REALM_SCHEMA_VERSION)
         .migration(
             migration = RealmMigrations(),
-            resolveEmbeddedObjectConstraints = true // Delete embedded objects if they are not in the schema anymore
-        )
-        .let { if (BuildConfig.DB_ENCRYPTION) it.encryptionKey(key) else it }
+            resolveEmbeddedObjectConstraints = true, // Delete embedded objects if they are not in the schema anymore
+        ).let { if (BuildConfig.DB_ENCRYPTION) it.encryptionKey(key) else it }
         .build()
 
     companion object {
-
         private const val REALM_SCHEMA_VERSION: Long = 15
     }
 }

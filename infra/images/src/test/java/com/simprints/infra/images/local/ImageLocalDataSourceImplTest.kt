@@ -13,27 +13,28 @@ import org.junit.Test
 import java.io.File
 
 class ImageLocalDataSourceImplTest {
-
     companion object {
         private const val PROJECT_ID = "projectId"
     }
 
     @Test
     fun `check file directory is created`() {
-
         val path = "testpath"
         val file = File(path)
 
-        ImageLocalDataSourceImpl(ctx = mockk {
-            every { filesDir } returns file
-        }, mockk(), UnconfinedTestDispatcher())
+        ImageLocalDataSourceImpl(
+            ctx = mockk {
+                every { filesDir } returns file
+            },
+            mockk(),
+            UnconfinedTestDispatcher(),
+        )
 
         assert(File(path).exists())
     }
 
     @Test
     fun `check saving the file opens a file output`() = runTest {
-
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
@@ -41,10 +42,13 @@ class ImageLocalDataSourceImplTest {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
-            every { filesDir } returns file
-        }, encryptedFileMock, UnconfinedTestDispatcher())
-
+        val localSource = ImageLocalDataSourceImpl(
+            ctx = mockk {
+                every { filesDir } returns file
+            },
+            encryptedFileMock,
+            UnconfinedTestDispatcher(),
+        )
 
         val fileName = Path("testDir/Images")
         val imageBytes = byteArrayOf()
@@ -54,8 +58,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun `checking listing files without saving returns empty list`()  = runTest {
-
+    fun `checking listing files without saving returns empty list`() = runTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
@@ -63,9 +66,13 @@ class ImageLocalDataSourceImplTest {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
-            every { filesDir } returns file
-        }, encryptedFileMock, UnconfinedTestDispatcher())
+        val localSource = ImageLocalDataSourceImpl(
+            ctx = mockk {
+                every { filesDir } returns file
+            },
+            encryptedFileMock,
+            UnconfinedTestDispatcher(),
+        )
 
         val images = localSource.listImages(PROJECT_ID)
 
@@ -73,7 +80,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun `checking decrypting the files opens the file stream`()  = runTest {
+    fun `checking decrypting the files opens the file stream`() = runTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
@@ -81,9 +88,13 @@ class ImageLocalDataSourceImplTest {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
-            every { filesDir } returns file
-        }, encryptedFileMock, UnconfinedTestDispatcher())
+        val localSource = ImageLocalDataSourceImpl(
+            ctx = mockk {
+                every { filesDir } returns file
+            },
+            encryptedFileMock,
+            UnconfinedTestDispatcher(),
+        )
 
         val fileName = Path("testDir/Images")
         localSource.decryptImage(SecuredImageRef(fileName))
@@ -92,18 +103,20 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check file delete deletes the dir`()  = runTest {
-
+    fun `check file delete deletes the dir`() = runTest {
         val path = "testpath"
         val file = File(path)
 
-        val localSource = ImageLocalDataSourceImpl(ctx = mockk {
-            every { filesDir } returns file
-        }, mockk(), UnconfinedTestDispatcher())
+        val localSource = ImageLocalDataSourceImpl(
+            ctx = mockk {
+                every { filesDir } returns file
+            },
+            mockk(),
+            UnconfinedTestDispatcher(),
+        )
 
-        localSource.deleteImage(SecuredImageRef(Path("${path}/Image")))
+        localSource.deleteImage(SecuredImageRef(Path("$path/Image")))
 
-        assert(!File("${path}/Image").exists())
+        assert(!File("$path/Image").exists())
     }
-
 }

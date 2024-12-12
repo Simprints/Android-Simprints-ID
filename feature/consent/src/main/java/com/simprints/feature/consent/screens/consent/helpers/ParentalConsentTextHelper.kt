@@ -13,14 +13,15 @@ internal data class ParentalConsentTextHelper(
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed
 
-    //First argument in consent text should always be program name, second is modality specific access/use case text
-    fun assembleText(context: Context): String = StringBuilder().apply {
-        val modalityUseCase = getModalitySpecificUseCaseText(context, modalities)
-        val modalityAccess = getModalitySpecificAccessText(context, modalities)
+    // First argument in consent text should always be program name, second is modality specific access/use case text
+    fun assembleText(context: Context): String = StringBuilder()
+        .apply {
+            val modalityUseCase = getModalitySpecificUseCaseText(context, modalities)
+            val modalityAccess = getModalitySpecificAccessText(context, modalities)
 
-        filterAppRequestForParentalConsent(context, consentType, config, modalityUseCase)
-        extractDataSharingOptions(context, config, modalityUseCase, modalityAccess)
-    }.toString()
+            filterAppRequestForParentalConsent(context, consentType, config, modalityUseCase)
+            extractDataSharingOptions(context, config, modalityUseCase, modalityAccess)
+        }.toString()
 
     private fun StringBuilder.filterAppRequestForParentalConsent(
         context: Context,
@@ -41,13 +42,15 @@ internal data class ParentalConsentTextHelper(
         modalityUseCase: String,
     ) = when (config?.enrolmentVariant) {
         ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY -> appendSentence(
-            context.getString(R.string.consent_parental_enrol_only)
-                .format(programName, modalityUseCase)
+            context
+                .getString(R.string.consent_parental_enrol_only)
+                .format(programName, modalityUseCase),
         )
 
         ConsentConfiguration.ConsentEnrolmentVariant.STANDARD -> appendSentence(
-            context.getString(R.string.consent_parental_enrol)
-                .format(programName, modalityUseCase)
+            context
+                .getString(R.string.consent_parental_enrol)
+                .format(programName, modalityUseCase),
         )
 
         else -> this
@@ -58,22 +61,22 @@ internal data class ParentalConsentTextHelper(
         programName: String,
         modalityUseCase: String,
     ) = appendSentence(
-        context.getString(R.string.consent_parental_id_verify).format(programName, modalityUseCase)
+        context.getString(R.string.consent_parental_id_verify).format(programName, modalityUseCase),
     )
 
     private fun StringBuilder.extractDataSharingOptions(
         context: Context,
         config: ConsentConfiguration,
         modalityUseCase: String,
-        modalityAccess: String
+        modalityAccess: String,
     ) {
         if (config.parentalPrompt?.dataSharedWithPartner == true) {
             appendSentence(
-                context.getString(R.string.consent_parental_share_data_yes).format(config.organizationName, modalityAccess)
+                context.getString(R.string.consent_parental_share_data_yes).format(config.organizationName, modalityAccess),
             )
         } else {
             appendSentence(
-                context.getString(R.string.consent_parental_share_data_no).format(modalityAccess)
+                context.getString(R.string.consent_parental_share_data_no).format(modalityAccess),
             )
         }
         if (config.parentalPrompt?.dataUsedForRAndD == true) {
@@ -84,7 +87,7 @@ internal data class ParentalConsentTextHelper(
         }
         if (config.parentalPrompt?.confirmation == true) {
             appendSentence(
-                context.getString(R.string.consent_parental_confirmation).format(modalityUseCase)
+                context.getString(R.string.consent_parental_confirmation).format(modalityUseCase),
             )
         }
     }
@@ -101,7 +104,7 @@ internal data class ParentalConsentTextHelper(
     private fun getConcatenatedModalitiesUseCaseText(context: Context) = "%s %s %s".format(
         context.getString(R.string.consent_biometrics_parental_fingerprint),
         context.getString(R.string.consent_biometric_concat_modalities),
-        context.getString(R.string.consent_biometrics_parental_face)
+        context.getString(R.string.consent_biometrics_parental_face),
     )
 
     private fun getSingleModalitySpecificUseCaseText(

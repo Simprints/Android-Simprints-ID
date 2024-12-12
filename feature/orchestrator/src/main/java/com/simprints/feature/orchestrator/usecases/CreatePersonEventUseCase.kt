@@ -7,8 +7,8 @@ import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -16,7 +16,6 @@ internal class CreatePersonEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
 ) {
-
     suspend operator fun invoke(results: List<Serializable>) {
         val sessionEvents = eventRepository.getEventsInCurrentSession()
         val previousPersonCreationEvent = sessionEvents

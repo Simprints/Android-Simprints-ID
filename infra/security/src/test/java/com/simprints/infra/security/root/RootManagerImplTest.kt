@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class RootManagerImplTest {
-
     private val ctx = mockk<Context>(relaxed = true)
     private var rootManager = RootManagerImpl(ctx)
 

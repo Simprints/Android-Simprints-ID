@@ -22,7 +22,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class FaceMatcherUseCaseTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -77,7 +76,7 @@ internal class FaceMatcherUseCaseTest {
         useCase.invoke(
             MatchParams(
                 probeFaceSamples = listOf(
-                    MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
+                    MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                 ),
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
@@ -88,7 +87,6 @@ internal class FaceMatcherUseCaseTest {
         coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
     }
 
-
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
@@ -96,8 +94,8 @@ internal class FaceMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
-                listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
-            )
+                listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate")),
+            ),
         )
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 42f
 
@@ -106,7 +104,7 @@ internal class FaceMatcherUseCaseTest {
         val result = useCase.invoke(
             matchParams = MatchParams(
                 probeFaceSamples = listOf(
-                    MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
+                    MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                 ),
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),

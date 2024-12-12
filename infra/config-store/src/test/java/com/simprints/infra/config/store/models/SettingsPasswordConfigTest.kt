@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class SettingsPasswordConfigTest {
-
     @Test
     fun testLocked() {
         assertThat(SettingsPasswordConfig.NotSet.locked).isFalse()

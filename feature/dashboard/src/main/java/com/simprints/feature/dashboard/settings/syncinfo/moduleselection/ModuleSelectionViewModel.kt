@@ -30,7 +30,6 @@ internal class ModuleSelectionViewModel @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
-
     val modulesList: LiveData<List<Module>>
         get() = _modulesList
     private val _modulesList = MutableLiveData<List<Module>>()
@@ -55,7 +54,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
                         is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                             encrypted = name,
                             tokenKeyType = TokenKeyType.ModuleId,
-                            project = configManager.getProject(authStore.signedInProjectId)
+                            project = configManager.getProject(authStore.signedInProjectId),
                         )
                     }
                     module.copy(name = decryptedName)
@@ -66,7 +65,8 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun loadPasswordSettings() {
         viewModelScope.launch {
-            configManager.getProjectConfiguration()
+            configManager
+                .getProjectConfiguration()
                 .general
                 .settingsPassword
                 .let { _screenLocked.postValue(it) }
@@ -75,8 +75,9 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun updateModuleSelection(moduleToUpdate: Module) {
         val selectedModulesSize = getSelected().size
-        if (!moduleToUpdate.isSelected && selectedModulesSize == maxNumberOfModules)
+        if (!moduleToUpdate.isSelected && selectedModulesSize == maxNumberOfModules) {
             throw TooManyModulesSelectedException(maxNumberOfModules = maxNumberOfModules)
+        }
 
         postUpdateModules {
             forEachIndexed { index, module ->
@@ -91,8 +92,9 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun saveModules() {
         val selectedModulesSize = getSelected().size
-        if (selectedModulesSize == 0)
+        if (selectedModulesSize == 0) {
             throw NoModuleSelectedException()
+        }
 
         externalScope.launch {
             val modules = modules.map { module ->
@@ -100,7 +102,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
                     is TokenizableString.Raw -> tokenizationProcessor.encrypt(
                         decrypted = name,
                         tokenKeyType = TokenKeyType.ModuleId,
-                        project = configManager.getProject(authStore.signedInProjectId)
+                        project = configManager.getProject(authStore.signedInProjectId),
                     )
 
                     is TokenizableString.Tokenized -> name
@@ -113,11 +115,10 @@ internal class ModuleSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun postUpdateModules(block: suspend MutableList<Module>.() -> Unit) =
-        viewModelScope.launch {
-            modules.block()
-            _modulesList.postValue(modules)
-        }
+    private fun postUpdateModules(block: suspend MutableList<Module>.() -> Unit) = viewModelScope.launch {
+        modules.block()
+        _modulesList.postValue(modules)
+    }
 
     private fun getSelected() = modules.filter { it.isSelected }
 

@@ -24,7 +24,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
-
     private val args by navArgs<ExitFormFragmentArgs>()
     private val viewModel by viewModels<ExitFormViewModel>()
     private val binding by viewBinding(FragmentExitFormBinding::bind)
@@ -33,7 +32,10 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         viewModel.reasonTextChanged(it)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         val config = args.exitFormConfiguration
 
@@ -113,8 +115,9 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         }
         viewModel.finishEvent.observe(viewLifecycleOwner) {
             val (answer, reason) = it.peekContent()
-            findNavController().finishWithResult(this,
-                ExitFormResult(true, answer, reason)
+            findNavController().finishWithResult(
+                this,
+                ExitFormResult(true, answer, reason),
             )
         }
     }
@@ -128,5 +131,4 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 
         inputManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
     }
-
 }

@@ -4,134 +4,134 @@ import androidx.annotation.Keep
 
 @Keep
 enum class EventType {
-
     // a constant key is required to serialise/deserialize
     // events correctly with Jackson (see annotation in Event).
     // Add a key in the companion object for each enum value
 
-    /* key added: AUTHENTICATION_KEY */
+    // key added: AUTHENTICATION_KEY
     AUTHENTICATION,
 
-    /* key added: CONSENT_KEY */
+    // key added: CONSENT_KEY
     CONSENT,
 
-    /* key added: ENROLMENT_V1_KEY */
+    // key added: ENROLMENT_V1_KEY
     ENROLMENT_V1,
 
-    /* key added: ENROLMENT_V1_KE2 */
+    // key added: ENROLMENT_V1_KE2
     ENROLMENT_V2,
 
-    /* key added: AUTHORIZATION_KEY */
+    // key added: AUTHORIZATION_KEY
     AUTHORIZATION,
 
-    /* key added: FINGERPRINT_CAPTURE_KEY */
+    // key added: FINGERPRINT_CAPTURE_KEY
     FINGERPRINT_CAPTURE,
 
-    /* key added: FINGERPRINT_CAPTURE_BIOMETRICS_KEY */
+    // key added: FINGERPRINT_CAPTURE_BIOMETRICS_KEY
     FINGERPRINT_CAPTURE_BIOMETRICS,
 
-    /* key added: ONE_TO_ONE_MATCH_KEY */
+    // key added: ONE_TO_ONE_MATCH_KEY
     ONE_TO_ONE_MATCH,
 
-    /* key added: ONE_TO_MANY_MATCH_KEY */
+    // key added: ONE_TO_MANY_MATCH_KEY
     ONE_TO_MANY_MATCH,
 
-    /* key added: ALERT_SCREEN_KEY */
+    // key added: ALERT_SCREEN_KEY
     ALERT_SCREEN,
 
-    /* key added: GUID_SELECTION_KEY */
+    // key added: GUID_SELECTION_KEY
     GUID_SELECTION,
 
-    /* key added: CONNECTIVITY_SNAPSHOT_KEY */
+    // key added: CONNECTIVITY_SNAPSHOT_KEY
     CONNECTIVITY_SNAPSHOT,
 
-    /* key added: REFUSAL_KEY */
+    // key added: REFUSAL_KEY
     REFUSAL,
 
-    /* key added: CANDIDATE_READ_KEY */
+    // key added: CANDIDATE_READ_KEY
     CANDIDATE_READ,
 
-    /* key added: SCANNER_CONNECTION_KEY */
+    // key added: SCANNER_CONNECTION_KEY
     SCANNER_CONNECTION,
 
-    /* key added: VERO_2_INFO_SNAPSHOT_KEY */
+    // key added: VERO_2_INFO_SNAPSHOT_KEY
     VERO_2_INFO_SNAPSHOT,
 
-    /* key added: SCANNER_FIRMWARE_UPDATE_KEY */
+    // key added: SCANNER_FIRMWARE_UPDATE_KEY
     SCANNER_FIRMWARE_UPDATE,
 
-    /* key added: INVALID_INTENT_KEY */
+    // key added: INVALID_INTENT_KEY
     INVALID_INTENT,
 
-    /* key added: CALLOUT_CONFIRMATION_KEY */
+    // key added: CALLOUT_CONFIRMATION_KEY
     CALLOUT_CONFIRMATION,
 
-    /* key added: CALLOUT_IDENTIFICATION_KEY */
+    // key added: CALLOUT_IDENTIFICATION_KEY
     CALLOUT_IDENTIFICATION,
 
-    /* key added: CALLOUT_ENROLMENT_KEY */
+    // key added: CALLOUT_ENROLMENT_KEY
     CALLOUT_ENROLMENT,
 
-    /* key added: CALLOUT_VERIFICATION_KEY */
+    // key added: CALLOUT_VERIFICATION_KEY
     CALLOUT_VERIFICATION,
 
-    /* key added: CALLOUT_LAST_BIOMETRICS_KEY */
+    // key added: CALLOUT_LAST_BIOMETRICS_KEY
     CALLOUT_LAST_BIOMETRICS,
 
-    /* key added: CALLBACK_IDENTIFICATION_KEY */
+    // key added: CALLBACK_IDENTIFICATION_KEY
     CALLBACK_IDENTIFICATION,
 
-    /* key added: CALLBACK_ENROLMENT_KEY */
+    // key added: CALLBACK_ENROLMENT_KEY
     CALLBACK_ENROLMENT,
 
-    /* key added: CALLBACK_REFUSAL_KEY */
+    // key added: CALLBACK_REFUSAL_KEY
     CALLBACK_REFUSAL,
 
-    /* key added: CALLBACK_VERIFICATION_KEY */
+    // key added: CALLBACK_VERIFICATION_KEY
     CALLBACK_VERIFICATION,
 
-    /* key added: CALLBACK_ERROR_KEY */
+    // key added: CALLBACK_ERROR_KEY
     CALLBACK_ERROR,
 
-    /* key added: SUSPICIOUS_INTENT_KEY */
+    // key added: SUSPICIOUS_INTENT_KEY
     SUSPICIOUS_INTENT,
 
-    /* key added: INTENT_PARSING_KEY */
+    // key added: INTENT_PARSING_KEY
     INTENT_PARSING,
 
-    /* key added: COMPLETION_CHECK_KEY */
+    // key added: COMPLETION_CHECK_KEY
     COMPLETION_CHECK,
 
-    /* key added: CALLBACK_CONFIRMATION_KEY */
+    // key added: CALLBACK_CONFIRMATION_KEY
     CALLBACK_CONFIRMATION,
 
-    /* key added: FACE_ONBOARDING_COMPLETE_KEY */
+    // key added: FACE_ONBOARDING_COMPLETE_KEY
     FACE_ONBOARDING_COMPLETE,
 
-    /* key added: FACE_FALLBACK_CAPTURE_KEY */
+    // key added: FACE_FALLBACK_CAPTURE_KEY
     FACE_FALLBACK_CAPTURE,
 
-    /* key added: FACE_CAPTURE_KEY */
+    // key added: FACE_CAPTURE_KEY
     FACE_CAPTURE,
 
-    /* key added: FACE_CAPTURE_BIOMETRICS_KEY */
+    // key added: FACE_CAPTURE_BIOMETRICS_KEY
     FACE_CAPTURE_BIOMETRICS,
 
-    /* key added: FACE_CAPTURE_CONFIRMATION_KEY */
+    // key added: FACE_CAPTURE_CONFIRMATION_KEY
     FACE_CAPTURE_CONFIRMATION,
 
-    /* key added: PERSON_CREATION_KEY */
+    // key added: PERSON_CREATION_KEY
     PERSON_CREATION,
 
-    /* key added: EVENT_DOWN_SYNC_REQUEST_KEY */
+    // key added: EVENT_DOWN_SYNC_REQUEST_KEY
     EVENT_DOWN_SYNC_REQUEST,
 
-    /* key added: EVENT_UP_SYNC_REQUEST_KEY */
+    // key added: EVENT_UP_SYNC_REQUEST_KEY
     EVENT_UP_SYNC_REQUEST,
 
-    /* key added: LICENSE_CHECK_KEY */
+    // key added: LICENSE_CHECK_KEY
     LICENSE_CHECK,
-    /* key added: AGE_GROUP_SELECTION_KEY */
+
+    // key added: AGE_GROUP_SELECTION_KEY
     AGE_GROUP_SELECTION,
     ;
 

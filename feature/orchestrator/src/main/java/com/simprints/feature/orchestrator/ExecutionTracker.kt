@@ -13,7 +13,6 @@ internal class ExecutionTracker @Inject constructor(
     private val timeHelper: TimeHelper,
     @ExecutorLockTimeoutSec private val executionTimeLimitSec: Int,
 ) : LifecycleEventObserver {
-
     /**
      * Timestamp representing when the [currentLifecycleOwnerId] was set. This is a safeguard
      * measure for cases when [Lifecycle.Event.ON_DESTROY] is not called by the system. Should it
@@ -29,7 +28,10 @@ internal class ExecutionTracker @Inject constructor(
      */
     private var currentLifecycleOwnerId: Int? = null
 
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+    override fun onStateChanged(
+        source: LifecycleOwner,
+        event: Lifecycle.Event,
+    ) {
         val ownerId = source.id()
         if (event == Lifecycle.Event.ON_CREATE) {
             if (currentLifecycleOwnerId == null || enoughTimePassedSinceLastLock()) {
@@ -54,8 +56,7 @@ internal class ExecutionTracker @Inject constructor(
      * @return true when the difference between current time and the [timestamp] is greater than
      * amount of seconds specified in the [executionTimeLimitSec]. False otherwise.
      */
-    private fun enoughTimePassedSinceLastLock() =
-        timeHelper.msBetweenNowAndTime(timestamp) > 1000 * executionTimeLimitSec
+    private fun enoughTimePassedSinceLastLock() = timeHelper.msBetweenNowAndTime(timestamp) > 1000 * executionTimeLimitSec
 
     fun LifecycleOwner.id(): Int = hashCode()
 
@@ -67,7 +68,5 @@ internal class ExecutionTracker @Inject constructor(
      * @return true if there are no other instances of this lifecycle owner running. False
      * otherwise.
      */
-    fun isMain(activity: LifecycleOwner): Boolean {
-        return currentLifecycleOwnerId == activity.hashCode()
-    }
+    fun isMain(activity: LifecycleOwner): Boolean = currentLifecycleOwnerId == activity.hashCode()
 }

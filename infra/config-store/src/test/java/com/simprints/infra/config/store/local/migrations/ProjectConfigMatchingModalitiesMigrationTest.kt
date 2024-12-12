@@ -1,23 +1,24 @@
 package com.simprints.infra.config.store.local.migrations
 
-import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
-import org.junit.Test
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
 import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration.Modality.FACE
 import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import kotlinx.coroutines.test.runTest
+import org.junit.Test
 
 class ProjectConfigMatchingModalitiesMigrationTest {
-
     @Test
     fun `should migrate if matching modalities is empty`() = runTest {
         // Given
-        val currentData = ProtoProjectConfiguration.newBuilder()
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
             .setGeneral(
-                ProtoGeneralConfiguration.newBuilder()
+                ProtoGeneralConfiguration
+                    .newBuilder()
                     .clearMatchingModalities()
-                    .build()
+                    .build(),
             ).build()
 
         // When
@@ -30,11 +31,13 @@ class ProjectConfigMatchingModalitiesMigrationTest {
     @Test
     fun `should not migrate if matching modalities is not empty`() = runTest {
         // Given
-        val currentData = ProtoProjectConfiguration.newBuilder()
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
             .setGeneral(
-                ProtoGeneralConfiguration.newBuilder()
+                ProtoGeneralConfiguration
+                    .newBuilder()
                     .addMatchingModalities(FACE)
-                    .build()
+                    .build(),
             ).build()
 
         // When
@@ -47,12 +50,14 @@ class ProjectConfigMatchingModalitiesMigrationTest {
     @Test
     fun `migration adds all modalities to matching modalities`() = runTest {
         // Given
-        val currentData = ProtoProjectConfiguration.newBuilder()
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
             .setGeneral(
-                ProtoGeneralConfiguration.newBuilder()
+                ProtoGeneralConfiguration
+                    .newBuilder()
                     .addAllModalities(listOf(FACE, FINGERPRINT))
                     .clearMatchingModalities()
-                    .build()
+                    .build(),
             ).build()
 
         // When
@@ -60,7 +65,7 @@ class ProjectConfigMatchingModalitiesMigrationTest {
 
         // Then
         assertThat(migratedData.general.matchingModalitiesList).containsExactlyElementsIn(
-            currentData.general.modalitiesList
+            currentData.general.modalitiesList,
         )
     }
 }

@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 class LogoutUseCaseTest {
-
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
 

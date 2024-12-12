@@ -7,5 +7,4 @@ enum class ConsentType {
     ENROL,
     IDENTIFY,
     VERIFY,
-    ;
 }

@@ -8,9 +8,10 @@ internal data class CollectFingerprintsState(
     val isShowingSplashScreen: Boolean,
     val isShowingConnectionScreen: Boolean,
 ) {
-
     fun currentFingerState(): FingerState = fingerStates[currentFingerIndex]
+
     fun currentCaptureState(): CaptureState = currentFingerState().currentCapture()
+
     fun isOnLastFinger(): Boolean = currentFingerIndex >= fingerStates.size - 1
 
     companion object {

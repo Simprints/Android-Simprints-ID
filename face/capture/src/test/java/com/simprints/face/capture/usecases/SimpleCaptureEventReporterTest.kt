@@ -6,13 +6,13 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
-import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
-import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -26,7 +26,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class SimpleCaptureEventReporterTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -51,7 +50,7 @@ class SimpleCaptureEventReporterTest {
             timeHelper,
             eventRepository,
             encodingUtils,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
@@ -59,9 +58,11 @@ class SimpleCaptureEventReporterTest {
     fun `Adds face onboarding event`() = runTest {
         reporter.addOnboardingCompleteEvent(Timestamp(1L))
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceOnboardingCompleteEvent::class.java)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceOnboardingCompleteEvent::class.java)
+                },
+            )
         }
     }
 
@@ -69,11 +70,13 @@ class SimpleCaptureEventReporterTest {
     fun `Adds capture confirmation continued event`() = runTest {
         reporter.addCaptureConfirmationEvent(Timestamp(1L), true)
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
-                assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result)
-                    .isEqualTo(FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
+                    assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result)
+                        .isEqualTo(FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE)
+                },
+            )
         }
     }
 
@@ -81,11 +84,13 @@ class SimpleCaptureEventReporterTest {
     fun `Adds capture confirmation restarted event`() = runTest {
         reporter.addCaptureConfirmationEvent(Timestamp(1L), false)
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
-                assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result)
-                    .isEqualTo(FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
+                    assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result)
+                        .isEqualTo(FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE)
+                },
+            )
         }
     }
 
@@ -93,9 +98,11 @@ class SimpleCaptureEventReporterTest {
     fun `Adds fallback capture event`() = runTest {
         reporter.addFallbackCaptureEvent(Timestamp(1L), Timestamp(1L))
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceFallbackCaptureEvent::class.java)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceFallbackCaptureEvent::class.java)
+                },
+            )
         }
     }
 
@@ -104,12 +111,16 @@ class SimpleCaptureEventReporterTest {
         reporter.addCaptureEvents(getDetection(FaceDetection.Status.VALID), 1, 0.5f)
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureEvent::class.java)
-            })
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureEvent::class.java)
+                },
+            )
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
+                },
+            )
         }
     }
 
@@ -118,12 +129,16 @@ class SimpleCaptureEventReporterTest {
         reporter.addCaptureEvents(getDetection(FaceDetection.Status.VALID_CAPTURING), 1, 0.5f)
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureEvent::class.java)
-            })
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureEvent::class.java)
+                },
+            )
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
+                },
+            )
         }
     }
 
@@ -137,14 +152,18 @@ class SimpleCaptureEventReporterTest {
         reporter.addCaptureEvents(getDetection(FaceDetection.Status.BAD_QUALITY), 1, 0.5f)
 
         coVerify(exactly = 6) {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureEvent::class.java)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureEvent::class.java)
+                },
+            )
         }
         coVerify(exactly = 0) {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(FaceCaptureBiometricsEvent::class.java)
+                },
+            )
         }
     }
 
@@ -152,7 +171,13 @@ class SimpleCaptureEventReporterTest {
         FaceDetection(mockk(), getFace(), status, mockk(), Timestamp(1L), false, "id", Timestamp(1L))
 
     private fun getFace() = Face(
-        100, 100, Rect(0, 0, 0, 0),
-        0f, 0f, 0f, byteArrayOf(), ""
+        100,
+        100,
+        Rect(0, 0, 0, 0),
+        0f,
+        0f,
+        0f,
+        byteArrayOf(),
+        "",
     )
 }

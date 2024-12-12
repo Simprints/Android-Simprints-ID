@@ -9,14 +9,17 @@ import org.junit.Test
 
 @Keep
 class FaceCaptureEventTest {
-
     @Test
     fun create_FaceCaptureEvent() {
         val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT)
         val event = FaceCaptureEvent(
             SampleDefaults.CREATED_AT,
-            SampleDefaults.ENDED_AT, 0, 1F,
-            FaceCaptureEvent.FaceCapturePayload.Result.VALID, true, faceArg,
+            SampleDefaults.ENDED_AT,
+            0,
+            1F,
+            FaceCaptureEvent.FaceCapturePayload.Result.VALID,
+            true,
+            faceArg,
         )
 
         assertThat(event.id).isNotNull()
@@ -34,4 +37,3 @@ class FaceCaptureEventTest {
         }
     }
 }
-

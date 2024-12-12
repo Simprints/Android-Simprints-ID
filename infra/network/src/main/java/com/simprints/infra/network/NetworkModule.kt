@@ -16,7 +16,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class NetworkBindingsModule {
-
     @Binds
     internal abstract fun provideSimNetwork(impl: SimNetworkImpl): SimNetwork
 
@@ -25,13 +24,11 @@ abstract class NetworkBindingsModule {
 
     @Binds
     internal abstract fun provideConnectivityTracker(impl: ConnectivityTrackerImpl): ConnectivityTracker
-
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     private const val NETWORK_CACHE_SIZE = 10 * 1024 * 1024L // 10mb
 
     @Provides
@@ -39,5 +36,4 @@ object NetworkModule {
     fun provideNetworkCache(
         @ApplicationContext context: Context,
     ): Cache = Cache(context.cacheDir, NETWORK_CACHE_SIZE)
-
 }

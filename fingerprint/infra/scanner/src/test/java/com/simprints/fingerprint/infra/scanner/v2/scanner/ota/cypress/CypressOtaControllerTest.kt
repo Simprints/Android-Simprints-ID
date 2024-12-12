@@ -36,18 +36,18 @@ class CypressOtaControllerTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
         val binFile = generateRandomBinFile()
-        val testObserver = cypressOtaController.program(
-            configureMessageStreamMock(),
-            binFile
-        ).toList()
+        val testObserver = cypressOtaController
+            .program(
+                configureMessageStreamMock(),
+                binFile,
+            ).toList()
 
-
-        assertThat(testObserver.toList()).containsExactlyElementsIn(
-            generateExpectedProgressValues(
-                binFile
-            )
-        ).inOrder()
-
+        assertThat(testObserver.toList())
+            .containsExactlyElementsIn(
+                generateExpectedProgressValues(
+                    binFile,
+                ),
+            ).inOrder()
     }
 
     @Test
@@ -71,9 +71,8 @@ class CypressOtaControllerTest {
 
         cypressOtaController.program(
             configureMessageStreamMock(errorPositions = listOf(0)),
-            generateRandomBinFile()
+            generateRandomBinFile(),
         )
-
     }
 
     @Test(expected = OtaFailedException::class)
@@ -81,25 +80,24 @@ class CypressOtaControllerTest {
         val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
         cypressOtaController.program(
             configureMessageStreamMock(errorPositions = listOf(1)),
-            generateRandomBinFile()
+            generateRandomBinFile(),
         )
     }
 
     @Test(expected = OtaFailedException::class)
-    fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() =
-        runTest {
-            val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
+    fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() = runTest {
+        val cypressOtaController = CypressOtaController(configureCrcCalculatorMock())
 
-            val binFile = generateRandomBinFile()
-            val progressValues = generateExpectedProgressValues(binFile)
-            val testObserver = cypressOtaController.program(
-                configureMessageStreamMock(errorPositions = listOf(4)),
-                binFile
-            )
-            assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues.slice(0..1))
-                .inOrder()
-
-        }
+        val binFile = generateRandomBinFile()
+        val progressValues = generateExpectedProgressValues(binFile)
+        val testObserver = cypressOtaController.program(
+            configureMessageStreamMock(errorPositions = listOf(4)),
+            binFile,
+        )
+        assertThat(testObserver.toList())
+            .containsExactlyElementsIn(progressValues.slice(0..1))
+            .inOrder()
+    }
 
     @Test(expected = OtaFailedException::class)
     fun program_receivesErrorAtVerify_throwsException() = runTest {
@@ -107,10 +105,11 @@ class CypressOtaControllerTest {
 
         val binFile = generateRandomBinFile()
         val indexOfVerifyResponse = expectedNumberOfChunks(binFile) + 2
-        cypressOtaController.program(
-            configureMessageStreamMock(errorPositions = listOf(indexOfVerifyResponse)),
-            binFile
-        ).toList()
+        cypressOtaController
+            .program(
+                configureMessageStreamMock(errorPositions = listOf(indexOfVerifyResponse)),
+                binFile,
+            ).toList()
     }
 
     private fun configureCrcCalculatorMock() = mockk<Crc32Calculator> {
@@ -139,19 +138,19 @@ class CypressOtaControllerTest {
                                 ErrorResponse()
                             } else {
                                 desirableResponse
-                            }
+                            },
                         )
                     }
                 }
-            }, Dispatchers.IO
+            },
+            Dispatchers.IO,
         )
     }
 
     companion object {
         private fun generateRandomBinFile() = Random.nextBytes(1200 + Random.nextInt(2000))
 
-        private fun expectedNumberOfChunks(binFile: ByteArray): Int =
-            (ceil((binFile.size.toFloat() - 16f) / 253f) + 1f).roundToInt()
+        private fun expectedNumberOfChunks(binFile: ByteArray): Int = (ceil((binFile.size.toFloat() - 16f) / 253f) + 1f).roundToInt()
 
         private fun generateExpectedProgressValues(binFile: ByteArray): List<Float> {
             val numberOfChunks = expectedNumberOfChunks(binFile)

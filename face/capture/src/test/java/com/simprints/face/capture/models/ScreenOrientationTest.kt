@@ -10,9 +10,7 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
-
 class ScreenOrientationTest {
-
     @MockK
     lateinit var resources: Resources
 
@@ -25,9 +23,9 @@ class ScreenOrientationTest {
     fun `when the resources are provided, then the correct screen orientation is mapped`() {
         val orientationMap = mapOf(
             Configuration.ORIENTATION_LANDSCAPE to ScreenOrientation.Landscape,
-            Configuration.ORIENTATION_PORTRAIT to ScreenOrientation.Portrait
+            Configuration.ORIENTATION_PORTRAIT to ScreenOrientation.Portrait,
         )
-        orientationMap.forEach {entry ->
+        orientationMap.forEach { entry ->
             val resourceOrientation = entry.key
             val expectedOrientation = entry.value
 
@@ -38,5 +36,4 @@ class ScreenOrientationTest {
             assertThat(orientation).isEqualTo(expectedOrientation)
         }
     }
-
 }

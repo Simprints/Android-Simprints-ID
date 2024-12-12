@@ -12,12 +12,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-
 import javax.inject.Inject
 
-
 private typealias Un20Step = FlowCollector<Un20OtaStep>
-
 
 /**
  * This class handles Un20 over the air firmware update, on the fingerprint scanner.
@@ -29,9 +26,8 @@ private typealias Un20Step = FlowCollector<Un20OtaStep>
  */
 internal class Un20OtaHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
-    private val firmwareLocalDataSource: FirmwareLocalDataSource
+    private val firmwareLocalDataSource: FirmwareLocalDataSource,
 ) {
-
     private var newFirmwareVersion: Un20ExtendedAppVersion? = null
 
     /**
@@ -46,7 +42,7 @@ internal class Un20OtaHelper @Inject constructor(
     fun performOtaSteps(
         scanner: Scanner,
         macAddress: String,
-        firmwareVersion: String
+        firmwareVersion: String,
     ): Flow<Un20OtaStep> = flow {
         enterMainMode(scanner)
         turnOnUn20BeforeTransfer(scanner)
@@ -70,9 +66,13 @@ internal class Un20OtaHelper @Inject constructor(
         scanner.turnUn20On()
     }
 
-    private suspend fun Un20Step.transferFirmwareBytes(scanner: Scanner, firmwareVersion: String) {
+    private suspend fun Un20Step.transferFirmwareBytes(
+        scanner: Scanner,
+        firmwareVersion: String,
+    ) {
         emit(Un20OtaStep.CommencingTransfer)
-        scanner.startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes(firmwareVersion))
+        scanner
+            .startUn20Ota(firmwareLocalDataSource.loadUn20FirmwareBytes(firmwareVersion))
             .map { Un20OtaStep.TransferInProgress(it) }
             .collect { emit(it) }
     }
@@ -95,7 +95,7 @@ internal class Un20OtaHelper @Inject constructor(
 
     private suspend fun Un20Step.validateRunningFirmwareVersion(
         scanner: Scanner,
-        firmwareVersion: String
+        firmwareVersion: String,
     ) {
         emit(Un20OtaStep.ValidatingNewFirmwareVersion)
         validateUn20FirmwareVersion(scanner, firmwareVersion)
@@ -103,7 +103,7 @@ internal class Un20OtaHelper @Inject constructor(
 
     private suspend fun Un20Step.reconnectScannerAfterValidating(
         scanner: Scanner,
-        macAddress: String
+        macAddress: String,
     ) {
         emit(Un20OtaStep.ReconnectingAfterValidating)
         connectionHelper.reconnect(scanner, macAddress)
@@ -115,25 +115,28 @@ internal class Un20OtaHelper @Inject constructor(
         updateUnifiedVersionInformation(scanner)
     }
 
-    private suspend fun validateUn20FirmwareVersion(scanner: Scanner, firmwareVersion: String) =
-        scanner.getUn20AppVersion().let {
-            val actualFirmwareVersion = it.versionAsString
-            if (firmwareVersion != actualFirmwareVersion) {
-                throw OtaFailedException("UN20 OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion")
-            } else {
-                newFirmwareVersion = it
-            }
+    private suspend fun validateUn20FirmwareVersion(
+        scanner: Scanner,
+        firmwareVersion: String,
+    ) = scanner.getUn20AppVersion().let {
+        val actualFirmwareVersion = it.versionAsString
+        if (firmwareVersion != actualFirmwareVersion) {
+            throw OtaFailedException(
+                "UN20 OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion",
+            )
+        } else {
+            newFirmwareVersion = it
         }
+    }
 
-    private suspend fun updateUnifiedVersionInformation(scanner: Scanner) =
-        scanner.getVersionInformation().let {
-            newFirmwareVersion?.let { newFirmwareVersion ->
-                val oldVersion = it.toScannerVersion()
-                val newVersion = oldVersion.updatedWithUn20Version(newFirmwareVersion)
-                scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
-            }
-                ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
+    private suspend fun updateUnifiedVersionInformation(scanner: Scanner) = scanner.getVersionInformation().let {
+        newFirmwareVersion?.let { newFirmwareVersion ->
+            val oldVersion = it.toScannerVersion()
+            val newVersion = oldVersion.updatedWithUn20Version(newFirmwareVersion)
+            scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
         }
+            ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
+    }
 
     private fun ScannerVersion.updatedWithUn20Version(un20Firmware: Un20ExtendedAppVersion) =
         copy(firmware = firmware.copy(un20 = un20Firmware.versionAsString))

@@ -28,12 +28,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
-
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 internal class LogoutSyncDeclineFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 

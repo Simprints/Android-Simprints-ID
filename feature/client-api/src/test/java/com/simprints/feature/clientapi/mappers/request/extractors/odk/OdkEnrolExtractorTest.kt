@@ -8,7 +8,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class OdkEnrolExtractorTest {
-
     @Test
     fun `should not include acceptableExtras in unknownExtras`() {
         val extras = mapOf(
@@ -17,7 +16,7 @@ class OdkEnrolExtractorTest {
             Constants.SIMPRINTS_MODULE_ID to "moduleId",
             Constants.SIMPRINTS_METADATA to "metadata",
             "key-a" to "value-a",
-            "key-b" to "value-b"
+            "key-b" to "value-b",
         )
 
         val acceptableExtras = listOf("key-a", "key-b")
@@ -27,5 +26,4 @@ class OdkEnrolExtractorTest {
 
         assertThat(unknownExtras).isEmpty()
     }
-
 }

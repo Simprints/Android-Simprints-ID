@@ -19,6 +19,8 @@ internal object DeviceConfigurationSerializer : Serializer<ProtoDeviceConfigurat
         }
     }
 
-    override suspend fun writeTo(t: ProtoDeviceConfiguration, output: OutputStream) =
-        t.writeTo(output)
+    override suspend fun writeTo(
+        t: ProtoDeviceConfiguration,
+        output: OutputStream,
+    ) = t.writeTo(output)
 }

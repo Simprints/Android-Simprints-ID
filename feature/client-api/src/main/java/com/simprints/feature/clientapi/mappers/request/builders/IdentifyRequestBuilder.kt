@@ -9,7 +9,6 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
-
 internal class IdentifyRequestBuilder(
     private val actionIdentifier: ActionRequestIdentifier,
     private val extractor: IdentifyRequestExtractor,
@@ -17,7 +16,6 @@ internal class IdentifyRequestBuilder(
     private val tokenizationProcessor: TokenizationProcessor,
     validator: IdentifyValidator,
 ) : ActionRequestBuilder(validator) {
-
     override fun encryptIfNecessary(actionRequest: ActionRequest): ActionRequest {
         val request =
             (actionRequest as? ActionRequest.IdentifyActionRequest) ?: return actionRequest
@@ -27,13 +25,13 @@ internal class IdentifyRequestBuilder(
             value = request.userId,
             project = project,
             tokenKeyType = TokenKeyType.AttendantId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         val encryptedModuleId = encryptField(
             value = request.moduleId,
             project = project,
             tokenKeyType = TokenKeyType.ModuleId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }
@@ -46,6 +44,6 @@ internal class IdentifyRequestBuilder(
         biometricDataSource = extractor.getBiometricDataSource(),
         subjectAge = extractor.getSubjectAge(),
         metadata = extractor.getMetadata(),
-        unknownExtras = extractor.getUnknownExtras()
+        unknownExtras = extractor.getUnknownExtras(),
     )
 }

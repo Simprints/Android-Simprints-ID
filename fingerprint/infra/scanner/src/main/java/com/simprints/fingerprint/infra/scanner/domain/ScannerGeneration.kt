@@ -8,5 +8,5 @@ package com.simprints.fingerprint.infra.scanner.domain
  */
 enum class ScannerGeneration {
     VERO_1,
-    VERO_2
+    VERO_2,
 }

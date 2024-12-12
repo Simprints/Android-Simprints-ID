@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class PermissionStatusTest {
-
     @Test
     fun testWorstPermissionStatus_DeniedNeverAskAgain() {
         val permissions = listOf(
@@ -19,7 +18,7 @@ class PermissionStatusTest {
     fun testWorstPermissionStatus_Denied() {
         val permissions = listOf(
             PermissionStatus.Granted,
-            PermissionStatus.Denied
+            PermissionStatus.Denied,
         )
         assertThat(permissions.worstPermissionStatus()).isEqualTo(PermissionStatus.Denied)
     }

@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.infra.scanner.v2.domain.cypressota
 
-enum class CypressOtaCommandType(val byte: Byte) {
+enum class CypressOtaCommandType(
+    val byte: Byte,
+) {
     PREPARE_DOWNLOAD(0x11),
     DOWNLOAD(0x12),
     VERIFY_IMAGE(0x13),

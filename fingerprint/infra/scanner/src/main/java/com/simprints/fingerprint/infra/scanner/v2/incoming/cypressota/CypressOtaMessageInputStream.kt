@@ -18,8 +18,7 @@ import javax.inject.Inject
 class CypressOtaMessageInputStream @Inject constructor(
     private val cypressOtaResponseParser: CypressOtaResponseParser,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
-    ) : MessageInputStream {
-
+) : MessageInputStream {
     var cypressOtaResponseStream: Flowable<CypressOtaResponse>? = null
 
     private var cypressOtaResponseStreamDisposable: Disposable? = null
@@ -39,11 +38,10 @@ class CypressOtaMessageInputStream @Inject constructor(
         cypressOtaResponseStreamDisposable?.dispose()
     }
 
-    inline fun <reified R : CypressOtaResponse> receiveResponse(): Single<R> =
-        Single.defer {
-            cypressOtaResponseStream
-                ?.filterCast<R>()
-                ?.firstOrError()
-                ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
-        }
+    inline fun <reified R : CypressOtaResponse> receiveResponse(): Single<R> = Single.defer {
+        cypressOtaResponseStream
+            ?.filterCast<R>()
+            ?.firstOrError()
+            ?: Single.error(IllegalStateException("Trying to receive response before connecting stream"))
+    }
 }

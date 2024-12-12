@@ -14,11 +14,8 @@ import javax.inject.Inject
 internal class ProjectRealmMigration @Inject constructor(
     private val authStore: AuthStore,
     private val realmWrapper: RealmWrapper,
-) :
-    DataMigration<ProtoProject> {
-
+) : DataMigration<ProtoProject> {
     companion object {
-
         const val PROJECT_ID_FIELD = "id"
     }
 
@@ -32,7 +29,8 @@ internal class ProjectRealmMigration @Inject constructor(
     override suspend fun migrate(currentData: ProtoProject): ProtoProject {
         Simber.i("Start migration of project to Datastore")
         val dbProject = realmWrapper.readRealm {
-            it.query(DbProject::class, "$PROJECT_ID_FIELD == $0", authStore.signedInProjectId)
+            it
+                .query(DbProject::class, "$PROJECT_ID_FIELD == $0", authStore.signedInProjectId)
                 .first()
                 .find()
         } ?: return currentData
@@ -49,6 +47,4 @@ internal class ProjectRealmMigration @Inject constructor(
 
     override suspend fun shouldMigrate(currentData: ProtoProject): Boolean =
         authStore.signedInProjectId.isNotEmpty() && currentData.id.isEmpty()
-
 }
-

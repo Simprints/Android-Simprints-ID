@@ -8,5 +8,4 @@ internal enum class ApiConfidenceMatch {
     LOW,
     MEDIUM,
     HIGH,
-    ;
 }

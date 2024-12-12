@@ -21,7 +21,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
-
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentScannerOffBinding::bind)
     private val args: ScannerOffFragmentArgs by navArgs()
@@ -29,7 +28,10 @@ internal class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
     @Inject
     lateinit var screenReporter: ReportAlertScreenEventUseCase
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         screenReporter.reportScannerOff()
 
@@ -57,14 +59,20 @@ internal class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
                 setupTryAgainMode()
             }
         }
-        connectScannerViewModel.scannerConnected.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { success ->
-            if (success) {
-                handleScannerConnectedEvent()
-            }
-        })
-        connectScannerViewModel.showScannerIssueScreen.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            connectScannerViewModel.resetConnectionState()
-        })
+        connectScannerViewModel.scannerConnected.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { success ->
+                if (success) {
+                    handleScannerConnectedEvent()
+                }
+            },
+        )
+        connectScannerViewModel.showScannerIssueScreen.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                connectScannerViewModel.resetConnectionState()
+            },
+        )
     }
 
     private fun handleScannerConnectedEvent() {

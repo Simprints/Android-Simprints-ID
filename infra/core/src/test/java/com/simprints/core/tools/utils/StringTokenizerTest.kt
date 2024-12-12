@@ -8,10 +8,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class StringTokenizerTest {
-
     private lateinit var stringTokenizer: StringTokenizer
 
     @Before
@@ -20,7 +18,6 @@ class StringTokenizerTest {
         DeterministicAeadConfig.register()
         stringTokenizer = StringTokenizer(EncodingUtilsImpl)
     }
-
 
     @Test
     fun `when value is encrypted then decryption returns the same value`() = with(stringTokenizer) {
@@ -41,7 +38,8 @@ class StringTokenizerTest {
     }
 
     companion object {
-        private val KEYSET_JSON = """
+        private val KEYSET_JSON =
+            """
             {
                "primaryKeyId":3444266861,
                "key":[
@@ -57,8 +55,9 @@ class StringTokenizerTest {
                   }
                ]
             }
-        """.trimIndent()
-        private val BFSID_KEYSET_JSON = """
+            """.trimIndent()
+        private val BFSID_KEYSET_JSON =
+            """
             {
                "primaryKeyId":3444266861,
                "key":[
@@ -74,6 +73,6 @@ class StringTokenizerTest {
                   }
                ]
             }
-        """.trimIndent()
+            """.trimIndent()
     }
 }

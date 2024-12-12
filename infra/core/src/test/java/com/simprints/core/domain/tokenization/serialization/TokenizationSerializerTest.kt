@@ -9,9 +9,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import org.junit.Test
 
-
 class TokenizationSerializerTest {
-
     @Test
     fun `class name tokenization serialization and deserialization should produce same result`() {
         val encrypted = "encrypted".asTokenizableEncrypted()
@@ -34,7 +32,6 @@ class TokenizationSerializerTest {
         assertThat(encryptedFromJson).isEqualTo(encrypted)
         assertThat(rawFromJson).isEqualTo(raw)
     }
-
 
     @Test
     fun `string tokenization serialization should produce plain string`() {

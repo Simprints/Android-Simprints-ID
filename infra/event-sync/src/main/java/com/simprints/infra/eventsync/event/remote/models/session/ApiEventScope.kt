@@ -29,9 +29,7 @@ internal data class ApiEventScope(
     val projectConfigurationId: String,
     val events: List<ApiEvent>,
 ) {
-
     companion object {
-
         fun fromDomain(
             scope: EventScope,
             events: List<Event>,
@@ -50,7 +48,7 @@ internal data class ApiEventScope(
             location = scope.payload.location?.fromDomainToApi(),
             projectConfigurationUpdatedAt = scope.payload.projectConfigurationUpdatedAt,
             projectConfigurationId = scope.payload.projectConfigurationId.orEmpty(),
-            events = events.map { it.fromDomainToApi() }
+            events = events.map { it.fromDomainToApi() },
         )
     }
 }

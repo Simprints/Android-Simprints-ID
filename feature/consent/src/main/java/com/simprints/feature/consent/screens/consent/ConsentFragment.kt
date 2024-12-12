@@ -26,12 +26,14 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
-
     private val args by navArgs<ConsentFragmentArgs>()
     private val binding by viewBinding(FragmentConsentBinding::bind)
     private val viewModel by viewModels<ConsentViewModel>()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.consentPrivacyNotice.paintFlags =
@@ -57,12 +59,12 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
 
         binding.consentAcceptButton.setOnClickListener {
             viewModel.acceptClicked(
-                getCurrentConsentTab()
+                getCurrentConsentTab(),
             )
         }
         binding.consentDeclineButton.setOnClickListener {
             viewModel.declineClicked(
-                getCurrentConsentTab()
+                getCurrentConsentTab(),
             )
         }
         binding.consentPrivacyNotice.setOnClickListener { openPrivacyNotice() }
@@ -77,12 +79,13 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
                 findNavController().navigateSafely(
                     currentFragment = this,
                     actionId = R.id.action_consentFragment_to_refusalFragment,
-                    args = it.toArgs()
+                    args = it.toArgs(),
                 )
             }
         }
         viewModel.returnConsentResult.observe(viewLifecycleOwner) { isApproved ->
-            isApproved.getContentIfNotHandled()
+            isApproved
+                .getContentIfNotHandled()
                 ?.let { findNavController().finishWithResult(this, it) }
         }
     }
@@ -90,7 +93,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
     private fun openPrivacyNotice() {
         findNavController().navigateSafely(
             this,
-            R.id.action_consentFragment_to_privacyNoticeFragment
+            R.id.action_consentFragment_to_privacyNoticeFragment,
         )
     }
 
@@ -117,18 +120,20 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
 
     private fun TabLayout.addParentalConsentTab(
         generalConsentText: String,
-        parentalConsentText: String
+        parentalConsentText: String,
     ) {
         addTab(newTab().setText(IDR.string.consent_parental_title), PARENTAL_CONSENT_TAB)
-        addOnTabSelectedListener(OnTabSelectedListener { tab ->
-            val position = tab.position
-            val (consentText, tabIndex) = when (position) {
-                PARENTAL_CONSENT_TAB -> parentalConsentText to PARENTAL_CONSENT_TAB
-                else -> generalConsentText to GENERAL_CONSENT_TAB
-            }
-            binding.consentTextHolderView.text = consentText
-            viewModel.setSelectedTab(tabIndex)
-        })
+        addOnTabSelectedListener(
+            OnTabSelectedListener { tab ->
+                val position = tab.position
+                val (consentText, tabIndex) = when (position) {
+                    PARENTAL_CONSENT_TAB -> parentalConsentText to PARENTAL_CONSENT_TAB
+                    else -> generalConsentText to GENERAL_CONSENT_TAB
+                }
+                binding.consentTextHolderView.text = consentText
+                viewModel.setSelectedTab(tabIndex)
+            },
+        )
     }
 
     private fun getCurrentConsentTab() = when (binding.consentTabHost.selectedTabPosition) {

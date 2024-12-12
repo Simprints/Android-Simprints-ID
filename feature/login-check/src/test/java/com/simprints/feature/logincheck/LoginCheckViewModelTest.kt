@@ -31,9 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-
 internal class LoginCheckViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -130,7 +128,8 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.DIFFERENT_PROJECT_ID }
     }
 
@@ -163,7 +162,8 @@ internal class LoginCheckViewModelTest {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
             syncOrchestrator.cancelBackgroundWork()
         }
-        viewModel.showLoginFlow.test()
+        viewModel.showLoginFlow
+            .test()
             .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
     }
 
@@ -183,7 +183,8 @@ internal class LoginCheckViewModelTest {
 
         viewModel.handleLoginResult(LoginResult(true, null))
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.UNEXPECTED_LOGIN_ERROR }
     }
 
@@ -194,7 +195,8 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.IntegrityServiceError))
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.INTEGRITY_SERVICE_ERROR }
     }
 
@@ -205,7 +207,8 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.MissingPlayServices))
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES }
     }
 
@@ -216,26 +219,27 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.OutdatedPlayServices))
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED }
     }
 
     @Test
-    fun `Triggers alert if login attempt failed with missing or outdated play services`() =
-        runTest {
-            coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+    fun `Triggers alert if login attempt failed with missing or outdated play services`() = runTest {
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-            viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
-            viewModel.handleLoginResult(
-                LoginResult(
-                    false,
-                    LoginError.MissingOrOutdatedPlayServices
-                )
-            )
+        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.handleLoginResult(
+            LoginResult(
+                false,
+                LoginError.MissingOrOutdatedPlayServices,
+            ),
+        )
 
-            viewModel.showAlert.test()
-                .assertValue { it.peekContent() == LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP }
-        }
+        viewModel.showAlert
+            .test()
+            .assertValue { it.peekContent() == LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP }
+    }
 
     @Test
     fun `Triggers alert if login attempt failed with unknown error`() = runTest {
@@ -244,7 +248,8 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.Unknown))
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.UNEXPECTED_LOGIN_ERROR }
     }
 
@@ -274,7 +279,8 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.PROJECT_PAUSED }
     }
 
@@ -285,7 +291,8 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showAlert.test()
+        viewModel.showAlert
+            .test()
             .assertValue { it.peekContent() == LoginCheckError.PROJECT_ENDING }
     }
 
@@ -296,7 +303,8 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showLoginFlow.test()
+        viewModel.showLoginFlow
+            .test()
             .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
     }
 
@@ -317,8 +325,8 @@ internal class LoginCheckViewModelTest {
             startBackgroundSync.invoke()
         }
 
-        viewModel.proceedWithAction.test()
+        viewModel.proceedWithAction
+            .test()
             .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
     }
-
 }

@@ -6,7 +6,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class ApiScannerFirmwareUpdatePayloadTest {
-
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
         val payload = ApiScannerFirmwareUpdatePayload(domainPayload = mockk(relaxed = true))

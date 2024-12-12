@@ -12,18 +12,17 @@ internal data class ApiFaceReference(
     val id: String,
     val templates: List<ApiFaceTemplate>,
     val format: String,
-    val metadata: HashMap<String, String>? = null
+    val metadata: HashMap<String, String>? = null,
 ) : ApiBiometricReference(ApiBiometricReferenceType.FaceReference)
 
-internal fun List<FaceSample>.toApi(encoder: EncodingUtils): ApiFaceReference? =
-    if (isNotEmpty()) {
-        ApiFaceReference(
-            UUID.nameUUIDFromBytes(concatTemplates()).toString(),
-            map {
-                ApiFaceTemplate(encoder.byteArrayToBase64(it.template))
-            },
-            first().format
-        )
-    } else {
-        null
-    }
+internal fun List<FaceSample>.toApi(encoder: EncodingUtils): ApiFaceReference? = if (isNotEmpty()) {
+    ApiFaceReference(
+        UUID.nameUUIDFromBytes(concatTemplates()).toString(),
+        map {
+            ApiFaceTemplate(encoder.byteArrayToBase64(it.template))
+        },
+        first().format,
+    )
+} else {
+    null
+}

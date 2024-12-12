@@ -14,7 +14,6 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
 internal class TroubleshootingPagerAdapter(
     fragmentActivity: FragmentActivity,
 ) : FragmentStateAdapter(fragmentActivity) {
-
     override fun getItemCount(): Int = Tabs.entries.size
 
     override fun createFragment(position: Int): Fragment = Tabs.entries[position].factory()
@@ -23,7 +22,6 @@ internal class TroubleshootingPagerAdapter(
         val title: String,
         val factory: () -> Fragment,
     ) {
-
         Overview("Overview", { OverviewFragment() }),
         Intents("Intents", { IntentLogFragment() }),
         Network("Network", { NetworkingLogFragment() }),

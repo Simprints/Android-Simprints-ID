@@ -10,7 +10,6 @@ internal class RecentUserActivityLocalSourceImpl @Inject constructor(
     private val recentUserActivityDataStore: DataStore<ProtoRecentUserActivity>,
     private val timeHelper: TimeHelper,
 ) : RecentUserActivityLocalSource {
-
     override suspend fun getRecentUserActivity(): RecentUserActivity =
         recentUserActivityDataStore.updateData { it.clearOldActivity() }.toDomain()
 
@@ -36,5 +35,4 @@ internal class RecentUserActivityLocalSourceImpl @Inject constructor(
         }
         return this
     }
-
 }

@@ -8,7 +8,7 @@ fun SimulatedScannerStateV1.updateStateAccordingToOutgoingMessage(message: Messa
         MESSAGE_TYPE.UN20_WAKEUP -> isUn20On = true
         MESSAGE_TYPE.UN20_SHUTDOWN -> isUn20On = false
         else -> {
-            /* do nothing */
+            // do nothing
         }
     }
 }

@@ -6,7 +6,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class ApiFingerprintCaptureBiometricsPayloadTest {
-
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
         val payload = ApiFingerprintCaptureBiometricsPayload(domainPayload = mockk(relaxed = true))

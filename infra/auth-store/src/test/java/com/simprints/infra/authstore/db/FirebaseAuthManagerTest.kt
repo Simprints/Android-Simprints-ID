@@ -27,7 +27,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class FirebaseAuthManagerTest {
-
     companion object {
         private const val GCP_PROJECT_ID = "GCP_PROJECT_ID"
         private const val API_KEY = "API_KEY"
@@ -54,7 +53,6 @@ class FirebaseAuthManagerTest {
         every { firebaseOptionsBuilder.setApiKey(any()) } returns firebaseOptionsBuilder
         every { firebaseOptionsBuilder.setProjectId(any()) } returns firebaseOptionsBuilder
         every { firebaseOptionsBuilder.setApplicationId(any()) } returns firebaseOptionsBuilder
-
     }
 
     @Test
@@ -68,14 +66,13 @@ class FirebaseAuthManagerTest {
         }
 
     @Test
-    fun `signIn should throw a NetworkConnectionException if Firebase throws ApiException`() =
-        runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.signInWithCustomToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
+    fun `signIn should throw a NetworkConnectionException if Firebase throws ApiException`() = runTest(UnconfinedTestDispatcher()) {
+        every { firebaseAuth.signInWithCustomToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
 
-            assertThrows<NetworkConnectionException> {
-                firebaseAuthManager.signIn(mockk(relaxed = true))
-            }
+        assertThrows<NetworkConnectionException> {
+            firebaseAuthManager.signIn(mockk(relaxed = true))
         }
+    }
 
     @Test
     fun `signOut should succeed`() = runTest(UnconfinedTestDispatcher()) {
@@ -97,14 +94,13 @@ class FirebaseAuthManagerTest {
         }
 
     @Test
-    fun `signOut should throw a NetworkConnectionException if Firebase throws ApiException`() =
-        runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.signOut() } throws ApiException(Status.RESULT_TIMEOUT)
+    fun `signOut should throw a NetworkConnectionException if Firebase throws ApiException`() = runTest(UnconfinedTestDispatcher()) {
+        every { firebaseAuth.signOut() } throws ApiException(Status.RESULT_TIMEOUT)
 
-            assertThrows<NetworkConnectionException> {
-                firebaseAuthManager.signOut()
-            }
+        assertThrows<NetworkConnectionException> {
+            firebaseAuthManager.signOut()
         }
+    }
 
     @Test
     fun `isSignedIn should return true if the project id claim is null`() {
@@ -170,9 +166,13 @@ class FirebaseAuthManagerTest {
         firebaseAuthManager.getCoreApp()
 
         verify(exactly = 1) {
-            Firebase.initialize(any(), match {
-                it.apiKey == API_KEY && it.applicationId == APPLICATION_ID && it.projectId == GCP_PROJECT_ID
-            }, any())
+            Firebase.initialize(
+                any(),
+                match {
+                    it.apiKey == API_KEY && it.applicationId == APPLICATION_ID && it.projectId == GCP_PROJECT_ID
+                },
+                any(),
+            )
         }
     }
 
@@ -197,7 +197,7 @@ class FirebaseAuthManagerTest {
             Firebase.initialize(
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws IllegalStateException() andThen mockk<FirebaseApp>()
 
@@ -205,9 +205,13 @@ class FirebaseAuthManagerTest {
 
         verify(exactly = 1) { firebaseApp.delete() }
         verify(exactly = 2) {
-            Firebase.initialize(any(), match {
-                it.apiKey == API_KEY && it.applicationId == APPLICATION_ID && it.projectId == GCP_PROJECT_ID
-            }, any())
+            Firebase.initialize(
+                any(),
+                match {
+                    it.apiKey == API_KEY && it.applicationId == APPLICATION_ID && it.projectId == GCP_PROJECT_ID
+                },
+                any(),
+            )
         }
     }
 }

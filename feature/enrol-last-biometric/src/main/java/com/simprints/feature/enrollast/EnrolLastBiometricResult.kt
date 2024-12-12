@@ -5,5 +5,5 @@ import java.io.Serializable
 
 @Keep
 data class EnrolLastBiometricResult(
-    val newSubjectId: String?
+    val newSubjectId: String?,
 ) : Serializable

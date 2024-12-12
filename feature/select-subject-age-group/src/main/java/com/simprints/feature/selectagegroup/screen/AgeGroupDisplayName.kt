@@ -18,19 +18,28 @@ fun AgeGroup.displayName(context: Context): String {
 }
 
 // Helper function to convert months to readable format
-private fun formatAgeInMonthsForDisplay(context: Context, ageInMonths: Int): String {
+private fun formatAgeInMonthsForDisplay(
+    context: Context,
+    ageInMonths: Int,
+): String {
     val years = ageInMonths / 12
     val remainingMonths = ageInMonths % 12
 
     val yearsString = context.resources.getQuantityString(
-        IDR.plurals.age_group_selection_age_in_years, years, years
+        IDR.plurals.age_group_selection_age_in_years,
+        years,
+        years,
     )
     val monthsString = context.resources.getQuantityString(
-        IDR.plurals.age_group_selection_age_in_months, ageInMonths, ageInMonths
+        IDR.plurals.age_group_selection_age_in_months,
+        ageInMonths,
+        ageInMonths,
     )
 
     val remainingMonthsString = context.resources.getQuantityString(
-        IDR.plurals.age_group_selection_age_in_months, remainingMonths, remainingMonths
+        IDR.plurals.age_group_selection_age_in_months,
+        remainingMonths,
+        remainingMonths,
     )
     return when {
         years == 0 -> monthsString
@@ -38,4 +47,3 @@ private fun formatAgeInMonthsForDisplay(context: Context, ageInMonths: Int): Str
         else -> "$yearsString, $remainingMonthsString"
     }
 }
-

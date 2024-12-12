@@ -16,11 +16,12 @@ data class EnrolLastBiometricParams(
     val steps: List<EnrolLastBiometricStepResult>,
 ) : Parcelable
 
-
 sealed class EnrolLastBiometricStepResult : Parcelable {
     @Keep
     @Parcelize
-    data class EnrolLastBiometricsResult(val subjectId: String?) : EnrolLastBiometricStepResult()
+    data class EnrolLastBiometricsResult(
+        val subjectId: String?,
+    ) : EnrolLastBiometricStepResult()
 
     @Keep
     @Parcelize
@@ -31,15 +32,21 @@ sealed class EnrolLastBiometricStepResult : Parcelable {
 
     @Keep
     @Parcelize
-    data class FaceMatchResult(val results: List<MatchResult>) : EnrolLastBiometricStepResult()
+    data class FaceMatchResult(
+        val results: List<MatchResult>,
+    ) : EnrolLastBiometricStepResult()
 
     @Keep
     @Parcelize
-    data class FingerprintCaptureResult(val results: List<FingerTemplateCaptureResult>) : EnrolLastBiometricStepResult()
+    data class FingerprintCaptureResult(
+        val results: List<FingerTemplateCaptureResult>,
+    ) : EnrolLastBiometricStepResult()
 
     @Keep
     @Parcelize
-    data class FaceCaptureResult(val results: List<FaceTemplateCaptureResult>) : EnrolLastBiometricStepResult()
+    data class FaceCaptureResult(
+        val results: List<FaceTemplateCaptureResult>,
+    ) : EnrolLastBiometricStepResult()
 }
 
 @Keep
@@ -86,7 +93,6 @@ data class FaceTemplateCaptureResult(
     val template: ByteArray,
     val format: String,
 ) : Parcelable {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

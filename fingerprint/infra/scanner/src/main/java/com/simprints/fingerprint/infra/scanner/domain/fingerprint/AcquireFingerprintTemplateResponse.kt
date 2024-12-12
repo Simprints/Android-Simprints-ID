@@ -9,5 +9,5 @@ package com.simprints.fingerprint.infra.scanner.domain.fingerprint
 class AcquireFingerprintTemplateResponse(
     val template: ByteArray,
     val templateFormat: String,
-    val imageQualityScore: Int
+    val imageQualityScore: Int,
 )

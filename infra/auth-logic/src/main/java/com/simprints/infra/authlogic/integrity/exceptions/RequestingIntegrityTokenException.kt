@@ -8,6 +8,5 @@ import com.google.android.play.core.integrity.model.IntegrityErrorCode
  * @property errorCode is one of the integrity api error codes listed in [IntegrityErrorCode]
  */
 class RequestingIntegrityTokenException(
-    val errorCode: Int
+    val errorCode: Int,
 ) : RuntimeException("Integrity API error $errorCode")
-

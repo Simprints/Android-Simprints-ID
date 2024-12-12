@@ -10,11 +10,13 @@ import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
 import com.simprints.infra.uibase.viewbinding.viewBinding
 
 internal class ConnectFragment : Fragment(R.layout.fragment_connect) {
-
     private val binding by viewBinding(FragmentConnectBinding::bind)
     private val viewModel: ConnectScannerViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.currentStep.observe(viewLifecycleOwner) { step ->

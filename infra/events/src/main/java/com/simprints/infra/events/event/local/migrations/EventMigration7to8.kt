@@ -11,7 +11,6 @@ import com.simprints.infra.logging.Simber
 import org.json.JSONObject
 
 internal class EventMigration7to8 : Migration(7, 8) {
-
     override fun migrate(database: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 7 to schema 8.")
         removeTemplateDataFromOldFingerprintCaptureAndSaveFingerBiometricsEvent(database)
@@ -21,7 +20,8 @@ internal class EventMigration7to8 : Migration(7, 8) {
 
     private fun removeTemplateDataFromOldFingerprintCaptureAndSaveFingerBiometricsEvent(database: SupportSQLiteDatabase) {
         val fingerprintCaptureQuery = database.query(
-            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(FINGERPRINT_CAPTURE_EVENT)
+            "SELECT * FROM DbEvent WHERE type = ?",
+            arrayOf(FINGERPRINT_CAPTURE_EVENT),
         )
 
         fingerprintCaptureQuery.use {
@@ -32,9 +32,10 @@ internal class EventMigration7to8 : Migration(7, 8) {
                     migrateFingerprintCaptureEventPayloadType(it, database, id)
                 } catch (t: Throwable) {
                     Simber.e(
-                        t, "Fail to migrate fingerprint capture ${
+                        t,
+                        "Fail to migrate fingerprint capture ${
                             it.getStringWithColumnName(DB_ID_FIELD)
-                        } in session ${it.getStringWithColumnName("sessionId")}"
+                        } in session ${it.getStringWithColumnName("sessionId")}",
                     )
                 }
             }
@@ -70,13 +71,13 @@ internal class EventMigration7to8 : Migration(7, 8) {
                 labelsObject = labelsObject,
                 createdAt = createdAt,
                 fingerprintObject = fingerprintObject,
-                payloadId = payloadId
+                payloadId = payloadId,
             )
 
             database.insert(
                 "DbEvent",
                 SQLiteDatabase.CONFLICT_NONE,
-                fingerprintCaptureBiometricsEvent
+                fingerprintCaptureBiometricsEvent,
             )
         }
     }
@@ -92,15 +93,15 @@ internal class EventMigration7to8 : Migration(7, 8) {
         if (isFingerprintEventBadQuality) {
             val personCreationQuery = database.query(
                 "SELECT * FROM DbEvent WHERE type = ? AND sessionId = ?",
-                arrayOf(PERSON_CREATION_EVENT, sessionId)
+                arrayOf(PERSON_CREATION_EVENT, sessionId),
             )
 
             personCreationQuery.use {
                 while (it.moveToNext()) {
                     val personCreationEvent = JSONObject(
                         it?.getStringWithColumnName(
-                            DB_EVENT_JSON_FIELD
-                        )!!
+                            DB_EVENT_JSON_FIELD,
+                        )!!,
                     )
 
                     val personCreationPayload =
@@ -175,7 +176,8 @@ internal class EventMigration7to8 : Migration(7, 8) {
      */
     private fun removeTemplateDataFromOldFaceCaptureAndSaveFaceBiometricsEvent(database: SupportSQLiteDatabase) {
         val faceCaptureQuery = database.query(
-            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(FACE_CAPTURE_EVENT)
+            "SELECT * FROM DbEvent WHERE type = ?",
+            arrayOf(FACE_CAPTURE_EVENT),
         )
 
         faceCaptureQuery.use {
@@ -186,11 +188,12 @@ internal class EventMigration7to8 : Migration(7, 8) {
                     migrateFaceCaptureEventPayloadType(it, database, id)
                 } catch (t: Throwable) {
                     Simber.e(
-                        t, "Fail to migrate face capture ${
+                        t,
+                        "Fail to migrate face capture ${
                             it.getStringWithColumnName(
-                                DB_ID_FIELD
+                                DB_ID_FIELD,
                             )
-                        } in session ${it.getStringWithColumnName("sessionId")}"
+                        } in session ${it.getStringWithColumnName("sessionId")}",
                     )
                 }
             }
@@ -223,7 +226,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
             labelsObject = labelsObject,
             createdAt = createdAt,
             faceObject = faceObject,
-            payloadId = payloadId
+            payloadId = payloadId,
         )
 
         database.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, faceCaptureBiometricsEvent)
@@ -247,7 +250,8 @@ internal class EventMigration7to8 : Migration(7, 8) {
                 faceObject.getDouble("quality")
             },\"format\":\"${
                 faceObject.getString("format")
-            }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}".trimIndent()
+            }\"},\"endedAt\":0,\"type\":\"FACE_CAPTURE_BIOMETRICS\"},\"type\":\"FACE_CAPTURE_BIOMETRICS\"}"
+                .trimIndent()
 
         return ContentValues().apply {
             this.put("id", eventId)
@@ -270,7 +274,6 @@ internal class EventMigration7to8 : Migration(7, 8) {
         database: SupportSQLiteDatabase,
         id: String?,
     ) {
-
         val json = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
 
         val payload = json.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
@@ -286,7 +289,6 @@ internal class EventMigration7to8 : Migration(7, 8) {
     }
 
     companion object {
-
         private const val PERSON_CREATION_EVENT = "PERSON_CREATION"
         private const val FACE_CAPTURE_EVENT = "FACE_CAPTURE"
         private const val FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
@@ -302,4 +304,3 @@ internal class EventMigration7to8 : Migration(7, 8) {
         private const val NEW_EVENT_VERSION_VALUE = 3
     }
 }
-

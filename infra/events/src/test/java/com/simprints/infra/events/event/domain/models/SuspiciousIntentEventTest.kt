@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class SuspiciousIntentEventTest {
-
     @Test
     fun create_SuspiciousIntentEvent() {
         val extrasArg = mapOf("extra_key" to "value")
@@ -23,4 +22,3 @@ class SuspiciousIntentEventTest {
         }
     }
 }
-

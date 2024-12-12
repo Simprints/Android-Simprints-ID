@@ -12,7 +12,6 @@ import com.simprints.infra.logging.Simber
  * in the JSON payload.
  */
 internal class EventMigration2to3 : Migration(2, 3) {
-
     private val sessionType = "SESSION_CAPTURE"
     private val idColumn = "id"
 
@@ -42,7 +41,7 @@ internal class EventMigration2to3 : Migration(2, 3) {
     private fun updateTableToCloseClosedSessions(database: SupportSQLiteDatabase) {
         val enrolmentEventsQuery = database.query(
             "SELECT * FROM DbEvent WHERE type = ? AND endedAt != 0",
-            arrayOf(sessionType)
+            arrayOf(sessionType),
         )
 
         enrolmentEventsQuery.use {
@@ -52,5 +51,4 @@ internal class EventMigration2to3 : Migration(2, 3) {
             }
         }
     }
-
 }

@@ -17,16 +17,17 @@ import javax.inject.Inject
 internal class WorkerLogViewModel @Inject constructor(
     private val workManager: WorkManager,
 ) : ViewModel() {
-
     private val _workers = MutableLiveData<List<TroubleshootingItemViewData>>(emptyList())
     val workers: LiveData<List<TroubleshootingItemViewData>>
         get() = _workers
 
     fun collectWorkerData() {
         viewModelScope.launch {
-            workManager.getWorkInfosFlow(WorkQuery.fromStates(WorkInfo.State.entries))
+            workManager
+                .getWorkInfosFlow(WorkQuery.fromStates(WorkInfo.State.entries))
                 .collect { infos ->
-                    infos.map { formatWorkInfo(it) }
+                    infos
+                        .map { formatWorkInfo(it) }
                         .take(50)
                         .ifEmpty { listOf(TroubleshootingItemViewData("No data")) }
                         .let { _workers.postValue(it) }
@@ -45,8 +46,6 @@ internal class WorkerLogViewModel @Inject constructor(
             "ID: ${info.id}\nNext run: ${Date(info.nextScheduleTimeMillis)}"
         } else {
             "ID: ${info.id}\nOutput: ${info.outputData}"
-        }
-
-
+        },
     )
 }

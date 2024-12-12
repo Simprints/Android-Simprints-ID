@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroC
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
 class GetUn20OnCommand : VeroCommand(VeroMessageType.GET_UN20_ON) {
-
     companion object {
-        fun fromBytes(@Suppress("unused_parameter") data: ByteArray) = GetUn20OnCommand()
+        fun fromBytes(
+            @Suppress("unused_parameter") data: ByteArray,
+        ) = GetUn20OnCommand()
     }
 }

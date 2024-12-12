@@ -29,7 +29,6 @@ internal data class ApiFaceCapturePayload(
     val isFallback: Boolean,
     val face: ApiFace?,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,
         domainPayload.createdAt.fromDomainToApi(),
@@ -38,7 +37,7 @@ internal data class ApiFaceCapturePayload(
         domainPayload.qualityThreshold,
         domainPayload.result.fromDomainToApi(),
         domainPayload.isFallback,
-        domainPayload.face?.fromDomainToApi()
+        domainPayload.face?.fromDomainToApi(),
     )
 
     @Keep
@@ -51,18 +50,16 @@ internal data class ApiFaceCapturePayload(
 
     @Keep
     enum class ApiResult {
-
         VALID,
         INVALID,
         BAD_QUALITY,
         OFF_YAW,
         OFF_ROLL,
         TOO_CLOSE,
-        TOO_FAR
+        TOO_FAR,
     }
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
 
 internal fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, format)

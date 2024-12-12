@@ -25,7 +25,6 @@ import org.junit.Before
 import org.junit.Test
 
 class MapRefusalOrErrorResultUseCaseTest {
-
     @MockK
     private lateinit var eventRepository: SessionEventRepository
 
@@ -64,7 +63,7 @@ class MapRefusalOrErrorResultUseCaseTest {
         listOf(
             FetchSubjectResult(found = true),
             SetupResult(isSuccess = true),
-            FaceCaptureResult(emptyList())
+            FaceCaptureResult(emptyList()),
         ).forEach { result -> assertThat(useCase(result, mockk())).isNull() }
     }
 
@@ -83,6 +82,8 @@ class MapRefusalOrErrorResultUseCaseTest {
         every { projectConfiguration.face?.rankOne?.allowedAgeRange } returns ageGroupSupported
 
         assertThat(useCase(SelectSubjectAgeGroupResult(ageGroupSupported), projectConfiguration)).isNull()
-        assertThat(useCase(SelectSubjectAgeGroupResult(ageGroupNotSupported), projectConfiguration)).isInstanceOf(AppErrorResponse::class.java)
+        assertThat(
+            useCase(SelectSubjectAgeGroupResult(ageGroupNotSupported), projectConfiguration),
+        ).isInstanceOf(AppErrorResponse::class.java)
     }
 }

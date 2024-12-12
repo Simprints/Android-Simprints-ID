@@ -24,7 +24,6 @@ import java.io.FileInputStream
 @Suppress("DEPRECATION")
 @RunWith(AndroidJUnit4::class)
 class ImageRemoteDataSourceImplTest {
-
     @MockK
     private lateinit var configManager: ConfigManager
 
@@ -127,5 +126,4 @@ class ImageRemoteDataSourceImplTest {
             }
         }
     }
-
 }

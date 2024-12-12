@@ -12,21 +12,21 @@ internal data class ApiOneToManyMatchPayload(
     val pool: ApiMatchPool,
     val matcher: String,
     val result: List<ApiMatchEntry>?,
-) : ApiEventPayload( startTime) {
-
+) : ApiEventPayload(startTime) {
     @Keep
-    data class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {
-
+    data class ApiMatchPool(
+        val type: ApiMatchPoolType,
+        val count: Int,
+    ) {
         constructor(matchPool: MatchPool) :
             this(ApiMatchPoolType.valueOf(matchPool.type.toString()), matchPool.count)
     }
 
     @Keep
     enum class ApiMatchPoolType {
-
         USER,
         MODULE,
-        PROJECT;
+        PROJECT,
     }
 
     constructor(domainPayload: OneToManyMatchPayload) : this(
@@ -34,9 +34,8 @@ internal data class ApiOneToManyMatchPayload(
         domainPayload.endedAt?.fromDomainToApi(),
         ApiMatchPool(domainPayload.pool),
         domainPayload.matcher,
-        domainPayload.result?.map { ApiMatchEntry(it) }
+        domainPayload.result?.map { ApiMatchEntry(it) },
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

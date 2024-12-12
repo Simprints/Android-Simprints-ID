@@ -13,17 +13,22 @@ fun hasAnyCompoundDrawable() = object : TypeSafeMatcher<View>() {
         description.appendText("TextView contains any compound drawable")
     }
 
-    override fun matchesSafely(tv: View?) = tv.let { it as? TextView }
-        ?.compoundDrawables?.any { it != null }
+    override fun matchesSafely(tv: View?) = tv
+        .let { it as? TextView }
+        ?.compoundDrawables
+        ?.any { it != null }
         ?: false
 }
 
-fun hasBackgroundColor(@ColorRes targetId: Int) = object : TypeSafeMatcher<View>() {
+fun hasBackgroundColor(
+    @ColorRes targetId: Int,
+) = object : TypeSafeMatcher<View>() {
     override fun describeTo(description: Description) {
         description.appendText("View background color ID should be $targetId")
     }
 
-    override fun matchesSafely(v: View?) = v?.let { it.background as? ColorDrawable }
+    override fun matchesSafely(v: View?) = v
+        ?.let { it.background as? ColorDrawable }
         ?.let { it.color == ResourcesCompat.getColor(v.resources, targetId, null) }
         ?: false
 }

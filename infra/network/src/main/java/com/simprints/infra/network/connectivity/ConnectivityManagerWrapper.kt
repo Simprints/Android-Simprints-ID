@@ -9,9 +9,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 internal class ConnectivityManagerWrapper @Inject constructor(
-    @ApplicationContext private val ctx: Context
+    @ApplicationContext private val ctx: Context,
 ) {
-
     private val connectivityManager by lazy {
         ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
@@ -27,11 +26,11 @@ internal class ConnectivityManagerWrapper @Inject constructor(
      */
     fun isNetworkAvailable(): Boolean {
         val network = connectivityManager.activeNetwork
-        val capabilities = connectivityManager.getNetworkCapabilities(network);
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
 
-        return capabilities != null
-            && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        return capabilities != null &&
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 
     fun registerNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {

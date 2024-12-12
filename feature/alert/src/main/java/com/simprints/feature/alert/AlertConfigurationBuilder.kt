@@ -43,19 +43,21 @@ data class AlertConfigurationBuilder(
  */
 fun alertConfiguration(block: AlertConfigurationBuilder.() -> Unit) = AlertConfigurationBuilder().apply(block)
 
-fun AlertConfigurationBuilder.toArgs() = AlertFragmentArgs(AlertConfiguration(
-    color = this.color,
-    title = this.title,
-    titleRes = this.titleRes,
-    image = this.image,
-    message = this.message,
-    messageRes = this.messageRes,
-    messageIcon = this.messageIcon,
-    leftButton = this.leftButton,
-    rightButton = this.rightButton,
-    eventType = this.eventType,
-    appErrorReason = this.appErrorReason,
-)).toBundle()
+fun AlertConfigurationBuilder.toArgs() = AlertFragmentArgs(
+    AlertConfiguration(
+        color = this.color,
+        title = this.title,
+        titleRes = this.titleRes,
+        image = this.image,
+        message = this.message,
+        messageRes = this.messageRes,
+        messageIcon = this.messageIcon,
+        leftButton = this.leftButton,
+        rightButton = this.rightButton,
+        eventType = this.eventType,
+        appErrorReason = this.appErrorReason,
+    ),
+).toBundle()
 
 data class AlertButtonBuilder(
     var text: String? = null,
@@ -84,4 +86,3 @@ fun alertButton(block: AlertButtonBuilder.() -> Unit): AlertButtonConfig = Alert
             closeOnClick = builder.closeOnClick,
         )
     }
-

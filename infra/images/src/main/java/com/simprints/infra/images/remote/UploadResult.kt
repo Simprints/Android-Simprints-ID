@@ -10,13 +10,14 @@ import com.simprints.infra.images.model.SecuredImageRef
  * @property status
  *           the outcome of the operation, either successful or failed
  */
-internal data class UploadResult(val image: SecuredImageRef, val status: Status) {
-
+internal data class UploadResult(
+    val image: SecuredImageRef,
+    val status: Status,
+) {
     fun isUploadSuccessful() = status == Status.SUCCESSFUL
 
     enum class Status {
         SUCCESSFUL,
-        FAILED
+        FAILED,
     }
-
 }

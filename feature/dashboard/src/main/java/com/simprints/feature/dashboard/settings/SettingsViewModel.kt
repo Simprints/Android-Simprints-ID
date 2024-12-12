@@ -19,7 +19,6 @@ internal class SettingsViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val syncOrchestrator: SyncOrchestrator,
 ) : ViewModel() {
-
     val generalConfiguration: LiveData<GeneralConfiguration>
         get() = _generalConfiguration
     private val _generalConfiguration = MutableLiveData<GeneralConfiguration>()

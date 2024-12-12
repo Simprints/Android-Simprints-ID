@@ -6,5 +6,5 @@ import java.io.Serializable
 @Keep
 data class FetchSubjectResult(
     val found: Boolean,
-    val wasOnline: Boolean = false
+    val wasOnline: Boolean = false,
 ) : Serializable

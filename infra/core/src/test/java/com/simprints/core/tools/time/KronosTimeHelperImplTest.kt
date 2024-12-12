@@ -12,7 +12,6 @@ import org.junit.Ignore
 import org.junit.Test
 
 class KronosTimeHelperImplTest {
-
     @MockK
     private lateinit var kronosClock: KronosClock
 
@@ -81,7 +80,6 @@ class KronosTimeHelperImplTest {
     }
 
     companion object {
-
         // Random date at random time
         private const val TIMESTAMP = 1_542_537_183_000L
 
@@ -91,5 +89,4 @@ class KronosTimeHelperImplTest {
         // Next day at 0:00:00
         private const val TIMESTAMP_TOMORROW = 1_542_578_400_000L
     }
-
 }

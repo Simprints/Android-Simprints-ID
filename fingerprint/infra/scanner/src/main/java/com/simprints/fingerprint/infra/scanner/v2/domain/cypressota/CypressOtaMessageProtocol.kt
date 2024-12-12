@@ -15,7 +15,10 @@ object CypressOtaMessageProtocol : Protocol {
     fun getMessageType(messageBytes: ByteArray): CypressOtaResponseType =
         CypressOtaResponseType.fromByte(messageBytes[MESSAGE_TYPE_INDEX_IN_HEADER])
 
-    fun buildMessageBytes(cypressOtaCommandType: CypressOtaCommandType, data: ByteArray): ByteArray {
+    fun buildMessageBytes(
+        cypressOtaCommandType: CypressOtaCommandType,
+        data: ByteArray,
+    ): ByteArray {
         val length = data.size
         val header = byteArrayOf(cypressOtaCommandType.byte, length.toShort().toByteArray())
         return header + data

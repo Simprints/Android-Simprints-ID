@@ -19,7 +19,6 @@ data class FaceCaptureEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         startTime: Timestamp,
         endTime: Timestamp,
@@ -41,15 +40,14 @@ data class FaceCaptureEvent(
             result = result,
             isFallback = isFallback,
             face = face,
-            id = payloadId
+            id = payloadId,
         ),
-        FACE_CAPTURE
+        FACE_CAPTURE,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FaceCapturePayload(
@@ -64,10 +62,8 @@ data class FaceCaptureEvent(
         val face: Face?,
         override val type: EventType = FACE_CAPTURE,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "result: $result, attempt nr: $attemptNb, fallback: $isFallback, " +
-                "quality: ${face?.quality},  format: ${face?.format}"
+        override fun toSafeString(): String = "result: $result, attempt nr: $attemptNb, fallback: $isFallback, " +
+            "quality: ${face?.quality},  format: ${face?.format}"
 
         @Keep
         data class Face(
@@ -84,12 +80,11 @@ data class FaceCaptureEvent(
             OFF_YAW,
             OFF_ROLL,
             TOO_CLOSE,
-            TOO_FAR
+            TOO_FAR,
         }
     }
 
     companion object {
-
         const val EVENT_VERSION = 4
     }
 }

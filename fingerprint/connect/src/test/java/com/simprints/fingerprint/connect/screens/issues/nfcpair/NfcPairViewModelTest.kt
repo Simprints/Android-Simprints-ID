@@ -18,7 +18,6 @@ import org.junit.Test
 import java.io.IOException
 
 class NfcPairViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 

@@ -7,7 +7,6 @@ import com.simprints.infra.eventsync.event.remote.models.ApiTier
 
 @Keep
 internal sealed class ApiCallbackComparisonScore {
-
     @Keep
     data class ApiCallbackComparisonScoreV1(
         val guid: String,
@@ -24,7 +23,6 @@ internal sealed class ApiCallbackComparisonScore {
     ) : ApiCallbackComparisonScore()
 }
 
-
 internal fun CallbackComparisonScore.fromDomainToApi(version: Int) = when (version) {
     1 -> ApiCallbackComparisonScore.ApiCallbackComparisonScoreV1(
         guid,
@@ -36,6 +34,6 @@ internal fun CallbackComparisonScore.fromDomainToApi(version: Int) = when (versi
         guid,
         confidence,
         ApiTier.valueOf(tier.name),
-        ApiConfidenceMatch.valueOf(confidenceMatch.name)
+        ApiConfidenceMatch.valueOf(confidenceMatch.name),
     )
 }

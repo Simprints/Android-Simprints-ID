@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.testtools.protoIdentificationConfigurati
 import org.junit.Test
 
 class IdentificationConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoIdentificationConfiguration.toDomain()).isEqualTo(identificationConfiguration)

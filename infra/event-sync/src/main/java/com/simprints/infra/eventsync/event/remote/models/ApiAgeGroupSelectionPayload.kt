@@ -10,26 +10,21 @@ internal data class ApiAgeGroupSelectionPayload(
     val endTime: ApiTimestamp,
     val subjectAgeGroup: ApiAgeGroup,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: AgeGroupSelectionEvent.AgeGroupSelectionPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi() ?: ApiTimestamp(0),
         domainPayload.subjectAgeGroup.fromDomainToApi(),
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 
     data class ApiAgeGroup(
         val startInclusive: Int,
         val endExclusive: Int?,
     )
-
 }
 
-private fun AgeGroupSelectionEvent.AgeGroup.fromDomainToApi() =
-    ApiAgeGroupSelectionPayload.ApiAgeGroup(
-        startInclusive = startInclusive,
-        endExclusive = endExclusive,
-    )
-
+private fun AgeGroupSelectionEvent.AgeGroup.fromDomainToApi() = ApiAgeGroupSelectionPayload.ApiAgeGroup(
+    startInclusive = startInclusive,
+    endExclusive = endExclusive,
+)

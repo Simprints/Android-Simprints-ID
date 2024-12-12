@@ -18,20 +18,18 @@ data class VerificationCallbackEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         score: CallbackComparisonScore,
     ) : this(
         UUID.randomUUID().toString(),
         VerificationCallbackPayload(createdAt, EVENT_VERSION, score),
-        CALLBACK_VERIFICATION
+        CALLBACK_VERIFICATION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class VerificationCallbackPayload(
@@ -41,12 +39,10 @@ data class VerificationCallbackEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_VERIFICATION,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "confidence: ${score.confidence}"
     }
 
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

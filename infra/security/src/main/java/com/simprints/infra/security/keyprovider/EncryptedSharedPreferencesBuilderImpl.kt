@@ -14,31 +14,27 @@ internal class EncryptedSharedPreferencesBuilderImpl @Inject constructor(
     @ApplicationContext private val ctx: Context,
     @BuildSdk private val buildSdk: Int,
     private val masterKeyProvider: MasterKeyProvider,
-    private val preferencesProvider: EncryptedSharedPreferencesProvider
-) :
-    EncryptedSharedPreferencesBuilder {
-
+    private val preferencesProvider: EncryptedSharedPreferencesProvider,
+) : EncryptedSharedPreferencesBuilder {
     private val masterKeyAlias: String
         get() = masterKeyProvider.provideMasterKey()
 
-    override fun buildEncryptedSharedPreferences(filename: String): SharedPreferences {
-        return try {
-            preferencesProvider.provideEncryptedSharedPreferences(
-                filename = filename,
-                masterKeyAlias = masterKeyAlias
-            )
-        } catch (e: Exception) {
-            // Workaround for CORE-2568
-            // Sometimes the master key has invalid tag (zero), and in such cases the process can be
-            // recovered by physically removing the shared preferences file and trying to create
-            // it once again
-            Simber.e(e, "Unable to create encrypted shared preferences")
-            deleteEncryptedSharedPreferences(filename = filename)
-            preferencesProvider.provideEncryptedSharedPreferences(
-                filename = filename,
-                masterKeyAlias = masterKeyAlias
-            )
-        }
+    override fun buildEncryptedSharedPreferences(filename: String): SharedPreferences = try {
+        preferencesProvider.provideEncryptedSharedPreferences(
+            filename = filename,
+            masterKeyAlias = masterKeyAlias,
+        )
+    } catch (e: Exception) {
+        // Workaround for CORE-2568
+        // Sometimes the master key has invalid tag (zero), and in such cases the process can be
+        // recovered by physically removing the shared preferences file and trying to create
+        // it once again
+        Simber.e(e, "Unable to create encrypted shared preferences")
+        deleteEncryptedSharedPreferences(filename = filename)
+        preferencesProvider.provideEncryptedSharedPreferences(
+            filename = filename,
+            masterKeyAlias = masterKeyAlias,
+        )
     }
 
     @SuppressLint("NewApi")

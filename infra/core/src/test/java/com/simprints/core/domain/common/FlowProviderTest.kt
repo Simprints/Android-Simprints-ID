@@ -3,8 +3,6 @@ package com.simprints.core.domain.common
 import org.junit.Test
 
 class FlowProviderTest {
-
-
     @Test
     fun `enrol value returns current type`() {
         assert(FlowType.valueOf("ENROL") == FlowType.ENROL)
@@ -19,5 +17,4 @@ class FlowProviderTest {
     fun `verify value returns current type`() {
         assert(FlowType.valueOf("VERIFY") == FlowType.VERIFY)
     }
-
 }

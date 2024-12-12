@@ -6,5 +6,5 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 enum class Partitioning {
     GLOBAL,
     USER,
-    MODULE
+    MODULE,
 }

@@ -14,19 +14,18 @@ internal enum class ApiFinger {
     LEFT_INDEX_FINGER,
     LEFT_3RD_FINGER,
     LEFT_4TH_FINGER,
-    LEFT_5TH_FINGER
+    LEFT_5TH_FINGER,
 }
 
-internal fun IFingerIdentifier.toApi(): ApiFinger =
-    when (this) {
-        IFingerIdentifier.RIGHT_5TH_FINGER -> ApiFinger.RIGHT_5TH_FINGER
-        IFingerIdentifier.RIGHT_4TH_FINGER -> ApiFinger.RIGHT_4TH_FINGER
-        IFingerIdentifier.RIGHT_3RD_FINGER -> ApiFinger.RIGHT_3RD_FINGER
-        IFingerIdentifier.RIGHT_INDEX_FINGER -> ApiFinger.RIGHT_INDEX_FINGER
-        IFingerIdentifier.RIGHT_THUMB -> ApiFinger.RIGHT_THUMB
-        IFingerIdentifier.LEFT_THUMB -> ApiFinger.LEFT_THUMB
-        IFingerIdentifier.LEFT_INDEX_FINGER -> ApiFinger.LEFT_INDEX_FINGER
-        IFingerIdentifier.LEFT_3RD_FINGER -> ApiFinger.LEFT_3RD_FINGER
-        IFingerIdentifier.LEFT_4TH_FINGER -> ApiFinger.LEFT_4TH_FINGER
-        IFingerIdentifier.LEFT_5TH_FINGER -> ApiFinger.LEFT_5TH_FINGER
-    }
+internal fun IFingerIdentifier.toApi(): ApiFinger = when (this) {
+    IFingerIdentifier.RIGHT_5TH_FINGER -> ApiFinger.RIGHT_5TH_FINGER
+    IFingerIdentifier.RIGHT_4TH_FINGER -> ApiFinger.RIGHT_4TH_FINGER
+    IFingerIdentifier.RIGHT_3RD_FINGER -> ApiFinger.RIGHT_3RD_FINGER
+    IFingerIdentifier.RIGHT_INDEX_FINGER -> ApiFinger.RIGHT_INDEX_FINGER
+    IFingerIdentifier.RIGHT_THUMB -> ApiFinger.RIGHT_THUMB
+    IFingerIdentifier.LEFT_THUMB -> ApiFinger.LEFT_THUMB
+    IFingerIdentifier.LEFT_INDEX_FINGER -> ApiFinger.LEFT_INDEX_FINGER
+    IFingerIdentifier.LEFT_3RD_FINGER -> ApiFinger.LEFT_3RD_FINGER
+    IFingerIdentifier.LEFT_4TH_FINGER -> ApiFinger.LEFT_4TH_FINGER
+    IFingerIdentifier.LEFT_5TH_FINGER -> ApiFinger.LEFT_5TH_FINGER
+}

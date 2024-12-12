@@ -14,7 +14,6 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RocV3WrapperModule {
-
     @Binds
     abstract fun provideSdkInitializer(impl: RocV3Initializer): FaceBioSdkInitializer
 

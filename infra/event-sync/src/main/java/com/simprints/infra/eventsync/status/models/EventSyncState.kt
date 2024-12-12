@@ -11,7 +11,6 @@ data class EventSyncState(
     val downSyncWorkersInfo: List<SyncWorkerInfo>,
     val reporterStates: List<SyncWorkerInfo>,
 ) {
-
     data class SyncWorkerInfo(
         val type: EventSyncWorkerType,
         val state: EventSyncWorkerState,
@@ -53,8 +52,16 @@ data class EventSyncState(
         ?.estimatedOutage
 
     fun isSyncFailed() = syncWorkersInfo
-        .any { it.state is EventSyncWorkerState.Failed || it.state is EventSyncWorkerState.Blocked || it.state is EventSyncWorkerState.Cancelled }
+        .any {
+            it.state is EventSyncWorkerState.Failed ||
+                it.state is EventSyncWorkerState.Blocked ||
+                it.state is EventSyncWorkerState.Cancelled
+        }
 
     fun isSyncReporterCompleted() = reporterStates
-        .all { it.state !is EventSyncWorkerState.Running && it.state !is EventSyncWorkerState.Enqueued && it.state !is EventSyncWorkerState.Blocked }
+        .all {
+            it.state !is EventSyncWorkerState.Running &&
+                it.state !is EventSyncWorkerState.Enqueued &&
+                it.state !is EventSyncWorkerState.Blocked
+        }
 }

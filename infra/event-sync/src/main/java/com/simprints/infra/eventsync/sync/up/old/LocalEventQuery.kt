@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync.sync.up.old
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.EventType
 
-
 @Keep
 @Deprecated(message = "This is used to support old data-upload format, should not be used going forward")
 data class LocalEventQuery(

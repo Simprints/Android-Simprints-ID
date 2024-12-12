@@ -1,7 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
 
@@ -9,7 +9,6 @@ internal class IsUserSignedInUseCase @Inject constructor(
     private val authStore: AuthStore,
     private val secureDataManager: SecurityManager,
 ) {
-
     operator fun invoke(action: ActionRequest): SignedInState {
         val signedInProjectId = authStore.signedInProjectId
 

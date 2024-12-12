@@ -11,7 +11,6 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Succeede
 import org.junit.Test
 
 class EventSyncStateTest {
-
     @Test
     fun `isThereNotSyncHistory() is true when there are no workers`() {
         assertThat(
@@ -19,7 +18,7 @@ class EventSyncStateTest {
                 up = emptyList(),
                 down = emptyList(),
                 reporters = emptyList(),
-            ).isThereNotSyncHistory()
+            ).isThereNotSyncHistory(),
         ).isTrue()
     }
 
@@ -30,7 +29,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Succeeded)),
                 down = emptyList(),
                 reporters = emptyList(),
-            ).isThereNotSyncHistory()
+            ).isThereNotSyncHistory(),
         ).isFalse()
     }
 
@@ -41,7 +40,7 @@ class EventSyncStateTest {
                 up = emptyList(),
                 down = emptyList(),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isFalse()
     }
 
@@ -52,7 +51,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Succeeded)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isFalse()
     }
 
@@ -63,21 +62,21 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Running)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isTrue()
         assertThat(
             createState(
                 up = listOf(createWorker(Succeeded)),
                 down = listOf(createWorker(Running)),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isTrue()
         assertThat(
             createState(
                 up = listOf(createWorker(Running)),
                 down = listOf(createWorker(Running)),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isTrue()
     }
 
@@ -88,21 +87,21 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isTrue()
         assertThat(
             createState(
                 up = listOf(createWorker(Succeeded)),
                 down = listOf(createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isTrue()
         assertThat(
             createState(
                 up = listOf(createWorker(Enqueued)),
                 down = listOf(createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncRunning()
+            ).isSyncRunning(),
         ).isTrue()
     }
 
@@ -113,7 +112,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Succeeded)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncCompleted()
+            ).isSyncCompleted(),
         ).isTrue()
     }
 
@@ -124,7 +123,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncCompleted()
+            ).isSyncCompleted(),
         ).isFalse()
     }
 
@@ -135,7 +134,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Running)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncCompleted()
+            ).isSyncCompleted(),
         ).isFalse()
     }
 
@@ -146,7 +145,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncInProgress()
+            ).isSyncInProgress(),
         ).isFalse()
     }
 
@@ -157,7 +156,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Running)),
                 down = listOf(createWorker(Succeeded), createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncInProgress()
+            ).isSyncInProgress(),
         ).isTrue()
     }
 
@@ -168,7 +167,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Running)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncConnecting()
+            ).isSyncConnecting(),
         ).isFalse()
     }
 
@@ -179,7 +178,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Running)),
                 down = listOf(createWorker(Succeeded), createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncConnecting()
+            ).isSyncConnecting(),
         ).isTrue()
     }
 
@@ -190,7 +189,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed())),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseReloginRequired()
+            ).isSyncFailedBecauseReloginRequired(),
         ).isFalse()
     }
 
@@ -201,7 +200,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed(failedBecauseReloginRequired = true))),
                 down = listOf(createWorker(Succeeded), createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseReloginRequired()
+            ).isSyncFailedBecauseReloginRequired(),
         ).isTrue()
     }
 
@@ -212,7 +211,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed())),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseTooManyRequests()
+            ).isSyncFailedBecauseTooManyRequests(),
         ).isFalse()
     }
 
@@ -223,7 +222,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed(failedBecauseTooManyRequest = true))),
                 down = listOf(createWorker(Succeeded), createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseTooManyRequests()
+            ).isSyncFailedBecauseTooManyRequests(),
         ).isTrue()
     }
 
@@ -234,7 +233,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed())),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseCloudIntegration()
+            ).isSyncFailedBecauseCloudIntegration(),
         ).isFalse()
     }
 
@@ -245,7 +244,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed(failedBecauseBackendMaintenance = true))),
                 down = listOf(createWorker(Succeeded), createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseBackendMaintenance()
+            ).isSyncFailedBecauseBackendMaintenance(),
         ).isTrue()
     }
 
@@ -256,7 +255,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed())),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseBackendMaintenance()
+            ).isSyncFailedBecauseBackendMaintenance(),
         ).isFalse()
     }
 
@@ -267,7 +266,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Failed(failedBecauseCloudIntegration = true))),
                 down = listOf(createWorker(Succeeded), createWorker(Enqueued)),
                 reporters = emptyList(),
-            ).isSyncFailedBecauseCloudIntegration()
+            ).isSyncFailedBecauseCloudIntegration(),
         ).isTrue()
     }
 
@@ -278,7 +277,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued), createWorker(Running)),
                 down = listOf(createWorker(Succeeded)),
                 reporters = emptyList(),
-            ).isSyncFailed()
+            ).isSyncFailed(),
         ).isFalse()
     }
 
@@ -289,7 +288,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued), createWorker(Running)),
                 down = listOf(createWorker(Succeeded), createWorker(Failed())),
                 reporters = emptyList(),
-            ).isSyncFailed()
+            ).isSyncFailed(),
         ).isTrue()
     }
 
@@ -300,7 +299,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued), createWorker(Running)),
                 down = listOf(createWorker(Succeeded), createWorker(Blocked)),
                 reporters = emptyList(),
-            ).isSyncFailed()
+            ).isSyncFailed(),
         ).isTrue()
     }
 
@@ -311,7 +310,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued), createWorker(Running)),
                 down = listOf(createWorker(Succeeded), createWorker(Cancelled)),
                 reporters = emptyList(),
-            ).isSyncFailed()
+            ).isSyncFailed(),
         ).isTrue()
     }
 
@@ -326,13 +325,13 @@ class EventSyncStateTest {
                     createWorker(
                         Failed(
                             failedBecauseBackendMaintenance = true,
-                            estimatedOutage = outage
-                        )
-                    )
+                            estimatedOutage = outage,
+                        ),
+                    ),
                 ),
                 down = listOf(createWorker(Succeeded), createWorker(Cancelled)),
                 reporters = emptyList(),
-            ).getEstimatedBackendMaintenanceOutage()
+            ).getEstimatedBackendMaintenanceOutage(),
         ).isEqualTo(outage)
     }
 
@@ -343,7 +342,7 @@ class EventSyncStateTest {
                 up = listOf(createWorker(Enqueued), createWorker(Running)),
                 down = listOf(createWorker(Succeeded), createWorker(Cancelled)),
                 reporters = emptyList(),
-            ).getEstimatedBackendMaintenanceOutage()
+            ).getEstimatedBackendMaintenanceOutage(),
         ).isNull()
     }
 
@@ -354,7 +353,7 @@ class EventSyncStateTest {
                 up = emptyList(),
                 down = emptyList(),
                 reporters = listOf(createWorker(Enqueued)),
-            ).isSyncReporterCompleted()
+            ).isSyncReporterCompleted(),
         ).isFalse()
     }
 
@@ -365,7 +364,7 @@ class EventSyncStateTest {
                 up = emptyList(),
                 down = emptyList(),
                 reporters = listOf(createWorker(Blocked)),
-            ).isSyncReporterCompleted()
+            ).isSyncReporterCompleted(),
         ).isFalse()
     }
 
@@ -376,7 +375,7 @@ class EventSyncStateTest {
                 up = emptyList(),
                 down = emptyList(),
                 reporters = listOf(createWorker(Succeeded)),
-            ).isSyncReporterCompleted()
+            ).isSyncReporterCompleted(),
         ).isTrue()
     }
 
@@ -387,7 +386,7 @@ class EventSyncStateTest {
                 up = emptyList(),
                 down = emptyList(),
                 reporters = listOf(createWorker(Failed())),
-            ).isSyncReporterCompleted()
+            ).isSyncReporterCompleted(),
         ).isTrue()
     }
 
@@ -397,7 +396,5 @@ class EventSyncStateTest {
         reporters: List<SyncWorkerInfo>,
     ) = EventSyncState("id", 0, 0, up, down, reporters)
 
-    private fun createWorker(state: EventSyncWorkerState) =
-        SyncWorkerInfo(type = EventSyncWorkerType.DOWNLOADER, state = state)
-
+    private fun createWorker(state: EventSyncWorkerState) = SyncWorkerInfo(type = EventSyncWorkerType.DOWNLOADER, state = state)
 }

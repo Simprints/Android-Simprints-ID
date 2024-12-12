@@ -78,6 +78,7 @@ Following the guidelines above the end goal of SID should look roughly like:
 - **Git**: Ensure you have Git installed to clone the repository.
 - **Android Studio**: Install the latest version of Android Studio.
 - **GitHub Account**: You will need a GitHub account to generate a token.
+- **[KtLint](https://pinterest.github.io/ktlint/latest/install/setup/)**: To ensure consistent code style.
 
 ### 1. Clone the Repository
 

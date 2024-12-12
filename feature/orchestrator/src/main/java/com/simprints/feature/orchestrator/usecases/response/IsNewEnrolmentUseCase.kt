@@ -7,7 +7,6 @@ import java.io.Serializable
 import javax.inject.Inject
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {
-
     /**
      * Returns true if the result is an actual enrollment and false if there is
      * a duplicate record and the result should be returned as an identification instead.
@@ -33,20 +32,20 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
     // Missing results and configuration are ignored as "valid" to allow creating new records.
     private fun isValidEnrolmentFingerprintResult(
         projectConfiguration: ProjectConfiguration,
-        fingerprintResult: FingerprintMatchResult?
+        fingerprintResult: FingerprintMatchResult?,
     ): Boolean = fingerprintResult?.let {
         projectConfiguration.fingerprint
             ?.getSdkConfiguration(fingerprintResult.sdk)
             ?.decisionPolicy
-            ?.medium?.toFloat()
+            ?.medium
+            ?.toFloat()
             ?.let { threshold -> fingerprintResult.results.all { it.confidence < threshold } }
     } ?: true
-
 
     // Missing results and configuration are ignored as "valid" to allow creating new records.
     private fun isNewEnrolmentFaceResult(
         projectConfiguration: ProjectConfiguration,
-        faceResult: FaceMatchResult?
+        faceResult: FaceMatchResult?,
     ): Boolean = projectConfiguration.face
         ?.decisionPolicy
         ?.medium

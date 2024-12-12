@@ -14,11 +14,13 @@ import kotlin.getValue
 
 @AndroidEntryPoint
 internal class NetworkingLogFragment : Fragment(R.layout.fragment_troubleshooting_list) {
-
     private val viewModel by viewModels<NetworkingLogViewModel>()
     private val binding by viewBinding(FragmentTroubleshootingListBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.logs.observe(viewLifecycleOwner) {

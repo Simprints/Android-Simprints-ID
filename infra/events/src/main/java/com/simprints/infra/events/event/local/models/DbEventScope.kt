@@ -18,7 +18,6 @@ internal data class DbEventScope(
     val type: EventScopeType,
     @Embedded("start_") val createdAt: DbTimestamp,
     @Embedded("end_") val endedAt: DbTimestamp?,
-
     // Payload is a collection of data that is not directly used in the app,
     // but it is reported to the backend in session scope header.
     val payloadJson: String,
@@ -30,7 +29,7 @@ internal fun EventScope.fromDomainToDb(jsonHelper: JsonHelper): DbEventScope = D
     type = type,
     createdAt = createdAt.fromDomainToDb(),
     endedAt = endedAt?.fromDomainToDb(),
-    payloadJson = jsonHelper.toJson(payload)
+    payloadJson = jsonHelper.toJson(payload),
 )
 
 internal fun DbEventScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = EventScope(
@@ -39,5 +38,5 @@ internal fun DbEventScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = E
     type = type,
     createdAt = createdAt.fromDbToDomain(),
     endedAt = endedAt?.fromDbToDomain(),
-    payload = jsonHelper.fromJson(payloadJson, object : TypeReference<EventScopePayload>() {})
+    payload = jsonHelper.fromJson(payloadJson, object : TypeReference<EventScopePayload>() {}),
 )

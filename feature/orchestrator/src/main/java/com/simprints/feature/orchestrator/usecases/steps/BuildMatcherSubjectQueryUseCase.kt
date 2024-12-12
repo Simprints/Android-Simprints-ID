@@ -9,7 +9,6 @@ import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mapping code")
 internal class BuildMatcherSubjectQueryUseCase @Inject constructor() {
-
     operator fun invoke(
         projectConfiguration: ProjectConfiguration,
         actionRequest: ActionRequest,

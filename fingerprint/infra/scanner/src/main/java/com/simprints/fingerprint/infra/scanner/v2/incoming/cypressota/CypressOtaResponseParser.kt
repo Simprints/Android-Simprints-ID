@@ -12,15 +12,13 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
 import javax.inject.Inject
 
 class CypressOtaResponseParser @Inject constructor() : MessageParser<CypressOtaResponse> {
-
-    override fun parse(messageBytes: ByteArray): CypressOtaResponse =
-        try {
-            when (CypressOtaResponseType.fromByte(messageBytes[0])) {
-                OK -> OkResponse()
-                CONTINUE -> ContinueResponse()
-                ERROR -> ErrorResponse()
-            }
-        } catch (e: Exception) {
-            handleExceptionDuringParsing(e)
+    override fun parse(messageBytes: ByteArray): CypressOtaResponse = try {
+        when (CypressOtaResponseType.fromByte(messageBytes[0])) {
+            OK -> OkResponse()
+            CONTINUE -> ContinueResponse()
+            ERROR -> ErrorResponse()
         }
+    } catch (e: Exception) {
+        handleExceptionDuringParsing(e)
+    }
 }

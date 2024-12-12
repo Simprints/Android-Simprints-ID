@@ -7,7 +7,6 @@ import java.nio.BufferUnderflowException
 import java.nio.ByteOrder
 
 class ByteArrayToolsTest {
-
     @Test
     fun byteArrayOfOverload_worksForValidArguments() {
         assertThat(byteArrayOf(0x10, 0x2A, 0x3F))

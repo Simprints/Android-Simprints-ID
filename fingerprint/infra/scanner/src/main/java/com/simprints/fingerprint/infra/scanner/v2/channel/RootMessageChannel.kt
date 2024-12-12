@@ -15,13 +15,13 @@ import javax.inject.Singleton
 class RootMessageChannel @Inject constructor(
     incoming: RootMessageInputStream,
     outgoing: RootMessageOutputStream,
-    @DispatcherIO dispatcher: CoroutineDispatcher
+    @DispatcherIO dispatcher: CoroutineDispatcher,
 ) : MessageChannel<RootMessageInputStream, RootMessageOutputStream>(
-    incoming, outgoing, dispatcher
-) {
-
-    suspend inline fun <reified R : RootResponse> sendCommandAndReceiveResponse(command: RootCommand): R =
-        runLockedTask {
-            outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
-        }
+        incoming,
+        outgoing,
+        dispatcher,
+    ) {
+    suspend inline fun <reified R : RootResponse> sendCommandAndReceiveResponse(command: RootCommand): R = runLockedTask {
+        outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
+    }
 }

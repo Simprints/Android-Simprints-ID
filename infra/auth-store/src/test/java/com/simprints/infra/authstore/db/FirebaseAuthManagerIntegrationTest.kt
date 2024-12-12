@@ -17,7 +17,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class FirebaseAuthManagerIntegrationTest {
-
     companion object {
         private const val GCP_PROJECT_ID = "GCP_PROJECT_ID"
         private const val API_KEY = "API_KEY"
@@ -45,8 +44,8 @@ class FirebaseAuthManagerIntegrationTest {
     fun `signIn should succeed`() = runTest(UnconfinedTestDispatcher()) {
         every { firebaseAuth.signInWithCustomToken(TOKEN_VALUE) } returns Tasks.forResult(
             mockk<AuthResult>(
-                relaxed = true
-            )
+                relaxed = true,
+            ),
         )
         val token = Token(TOKEN_VALUE, GCP_PROJECT_ID, API_KEY, APPLICATION_ID)
         firebaseAuthManager.signIn(token)

@@ -1,3 +1,6 @@
+// Otherwise there would be an import per test case/event
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package com.simprints.infra.events.event.local.models
 
 import com.google.common.truth.Truth.assertThat
@@ -6,7 +9,6 @@ import com.simprints.infra.events.sampledata.*
 import org.junit.Test
 
 class DbEventTest {
-
     @Test
     fun convert_ConfirmationCallbackEvent() {
         val original = createConfirmationCallbackEvent()
@@ -146,7 +148,7 @@ class DbEventTest {
 
         with(transformed) {
             assertThat((payload)).isInstanceOf(AuthenticationPayload::class.java)
-            //These are basically enums so if they are the same instance, we are golden
+            // These are basically enums so if they are the same instance, we are golden
             assertThat((payload as AuthenticationPayload).result).isInstanceOf(original.payload.result::class.java)
         }
     }

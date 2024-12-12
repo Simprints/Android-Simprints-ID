@@ -1,13 +1,11 @@
 package com.simprints.infra.eventsync.status
 
-
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import org.junit.Test
 
 class ConvertersTest {
-
     private val converters = Converters()
 
     @Test

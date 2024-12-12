@@ -28,7 +28,6 @@ internal class AboutViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
-
     val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
         get() = _syncAndSearchConfig
     private val _syncAndSearchConfig = MutableLiveData<SyncAndSearchConfig>()
@@ -79,12 +78,9 @@ internal class AboutViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hasEventsToUpload(): Boolean =
-        eventSyncManager.countEventsToUpload(type = null).first() > 0
+    private suspend fun hasEventsToUpload(): Boolean = eventSyncManager.countEventsToUpload(type = null).first() > 0
 
-    private suspend fun canSyncDataToSimprints(): Boolean =
-        configManager.getProjectConfiguration().canSyncDataToSimprints()
-
+    private suspend fun canSyncDataToSimprints(): Boolean = configManager.getProjectConfiguration().canSyncDataToSimprints()
 
     private fun load() = viewModelScope.launch {
         val configuration = configManager.getProjectConfiguration()

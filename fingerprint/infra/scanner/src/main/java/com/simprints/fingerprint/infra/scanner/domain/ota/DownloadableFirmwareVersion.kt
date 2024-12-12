@@ -10,15 +10,17 @@ import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerFirmwareVe
  */
 data class DownloadableFirmwareVersion(
     val chip: Chip,
-    val version: String
+    val version: String,
 ) {
     /**
      * This enum class represent the different chips on the scanner
      */
-    enum class Chip(val chipName: String) {
+    enum class Chip(
+        val chipName: String,
+    ) {
         CYPRESS("cypress"),
         STM("stm"),
-        UN20("un20")
+        UN20("un20"),
     }
 
     fun toStringForApi(): String {

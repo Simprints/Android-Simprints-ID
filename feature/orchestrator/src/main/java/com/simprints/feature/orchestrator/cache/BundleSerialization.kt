@@ -11,13 +11,12 @@ import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
 import java.io.IOException
 
-
 class BundleSerializer : JsonSerializer<Bundle>() {
     @Throws(IOException::class, JsonProcessingException::class)
     override fun serialize(
         value: Bundle,
         gen: JsonGenerator,
-        serializers: SerializerProvider
+        serializers: SerializerProvider,
     ) {
         val map = value.keySet().associateWith { key -> value.get(key) }
         gen.writeObject(map)
@@ -28,7 +27,7 @@ class BundleDeserializer : JsonDeserializer<Bundle>() {
     @Throws(IOException::class, JsonProcessingException::class)
     override fun deserialize(
         p: JsonParser,
-        ctxt: DeserializationContext
+        ctxt: DeserializationContext,
     ): Bundle {
         val mapType = ctxt.typeFactory.constructMapType(Map::class.java, String::class.java, Any::class.java)
         val map: Map<String, Any> = ctxt.readValue(p, mapType)

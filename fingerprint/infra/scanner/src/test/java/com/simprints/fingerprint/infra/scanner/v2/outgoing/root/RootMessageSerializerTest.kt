@@ -6,7 +6,6 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toHexString
 import org.junit.Test
 
 class RootMessageSerializerTest {
-
     @Test
     fun rootCommand_serialized_producesCorrectPackets() {
         val message = EnterMainModeCommand()

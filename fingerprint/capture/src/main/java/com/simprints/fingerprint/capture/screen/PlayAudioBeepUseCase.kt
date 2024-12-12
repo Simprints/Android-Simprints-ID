@@ -11,6 +11,7 @@ class PlayAudioBeepUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     private var mediaPlayer: MediaPlayer? = null
+
     operator fun invoke() {
         if (mediaPlayer == null) {
             mediaPlayer = MediaPlayer.create(context, R.raw.beep)

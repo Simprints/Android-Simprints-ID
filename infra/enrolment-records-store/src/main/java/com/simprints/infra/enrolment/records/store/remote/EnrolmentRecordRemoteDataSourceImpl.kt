@@ -2,19 +2,17 @@ package com.simprints.infra.enrolment.records.store.remote
 
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.remote.models.ApiEnrolmentRecords
 import com.simprints.infra.enrolment.records.store.remote.models.toEnrolmentRecord
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
 
 internal class EnrolmentRecordRemoteDataSourceImpl(
     private val authStore: AuthStore,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
-) :
-    EnrolmentRecordRemoteDataSource {
-
+) : EnrolmentRecordRemoteDataSource {
     @Inject
     constructor(authStore: AuthStore) : this(authStore, EncodingUtilsImpl)
 
@@ -24,12 +22,11 @@ internal class EnrolmentRecordRemoteDataSourceImpl(
         return getClient().executeCall { apiInterface ->
             apiInterface.uploadRecords(
                 projectId,
-                ApiEnrolmentRecords(subjects.map { it.toEnrolmentRecord(encoder) })
+                ApiEnrolmentRecords(subjects.map { it.toEnrolmentRecord(encoder) }),
             )
         }
     }
 
-    private suspend fun getClient(): SimNetwork.SimApiClient<EnrolmentRecordApiInterface> {
-        return authStore.buildClient(EnrolmentRecordApiInterface::class)
-    }
+    private suspend fun getClient(): SimNetwork.SimApiClient<EnrolmentRecordApiInterface> =
+        authStore.buildClient(EnrolmentRecordApiInterface::class)
 }

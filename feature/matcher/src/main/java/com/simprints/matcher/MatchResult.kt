@@ -22,7 +22,6 @@ interface MatchResultItem : Serializable {
 data class FaceMatchResult(
     override val results: List<MatchResultItem>,
 ) : MatchResult {
-
     @Keep
     data class Item(
         override val subjectId: String,
@@ -35,7 +34,6 @@ data class FingerprintMatchResult(
     override val results: List<MatchResultItem>,
     val sdk: FingerprintConfiguration.BioSdk,
 ) : MatchResult {
-
     @Keep
     data class Item(
         override val subjectId: String,

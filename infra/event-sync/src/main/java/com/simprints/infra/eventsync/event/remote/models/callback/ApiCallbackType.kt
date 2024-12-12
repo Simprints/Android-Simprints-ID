@@ -9,5 +9,5 @@ internal enum class ApiCallbackType {
     Refusal,
     Verification,
     Error,
-    Confirmation
+    Confirmation,
 }

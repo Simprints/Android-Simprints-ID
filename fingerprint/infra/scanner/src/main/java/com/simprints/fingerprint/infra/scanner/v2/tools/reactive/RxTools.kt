@@ -28,4 +28,3 @@ fun <T> Flowable<T>.subscribeOnIoAndPublish(dispatcher: CoroutineDispatcher): Co
 
 fun <T : Any> Completable.doSimultaneously(single: Single<T>): Single<T> =
     Singles.zip(single, this.toSingleDefault(Unit)) { value, _ -> value }
-

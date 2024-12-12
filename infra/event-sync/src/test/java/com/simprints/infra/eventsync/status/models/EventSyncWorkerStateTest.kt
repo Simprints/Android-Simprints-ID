@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class EventSyncWorkerStateTest {
-
     @Test
     fun shouldMapWorkInfoCorrectlyIfError() {
         val state =

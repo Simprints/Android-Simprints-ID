@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-
 private typealias StmStep = FlowCollector<StmOtaStep>
 
 /**
@@ -25,11 +24,9 @@ private typealias StmStep = FlowCollector<StmOtaStep>
  */
 internal class StmOtaHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
-    private val firmwareLocalDataSource: FirmwareLocalDataSource
+    private val firmwareLocalDataSource: FirmwareLocalDataSource,
 ) {
-
     private var newFirmwareVersion: StmExtendedFirmwareVersion? = null
-
 
     /**
      * This function is responsible for performing STM firmware updates on Vero 2 Scanner, and
@@ -43,7 +40,7 @@ internal class StmOtaHelper @Inject constructor(
     fun performOtaSteps(
         scanner: Scanner,
         macAddress: String,
-        firmwareVersion: String
+        firmwareVersion: String,
     ): Flow<StmOtaStep> = flow {
         // enter stm ota mode, which
         // will trigger scanner restart
@@ -71,12 +68,12 @@ internal class StmOtaHelper @Inject constructor(
     private suspend fun StmStep.enterStmOtaMode(scanner: Scanner) {
         emit(StmOtaStep.EnteringOtaModeFirstTime)
         // Ignore exception here, as we will reconnect after this step
-        runCatching {  scanner.enterStmOtaMode()}
+        runCatching { scanner.enterStmOtaMode() }
     }
 
     private suspend fun StmStep.reconnectAfterEnteringStmOtaMode(
         scanner: Scanner,
-        macAddress: String
+        macAddress: String,
     ) {
         emit(StmOtaStep.ReconnectingAfterEnteringOtaMode)
         connectionHelper.reconnect(scanner, macAddress)
@@ -89,15 +86,22 @@ internal class StmOtaHelper @Inject constructor(
         delayForOneSecond()
     }
 
-    private suspend fun StmStep.transferFirmwareBytes(scanner: Scanner, firmwareVersion: String) {
+    private suspend fun StmStep.transferFirmwareBytes(
+        scanner: Scanner,
+        firmwareVersion: String,
+    ) {
         // transfer bytes and publish the transfer-progress
         emit(StmOtaStep.CommencingTransfer)
-        scanner.startStmOta(firmwareLocalDataSource.loadStmFirmwareBytes(firmwareVersion))
+        scanner
+            .startStmOta(firmwareLocalDataSource.loadStmFirmwareBytes(firmwareVersion))
             .map { StmOtaStep.TransferInProgress(it) }
             .collect { emit(it) }
     }
 
-    private suspend fun StmStep.reconnectAfterTransfer(scanner: Scanner, macAddress: String) {
+    private suspend fun StmStep.reconnectAfterTransfer(
+        scanner: Scanner,
+        macAddress: String,
+    ) {
         emit(StmOtaStep.ReconnectingAfterTransfer)
         connectionHelper.reconnect(scanner, macAddress)
         delayForOneSecond()
@@ -111,7 +115,7 @@ internal class StmOtaHelper @Inject constructor(
 
     private suspend fun StmStep.validateRunningFirmwareVersion(
         scanner: Scanner,
-        firmwareVersion: String
+        firmwareVersion: String,
     ) {
         emit(StmOtaStep.ValidatingNewFirmwareVersion)
         validateStmFirmwareVersion(scanner, firmwareVersion)
@@ -119,7 +123,7 @@ internal class StmOtaHelper @Inject constructor(
 
     private suspend fun StmStep.reconnectAfterValidatingVersion(
         scanner: Scanner,
-        macAddress: String
+        macAddress: String,
     ) {
         emit(StmOtaStep.ReconnectingAfterValidating)
         connectionHelper.reconnect(scanner, macAddress)
@@ -131,10 +135,15 @@ internal class StmOtaHelper @Inject constructor(
         updateUnifiedVersionInformation(scanner)
     }
 
-    private suspend fun validateStmFirmwareVersion(scanner: Scanner, firmwareVersion: String) {
+    private suspend fun validateStmFirmwareVersion(
+        scanner: Scanner,
+        firmwareVersion: String,
+    ) {
         val actualFirmwareVersion = scanner.getStmFirmwareVersion()
         if (firmwareVersion != actualFirmwareVersion.versionAsString) {
-            throw OtaFailedException("STM OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion")
+            throw OtaFailedException(
+                "STM OTA did not increment firmware version. Expected $firmwareVersion, but was $actualFirmwareVersion",
+            )
         } else {
             newFirmwareVersion = actualFirmwareVersion
         }

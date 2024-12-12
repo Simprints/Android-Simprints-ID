@@ -12,11 +12,13 @@ data class AppRefusalResponse(
     val reason: String,
     val extra: String,
 ) : AppResponse() {
-
     companion object {
-
         fun fromResult(result: ExitFormResult) = AppRefusalResponse(
-            result.submittedOption()?.answer?.name.orEmpty(),
+            result
+                .submittedOption()
+                ?.answer
+                ?.name
+                .orEmpty(),
             result.reason.orEmpty(),
         )
     }

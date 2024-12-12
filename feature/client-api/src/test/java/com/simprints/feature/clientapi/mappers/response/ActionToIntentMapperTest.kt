@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ActionToIntentMapperTest {
-
     @MockK
     private lateinit var odkResponseMapper: OdkResponseMapper
 
@@ -33,7 +32,7 @@ class ActionToIntentMapperTest {
         mapper = ActionToIntentMapper(
             mapOdkResponse = odkResponseMapper,
             mapCommCareResponse = commCareResponseMapper,
-            mapLibSimprintsResponse = libSimprintsResponseMapper
+            mapLibSimprintsResponse = libSimprintsResponseMapper,
         )
     }
 
@@ -45,7 +44,6 @@ class ActionToIntentMapperTest {
         verify(exactly = 0) { commCareResponseMapper(any()) }
         verify(exactly = 0) { libSimprintsResponseMapper(any()) }
     }
-
 
     @Test
     fun `Maps CommCare package name to correct mapper`() {
@@ -77,5 +75,4 @@ class ActionToIntentMapperTest {
         sessionId = "sessionId",
         confirmed = true,
     )
-
 }

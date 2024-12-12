@@ -4,7 +4,6 @@ data class FaceConfiguration(
     val allowedSDKs: List<BioSdk>,
     val rankOne: FaceSdkConfiguration?,
 ) {
-
     val nbOfImagesToCapture: Int
         get() = rankOne?.nbOfImagesToCapture!!
 
@@ -37,7 +36,8 @@ data class FaceConfiguration(
     enum class ImageSavingStrategy {
         NEVER,
         ONLY_USED_IN_REFERENCE,
-        ONLY_GOOD_SCAN;
+        ONLY_GOOD_SCAN,
+        ;
 
         fun shouldSaveImage() = this != NEVER
     }

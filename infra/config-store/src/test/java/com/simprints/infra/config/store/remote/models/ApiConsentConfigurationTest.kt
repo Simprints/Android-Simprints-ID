@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.testtools.consentConfiguration
 import org.junit.Test
 
 class ApiConsentConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiConsentConfiguration.toDomain()).isEqualTo(consentConfiguration)

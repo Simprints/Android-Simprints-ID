@@ -20,7 +20,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class RunBlockingEventSyncUseCaseTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -43,7 +42,7 @@ class RunBlockingEventSyncUseCaseTest {
 
         usecase = RunBlockingEventSyncUseCase(
             syncManager,
-            syncOrchestrator
+            syncOrchestrator,
         )
     }
 
@@ -107,8 +106,8 @@ class RunBlockingEventSyncUseCaseTest {
         listOf(
             EventSyncState.SyncWorkerInfo(
                 EventSyncWorkerType.END_SYNC_REPORTER,
-                endReporterState
-            )
-        )
+                endReporterState,
+            ),
+        ),
     )
 }

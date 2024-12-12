@@ -9,5 +9,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class LoginParams(
     val projectId: String,
-    val userId: TokenizableString
-): Parcelable
+    val userId: TokenizableString,
+) : Parcelable

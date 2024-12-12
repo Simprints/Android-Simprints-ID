@@ -17,7 +17,6 @@ import javax.inject.Inject
 internal class EventsLogViewModel @Inject constructor(
     private val eventRepository: EventRepository,
 ) : ViewModel() {
-
     private val _scopes = MutableLiveData<List<TroubleshootingItemViewData>>(emptyList())
     val scopes: LiveData<List<TroubleshootingItemViewData>>
         get() = _scopes
@@ -28,7 +27,8 @@ internal class EventsLogViewModel @Inject constructor(
 
     fun collectEventScopes() {
         viewModelScope.launch {
-            eventRepository.getAllScopes()
+            eventRepository
+                .getAllScopes()
                 .map { scope -> formatScopeViewData(scope) }
                 .ifEmpty { listOf(TroubleshootingItemViewData(title = "No event scopes found")) }
                 .let { _scopes.postValue(it) }
@@ -37,7 +37,8 @@ internal class EventsLogViewModel @Inject constructor(
 
     fun collectEvents(scopeId: String) {
         viewModelScope.launch {
-            eventRepository.getEventsFromScope(scopeId)
+            eventRepository
+                .getEventsFromScope(scopeId)
                 .map { event -> formatEventViewData(event) }
                 .reversed()
                 .ifEmpty { listOf(TroubleshootingItemViewData(title = "No events found (might be already up-synced)")) }
@@ -45,29 +46,29 @@ internal class EventsLogViewModel @Inject constructor(
         }
     }
 
-    private fun formatScopeViewData(scope: EventScope): TroubleshootingItemViewData =
-        TroubleshootingItemViewData(
-            title = scope.id,
-            subtitle = formatTimestampSubtitle(scope.createdAt.ms, scope.endedAt?.ms),
-            body = """
-                    Type: ${scope.type} | End cause: ${scope.payload.endCause}
-                    ${scope.payload.language} | ${scope.payload.sidVersion} | Lib: ${scope.payload.libSimprintsVersion}
-                    Configuration ID: ${scope.payload.projectConfigurationId}
-                    """.trimIndent(),
-            navigationId = scope.id,
-        )
+    private fun formatScopeViewData(scope: EventScope): TroubleshootingItemViewData = TroubleshootingItemViewData(
+        title = scope.id,
+        subtitle = formatTimestampSubtitle(scope.createdAt.ms, scope.endedAt?.ms),
+        body =
+            """
+            Type: ${scope.type} | End cause: ${scope.payload.endCause}
+            ${scope.payload.language} | ${scope.payload.sidVersion} | Lib: ${scope.payload.libSimprintsVersion}
+            Configuration ID: ${scope.payload.projectConfigurationId}
+            """.trimIndent(),
+        navigationId = scope.id,
+    )
 
-    private fun formatEventViewData(event: Event): TroubleshootingItemViewData =
-        TroubleshootingItemViewData(
-            title = event.type.name,
-            subtitle = formatTimestampSubtitle(
-                event.payload.createdAt.ms,
-                event.payload.endedAt?.ms
-            ),
-            body = "ID: ${event.id}\n" + event.payload.toSafeString(),
-        )
+    private fun formatEventViewData(event: Event): TroubleshootingItemViewData = TroubleshootingItemViewData(
+        title = event.type.name,
+        subtitle = formatTimestampSubtitle(
+            event.payload.createdAt.ms,
+            event.payload.endedAt?.ms,
+        ),
+        body = "ID: ${event.id}\n" + event.payload.toSafeString(),
+    )
 
-    private fun formatTimestampSubtitle(startMs: Long, endMs: Long? = null): String =
-        "Started: ${Date(startMs)}" + endMs?.let { "\nEnded: ${Date(it)}" }.orEmpty()
-
+    private fun formatTimestampSubtitle(
+        startMs: Long,
+        endMs: Long? = null,
+    ): String = "Started: ${Date(startMs)}" + endMs?.let { "\nEnded: ${Date(it)}" }.orEmpty()
 }

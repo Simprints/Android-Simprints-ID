@@ -16,7 +16,6 @@ internal class AppResponseBuilderUseCase @Inject constructor(
     private val handleConfirmIdentity: CreateConfirmIdentityResponseUseCase,
     private val handleEnrolLastBiometric: CreateEnrolLastBiometricResponseUseCase,
 ) {
-
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
         request: ActionRequest?,

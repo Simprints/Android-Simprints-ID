@@ -5,7 +5,6 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 
 @Keep
 internal enum class ApiEventScopeEndCause {
-
     WORKFLOW_ENDED,
     NEW_SESSION,
 }

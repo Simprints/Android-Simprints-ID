@@ -9,12 +9,10 @@ internal data class ApiFaceConfiguration(
     val allowedSDKs: List<BioSdk>,
     val rankOne: ApiFaceSdkConfiguration,
 ) {
-
-    fun toDomain(): FaceConfiguration =
-        FaceConfiguration(
-            allowedSDKs = allowedSDKs.map { it.toDomain() },
-            rankOne = rankOne.toDomain()
-        )
+    fun toDomain(): FaceConfiguration = FaceConfiguration(
+        allowedSDKs = allowedSDKs.map { it.toDomain() },
+        rankOne = rankOne.toDomain(),
+    )
 
     @Keep
     data class ApiFaceSdkConfiguration(
@@ -24,7 +22,7 @@ internal data class ApiFaceConfiguration(
         val imageSavingStrategy: ImageSavingStrategy,
         val allowedAgeRange: ApiAllowedAgeRange?,
         val verificationMatchThreshold: Float?,
-        val version: String
+        val version: String,
     ) {
         fun toDomain() = FaceConfiguration.FaceSdkConfiguration(
             nbOfImagesToCapture = nbOfImagesToCapture,
@@ -33,13 +31,14 @@ internal data class ApiFaceConfiguration(
             imageSavingStrategy = imageSavingStrategy.toDomain(),
             allowedAgeRange = allowedAgeRange?.toDomain() ?: AgeGroup(0, null),
             verificationMatchThreshold = verificationMatchThreshold,
-            version = version
+            version = version,
         )
     }
 
     @Keep
     enum class BioSdk {
-        RANK_ONE;
+        RANK_ONE,
+        ;
 
         fun toDomain() = when (this) {
             RANK_ONE -> FaceConfiguration.BioSdk.RANK_ONE
@@ -50,13 +49,13 @@ internal data class ApiFaceConfiguration(
     enum class ImageSavingStrategy {
         NEVER,
         ONLY_USED_IN_REFERENCE,
-        ONLY_GOOD_SCAN;
+        ONLY_GOOD_SCAN,
+        ;
 
-        fun toDomain(): FaceConfiguration.ImageSavingStrategy =
-            when (this) {
-                NEVER -> FaceConfiguration.ImageSavingStrategy.NEVER
-                ONLY_USED_IN_REFERENCE -> FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
-                ONLY_GOOD_SCAN -> FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
-            }
+        fun toDomain(): FaceConfiguration.ImageSavingStrategy = when (this) {
+            NEVER -> FaceConfiguration.ImageSavingStrategy.NEVER
+            ONLY_USED_IN_REFERENCE -> FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
+            ONLY_GOOD_SCAN -> FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
+        }
     }
 }

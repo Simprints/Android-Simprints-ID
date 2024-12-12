@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ResolveBioSdkWrapperUseCaseTest {
-
     private lateinit var bioSdkResolverUseCase: ResolveBioSdkWrapperUseCase
 
     @MockK

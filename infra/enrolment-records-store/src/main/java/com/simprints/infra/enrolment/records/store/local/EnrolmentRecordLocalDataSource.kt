@@ -6,10 +6,10 @@ import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 
 interface EnrolmentRecordLocalDataSource : IdentityDataSource {
-
     suspend fun load(query: SubjectQuery): List<Subject>
 
     suspend fun delete(queries: List<SubjectQuery>)
+
     suspend fun deleteAll()
 
     suspend fun performActions(actions: List<SubjectAction>)

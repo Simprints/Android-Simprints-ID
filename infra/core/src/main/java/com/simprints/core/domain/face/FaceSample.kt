@@ -12,7 +12,6 @@ data class FaceSample(
     val format: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -24,26 +23,21 @@ data class FaceSample(
         return true
     }
 
-    override fun hashCode(): Int {
-        return template.contentHashCode()
-    }
+    override fun hashCode(): Int = template.contentHashCode()
 }
 
 // Generates a unique id for a list of samples.
 // It concats the templates (sorted by quality score) and creates a UUID from that. Or null if there
 // are not templates
-fun List<FaceSample>.uniqueId(): String? {
-    return if (this.isNotEmpty()) {
-        UUID.nameUUIDFromBytes(
-            concatTemplates()
+fun List<FaceSample>.uniqueId(): String? = if (this.isNotEmpty()) {
+    UUID
+        .nameUUIDFromBytes(
+            concatTemplates(),
         ).toString()
-    } else {
-        null
-    }
+} else {
+    null
 }
 
-fun List<FaceSample>.concatTemplates(): ByteArray {
-    return this.sortedBy { it.template.contentHashCode() }.fold(byteArrayOf()) { acc, sample ->
-        acc + sample.template
-    }
+fun List<FaceSample>.concatTemplates(): ByteArray = this.sortedBy { it.template.contentHashCode() }.fold(byteArrayOf()) { acc, sample ->
+    acc + sample.template
 }

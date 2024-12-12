@@ -20,7 +20,7 @@ internal class ProgressPainter(
     var max: Int,
     private val strokeWidth: Float,
     private val dashWidth: Float,
-    private val dashSpace: Float
+    private val dashSpace: Float,
 ) {
     private var progressCircle: RectF = RectF()
     private lateinit var progressPaint: Paint
@@ -52,7 +52,10 @@ internal class ProgressPainter(
         canvas?.drawArc(progressCircle, startAngle, plusAngle, false, progressPaint)
     }
 
-    fun onSizeChanged(height: Int, width: Int) {
+    fun onSizeChanged(
+        height: Int,
+        width: Int,
+    ) {
         this.height = height
         this.width = width
         changeInternalCircleSize()
@@ -64,7 +67,7 @@ internal class ProgressPainter(
             0f - padding,
             0f - padding,
             width.toFloat() + padding,
-            height.toFloat() + padding
+            height.toFloat() + padding,
         )
     }
 

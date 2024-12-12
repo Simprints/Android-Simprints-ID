@@ -17,9 +17,7 @@ import org.junit.Test
 import java.util.Date
 
 class EventSyncCacheTest {
-
     companion object {
-
         private const val WORK_ID = "workID"
     }
 
@@ -44,9 +42,12 @@ class EventSyncCacheTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_DOWN_COUNTS_SHARED_PREFS) } returns sharedPrefsForCount
-        every { securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_PROGRESSES_SHARED_PREFS) } returns sharedPrefsForProgresses
-        every { securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS) } returns sharedPrefsForLastSyncTime
+        every { securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_DOWN_COUNTS_SHARED_PREFS) } returns
+            sharedPrefsForCount
+        every { securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_PROGRESSES_SHARED_PREFS) } returns
+            sharedPrefsForProgresses
+        every { securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS) } returns
+            sharedPrefsForLastSyncTime
 
         eventSyncCache = EventSyncCache(securityManager, testCoroutineRule.testCoroutineDispatcher)
     }
@@ -56,7 +57,7 @@ class EventSyncCacheTest {
         every {
             sharedPrefsForLastSyncTime.getLong(
                 PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY,
-                -1
+                -1,
             )
         } returns 30
 
@@ -69,7 +70,7 @@ class EventSyncCacheTest {
         every {
             sharedPrefsForLastSyncTime.getLong(
                 PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY,
-                -1
+                -1,
             )
         } returns -1
 
@@ -159,5 +160,4 @@ class EventSyncCacheTest {
             progressEditor.clear()
         }
     }
-
 }

@@ -39,8 +39,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ScannerExtendedInfoReaderHelperTest {
-
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
     private val ioDispatcher = testCoroutineRule.testCoroutineDispatcher
@@ -59,7 +57,6 @@ class ScannerExtendedInfoReaderHelperTest {
         rootMessageChannel,
     )
 
-
     @Test
     fun shouldReturn_scannerInformation_withLegacyFirmwareInfo_whenCypressVersion_isOldApi() = runTest {
         val stmMajorFirmwareVersion: Short = 1
@@ -67,33 +64,43 @@ class ScannerExtendedInfoReaderHelperTest {
         val un20MajorFirmwareVersion: Short = 1
         val un20MinorFirmwareVersion: Short = 1
 
-
         val expectedCypressVersion = CypressFirmwareVersion(1, 0, 1, 0)
         expectedCypressVersionResponse = GetCypressVersionResponse(expectedCypressVersion)
 
         val expectedUnifiedVersion = UnifiedVersionInformation(
             masterFirmwareVersion = 1202022L,
             cypressFirmwareVersion = expectedCypressVersion,
-            stmFirmwareVersion = StmFirmwareVersion(1, 1,
-                stmMajorFirmwareVersion, stmMinorFirmwareVersion),
-            un20AppVersion = Un20AppVersion(1, 1,
-                un20MajorFirmwareVersion, un20MinorFirmwareVersion)
+            stmFirmwareVersion = StmFirmwareVersion(
+                1,
+                1,
+                stmMajorFirmwareVersion,
+                stmMinorFirmwareVersion,
+            ),
+            un20AppVersion = Un20AppVersion(
+                1,
+                1,
+                un20MajorFirmwareVersion,
+                un20MinorFirmwareVersion,
+            ),
         )
         expectedVersionResponse = GetVersionResponse(expectedUnifiedVersion)
 
         val expectedHardware = "E-1"
         val expectedFirmwareVersions = ExtendedVersionInformation(
             cypressFirmwareVersion = CypressExtendedFirmwareVersion(
-                "${expectedCypressVersion.firmwareMajorVersion}.$expectedHardware.${expectedCypressVersion.firmwareMinorVersion}"),
+                "${expectedCypressVersion.firmwareMajorVersion}.$expectedHardware.${expectedCypressVersion.firmwareMinorVersion}",
+            ),
             stmFirmwareVersion = StmExtendedFirmwareVersion(
-                "$stmMajorFirmwareVersion.$expectedHardware.$stmMinorFirmwareVersion"),
+                "$stmMajorFirmwareVersion.$expectedHardware.$stmMinorFirmwareVersion",
+            ),
             un20AppVersion = Un20ExtendedAppVersion(
-                "$un20MajorFirmwareVersion.$expectedHardware.$un20MinorFirmwareVersion")
+                "$un20MajorFirmwareVersion.$expectedHardware.$un20MinorFirmwareVersion",
+            ),
         )
         val scannerInformation = scannerInfoReader.readScannerInfo()
         assertThat(scannerInformation.hardwareVersion).isEqualTo("E-1")
         assertThat(scannerInformation.firmwareVersions).isEqualTo(
-            expectedFirmwareVersions
+            expectedFirmwareVersions,
         )
     }
 
@@ -104,13 +111,13 @@ class ScannerExtendedInfoReaderHelperTest {
 
         val expectedHardware = "F-1"
         expectedHardwareResponse = GetHardwareVersionResponse(
-            ExtendedHardwareVersion(expectedHardware)
+            ExtendedHardwareVersion(expectedHardware),
         )
 
         val expectedFirmwareVersions = ExtendedVersionInformation(
             cypressFirmwareVersion = CypressExtendedFirmwareVersion("1.$expectedHardware.3"),
             stmFirmwareVersion = StmExtendedFirmwareVersion("1.$expectedHardware.2"),
-            un20AppVersion = Un20ExtendedAppVersion("1.$expectedHardware.1")
+            un20AppVersion = Un20ExtendedAppVersion("1.$expectedHardware.1"),
         )
         expectedExtendedVersionResponse = GetExtendedVersionResponse(expectedFirmwareVersions)
 
@@ -126,38 +133,34 @@ class ScannerExtendedInfoReaderHelperTest {
 
         val expectedHardware = "F-1"
         expectedHardwareResponse = GetHardwareVersionResponse(
-            ExtendedHardwareVersion(expectedHardware)
+            ExtendedHardwareVersion(expectedHardware),
         )
 
         val firmwareVersions = ExtendedVersionInformation(
             cypressFirmwareVersion = CypressExtendedFirmwareVersion("1.$expectedHardware.3"),
             stmFirmwareVersion = StmExtendedFirmwareVersion(""),
-            un20AppVersion = Un20ExtendedAppVersion("")
+            un20AppVersion = Un20ExtendedAppVersion(""),
         )
         expectedExtendedVersionResponse = GetExtendedVersionResponse(firmwareVersions)
-
 
         val expectedUnifiedVersion = UnifiedVersionInformation(
             masterFirmwareVersion = 1202022L,
             cypressFirmwareVersion = expectedCypressVersion,
             stmFirmwareVersion = StmFirmwareVersion(1, 1, 1, 2),
-            un20AppVersion = Un20AppVersion(1, 1, 1, 1)
+            un20AppVersion = Un20AppVersion(1, 1, 1, 1),
         )
         expectedVersionResponse = GetVersionResponse(expectedUnifiedVersion)
-
 
         // merge extended version-info, with old-api's unified version-info
         // for missing version values.
         val expectedFirmwareVersions = firmwareVersions.copy(
             stmFirmwareVersion = StmExtendedFirmwareVersion(
-                expectedUnifiedVersion.stmFirmwareVersion.toNewVersionNamingScheme()
+                expectedUnifiedVersion.stmFirmwareVersion.toNewVersionNamingScheme(),
             ),
-
             un20AppVersion = Un20ExtendedAppVersion(
-                expectedUnifiedVersion.un20AppVersion.toNewVersionNamingScheme()
-            )
+                expectedUnifiedVersion.un20AppVersion.toNewVersionNamingScheme(),
+            ),
         )
-
 
         val scannerInformation = scannerInfoReader.readScannerInfo()
 
@@ -165,11 +168,10 @@ class ScannerExtendedInfoReaderHelperTest {
         assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
     }
 
-
     private fun getRootMessageChannel(): RootMessageChannel {
         val responseSubject = PublishSubject.create<RootResponse>()
 
-        val spyRootMessageInputStream = spyk(RootMessageInputStream(mockk(),mockk())).apply {
+        val spyRootMessageInputStream = spyk(RootMessageInputStream(mockk(), mockk())).apply {
             justRun { connect(any()) }
             justRun { disconnect() }
             every { rootResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
@@ -185,7 +187,7 @@ class ScannerExtendedInfoReaderHelperTest {
                             is GetCypressExtendedVersionCommand -> expectedCypressExtendedVersionResponse
                             is GetHardwareVersionCommand -> expectedHardwareResponse
                             else -> throw IllegalArgumentException()
-                        }
+                        },
                     )
                 }
             }

@@ -18,17 +18,15 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
-import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.local.EventRoomDatabase
-
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration10to11Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -42,8 +40,8 @@ class EventMigration10to11Test {
         createV10DatabaseWithEvents(
             listOf(
                 createCaptureSessionEvent(randomUUID(), ongoingSessionId),
-                createCaptureSessionEvent(randomUUID(), endedSessionId, true)
-            )
+                createCaptureSessionEvent(randomUUID(), endedSessionId, true),
+            ),
         )
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 11, true, EventMigration10to11())
@@ -64,20 +62,22 @@ class EventMigration10to11Test {
             listOf(
                 createCaptureSessionEvent(randomUUID(), randomUUID()),
                 createOtherEvent(randomUUID(), randomUUID()),
-                createTerminationEvent(randomUUID(), randomUUID())
-            )
+                createTerminationEvent(randomUUID(), randomUUID()),
+            ),
         )
         val db = helper.runMigrationsAndValidate(TEST_DB, 11, true, EventMigration10to11())
 
-        db.query(
-            "SELECT * FROM DbEvent WHERE type = ?",
-            arrayOf(OLD_CAPTURE_SESSION_EVENT_KEY)
-        ).use { assertThat(it.count).isEqualTo(0) }
+        db
+            .query(
+                "SELECT * FROM DbEvent WHERE type = ?",
+                arrayOf(OLD_CAPTURE_SESSION_EVENT_KEY),
+            ).use { assertThat(it.count).isEqualTo(0) }
 
-        db.query(
-            "SELECT * FROM DbEvent WHERE type = ?",
-            arrayOf(OLD_ARTIFICIAL_TERMINATION_EVENT_KEY)
-        ).use { assertThat(it.count).isEqualTo(0) }
+        db
+            .query(
+                "SELECT * FROM DbEvent WHERE type = ?",
+                arrayOf(OLD_ARTIFICIAL_TERMINATION_EVENT_KEY),
+            ).use { assertThat(it.count).isEqualTo(0) }
 
         db.query("SELECT * FROM DbEvent").use { assertThat(it.count).isEqualTo(1) }
 
@@ -94,52 +94,53 @@ class EventMigration10to11Test {
     private fun getSessionScopeCursor(
         db: SupportSQLiteDatabase,
         sessionId: String,
-    ) = db.query("SELECT * from DbSessionScope where id= ?", arrayOf(sessionId))
+    ) = db
+        .query("SELECT * from DbSessionScope where id= ?", arrayOf(sessionId))
         .apply { moveToNext() }
-
 
     private fun createCaptureSessionEvent(
         id: String,
         sessionId: String,
         ended: Boolean = false,
     ) = ContentValues().apply {
-        val event = """
-                {
+        val event =
+            """
+            {
+            "id":"$id",
+            "type":"$OLD_CAPTURE_SESSION_EVENT_KEY",
+            "labels":{
+                "projectId":"$PROJECT_ID",
+                "sessionId": "$sessionId",
+                "deviceId": "$DEVICE_ID"
+            },
+            "payload":{
+                "eventVersion":2,
                 "id":"$id",
+                "projectId":"$PROJECT_ID",
                 "type":"$OLD_CAPTURE_SESSION_EVENT_KEY",
-                "labels":{
-                    "projectId":"$PROJECT_ID",
-                    "sessionId": "$sessionId",
-                    "deviceId": "$DEVICE_ID"
+                "createdAt":$CREATED_AT,
+                "endedAt":${ENDED_AT.takeIf { ended } ?: 0},
+                "modalities":["FINGERPRINT","FACE"],
+                "appVersionName":"1.0.0",
+                "libVersionName":"1.0.0",
+                "language":"en",
+                "device":{
+                    "androidSdkVersion":"29",
+                    "deviceModel":"Pixel 3",
+                    "deviceId":"$DEVICE_ID"
                 },
-                "payload":{
-                    "eventVersion":2,
-                    "id":"$id",
-                    "projectId":"$PROJECT_ID",
-                    "type":"$OLD_CAPTURE_SESSION_EVENT_KEY",
-                    "createdAt":$CREATED_AT,
-                    "endedAt":${ENDED_AT.takeIf { ended } ?: 0},
-                    "modalities":["FINGERPRINT","FACE"],
-                    "appVersionName":"1.0.0",
-                    "libVersionName":"1.0.0",
-                    "language":"en",
-                    "device":{
-                        "androidSdkVersion":"29",
-                        "deviceModel":"Pixel 3",
-                        "deviceId":"$DEVICE_ID"
-                    },
-                    "databaseInfo":{
-                        "sessionCount":4,
-                        "recordCount":10
-                    },
-                    "location":{
-                        "latitude":42.0,
-                        "longitude":42.0
-                    },
-                    "sessionIsClosed":$ended
-                }
-                }
-                """.trimIndent()
+                "databaseInfo":{
+                    "sessionCount":4,
+                    "recordCount":10
+                },
+                "location":{
+                    "latitude":42.0,
+                    "longitude":42.0
+                },
+                "sessionIsClosed":$ended
+            }
+            }
+            """.trimIndent()
 
         this.put("id", id)
         this.put("type", OLD_CAPTURE_SESSION_EVENT_KEY)
@@ -153,24 +154,25 @@ class EventMigration10to11Test {
         id: String,
         sessionId: String,
     ) = ContentValues().apply {
-        val event = """
-                {
-                "id":"$id",
+        val event =
+            """
+            {
+            "id":"$id",
+            "type":"$OLD_ARTIFICIAL_TERMINATION_EVENT_KEY",
+            "labels":{
+                "projectId":"$PROJECT_ID",
+                "sessionId": "$sessionId",
+                "deviceId": "$DEVICE_ID"
+            },
+            "payload":{
                 "type":"$OLD_ARTIFICIAL_TERMINATION_EVENT_KEY",
-                "labels":{
-                    "projectId":"$PROJECT_ID",
-                    "sessionId": "$sessionId",
-                    "deviceId": "$DEVICE_ID"
-                },
-                "payload":{
-                    "type":"$OLD_ARTIFICIAL_TERMINATION_EVENT_KEY",
-                    "eventVersion":2,
-                    "createdAt":$CREATED_AT,
-                    "endedAt":$ENDED_AT,
-                    "reason":"NEW_SESSION"
-                }
-                }
-                """.trimIndent()
+                "eventVersion":2,
+                "createdAt":$CREATED_AT,
+                "endedAt":$ENDED_AT,
+                "reason":"NEW_SESSION"
+            }
+            }
+            """.trimIndent()
 
         this.put("id", id)
         this.put("type", OLD_ARTIFICIAL_TERMINATION_EVENT_KEY)
@@ -184,25 +186,26 @@ class EventMigration10to11Test {
         id: String,
         sessionId: String,
     ) = ContentValues().apply {
-        val event = """
-                {
-                "id":"$id",
+        val event =
+            """
+            {
+            "id":"$id",
+            "type":"${EventType.REFUSAL_KEY}",
+            "labels":{
+                "projectId":"$PROJECT_ID",
+                "sessionId": "$sessionId",
+                "deviceId": "$DEVICE_ID"
+            },
+            "payload":{
                 "type":"${EventType.REFUSAL_KEY}",
-                "labels":{
-                    "projectId":"$PROJECT_ID",
-                    "sessionId": "$sessionId",
-                    "deviceId": "$DEVICE_ID"
-                },
-                "payload":{
-                    "type":"${EventType.REFUSAL_KEY}",
-                    "eventVersion":2,
-                    "createdAt":$CREATED_AT,
-                    "endedAt":$ENDED_AT,
-                    "reason":"REFUSED_RELIGION",
-                    "otherText":"AAA"
-                }
-                }
-                """.trimIndent()
+                "eventVersion":2,
+                "createdAt":$CREATED_AT,
+                "endedAt":$ENDED_AT,
+                "reason":"REFUSED_RELIGION",
+                "otherText":"AAA"
+            }
+            }
+            """.trimIndent()
 
         this.put("id", id)
         this.put("type", EventType.REFUSAL_KEY)
@@ -219,7 +222,7 @@ class EventMigration10to11Test {
     ) {
         val scopePayload = JsonHelper.fromJson(
             scopeCursor.getStringWithColumnName("payloadJson").orEmpty(),
-            object : TypeReference<EventScopePayload>() {}
+            object : TypeReference<EventScopePayload>() {},
         )
 
         assertThat(scopeCursor.getStringWithColumnName("id")).isEqualTo(sessionId)
@@ -231,8 +234,8 @@ class EventMigration10to11Test {
         assertThat(scopePayload.modalities).isEqualTo(
             listOf(
                 GeneralConfiguration.Modality.FINGERPRINT,
-                GeneralConfiguration.Modality.FACE
-            )
+                GeneralConfiguration.Modality.FACE,
+            ),
         )
         assertThat(scopePayload.device).isEqualTo(Device("29", "Pixel 3", DEVICE_ID))
         assertThat(scopePayload.databaseInfo).isEqualTo(DatabaseInfo(4, 10))
@@ -248,7 +251,6 @@ class EventMigration10to11Test {
     }
 
     companion object {
-
         private const val TEST_DB = "some_db"
 
         private const val OLD_CAPTURE_SESSION_EVENT_KEY = "SESSION_CAPTURE"

@@ -8,7 +8,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class PacketParserTest {
-
     @Test
     fun parsePacket_buildsPacketCorrectlyFromProtocol() {
         val packetParser = PacketParser()
@@ -20,7 +19,7 @@ class PacketParserTest {
             payload = "F0 F1 F2 F3".hexToByteArray(),
             source = 0x10,
             destination = 0xA0.toByte(),
-            payloadLength = 8
+            payloadLength = 8,
         )
         val actualPacket = packetParser.parse(rawBytes)
 

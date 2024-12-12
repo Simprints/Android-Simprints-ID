@@ -7,7 +7,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class JwtTokenHelperTest {
-
     companion object {
         const val VALID_JWT_RESULT =
             "eyJhbGciOiJSUzI1NiIsImtpZCI6ImY1NWU0ZDkxOGE0ODY0YWQxMzUxMDViYmRjMDEwYWY5Njc5YzM0MTMiLCJ0eXAiOiJKV1QifQ.eyJiYXNpY0ludGVncml0eSI6dHJ1ZSwiY3RzUHJvZmlsZU1hdGNoIjp0cnVlLCJkZXZpY2VJZCI6IiIsInByb2plY3RJZCI6IjdReDZzMnc3THFKMHp1RjhQcVdYIiwidXNlcklkIjoi4Yqg4YiN4Yib4YudIOGKoOGLreGLm0QiLCJ2YWxpZEFwa0NlcnRpZmljYXRlRGlnZXN0Ijp0cnVlLCJ2YWxpZE5vbmNlIjp0cnVlLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vc2ltcHJpbnRzLWRldiIsImF1ZCI6InNpbXByaW50cy1kZXYiLCJhdXRoX3RpbWUiOjE2NzM5NDI5MzYsInVzZXJfaWQiOiI3UXg2czJ3N0xxSjB6dUY4UHFXWC7hiqDhiI3hiJvhi50g4Yqg4Yut4YubRCIsInN1YiI6IjdReDZzMnc3THFKMHp1RjhQcVdYLuGKoOGIjeGIm-GLnSDhiqDhi63hi5tEIiwiaWF0IjoxNjczOTQyOTM2LCJleHAiOjE2NzM5NDY1MzYsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnt9LCJzaWduX2luX3Byb3ZpZGVyIjoiY3VzdG9tIn19.bnBBLM4HjfSOJHVPCPiN9XdfHTlNK9YrC63BuVi-epkcbqY_aHb14Fo5ptiW41dARXwSWhsrFHpQfFO7fk2qzPwT-g9Nc4-Gh5Pm7d_bOXD8b1pLGjsr2AviTD3H8v4__lhD2TJfGYU_IFyqEKln44JJHfxYgWmgTUoV7tXMFEMPcNoWUAYvy131y5VageR5kxJYwvUB9ec9DucEh-yJR7GFmuH8XPATooLLFlBGmf3T-OO1IC7y5UDh9LI3RMqovtLwSAEBtBFymCYQV7ITQqFkPiH7-ov8fPvuNb5RqxHqIiVH_d6JSVXftJED6nf4G2vRgRt5b28yHvD9fb-GBg"
@@ -19,7 +18,13 @@ class JwtTokenHelperTest {
     fun `should extract the claims correctly with a valid jwt`() {
         val payload = JwtTokenHelper.extractTokenPayloadAsJson(VALID_JWT_RESULT)
         assertThat(payload).isNotNull()
-        assertThat(payload!!.keys().asSequence().toList().size).isGreaterThan(0)
+        assertThat(
+            payload!!
+                .keys()
+                .asSequence()
+                .toList()
+                .size,
+        ).isGreaterThan(0)
     }
 
     @Test

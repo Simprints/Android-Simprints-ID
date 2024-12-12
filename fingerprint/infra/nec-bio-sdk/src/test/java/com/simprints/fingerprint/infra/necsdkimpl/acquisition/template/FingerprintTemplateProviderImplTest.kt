@@ -20,7 +20,6 @@ import org.junit.Before
 import org.junit.Test
 
 class FingerprintTemplateProviderImplTest {
-
     private lateinit var fingerprintTemplateProviderImpl: FingerprintTemplateProviderImpl
 
     @RelaxedMockK
@@ -51,14 +50,16 @@ class FingerprintTemplateProviderImplTest {
         coEvery {
             captureWrapper.acquireUnprocessedImage(any())
         } returns AcquireUnprocessedImageResponse(
-            rawUnprocessedImage = createDummyRawUnprocessedImage()
+            rawUnprocessedImage = createDummyRawUnprocessedImage(),
         )
         coEvery {
             extractNecTemplateUseCase.invoke(any(), any())
         } returns TemplateResponse(
-            byteArrayOf(1, 2, 3), FingerprintTemplateMetadata(
-                templateFormat = NEC_TEMPLATE_FORMAT, imageQualityScore = 10
-            )
+            byteArrayOf(1, 2, 3),
+            FingerprintTemplateMetadata(
+                templateFormat = NEC_TEMPLATE_FORMAT,
+                imageQualityScore = 10,
+            ),
         )
         fingerprintTemplateProviderImpl = FingerprintTemplateProviderImpl(
             fingerprintCaptureWrapperFactory = fingerprintCaptureWrapperFactory,
@@ -66,9 +67,8 @@ class FingerprintTemplateProviderImplTest {
             captureProcessedImageCache = processedImageCache,
             extractNecTemplateUseCase = extractNecTemplateUseCase,
             processImage = processRawImage,
-            scannerInfo = scannerInfo
+            scannerInfo = scannerInfo,
         )
-
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -78,7 +78,6 @@ class FingerprintTemplateProviderImplTest {
         // When
         fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
         // Then exception is thrown
-
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -89,7 +88,7 @@ class FingerprintTemplateProviderImplTest {
             processingResolution = Dpi(500),
             qualityThreshold = 0,
             timeOutMs = 0,
-            allowLowQualityExtraction = false
+            allowLowQualityExtraction = false,
         )
         // When
         fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
@@ -105,30 +104,29 @@ class FingerprintTemplateProviderImplTest {
     }
 
     @Test
-    fun `test acquireFingerprintTemplate fails if quality score is less than threshold and allowLowQualityExtraction is false`() =
-        runTest {
-            // Given
-            coEvery { calculateNecImageQualityUseCase.invoke(any()) } returns 10
-            val settings = FingerprintTemplateAcquisitionSettings(
-                processingResolution = Dpi(500),
-                qualityThreshold = 20,
-                timeOutMs = 0,
-                allowLowQualityExtraction = false
-            )
-            // When
-            val result = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
-            // Then
-            coVerify {
-                captureWrapper.acquireUnprocessedImage(any())
-                processedImageCache.recentlyCapturedImage = any()
-                processRawImage(any(), any(), any(), any())
-                calculateNecImageQualityUseCase.invoke(any())
-            }
-            coVerify(exactly = 0) {
-                extractNecTemplateUseCase.invoke(any(), any())
-            }
-            Truth.assertThat(result.template).isEmpty()
+    fun `test acquireFingerprintTemplate fails if quality score is less than threshold and allowLowQualityExtraction is false`() = runTest {
+        // Given
+        coEvery { calculateNecImageQualityUseCase.invoke(any()) } returns 10
+        val settings = FingerprintTemplateAcquisitionSettings(
+            processingResolution = Dpi(500),
+            qualityThreshold = 20,
+            timeOutMs = 0,
+            allowLowQualityExtraction = false,
+        )
+        // When
+        val result = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
+        // Then
+        coVerify {
+            captureWrapper.acquireUnprocessedImage(any())
+            processedImageCache.recentlyCapturedImage = any()
+            processRawImage(any(), any(), any(), any())
+            calculateNecImageQualityUseCase.invoke(any())
         }
+        coVerify(exactly = 0) {
+            extractNecTemplateUseCase.invoke(any(), any())
+        }
+        Truth.assertThat(result.template).isEmpty()
+    }
 
     @Test
     fun `test acquireFingerprintTemplate extracts template if quality score is less than threshold and allowLowQualityExtraction is true`() =
@@ -139,7 +137,7 @@ class FingerprintTemplateProviderImplTest {
                 processingResolution = Dpi(500),
                 qualityThreshold = 20,
                 timeOutMs = 0,
-                allowLowQualityExtraction = true
+                allowLowQualityExtraction = true,
             )
             // When
             val result = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)

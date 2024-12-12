@@ -13,7 +13,6 @@ import org.junit.Test
 
 @Keep
 class EnrolmentCalloutEventTest {
-
     @Test
     fun create_EnrolmentCalloutEvent() {
         val event = EnrolmentCalloutEvent(

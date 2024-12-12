@@ -8,7 +8,6 @@ import org.junit.Test
 import kotlin.coroutines.CoroutineContext
 
 class AppCoroutineExceptionHandlerTest {
-
     @Test
     fun `calling handleException logs it to Simber`() {
         val appCoroutineExceptionHandler = AppCoroutineExceptionHandler()

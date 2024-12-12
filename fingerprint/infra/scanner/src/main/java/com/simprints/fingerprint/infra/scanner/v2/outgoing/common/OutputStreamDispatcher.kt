@@ -12,7 +12,6 @@ import javax.inject.Inject
  * [outputStream]
  */
 class OutputStreamDispatcher @Inject constructor() : OutgoingConnectable {
-
     private var outputStream: OutputStream? = null
 
     override fun connect(outputStream: OutputStream) {

@@ -7,17 +7,14 @@ import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcher.Compan
 import javax.inject.Inject
 
 internal class FingerprintMatcherImpl @Inject constructor(
-    private val simAfisMatcher: SimAfisMatcher
+    private val simAfisMatcher: SimAfisMatcher,
 ) : FingerprintMatcher<SimAfisMatcherSettings> {
-
     override val supportedTemplateFormat = SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT
     override val matcherName: String = "SIM_AFIS"
 
     override suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
-        settings: SimAfisMatcherSettings?
-    ): List<MatchResult> = simAfisMatcher.match(probe, candidates, settings?.crossFingerComparison?:false)
+        settings: SimAfisMatcherSettings?,
+    ): List<MatchResult> = simAfisMatcher.match(probe, candidates, settings?.crossFingerComparison ?: false)
 }
-
-

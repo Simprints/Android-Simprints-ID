@@ -5,8 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.allowedAgeRanges
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -15,11 +13,9 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 class BuildAgeGroupsDescriptionUseCaseTest {
-
     private lateinit var buildAgeGroups: BuildAgeGroupsUseCase
 
     @MockK
@@ -35,7 +31,9 @@ class BuildAgeGroupsDescriptionUseCaseTest {
     @Test
     fun testAgeGroupDescriptions() = runTest {
         coEvery { configurationRepo.getProjectConfiguration().allowedAgeRanges() } returns listOf(
-            AgeGroup(6, 60), AgeGroup(120, null), AgeGroup(60, 120)
+            AgeGroup(6, 60),
+            AgeGroup(120, null),
+            AgeGroup(60, 120),
         )
         val result = buildAgeGroups()
         val expected = listOf(AgeGroup(0, 6), AgeGroup(6, 60), AgeGroup(60, 120), AgeGroup(120, null))
@@ -45,7 +43,9 @@ class BuildAgeGroupsDescriptionUseCaseTest {
     @Test
     fun testAgeGroupsOverlapping() = runTest {
         coEvery { configurationRepo.getProjectConfiguration().allowedAgeRanges() } returns listOf(
-            AgeGroup(6, 60), AgeGroup(36, null), AgeGroup(60, null)
+            AgeGroup(6, 60),
+            AgeGroup(36, null),
+            AgeGroup(60, null),
         )
         val result = buildAgeGroups()
         val expected = listOf(AgeGroup(0, 6), AgeGroup(6, 36), AgeGroup(36, 60), AgeGroup(60, null))
@@ -55,7 +55,7 @@ class BuildAgeGroupsDescriptionUseCaseTest {
     @Test
     fun testAgeGroupWithInitialAndFinalMissing() = runTest {
         coEvery { configurationRepo.getProjectConfiguration().allowedAgeRanges() } returns listOf(
-            AgeGroup(6, 60)
+            AgeGroup(6, 60),
         )
         val result = buildAgeGroups()
         val expected = listOf(AgeGroup(0, 6), AgeGroup(6, 60), AgeGroup(60, null))

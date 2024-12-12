@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.cache
 
 import android.content.SharedPreferences
 import com.fasterxml.jackson.core.type.TypeReference
+import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.infra.config.store.models.AgeGroup
@@ -13,10 +14,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import com.google.common.truth.Truth.assertThat
 
 class OrchestratorCacheTest {
-
     @MockK
     private lateinit var securityManager: SecurityManager
 
@@ -51,7 +50,7 @@ class OrchestratorCacheTest {
         val stepsResultJson = steps.joinToString(separator = ",") { json }
         verify {
             jsonHelper.toJson(any(), any())
-            prefs.edit().putString(any(), eq("[${stepsResultJson}]"))
+            prefs.edit().putString(any(), eq("[$stepsResultJson]"))
         }
     }
 

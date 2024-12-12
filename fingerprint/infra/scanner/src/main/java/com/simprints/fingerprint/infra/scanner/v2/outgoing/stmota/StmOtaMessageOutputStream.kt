@@ -7,5 +7,5 @@ import javax.inject.Inject
 
 class StmOtaMessageOutputStream @Inject constructor(
     stmOtaMessageSerializer: StmOtaMessageSerializer,
-    outputStreamDispatcher: OutputStreamDispatcher
+    outputStreamDispatcher: OutputStreamDispatcher,
 ) : MessageOutputStream<StmOtaCommand>(stmOtaMessageSerializer, outputStreamDispatcher)

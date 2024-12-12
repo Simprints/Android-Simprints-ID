@@ -10,7 +10,6 @@ import org.junit.Test
 import java.util.UUID
 
 internal class VerifyValidatorTest : ActionRequestValidatorTest(VerifyActionFactory) {
-
     private val mockExtractor = VerifyActionFactory.getMockExtractor()
 
     @Test
@@ -61,5 +60,4 @@ internal class VerifyValidatorTest : ActionRequestValidatorTest(VerifyActionFact
             Assert.fail()
         }
     }
-
 }

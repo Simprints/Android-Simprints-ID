@@ -14,13 +14,11 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
 ) : ImageRemoteDataSource {
-
     override suspend fun uploadImage(
         imageStream: FileInputStream,
         imageRef: SecuredImageRef,
         metadata: Map<String, String>,
     ): UploadResult {
-
         val firebaseProjectName = authStore.getLegacyAppFallback().options.projectId
 
         return if (firebaseProjectName != null) {
@@ -33,10 +31,11 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
 
             val bucketUrl = configManager.getProject(projectId).imageBucket
 
-            val rootRef = FirebaseStorage.getInstance(
-                authStore.getLegacyAppFallback(),
-                bucketUrl
-            ).reference
+            val rootRef = FirebaseStorage
+                .getInstance(
+                    authStore.getLegacyAppFallback(),
+                    bucketUrl,
+                ).reference
 
             var fileRef = rootRef
             imageRef.relativePath.parts.forEach { pathPart ->
@@ -48,7 +47,8 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
             val uploadTask = if (metadata.isEmpty()) {
                 fileRef.putStream(imageStream).await()
             } else {
-                val storeMetadata = StorageMetadata.Builder()
+                val storeMetadata = StorageMetadata
+                    .Builder()
                     .also { metadata.forEach { (key, value) -> it.setCustomMetadata(key, value) } }
                     .build()
                 fileRef.putStream(imageStream, storeMetadata).await()
@@ -66,5 +66,4 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
             UploadResult(imageRef, UploadResult.Status.FAILED)
         }
     }
-
 }

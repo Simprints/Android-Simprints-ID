@@ -14,12 +14,11 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ActivityExtTest {
-
     @Test
     fun `when grant result is true, then should map to Permission_Granted`() {
         val permission = runPermissionMappingTest(
             grantResult = true,
-            shouldShowRationale = true
+            shouldShowRationale = true,
         )
         Truth.assertThat(permission).isEqualTo(PermissionStatus.Granted)
     }
@@ -28,7 +27,7 @@ class ActivityExtTest {
     fun `given grant result is false, when shouldShowRationale is true, then should map to Permission_Denied`() {
         val permission = runPermissionMappingTest(
             grantResult = false,
-            shouldShowRationale = true
+            shouldShowRationale = true,
         )
         Truth.assertThat(permission).isEqualTo(PermissionStatus.Denied)
     }
@@ -37,14 +36,14 @@ class ActivityExtTest {
     fun `given grant result is false, when shouldShowRationale is false, then should map to Permission_DeniedNeverAskAgain`() {
         val permission = runPermissionMappingTest(
             grantResult = false,
-            shouldShowRationale = false
+            shouldShowRationale = false,
         )
         Truth.assertThat(permission).isEqualTo(PermissionStatus.DeniedNeverAskAgain)
     }
 
     private fun runPermissionMappingTest(
         grantResult: Boolean,
-        shouldShowRationale: Boolean
+        shouldShowRationale: Boolean,
     ): PermissionStatus {
         val activity = mockk<Activity>()
         val permission = "permission"
@@ -54,7 +53,7 @@ class ActivityExtTest {
 
         return activity.permissionFromResult(
             permission = permission,
-            grantResult = grantResult
+            grantResult = grantResult,
         )
     }
 }

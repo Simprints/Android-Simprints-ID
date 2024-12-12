@@ -11,14 +11,15 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.core.tools.extentions.dpToPx
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.face.capture.R
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import kotlin.math.max
 import kotlin.math.min
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class CameraTargetOverlay(
-    context: Context, attrs: AttributeSet
+    context: Context,
+    attrs: AttributeSet,
 ) : AppCompatImageView(context, attrs) {
     companion object {
         private val SEMI_TRANSPARENT_OVERLAY = Color.argb(102, 0, 0, 0)
@@ -75,14 +76,21 @@ internal class CameraTargetOverlay(
         drawOval(circleRect, circleBorderPaint)
     }
 
-
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int,
+    ) {
         super.onSizeChanged(w, h, oldw, oldh)
         // Calculate the circle rect only when the view's size changes
         calculateCircleRect(w.toFloat(), h.toFloat())
     }
 
-    private fun calculateCircleRect(width: Float, height: Float) {
+    private fun calculateCircleRect(
+        width: Float,
+        height: Float,
+    ) {
         // Calculate the margin as 10% of the max dimension
         val guidelineMarginPercent =
             ResourcesCompat.getFloat(context.resources, R.dimen.guideline_margin_percent)
@@ -100,6 +108,4 @@ internal class CameraTargetOverlay(
         // Set the dimensions of the circle rect
         circleRect.set(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
     }
-
-
 }

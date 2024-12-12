@@ -7,15 +7,16 @@ import java.io.File
 import javax.inject.Inject
 
 class MasterKeyHelper @Inject constructor() {
-
     private fun getMasterKeyAlias() = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
-    fun getEncryptedFileBuilder(file: File, context: Context): EncryptedFile =
-        EncryptedFile.Builder(
+    fun getEncryptedFileBuilder(
+        file: File,
+        context: Context,
+    ): EncryptedFile = EncryptedFile
+        .Builder(
             file,
             context,
             getMasterKeyAlias(),
-            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
         ).build()
-
 }

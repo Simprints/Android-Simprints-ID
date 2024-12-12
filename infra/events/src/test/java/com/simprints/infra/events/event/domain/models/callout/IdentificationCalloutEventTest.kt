@@ -13,7 +13,6 @@ import org.junit.Test
 
 @Keep
 class IdentificationCalloutEventTest {
-
     @Test
     fun create_IdentificationCalloutEvent() {
         val event = IdentificationCalloutEvent(
@@ -37,4 +36,3 @@ class IdentificationCalloutEventTest {
         }
     }
 }
-

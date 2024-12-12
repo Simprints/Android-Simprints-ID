@@ -6,8 +6,6 @@ import com.simprints.infra.license.models.LicenseVersion
 import org.junit.Test
 
 class LicenseUtilsTest {
-
-
     @Test
     fun testDetermineLicenseStatus() {
         val nullLicense: License? = null
@@ -30,8 +28,7 @@ class LicenseUtilsTest {
 
         val validLicenseWithBadExpirationDate = License(expiration = "bad date", data = "data", version = LicenseVersion.UNLIMITED)
         assertThat(validLicenseWithBadExpirationDate.determineLicenseStatus()).isEqualTo(
-            LicenseStatus.VALID
+            LicenseStatus.VALID,
         )
-
     }
 }

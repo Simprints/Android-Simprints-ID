@@ -19,16 +19,24 @@ sealed class TokenizableString : Parcelable {
     abstract val value: String
 
     @Parcelize
-    data class Tokenized(override val value: String) : TokenizableString() {
+    data class Tokenized(
+        override val value: String,
+    ) : TokenizableString() {
         override fun hashCode() = super.hashCode()
+
         override fun equals(other: Any?) = super.equals(other)
+
         override fun toString() = super.toString()
     }
 
     @Parcelize
-    data class Raw(override val value: String) : TokenizableString() {
+    data class Raw(
+        override val value: String,
+    ) : TokenizableString() {
         override fun hashCode() = super.hashCode()
+
         override fun equals(other: Any?) = super.equals(other)
+
         override fun toString() = super.toString()
     }
 
@@ -44,8 +52,10 @@ sealed class TokenizableString : Parcelable {
 }
 
 fun String.asTokenizableRaw() = Raw(this)
+
 fun String.asTokenizableEncrypted() = Tokenized(this)
-fun String.asTokenizable(isTokenized: Boolean) = if(isTokenized) Tokenized(this) else Raw(this)
+
+fun String.asTokenizable(isTokenized: Boolean) = if (isTokenized) Tokenized(this) else Raw(this)
 
 fun TokenizableString.isTokenized() = when (this) {
     is Tokenized -> true
@@ -58,4 +68,3 @@ fun <T> TokenizableString.takeIfTokenized(value: T): T? = when (this) {
     is Raw -> null
     is Tokenized -> value
 }
-

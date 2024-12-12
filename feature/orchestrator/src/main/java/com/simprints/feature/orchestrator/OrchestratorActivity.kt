@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class OrchestratorActivity : BaseActivity() {
-
     private val binding by viewBinding(ActivityOrchestratorBinding::inflate)
 
     @Inject
@@ -28,6 +27,7 @@ internal class OrchestratorActivity : BaseActivity() {
      * during the existence of this activity, and the flag tracks graph's state.
      */
     private var isGraphInitialized = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Simber.i("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized")
@@ -39,7 +39,7 @@ internal class OrchestratorActivity : BaseActivity() {
 
         binding.orchestrationHost.handleResult<AppResult>(
             this,
-            R.id.orchestratorRootFragment
+            R.id.orchestratorRootFragment,
         ) { result ->
             Simber.i("OrchestratorActivity on result ${result.resultCode}")
 
@@ -65,7 +65,7 @@ internal class OrchestratorActivity : BaseActivity() {
 
                 findNavController(R.id.orchestrationHost).setGraph(
                     R.navigation.graph_orchestration,
-                    OrchestratorFragmentArgs(action, extras).toBundle()
+                    OrchestratorFragmentArgs(action, extras).toBundle(),
                 )
                 isGraphInitialized = true
             }
@@ -75,7 +75,10 @@ internal class OrchestratorActivity : BaseActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+    override fun onSaveInstanceState(
+        outState: Bundle,
+        outPersistentState: PersistableBundle,
+    ) {
         outState.putBoolean(KEY_IS_GRAPH_INITIALIZED, isGraphInitialized)
         super.onSaveInstanceState(outState, outPersistentState)
     }

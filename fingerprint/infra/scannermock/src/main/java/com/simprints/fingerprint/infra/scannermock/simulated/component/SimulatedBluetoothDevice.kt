@@ -5,10 +5,10 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import com.simprints.fingerprint.infra.scannermock.simulated.SimulatedScannerManager
 import java.util.UUID
 
-
-class SimulatedBluetoothDevice(private val simulatedScannerManager: SimulatedScannerManager,
-                               macAddress: String) : ComponentBluetoothDevice {
-
+class SimulatedBluetoothDevice(
+    private val simulatedScannerManager: SimulatedScannerManager,
+    macAddress: String,
+) : ComponentBluetoothDevice {
     override var name: String? = simulatedScannerManager.deviceName
 
     override fun isBonded(): Boolean = simulatedScannerManager.isDeviceBonded
@@ -18,8 +18,7 @@ class SimulatedBluetoothDevice(private val simulatedScannerManager: SimulatedSca
         return true
     }
 
-    override fun createRfcommSocketToServiceRecord(uuid: UUID): ComponentBluetoothSocket =
-        SimulatedBluetoothSocket(simulatedScannerManager)
+    override fun createRfcommSocketToServiceRecord(uuid: UUID): ComponentBluetoothSocket = SimulatedBluetoothSocket(simulatedScannerManager)
 
     override val address: String = macAddress
 }

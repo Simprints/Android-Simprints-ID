@@ -8,7 +8,8 @@ import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 
 internal fun RecentUserActivity.toProto(): ProtoRecentUserActivity {
     val isTokenized = lastUserUsed.isTokenized()
-    return ProtoRecentUserActivity.newBuilder()
+    return ProtoRecentUserActivity
+        .newBuilder()
         .setLastScannerVersion(lastScannerVersion)
         .setLastScannerUsed(lastScannerUsed)
         .setLastUserUsed(lastUserUsed.value)

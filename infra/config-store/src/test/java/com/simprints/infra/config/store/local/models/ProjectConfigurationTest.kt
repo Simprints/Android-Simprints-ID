@@ -7,7 +7,6 @@ import org.junit.Test
 import java.io.InputStream
 
 class ProjectConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoProjectConfiguration.toDomain()).isEqualTo(projectConfiguration)
@@ -17,16 +16,20 @@ class ProjectConfigurationTest {
     @Test
     fun `should ignore broken custom config model`() {
         assertThat(
-            protoProjectConfiguration.toBuilder().setCustomJson("{").build().toDomain()
+            protoProjectConfiguration
+                .toBuilder()
+                .setCustomJson("{")
+                .build()
+                .toDomain(),
         ).isEqualTo(
-            projectConfiguration.copy(custom = null)
+            projectConfiguration.copy(custom = null),
         )
 
         assertThat(
             // custom map contains class that Jackson cannot convert to string
-            projectConfiguration.copy(custom = mapOf("test" to InputStream.nullInputStream())).toProto()
+            projectConfiguration.copy(custom = mapOf("test" to InputStream.nullInputStream())).toProto(),
         ).isEqualTo(
-            protoProjectConfiguration.toBuilder().clearCustomJson().build()
+            protoProjectConfiguration.toBuilder().clearCustomJson().build(),
         )
     }
 }

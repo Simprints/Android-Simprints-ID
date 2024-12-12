@@ -2,5 +2,5 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.mode
 
 class ImageData(
     val image: ByteArray,
-    val crcValue: Int
+    val crcValue: Int,
 )

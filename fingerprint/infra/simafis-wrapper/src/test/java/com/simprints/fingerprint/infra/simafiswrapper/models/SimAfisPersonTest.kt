@@ -11,7 +11,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SimAfisPersonTest {
-
     @Test
     fun testConstructorWithFingerprints() {
         val guid = "1234567890"
@@ -32,14 +31,13 @@ class SimAfisPersonTest {
         val guid = "1234567890"
         val sameFingerprint = SimAfisFingerprint(
             SimAfisFingerIdentifier.LEFT_INDEX_FINGER,
-            validTemplateWithLowQuality
+            validTemplateWithLowQuality,
         )
         val betterFingerprint =
             SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
         val fingerprints = listOf(sameFingerprint, betterFingerprint)
         val person = SimAfisPerson(guid, fingerprints)
         assertTrue(person.fingerprints[SimAfisFingerIdentifier.LEFT_INDEX_FINGER] == betterFingerprint)
-
     }
 
     @Test
@@ -47,11 +45,11 @@ class SimAfisPersonTest {
         val guid = "1234567890"
         val fingerprints1 = listOf(
             SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
-            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate),
         )
         val fingerprints2 = listOf(
             SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
-            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate),
         )
         val person1 = SimAfisPerson(guid, fingerprints1)
         val person2 = SimAfisPerson(guid, fingerprints2)
@@ -59,13 +57,12 @@ class SimAfisPersonTest {
         assertTrue(person1 == person2)
     }
 
-
     @Test
     fun testToString() {
         val guid = "1234567890"
         val fingerprints = listOf(
             SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
-            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate),
         )
         val person = SimAfisPerson(guid, fingerprints)
 
@@ -80,7 +77,7 @@ class SimAfisPersonTest {
         val guid = "1234567890"
         val fingerprints = listOf(
             SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
-            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate),
         )
         val person = SimAfisPerson(guid, fingerprints)
 
@@ -97,7 +94,7 @@ class SimAfisPersonTest {
         val guid = "1234567890"
         val fingerprints = listOf(
             SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
-            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate),
         )
         val person = SimAfisPerson(guid, fingerprints)
         val person2 = SimAfisPerson(guid, fingerprints)
@@ -106,11 +103,11 @@ class SimAfisPersonTest {
     }
 
     @Test
-    fun testGetFingerprints(){
+    fun testGetFingerprints() {
         val guid = "1234567890"
         val fingerprints = listOf(
             SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
-            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate),
         )
         val person = SimAfisPerson(guid, fingerprints)
 

@@ -11,8 +11,10 @@ import org.junit.runners.model.Statement
 class TestCoroutineRule : TestRule {
     val testCoroutineDispatcher = UnconfinedTestDispatcher()
 
-    override fun apply(base: Statement, description: Description) = object : Statement() {
-
+    override fun apply(
+        base: Statement,
+        description: Description,
+    ) = object : Statement() {
         override fun evaluate() {
             Dispatchers.setMain(testCoroutineDispatcher)
 

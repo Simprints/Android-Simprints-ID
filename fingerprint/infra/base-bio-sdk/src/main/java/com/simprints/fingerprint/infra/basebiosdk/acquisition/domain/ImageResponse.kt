@@ -5,6 +5,7 @@ import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerp
 @Suppress("unused") // ImageMetadata maybe used in other SDKs
 class ImageResponse<T>(
     val imageBytes: ByteArray,
-    val imageMetadata: T? = null
+    val imageMetadata: T? = null,
 )
+
 fun ImageResponse<Unit>.toDomain() = AcquireFingerprintImageResponse(this.imageBytes)

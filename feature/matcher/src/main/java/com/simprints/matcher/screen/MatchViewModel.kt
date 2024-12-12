@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
 
-
 @HiltViewModel
 internal class MatchViewModel @Inject constructor(
     private val faceMatcher: FaceMatcherUseCase,
@@ -29,7 +28,6 @@ internal class MatchViewModel @Inject constructor(
     private val saveMatchEvent: SaveMatchEventUseCase,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
-
     var isInitialized = false
         private set
 
@@ -69,28 +67,31 @@ internal class MatchViewModel @Inject constructor(
             params,
             matcherResult.totalCandidates,
             matcherResult.matcherName,
-            matcherResult.matchResultItems
+            matcherResult.matchResultItems,
         )
 
         setMatchState(matcherResult.totalCandidates, matcherResult.matchResultItems)
 
         // wait a bit for the user to see the results
-        delay(matchingEndWaitTimeInMillis)
+        delay(MATCHING_END_WAIT_TIME_MS)
 
         _matchResponse.send(
             when {
                 isFaceMatch -> FaceMatchResult(matcherResult.matchResultItems)
                 else -> FingerprintMatchResult(matcherResult.matchResultItems, params.fingerprintSDK!!)
-            }
+            },
         )
     }
 
-    private fun setMatchState(candidatesMatched: Int, results: List<MatchResultItem>) {
-        val veryGoodMatches = results.count { veryGoodMatchThreshold <= it.confidence }
+    private fun setMatchState(
+        candidatesMatched: Int,
+        results: List<MatchResultItem>,
+    ) {
+        val veryGoodMatches = results.count { VERY_GOOD_MATCH_THRESHOLD <= it.confidence }
         val goodMatches =
-            results.count { goodMatchThreshold <= it.confidence && it.confidence < veryGoodMatchThreshold }
+            results.count { GOOD_MATCH_THRESHOLD <= it.confidence && it.confidence < VERY_GOOD_MATCH_THRESHOLD }
         val fairMatches =
-            results.count { fairMatchThreshold <= it.confidence && it.confidence < goodMatchThreshold }
+            results.count { FAIR_MATCH_THRESHOLD <= it.confidence && it.confidence < GOOD_MATCH_THRESHOLD }
 
         _matchState.postValue(
             MatchState.Finished(
@@ -98,8 +99,8 @@ internal class MatchViewModel @Inject constructor(
                 results.size,
                 veryGoodMatches,
                 goodMatches,
-                fairMatches
-            )
+                fairMatches,
+            ),
         )
     }
 
@@ -109,8 +110,11 @@ internal class MatchViewModel @Inject constructor(
 
     sealed class MatchState {
         data object NotStarted : MatchState()
+
         data object LoadingCandidates : MatchState()
+
         data object Matching : MatchState()
+
         data class NoPermission(
             val shouldOpenSettings: Boolean,
         ) : MatchState()
@@ -127,10 +131,9 @@ internal class MatchViewModel @Inject constructor(
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
-
-        private const val veryGoodMatchThreshold = 50.0
-        private const val goodMatchThreshold = 35.0
-        private const val fairMatchThreshold = 20.0
-        private const val matchingEndWaitTimeInMillis = 1000L
+        private const val VERY_GOOD_MATCH_THRESHOLD = 50.0
+        private const val GOOD_MATCH_THRESHOLD = 35.0
+        private const val FAIR_MATCH_THRESHOLD = 20.0
+        private const val MATCHING_END_WAIT_TIME_MS = 1000L
     }
 }

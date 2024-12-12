@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroR
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.BatteryPercentCharge
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
-class GetBatteryPercentChargeResponse(val batteryPercentCharge: BatteryPercentCharge) : VeroResponse(VeroMessageType.GET_BATTERY_PERCENT_CHARGE) {
-
+class GetBatteryPercentChargeResponse(
+    val batteryPercentCharge: BatteryPercentCharge,
+) : VeroResponse(VeroMessageType.GET_BATTERY_PERCENT_CHARGE) {
     override fun getDataBytes(): ByteArray = batteryPercentCharge.getBytes()
 
     companion object {

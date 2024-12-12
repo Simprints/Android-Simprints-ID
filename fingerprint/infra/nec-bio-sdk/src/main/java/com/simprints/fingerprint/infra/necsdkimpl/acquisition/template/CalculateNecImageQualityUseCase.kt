@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 internal class CalculateNecImageQualityUseCase @Inject constructor(
     private val necInstant: NEC,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(image: FingerprintImage): Int = withContext(dispatcher) {
         try {
@@ -19,8 +19,8 @@ internal class CalculateNecImageQualityUseCase @Inject constructor(
                     width = image.width,
                     height = image.height,
                     resolution = image.resolution,
-                    imageBytes = image.imageBytes
-                )
+                    imageBytes = image.imageBytes,
+                ),
             )
         } catch (e: Exception) {
             throw BioSdkException.ImageQualityCheckingException(e)

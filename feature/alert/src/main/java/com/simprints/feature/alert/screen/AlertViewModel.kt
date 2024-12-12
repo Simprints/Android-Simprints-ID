@@ -5,8 +5,8 @@ import com.simprints.core.DeviceID
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -21,7 +21,6 @@ internal class AlertViewModel @Inject constructor(
     private val authStore: AuthStore,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
-
     private lateinit var cachedAlertEvent: AlertScreenEvent
 
     fun saveAlertEvent(type: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType) {
@@ -37,13 +36,13 @@ internal class AlertViewModel @Inject constructor(
         val sessionId = eventRepository.getCurrentSessionScope().id
 
         """
-            Event ID:   ${cachedAlertEvent.id}
-            Timestamp:  ${cachedAlertEvent.payload.createdAt.ms}
-            Project ID: ${authStore.signedInProjectId}
-            User ID:    ${authStore.signedInUserId?.value}
-            Device ID:  $deviceId
-            Session ID: $sessionId
-            Alert type: ${cachedAlertEvent.payload.alertType}
+        Event ID:   ${cachedAlertEvent.id}
+        Timestamp:  ${cachedAlertEvent.payload.createdAt.ms}
+        Project ID: ${authStore.signedInProjectId}
+        User ID:    ${authStore.signedInUserId?.value}
+        Device ID:  $deviceId
+        Session ID: $sessionId
+        Alert type: ${cachedAlertEvent.payload.alertType}
         """.trimIndent()
     }
 }

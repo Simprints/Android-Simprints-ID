@@ -18,7 +18,7 @@ class LibraryProtobufConventionPlugin : Plugin<Project> {
 
             val libs = getLibs()
 
-            extensions.configure<ProtobufExtension>() {
+            extensions.configure<ProtobufExtension> {
                 protoc {
                     artifact = "com.google.protobuf:protoc:${libs.findVersion("protobuf.version").get()}"
                 }

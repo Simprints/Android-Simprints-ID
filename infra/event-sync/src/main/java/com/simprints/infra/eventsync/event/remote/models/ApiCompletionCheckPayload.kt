@@ -9,13 +9,10 @@ internal data class ApiCompletionCheckPayload(
     override val startTime: ApiTimestamp,
     val completed: Boolean,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: CompletionCheckPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.completed,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
-

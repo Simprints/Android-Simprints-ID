@@ -19,7 +19,6 @@ import org.junit.Test
 import java.util.UUID
 
 class WorkerLogViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -42,13 +41,15 @@ class WorkerLogViewModelTest {
 
     @Test
     fun `sets list of scopes on request`() = runTest {
-        coEvery { workManager.getWorkInfosFlow(any()) } returns flowOf(listOf(
-            mockk<WorkInfo>(relaxed = true) {
-                every { id } returns UUID.fromString("c92d4da1-dc9a-4e25-9fcd-a9aca78a4cf3")
-                every { tags } returns setOf("com.simprints.Worker")
-                every { state } returns WorkInfo.State.SUCCEEDED
-            }
-        ))
+        coEvery { workManager.getWorkInfosFlow(any()) } returns flowOf(
+            listOf(
+                mockk<WorkInfo>(relaxed = true) {
+                    every { id } returns UUID.fromString("c92d4da1-dc9a-4e25-9fcd-a9aca78a4cf3")
+                    every { tags } returns setOf("com.simprints.Worker")
+                    every { state } returns WorkInfo.State.SUCCEEDED
+                },
+            ),
+        )
 
         val workers = viewModel.workers.test()
         viewModel.collectWorkerData()
@@ -70,12 +71,14 @@ class WorkerLogViewModelTest {
 
     @Test
     fun `sets id to UUID if no tag`() = runTest {
-        coEvery { workManager.getWorkInfosFlow(any()) } returns flowOf(listOf(
-            mockk<WorkInfo>(relaxed = true) {
-                every { id } returns UUID.fromString("c92d4da1-dc9a-4e25-9fcd-a9aca78a4cf3")
-                every { tags } returns setOf("Worker")
-            }
-        ))
+        coEvery { workManager.getWorkInfosFlow(any()) } returns flowOf(
+            listOf(
+                mockk<WorkInfo>(relaxed = true) {
+                    every { id } returns UUID.fromString("c92d4da1-dc9a-4e25-9fcd-a9aca78a4cf3")
+                    every { tags } returns setOf("Worker")
+                },
+            ),
+        )
 
         val workers = viewModel.workers.test()
         viewModel.collectWorkerData()
@@ -86,11 +89,13 @@ class WorkerLogViewModelTest {
 
     @Test
     fun `sets takes next scheduled time if worked is enqueued`() = runTest {
-        coEvery { workManager.getWorkInfosFlow(any()) } returns flowOf(listOf(
-            mockk<WorkInfo>(relaxed = true) {
-                every { state } returns WorkInfo.State.ENQUEUED
-            }
-        ))
+        coEvery { workManager.getWorkInfosFlow(any()) } returns flowOf(
+            listOf(
+                mockk<WorkInfo>(relaxed = true) {
+                    every { state } returns WorkInfo.State.ENQUEUED
+                },
+            ),
+        )
 
         val workers = viewModel.workers.test()
         viewModel.collectWorkerData()

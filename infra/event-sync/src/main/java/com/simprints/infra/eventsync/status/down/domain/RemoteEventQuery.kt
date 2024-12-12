@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.modality.Modes
 import com.simprints.infra.eventsync.event.remote.ApiRemoteEventQuery
 
-
 @Keep
 internal data class RemoteEventQuery(
     val projectId: String,
@@ -14,7 +13,6 @@ internal data class RemoteEventQuery(
     val lastEventId: String? = null,
     val modes: List<Modes>,
 ) {
-
     internal fun fromDomainToApi() = ApiRemoteEventQuery(
         projectId = projectId,
         userId = attendantId,
@@ -23,4 +21,3 @@ internal data class RemoteEventQuery(
         lastEventId = lastEventId,
     )
 }
-

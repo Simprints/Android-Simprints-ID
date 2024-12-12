@@ -28,7 +28,6 @@ import java.io.IOException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 
 class CypressOtaHelperTest {
-
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val firmwareFileManagerMock = mockk<FirmwareLocalDataSource>()
@@ -38,30 +37,33 @@ class CypressOtaHelperTest {
     fun setup() {
         coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
 
-
-         coJustRun { scannerMock.enterCypressOtaMode() }
-         coEvery { scannerMock.startCypressOta(any()) } returns OTA_PROGRESS_VALUES.asFlow()
-         coEvery { scannerMock.getVersionInformation() } returns OLD_SCANNER_VERSION
-         coJustRun { scannerMock.setVersionInformation(any()) }
-         coEvery { scannerMock.getCypressFirmwareVersion() } returns OLD_CYPRESS_VERSION
-         coEvery { scannerMock.getCypressExtendedFirmwareVersion() } returns NEW_CYPRESS_VERSION
+        coJustRun { scannerMock.enterCypressOtaMode() }
+        coEvery { scannerMock.startCypressOta(any()) } returns OTA_PROGRESS_VALUES.asFlow()
+        coEvery { scannerMock.getVersionInformation() } returns OLD_SCANNER_VERSION
+        coJustRun { scannerMock.setVersionInformation(any()) }
+        coEvery { scannerMock.getCypressFirmwareVersion() } returns OLD_CYPRESS_VERSION
+        coEvery { scannerMock.getCypressExtendedFirmwareVersion() } returns NEW_CYPRESS_VERSION
 
         coEvery {
             firmwareFileManagerMock.getAvailableScannerFirmwareVersions()
         } returns mutableMapOf(
-            DownloadableFirmwareVersion.Chip.CYPRESS to mutableSetOf(NEW_CYPRESS_VERSION_STRING)
+            DownloadableFirmwareVersion.Chip.CYPRESS to mutableSetOf(NEW_CYPRESS_VERSION_STRING),
         )
-        coEvery { firmwareFileManagerMock.loadCypressFirmwareBytes(NEW_CYPRESS_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        coEvery { firmwareFileManagerMock.loadCypressFirmwareBytes(NEW_CYPRESS_VERSION_STRING) } returns
+            byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test
     fun performCypressOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runTest {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
-            listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion, CypressOtaStep.UpdatingUnifiedVersionInformation)
+            listOf(
+                CypressOtaStep.ReconnectingAfterTransfer,
+                CypressOtaStep.ValidatingNewFirmwareVersion,
+                CypressOtaStep.UpdatingUnifiedVersionInformation,
+            )
 
         val actualItems = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING).toList()
-
 
         assertThat(actualItems).containsExactlyElementsIn(expectedSteps).inOrder()
         assertThat(actualItems.map { it.totalProgress })
@@ -82,14 +84,14 @@ class CypressOtaHelperTest {
                 progressValues.map { CypressOtaStep.TransferInProgress(it) }
         val error = ScannerV2OtaFailedException("oops!")
 
-        coEvery { scannerMock.startCypressOta(any()) } returns progressValues.asFlow()
+        coEvery { scannerMock.startCypressOta(any()) } returns progressValues
+            .asFlow()
             .onCompletion { throw error }
 
         val otaFlow = cypressOtaHelper.performOtaSteps(scannerMock, "mac address", NEW_CYPRESS_VERSION_STRING)
         val actualItems = otaFlow
             .take(expectedSteps.size)
             .toList()
-
 
         assertThat(actualItems).containsExactlyElementsIn(expectedSteps).inOrder()
         assertThat(actualItems.map { it.totalProgress })
@@ -127,7 +129,7 @@ class CypressOtaHelperTest {
                 OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
                 listOf(
                     CypressOtaStep.ReconnectingAfterTransfer,
-                    CypressOtaStep.ValidatingNewFirmwareVersion
+                    CypressOtaStep.ValidatingNewFirmwareVersion,
                 )
 
         coEvery { scannerMock.getCypressExtendedFirmwareVersion() } returns
@@ -161,18 +163,17 @@ class CypressOtaHelperTest {
                 5066639776677915L,
                 OLD_CYPRESS_VERSION,
                 mockk(relaxed = true),
-                mockk(relaxed = true)
-            ).toExtendedVersionInfo()
+                mockk(relaxed = true),
+            ).toExtendedVersionInfo(),
         )
-
 
         private val NEW_SCANNER_VERSION = ScannerInformation(
             hardwareVersion = HARDWARE_VERSION,
             firmwareVersions = ExtendedVersionInformation(
                 cypressFirmwareVersion = NEW_CYPRESS_VERSION,
                 stmFirmwareVersion = mockk(relaxed = true),
-                un20AppVersion = mockk(relaxed = true)
-            )
+                un20AppVersion = mockk(relaxed = true),
+            ),
         )
     }
 }

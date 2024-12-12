@@ -50,14 +50,12 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class SyncViewModelTest {
-
     companion object {
-
         private const val DATE = "2022-10-10"
         private val deviceConfiguration = DeviceConfiguration(
             language = "",
             selectedModules = listOf("module 1".asTokenizableEncrypted()),
-            lastInstructionId = ""
+            lastInstructionId = "",
         )
     }
 
@@ -150,12 +148,17 @@ internal class SyncViewModelTest {
     @Test
     fun `should not trigger an initial sync if the sync is running`() {
         syncState.value = EventSyncState(
-            "", 0, 0, listOf(
+            "",
+            0,
+            0,
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Running
-                )
-            ), listOf(), listOf()
+                    EventSyncWorkerState.Running,
+                ),
+            ),
+            listOf(),
+            listOf(),
         )
         isConnected.value = true
 
@@ -169,7 +172,7 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(),
-            ""
+            "",
         )
         isConnected.value = true
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
@@ -211,13 +214,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 0, 0, listOf(),
+            "",
+            0,
+            0,
+            listOf(),
             listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Succeeded
-                )
-            ), listOf()
+                    EventSyncWorkerState.Succeeded,
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -231,12 +238,17 @@ internal class SyncViewModelTest {
 
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 0, 0, listOf(), listOf(
+            "",
+            0,
+            0,
+            listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Succeeded
-                )
-            ), listOf()
+                    EventSyncWorkerState.Succeeded,
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -248,13 +260,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(),
+            "",
+            10,
+            40,
+            listOf(),
             listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Running
-                )
-            ), listOf()
+                    EventSyncWorkerState.Running,
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -266,13 +282,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(),
+            "",
+            10,
+            40,
+            listOf(),
             listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Enqueued
-                )
-            ), listOf()
+                    EventSyncWorkerState.Enqueued,
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -284,12 +304,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "",
+            10,
+            40,
+            listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
-                )
-            ), listOf()
+                    EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true),
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -301,12 +326,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "",
+            10,
+            40,
+            listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
-                )
-            ), listOf()
+                    EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true),
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -318,12 +348,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "",
+            10,
+            40,
+            listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
-                )
-            ), listOf()
+                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true),
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -363,13 +398,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(),
+            "",
+            10,
+            40,
+            listOf(),
             listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
-                )
-            ), listOf()
+                    EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true),
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -381,15 +420,20 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "",
+            10,
+            40,
+            listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed(
                         failedBecauseBackendMaintenance = true,
-                        estimatedOutage = 30
-                    )
-                )
-            ), listOf()
+                        estimatedOutage = 30,
+                    ),
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -401,13 +445,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(),
+            "",
+            10,
+            40,
+            listOf(),
             listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed()
-                )
-            ), listOf()
+                    EventSyncWorkerState.Failed(),
+                ),
+            ),
+            listOf(),
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -420,13 +468,17 @@ internal class SyncViewModelTest {
         coEvery { configManager.getProject(any()).state } returns ProjectState.PROJECT_ENDING
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 0, 0, listOf(),
+            "",
+            0,
+            0,
+            listOf(),
             listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Succeeded
-                )
-            ), listOf()
+                    EventSyncWorkerState.Succeeded,
+                ),
+            ),
+            listOf(),
         )
         val viewModel = initViewModel()
         viewModel.syncCardLiveData.getOrAwaitValue()

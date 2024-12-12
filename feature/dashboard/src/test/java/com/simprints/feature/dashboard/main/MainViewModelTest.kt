@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class MainViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -29,13 +28,13 @@ class MainViewModelTest {
     }
     private val securityManager = mockk<SecurityManager>(relaxed = true)
 
-
     @Test
     fun `should initialize the live data correctly`() {
         val viewModel = MainViewModel(configManager, securityManager)
 
         assertThat(viewModel.consentRequired.value).isEqualTo(true)
     }
+
     @Test
     fun `should show rooted device detected if device is rooted`() {
         coEvery { securityManager.checkIfDeviceIsRooted() } throws RootedDeviceException()

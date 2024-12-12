@@ -22,16 +22,17 @@ import java.io.PipedOutputStream
 import java.util.concurrent.TimeUnit
 
 class StmOtaMessageInputStreamTest {
-
     private val stmOtaResponseParser = StmOtaResponseParser()
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val stmOtaMessageInputStream = StmOtaMessageInputStream(stmOtaResponseParser,
-        UnconfinedTestDispatcher()
+    private val stmOtaMessageInputStream = StmOtaMessageInputStream(
+        stmOtaResponseParser,
+        UnconfinedTestDispatcher(),
     )
 
     @Test
     fun `test disconnect disposes the flowable stream`() {
-        //Given
+        // Given
         val flowableDisposable = mockk<Disposable>(relaxed = true)
 
         val stmResponseFlowable: Flowable<StmOtaResponse> = mockk {
@@ -45,17 +46,19 @@ class StmOtaMessageInputStreamTest {
             every { map(any<Function<ByteArray, StmOtaResponse>>()) } returns stmResponseFlowable
         }
 
-        //When
+        // When
         stmOtaMessageInputStream.connect(flowable)
         stmOtaMessageInputStream.disconnect()
 
-        //Then
+        // Then
         verify { flowableDisposable.dispose() }
     }
 
-    @Suppress("Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
-        " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
-        "re-written when the RxJava is finally removed from the scanners SDK.")
+    @Suppress(
+        "Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
+            " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
+            "re-written when the RxJava is finally removed from the scanners SDK.",
+    )
     fun stmOtaMessageInputStream_receiveStmOtaResponse_correctlyForwardsResponse() {
         val messageBytes = "79".hexToByteArray()
         val expectedResponse = CommandAcknowledgement(CommandAcknowledgement.Kind.ACK)
@@ -66,8 +69,10 @@ class StmOtaMessageInputStreamTest {
 
         stmOtaMessageInputStream.connect(inputStream.toFlowable())
 
-        val testSubscriber = stmOtaMessageInputStream.receiveResponse<CommandAcknowledgement>()
-            .timeout(SchedulerHelper.TIMEOUT, TimeUnit.SECONDS).testSubscribe()
+        val testSubscriber = stmOtaMessageInputStream
+            .receiveResponse<CommandAcknowledgement>()
+            .timeout(SchedulerHelper.TIMEOUT, TimeUnit.SECONDS)
+            .testSubscribe()
 
         outputStream.write(messageBytes)
 

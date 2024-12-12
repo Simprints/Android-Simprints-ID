@@ -20,9 +20,10 @@ import com.simprints.fingerprint.infra.scannermock.simulated.common.RealisticSpe
 import com.simprints.fingerprint.infra.scannermock.simulated.common.SimulationSpeedBehaviour
 import com.simprints.fingerprint.infra.scannermock.simulated.v2.SimulatedScannerV2
 
-class SimulatedRootResponseHelper(private val simulatedScannerManager: SimulatedScannerManager,
-                                  private val simulatedScannerV2: SimulatedScannerV2) : SimulatedResponseHelperV2<RootCommand, RootResponse> {
-
+class SimulatedRootResponseHelper(
+    private val simulatedScannerManager: SimulatedScannerManager,
+    private val simulatedScannerV2: SimulatedScannerV2,
+) : SimulatedResponseHelperV2<RootCommand, RootResponse> {
     override fun createResponseToCommand(command: RootCommand): RootResponse {
         val response = when (command) {
             is EnterMainModeCommand -> EnterMainModeResponse()
@@ -30,7 +31,7 @@ class SimulatedRootResponseHelper(private val simulatedScannerManager: Simulated
             is EnterStmOtaModeCommand -> EnterStmOtaModeResponse()
             is GetVersionCommand -> GetVersionResponse(simulatedScannerV2.scannerState.versionInfo)
             is SetVersionCommand -> SetVersionResponse()
-            is GetCypressVersionCommand -> GetCypressVersionResponse(CypressFirmwareVersion(1,0,0,0))
+            is GetCypressVersionCommand -> GetCypressVersionResponse(CypressFirmwareVersion(1, 0, 0, 0))
             else -> throw UnsupportedOperationException("Un-mocked response to $command in SimulatedRootResponseHelper")
         }
 

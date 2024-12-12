@@ -29,11 +29,13 @@ abstract class MessageChannel<I : MessageInputStream, O : MessageOutputStream<*>
     val dispatcher: CoroutineDispatcher,
     val readWriteLock: Mutex = Mutex(),
     val responseErrorHandler: ResponseErrorHandler = ResponseErrorHandler(
-        ResponseErrorHandlingStrategy.DEFAULT
+        ResponseErrorHandlingStrategy.DEFAULT,
     ),
 ) : Connectable {
-
-    override fun connect(flowableInputStream: Flowable<ByteArray>, outputStream: OutputStream) {
+    override fun connect(
+        flowableInputStream: Flowable<ByteArray>,
+        outputStream: OutputStream,
+    ) {
         incoming.connect(flowableInputStream)
         outgoing.connect(outputStream)
     }
@@ -43,7 +45,6 @@ abstract class MessageChannel<I : MessageInputStream, O : MessageOutputStream<*>
         incoming.disconnect()
     }
 
-    suspend inline fun <reified R> runLockedTask(
-        crossinline block: suspend () -> R,
-    ): R = withContext(dispatcher) { readWriteLock.withLock { responseErrorHandler.handle(block) } }
+    suspend inline fun <reified R> runLockedTask(crossinline block: suspend () -> R): R =
+        withContext(dispatcher) { readWriteLock.withLock { responseErrorHandler.handle(block) } }
 }

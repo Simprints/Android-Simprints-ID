@@ -18,20 +18,18 @@ data class FaceOnboardingCompleteEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         startTime: Timestamp,
         endTime: Timestamp,
     ) : this(
         UUID.randomUUID().toString(),
         FaceOnboardingCompletePayload(startTime, endTime, EVENT_VERSION),
-        FACE_ONBOARDING_COMPLETE
+        FACE_ONBOARDING_COMPLETE,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FaceOnboardingCompletePayload(
@@ -42,7 +40,6 @@ data class FaceOnboardingCompleteEvent(
     ) : EventPayload()
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

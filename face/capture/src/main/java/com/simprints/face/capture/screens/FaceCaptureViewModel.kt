@@ -22,6 +22,9 @@ import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.determineLicenseStatus
+import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.LicenseState
+import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -33,9 +36,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import com.simprints.infra.license.models.License
-import com.simprints.infra.license.models.LicenseState
-import com.simprints.infra.license.models.LicenseVersion
 
 @HiltViewModel
 internal class FaceCaptureViewModel @Inject constructor(
@@ -49,7 +49,6 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
     @DeviceID private val deviceID: String,
 ) : ViewModel() {
-
     // Updated in live feedback screen
     var attemptNumber: Int = 0
     var samplesToCapture = 1
@@ -100,7 +99,14 @@ internal class FaceCaptureViewModel @Inject constructor(
             licenseStatus = refreshLicenceAndRetry(
                 activity,
                 licenseVendor,
-                LicenseVersion(configManager.getProjectConfiguration().face?.rankOne?.version.orEmpty())
+                LicenseVersion(
+                    configManager
+                        .getProjectConfiguration()
+                        .face
+                        ?.rankOne
+                        ?.version
+                        .orEmpty(),
+                ),
             )
         }
         // Still invalid after attempted refresh
@@ -112,7 +118,10 @@ internal class FaceCaptureViewModel @Inject constructor(
         saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
 
-    private suspend fun initialize(activity: Activity, license: License): LicenseStatus {
+    private suspend fun initialize(
+        activity: Activity,
+        license: License,
+    ): LicenseStatus {
         val initializer = resolveFaceBioSdk().initializer
         if (!initializer.tryInitWithLicense(activity, license.data)) {
             // License is valid but the SDK failed to initialize
@@ -122,16 +131,19 @@ internal class FaceCaptureViewModel @Inject constructor(
         return LicenseStatus.VALID
     }
 
-    private suspend fun refreshLicenceAndRetry(activity: Activity, licenseVendor: Vendor, licenseVersion: LicenseVersion) = licenseRepository
-        .redownloadLicence(authStore.signedInProjectId, deviceID, licenseVendor,licenseVersion)
+    private suspend fun refreshLicenceAndRetry(
+        activity: Activity,
+        licenseVendor: Vendor,
+        licenseVersion: LicenseVersion,
+    ) = licenseRepository
+        .redownloadLicence(authStore.signedInProjectId, deviceID, licenseVendor, licenseVersion)
         .map { state ->
             when (state) {
                 is LicenseState.FinishedWithSuccess -> initialize(activity, state.license)
                 is LicenseState.FinishedWithBackendMaintenanceError, is LicenseState.FinishedWithError -> LicenseStatus.MISSING
                 else -> null
             }
-        }
-        .filterNotNull()
+        }.filterNotNull()
         .last()
 
     fun getSampleDetection() = faceDetections.firstOrNull()
@@ -145,12 +157,14 @@ internal class FaceCaptureViewModel @Inject constructor(
 
             val items = faceDetections.mapIndexed { index, detection ->
                 FaceCaptureResult.Item(
-                    captureEventId = detection.id, index = index, sample = FaceCaptureResult.Sample(
+                    captureEventId = detection.id,
+                    index = index,
+                    sample = FaceCaptureResult.Sample(
                         faceId = detection.id,
                         template = detection.face?.template ?: ByteArray(0),
                         imageRef = detection.securedImageRef,
                         format = detection.face?.format ?: "",
-                    )
+                    ),
                 )
             }
 
@@ -177,7 +191,10 @@ internal class FaceCaptureViewModel @Inject constructor(
         faceDetections.forEach { saveImage(it, it.id) }
     }
 
-    private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {
+    private fun saveImage(
+        faceDetection: FaceDetection,
+        captureEventId: String,
+    ) {
         runBlocking {
             faceDetection.securedImageRef = saveFaceImage(bitmapToByteArray(faceDetection.bitmap), captureEventId)
         }
@@ -192,8 +209,10 @@ internal class FaceCaptureViewModel @Inject constructor(
         eventReporter.addOnboardingCompleteEvent(startTime)
     }
 
-    fun addCaptureConfirmationAction(startTime: Timestamp, isContinue: Boolean) {
+    fun addCaptureConfirmationAction(
+        startTime: Timestamp,
+        isContinue: Boolean,
+    ) {
         eventReporter.addCaptureConfirmationEvent(startTime, isContinue)
     }
-
 }

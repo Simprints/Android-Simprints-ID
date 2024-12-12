@@ -19,12 +19,11 @@ import com.simprints.core.domain.tokenization.TokenizableString
  * Wrapper(val someValue = TokenizableString.Tokenized(value = "eq2Efc98d"))
  *     -> { "someValue": "eq2Efc98d" }
  */
-class TokenizationAsStringSerializer :
-    StdSerializer<TokenizableString>(TokenizableString::class.java) {
+class TokenizationAsStringSerializer : StdSerializer<TokenizableString>(TokenizableString::class.java) {
     override fun serialize(
         value: TokenizableString,
         gen: JsonGenerator,
-        provider: SerializerProvider
+        provider: SerializerProvider,
     ) {
         gen.writeString(value.value)
     }

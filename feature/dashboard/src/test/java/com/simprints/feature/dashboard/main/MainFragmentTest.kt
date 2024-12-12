@@ -33,7 +33,6 @@ import com.simprints.infra.resources.R as IDR
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class MainFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 

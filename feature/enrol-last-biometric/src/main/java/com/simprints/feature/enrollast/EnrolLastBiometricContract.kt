@@ -4,7 +4,6 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.enrollast.screen.EnrolLastBiometricFragmentArgs
 
 object EnrolLastBiometricContract {
-
     val DESTINATION = R.id.enrolLastBiometricFragment
 
     fun getArgs(
@@ -12,10 +11,12 @@ object EnrolLastBiometricContract {
         userId: TokenizableString,
         moduleId: TokenizableString,
         steps: List<EnrolLastBiometricStepResult>,
-    ) = EnrolLastBiometricFragmentArgs(EnrolLastBiometricParams(
-        projectId = projectId,
-        userId = userId,
-        moduleId = moduleId,
-        steps = steps,
-    )).toBundle()
+    ) = EnrolLastBiometricFragmentArgs(
+        EnrolLastBiometricParams(
+            projectId = projectId,
+            userId = userId,
+            moduleId = moduleId,
+            steps = steps,
+        ),
+    ).toBundle()
 }

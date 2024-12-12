@@ -3,9 +3,9 @@ package com.simprints.feature.orchestrator.usecases
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import com.simprints.infra.orchestration.data.responses.AppResponse
 import javax.inject.Inject
 
 internal class UpdateDailyActivityUseCase @Inject constructor(
@@ -36,7 +36,7 @@ internal class UpdateDailyActivityUseCase @Inject constructor(
             }
 
             else -> {
-                //Other cases are ignore and we don't show info in dashboard for it
+                // Other cases are ignore and we don't show info in dashboard for it
             }
         }
     }

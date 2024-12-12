@@ -34,9 +34,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_selection),
-    ModuleSelectionListener, ChipClickListener {
-
+internal class ModuleSelectionFragment :
+    Fragment(R.layout.fragment_sync_module_selection),
+    ModuleSelectionListener,
+    ChipClickListener {
     private val adapter by lazy { ModuleAdapter(listener = this) }
     private val chipHelper by lazy {
         // We need to have material theme for the chip
@@ -60,7 +61,10 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
             .create()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         configureOverlay()
@@ -75,7 +79,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
                 override fun handleOnBackPressed() {
                     onBackPress()
                 }
-            }
+            },
         )
     }
 
@@ -87,14 +91,15 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         SettingsPasswordDialogFragment.registerForResult(
             fragmentManager = childFragmentManager,
             lifecycleOwner = this,
-            onSuccess = { viewModel.unlockScreen() }
+            onSuccess = { viewModel.unlockScreen() },
         )
         binding.modulesLockOverlayClickableArea.setOnClickListener {
             val password = viewModel.screenLocked.value?.getNullablePassword()
             if (password != null) {
-                SettingsPasswordDialogFragment.newInstance(
-                    passwordToMatch = password,
-                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+                SettingsPasswordDialogFragment
+                    .newInstance(
+                        passwordToMatch = password,
+                    ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
             }
         }
     }
@@ -179,11 +184,12 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         }
     }
 
-    private fun getModulesSelectedTextForDialog() = StringBuilder().apply {
-        modulesToSelect.filter { it.isSelected }.forEach { module ->
-            append(module.name.value + "\n")
-        }
-    }.toString()
+    private fun getModulesSelectedTextForDialog() = StringBuilder()
+        .apply {
+            modulesToSelect.filter { it.isSelected }.forEach { module ->
+                append(module.name.value + "\n")
+            }
+        }.toString()
 
     private fun handleModulesConfirmClick() {
         try {
@@ -195,22 +201,24 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     }
 
     private fun notifyNoModulesSelected() {
-        Toast.makeText(
-            requireContext(),
-            IDR.string.dashboard_select_modules_no_modules,
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast
+            .makeText(
+                requireContext(),
+                IDR.string.dashboard_select_modules_no_modules,
+                Toast.LENGTH_SHORT,
+            ).show()
     }
 
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
-        Toast.makeText(
-            requireContext(),
-            String.format(
-                getString(IDR.string.dashboard_select_modules_too_many_modules),
-                maxAllowed
-            ),
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast
+            .makeText(
+                requireContext(),
+                String.format(
+                    getString(IDR.string.dashboard_select_modules_too_many_modules),
+                    maxAllowed,
+                ),
+                Toast.LENGTH_SHORT,
+            ).show()
     }
 
     private fun configureSearchView() {
@@ -223,7 +231,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
 
     private fun configureSearchViewEditText() {
         val editText: EditText? = requireActivity().findViewById(
-            androidx.appcompat.R.id.search_src_text
+            androidx.appcompat.R.id.search_src_text,
         )
 
         editText?.let {
@@ -244,7 +252,6 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private fun removeChipForModule(selectedModule: Module) {
         chipHelper.removeModuleChip(binding.chipGroup, selectedModule)
     }
-
 
     private fun configureTextViewVisibility() {
         if (isNoModulesSelected()) {
@@ -286,8 +293,9 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private fun EditText.observeFocus() {
         setOnFocusChangeListener { v, hasFocus ->
             (v as EditText).isCursorVisible = hasFocus
-            if (!hasFocus)
+            if (!hasFocus) {
                 rvModules?.scrollToPosition(0)
+            }
             // The safe call above is necessary only when the 'up' action bar button is clicked
         }
     }

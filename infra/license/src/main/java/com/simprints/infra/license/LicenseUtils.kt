@@ -7,7 +7,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-
 private fun License.isExpired(): Boolean {
     if (expiration.isNullOrEmpty()) return false
 

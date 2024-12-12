@@ -8,8 +8,7 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
-class CreateEnrolLastBiometricResponseUseCaseTest{
-
+class CreateEnrolLastBiometricResponseUseCaseTest {
     private lateinit var useCase: CreateEnrolLastBiometricResponseUseCase
 
     @Before
@@ -19,10 +18,15 @@ class CreateEnrolLastBiometricResponseUseCaseTest{
 
     @Test
     fun `Converts correct results to response`() {
-        Truth.assertThat(useCase(listOf(
-            EnrolLastBiometricResult("1234"),
-            mockk(),
-        ))).isInstanceOf(AppEnrolResponse::class.java)
+        Truth
+            .assertThat(
+                useCase(
+                    listOf(
+                        EnrolLastBiometricResult("1234"),
+                        mockk(),
+                    ),
+                ),
+            ).isInstanceOf(AppEnrolResponse::class.java)
     }
 
     @Test

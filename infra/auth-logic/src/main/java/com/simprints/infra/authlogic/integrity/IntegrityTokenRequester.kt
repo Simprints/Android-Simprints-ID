@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 internal class IntegrityTokenRequester @Inject constructor(
     private val integrityManager: IntegrityManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
     /**
      * A method that gets the integrity service token, using a blocking [Tasks.await] method.
@@ -36,19 +36,22 @@ internal class IntegrityTokenRequester @Inject constructor(
      */
     suspend fun getToken(nonce: String): String = withContext(dispatcher) {
         try {
-            //Wait till the integrity token gets retrieved
-            Tasks.await(
-                integrityManager.requestIntegrityToken(
-                    IntegrityTokenRequest.builder().setNonce(nonce)
-                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong()).build()
-                )
-            ).token()
+            // Wait till the integrity token gets retrieved
+            Tasks
+                .await(
+                    integrityManager.requestIntegrityToken(
+                        IntegrityTokenRequest
+                            .builder()
+                            .setNonce(nonce)
+                            .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                            .build(),
+                    ),
+                ).token()
         } catch (integrityServiceException: IntegrityServiceException) {
             Simber.e(integrityServiceException)
             throw mapException(
-                integrityServiceException
+                integrityServiceException,
             )
-
         }
     }
 
@@ -57,7 +60,8 @@ internal class IntegrityTokenRequester @Inject constructor(
             // errors where the user should install or update play store app
             API_NOT_AVAILABLE, CANNOT_BIND_TO_SERVICE,
             PLAY_STORE_ACCOUNT_NOT_FOUND,
-            PLAY_STORE_NOT_FOUND, PLAY_STORE_VERSION_OUTDATED -> {
+            PLAY_STORE_NOT_FOUND, PLAY_STORE_VERSION_OUTDATED,
+            -> {
                 MissingOrOutdatedGooglePlayStoreApp(errorCode)
             }
             // errors where the user should retry again later

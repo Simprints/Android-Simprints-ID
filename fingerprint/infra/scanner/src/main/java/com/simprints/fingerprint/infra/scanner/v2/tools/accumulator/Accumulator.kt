@@ -32,9 +32,8 @@ abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
     private val computeElementLengthFromCollection: (FragmentCollection) -> Int,
     private val getCollectionLength: FragmentCollection.() -> Int,
     private val sliceCollection: FragmentCollection.(IntRange) -> FragmentCollection,
-    private val buildElementFromCompleteCollection: (FragmentCollection) -> Element
+    private val buildElementFromCompleteCollection: (FragmentCollection) -> Element,
 ) {
-
     private var fragmentCollection: FragmentCollection = initialFragmentCollection
 
     private var currentElementLength: Int? = null
@@ -44,21 +43,19 @@ abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
         updateCurrentElementLength()
     }
 
-    fun takeElements(): Flowable<Element> =
-        Flowable.generate { emitter ->
-            try {
-                if (containsCompleteElement()) {
-                    emitter.onNext(takeElement()!!)
-                } else {
-                    emitter.onComplete()
-                }
-            } catch (e: Throwable) {
-                emitter.onError(e)
+    fun takeElements(): Flowable<Element> = Flowable.generate { emitter ->
+        try {
+            if (containsCompleteElement()) {
+                emitter.onNext(takeElement()!!)
+            } else {
+                emitter.onComplete()
             }
+        } catch (e: Throwable) {
+            emitter.onError(e)
         }
+    }
 
-    private fun containsCompleteElement() =
-        currentElementLength?.let { fragmentCollection.getCollectionLength() >= it } ?: false
+    private fun containsCompleteElement() = currentElementLength?.let { fragmentCollection.getCollectionLength() >= it } ?: false
 
     private fun takeElement(): Element {
         currentElementLength?.let { packetLength ->

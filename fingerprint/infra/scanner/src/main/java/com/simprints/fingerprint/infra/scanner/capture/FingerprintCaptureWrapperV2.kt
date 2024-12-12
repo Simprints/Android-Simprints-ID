@@ -18,23 +18,18 @@ internal class FingerprintCaptureWrapperV2(
     private val scannerV2: Scanner,
     private val tracker: FingerprintScanningStatusTracker,
 ) : FingerprintCaptureWrapper {
-
     override suspend fun acquireImageDistortionMatrixConfiguration(): ByteArray = runWithErrorWrapping {
         scannerV2.acquireImageDistortionConfigurationMatrix()
             ?: throw NoImageDistortionConfigurationMatrixException("Failed to acquire image distortion configuration matrix")
     }
 
-    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse =
-        runWithErrorWrapping {
-            scannerV2.acquireImage(IMAGE_FORMAT)?.image?.let { imageBytes ->
-                AcquireFingerprintImageResponse(imageBytes)
-            } ?: throw NoFingerDetectedException("Failed to acquire image")
-        }
+    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse = runWithErrorWrapping {
+        scannerV2.acquireImage(IMAGE_FORMAT)?.image?.let { imageBytes ->
+            AcquireFingerprintImageResponse(imageBytes)
+        } ?: throw NoFingerDetectedException("Failed to acquire image")
+    }
 
-
-    override suspend fun acquireUnprocessedImage(
-        captureDpi: Dpi?,
-    ): AcquireUnprocessedImageResponse = runWithErrorWrapping {
+    override suspend fun acquireUnprocessedImage(captureDpi: Dpi?): AcquireUnprocessedImageResponse = runWithErrorWrapping {
         require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
         }
@@ -45,8 +40,8 @@ internal class FingerprintCaptureWrapperV2(
         scannerV2.acquireUnprocessedImage(IMAGE_FORMAT)?.image?.let { imageData ->
             AcquireUnprocessedImageResponse(
                 RawUnprocessedImage(
-                    imageData
-                )
+                    imageData,
+                ),
             )
         } ?: throw NoFingerDetectedException("Failed to acquire unprocessed image data")
     }
@@ -55,7 +50,7 @@ internal class FingerprintCaptureWrapperV2(
         captureDpi: Dpi?,
         timeOutMs: Int,
         qualityThreshold: Int,
-        allowLowQualityExtraction: Boolean
+        allowLowQualityExtraction: Boolean,
     ): AcquireFingerprintTemplateResponse = runWithErrorWrapping {
         require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
@@ -69,9 +64,10 @@ internal class FingerprintCaptureWrapperV2(
         // If the quality score is below the threshold and we don't allow low quality extraction, return an empty template
         if (qualityScore < qualityThreshold && !allowLowQualityExtraction) {
             AcquireFingerprintTemplateResponse(
-                ByteArray(0), templateFormat, qualityScore
+                ByteArray(0),
+                templateFormat,
+                qualityScore,
             )
-
         } else {
             acquireTemplateAndAssembleResponse(qualityScore)
                 ?: throw NoFingerDetectedException("Failed to acquire template")
@@ -79,7 +75,7 @@ internal class FingerprintCaptureWrapperV2(
     }
 
     private fun CaptureFingerprintResult.ensureCaptureResultOkOrError() = when (this) {
-        CaptureFingerprintResult.OK -> { /* Do nothing */
+        CaptureFingerprintResult.OK -> { // Do nothing
         }
 
         CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> throw NoFingerDetectedException("Fingerprint not found")
@@ -93,12 +89,13 @@ internal class FingerprintCaptureWrapperV2(
         }
     }
 
-    private suspend fun acquireTemplateAndAssembleResponse(imageQuality: Int) =
-        scannerV2.acquireTemplate()?.template?.let { templateData ->
-            AcquireFingerprintTemplateResponse(
-                templateData, templateFormat, imageQuality
-            )
-        }
+    private suspend fun acquireTemplateAndAssembleResponse(imageQuality: Int) = scannerV2.acquireTemplate()?.template?.let { templateData ->
+        AcquireFingerprintTemplateResponse(
+            templateData,
+            templateFormat,
+            imageQuality,
+        )
+    }
 
     companion object {
         private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD =

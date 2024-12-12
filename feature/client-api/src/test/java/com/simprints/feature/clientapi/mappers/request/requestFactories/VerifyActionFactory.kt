@@ -12,7 +12,6 @@ import io.mockk.every
 import io.mockk.mockk
 
 internal object VerifyActionFactory : RequestActionFactory() {
-
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
         actionName = ActionConstants.ACTION_VERIFY,
@@ -29,20 +28,18 @@ internal object VerifyActionFactory : RequestActionFactory() {
         metadata = MOCK_METADATA,
         verifyGuid = MOCK_VERIFY_GUID,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
-        unknownExtras = emptyMap()
+        unknownExtras = emptyMap(),
     )
 
-    override fun getBuilder(extractor: ActionRequestExtractor): VerifyRequestBuilder =
-        VerifyRequestBuilder(
-            actionIdentifier = getIdentifier(),
-            extractor = extractor as VerifyRequestExtractor,
-            project = mockk(),
-            tokenizationProcessor = mockk(),
-            validator = getValidator(extractor)
-        )
+    override fun getBuilder(extractor: ActionRequestExtractor): VerifyRequestBuilder = VerifyRequestBuilder(
+        actionIdentifier = getIdentifier(),
+        extractor = extractor as VerifyRequestExtractor,
+        project = mockk(),
+        tokenizationProcessor = mockk(),
+        validator = getValidator(extractor),
+    )
 
-    override fun getValidator(extractor: ActionRequestExtractor): VerifyValidator =
-        VerifyValidator(extractor as VerifyRequestExtractor)
+    override fun getValidator(extractor: ActionRequestExtractor): VerifyValidator = VerifyValidator(extractor as VerifyRequestExtractor)
 
     override fun getMockExtractor(): VerifyRequestExtractor {
         val mockVerifyExtractor = mockk<VerifyRequestExtractor>()
@@ -50,5 +47,4 @@ internal object VerifyActionFactory : RequestActionFactory() {
         every { mockVerifyExtractor.getVerifyGuid() } returns MOCK_VERIFY_GUID
         return mockVerifyExtractor
     }
-
 }

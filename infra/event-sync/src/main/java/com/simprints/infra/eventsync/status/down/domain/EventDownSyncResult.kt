@@ -6,5 +6,5 @@ import kotlinx.coroutines.channels.ReceiveChannel
 data class EventDownSyncResult(
     val totalCount: Int?,
     val status: Int,
-    val eventStream: ReceiveChannel<EnrolmentRecordEvent>
+    val eventStream: ReceiveChannel<EnrolmentRecordEvent>,
 )

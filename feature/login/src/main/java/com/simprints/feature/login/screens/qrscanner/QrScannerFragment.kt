@@ -26,7 +26,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
-
     private val binding by viewBinding(FragmentQrScannerBinding::bind)
 
     @Inject
@@ -45,7 +44,10 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -54,8 +56,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
                     .catch { e ->
                         Simber.e(e)
                         finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
-                    }
-                    .collectLatest { qrCode ->
+                    }.collectLatest { qrCode ->
                         if (qrCode.isNotEmpty()) {
                             finishWithContent(qrCode)
                         }
@@ -75,7 +76,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
         cameraHelper.startCamera(
             viewLifecycleOwner,
             binding.qrScannerPreview,
-            qrCodeAnalyzer
+            qrCodeAnalyzer,
         ) {
             finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
         }

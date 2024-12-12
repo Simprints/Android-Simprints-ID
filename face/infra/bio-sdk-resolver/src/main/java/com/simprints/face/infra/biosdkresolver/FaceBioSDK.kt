@@ -1,6 +1,5 @@
 package com.simprints.face.infra.biosdkresolver
 
-
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher

@@ -5,7 +5,6 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class ApiFingerTest {
-
     @Test
     fun `should map correctly the Finger enums`() {
         val mapping = mapOf(
@@ -19,13 +18,10 @@ class ApiFingerTest {
             IFingerIdentifier.RIGHT_3RD_FINGER to ApiFinger.RIGHT_3RD_FINGER,
             IFingerIdentifier.RIGHT_4TH_FINGER to ApiFinger.RIGHT_4TH_FINGER,
             IFingerIdentifier.RIGHT_5TH_FINGER to ApiFinger.RIGHT_5TH_FINGER,
-            )
+        )
 
         mapping.forEach {
             assertThat(it.key.toApi()).isEqualTo(it.value)
         }
-
     }
-
-
 }

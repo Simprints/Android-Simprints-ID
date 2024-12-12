@@ -8,7 +8,9 @@ import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import kotlin.math.max
 
-internal class BitmapToByteArrayUseCase @Inject constructor(@ApplicationContext private val context: Context) {
+internal class BitmapToByteArrayUseCase @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
     companion object {
         const val IMAGE_QUALITY = 100
         const val IMAGE_MAXIMUM_SIZE = 240f
@@ -37,6 +39,5 @@ internal class BitmapToByteArrayUseCase @Inject constructor(@ApplicationContext 
 
         // Resize the bitmap
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-
     }
 }

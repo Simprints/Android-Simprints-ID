@@ -14,7 +14,6 @@ const val RAW = "TokenizableString.Raw"
 const val FIELD_CLASS_NAME = "className"
 const val FIELD_VALUE = "value"
 
-
 /**
  * JSON serializer for the [TokenizableString] that creates an explicit specification of the child
  * class being used to create a JSON.
@@ -27,12 +26,11 @@ const val FIELD_VALUE = "value"
  * TokenizableString.Tokenized(value = "eq2Efc98d")
  *     -> { "className": "TokenizableString.Tokenized", "value": "eq2Efc98d" }
  */
-class TokenizationClassNameSerializer :
-    StdSerializer<TokenizableString>(TokenizableString::class.java) {
+class TokenizationClassNameSerializer : StdSerializer<TokenizableString>(TokenizableString::class.java) {
     override fun serialize(
         value: TokenizableString,
         gen: JsonGenerator,
-        provider: SerializerProvider
+        provider: SerializerProvider,
     ) {
         val className = when (value) {
             is TokenizableString.Raw -> RAW
@@ -65,7 +63,10 @@ class TokenizationClassNameSerializer :
  *     -> TokenizableString.Raw(value = "no class")
  */
 class TokenizationClassNameDeserializer : StdDeserializer<TokenizableString>(TokenizableString::class.java) {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): TokenizableString {
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): TokenizableString {
         val node: JsonNode = p.codec.readTree(p)
 
         val className = node[FIELD_CLASS_NAME]?.asText() ?: ""

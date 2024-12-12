@@ -25,7 +25,6 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 class StmOtaControllerTest {
-
     @Test
     fun program_correctlyEmitsProgressValuesAndCompletes() = runTest {
         val stmOtaController = StmOtaController()
@@ -52,10 +51,11 @@ class StmOtaControllerTest {
     @Test(expected = OtaFailedException::class)
     fun program_receivesNackAtStart_throwsException() = runTest {
         val stmOtaController = StmOtaController()
-        stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(0)),
-            byteArrayOf()
-        ).toList()
+        stmOtaController
+            .program(
+                configureMessageStreamMock(nackPositions = listOf(0)),
+                byteArrayOf(),
+            ).toList()
     }
 
     @Test(expected = OtaFailedException::class)
@@ -65,11 +65,13 @@ class StmOtaControllerTest {
         val firmwareBin = generateRandomBinFile()
         val expectedProgress = generateExpectedProgressValues(firmwareBin)
 
-        val testObserver = stmOtaController.program(
-            configureMessageStreamMock(nackPositions = listOf(10)),
-            firmwareBin
-        ).toList()
-        assertThat(testObserver.toList()).containsExactlyElementsIn(expectedProgress.slice(0..1))
+        val testObserver = stmOtaController
+            .program(
+                configureMessageStreamMock(nackPositions = listOf(10)),
+                firmwareBin,
+            ).toList()
+        assertThat(testObserver.toList())
+            .containsExactlyElementsIn(expectedProgress.slice(0..1))
             .inOrder()
     }
 
@@ -82,7 +84,7 @@ class StmOtaControllerTest {
             spyk(StmOtaMessageInputStream(mockk(), mockk())).apply {
                 justRun { connect(any()) }
                 every { stmOtaResponseStream } returns responseSubject.toFlowable(
-                    BackpressureStrategy.BUFFER
+                    BackpressureStrategy.BUFFER,
                 )
             },
             mockk {
@@ -94,20 +96,20 @@ class StmOtaControllerTest {
                                     CommandAcknowledgement.Kind.NACK
                                 } else {
                                     CommandAcknowledgement.Kind.ACK
-                                }
-                            )
+                                },
+                            ),
                         )
                     }
                 }
-            }, Dispatchers.IO
+            },
+            Dispatchers.IO,
         )
     }
 
     companion object {
         private fun generateRandomBinFile() = Random.nextBytes(1200 + Random.nextInt(2000))
 
-        private fun expectedNumberOfChunks(binFile: ByteArray): Int =
-            ceil(binFile.size.toFloat() / 256f).roundToInt()
+        private fun expectedNumberOfChunks(binFile: ByteArray): Int = ceil(binFile.size.toFloat() / 256f).roundToInt()
 
         private fun generateExpectedProgressValues(binFile: ByteArray): List<Float> {
             val numberOfChunks = expectedNumberOfChunks(binFile)

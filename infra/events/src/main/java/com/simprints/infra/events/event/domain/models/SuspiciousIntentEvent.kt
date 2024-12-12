@@ -15,20 +15,18 @@ data class SuspiciousIntentEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         unexpectedExtras: Map<String, Any?>,
     ) : this(
         UUID.randomUUID().toString(),
         SuspiciousIntentPayload(createdAt, EVENT_VERSION, unexpectedExtras),
-        SUSPICIOUS_INTENT
+        SUSPICIOUS_INTENT,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class SuspiciousIntentPayload(
@@ -44,7 +42,6 @@ data class SuspiciousIntentEvent(
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

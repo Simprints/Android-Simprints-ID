@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 @Keep
 internal enum class ApiFingerComparisonStrategy {
     SAME_FINGER,
-    CROSS_FINGER_USING_MEAN_OF_MAX
+    CROSS_FINGER_USING_MEAN_OF_MAX,
 }
 
 internal fun FingerComparisonStrategy.fromDomainToApi() = when (this) {

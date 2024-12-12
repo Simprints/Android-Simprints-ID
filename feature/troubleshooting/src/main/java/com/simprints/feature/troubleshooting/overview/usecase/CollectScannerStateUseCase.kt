@@ -8,10 +8,10 @@ internal class CollectScannerStateUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val scannerManager: ScannerManager,
 ) {
-
     suspend operator fun invoke(): String {
         try {
-            val sdk = configRepository.getProjectConfiguration()
+            val sdk = configRepository
+                .getProjectConfiguration()
                 .fingerprint
                 ?.allowedSDKs
                 ?.firstOrNull() // Just need any to trigger hardware version fetch

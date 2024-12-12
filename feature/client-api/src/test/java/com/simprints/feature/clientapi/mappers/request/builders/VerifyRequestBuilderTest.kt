@@ -17,7 +17,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 internal class VerifyRequestBuilderTest {
-
     @Test
     fun `VerifyActionRequest should contain mandatory fields`() {
         val extractor = VerifyActionFactory.getMockExtractor()
@@ -38,7 +37,7 @@ internal class VerifyRequestBuilderTest {
             extractor = extractor,
             project = project,
             tokenizationProcessor = tokenizationProcessor,
-            validator = validator
+            validator = validator,
         ).build() as ActionRequest.VerifyActionRequest
 
         assertThat(action.projectId).isEqualTo(MOCK_PROJECT_ID)

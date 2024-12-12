@@ -23,12 +23,14 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
-
     private val logoutSyncViewModel by viewModels<LogoutSyncViewModel>()
     private val syncViewModel by viewModels<SyncViewModel>()
     private val binding by viewBinding(FragmentLogoutSyncBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
         observeLiveData()
@@ -67,18 +69,20 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
             logoutWithoutSyncButton.isVisible = isLogoutButtonVisible.not()
             logoutSyncInfo.isInvisible = isLogoutButtonVisible
         }
-        syncViewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
-            findNavController().navigate(
-                R.id.action_logOutSyncFragment_to_login,
-                loginArgs
-            )
-        })
+        syncViewModel.loginRequestedEventLiveData.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { loginArgs ->
+                findNavController().navigate(
+                    R.id.action_logOutSyncFragment_to_login,
+                    loginArgs,
+                )
+            },
+        )
     }
 
     /**
      * Helper function that calculates whether the 'proceed to log out' button should be visible.
      * The button should be visible only when synchronization is complete
      */
-    private fun isLogoutButtonVisible(state: SyncCardState) =
-        state is SyncCardState.SyncComplete
+    private fun isLogoutButtonVisible(state: SyncCardState) = state is SyncCardState.SyncComplete
 }

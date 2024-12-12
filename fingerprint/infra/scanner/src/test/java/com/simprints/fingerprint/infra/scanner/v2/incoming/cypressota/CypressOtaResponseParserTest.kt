@@ -7,7 +7,6 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.hexToByteArra
 import org.junit.Test
 
 class CypressOtaResponseParserTest {
-
     @Test
     fun parseCypressOtaResponse_buildsMessageCorrectlyFromProtocol() {
         val messageParser = CypressOtaResponseParser()

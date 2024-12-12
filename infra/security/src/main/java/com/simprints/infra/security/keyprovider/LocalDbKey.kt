@@ -3,8 +3,10 @@ package com.simprints.infra.security.keyprovider
 import androidx.annotation.Keep
 
 @Keep
-data class LocalDbKey(val projectId: String, val value: ByteArray) {
-
+data class LocalDbKey(
+    val projectId: String,
+    val value: ByteArray,
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is LocalDbKey) return false

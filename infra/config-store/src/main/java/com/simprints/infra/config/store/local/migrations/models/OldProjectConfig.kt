@@ -22,7 +22,6 @@ import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.BASIC
 import com.simprints.infra.config.store.models.Vero2Configuration.LedsMode.LIVE_QUALITY_FEEDBACK
 import org.json.JSONObject
 
-
 @Keep
 internal data class OldProjectConfig(
     @JsonProperty("CaptureFingerprintStrategy") private val captureFingerprintStrategy: String?,
@@ -62,28 +61,28 @@ internal data class OldProjectConfig(
     @JsonProperty("SyncGroup") private val syncGroup: String,
     @JsonProperty("NbOfIdsInt") private val nbOfIdsInt: String,
     @JsonProperty("Modality") private val modality: String,
-    @JsonProperty("Custom") private val custom: Any?
+    @JsonProperty("Custom") private val custom: Any?,
 ) {
-    fun toDomain(projectId: String): ProjectConfiguration =
-        ProjectConfiguration(
-            id = "",
-            projectId = projectId,
-            updatedAt = "",
-            general = generalConfiguration(),
-            face = faceConfiguration(),
-            fingerprint = fingerprintConfiguration(),
-            consent = consentConfiguration(),
-            identification = identificationConfiguration(),
-            synchronization = synchronizationConfiguration(),
-            custom = null,
-        )
+    fun toDomain(projectId: String): ProjectConfiguration = ProjectConfiguration(
+        id = "",
+        projectId = projectId,
+        updatedAt = "",
+        general = generalConfiguration(),
+        face = faceConfiguration(),
+        fingerprint = fingerprintConfiguration(),
+        consent = consentConfiguration(),
+        identification = identificationConfiguration(),
+        synchronization = synchronizationConfiguration(),
+        custom = null,
+    )
 
     private fun generalConfiguration(): GeneralConfiguration {
-        val modalities = modality.split(",")
+        val modalities = modality
+            .split(",")
             .map { if (it == "FINGER") "FINGERPRINT" else it }
             .map {
                 GeneralConfiguration.Modality.valueOf(
-                    it
+                    it,
                 )
             }
         return GeneralConfiguration(
@@ -97,175 +96,175 @@ internal data class OldProjectConfig(
         )
     }
 
-    private fun faceConfiguration(): FaceConfiguration? =
-        if (faceQualityThreshold == null) null
-        else
-            FaceConfiguration(
-                allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
-                rankOne = FaceConfiguration.FaceSdkConfiguration(
-                    nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull()
-                        ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
-                    qualityThreshold = faceQualityThreshold.toFloat(),
-                    imageSavingStrategy = if (saveFaceImages.toBoolean()) {
-                        FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
-                    } else {
-                        FaceConfiguration.ImageSavingStrategy.NEVER
-                    },
-                    decisionPolicy = faceConfidenceThresholds?.let { parseDecisionPolicy(it) }
-                        ?: DecisionPolicy(0, 0, 0),
-                    version = DEFAULT_FACE_SDK_VERSION,
-                ),
-            )
-
-    private fun fingerprintConfiguration(): FingerprintConfiguration? =
-        if (fingerprintQualityThreshold == null) null
-        else
-            FingerprintConfiguration(
-                allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
-                displayHandIcons = fingerImagesExist.toBoolean(),
-                allowedScanners = scannerGenerations?.split(",")
-                    ?.map {
-                        FingerprintConfiguration.VeroGeneration.valueOf(
-                            it
-                        )
-                    }
-                    ?: listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
-
-                secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
-                    fingersToCapture = fingerprintsToCollect?.split(",")
-                        ?.map { Finger.valueOf(it) }
-                        ?: listOf(
-                            Finger.LEFT_THUMB,
-                            Finger.LEFT_INDEX_FINGER
-                        ),
-                    decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
-                        ?: DecisionPolicy(0, 0, 700),
-
-                    comparisonStrategyForVerification = fingerComparisonStrategyForVerification
-                        ?.let {
-                            FingerprintConfiguration.FingerComparisonStrategy.valueOf(it)
-                        }
-                        ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-                    vero1 = Vero1Configuration(fingerprintQualityThreshold.toInt()),
-                    vero2 = vero2Configuration(),
-                    maxCaptureAttempts = null
-                ),
-                nec = null,
-            )
-
-    private fun vero2Configuration(): Vero2Configuration? =
-        if (captureFingerprintStrategy == null) null
-        else
-            Vero2Configuration(
-                fingerprintQualityThreshold!!.toInt(),
-                captureStrategy = Vero2Configuration.CaptureStrategy.valueOf(
-                    captureFingerprintStrategy
-                ),
-                ledsMode = if(fingerprintLiveFeedbackOn.toBoolean()) LIVE_QUALITY_FEEDBACK else BASIC,
-                imageSavingStrategy = when (saveFingerprintImagesStrategy) {
-                    "NEVER" -> Vero2Configuration.ImageSavingStrategy.NEVER
-                    "WSQ_15" -> Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
-                    "WSQ_15_EAGER" -> Vero2Configuration.ImageSavingStrategy.EAGER
-                    else -> Vero2Configuration.ImageSavingStrategy.NEVER
-                },
-                firmwareVersions = if (vero2FirmwareVersions.isNullOrEmpty()) {
-                    emptyMap()
+    private fun faceConfiguration(): FaceConfiguration? = if (faceQualityThreshold == null) {
+        null
+    } else {
+        FaceConfiguration(
+            allowedSDKs = listOf(FaceConfiguration.BioSdk.RANK_ONE),
+            rankOne = FaceConfiguration.FaceSdkConfiguration(
+                nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull()
+                    ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
+                qualityThreshold = faceQualityThreshold.toFloat(),
+                imageSavingStrategy = if (saveFaceImages.toBoolean()) {
+                    FaceConfiguration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
                 } else {
-                    // Construct a JavaType instance for Map<String, Vero2FirmwareVersions>
-                    val type = JsonHelper.jackson.typeFactory.constructMapType(
-                        Map::class.java,
-                        String::class.java,
-                        Vero2Configuration.Vero2FirmwareVersions::class.java
-                    )
-                    JsonHelper.fromJson(vero2FirmwareVersions, type)
+                    FaceConfiguration.ImageSavingStrategy.NEVER
                 },
-            )
-
-    private fun consentConfiguration(): ConsentConfiguration =
-        ConsentConfiguration(
-            programName = programName,
-            organizationName = organizationName,
-            collectConsent = consentRequired.toBoolean(),
-            displaySimprintsLogo = logoExists.toBoolean(),
-            allowParentalConsent = consentParentalExists.toBoolean(),
-            generalPrompt = JsonHelper.fromJson<GeneralConsentOptions>(consentGeneralOptions)
-                .toDomain(),
-            parentalPrompt = JsonHelper.fromJson<ParentalConsentOptions>(consentParentalOptions)
-                .toDomain(),
-        )
-
-    private fun identificationConfiguration(): IdentificationConfiguration =
-        IdentificationConfiguration(
-            maxNbOfReturnedCandidates = nbOfIdsInt.toInt(),
-            poolType = IdentificationConfiguration.PoolType.valueOf(
-                if (matchGroup == "GLOBAL") "PROJECT" else matchGroup
+                decisionPolicy = faceConfidenceThresholds?.let { parseDecisionPolicy(it) }
+                    ?: DecisionPolicy(0, 0, 0),
+                version = DEFAULT_FACE_SDK_VERSION,
             ),
         )
+    }
 
-    private fun synchronizationConfiguration(): SynchronizationConfiguration =
-        SynchronizationConfiguration(
-            frequency = when (downSyncSetting) {
-                "OFF" -> SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
-                "ON" -> SynchronizationConfiguration.Frequency.PERIODICALLY
-                "EXTRA" -> SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
-                else -> SynchronizationConfiguration.Frequency.PERIODICALLY
-            },
-            up = UpSynchronizationConfiguration(
-                simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-                    kind = if (simprintsSync == null) {
-                        if (syncDestination?.contains("SIMPRINTS") == true) {
-                            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-                        } else {
-                            UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                        }
-                    } else {
-                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(
-                            simprintsSync
-                        )
-                    },
-                    batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
-                        sessions = 1,
-                        upSyncs = 1,
-                        downSyncs = 1,
+    private fun fingerprintConfiguration(): FingerprintConfiguration? = if (fingerprintQualityThreshold == null) {
+        null
+    } else {
+        FingerprintConfiguration(
+            allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+            displayHandIcons = fingerImagesExist.toBoolean(),
+            allowedScanners = scannerGenerations
+                ?.split(",")
+                ?.map {
+                    FingerprintConfiguration.VeroGeneration.valueOf(
+                        it,
+                    )
+                }
+                ?: listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
+            secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
+                fingersToCapture = fingerprintsToCollect
+                    ?.split(",")
+                    ?.map { Finger.valueOf(it) }
+                    ?: listOf(
+                        Finger.LEFT_THUMB,
+                        Finger.LEFT_INDEX_FINGER,
                     ),
-                    imagesRequireUnmeteredConnection = false,
-                ),
-                coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
-                    kind = if (coSync == null) {
-                        if (syncDestination?.contains("COMMCARE") == true) {
-                            UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-                        } else {
-                            UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                        }
-                    } else {
-                        UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(
-                            coSync
-                        )
+                decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
+                    ?: DecisionPolicy(0, 0, 700),
+                comparisonStrategyForVerification = fingerComparisonStrategyForVerification
+                    ?.let {
+                        FingerprintConfiguration.FingerComparisonStrategy.valueOf(it)
                     }
-                ),
+                    ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                vero1 = Vero1Configuration(fingerprintQualityThreshold.toInt()),
+                vero2 = vero2Configuration(),
+                maxCaptureAttempts = null,
             ),
-            down = DownSynchronizationConfiguration(
-                partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(
-                    if (syncGroup == "GLOBAL") "PROJECT" else syncGroup
-                ),
-                maxNbOfModules = maxNbOfModules.toInt(),
-                moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw),
-                maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
-            ),
+            nec = null,
         )
+    }
 
-    private fun parseDecisionPolicy(decisionPolicy: String): DecisionPolicy =
-        with(JSONObject(decisionPolicy)) {
-            DecisionPolicy(
-                low = getString("LOW").toInt(),
-                medium = getString("MEDIUM").toInt(),
-                high = getString("HIGH").toInt(),
-            )
-        }
+    private fun vero2Configuration(): Vero2Configuration? = if (captureFingerprintStrategy == null) {
+        null
+    } else {
+        Vero2Configuration(
+            fingerprintQualityThreshold!!.toInt(),
+            captureStrategy = Vero2Configuration.CaptureStrategy.valueOf(
+                captureFingerprintStrategy,
+            ),
+            ledsMode = if (fingerprintLiveFeedbackOn.toBoolean()) LIVE_QUALITY_FEEDBACK else BASIC,
+            imageSavingStrategy = when (saveFingerprintImagesStrategy) {
+                "NEVER" -> Vero2Configuration.ImageSavingStrategy.NEVER
+                "WSQ_15" -> Vero2Configuration.ImageSavingStrategy.ONLY_USED_IN_REFERENCE
+                "WSQ_15_EAGER" -> Vero2Configuration.ImageSavingStrategy.EAGER
+                else -> Vero2Configuration.ImageSavingStrategy.NEVER
+            },
+            firmwareVersions = if (vero2FirmwareVersions.isNullOrEmpty()) {
+                emptyMap()
+            } else {
+                // Construct a JavaType instance for Map<String, Vero2FirmwareVersions>
+                val type = JsonHelper.jackson.typeFactory.constructMapType(
+                    Map::class.java,
+                    String::class.java,
+                    Vero2Configuration.Vero2FirmwareVersions::class.java,
+                )
+                JsonHelper.fromJson(vero2FirmwareVersions, type)
+            },
+        )
+    }
+
+    private fun consentConfiguration(): ConsentConfiguration = ConsentConfiguration(
+        programName = programName,
+        organizationName = organizationName,
+        collectConsent = consentRequired.toBoolean(),
+        displaySimprintsLogo = logoExists.toBoolean(),
+        allowParentalConsent = consentParentalExists.toBoolean(),
+        generalPrompt = JsonHelper
+            .fromJson<GeneralConsentOptions>(consentGeneralOptions)
+            .toDomain(),
+        parentalPrompt = JsonHelper
+            .fromJson<ParentalConsentOptions>(consentParentalOptions)
+            .toDomain(),
+    )
+
+    private fun identificationConfiguration(): IdentificationConfiguration = IdentificationConfiguration(
+        maxNbOfReturnedCandidates = nbOfIdsInt.toInt(),
+        poolType = IdentificationConfiguration.PoolType.valueOf(
+            if (matchGroup == "GLOBAL") "PROJECT" else matchGroup,
+        ),
+    )
+
+    private fun synchronizationConfiguration(): SynchronizationConfiguration = SynchronizationConfiguration(
+        frequency = when (downSyncSetting) {
+            "OFF" -> SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+            "ON" -> SynchronizationConfiguration.Frequency.PERIODICALLY
+            "EXTRA" -> SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
+            else -> SynchronizationConfiguration.Frequency.PERIODICALLY
+        },
+        up = UpSynchronizationConfiguration(
+            simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+                kind = if (simprintsSync == null) {
+                    if (syncDestination?.contains("SIMPRINTS") == true) {
+                        UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+                    } else {
+                        UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                    }
+                } else {
+                    UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(
+                        simprintsSync,
+                    )
+                },
+                batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+                    sessions = 1,
+                    upSyncs = 1,
+                    downSyncs = 1,
+                ),
+                imagesRequireUnmeteredConnection = false,
+            ),
+            coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
+                kind = if (coSync == null) {
+                    if (syncDestination?.contains("COMMCARE") == true) {
+                        UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+                    } else {
+                        UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                    }
+                } else {
+                    UpSynchronizationConfiguration.UpSynchronizationKind.valueOf(
+                        coSync,
+                    )
+                },
+            ),
+        ),
+        down = DownSynchronizationConfiguration(
+            partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(
+                if (syncGroup == "GLOBAL") "PROJECT" else syncGroup,
+            ),
+            maxNbOfModules = maxNbOfModules.toInt(),
+            moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw),
+            maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
+        ),
+    )
+
+    private fun parseDecisionPolicy(decisionPolicy: String): DecisionPolicy = with(JSONObject(decisionPolicy)) {
+        DecisionPolicy(
+            low = getString("LOW").toInt(),
+            medium = getString("MEDIUM").toInt(),
+            high = getString("HIGH").toInt(),
+        )
+    }
 
     companion object {
         private const val DEFAULT_FACE_FRAMES_TO_CAPTURE = 2
         private const val DEFAULT_FACE_SDK_VERSION = "1.23"
     }
 }
-

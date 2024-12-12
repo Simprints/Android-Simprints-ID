@@ -21,7 +21,6 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     private val configManager: ConfigManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
-
     override val tag: String = "EnrolmentRecordWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {

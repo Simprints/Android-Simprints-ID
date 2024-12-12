@@ -35,7 +35,6 @@ import com.simprints.infra.resources.R as IDR
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 internal class LogoutSyncFragmentTest {
-
     companion object {
         private const val LAST_SYNC_TIME = "2022-10-10"
     }
@@ -76,17 +75,17 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_default_items_to_upload)).check(
-            matches(withText(context.getString(IDR.string.dashboard_sync_card_records_uploaded)))
+            matches(withText(context.getString(IDR.string.dashboard_sync_card_records_uploaded))),
         )
         onView(withId(R.id.sync_card_default_state_sync_button))
             .check(matches(isDisplayed()))
@@ -108,12 +107,12 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
@@ -123,10 +122,10 @@ internal class LogoutSyncFragmentTest {
                     context.resources.getQuantityString(
                         com.simprints.infra.resources.R.plurals.dashboard_sync_card_records_to_upload,
                         2,
-                        2
-                    )
-                )
-            )
+                        2,
+                    ),
+                ),
+            ),
         )
         onView(withId(R.id.sync_card_default_state_sync_button))
             .check(matches(isDisplayed()))
@@ -148,13 +147,13 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
@@ -176,12 +175,12 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
@@ -195,8 +194,8 @@ internal class LogoutSyncFragmentTest {
         mockSyncCardLiveData(
             SyncCardState.SyncFailedBackendMaintenance(
                 LAST_SYNC_TIME,
-                10L
-            )
+                10L,
+            ),
         )
 
         launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
@@ -208,20 +207,20 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
         val text =
             context.getString(
                 IDR.string.error_backend_maintenance_with_time_message,
-                "10 seconds"
+                "10 seconds",
             )
         onView(withId(R.id.sync_card_failed_message))
             .check(matches(withText(text)))
@@ -241,13 +240,13 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
@@ -269,13 +268,13 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_select_no_modules,
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
@@ -301,13 +300,13 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
@@ -332,21 +331,21 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
             matches(
-                isDisplayed()
-            )
+                isDisplayed(),
+            ),
         )
 
         val text = context.getString(IDR.string.dashboard_sync_card_progress, "50%")
@@ -368,19 +367,19 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
-                R.id.logoutButton
-            )
+                R.id.logoutButton,
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
-            matches(isDisplayed())
+            matches(isDisplayed()),
         )
 
         onView(withId(R.id.sync_card_progress_message))
@@ -401,18 +400,18 @@ internal class LogoutSyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
-            )
+            ),
         )
 
         val lastSyncText = context.getString(
             IDR.string.dashboard_sync_card_last_sync,
-            LAST_SYNC_TIME
+            LAST_SYNC_TIME,
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
-            matches(isDisplayed())
+            matches(isDisplayed()),
         )
 
         onView(withId(R.id.sync_card_progress_message))
@@ -479,5 +478,4 @@ internal class LogoutSyncFragmentTest {
                 .check(matches(not(isDisplayed())))
         }
     }
-
 }

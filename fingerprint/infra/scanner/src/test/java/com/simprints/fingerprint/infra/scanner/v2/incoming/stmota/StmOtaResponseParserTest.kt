@@ -8,7 +8,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class StmOtaResponseParserTest {
-
     @Test
     fun parseStmOtaResponse_buildsMessageCorrectlyFromProtocol() {
         val messageParser = StmOtaResponseParser()

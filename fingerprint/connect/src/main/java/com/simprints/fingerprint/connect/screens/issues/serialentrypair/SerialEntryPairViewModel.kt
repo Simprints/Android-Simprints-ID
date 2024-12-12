@@ -13,9 +13,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SerialEntryPairViewModel @Inject constructor(
     private val scannerPairingManager: ScannerPairingManager,
-    private val serialNumberConverter: SerialNumberConverter
+    private val serialNumberConverter: SerialNumberConverter,
 ) : ViewModel() {
-
     var scannerNumber: String? = null
     val awaitingToPairToMacAddress: LiveData<LiveDataEventWithContent<String>>
         get() = _awaitingToPairToMacAddress

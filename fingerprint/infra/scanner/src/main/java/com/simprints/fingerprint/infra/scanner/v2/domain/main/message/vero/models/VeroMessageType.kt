@@ -3,8 +3,10 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.mode
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toHexString
 
-enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
-
+enum class VeroMessageType(
+    val majorByte: Byte,
+    val minorByte: Byte,
+) {
     // 0x1_ : Versioning
     GET_STM_EXTENDED_FIRMWARE_VERSION(0x10, 0x01),
 
@@ -29,7 +31,8 @@ enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
     GET_BATTERY_PERCENT_CHARGE(0x50, 0x10),
     GET_BATTERY_VOLTAGE(0x50, 0x11),
     GET_BATTERY_CURRENT(0x50, 0x12),
-    GET_BATTERY_TEMPERATURE(0x50, 0x13);
+    GET_BATTERY_TEMPERATURE(0x50, 0x13),
+    ;
 
     fun getBytes() = byteArrayOf(majorByte, minorByte)
 

@@ -24,7 +24,6 @@ internal class ProjectAuthenticator @Inject constructor(
     private val integrityTokenRequester: IntegrityTokenRequester,
     private val firmwareRepository: FirmwareRepository,
 ) {
-
     /**
      * @throws IOException
      * @throws AuthRequestInvalidCredentialsException
@@ -43,7 +42,7 @@ internal class ProjectAuthenticator @Inject constructor(
 
         val config = configManager.getProjectConfiguration()
         fetchProjectLongConsentTexts(config.general.languageOptions, config.projectId)
-        
+
         // This is safe to call even on face-only projects as it will do nothing in such cases
         firmwareRepository.updateStoredFirmwareFilesWithLatest()
     }
@@ -72,13 +71,14 @@ internal class ProjectAuthenticator @Inject constructor(
         integrityToken: String,
     ): AuthRequest = AuthRequest(projectSecret, integrityToken)
 
-
-    private suspend fun makeAuthRequest(authRequest: AuthRequest, nonceScope: NonceScope): Token =
-        authenticationRemoteDataSource.requestAuthToken(
-            nonceScope.projectId,
-            nonceScope.deviceId,
-            authRequest
-        )
+    private suspend fun makeAuthRequest(
+        authRequest: AuthRequest,
+        nonceScope: NonceScope,
+    ): Token = authenticationRemoteDataSource.requestAuthToken(
+        nonceScope.projectId,
+        nonceScope.deviceId,
+        authRequest,
+    )
 
     private suspend fun Token.signIn(projectId: String) {
         signerManager.signIn(projectId, this)
@@ -88,7 +88,10 @@ internal class ProjectAuthenticator @Inject constructor(
         secureDataManager.createLocalDatabaseKeyIfMissing(projectId)
     }
 
-    private suspend fun fetchProjectLongConsentTexts(languages: List<String>, projectId: String) {
+    private suspend fun fetchProjectLongConsentTexts(
+        languages: List<String>,
+        projectId: String,
+    ) {
         languages.forEach { language ->
             configManager.getPrivacyNotice(projectId, language).collect()
         }

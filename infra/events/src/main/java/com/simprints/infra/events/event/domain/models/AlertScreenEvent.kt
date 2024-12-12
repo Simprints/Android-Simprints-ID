@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
 import java.util.UUID
 
-
 @Keep
 data class AlertScreenEvent(
     override val id: String = UUID.randomUUID().toString(),
@@ -16,14 +15,13 @@ data class AlertScreenEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         alertType: AlertScreenPayload.AlertScreenEventType,
     ) : this(
         UUID.randomUUID().toString(),
         AlertScreenPayload(createdAt, EVENT_VERSION, alertType),
-        ALERT_SCREEN
+        ALERT_SCREEN,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
@@ -38,7 +36,6 @@ data class AlertScreenEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = ALERT_SCREEN,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "type: $alertType"
 
         enum class AlertScreenEventType {
@@ -78,7 +75,7 @@ data class AlertScreenEvent(
             MISSING_GOOGLE_PLAY_SERVICES,
             MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
             PROJECT_PAUSED,
-            PROJECT_ENDING
+            PROJECT_ENDING,
         }
     }
 

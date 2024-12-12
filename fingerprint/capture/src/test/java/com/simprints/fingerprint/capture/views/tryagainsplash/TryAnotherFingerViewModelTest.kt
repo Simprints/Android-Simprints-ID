@@ -13,7 +13,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TryAnotherFingerViewModelTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -21,7 +20,6 @@ class TryAnotherFingerViewModelTest {
 
     @Before
     fun setUp() {
-
         viewModel = TryAnotherFingerViewModel()
     }
 

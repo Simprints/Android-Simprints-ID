@@ -5,9 +5,9 @@ import com.simprints.infra.config.store.models.MaxCaptureAttempts
 
 @Keep
 internal data class ApiMaxCaptureAttempts(
-    val noFingerDetected: Int
+    val noFingerDetected: Int,
 ) {
     fun toDomain(): MaxCaptureAttempts = MaxCaptureAttempts(
-        noFingerDetected = noFingerDetected
+        noFingerDetected = noFingerDetected,
     )
 }

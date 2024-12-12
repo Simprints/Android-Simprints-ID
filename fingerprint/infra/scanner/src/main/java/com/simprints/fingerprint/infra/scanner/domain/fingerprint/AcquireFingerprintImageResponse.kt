@@ -7,5 +7,5 @@ package com.simprints.fingerprint.infra.scanner.domain.fingerprint
  * @property imageBytes  the bytes of the captured fingerprint image
  */
 class AcquireFingerprintImageResponse(
-    val imageBytes: ByteArray
+    val imageBytes: ByteArray,
 )

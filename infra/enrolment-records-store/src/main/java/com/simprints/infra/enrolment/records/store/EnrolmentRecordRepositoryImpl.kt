@@ -28,8 +28,8 @@ internal class EnrolmentRecordRepositoryImpl(
     private val tokenizationProcessor: TokenizationProcessor,
     private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
-) : EnrolmentRecordRepository, EnrolmentRecordLocalDataSource by localDataSource {
-
+) : EnrolmentRecordRepository,
+    EnrolmentRecordLocalDataSource by localDataSource {
     @Inject
     constructor(
         @ApplicationContext context: Context,
@@ -45,13 +45,12 @@ internal class EnrolmentRecordRepositoryImpl(
         commCareDataSource = commCareDataSource,
         tokenizationProcessor = tokenizationProcessor,
         dispatcher = dispatcher,
-        batchSize = BATCH_SIZE
+        batchSize = BATCH_SIZE,
     )
 
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
     companion object {
-
         private const val BATCH_SIZE = 80
         private const val PREF_FILE_NAME = "UPLOAD_ENROLMENT_RECORDS_PROGRESS"
         private const val PROGRESS_KEY = "PROGRESS"
@@ -64,10 +63,11 @@ internal class EnrolmentRecordRepositoryImpl(
             query = SubjectQuery(
                 subjectIds = subjectIds,
                 sort = true,
-                afterSubjectId = lastUploadedRecord
+                afterSubjectId = lastUploadedRecord,
             )
         }
-        localDataSource.load(query)
+        localDataSource
+            .load(query)
             .chunked(batchSize)
             .forEach { subjects ->
                 remoteDataSource.uploadRecords(subjects)
@@ -80,20 +80,22 @@ internal class EnrolmentRecordRepositoryImpl(
         try {
             val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
             val tokenizedSubjectsCreateAction =
-                localDataSource.load(query).mapNotNull { subject ->
-                    if (subject.projectId != project.id) return@mapNotNull null
-                    val moduleId = tokenizeIfNecessary(
-                        value = subject.moduleId,
-                        tokenKeyType = TokenKeyType.ModuleId,
-                        project = project
-                    )
-                    val attendantId = tokenizeIfNecessary(
-                        value = subject.attendantId,
-                        tokenKeyType = TokenKeyType.AttendantId,
-                        project = project
-                    )
-                    return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
-                }.map(SubjectAction::Creation)
+                localDataSource
+                    .load(query)
+                    .mapNotNull { subject ->
+                        if (subject.projectId != project.id) return@mapNotNull null
+                        val moduleId = tokenizeIfNecessary(
+                            value = subject.moduleId,
+                            tokenKeyType = TokenKeyType.ModuleId,
+                            project = project,
+                        )
+                        val attendantId = tokenizeIfNecessary(
+                            value = subject.attendantId,
+                            tokenKeyType = TokenKeyType.AttendantId,
+                            project = project,
+                        )
+                        return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
+                    }.map(SubjectAction::Creation)
             localDataSource.performActions(tokenizedSubjectsCreateAction)
         } catch (e: Exception) {
             when (e) {
@@ -112,7 +114,7 @@ internal class EnrolmentRecordRepositoryImpl(
         is TokenizableString.Raw -> tokenizationProcessor.encrypt(
             decrypted = value,
             tokenKeyType = tokenKeyType,
-            project = project
+            project = project,
         )
     }
 
@@ -125,15 +127,13 @@ internal class EnrolmentRecordRepositoryImpl(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FingerprintIdentity> =
-        fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range, dataSource)
+    ): List<FingerprintIdentity> = fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range, dataSource)
 
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FaceIdentity> =
-        fromIdentityDataSource(dataSource).loadFaceIdentities(query, range, dataSource)
+    ): List<FaceIdentity> = fromIdentityDataSource(dataSource).loadFaceIdentities(query, range, dataSource)
 
     private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
         is BiometricDataSource.Simprints -> localDataSource

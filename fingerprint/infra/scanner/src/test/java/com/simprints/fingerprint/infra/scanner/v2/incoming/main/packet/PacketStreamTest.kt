@@ -15,7 +15,6 @@ import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test
 
 class PacketStreamTest {
-
     private val packetParserMock = mockk<PacketParser> {
         every { parse(any()) } answers {
             hollowPacketWithRawBytes(args[0] as ByteArray)
@@ -26,15 +25,23 @@ class PacketStreamTest {
     fun packetStream_accumulatesAndCreatesPacketsCorrectly() {
         val packetStrings = listOf("10 A0 01 00 F0", "10 A0 03 00 F0 F1 F2", "10 A0 02 00 F0 F1")
 
-        val testSubscriber = packetStrings.reduceString().hexToByteArray().chunked(4)
+        val testSubscriber = packetStrings
+            .reduceString()
+            .hexToByteArray()
+            .chunked(4)
             .toFlowable()
             .toPacketStream(ByteArrayToPacketAccumulator(packetParserMock))
             .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()
 
-        assertThat(testSubscriber.values().map { it.bytes }.toHexStrings().stripWhiteSpaceToLowercase())
-            .containsExactlyElementsIn(packetStrings.stripWhiteSpaceToLowercase())
+        assertThat(
+            testSubscriber
+                .values()
+                .map { it.bytes }
+                .toHexStrings()
+                .stripWhiteSpaceToLowercase(),
+        ).containsExactlyElementsIn(packetStrings.stripWhiteSpaceToLowercase())
             .inOrder()
     }
 }

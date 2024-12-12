@@ -7,6 +7,5 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.Message
  * packets to be sent over the Bluetooth output stream
  */
 interface MessageSerializer<in T : Message> {
-
     fun serialize(message: T): List<ByteArray>
 }

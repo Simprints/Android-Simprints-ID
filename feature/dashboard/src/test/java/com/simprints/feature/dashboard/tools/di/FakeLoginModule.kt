@@ -12,10 +12,9 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [AuthStoreModule::class]
+    replaces = [AuthStoreModule::class],
 )
 object FakeLoginModule {
-
     @Provides
     @Singleton
     fun provideAuthStore(): AuthStore = mockk()

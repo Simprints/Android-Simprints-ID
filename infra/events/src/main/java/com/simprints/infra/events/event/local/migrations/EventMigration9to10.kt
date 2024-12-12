@@ -29,7 +29,6 @@ import com.simprints.infra.logging.Simber
  * the new Event objects containing TokenizableString fields.
  */
 internal class EventMigration9to10 : Migration(9, 10) {
-
     override fun migrate(database: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 9 to schema 10.")
         migrateEventJson(database)
@@ -50,11 +49,10 @@ internal class EventMigration9to10 : Migration(9, 10) {
                     jsonData.migrateJsonStringToTokenizableString(USER_ID, ATTENDANT_ID, MODULE_ID)
                 database.execSQL(
                     "UPDATE $DB_EVENT_ENTITY SET $DB_EVENT_JSON_FIELD = ? WHERE id = ?",
-                    arrayOf(migratedJson, id)
+                    arrayOf(migratedJson, id),
                 )
             }
         }
-
     }
 
     companion object {

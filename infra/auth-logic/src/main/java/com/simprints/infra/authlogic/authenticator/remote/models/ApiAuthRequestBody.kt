@@ -9,10 +9,9 @@ internal data class ApiAuthRequestBody(
     var integrityToken: String = "",
 ) {
     companion object {
-        fun fromDomain(authRequest: AuthRequest): ApiAuthRequestBody =
-            ApiAuthRequestBody(
-                authRequest.projectSecret,
-                authRequest.integrityToken,
-            )
+        fun fromDomain(authRequest: AuthRequest): ApiAuthRequestBody = ApiAuthRequestBody(
+            authRequest.projectSecret,
+            authRequest.integrityToken,
+        )
     }
 }

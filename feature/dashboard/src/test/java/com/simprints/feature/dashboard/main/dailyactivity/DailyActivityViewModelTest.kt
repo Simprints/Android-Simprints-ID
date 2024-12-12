@@ -15,7 +15,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class DailyActivityViewModelTest {
-
     companion object {
         private const val DATE = "2022-11-15"
         private const val ENROLMENTS_COUNT = 2
@@ -40,7 +39,7 @@ class DailyActivityViewModelTest {
             ENROLMENTS_COUNT,
             IDENTIFICATIONS_COUNT,
             VERIFICATIONS_COUNT,
-            0
+            0,
         )
     }
 
@@ -54,7 +53,7 @@ class DailyActivityViewModelTest {
         val expectedState = DashboardDailyActivityState(
             ENROLMENTS_COUNT,
             IDENTIFICATIONS_COUNT,
-            VERIFICATIONS_COUNT
+            VERIFICATIONS_COUNT,
         )
         assertThat(viewModel.dailyActivity.value).isEqualTo(expectedState)
     }

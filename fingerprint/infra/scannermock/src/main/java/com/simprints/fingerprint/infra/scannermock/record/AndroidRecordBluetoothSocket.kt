@@ -8,18 +8,21 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-class AndroidRecordBluetoothSocket(private val socket: BluetoothSocket,
-                                   private val fileWithFakeBytes: String?): ComponentBluetoothSocket {
-
+class AndroidRecordBluetoothSocket(
+    private val socket: BluetoothSocket,
+    private val fileWithFakeBytes: String?,
+) : ComponentBluetoothSocket {
     override fun connect() = socket.connect()
 
-    override fun getInputStream(): InputStream =
-            fileWithFakeBytes?.let {
-                // we forward all bytes through the FileOutputStream before consuming them
-                TeeInputStream(socket.inputStream, File(fileWithFakeBytes).delete().let {
-                    FileOutputStream(fileWithFakeBytes)
-                })
-            } ?: socket.inputStream
+    override fun getInputStream(): InputStream = fileWithFakeBytes?.let {
+        // we forward all bytes through the FileOutputStream before consuming them
+        TeeInputStream(
+            socket.inputStream,
+            File(fileWithFakeBytes).delete().let {
+                FileOutputStream(fileWithFakeBytes)
+            },
+        )
+    } ?: socket.inputStream
 
     override fun getOutputStream(): OutputStream = socket.outputStream
 

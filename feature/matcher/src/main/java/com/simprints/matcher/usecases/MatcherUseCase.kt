@@ -4,7 +4,6 @@ import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 
 internal interface MatcherUseCase {
-
     val crashReportTag: String
 
     /**

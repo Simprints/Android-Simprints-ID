@@ -9,7 +9,6 @@ internal data class ApiDeviceState(
     val isCompromised: Boolean,
     val mustUpSyncEnrolmentRecords: ApiUpSyncEnrolmentRecords? = null,
 ) {
-
     fun toDomain() = DeviceState(
         deviceId,
         isCompromised,

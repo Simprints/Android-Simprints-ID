@@ -9,7 +9,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test
 
 class RefusalEventTest {
-
     @Test
     fun create_RefusalEvent() {
         val otherTextArg = "other_text"

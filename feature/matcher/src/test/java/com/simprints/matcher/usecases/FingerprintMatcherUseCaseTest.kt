@@ -25,7 +25,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class FingerprintMatcherUseCaseTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -93,7 +92,7 @@ internal class FingerprintMatcherUseCaseTest {
                     MatchParams.FingerprintSample(
                         IFingerIdentifier.LEFT_3RD_FINGER,
                         "format",
-                        byteArrayOf(1, 2, 3)
+                        byteArrayOf(1, 2, 3),
                     ),
                 ),
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
@@ -130,8 +129,8 @@ internal class FingerprintMatcherUseCaseTest {
                     fingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER),
                     fingerprintSample(IFingerIdentifier.LEFT_4TH_FINGER),
                     fingerprintSample(IFingerIdentifier.LEFT_5TH_FINGER),
-                )
-            )
+                ),
+            ),
         )
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
@@ -143,7 +142,7 @@ internal class FingerprintMatcherUseCaseTest {
                     MatchParams.FingerprintSample(
                         IFingerIdentifier.LEFT_3RD_FINGER,
                         "format",
-                        byteArrayOf(1, 2, 3)
+                        byteArrayOf(1, 2, 3),
                     ),
                 ),
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
@@ -159,6 +158,5 @@ internal class FingerprintMatcherUseCaseTest {
         assertThat(onLoadingCalled).isTrue()
     }
 
-    private fun fingerprintSample(finger: IFingerIdentifier) =
-        FingerprintSample(finger, byteArrayOf(1), 42, "format")
+    private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), 42, "format")
 }

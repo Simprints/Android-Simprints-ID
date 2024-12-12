@@ -16,14 +16,14 @@ import javax.inject.Inject
 internal class IntentLogViewModel @Inject constructor(
     private val persistentLogger: PersistentLogger,
 ) : ViewModel() {
-
     private val _logs = MutableLiveData<List<TroubleshootingItemViewData>>(emptyList())
     val logs: LiveData<List<TroubleshootingItemViewData>>
         get() = _logs
 
     fun collectData() {
         viewModelScope.launch {
-            persistentLogger.get(LogEntryType.Intent)
+            persistentLogger
+                .get(LogEntryType.Intent)
                 .map {
                     TroubleshootingItemViewData(
                         title = it.title,
@@ -31,8 +31,7 @@ internal class IntentLogViewModel @Inject constructor(
                         body = it.body,
                         navigationId = it.title,
                     )
-                }
-                .ifEmpty { listOf(TroubleshootingItemViewData(title = "No intents")) }
+                }.ifEmpty { listOf(TroubleshootingItemViewData(title = "No intents")) }
                 .let { _logs.postValue(it) }
         }
     }

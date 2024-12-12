@@ -6,9 +6,9 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class ScanCountdownBar(
-    val progressBar: ProgressBar, scanningTimeoutMs: Long
+    val progressBar: ProgressBar,
+    scanningTimeoutMs: Long,
 ) : CountDownTimer(scanningTimeoutMs, scanningTimeoutMs / TOTAL_PROGRESS.toLong()) {
-
     private var scanningProgress = INITIAL_PROGRESS
 
     fun startTimeoutBar() {

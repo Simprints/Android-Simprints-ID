@@ -24,20 +24,18 @@ internal class EventStartSyncReporterWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
-
     override val tag: String = EventStartSyncReporterWorker::class.java.simpleName
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            try {
-                showProgressNotification()
-                val syncId = inputData.getString(SYNC_ID_STARTED)
-                crashlyticsLog("Start - Params: $syncId")
-                success(inputData)
-            } catch (t: Throwable) {
-                fail(t)
-            }
+    override suspend fun doWork(): Result = withContext(dispatcher) {
+        try {
+            showProgressNotification()
+            val syncId = inputData.getString(SYNC_ID_STARTED)
+            crashlyticsLog("Start - Params: $syncId")
+            success(inputData)
+        } catch (t: Throwable) {
+            fail(t)
         }
+    }
 
     companion object {
         const val SYNC_ID_STARTED = "SYNC_ID_STARTED"

@@ -7,7 +7,6 @@ import androidx.room.Query
 
 @Dao
 internal interface ImageMetadataDao {
-
     @Query("SELECT * FROM DbImageMetadata WHERE imageId = :imageId")
     suspend fun get(imageId: String): List<DbImageMetadata>
 

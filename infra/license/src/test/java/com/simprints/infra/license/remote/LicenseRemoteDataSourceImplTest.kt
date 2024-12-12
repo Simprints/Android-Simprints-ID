@@ -2,7 +2,6 @@ package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.license.models.License
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.network.SimNetwork
@@ -40,7 +39,7 @@ class LicenseRemoteDataSourceImplTest {
             val args = this.args
             @Suppress("UNCHECKED_CAST")
             (args[0] as InterfaceInvocation<LicenseRemoteInterface, ApiLicense>).invoke(
-                remoteInterface
+                remoteInterface,
             )
         }
 
@@ -63,35 +62,37 @@ class LicenseRemoteDataSourceImplTest {
                 "invalidProject",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws SyncCloudIntegrationException(
             cause = HttpException(
                 Response.error<ApiLicense>(
-                    403, "{\"error\":\"001\"}".toResponseBody("application/json".toMediaType())
-                )
-            )
+                    403,
+                    "{\"error\":\"001\"}".toResponseBody("application/json".toMediaType()),
+                ),
+            ),
         )
         coEvery {
             remoteInterface.getLicense(
                 "invalidProjectUnknownErrorCode",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws SyncCloudIntegrationException(
             cause = HttpException(
                 Response.error<ApiLicense>(
-                    403, "{\"error\":\"000\"}".toResponseBody("application/json".toMediaType())
-                )
-            )
+                    403,
+                    "{\"error\":\"000\"}".toResponseBody("application/json".toMediaType()),
+                ),
+            ),
         )
         coEvery {
             remoteInterface.getLicense(
                 "backendMaintenanceErrorProject",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws BackendMaintenanceException(estimatedOutage = null)
 
@@ -100,43 +101,44 @@ class LicenseRemoteDataSourceImplTest {
                 "noQuotaProject",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws SyncCloudIntegrationException(
             cause = HttpException(
                 Response.error<ApiLicense>(
-                    403, "{\"error\":\"002\"}".toResponseBody("application/json".toMediaType())
-                )
-            )
+                    403,
+                    "{\"error\":\"002\"}".toResponseBody("application/json".toMediaType()),
+                ),
+            ),
         )
         coEvery {
             remoteInterface.getLicense(
                 "serviceUnavailable",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws SyncCloudIntegrationException(
             cause = HttpException(
-                Response.error<ApiLicense>(503, "".toResponseBody("application/json".toMediaType()))
-            )
+                Response.error<ApiLicense>(503, "".toResponseBody("application/json".toMediaType())),
+            ),
         )
         coEvery {
             remoteInterface.getLicense(
                 "networkConnectionException",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws NetworkConnectionException(
-            cause = Throwable()
+            cause = Throwable(),
         )
         coEvery {
             remoteInterface.getLicense(
                 "genericException",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } throws Exception()
     }
@@ -220,32 +222,30 @@ class LicenseRemoteDataSourceImplTest {
     }
 
     @Test
-    fun `Get no license if there is a connection exception - generic error`() =
-        runTest(StandardTestDispatcher()) {
-            val newLicense =
-                licenseRemoteDataSourceImpl.getLicense(
-                    "networkConnectionException",
-                    "deviceId",
-                    RANK_ONE_FACE,
-                    LicenseVersion.UNLIMITED,
-                )
+    fun `Get no license if there is a connection exception - generic error`() = runTest(StandardTestDispatcher()) {
+        val newLicense =
+            licenseRemoteDataSourceImpl.getLicense(
+                "networkConnectionException",
+                "deviceId",
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
+            )
 
-            assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
-        }
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+    }
 
     @Test
-    fun `Get no license if there is a generic exception - generic error`() =
-        runTest(StandardTestDispatcher()) {
-            val newLicense =
-                licenseRemoteDataSourceImpl.getLicense(
-                    "genericException",
-                    "deviceId",
-                    RANK_ONE_FACE,
-                    LicenseVersion.UNLIMITED,
-                )
+    fun `Get no license if there is a generic exception - generic error`() = runTest(StandardTestDispatcher()) {
+        val newLicense =
+            licenseRemoteDataSourceImpl.getLicense(
+                "genericException",
+                "deviceId",
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
+            )
 
-            assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
-        }
+        assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+    }
 
     companion object {
         private val RANK_ONE_FACE = Vendor.RankOne

@@ -31,7 +31,6 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
-
     override val crashReportTag = LoggingConstants.CrashReportTag.MATCHING.name
 
     override suspend operator fun invoke(
@@ -47,7 +46,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         // Only candidates with supported template format are considered
         val queryWithSupportedFormat =
             matchParams.queryForCandidates.copy(
-                fingerprintSampleFormat = bioSdkWrapper.supportedTemplateFormat
+                fingerprintSampleFormat = bioSdkWrapper.supportedTemplateFormat,
             )
         val totalCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
         if (totalCandidates == 0) {
@@ -64,8 +63,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
                             acc.add(FingerprintMatchResult.Item(item.id, item.score))
                         }
                 }
-            }
-            .awaitAll()
+            }.awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
         MatcherResult(resultItems, totalCandidates, bioSdkWrapper.matcherName)
@@ -89,7 +87,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
                         finger.template,
                         finger.format,
                     )
-                }
+                },
             )
         }
 
@@ -127,6 +125,4 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         IFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
         IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
     }
-
-
 }

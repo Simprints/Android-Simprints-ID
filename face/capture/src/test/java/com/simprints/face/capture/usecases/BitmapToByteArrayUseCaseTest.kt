@@ -16,13 +16,10 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class BitmapToByteArrayUseCaseTest {
-
     @RelaxedMockK
     private lateinit var context: Context
 
-
     private lateinit var bitmapToByteArray: BitmapToByteArrayUseCase
-
 
     @Before
     fun setUp() {
@@ -36,7 +33,6 @@ class BitmapToByteArrayUseCaseTest {
         bitmapToByteArray = BitmapToByteArrayUseCase(context)
     }
 
-
     @Test
     fun `invoke should resized and compressed the bitmap`() {
         // Given
@@ -47,12 +43,13 @@ class BitmapToByteArrayUseCaseTest {
         val resizedBitmap: Bitmap = mockk(relaxed = true) {
             every {
                 compress(
-                    Bitmap.CompressFormat.JPEG, BitmapToByteArrayUseCase.IMAGE_QUALITY, any()
+                    Bitmap.CompressFormat.JPEG,
+                    BitmapToByteArrayUseCase.IMAGE_QUALITY,
+                    any(),
                 )
             } returns true
         }
         every { Bitmap.createScaledBitmap(any(), any(), any(), any()) } returns resizedBitmap
-
 
         // When
         bitmapToByteArray(mockBitmap)
@@ -62,10 +59,11 @@ class BitmapToByteArrayUseCaseTest {
         verify { resizedBitmap.recycle() }
         verify {
             resizedBitmap.compress(
-                Bitmap.CompressFormat.JPEG, BitmapToByteArrayUseCase.IMAGE_QUALITY, any()
+                Bitmap.CompressFormat.JPEG,
+                BitmapToByteArrayUseCase.IMAGE_QUALITY,
+                any(),
             )
         }
-
     }
 
     @Test
@@ -102,7 +100,5 @@ class BitmapToByteArrayUseCaseTest {
         verify {
             Bitmap.createScaledBitmap(mockBitmap, 240, 240, true)
         }
-
     }
-
 }

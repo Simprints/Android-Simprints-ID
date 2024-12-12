@@ -17,9 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class NfcPairViewModel @Inject constructor(
     private val nfcManager: NfcManager,
-    private val scannerPairingManager: ScannerPairingManager
+    private val scannerPairingManager: ScannerPairingManager,
 ) : ViewModel() {
-
     val awaitingToPairToMacAddress: LiveData<LiveDataEventWithContent<String>>
         get() = _awaitingToPairToMacAddress
     private val _awaitingToPairToMacAddress = MutableLiveData<LiveDataEventWithContent<String>>()

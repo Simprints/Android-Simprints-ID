@@ -5,19 +5,19 @@ import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Ver
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 
 object Vero2InfoSnapshotEventSample {
-
     fun getEvent(): Vero2InfoSnapshotEvent {
         val versionArg = Vero2Version.Vero2NewApiVersion(
             "E-1",
             "cypressApp",
             "stmApp",
-            "un20App"
+            "un20App",
         )
         val batteryArg = BatteryInfo(0, 1, 2, 3)
         return Vero2InfoSnapshotEvent(CREATED_AT, versionArg, batteryArg)
     }
 
-    val newApiJsonEventString = """
+    val newApiJsonEventString =
+        """
         {
             "id": "5bc59283-a448-4911-a21a-5d39b0e346a7",
             "scopeId": "af4eca90-c599-4323-97c7-c70e490c5568",
@@ -42,9 +42,10 @@ object Vero2InfoSnapshotEventSample {
             },
             "type": "VERO_2_INFO_SNAPSHOT"
         }
-    """.trimIndent()
+        """.trimIndent()
 
-    val oldApiJsonEventString = """
+    val oldApiJsonEventString =
+        """
         {
             "id": "3afb1b9e-b263-4073-b773-6e1dac20d72f",
             "scopeId": "6dcb3810-4789-4149-8fea-473ffb520958",
@@ -71,6 +72,5 @@ object Vero2InfoSnapshotEventSample {
             },
             "type": "VERO_2_INFO_SNAPSHOT"
         }
-    """.trimIndent()
-
+        """.trimIndent()
 }

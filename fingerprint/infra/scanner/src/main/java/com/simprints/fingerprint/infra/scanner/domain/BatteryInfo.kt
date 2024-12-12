@@ -12,9 +12,8 @@ data class BatteryInfo(
     val charge: Int,
     val voltage: Int,
     val current: Int,
-    val temperature: Int
+    val temperature: Int,
 ) {
-
     fun isLowBattery() = charge <= LOW_BATTERY_CHARGE
 
     companion object {

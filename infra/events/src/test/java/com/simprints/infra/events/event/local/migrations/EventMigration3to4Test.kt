@@ -22,7 +22,6 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration3to4Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -71,14 +70,14 @@ class EventMigration3to4Test {
             migrationSpy.migrateEnrolmentEventPayloadType(
                 any(),
                 any(),
-                eventId1
+                eventId1,
             )
         }
         verify(exactly = 1) {
             migrationSpy.migrateEnrolmentEventPayloadType(
                 any(),
                 any(),
-                eventId2
+                eventId2,
             )
         }
     }
@@ -98,7 +97,8 @@ class EventMigration3to4Test {
         this.put("id", id)
         this.put("type", "CONNECTIVITY_SNAPSHOT")
         this.put(
-            "eventJson", """
+            "eventJson",
+            """
             {
                 "id":"$id",
                 "labels":{
@@ -112,7 +112,7 @@ class EventMigration3to4Test {
                 },
                 "type":"CONNECTIVITY_SNAPSHOT"
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
         this.put("createdAt", 1611584017198)
         this.put("endedAt", 0)
@@ -122,20 +122,17 @@ class EventMigration3to4Test {
     private fun setupV3DbWithEvent(
         vararg eventId: String,
         close: Boolean = true,
-    ): SupportSQLiteDatabase =
-        helper.createDatabase(TEST_DB, 3).apply {
-            eventId.forEach {
-                val event = createEvent(it)
-                this.insert("DbEvent", CONFLICT_NONE, event)
-            }
-            if (close)
-                close()
+    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 3).apply {
+        eventId.forEach {
+            val event = createEvent(it)
+            this.insert("DbEvent", CONFLICT_NONE, event)
         }
-
-
-    companion object {
-
-        private const val TEST_DB = "test"
+        if (close) {
+            close()
+        }
     }
 
+    companion object {
+        private const val TEST_DB = "test"
+    }
 }
