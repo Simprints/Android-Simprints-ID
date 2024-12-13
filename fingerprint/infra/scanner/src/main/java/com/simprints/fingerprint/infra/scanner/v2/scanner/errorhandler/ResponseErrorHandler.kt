@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler
 
-
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
@@ -11,7 +10,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class ResponseErrorHandler @Inject constructor(
-    val strategy: ResponseErrorHandlingStrategy
+    val strategy: ResponseErrorHandlingStrategy,
 ) {
     /**
      * Handles the execution of a suspending block with a timeout based on the response type.
@@ -47,6 +46,3 @@ class ResponseErrorHandler @Inject constructor(
         throw IOException("Scanner did not respond after $timeoutDelay milliseconds")
     }
 }
-
-
-

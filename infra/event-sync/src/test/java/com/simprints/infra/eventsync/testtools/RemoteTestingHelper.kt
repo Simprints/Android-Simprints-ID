@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync.testtools
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 
 internal class RemoteTestingHelper {
-
     // Never invoked, but used to enforce that every test class has a test
     fun enforceThatAnyTestHasATest(type: ApiEventPayloadType?) {
         when (type) {
@@ -14,8 +13,9 @@ internal class RemoteTestingHelper {
             ApiEventPayloadType.CompletionCheck, ApiEventPayloadType.FaceOnboardingComplete, ApiEventPayloadType.FaceFallbackCapture, ApiEventPayloadType.FaceCapture,
             ApiEventPayloadType.FaceCaptureConfirmation, ApiEventPayloadType.FingerprintCaptureBiometrics, ApiEventPayloadType.FaceCaptureBiometrics,
             ApiEventPayloadType.EventDownSyncRequest, ApiEventPayloadType.EventUpSyncRequest,
-            ApiEventPayloadType.LicenseCheck,ApiEventPayloadType.AgeGroupSelection,
-            null, -> {
+            ApiEventPayloadType.LicenseCheck, ApiEventPayloadType.AgeGroupSelection,
+            null,
+            -> {
                 // ADD TEST FOR NEW EVENT IN THIS CLASS
             }
         }

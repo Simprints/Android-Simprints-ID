@@ -3,7 +3,7 @@ package com.simprints.feature.consent.screens.consent.helpers
 import android.content.Context
 import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration.*
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.resources.R
 
 internal data class GeneralConsentTextHelper(
@@ -13,14 +13,15 @@ internal data class GeneralConsentTextHelper(
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed
 
-    //First argument in consent text should always be program name, second is modality specific access/use case text
-    fun assembleText(context: Context) = StringBuilder().apply {
-        val modalityUseCase = getModalitySpecificUseCaseText(context, modalities)
-        val modalityAccess = getModalitySpecificAccessText(context, modalities)
+    // First argument in consent text should always be program name, second is modality specific access/use case text
+    fun assembleText(context: Context) = StringBuilder()
+        .apply {
+            val modalityUseCase = getModalitySpecificUseCaseText(context, modalities)
+            val modalityAccess = getModalitySpecificAccessText(context, modalities)
 
-        filterAppRequestForConsent(context, consentType, config, modalityUseCase)
-        filterForDataSharingOptions(context, config, modalityUseCase, modalityAccess)
-    }.toString()
+            filterAppRequestForConsent(context, consentType, config, modalityUseCase)
+            filterForDataSharingOptions(context, config, modalityUseCase, modalityAccess)
+        }.toString()
 
     private fun StringBuilder.filterAppRequestForConsent(
         context: Context,
@@ -41,11 +42,11 @@ internal data class GeneralConsentTextHelper(
         modalityUseCase: String,
     ) = when (config?.enrolmentVariant) {
         ConsentConfiguration.ConsentEnrolmentVariant.ENROLMENT_ONLY -> appendSentence(
-            context.getString(R.string.consent_enrol_only).format(programName, modalityUseCase)
+            context.getString(R.string.consent_enrol_only).format(programName, modalityUseCase),
         )
 
         ConsentConfiguration.ConsentEnrolmentVariant.STANDARD -> appendSentence(
-            context.getString(R.string.consent_enrol).format(programName, modalityUseCase)
+            context.getString(R.string.consent_enrol).format(programName, modalityUseCase),
         )
 
         else -> this
@@ -54,9 +55,9 @@ internal data class GeneralConsentTextHelper(
     private fun StringBuilder.appendTextForConsentVerifyOrIdentify(
         context: Context,
         programName: String,
-        modalityUseCase: String
+        modalityUseCase: String,
     ) = appendSentence(
-        context.getString(R.string.consent_id_verify).format(programName, modalityUseCase)
+        context.getString(R.string.consent_id_verify).format(programName, modalityUseCase),
     )
 
     private fun StringBuilder.filterForDataSharingOptions(
@@ -67,13 +68,15 @@ internal data class GeneralConsentTextHelper(
     ) {
         if (config.generalPrompt?.dataSharedWithPartner == true) {
             appendSentence(
-                context.getString(R.string.consent_share_data_yes)
-                    .format(config.organizationName, modalityAccess)
+                context
+                    .getString(R.string.consent_share_data_yes)
+                    .format(config.organizationName, modalityAccess),
             )
         } else {
             appendSentence(
-                context.getString(R.string.consent_share_data_no)
-                    .format(modalityAccess)
+                context
+                    .getString(R.string.consent_share_data_no)
+                    .format(modalityAccess),
             )
         }
         if (config.generalPrompt?.dataUsedForRAndD == true) {
@@ -84,7 +87,7 @@ internal data class GeneralConsentTextHelper(
         }
         if (config.generalPrompt?.confirmation == true) {
             appendSentence(
-                context.getString(R.string.consent_confirmation).format(modalityUseCase)
+                context.getString(R.string.consent_confirmation).format(modalityUseCase),
             )
         }
     }
@@ -98,11 +101,11 @@ internal data class GeneralConsentTextHelper(
         getConcatenatedModalitiesUseCaseText(context)
     }
 
-    private fun getConcatenatedModalitiesUseCaseText(context: Context) = "%s %s %s".format(
+    private fun getConcatenatedModalitiesUseCaseText(context: Context) = listOf(
         context.getString(R.string.consent_biometrics_general_fingerprint),
         context.getString(R.string.consent_biometric_concat_modalities),
-        context.getString(R.string.consent_biometric_general_face)
-    )
+        context.getString(R.string.consent_biometric_general_face),
+    ).joinToString(" ")
 
     private fun getSingleModalitySpecificUseCaseText(
         context: Context,

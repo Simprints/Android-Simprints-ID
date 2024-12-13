@@ -21,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 
 class SaveImageUseCaseTest {
-
     @MockK
     lateinit var imageRepo: ImageRepository
 
@@ -74,7 +73,7 @@ class SaveImageUseCaseTest {
             "finger" to IFingerIdentifier.LEFT_3RD_FINGER.name,
             "dpi" to "1300",
             "scannerID" to scannerId,
-            "un20SerialNumber" to un20SerialNumber
+            "un20SerialNumber" to un20SerialNumber,
         )
         coEvery { eventRepo.getCurrentSessionScope() } returns mockk {
             every { projectId } returns "projectId"
@@ -85,8 +84,11 @@ class SaveImageUseCaseTest {
 
         val expectedPath = Path(
             arrayOf(
-                "sessions", "sessionId", "fingerprints", "captureEventId.wsq"
-            )
+                "sessions",
+                "sessionId",
+                "fingerprints",
+                "captureEventId.wsq",
+            ),
         )
         coEvery {
             imageRepo.storeImageSecurely(any(), "projectId", any(), any())
@@ -98,16 +100,20 @@ class SaveImageUseCaseTest {
                 IFingerIdentifier.LEFT_3RD_FINGER,
                 "captureEventId",
                 createCollectedStub(byteArrayOf()),
-            )
+            ),
         ).isNotNull()
 
         coVerify {
-            imageRepo.storeImageSecurely(withArg { assert(it.isEmpty()) }, "projectId", withArg {
-                assert(expectedPath.compose().contains(it.compose()))
-            }, withArg { assert(it == expectedMetadata) })
+            imageRepo.storeImageSecurely(
+                withArg { assert(it.isEmpty()) },
+                "projectId",
+                withArg {
+                    assert(expectedPath.compose().contains(it.compose()))
+                },
+                withArg { assert(it == expectedMetadata) },
+            )
         }
     }
-
 
     @Test
     fun `Returns null when no current session event`() = runTest {
@@ -119,7 +125,7 @@ class SaveImageUseCaseTest {
                 IFingerIdentifier.LEFT_3RD_FINGER,
                 "captureEventId",
                 createCollectedStub(byteArrayOf()),
-            )
+            ),
         ).isNull()
     }
 
@@ -139,7 +145,7 @@ class SaveImageUseCaseTest {
                 IFingerIdentifier.LEFT_3RD_FINGER,
                 "captureEventId",
                 createCollectedStub(byteArrayOf()),
-            )
+            ),
         ).isNull()
 
         coVerify { imageRepo.storeImageSecurely(any(), "projectId", any(), any()) }

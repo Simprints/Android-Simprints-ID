@@ -38,7 +38,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class ClientApiViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -81,10 +80,7 @@ internal class ClientApiViewModelTest {
     @MockK
     lateinit var persistentLogger: PersistentLogger
 
-
-
     private lateinit var viewModel: ClientApiViewModel
-
 
     @Before
     fun setUp() {
@@ -121,7 +117,7 @@ internal class ClientApiViewModelTest {
             intentMapper.invoke(
                 action = any(),
                 extras = any(),
-                project = any()
+                project = any(),
             )
         } returns mockk()
 
@@ -138,7 +134,7 @@ internal class ClientApiViewModelTest {
             intentMapper.invoke(
                 action = any(),
                 extras = any(),
-                project = any()
+                project = any(),
             )
         } throws InvalidRequestException("Invalid intent")
 
@@ -152,7 +148,7 @@ internal class ClientApiViewModelTest {
     fun `handleEnrolResponse saves correct events`() = runTest {
         viewModel.handleEnrolResponse(
             mockRequest(),
-            mockk { every { guid } returns "guid" }
+            mockk { every { guid } returns "guid" },
         )
 
         coVerify {
@@ -169,7 +165,7 @@ internal class ClientApiViewModelTest {
     fun `handleIdentifyResponse saves correct events`() = runTest {
         viewModel.handleIdentifyResponse(
             mockRequest(),
-            mockk { every { identifications } returns emptyList() }
+            mockk { every { identifications } returns emptyList() },
         )
 
         coVerify {
@@ -184,7 +180,7 @@ internal class ClientApiViewModelTest {
     fun `handleConfirmResponse saves correct events`() = runTest {
         viewModel.handleConfirmResponse(
             mockRequest(),
-            mockk { every { identificationOutcome } returns true }
+            mockk { every { identificationOutcome } returns true },
         )
 
         coVerify {
@@ -200,7 +196,7 @@ internal class ClientApiViewModelTest {
     fun `handleVerifyResponse saves correct events`() = runTest {
         viewModel.handleVerifyResponse(
             mockRequest(),
-            mockk { every { matchResult } returns mockk(relaxed = true) }
+            mockk { every { matchResult } returns mockk(relaxed = true) },
         )
 
         coVerify {
@@ -220,7 +216,7 @@ internal class ClientApiViewModelTest {
             mockk {
                 every { reason } returns ""
                 every { extra } returns ""
-            }
+            },
         )
 
         coVerify {
@@ -237,7 +233,7 @@ internal class ClientApiViewModelTest {
     fun `handleErrorResponse saves correct events`() = runTest {
         viewModel.handleErrorResponse(
             "action.package",
-            mockk { every { reason } returns mockk() }
+            mockk { every { reason } returns mockk() },
         )
 
         coVerify {

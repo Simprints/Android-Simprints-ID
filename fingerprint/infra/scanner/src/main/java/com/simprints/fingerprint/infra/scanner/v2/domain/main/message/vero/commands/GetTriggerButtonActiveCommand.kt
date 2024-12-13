@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroC
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
 class GetTriggerButtonActiveCommand : VeroCommand(VeroMessageType.GET_TRIGGER_BUTTON_ACTIVE) {
-
     companion object {
-        fun fromBytes(@Suppress("unused_parameter") data: ByteArray) = GetTriggerButtonActiveCommand()
+        fun fromBytes(
+            @Suppress("unused_parameter") data: ByteArray,
+        ) = GetTriggerButtonActiveCommand()
     }
 }

@@ -13,21 +13,17 @@ internal class ImageRepositoryImpl @Inject internal constructor(
     private val remoteDataSource: ImageRemoteDataSource,
     private val metadataStore: ImageMetadataStore,
 ) : ImageRepository {
-
     override suspend fun storeImageSecurely(
         imageBytes: ByteArray,
         projectId: String,
         relativePath: Path,
         metadata: Map<String, String>,
-    ): SecuredImageRef? {
-        return localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
-            // Only store metadata if the image was stored successfully
-            ?.also { metadataStore.storeMetadata(relativePath, metadata) }
-    }
+    ): SecuredImageRef? = localDataSource
+        .encryptAndStoreImage(imageBytes, projectId, relativePath)
+        // Only store metadata if the image was stored successfully
+        ?.also { metadataStore.storeMetadata(relativePath, metadata) }
 
-    override suspend fun getNumberOfImagesToUpload(projectId: String): Int =
-        localDataSource.listImages(projectId).count()
-
+    override suspend fun getNumberOfImagesToUpload(projectId: String): Int = localDataSource.listImages(projectId).count()
 
     override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean {
         var allImagesUploaded = true

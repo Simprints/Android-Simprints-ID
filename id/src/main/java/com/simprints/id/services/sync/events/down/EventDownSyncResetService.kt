@@ -26,7 +26,6 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports("Workaround for circular module dependency")
 @AndroidEntryPoint
 class EventDownSyncResetService : Service() {
-
     @Inject
     lateinit var eventSyncManager: EventSyncManager
 
@@ -39,7 +38,11 @@ class EventDownSyncResetService : Service() {
     @ExternalScope
     lateinit var externalScope: CoroutineScope
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         Simber.tag(SYNC.name).i("Reset downSync")
         resetJob = externalScope.launch {
             startForegroundIfNeeded()
@@ -47,18 +50,18 @@ class EventDownSyncResetService : Service() {
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
             syncOrchestrator.startEventSync()
-
         }
         resetJob?.invokeOnCompletion { stopSelf() }
 
         return START_REDELIVER_INTENT
     }
 
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(p0: Intent?): IBinder? = null
 
-    override fun onTimeout(startId: Int, fgsType: Int) {
+    override fun onTimeout(
+        startId: Int,
+        fgsType: Int,
+    ) {
         resetJob?.cancel()
         super.onTimeout(startId, fgsType)
     }
@@ -68,12 +71,13 @@ class EventDownSyncResetService : Service() {
             val chan = NotificationChannel(
                 CHANNEL_ID,
                 "Maintenance Service",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_LOW,
             )
             val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(chan)
 
-            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            val notification = NotificationCompat
+                .Builder(this, CHANNEL_ID)
                 .setPriority(NotificationManager.IMPORTANCE_LOW)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build()

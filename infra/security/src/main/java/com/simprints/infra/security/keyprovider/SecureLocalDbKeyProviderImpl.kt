@@ -1,6 +1,8 @@
 package com.simprints.infra.security.keyprovider
 
-import android.util.Base64.*
+import android.util.Base64.DEFAULT
+import android.util.Base64.decode
+import android.util.Base64.encodeToString
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MatchingLocalDatabaseKeyHashesException
@@ -16,9 +18,8 @@ import javax.inject.Inject
 
 internal class SecureLocalDbKeyProviderImpl @Inject constructor(
     private val encryptedSharedPrefs: EncryptedSharedPreferencesBuilder,
-    private val randomGenerator: RandomGenerator = RandomGeneratorImpl()
+    private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
 ) : SecureLocalDbKeyProvider {
-
     companion object {
         // The value of this const can't be changed, otherwise we will need to migrate the previous
         // value.
@@ -36,7 +37,8 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
 
     private fun calculateKeyHash(key: String): String {
         val md = MessageDigest.getInstance("SHA-512")
-        return md.digest(key.toByteArray())
+        return md
+            .digest(key.toByteArray())
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
     }
 
@@ -96,7 +98,10 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
      * prefs. In order to cover more users, check if the hash is present at read time and save it
      * if it's missing.
      */
-    private fun saveKeyHashIfMissing(dbName: String, key: String) {
+    private fun saveKeyHashIfMissing(
+        dbName: String,
+        key: String,
+    ) {
         val savedKeyHash = readKeyHashFromSharedPrefs(dbName)
         if (savedKeyHash == null) {
             val keyHash = calculateKeyHash(key)
@@ -104,10 +109,12 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
         }
     }
 
-    private fun getSharedPrefsKeyForDbName(dbName: String) =
-        "${SHARED_PREFS_KEY_FOR_DB_KEY_IDENTIFIER}_$dbName"
+    private fun getSharedPrefsKeyForDbName(dbName: String) = "${SHARED_PREFS_KEY_FOR_DB_KEY_IDENTIFIER}_$dbName"
 
-    private fun writeRealmKeyInSharedPrefs(dbName: String, key: String) {
+    private fun writeRealmKeyInSharedPrefs(
+        dbName: String,
+        key: String,
+    ) {
         encryptedSharedPrefs
             .buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS)
             .edit()
@@ -115,22 +122,22 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
             .apply()
     }
 
-    private fun readRealmKeyFromSharedPrefs(dnName: String): String? =
-        encryptedSharedPrefs
-            .buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS)
-            .getString(getSharedPrefsKeyForDbName(dnName), null)
+    private fun readRealmKeyFromSharedPrefs(dnName: String): String? = encryptedSharedPrefs
+        .buildEncryptedSharedPreferences(FILENAME_FOR_REALM_KEY_SHARED_PREFS)
+        .getString(getSharedPrefsKeyForDbName(dnName), null)
 
-    private fun writeKeyHashInSharedPrefs(dbName: String, keyHash: String) =
-        encryptedSharedPrefs
-            .buildEncryptedSharedPreferences(FILENAME_FOR_KEY_HASHES_SHARED_PREFS)
-            .edit()
-            .putString(getSharedPrefsKeyForDbName(dbName), keyHash)
-            .apply()
+    private fun writeKeyHashInSharedPrefs(
+        dbName: String,
+        keyHash: String,
+    ) = encryptedSharedPrefs
+        .buildEncryptedSharedPreferences(FILENAME_FOR_KEY_HASHES_SHARED_PREFS)
+        .edit()
+        .putString(getSharedPrefsKeyForDbName(dbName), keyHash)
+        .apply()
 
-    private fun readKeyHashFromSharedPrefs(dnName: String): String? =
-        encryptedSharedPrefs
-            .buildEncryptedSharedPreferences(FILENAME_FOR_KEY_HASHES_SHARED_PREFS)
-            .getString(getSharedPrefsKeyForDbName(dnName), null)
+    private fun readKeyHashFromSharedPrefs(dnName: String): String? = encryptedSharedPrefs
+        .buildEncryptedSharedPreferences(FILENAME_FOR_KEY_HASHES_SHARED_PREFS)
+        .getString(getSharedPrefsKeyForDbName(dnName), null)
 
     private fun generateRealmKey(): String {
         val realmKey = randomGenerator.generateByteArray()

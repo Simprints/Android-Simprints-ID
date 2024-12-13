@@ -46,8 +46,8 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     private val jsonHelper: JsonHelper,
     private val eventRepository: EventRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
-) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
-
+) : SimCoroutineWorker(context, params),
+    WorkerProgressCountReporter {
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
 
     private val upSyncScope by lazy {
@@ -70,7 +70,6 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
         .getString(INPUT_EVENT_UP_SYNC_SCOPE_ID)
         ?.let { eventRepository.getEventScope(it) }
         ?: throw IllegalArgumentException("input required")
-
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
@@ -98,7 +97,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                     OUTPUT_UP_SYNC to count,
                     OUTPUT_UP_MAX_SYNC to max,
                 ),
-                "Total uploaded: $count / $max"
+                "Total uploaded: $count / $max",
             )
         } catch (t: Throwable) {
             Simber.d(t)
@@ -115,8 +114,8 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                 t.message,
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
-                )
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage,
+                ),
             )
         }
 
@@ -133,17 +132,19 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun reportCount(count: Int, maxCount: Int?) {
+    override suspend fun reportCount(
+        count: Int,
+        maxCount: Int?,
+    ) {
         setProgress(
             workDataOf(
                 PROGRESS_UP_SYNC to count,
                 PROGRESS_UP_MAX_SYNC to maxCount,
-            )
+            ),
         )
     }
 
     companion object {
-
         const val INPUT_UP_SYNC = "INPUT_UP_SYNC"
         const val INPUT_EVENT_UP_SYNC_SCOPE_ID = "INPUT_EVENT_UP_SYNC_SCOPE_ID"
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
@@ -157,7 +158,7 @@ internal suspend fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCac
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
 
-    //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
+    // When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
     val cached = eventSyncCache.readProgress(id.toString())
     return maxOf(progress, output, cached)
 }
@@ -166,7 +167,7 @@ internal suspend fun WorkInfo.extractUpSyncMaxCount(eventSyncCache: EventSyncCac
     val progress = this.progress.getInt(PROGRESS_UP_MAX_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_UP_MAX_SYNC, -1)
 
-    //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
+    // When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
     val cached = eventSyncCache.readMax(id.toString())
     return maxOf(progress, output, cached)
 }

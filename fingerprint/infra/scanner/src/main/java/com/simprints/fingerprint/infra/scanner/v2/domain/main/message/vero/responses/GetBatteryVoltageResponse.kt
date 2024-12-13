@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroR
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.BatteryVoltage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
-class GetBatteryVoltageResponse(val batteryVoltage: BatteryVoltage) : VeroResponse(VeroMessageType.GET_BATTERY_VOLTAGE) {
-
+class GetBatteryVoltageResponse(
+    val batteryVoltage: BatteryVoltage,
+) : VeroResponse(VeroMessageType.GET_BATTERY_VOLTAGE) {
     override fun getDataBytes(): ByteArray = batteryVoltage.getBytes()
 
     companion object {

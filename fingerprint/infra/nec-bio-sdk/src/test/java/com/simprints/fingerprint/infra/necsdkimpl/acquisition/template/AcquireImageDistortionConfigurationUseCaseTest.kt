@@ -18,7 +18,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalStdlibApi::class)
 class AcquireImageDistortionConfigurationUseCaseTest {
-
     @MockK
     private lateinit var fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
 
@@ -45,48 +44,45 @@ class AcquireImageDistortionConfigurationUseCaseTest {
         coEvery { recentUserActivityManager.getRecentUserActivity().lastScannerUsed } returns "scannerId"
 
         acquireImageDistortionConfigurationUseCase = AcquireImageDistortionConfigurationUseCase(
-            fingerprintCaptureWrapperFactory, securityManager, recentUserActivityManager
+            fingerprintCaptureWrapperFactory,
+            securityManager,
+            recentUserActivityManager,
         )
-
     }
 
     @Test
-    fun `should acquire image distortion configuration from scanner if not available in shared preferences`() =
-        runTest {
+    fun `should acquire image distortion configuration from scanner if not available in shared preferences`() = runTest {
+        // given
+        val distortionConfiguration = byteArrayOf(1, 2, 3).toHexString()
+        every { sharedPreferences.getString(any(), null) } returns null
+        coEvery {
+            captureWrapper.acquireImageDistortionMatrixConfiguration()
+        } returns distortionConfiguration.hexToByteArray()
 
-            // given
-            val distortionConfiguration = byteArrayOf(1, 2, 3).toHexString()
-            every { sharedPreferences.getString(any(),null) } returns null
-            coEvery {
-                captureWrapper.acquireImageDistortionMatrixConfiguration()
-            } returns distortionConfiguration.hexToByteArray()
+        // when
+        val result = acquireImageDistortionConfigurationUseCase()
 
-
-            // when
-            val result = acquireImageDistortionConfigurationUseCase()
-
-            // then
-            Truth.assertThat(result.toHexString())
-                .isEqualTo(distortionConfiguration)
-            coVerify { captureWrapper.acquireImageDistortionMatrixConfiguration() }
-            coVerify { sharedPreferences.edit().putString(any(), any())}
-        }
+        // then
+        Truth
+            .assertThat(result.toHexString())
+            .isEqualTo(distortionConfiguration)
+        coVerify { captureWrapper.acquireImageDistortionMatrixConfiguration() }
+        coVerify { sharedPreferences.edit().putString(any(), any()) }
+    }
 
     @Test
-    fun `should acquire image distortion configuration from shared preferences if available`() =
-        runTest {
+    fun `should acquire image distortion configuration from shared preferences if available`() = runTest {
+        // given
+        val distortionConfiguration = byteArrayOf(1, 2, 3).toHexString()
+        every { sharedPreferences.getString(any(), null) } returns distortionConfiguration
 
-            // given
-            val distortionConfiguration = byteArrayOf(1, 2, 3).toHexString()
-            every { sharedPreferences.getString(any(),null) } returns distortionConfiguration
+        // when
+        val result = acquireImageDistortionConfigurationUseCase()
 
-
-            // when
-            val result = acquireImageDistortionConfigurationUseCase()
-
-            // then
-            Truth.assertThat(result.toHexString())
-                .isEqualTo(distortionConfiguration)
-            coVerify(exactly = 0) { captureWrapper.acquireImageDistortionMatrixConfiguration() }
-        }
+        // then
+        Truth
+            .assertThat(result.toHexString())
+            .isEqualTo(distortionConfiguration)
+        coVerify(exactly = 0) { captureWrapper.acquireImageDistortionMatrixConfiguration() }
+    }
 }

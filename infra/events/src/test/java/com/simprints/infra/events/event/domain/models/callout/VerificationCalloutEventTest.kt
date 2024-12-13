@@ -14,7 +14,6 @@ import org.junit.Test
 
 @Keep
 class VerificationCalloutEventTest {
-
     @Test
     fun create_VerificationCalloutEvent() {
         val event = VerificationCalloutEvent(
@@ -40,5 +39,3 @@ class VerificationCalloutEventTest {
         }
     }
 }
-
-

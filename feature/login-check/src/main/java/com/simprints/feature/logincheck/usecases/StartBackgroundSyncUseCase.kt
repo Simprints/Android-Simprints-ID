@@ -9,7 +9,6 @@ internal class StartBackgroundSyncUseCase @Inject constructor(
     private val syncOrchestrator: SyncOrchestrator,
     private val configManager: ConfigManager,
 ) {
-
     suspend operator fun invoke() {
         syncOrchestrator.scheduleBackgroundWork()
 

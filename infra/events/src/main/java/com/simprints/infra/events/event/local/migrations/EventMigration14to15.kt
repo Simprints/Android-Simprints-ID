@@ -11,7 +11,6 @@ import net.sqlcipher.database.SQLiteDatabase
 import org.json.JSONObject
 
 internal class EventMigration14to15 : Migration(14, 15) {
-
     override fun migrate(database: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 14 to schema 15.")
         updateSessionIdtoScopeIdColumn(database)
@@ -31,7 +30,8 @@ internal class EventMigration14to15 : Migration(14, 15) {
                     `scopeId` TEXT,
                     `eventJson` TEXT NOT NULL,
                     PRIMARY KEY(`id`)
-                )""".trimMargin()
+                )
+            """.trimMargin(),
         )
 
         // copy existing data into new table
@@ -48,10 +48,11 @@ internal class EventMigration14to15 : Migration(14, 15) {
                 val sessionId = cursor.getStringWithColumnName("sessionId")
                 val jsonData = cursor.getStringWithColumnName("eventJson") ?: break
 
-                val updatedJson = JSONObject(jsonData).apply {
-                    put("scopeId", optString("sessionId"))
-                    remove("sessionId")
-                }.toString()
+                val updatedJson = JSONObject(jsonData)
+                    .apply {
+                        put("scopeId", optString("sessionId"))
+                        remove("sessionId")
+                    }.toString()
 
                 database.insert(
                     TEMP_EVENT_TABLE_NAME,
@@ -65,7 +66,7 @@ internal class EventMigration14to15 : Migration(14, 15) {
                         put("projectId", projectId)
                         put("scopeId", sessionId)
                         put("eventJson", updatedJson)
-                    }
+                    },
                 )
             }
         }
@@ -77,9 +78,7 @@ internal class EventMigration14to15 : Migration(14, 15) {
     }
 
     companion object {
-
         private const val TEMP_EVENT_TABLE_NAME = "DbEvent_Temp"
         private const val TABLE_NAME = "DbEvent"
     }
 }
-

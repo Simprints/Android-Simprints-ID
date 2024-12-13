@@ -5,7 +5,6 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class FingerIdentifierTest {
-
     @Test
     fun `should map correctly the Finger enums`() {
         val mapping = mapOf(

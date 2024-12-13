@@ -5,12 +5,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AgeGroupTest {
-
     @Test
     fun `should return empty when the age group is 0, 0`() {
         val ageGroup = AgeGroup(0, 0)
         assertTrue(ageGroup.isEmpty())
     }
+
     @Test
     fun `should return empty when the age group is 0, null`() {
         val ageGroup = AgeGroup(0, null)

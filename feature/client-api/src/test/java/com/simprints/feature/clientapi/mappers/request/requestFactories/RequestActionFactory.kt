@@ -8,7 +8,6 @@ import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.every
 
 internal abstract class RequestActionFactory {
-
     companion object {
         const val MOCK_PACKAGE = "com.test.package"
         const val MOCK_PROJECT_ID = "xppPLwmR2eUmyN6LS3SN"
@@ -40,5 +39,4 @@ internal abstract class RequestActionFactory {
         every { mockExtractor.getBiometricDataSource() } returns MOCK_BIOMETRIC_DATA_SOURCE
         every { mockExtractor.getUnknownExtras() } returns emptyMap()
     }
-
 }

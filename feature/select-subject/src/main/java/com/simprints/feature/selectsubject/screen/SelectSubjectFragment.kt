@@ -13,11 +13,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class SelectSubjectFragment : Fragment(R.layout.fragment_select_subject) {
-
     private val viewModel: SelectSubjectViewModel by viewModels()
     private val args: SelectSubjectFragmentArgs by navArgs()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.finish.observe(viewLifecycleOwner) {

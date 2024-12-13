@@ -11,10 +11,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class TroubleshootingFragment : Fragment(R.layout.fragment_troubleshooting) {
-
     private val binding by viewBinding(FragmentTroubleshootingBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.troubleshootingToolbar.setNavigationOnClickListener {

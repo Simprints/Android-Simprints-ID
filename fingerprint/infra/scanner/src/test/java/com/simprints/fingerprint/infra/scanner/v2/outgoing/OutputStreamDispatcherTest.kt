@@ -12,7 +12,6 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class OutputStreamDispatcherTest {
-
     @Test
     fun notConnected_callDispatch_throwsException() {
         val outputStreamDispatcher = OutputStreamDispatcher()
@@ -50,7 +49,8 @@ class OutputStreamDispatcherTest {
 
         testSubscriber.awaitCompletionWithNoErrors()
 
-        Truth.assertThat(testSubscriber.values().reduce { acc, bytes -> acc + bytes })
+        Truth
+            .assertThat(testSubscriber.values().reduce { acc, bytes -> acc + bytes })
             .isEqualTo(expectedBytes.reduce { acc, bytes -> acc + bytes })
     }
 }

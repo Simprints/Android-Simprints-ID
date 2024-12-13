@@ -16,7 +16,6 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class PacketRouterTest {
-
     private lateinit var outputStream: PipedOutputStream
     private lateinit var inputStream: PipedInputStream
     private lateinit var router: PacketRouter
@@ -29,10 +28,12 @@ class PacketRouterTest {
         inputStream.connect(outputStream)
 
         router = PacketRouter(
-            Route.Remote::class.objects(), { source }, ByteArrayToPacketAccumulator(
+            Route.Remote::class.objects(),
+            { source },
+            ByteArrayToPacketAccumulator(
                 PacketParser(),
-            )
-            , Dispatchers.IO
+            ),
+            Dispatchers.IO,
         )
 
         router.connect(inputStream.toFlowable())

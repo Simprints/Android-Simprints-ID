@@ -34,7 +34,6 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
     private val authToken: String? = null,
     private val attempts: Int = ATTEMPTS_FOR_NETWORK_CALLS,
 ) : SimNetwork.SimApiClient<T> {
-
     companion object {
         private const val BACKEND_MAINTENANCE_ERROR_STRING = "002"
         private const val HEADER_RETRY_AFTER = "retry-after"
@@ -47,54 +46,54 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
     }
 
     private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
+        Retrofit
+            .Builder()
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(JsonHelper.jackson))
             .baseUrl(url)
-            .client(okHttpClientConfig.build()).build()
+            .client(okHttpClientConfig.build())
+            .build()
     }
 
     private val okHttpClientConfig: OkHttpClient.Builder by lazy {
         okHttpClientBuilder.get(authToken, deviceId, versionName)
     }
 
-    override suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V =
-        try {
-            retryIO(
-                times = attempts,
-                runBlock = {
-                    return@retryIO try {
-                        withContext(Dispatchers.IO) {
-                            networkBlock(api)
-                        }
-                    } catch (e: Exception) {
-                        throw transformExceptionIfNeeded(e)
+    override suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V = try {
+        retryIO(
+            times = attempts,
+            runBlock = {
+                return@retryIO try {
+                    withContext(Dispatchers.IO) {
+                        networkBlock(api)
                     }
-                },
-                retryIf = { it is RetryableCloudException })
-        } catch (e: Exception) {
-            throw when (e) {
-                is RetryableCloudException -> SyncCloudIntegrationException(cause = e.cause!!)
-                else -> e
-            }
-        }
-
-    private fun transformExceptionIfNeeded(e: Exception): Exception {
-        return when {
-            e is HttpException -> {
-                when {
-                    e.isBackendMaintenanceError() -> BackendMaintenanceException(
-                        estimatedOutage = e.parseEstimatedOutage()
-                    )
-                    HTTP_CODES_FOR_RETRYABLE_ERROR.contains(e.code()) -> RetryableCloudException(
-                        cause = e
-                    )
-                    else -> SyncCloudIntegrationException(cause = e)
+                } catch (e: Exception) {
+                    throw transformExceptionIfNeeded(e)
                 }
-            }
-            e.isCausedFromBadNetworkConnection() -> NetworkConnectionException(cause = e)
+            },
+            retryIf = { it is RetryableCloudException },
+        )
+    } catch (e: Exception) {
+        throw when (e) {
+            is RetryableCloudException -> SyncCloudIntegrationException(cause = e.cause!!)
             else -> e
         }
+    }
+
+    private fun transformExceptionIfNeeded(e: Exception): Exception = when {
+        e is HttpException -> {
+            when {
+                e.isBackendMaintenanceError() -> BackendMaintenanceException(
+                    estimatedOutage = e.parseEstimatedOutage(),
+                )
+                HTTP_CODES_FOR_RETRYABLE_ERROR.contains(e.code()) -> RetryableCloudException(
+                    cause = e,
+                )
+                else -> SyncCloudIntegrationException(cause = e)
+            }
+        }
+        e.isCausedFromBadNetworkConnection() -> NetworkConnectionException(cause = e)
+        else -> e
     }
 
     private fun HttpException.isBackendMaintenanceError(): Boolean {
@@ -105,10 +104,9 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
         return apiError?.error == BACKEND_MAINTENANCE_ERROR_STRING
     }
 
-    private fun HttpException.parseEstimatedOutage(): Long? =
-        try {
-            response()?.headers()?.get(HEADER_RETRY_AFTER)?.toLong()
-        } catch (e: NumberFormatException) {
-            null
-        }
+    private fun HttpException.parseEstimatedOutage(): Long? = try {
+        response()?.headers()?.get(HEADER_RETRY_AFTER)?.toLong()
+    } catch (e: NumberFormatException) {
+        null
+    }
 }

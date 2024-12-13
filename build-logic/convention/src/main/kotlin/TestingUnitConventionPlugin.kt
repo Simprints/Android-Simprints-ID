@@ -11,7 +11,6 @@ class TestingUnitConventionPlugin : Plugin<Project> {
                 apply("simprints.android.library")
             }
             extensions.configure<LibraryExtension> {
-
                 defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
                 testOptions {

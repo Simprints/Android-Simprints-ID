@@ -11,7 +11,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import org.junit.Test
 
 class EnrolmentEventV2Test {
-
     @Test
     fun create_EnrolmentEvent() {
         val event = EnrolmentEventV2(
@@ -36,4 +35,3 @@ class EnrolmentEventV2Test {
         }
     }
 }
-

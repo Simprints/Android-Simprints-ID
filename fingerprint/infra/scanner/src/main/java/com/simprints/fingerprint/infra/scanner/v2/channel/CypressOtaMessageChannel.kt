@@ -15,14 +15,13 @@ import javax.inject.Singleton
 class CypressOtaMessageChannel @Inject constructor(
     incoming: CypressOtaMessageInputStream,
     outgoing: CypressOtaMessageOutputStream,
-    @DispatcherIO dispatcher: CoroutineDispatcher
+    @DispatcherIO dispatcher: CoroutineDispatcher,
 ) : MessageChannel<CypressOtaMessageInputStream, CypressOtaMessageOutputStream>(
-    incoming, outgoing, dispatcher
-) {
-
-    suspend inline fun <reified R : CypressOtaResponse> sendCommandAndReceiveResponse(
-        command: CypressOtaCommand
-    ): R = runLockedTask {
+        incoming,
+        outgoing,
+        dispatcher,
+    ) {
+    suspend inline fun <reified R : CypressOtaResponse> sendCommandAndReceiveResponse(command: CypressOtaCommand): R = runLockedTask {
         outgoing.sendMessage(command).doSimultaneously(incoming.receiveResponse<R>()).await()
     }
 }

@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ShouldScheduleFirmwareUpdateUseCaseTest {
-
     @MockK
     private lateinit var configManager: ConfigManager
 
@@ -47,5 +46,4 @@ class ShouldScheduleFirmwareUpdateUseCaseTest {
 
         assertThat(useCase()).isFalse()
     }
-
 }

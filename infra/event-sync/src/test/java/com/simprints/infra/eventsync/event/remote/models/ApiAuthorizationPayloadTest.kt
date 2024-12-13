@@ -6,7 +6,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class ApiAuthorizationPayloadTest {
-
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, correct fields are returned`() {
         val payload = ApiAuthorizationPayload(domainPayload = mockk(relaxed = true))

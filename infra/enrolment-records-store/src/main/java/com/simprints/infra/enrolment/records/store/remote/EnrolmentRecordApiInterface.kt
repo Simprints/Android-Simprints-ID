@@ -8,7 +8,6 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 internal interface EnrolmentRecordApiInterface : SimRemoteInterface {
-
     @Headers("Content-Encoding: gzip")
     @POST("projects/{projectId}/enrolment-records")
     suspend fun uploadRecords(

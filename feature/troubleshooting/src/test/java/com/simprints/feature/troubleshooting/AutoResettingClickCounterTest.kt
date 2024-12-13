@@ -12,7 +12,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AutoResettingClickCounterTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 

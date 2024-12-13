@@ -44,7 +44,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class EventUpSyncUploaderWorkerTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -85,9 +84,10 @@ internal class EventUpSyncUploaderWorkerTest {
                 EventUpSyncOperation(
                     projectId = "",
                     lastState = EventUpSyncOperation.UpSyncState.COMPLETE,
-                    lastSyncTime = null
-                ), 12
-            )
+                    lastSyncTime = null,
+                ),
+                12,
+            ),
         )
 
         val eventUpSyncUploaderWorker = init(projectScope)
@@ -97,9 +97,9 @@ internal class EventUpSyncUploaderWorkerTest {
             ListenableWorker.Result.success(
                 workDataOf(
                     EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 12,
-                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12
-                )
-            )
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12,
+                ),
+            ),
         )
     }
 
@@ -125,9 +125,9 @@ internal class EventUpSyncUploaderWorkerTest {
             ListenableWorker.Result.failure(
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to null
-                )
-            )
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to null,
+                ),
+            ),
         )
     }
 
@@ -144,9 +144,9 @@ internal class EventUpSyncUploaderWorkerTest {
             ListenableWorker.Result.failure(
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L
-                )
-            )
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L,
+                ),
+            ),
         )
     }
 
@@ -162,9 +162,9 @@ internal class EventUpSyncUploaderWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
                 workDataOf(
-                    OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true
-                )
-            )
+                    OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true,
+                ),
+            ),
         )
     }
 
@@ -181,9 +181,9 @@ internal class EventUpSyncUploaderWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
                 workDataOf(
-                    OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true
-                )
-            )
+                    OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true,
+                ),
+            ),
         )
     }
 
@@ -203,17 +203,18 @@ internal class EventUpSyncUploaderWorkerTest {
     fun `should create a new scope if the current one throws JsonParseException`() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
 
-        val jsonInput = """
-        {
-            "type": "EventUpSyncScope${'$'}ProjectScope",
-            "projectId': "pcmqBbcaB4xWvfRHRELG",
-            "operation": {
-                "projectId": "pcmqBbcaB4xWvfRHRELG",
-                "lastState${0.toChar()}": "FAILED",
-                "lastSyncTime": 1620103325620
+        val jsonInput =
+            """
+            {
+                "type": "EventUpSyncScope${'$'}ProjectScope",
+                "projectId': "pcmqBbcaB4xWvfRHRELG",
+                "operation": {
+                    "projectId": "pcmqBbcaB4xWvfRHRELG",
+                    "lastState${0.toChar()}": "FAILED",
+                    "lastSyncTime": 1620103325620
+                }
             }
-        }
-        """.trimIndent()
+            """.trimIndent()
 
         init(jsonInput).doWork()
 
@@ -226,11 +227,12 @@ internal class EventUpSyncUploaderWorkerTest {
     fun `should create a new scope if the current one throws JsonMappingException`() = runTest {
         coEvery { eventRepository.getEventScope(any()) } returns eventScope
 
-        val jsonInput = """
-        {
-            "type": "EventUpSyncScope${'$'}ProjectScope"
-        }
-        """.trimIndent()
+        val jsonInput =
+            """
+            {
+                "type": "EventUpSyncScope${'$'}ProjectScope"
+            }
+            """.trimIndent()
         init(jsonInput).doWork()
 
         val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
@@ -249,23 +251,24 @@ internal class EventUpSyncUploaderWorkerTest {
 
     // We are using the TestListenableWorkerBuilder and not the constructor directly to have a test worker
     // that will finish when calling setProgress
-    private fun init(scope: String?, eventScopeId: String? = "scopeId"): EventUpSyncUploaderWorker =
-        TestListenableWorkerBuilder<EventUpSyncUploaderWorker>(
-            mockk(),
-            workDataOf(
-                INPUT_UP_SYNC to scope,
-                INPUT_EVENT_UP_SYNC_SCOPE_ID to eventScopeId
-            )
-        ).setWorkerFactory(
-            TestWorkerFactory(
-                upSyncTask,
-                mockk(relaxed = true),
-                authStore,
-                eventRepository,
-                testCoroutineRule.testCoroutineDispatcher
-            )
-        ).build()
-
+    private fun init(
+        scope: String?,
+        eventScopeId: String? = "scopeId",
+    ): EventUpSyncUploaderWorker = TestListenableWorkerBuilder<EventUpSyncUploaderWorker>(
+        mockk(),
+        workDataOf(
+            INPUT_UP_SYNC to scope,
+            INPUT_EVENT_UP_SYNC_SCOPE_ID to eventScopeId,
+        ),
+    ).setWorkerFactory(
+        TestWorkerFactory(
+            upSyncTask,
+            mockk(relaxed = true),
+            authStore,
+            eventRepository,
+            testCoroutineRule.testCoroutineDispatcher,
+        ),
+    ).build()
 
     private class TestWorkerFactory(
         private val upSyncTask: EventUpSyncTask,
@@ -274,7 +277,6 @@ internal class EventUpSyncUploaderWorkerTest {
         private val eventRepository: EventRepository,
         private val dispatcher: CoroutineDispatcher,
     ) : WorkerFactory() {
-
         override fun createWorker(
             appContext: Context,
             workerClassName: String,
@@ -287,12 +289,11 @@ internal class EventUpSyncUploaderWorkerTest {
             authStore,
             JsonHelper,
             eventRepository,
-            dispatcher
+            dispatcher,
         )
     }
 
     companion object {
-
         private const val PROJECT_ID = "projectId"
     }
 }

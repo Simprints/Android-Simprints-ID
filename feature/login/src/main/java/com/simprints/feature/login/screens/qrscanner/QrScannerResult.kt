@@ -8,13 +8,10 @@ internal class QrScannerResult(
     val content: String?,
     val error: QrScannerError?,
 ) : Serializable {
-
     @Keep
     enum class QrScannerError {
         NoPermission,
         CameraNotAvailable,
         UnknownError,
-        ;
     }
 }
-

@@ -23,7 +23,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorCacheIntegrationTest {
-
     @MockK
     private lateinit var securityManager: SecurityManager
 
@@ -65,9 +64,9 @@ class OrchestratorCacheIntegrationTest {
                         FingerprintCaptureResult.Item(
                             captureEventId = GUID1,
                             identifier = IFingerIdentifier.LEFT_THUMB,
-                            sample = null
-                        )
-                    )
+                            sample = null,
+                        ),
+                    ),
                 ),
             ),
             Step(
@@ -77,7 +76,7 @@ class OrchestratorCacheIntegrationTest {
                 payload = bundleOf("key" to "value"),
                 status = StepStatus.COMPLETED,
                 result = null,
-            )
+            ),
         )
 
         cache.steps = expected
@@ -88,7 +87,10 @@ class OrchestratorCacheIntegrationTest {
         compareStubs(expected[1], actual[1])
     }
 
-    private fun compareStubs(expected: Step, actual: Step) {
+    private fun compareStubs(
+        expected: Step,
+        actual: Step,
+    ) {
         assertThat(actual.id).isEqualTo(expected.id)
         assertThat(actual.navigationActionId).isEqualTo(expected.navigationActionId)
         assertThat(actual.destinationId).isEqualTo(expected.destinationId)

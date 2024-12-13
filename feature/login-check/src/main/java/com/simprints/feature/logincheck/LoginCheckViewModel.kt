@@ -21,7 +21,7 @@ import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
 import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
-import com.simprints.infra.config.store.models.ProjectState 
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -50,7 +50,6 @@ class LoginCheckViewModel @Inject internal constructor(
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
     private val updateStoredUserId: UpdateStoredUserIdUseCase,
 ) : ViewModel() {
-
     private var cachedRequest: ActionRequest? = null
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
 
@@ -69,7 +68,6 @@ class LoginCheckViewModel @Inject internal constructor(
     val returnLoginNotComplete: LiveData<LiveDataEvent>
         get() = _returnLoginNotComplete
     private val _returnLoginNotComplete = MutableLiveData<LiveDataEvent>()
-
 
     fun isDeviceSafe(): Boolean = try {
         rootManager.checkIfDeviceIsRooted()
@@ -145,11 +143,10 @@ class LoginCheckViewModel @Inject internal constructor(
         awaitAll(
             async { updateDatabaseCountsInCurrentSession() },
             async { addAuthorizationEvent(actionRequest, true) },
-            async { extractParametersForCrashReport(actionRequest) }
+            async { extractParametersForCrashReport(actionRequest) },
         )
 
         startBackgroundSync()
         _proceedWithAction.send(actionRequest)
     }
-
 }

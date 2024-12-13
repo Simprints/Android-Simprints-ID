@@ -4,8 +4,10 @@ import androidx.annotation.Keep
 import com.simprints.infra.authstore.domain.models.Token
 
 @Keep
-internal  data class ApiToken(val firebaseCustomToken: String = "", val firebaseOptions: FirebaseOptions) {
-
+internal data class ApiToken(
+    val firebaseCustomToken: String = "",
+    val firebaseOptions: FirebaseOptions,
+) {
     @Keep
     data class FirebaseOptions(
         val projectId: String,
@@ -13,13 +15,13 @@ internal  data class ApiToken(val firebaseCustomToken: String = "", val firebase
         val applicationId: String,
         val databaseUrl: String?,
         val gcmSenderId: String?,
-        val storageBucket: String?
+        val storageBucket: String?,
     )
 
     fun toDomain(): Token = Token(
         firebaseCustomToken,
         firebaseOptions.projectId,
         firebaseOptions.apiKey,
-        firebaseOptions.applicationId
+        firebaseOptions.applicationId,
     )
 }

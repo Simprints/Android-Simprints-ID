@@ -18,20 +18,18 @@ data class EnrolmentCallbackEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         guid: String,
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentCallbackPayload(createdAt, EVENT_VERSION, guid),
-        CALLBACK_ENROLMENT
+        CALLBACK_ENROLMENT,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class EnrolmentCallbackPayload(
@@ -41,13 +39,10 @@ data class EnrolmentCallbackEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_ENROLMENT,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "guid: $guid"
     }
 
-
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

@@ -28,26 +28,23 @@ internal class ConfigRepositoryImpl @Inject constructor(
     private val simNetwork: SimNetwork,
     @DeviceID private val deviceId: String,
 ) : ConfigRepository {
-
     companion object {
-
         @VisibleForTesting
         const val PRIVACY_NOTICE_FILE = "privacy_notice"
     }
 
     override suspend fun getProject(): Project = localDataSource.getProject()
 
-    override suspend fun refreshProject(projectId: String): ProjectWithConfig =
-        remoteDataSource
-            .getProject(projectId)
-            .also { (project, configuration) ->
-                localDataSource.saveProject(project)
-                localDataSource.saveProjectConfiguration(configuration)
+    override suspend fun refreshProject(projectId: String): ProjectWithConfig = remoteDataSource
+        .getProject(projectId)
+        .also { (project, configuration) ->
+            localDataSource.saveProject(project)
+            localDataSource.saveProjectConfiguration(configuration)
 
-                if (!project.baseUrl.isNullOrBlank()) {
-                    simNetwork.setApiBaseUrl(project.baseUrl)
-                }
+            if (!project.baseUrl.isNullOrBlank()) {
+                simNetwork.setApiBaseUrl(project.baseUrl)
             }
+        }
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration = localDataSource.getProjectConfiguration()
 
@@ -58,12 +55,10 @@ internal class ConfigRepositoryImpl @Inject constructor(
         return remoteDataSource.getDeviceState(projectId, deviceId, lastInstructionId)
     }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        localDataSource.getDeviceConfiguration()
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration = localDataSource.getDeviceConfiguration()
 
-    override suspend fun updateDeviceConfiguration(
-        update: suspend (t: DeviceConfiguration) -> DeviceConfiguration,
-    ) = localDataSource.updateDeviceConfiguration(update)
+    override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
+        localDataSource.updateDeviceConfiguration(update)
 
     override suspend fun clearData() {
         localDataSource.clearProject()
@@ -75,15 +70,14 @@ internal class ConfigRepositoryImpl @Inject constructor(
     override suspend fun getPrivacyNotice(
         projectId: String,
         language: String,
-    ): Flow<PrivacyNoticeResult> =
-        flow {
-            if (localDataSource.hasPrivacyNoticeFor(projectId, language)) {
-                val privacyNotice = localDataSource.getPrivacyNotice(projectId, language)
-                emit(Succeed(language, privacyNotice))
-            } else {
-                downloadPrivacyNotice(this, projectId, language)
-            }
+    ): Flow<PrivacyNoticeResult> = flow {
+        if (localDataSource.hasPrivacyNoticeFor(projectId, language)) {
+            val privacyNotice = localDataSource.getPrivacyNotice(projectId, language)
+            emit(Succeed(language, privacyNotice))
+        } else {
+            downloadPrivacyNotice(this, projectId, language)
         }
+    }
 
     private suspend fun downloadPrivacyNotice(
         flowCollector: FlowCollector<PrivacyNoticeResult>,
@@ -99,10 +93,11 @@ internal class ConfigRepositoryImpl @Inject constructor(
         } catch (t: Throwable) {
             Simber.i(t)
             flowCollector.emit(
-                if (t is BackendMaintenanceException)
+                if (t is BackendMaintenanceException) {
                     FailedBecauseBackendMaintenance(language, t, t.estimatedOutage)
-                else
+                } else {
                     Failed(language, t)
+                },
             )
         }
     }

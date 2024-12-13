@@ -1,3 +1,6 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+// This class uses entire vero API so import list would be extremely long without wildcards
+
 package com.simprints.fingerprint.infra.scanner.v2.scanner
 
 import com.simprints.core.DispatcherIO
@@ -59,8 +62,7 @@ class Scanner @Inject constructor(
     private val un20OtaController: Un20OtaController,
     private val scannerInfo: ScannerInfo,
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
-
-    ) {
+) {
     private lateinit var flowableDisposable: Disposable
 
     private lateinit var outputStream: OutputStream
@@ -71,8 +73,13 @@ class Scanner @Inject constructor(
 
     private var scannerTriggerListenerDisposable: Disposable? = null
 
-    fun connect(inputStream: InputStream, outputStream: OutputStream) {
-        this.flowableInputStream = inputStream.toFlowable().subscribeOnIoAndPublish(ioDispatcher)
+    fun connect(
+        inputStream: InputStream,
+        outputStream: OutputStream,
+    ) {
+        this.flowableInputStream = inputStream
+            .toFlowable()
+            .subscribeOnIoAndPublish(ioDispatcher)
             .also { this.flowableDisposable = it.connect() }
         this.outputStream = outputStream
         state.connected = true
@@ -93,7 +100,7 @@ class Scanner @Inject constructor(
 
                 CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
                 STM_OTA -> stmOtaMessageChannel.disconnect()
-                null -> {/* Do nothing */
+                null -> { // Do nothing
                 }
             }
             flowableDisposable.dispose()
@@ -150,7 +157,7 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(ROOT)
         rootMessageChannel.sendCommandAndReceiveResponse<EnterMainModeResponse>(
-            EnterMainModeCommand()
+            EnterMainModeCommand(),
         )
         handleMainModeEntered()
     }
@@ -159,7 +166,7 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(ROOT)
         rootMessageChannel.sendCommandAndReceiveResponse<EnterCypressOtaModeResponse>(
-            EnterCypressOtaModeCommand()
+            EnterCypressOtaModeCommand(),
         )
         handleCypressOtaModeEntered()
     }
@@ -168,7 +175,7 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(ROOT)
         rootMessageChannel.sendCommandAndReceiveResponse<EnterStmOtaModeResponse>(
-            EnterStmOtaModeCommand()
+            EnterStmOtaModeCommand(),
         )
         handleStmOtaModeEntered()
     }
@@ -182,12 +189,11 @@ class Scanner @Inject constructor(
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
     }
 
-    private fun subscribeTriggerButtonListeners() =
-        mainMessageChannel.incoming.veroEvents
-            ?.filterCast<TriggerButtonPressedEvent>()
-            ?.subscribeBy(onNext = {
-                triggerButtonListeners.forEach { it.onNext(Unit) }
-            }, onError = { it.printStackTrace() })
+    private fun subscribeTriggerButtonListeners() = mainMessageChannel.incoming.veroEvents
+        ?.filterCast<TriggerButtonPressedEvent>()
+        ?.subscribeBy(onNext = {
+            triggerButtonListeners.forEach { it.onNext(Unit) }
+        }, onError = { it.printStackTrace() })
 
     private fun handleCypressOtaModeEntered() {
         rootMessageChannel.disconnect()
@@ -217,17 +223,15 @@ class Scanner @Inject constructor(
         return un20Status
     }
 
-
     suspend fun turnUn20On() {
         assertConnected()
         assertMode(MAIN)
         mainMessageChannel.sendCommandAndReceiveResponse<SetUn20OnResponse>(
-            SetUn20OnCommand(StmDigitalValue.TRUE)
+            SetUn20OnCommand(StmDigitalValue.TRUE),
         )
         mainMessageChannel.receiveResponse<Un20StateChangeEvent>()
         state.un20On = true
     }
-
 
     suspend fun turnUn20Off() {
         assertConnected()
@@ -250,9 +254,11 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(MAIN)
         state.batteryPercentCharge =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
-                GetBatteryPercentChargeCommand()
-            ).batteryPercentCharge.percentCharge.unsignedToInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
+                    GetBatteryPercentChargeCommand(),
+                ).batteryPercentCharge.percentCharge
+                .unsignedToInt()
         return state.batteryPercentCharge!!
     }
 
@@ -260,9 +266,11 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(MAIN)
         state.batteryVoltageMilliVolts =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryVoltageResponse>(
-                GetBatteryVoltageCommand()
-            ).batteryVoltage.milliVolts.unsignedToInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryVoltageResponse>(
+                    GetBatteryVoltageCommand(),
+                ).batteryVoltage.milliVolts
+                .unsignedToInt()
 
         return state.batteryVoltageMilliVolts!!
     }
@@ -271,9 +279,11 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(MAIN)
         state.batteryCurrentMilliAmps =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryCurrentResponse>(
-                GetBatteryCurrentCommand()
-            ).batteryCurrent.milliAmps.toInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryCurrentResponse>(
+                    GetBatteryCurrentCommand(),
+                ).batteryCurrent.milliAmps
+                .toInt()
         return state.batteryCurrentMilliAmps!!
     }
 
@@ -281,12 +291,13 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(MAIN)
         state.batteryTemperatureDeciKelvin =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryTemperatureResponse>(
-                GetBatteryTemperatureCommand()
-            ).batteryTemperature.deciKelvin.unsignedToInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryTemperatureResponse>(
+                    GetBatteryTemperatureCommand(),
+                ).batteryTemperature.deciKelvin
+                .unsignedToInt()
         return state.batteryTemperatureDeciKelvin!!
     }
-
 
     suspend fun getUn20AppVersion(): Un20ExtendedAppVersion {
         assertConnected()
@@ -295,14 +306,14 @@ class Scanner @Inject constructor(
         return scannerInfoReaderHelper.getUn20ExtendedAppVersion()
     }
 
-
     suspend fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): CaptureFingerprintResult {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<CaptureFingerprintResponse>(
-            CaptureFingerprintCommand(dpi)
-        ).captureFingerprintResult
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<CaptureFingerprintResponse>(
+                CaptureFingerprintCommand(dpi),
+            ).captureFingerprintResult
     }
 
     /** Requires UN20 API 1.1 */
@@ -311,7 +322,7 @@ class Scanner @Inject constructor(
         assertMode(MAIN)
         assertUn20On()
         mainMessageChannel.sendCommandAndReceiveResponse<SetScanLedStateResponse>(
-            SetScanLedStateCommand(Un20DigitalValue.TRUE)
+            SetScanLedStateCommand(Un20DigitalValue.TRUE),
         )
         state.scanLedState = true
     }
@@ -322,7 +333,7 @@ class Scanner @Inject constructor(
         assertMode(MAIN)
         assertUn20On()
         mainMessageChannel.sendCommandAndReceiveResponse<SetScanLedStateResponse>(
-            SetScanLedStateCommand(Un20DigitalValue.FALSE)
+            SetScanLedStateCommand(Un20DigitalValue.FALSE),
         )
         state.scanLedState = false
     }
@@ -333,9 +344,10 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
-            GetImageQualityPreviewCommand()
-        ).imageQualityScore
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
+                GetImageQualityPreviewCommand(),
+            ).imageQualityScore
     }
 
     /** No value emitted if an image has not been captured */
@@ -343,38 +355,41 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetTemplateResponse>(
-            GetTemplateCommand(templateType)
-        ).templateData
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetTemplateResponse>(
+                GetTemplateCommand(templateType),
+            ).templateData
     }
-
 
     /** No value emitted if an image has not been captured */
     suspend fun acquireImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): ImageData? {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageResponse>(
-            GetImageCommand(imageFormatData)
-        ).imageData
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageResponse>(
+                GetImageCommand(imageFormatData),
+            ).imageData
     }
 
     suspend fun acquireUnprocessedImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): ImageData? {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageResponse>(
-            GetUnprocessedImageCommand(imageFormatData)
-        ).imageData
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageResponse>(
+                GetUnprocessedImageCommand(imageFormatData),
+            ).imageData
     }
 
     suspend fun acquireImageDistortionConfigurationMatrix(): ByteArray? {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageDistortionConfigurationMatrixResponse>(
-            GetImageDistortionConfigurationMatrixCommand()
-        ).imageConfigurationMatrix
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageDistortionConfigurationMatrixResponse>(
+                GetImageDistortionConfigurationMatrixCommand(),
+            ).imageConfigurationMatrix
     }
 
     /** No value emitted if an image has not been captured */
@@ -382,9 +397,10 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageQualityResponse>(
-            GetImageQualityCommand()
-        ).imageQualityScore
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageQualityResponse>(
+                GetImageQualityCommand(),
+            ).imageQualityScore
     }
 
     /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
@@ -392,7 +408,8 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(CYPRESS_OTA)
         return cypressOtaController.program(
-            cypressOtaMessageChannel, firmwareBinFile
+            cypressOtaMessageChannel,
+            firmwareBinFile,
         )
     }
 
@@ -401,7 +418,8 @@ class Scanner @Inject constructor(
         assertConnected()
         assertMode(STM_OTA)
         return stmOtaController.program(
-            stmOtaMessageChannel, firmwareBinFile
+            stmOtaMessageChannel,
+            firmwareBinFile,
         )
     }
 
@@ -411,7 +429,8 @@ class Scanner @Inject constructor(
         assertMode(MAIN)
         assertUn20On()
         return un20OtaController.program(
-            mainMessageChannel, firmwareBinFile
+            mainMessageChannel,
+            firmwareBinFile,
         )
     }
 

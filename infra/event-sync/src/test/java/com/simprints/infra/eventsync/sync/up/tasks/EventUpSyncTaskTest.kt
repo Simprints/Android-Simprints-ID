@@ -16,11 +16,18 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
-import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID3
+import com.simprints.infra.events.sampledata.createAlertScreenEvent
+import com.simprints.infra.events.sampledata.createAuthenticationEvent
+import com.simprints.infra.events.sampledata.createEnrolmentEventV2
+import com.simprints.infra.events.sampledata.createEventWithSessionId
+import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createPersonCreationEvent
+import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
@@ -45,7 +52,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 
 internal class EventUpSyncTaskTest {
-
     private val operation = SampleSyncScopes.projectUpSyncScope.operation
 
     private lateinit var eventUpSyncTask: EventUpSyncTask
@@ -85,7 +91,9 @@ internal class EventUpSyncTaskTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            10, 10, 10
+            10,
+            10,
+            10,
         )
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
@@ -109,7 +117,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 2 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
             createSessionScope(GUID1),
-            createSessionScope(GUID2)
+            createSessionScope(GUID2),
         )
         coEvery {
             eventRepo.getEventsFromScope(GUID1)
@@ -127,7 +135,9 @@ internal class EventUpSyncTaskTest {
     fun `upload events in batches of provided size`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            2, 2, 2
+            2,
+            2,
+            2,
         )
 
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
@@ -135,7 +145,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
             createSessionScope(GUID1),
             createSessionScope(GUID2),
-            createSessionScope(GUID3)
+            createSessionScope(GUID3),
         )
         coEvery {
             eventRepo.getEventsFromScope(any())
@@ -151,7 +161,9 @@ internal class EventUpSyncTaskTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         val batchSize = 2
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            batchSize, batchSize, batchSize
+            batchSize,
+            batchSize,
+            batchSize,
         )
 
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
@@ -177,19 +189,21 @@ internal class EventUpSyncTaskTest {
     fun `upload out-of-session events in correct fields`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            2, 2, 2
+            2,
+            2,
+            2,
         )
 
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.DOWN_SYNC) } returns 1 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.DOWN_SYNC, any()) } returns listOf(
-            createSessionScope(GUID1)
+            createSessionScope(GUID1),
         )
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.UP_SYNC) } returns 2 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.UP_SYNC, any()) } returns listOf(
             createSessionScope(GUID2),
-            createSessionScope(GUID3)
+            createSessionScope(GUID3),
         )
         coEvery {
             eventRepo.getEventsFromScope(any())
@@ -210,7 +224,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 1 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
-            createSessionScope(GUID1)
+            createSessionScope(GUID1),
         )
         coEvery { eventRepo.getEventsFromScope(any()) } returns listOf(
             createAuthenticationEvent(),
@@ -227,7 +241,7 @@ internal class EventUpSyncTaskTest {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
                     assertThat(it.sessions.first().events).hasSize(2)
                 },
-                any()
+                any(),
             )
         }
     }
@@ -239,7 +253,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 1 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
-            createSessionScope(GUID1)
+            createSessionScope(GUID1),
         )
         coEvery { eventRepo.getEventsFromScope(any()) } returns listOf(
             createAuthenticationEvent(),
@@ -261,7 +275,7 @@ internal class EventUpSyncTaskTest {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
                     assertThat(it.sessions.first().events).hasSize(4)
                 },
-                any()
+                any(),
             )
         }
     }
@@ -273,7 +287,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 1 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
-            createSessionScope(GUID1)
+            createSessionScope(GUID1),
         )
         coEvery { eventRepo.getEventsFromScope(any()) } returns listOf(
             createFingerprintCaptureBiometricsEvent(),
@@ -294,7 +308,7 @@ internal class EventUpSyncTaskTest {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
                     assertThat(it.sessions.first().events).hasSize(3)
                 },
-                any()
+                any(),
             )
         }
     }
@@ -313,7 +327,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 2 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
             createSessionScope(GUID1),
-            createSessionScope(GUID2)
+            createSessionScope(GUID2),
         )
         coEvery {
             eventRepo.getEventsFromScope(GUID1)
@@ -337,7 +351,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 2 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
             createSessionScope(GUID1),
-            createSessionScope(GUID2)
+            createSessionScope(GUID2),
         )
         coEvery { eventRepo.getEventsFromScope(GUID1) } returns listOf(
             createEventWithSessionId(GUID1, GUID1),
@@ -376,7 +390,7 @@ internal class EventUpSyncTaskTest {
 
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
-            createSessionScope(GUID1)
+            createSessionScope(GUID1),
         )
         coEvery {
             eventRepo.getEventsFromScope(GUID1)
@@ -385,7 +399,7 @@ internal class EventUpSyncTaskTest {
         coEvery {
             eventRemoteDataSource.post(any(), any(), any())
         } throws NetworkConnectionException(
-            cause = Exception()
+            cause = Exception(),
         )
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
@@ -442,7 +456,7 @@ internal class EventUpSyncTaskTest {
         } throws JsonParseException(mockk(relaxed = true), "")
         coEvery { eventRepo.getEventsJsonFromScope(GUID1) } returns listOf("{}")
         coEvery { eventRemoteDataSource.dumpInvalidEvents(any(), any()) } throws HttpException(
-            Response.error<String>(503, "".toResponseBody(null))
+            Response.error<String>(503, "".toResponseBody(null)),
         )
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
@@ -478,7 +492,7 @@ internal class EventUpSyncTaskTest {
             createSessionScope(GUID1),
         )
         coEvery { eventRemoteDataSource.post(any(), any(), any()) } throws HttpException(
-            Response.error<ResponseBody>(427, "".toResponseBody(null))
+            Response.error<ResponseBody>(427, "".toResponseBody(null)),
         )
 
         val progress = eventUpSyncTask.upSync(operation, eventScope).toList()
@@ -486,9 +500,12 @@ internal class EventUpSyncTaskTest {
         assertThat(progress.first().operation.lastState).isEqualTo(UpSyncState.RUNNING)
         assertThat(progress.last().operation.lastState).isEqualTo(UpSyncState.COMPLETE)
         coVerify(exactly = 1) {
-            eventRepo.addOrUpdateEvent(any(), match {
-                it is EventUpSyncRequestEvent && !it.payload.errorType.isNullOrEmpty()
-            })
+            eventRepo.addOrUpdateEvent(
+                any(),
+                match {
+                    it is EventUpSyncRequestEvent && !it.payload.errorType.isNullOrEmpty()
+                },
+            )
         }
     }
 
@@ -499,7 +516,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 2 andThen 0
         coEvery { eventRepo.getClosedEventScopes(EventScopeType.SESSION, any()) } returns listOf(
             createSessionScope(GUID1),
-            createSessionScope(GUID2)
+            createSessionScope(GUID2),
         )
         coEvery {
             eventRepo.getEventsFromScope(GUID1)
@@ -511,9 +528,12 @@ internal class EventUpSyncTaskTest {
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
         coVerify(exactly = 1) {
-            eventRepo.addOrUpdateEvent(any(), match {
-                it is EventUpSyncRequestEvent && it.payload.content.sessionCount == 2
-            })
+            eventRepo.addOrUpdateEvent(
+                any(),
+                match {
+                    it is EventUpSyncRequestEvent && it.payload.content.sessionCount == 2
+                },
+            )
         }
     }
 
@@ -570,15 +590,24 @@ internal class EventUpSyncTaskTest {
         coVerify(exactly = 3) { eventRepo.addOrUpdateEvent(any(), any()) }
 
         coVerify(exactly = 1) {
-            eventRepo.addOrUpdateEvent(any(), match {
-                it is EventUpSyncRequestEvent && it.payload.content.sessionCount == 1
-            })
-            eventRepo.addOrUpdateEvent(any(), match {
-                it is EventUpSyncRequestEvent && it.payload.content.eventUpSyncCount == 1
-            })
-            eventRepo.addOrUpdateEvent(any(), match {
-                it is EventUpSyncRequestEvent && it.payload.content.eventDownSyncCount == 1
-            })
+            eventRepo.addOrUpdateEvent(
+                any(),
+                match {
+                    it is EventUpSyncRequestEvent && it.payload.content.sessionCount == 1
+                },
+            )
+            eventRepo.addOrUpdateEvent(
+                any(),
+                match {
+                    it is EventUpSyncRequestEvent && it.payload.content.eventUpSyncCount == 1
+                },
+            )
+            eventRepo.addOrUpdateEvent(
+                any(),
+                match {
+                    it is EventUpSyncRequestEvent && it.payload.content.eventDownSyncCount == 1
+                },
+            )
         }
     }
 
@@ -620,7 +649,6 @@ internal class EventUpSyncTaskTest {
     }
 
     companion object {
-
         private val NOW = Timestamp(1000L)
     }
 }

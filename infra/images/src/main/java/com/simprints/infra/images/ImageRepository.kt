@@ -7,7 +7,6 @@ import com.simprints.infra.images.model.SecuredImageRef
  * Repository for handling local and remote image file operations
  */
 interface ImageRepository {
-
     /**
      * Encrypts and stores an image file locally
      *
@@ -39,5 +38,4 @@ interface ImageRepository {
     suspend fun deleteStoredImages()
 
     suspend fun getNumberOfImagesToUpload(projectId: String): Int
-
 }

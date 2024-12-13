@@ -9,9 +9,10 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 internal interface ConfigRemoteInterface : SimRemoteInterface {
-
     @GET("projects/{projectId}")
-    suspend fun getProject(@Path("projectId") projectId: String): ApiProject
+    suspend fun getProject(
+        @Path("projectId") projectId: String,
+    ): ApiProject
 
     @GET("projects/{projectId}/devices/{deviceId}")
     suspend fun getDeviceState(
@@ -23,6 +24,6 @@ internal interface ConfigRemoteInterface : SimRemoteInterface {
     @GET("projects/{projectId}/files/{fileId}")
     suspend fun getFileUrl(
         @Path("projectId") projectId: String,
-        @Path("fileId") fileId: String
+        @Path("fileId") fileId: String,
     ): ApiFileUrl
 }

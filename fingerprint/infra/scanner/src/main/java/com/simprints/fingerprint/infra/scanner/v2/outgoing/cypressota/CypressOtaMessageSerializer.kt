@@ -4,8 +4,6 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.CypressOtaCo
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.common.MessageSerializer
 import javax.inject.Inject
 
-class CypressOtaMessageSerializer  @Inject constructor(): MessageSerializer<CypressOtaCommand> {
-
-    override fun serialize(message: CypressOtaCommand): List<ByteArray> =
-        listOf(message.getBytes())
+class CypressOtaMessageSerializer @Inject constructor() : MessageSerializer<CypressOtaCommand> {
+    override fun serialize(message: CypressOtaCommand): List<ByteArray> = listOf(message.getBytes())
 }

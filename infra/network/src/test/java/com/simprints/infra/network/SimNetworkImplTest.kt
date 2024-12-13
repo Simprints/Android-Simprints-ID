@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class SimNetworkImplTest {
-
     @MockK
     private lateinit var baseUrlProvider: BaseUrlProvider
 
@@ -60,7 +59,7 @@ class SimNetworkImplTest {
             mockk(),
             "testDeviceID",
             "testVersion",
-            "testAuthToken"
+            "testAuthToken",
         )
 
         assert(clientApi is SimApiClientImpl<SimRemoteInterface>)
@@ -74,10 +73,9 @@ class SimNetworkImplTest {
             mockk(),
             "testDeviceID",
             "testVersion",
-            null
+            null,
         )
 
         assert(clientApi is SimApiClientImpl<SimRemoteInterface>)
     }
-
 }

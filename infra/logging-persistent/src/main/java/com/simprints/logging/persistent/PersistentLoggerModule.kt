@@ -14,7 +14,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class PersistentLoggerModule {
-
     @Binds
     internal abstract fun providePersistentLogger(logger: DatabasePersistentLogger): PersistentLogger
 }
@@ -22,10 +21,11 @@ abstract class PersistentLoggerModule {
 @Module
 @InstallIn(SingletonComponent::class)
 internal class PersistentLoggerModuleProviders {
-
     @Provides
     @Singleton
-    fun provideImageMetadataDatabase(@ApplicationContext ctx: Context): LogEntryDatabase = LogEntryDatabase.getDatabase(ctx)
+    fun provideImageMetadataDatabase(
+        @ApplicationContext ctx: Context,
+    ): LogEntryDatabase = LogEntryDatabase.getDatabase(ctx)
 
     @Provides
     @Singleton

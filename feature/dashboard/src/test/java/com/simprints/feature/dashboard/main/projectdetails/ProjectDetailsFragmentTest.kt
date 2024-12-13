@@ -24,7 +24,6 @@ import org.robolectric.annotation.Config
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class ProjectDetailsFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -39,7 +38,7 @@ class ProjectDetailsFragmentTest {
         launchFragmentInHiltContainer<ProjectDetailsFragment>()
 
         onView(withId(R.id.dashboard_project_details_card_scanner_used)).check(
-            matches(not(isDisplayed()))
+            matches(not(isDisplayed())),
         )
     }
 
@@ -50,7 +49,7 @@ class ProjectDetailsFragmentTest {
         launchFragmentInHiltContainer<ProjectDetailsFragment>()
 
         onView(withId(R.id.dashboard_project_details_card_scanner_used)).check(
-            matches(withText(containsString("SP56743526")))
+            matches(withText(containsString("SP56743526"))),
         )
     }
 
@@ -61,8 +60,8 @@ class ProjectDetailsFragmentTest {
                     DashboardProjectState(
                         "",
                         "",
-                        lastScanner
-                    )
+                        lastScanner,
+                    ),
                 )
             }
         }

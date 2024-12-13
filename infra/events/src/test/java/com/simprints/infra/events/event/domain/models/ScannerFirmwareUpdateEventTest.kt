@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test
 
 class ScannerFirmwareUpdateEventTest {
-
     @Test
     fun create_ScannerFirmwareUpdateEvent() {
         val chipArg = "chip"
@@ -19,7 +18,7 @@ class ScannerFirmwareUpdateEventTest {
             ENDED_AT,
             chipArg,
             targetVersionArg,
-            failureReasonArg
+            failureReasonArg,
         )
 
         assertThat(event.id).isNotNull()
@@ -35,4 +34,3 @@ class ScannerFirmwareUpdateEventTest {
         }
     }
 }
-

@@ -8,7 +8,6 @@ import io.mockk.*
 import org.junit.Test
 
 class SecurityManagerImplTest {
-
     @Test
     fun `calling build encrypted prefs should call the pref builder`() {
         val encryptedSharedPreferencesBuilder: EncryptedSharedPreferencesBuilder = spyk()
@@ -21,7 +20,7 @@ class SecurityManagerImplTest {
 
         verify(exactly = 1) {
             encryptedSharedPreferencesBuilder.buildEncryptedSharedPreferences(
-                fileName
+                fileName,
             )
         }
     }
@@ -76,18 +75,16 @@ class SecurityManagerImplTest {
 
     @Test
     fun `test recreateLocalDatabaseKey`() {
-        //Given
+        // Given
         val dbName = "dbName"
         val secureLocalDbKeyProvider = mockk<SecureLocalDbKeyProvider> {
             justRun { recreateLocalDatabaseKey(dbName) }
         }
         val securityManager =
             SecurityManagerImpl(mockk(), secureLocalDbKeyProvider, mockk(), mockk())
-        //When
+        // When
         securityManager.recreateLocalDatabaseKey(dbName)
-        //Then
+        // Then
         verify { secureLocalDbKeyProvider.recreateLocalDatabaseKey(dbName) }
-
     }
-
 }

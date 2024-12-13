@@ -18,7 +18,6 @@ data class VerificationCalloutEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         projectId: String,
@@ -35,21 +34,21 @@ data class VerificationCalloutEvent(
             userId = userId,
             moduleId = moduleId,
             verifyGuid = verifyGuid,
-            metadata = metadata
+            metadata = metadata,
         ),
-        CALLOUT_VERIFICATION
+        CALLOUT_VERIFICATION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = mapOf(
         TokenKeyType.AttendantId to payload.userId,
-        TokenKeyType.ModuleId to payload.moduleId
+        TokenKeyType.ModuleId to payload.moduleId,
     )
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
         payload = payload.copy(
             userId = map[TokenKeyType.AttendantId] ?: payload.userId,
-            moduleId = map[TokenKeyType.ModuleId] ?: payload.moduleId
-        )
+            moduleId = map[TokenKeyType.ModuleId] ?: payload.moduleId,
+        ),
     )
 
     @Keep
@@ -64,13 +63,10 @@ data class VerificationCalloutEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_VERIFICATION,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata"
+        override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata"
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

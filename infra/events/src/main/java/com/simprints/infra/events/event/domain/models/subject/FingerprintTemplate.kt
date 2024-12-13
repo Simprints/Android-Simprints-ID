@@ -9,5 +9,3 @@ data class FingerprintTemplate(
     val template: String,
     val finger: IFingerIdentifier,
 )
-
-

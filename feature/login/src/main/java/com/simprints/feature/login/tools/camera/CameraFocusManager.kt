@@ -5,7 +5,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import androidx.camera.core.*
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraControl
+import androidx.camera.core.CameraInfoUnavailableException
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.core.MeteringPoint
+import androidx.camera.core.MeteringPointFactory
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.view.PreviewView
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.logging.Simber
@@ -13,12 +19,14 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports(
-    reason = "These are UI utilities for focus controls in the camera preview"
+    reason = "These are UI utilities for focus controls in the camera preview",
 )
 internal class CameraFocusManager @Inject constructor() {
-
     @SuppressLint("ClickableViewAccessibility")
-    fun setUpFocusOnTap(cameraPreview: PreviewView, camera: Camera) {
+    fun setUpFocusOnTap(
+        cameraPreview: PreviewView,
+        camera: Camera,
+    ) {
         cameraPreview.afterMeasured {
             it.setOnTouchListener(touchListener(camera.cameraControl))
         }
@@ -33,10 +41,12 @@ internal class CameraFocusManager @Inject constructor() {
             MotionEvent.ACTION_UP -> {
                 val focusPoint = getFocusOnTapPoint(view, event)
 
-                val focusAction = FocusMeteringAction.Builder(
-                    focusPoint,
-                    FocusMeteringAction.FLAG_AF
-                ).disableAutoCancel().build()
+                val focusAction = FocusMeteringAction
+                    .Builder(
+                        focusPoint,
+                        FocusMeteringAction.FLAG_AF,
+                    ).disableAutoCancel()
+                    .build()
 
                 try {
                     cameraControl.startFocusAndMetering(focusAction)
@@ -50,14 +60,19 @@ internal class CameraFocusManager @Inject constructor() {
         }
     }
 
-    fun setUpAutoFocus(cameraPreview: PreviewView, camera: Camera) {
+    fun setUpAutoFocus(
+        cameraPreview: PreviewView,
+        camera: Camera,
+    ) {
         cameraPreview.afterMeasured {
             val focusPoint = getAutoFocusPoint(it)
 
-            val focusAction = FocusMeteringAction.Builder(
-                focusPoint,
-                FocusMeteringAction.FLAG_AF
-            ).setAutoCancelDuration(1, TimeUnit.SECONDS).build()
+            val focusAction = FocusMeteringAction
+                .Builder(
+                    focusPoint,
+                    FocusMeteringAction.FLAG_AF,
+                ).setAutoCancelDuration(1, TimeUnit.SECONDS)
+                .build()
 
             try {
                 camera.cameraControl.startFocusAndMetering(focusAction)
@@ -67,9 +82,7 @@ internal class CameraFocusManager @Inject constructor() {
         }
     }
 
-    private inline fun PreviewView.afterMeasured(
-        crossinline block: (previewView: PreviewView) -> Unit
-    ) {
+    private inline fun PreviewView.afterMeasured(crossinline block: (previewView: PreviewView) -> Unit) {
         viewTreeObserver.addOnGlobalLayoutListener(
             @ExcludedFromGeneratedTestCoverageReports("Inner class of excluded file")
             object : OnGlobalLayoutListener {
@@ -79,12 +92,15 @@ internal class CameraFocusManager @Inject constructor() {
                         block(this@afterMeasured)
                     }
                 }
-            })
+            },
+        )
     }
 
-    private fun getFocusOnTapPoint(view: View, event: MotionEvent): MeteringPoint =
-        SurfaceOrientedMeteringPointFactory(view.width.toFloat(), view.height.toFloat())
-            .createPoint(event.x, event.y)
+    private fun getFocusOnTapPoint(
+        view: View,
+        event: MotionEvent,
+    ): MeteringPoint = SurfaceOrientedMeteringPointFactory(view.width.toFloat(), view.height.toFloat())
+        .createPoint(event.x, event.y)
 
     private fun getAutoFocusPoint(view: View): MeteringPoint {
         val width = view.width.toFloat()
@@ -96,5 +112,4 @@ internal class CameraFocusManager @Inject constructor() {
 
         return factory.createPoint(centreWidth, centreHeight)
     }
-
 }

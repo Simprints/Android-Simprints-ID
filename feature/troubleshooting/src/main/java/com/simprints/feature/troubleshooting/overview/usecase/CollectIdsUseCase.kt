@@ -8,10 +8,10 @@ internal class CollectIdsUseCase @Inject constructor(
     @DeviceID private val deviceID: String,
     private val authStore: AuthStore,
 ) {
-
-    operator fun invoke() = """
+    operator fun invoke() =
+        """
         Device ID: $deviceID
         Project ID: ${authStore.signedInProjectId}
         User ID: ${authStore.signedInUserId?.value.orEmpty()}
-    """.trimIndent()
+        """.trimIndent()
 }

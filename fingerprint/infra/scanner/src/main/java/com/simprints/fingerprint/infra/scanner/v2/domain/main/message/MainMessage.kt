@@ -6,6 +6,10 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.OutgoingMessage
 
 interface MainMessage : Message
 
-interface OutgoingMainMessage : MainMessage, OutgoingMessage
+interface OutgoingMainMessage :
+    MainMessage,
+    OutgoingMessage
 
-interface IncomingMainMessage : MainMessage, IncomingMessage
+interface IncomingMainMessage :
+    MainMessage,
+    IncomingMessage

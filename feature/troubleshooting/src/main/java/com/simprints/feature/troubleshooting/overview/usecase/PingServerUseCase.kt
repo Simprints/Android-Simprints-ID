@@ -17,7 +17,6 @@ internal class PingServerUseCase @Inject constructor(
     private val baseUrlProvider: BaseUrlProvider,
     private val urlFactory: UrlFactory,
 ) {
-
     /**
      * Does the most bare-bones version of HTTP request to access the root URL
      * of the last configured BFSID server. Any response code below 500 is considered
@@ -49,18 +48,23 @@ internal class PingServerUseCase @Inject constructor(
     }.flowOn(dispatcherIO)
 
     internal sealed class PingResult {
-
         data object NotDone : PingResult()
+
         data object InProgress : PingResult()
-        data class Success(val message: String) : PingResult()
-        data class Failure(val message: String) : PingResult()
+
+        data class Success(
+            val message: String,
+        ) : PingResult()
+
+        data class Failure(
+            val message: String,
+        ) : PingResult()
     }
 
     @ExcludedFromGeneratedTestCoverageReports(
-        "Wrapper to allow substituting the URL constructor for testing purposes"
+        "Wrapper to allow substituting the URL constructor for testing purposes",
     )
     internal class UrlFactory @Inject constructor() {
-
         operator fun invoke(baseUrl: String) = URL(baseUrl)
     }
 }

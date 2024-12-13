@@ -13,8 +13,10 @@ internal class FetchSubjectUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventSyncManager: EventSyncManager,
 ) {
-
-    suspend operator fun invoke(projectId: String, subjectId: String): FetchSubjectState {
+    suspend operator fun invoke(
+        projectId: String,
+        subjectId: String,
+    ): FetchSubjectState {
         Simber.d("[FETCH_GUID] Fetching $subjectId")
         try {
             val localSubject = loadFromDatabase(projectId, subjectId)
@@ -41,10 +43,14 @@ internal class FetchSubjectUseCase @Inject constructor(
         }
     }
 
-    private suspend fun loadFromDatabase(projectId: String, subjectId: String) =
-        enrolmentRecordRepository.load(SubjectQuery(projectId, subjectId)).firstOrNull()
+    private suspend fun loadFromDatabase(
+        projectId: String,
+        subjectId: String,
+    ) = enrolmentRecordRepository.load(SubjectQuery(projectId, subjectId)).firstOrNull()
 
-    private fun notFoundState() =
-        if (connectivityTracker.isConnected()) FetchSubjectState.NotFound
-        else FetchSubjectState.ConnectionError
+    private fun notFoundState() = if (connectivityTracker.isConnected()) {
+        FetchSubjectState.NotFound
+    } else {
+        FetchSubjectState.ConnectionError
+    }
 }

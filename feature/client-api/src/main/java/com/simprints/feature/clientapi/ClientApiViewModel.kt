@@ -53,7 +53,6 @@ class ClientApiViewModel @Inject internal constructor(
     private val timeHelper: TimeHelper,
     private val persistentLogger: PersistentLogger,
 ) : ViewModel() {
-
     val returnResponse: LiveData<LiveDataEventWithContent<Bundle>>
         get() = _returnResponse
     private val _returnResponse = MutableLiveData<LiveDataEventWithContent<Bundle>>()
@@ -66,10 +65,12 @@ class ClientApiViewModel @Inject internal constructor(
         get() = _showAlert
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
 
-    private suspend fun getProject() =
-        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
+    private suspend fun getProject() = runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
-    suspend fun handleIntent(action: String, extras: Bundle): ActionRequest? {
+    suspend fun handleIntent(
+        action: String,
+        extras: Bundle,
+    ): ActionRequest? {
         val extrasMap = extras.toMap()
         return try {
             // Session must be created to be able to report invalid intents if mapping fails
@@ -113,8 +114,8 @@ class ClientApiViewModel @Inject internal constructor(
                     sessionId = currentSessionId,
                     enrolledGuid = enrolResponse.guid,
                     subjectActions = coSyncEnrolmentRecords,
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -128,7 +129,7 @@ class ClientApiViewModel @Inject internal constructor(
         logIntent(
             action,
             currentSessionId,
-            "Identifications: ${identifyResponse.identifications.size}"
+            "Identifications: ${identifyResponse.identifications.size}",
         )
 
         _returnResponse.send(
@@ -137,8 +138,8 @@ class ClientApiViewModel @Inject internal constructor(
                     actionIdentifier = action.actionIdentifier,
                     sessionId = currentSessionId,
                     identifications = identifyResponse.identifications,
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -159,8 +160,8 @@ class ClientApiViewModel @Inject internal constructor(
                     actionIdentifier = action.actionIdentifier,
                     sessionId = currentSessionId,
                     confirmed = confirmResponse.identificationOutcome,
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -177,7 +178,7 @@ class ClientApiViewModel @Inject internal constructor(
         logIntent(
             action,
             currentSessionId,
-            "GUID: ${verifyResponse.matchResult.guid}\nVerification result: ${verifyResponse.matchResult.matchConfidence}"
+            "GUID: ${verifyResponse.matchResult.guid}\nVerification result: ${verifyResponse.matchResult.matchConfidence}",
         )
 
         _returnResponse.send(
@@ -186,8 +187,8 @@ class ClientApiViewModel @Inject internal constructor(
                     actionIdentifier = action.actionIdentifier,
                     sessionId = currentSessionId,
                     matchResult = verifyResponse.matchResult,
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -210,8 +211,8 @@ class ClientApiViewModel @Inject internal constructor(
                     sessionId = currentSessionId,
                     reason = exitFormResponse.reason,
                     extraText = exitFormResponse.extra,
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -243,15 +244,15 @@ class ClientApiViewModel @Inject internal constructor(
                     sessionId = currentSessionId,
                     reason = errorResponse.reason,
                     flowCompleted = flowCompleted,
-                )
-            )
+                ),
+            ),
         )
     }
 
     private suspend fun logIntent(
         action: ActionRequest,
         currentSessionId: String,
-        response: String
+        response: String,
     ) {
         persistentLogger.log(
             type = LogEntryType.Intent,
@@ -260,6 +261,4 @@ class ClientApiViewModel @Inject internal constructor(
             body = "${action.actionIdentifier}\n$response",
         )
     }
-
-
 }

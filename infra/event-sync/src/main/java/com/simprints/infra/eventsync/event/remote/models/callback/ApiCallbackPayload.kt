@@ -20,39 +20,38 @@ internal data class ApiCallbackPayload(
     override val startTime: ApiTimestamp,
     val callback: ApiCallback,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: EnrolmentCallbackPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        ApiEnrolmentCallback(domainPayload.guid)
+        ApiEnrolmentCallback(domainPayload.guid),
     )
 
     constructor(domainPayload: IdentificationCallbackPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         ApiIdentificationCallback(
             domainPayload.sessionId,
-            domainPayload.scores.map { it.fromDomainToApi(domainPayload.eventVersion) })
+            domainPayload.scores.map { it.fromDomainToApi(domainPayload.eventVersion) },
+        ),
     )
 
     constructor(domainPayload: VerificationCallbackPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        ApiVerificationCallback(domainPayload.score.fromDomainToApi(domainPayload.eventVersion))
+        ApiVerificationCallback(domainPayload.score.fromDomainToApi(domainPayload.eventVersion)),
     )
 
     constructor(domainPayload: ConfirmationCallbackPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        ApiConfirmationCallback(domainPayload.identificationOutcome)
+        ApiConfirmationCallback(domainPayload.identificationOutcome),
     )
 
     constructor(domainPayload: ErrorCallbackPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        ApiErrorCallback(domainPayload.reason.fromDomainToApi())
+        ApiErrorCallback(domainPayload.reason.fromDomainToApi()),
     )
 
     constructor(domainPayload: RefusalCallbackPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
-        ApiRefusalCallback(domainPayload.reason, domainPayload.extra)
+        ApiRefusalCallback(domainPayload.reason, domainPayload.extra),
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

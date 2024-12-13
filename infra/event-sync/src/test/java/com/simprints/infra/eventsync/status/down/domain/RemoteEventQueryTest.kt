@@ -10,7 +10,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import org.junit.Test
 
 class RemoteEventQueryTest {
-
     @Test
     fun remoteEventQuery_fromDomainToAPi() {
         val api = RemoteEventQuery(

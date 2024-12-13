@@ -7,7 +7,5 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import javax.inject.Inject
 
 class RootMessageSerializer @Inject constructor() : MessageSerializer<RootCommand> {
-
-    override fun serialize(message: RootCommand): List<ByteArray> =
-        message.getBytes().chunked(RootMessageProtocol.MAX_PAYLOAD_SIZE)
+    override fun serialize(message: RootCommand): List<ByteArray> = message.getBytes().chunked(RootMessageProtocol.MAX_PAYLOAD_SIZE)
 }

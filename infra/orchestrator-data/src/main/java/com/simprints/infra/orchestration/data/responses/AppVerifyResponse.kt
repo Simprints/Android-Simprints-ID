@@ -10,5 +10,3 @@ import kotlinx.parcelize.Parcelize
 data class AppVerifyResponse(
     val matchResult: AppMatchResult,
 ) : AppResponse()
-
-

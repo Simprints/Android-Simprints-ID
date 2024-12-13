@@ -18,7 +18,6 @@ data class FingerprintCaptureBiometricsEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         fingerprint: FingerprintCaptureBiometricsPayload.Fingerprint,
@@ -30,15 +29,14 @@ data class FingerprintCaptureBiometricsEvent(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
             fingerprint = fingerprint,
-            id = payloadId
+            id = payloadId,
         ),
-        type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS
+        type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FingerprintCaptureBiometricsPayload(
@@ -49,9 +47,7 @@ data class FingerprintCaptureBiometricsEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "format: ${fingerprint.format}, quality: ${fingerprint.quality}"
+        override fun toSafeString(): String = "format: ${fingerprint.format}, quality: ${fingerprint.quality}"
 
         @Keep
         data class Fingerprint(
@@ -63,7 +59,6 @@ data class FingerprintCaptureBiometricsEvent(
     }
 
     companion object {
-
         const val EVENT_VERSION = 1
     }
 }

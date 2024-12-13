@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class GetCurrentSessionIdUseCaseTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -25,7 +24,6 @@ class GetCurrentSessionIdUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
 
         useCase = GetCurrentSessionIdUseCase(eventRepository)
     }

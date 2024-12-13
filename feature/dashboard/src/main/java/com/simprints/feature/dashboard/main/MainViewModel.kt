@@ -17,9 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class MainViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val securityManager: SecurityManager
+    private val securityManager: SecurityManager,
 ) : ViewModel() {
-
     val consentRequired: LiveData<Boolean>
         get() = _consentRequired
     private val _consentRequired = MutableLiveData<Boolean>()

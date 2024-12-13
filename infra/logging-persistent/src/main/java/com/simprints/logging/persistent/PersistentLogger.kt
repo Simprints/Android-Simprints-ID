@@ -5,12 +5,31 @@ package com.simprints.logging.persistent
  * Entries are stored for around 2 weeks and can be deleted at any point after that.
  */
 interface PersistentLogger {
+    fun logSync(
+        type: LogEntryType,
+        title: String,
+        body: String,
+    )
 
-    fun logSync(type: LogEntryType, title: String, body: String)
-    fun logSync(type: LogEntryType, timestampMs: Long, title: String, body: String)
+    fun logSync(
+        type: LogEntryType,
+        timestampMs: Long,
+        title: String,
+        body: String,
+    )
 
-    suspend fun log(type: LogEntryType, title: String, body: String)
-    suspend fun log(type: LogEntryType, timestampMs: Long, title: String, body: String)
+    suspend fun log(
+        type: LogEntryType,
+        title: String,
+        body: String,
+    )
+
+    suspend fun log(
+        type: LogEntryType,
+        timestampMs: Long,
+        title: String,
+        body: String,
+    )
 
     /**
      * Get all entries of the provided type newest to oldest.

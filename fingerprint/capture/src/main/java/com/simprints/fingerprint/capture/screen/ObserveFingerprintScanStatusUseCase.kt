@@ -31,13 +31,18 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
     private val preference = PreferenceManager.getDefaultSharedPreferences(context)
 
     operator fun invoke(
-        coroutineScope: CoroutineScope, fingerprintSdk: FingerprintConfiguration.BioSdk
+        coroutineScope: CoroutineScope,
+        fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         stopObserving()
         observeJob = coroutineScope.launch {
-            ledsMode = configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(
-                fingerprintSdk
-            )?.vero2?.ledsMode
+            ledsMode = configManager
+                .getProjectConfiguration()
+                .fingerprint
+                ?.getSdkConfiguration(
+                    fingerprintSdk,
+                )?.vero2
+                ?.ledsMode
             launch {
                 statusTracker.scanCompleted.collect {
                     playRemoveFingerAudio()
@@ -78,18 +83,19 @@ class ObserveFingerprintScanStatusUseCase @Inject constructor(
     private suspend fun setUiAfterScan(isGoodScan: Boolean) {
         // There's no need to check the configuration, as the good/bad scan visual notifications apply across all LED modes.
         with(scannerManager.scanner) {
-            if (isGoodScan) setUiGoodCapture()
-            else setUiBadCapture()
+            if (isGoodScan) {
+                setUiGoodCapture()
+            } else {
+                setUiBadCapture()
+            }
 
-            //Wait before turn of the leds
+            // Wait before turn of the leds
             delay(LONG_DELAY)
             turnOffSmileLeds()
         }
-
     }
 
     private fun playRemoveFingerAudio() {
-
         if (isAudioEnabled()) playAudioBeep()
     }
 

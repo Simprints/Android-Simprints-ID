@@ -19,7 +19,6 @@ class ScannerManagerImpl @Inject constructor(
     private val serialNumberConverter: SerialNumberConverter,
     private val firmwareRepository: FirmwareRepository,
 ) : ScannerManager {
-
     private var _scanner: ScannerWrapper? = null
 
     private var _otaOperationsWrapper: ScannerOtaOperationsWrapper? = null

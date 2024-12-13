@@ -15,7 +15,6 @@ class ModuleFeatureConventionPlugin : Plugin<Project> {
                 apply("androidx.navigation.safeargs.kotlin")
             }
             extensions.configure<LibraryExtension> {
-
                 buildFeatures.viewBinding = true
 
                 testOptions {

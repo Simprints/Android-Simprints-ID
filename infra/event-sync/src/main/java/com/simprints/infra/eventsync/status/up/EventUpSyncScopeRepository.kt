@@ -1,17 +1,16 @@
 package com.simprints.infra.eventsync.status.up
 
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope.ProjectScope
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
-import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
 internal class EventUpSyncScopeRepository @Inject constructor(
     val authStore: AuthStore,
     private val dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao,
 ) {
-
     suspend fun getUpSyncScope(): ProjectScope {
         val projectId = authStore.signedInProjectId
         val syncScope = ProjectScope(projectId)

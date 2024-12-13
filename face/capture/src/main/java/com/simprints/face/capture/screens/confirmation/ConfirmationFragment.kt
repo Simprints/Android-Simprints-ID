@@ -9,8 +9,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentConfirmationBinding
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,7 +20,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
-
     private val binding by viewBinding(FragmentConfirmationBinding::bind)
 
     private val mainVm: FaceCaptureViewModel by activityViewModels()
@@ -30,7 +29,10 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
 
     private var startTime = Timestamp(0L)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         startTime = faceTimeHelper.now()
         super.onViewCreated(view, savedInstanceState)
 

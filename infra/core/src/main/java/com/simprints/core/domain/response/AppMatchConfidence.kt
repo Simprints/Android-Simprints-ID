@@ -7,5 +7,5 @@ enum class AppMatchConfidence {
     NONE,
     LOW,
     MEDIUM,
-    HIGH
+    HIGH,
 }

@@ -23,7 +23,6 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 internal class EventRoomDaoTest {
-
     private val eventJson = """{"id": "anID", "payload": "a payload"}"""
     val event = DbEvent(
         GUID1,
@@ -42,8 +41,10 @@ internal class EventRoomDaoTest {
         MockKAnnotations.init(this)
 
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
-            .allowMainThreadQueries().build()
+        db = Room
+            .inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
         eventDao = db.eventDao
     }
 
@@ -98,7 +99,10 @@ internal class EventRoomDaoTest {
         }
     }
 
-    private fun verifyEvents(expectedEvents: List<DbEvent>, queryResult: List<DbEvent>) {
+    private fun verifyEvents(
+        expectedEvents: List<DbEvent>,
+        queryResult: List<DbEvent>,
+    ) {
         assertThat(queryResult).containsExactlyElementsIn(expectedEvents)
     }
 

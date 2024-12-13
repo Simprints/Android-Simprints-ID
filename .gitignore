@@ -19,6 +19,7 @@ Thumbs.db
 build/
 projectFilesBackup/
 .kotlin/
+!.idea/ktlint-plugin.xml
 
 # PyCharm
 testing/__pycache__/

@@ -88,7 +88,6 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class ScannerTest {
-
     private lateinit var mockkMessageOutputStream: MainMessageOutputStream
     private lateinit var mockkMessageInputStream: MainMessageInputStream
     private lateinit var scanner: Scanner
@@ -127,8 +126,14 @@ class ScannerTest {
         scanner = Scanner(
             MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
             setupRootMessageChannelMock(),
-            mockk(), mockk(), mockk(), mockk(), mockk(),
-            un20OtaController,scannerInfo,dispatcher,
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            un20OtaController,
+            scannerInfo,
+            dispatcher,
         )
     }
 
@@ -149,8 +154,8 @@ class ScannerTest {
                 GetBatteryPercentChargeResponse(BatteryPercentCharge(expectedPercentCharge.toByte())),
                 GetBatteryTemperatureResponse(BatteryTemperature(expectedTemperatureDeciKelvin.toShort())),
                 GetBatteryVoltageResponse(BatteryVoltage(expectedVoltageMilliVolts.toShort())),
-                GetBatteryCurrentResponse(BatteryCurrent(expectedCurrentMilliAmps.toShort()))
-            )
+                GetBatteryCurrentResponse(BatteryCurrent(expectedCurrentMilliAmps.toShort())),
+            ),
         )
 
         val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
@@ -160,7 +165,7 @@ class ScannerTest {
         assertThat(scanner.getBatteryVoltageMilliVolts()).isEqualTo(expectedVoltageMilliVolts)
         assertThat(scanner.getBatteryCurrentMilliAmps()).isEqualTo(expectedCurrentMilliAmps)
         assertThat(scanner.getBatteryTemperatureDeciKelvin()).isEqualTo(
-            expectedTemperatureDeciKelvin
+            expectedTemperatureDeciKelvin,
         )
     }
 
@@ -268,7 +273,6 @@ class ScannerTest {
         assertThat(result).isEqualTo(expectedValue.imageQualityScore)
     }
 
-
     @Test(expected = NotConnectedException::class)
     fun scanner_connectThenDisconnectThenEnterMainMode_throwsException() = runTest {
         scanner.connect(mockk(), mockk())
@@ -291,7 +295,7 @@ class ScannerTest {
             mockk(),
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
         verify { rootMessageChannel.connect(any(), any()) }
@@ -305,7 +309,6 @@ dispatcher,
 
     @Test
     fun scanner_connectThenEnterMainMode_callsConnectOnMainMessageStreams() = runTest {
-
         scanner.connect(mockkInputStream, mockkOutputStream)
         scanner.enterMainMode()
         verify { mockkMessageInputStream.connect(any()) }
@@ -313,8 +316,6 @@ dispatcher,
         scanner.disconnect()
         verify { mockkMessageInputStream.disconnect() }
         verify { mockkMessageOutputStream.disconnect() }
-
-
     }
 
     @Test
@@ -340,7 +341,7 @@ dispatcher,
             mockk(),
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.disconnect()
         verify(exactly = 0) { mockRootMessageChannel.disconnect() }
@@ -363,7 +364,7 @@ dispatcher,
             mockk(),
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
         scanner.enterCypressOtaMode()
@@ -374,7 +375,6 @@ dispatcher,
 
     @Test
     fun scanner_connectThenEnterCypressOtaMode_stateIsInCypressOtaMode() = runTest {
-
         val mockkCypressOtaMessageChannel: CypressOtaMessageChannel = mockk {
             justRun { connect(any(), any()) }
         }
@@ -388,54 +388,53 @@ dispatcher,
             mockk(),
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
         scanner.enterCypressOtaMode()
 
         assertThat(scanner.state.mode).isEqualTo(Mode.CYPRESS_OTA)
-
     }
 
     @Test
-    fun scanner_connectThenEnterCypressOtaModeThenStartCypressOta_receivesProgressCorrectly() =
-        runTest {
-            val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
+    fun scanner_connectThenEnterCypressOtaModeThenStartCypressOta_receivesProgressCorrectly() = runTest {
+        val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
 
-            val mockkCypressOtaController = mockk<CypressOtaController> {
-                coEvery {
-                    program(any(), any())
-                } returns progressValues.asFlow()
-            }
-
-            val mockkMessageInputStream = mockk<CypressOtaMessageInputStream>(relaxed = true) {
-                every { cypressOtaResponseStream } returns emptyList<CypressOtaResponse>().toFlowable()
-            }
-
-            val scanner = Scanner(
-                mockk(),
-                setupRootMessageChannelMock(),
-                mockk(),
-                CypressOtaMessageChannel(
-                    mockkMessageInputStream, mockk(relaxed = true), dispatcher
-                ),
-                mockk(),
-                mockkCypressOtaController,
-                mockk(),
-                mockk(),
-                scannerInfo,
-dispatcher,
-            )
-            scanner.connect(mockkInputStream, mockkOutputStream)
-            scanner.enterCypressOtaMode()
-            val testObserver = scanner.startCypressOta(byteArrayOf())
-            assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues).inOrder()
+        val mockkCypressOtaController = mockk<CypressOtaController> {
+            coEvery {
+                program(any(), any())
+            } returns progressValues.asFlow()
         }
+
+        val mockkMessageInputStream = mockk<CypressOtaMessageInputStream>(relaxed = true) {
+            every { cypressOtaResponseStream } returns emptyList<CypressOtaResponse>().toFlowable()
+        }
+
+        val scanner = Scanner(
+            mockk(),
+            setupRootMessageChannelMock(),
+            mockk(),
+            CypressOtaMessageChannel(
+                mockkMessageInputStream,
+                mockk(relaxed = true),
+                dispatcher,
+            ),
+            mockk(),
+            mockkCypressOtaController,
+            mockk(),
+            mockk(),
+            scannerInfo,
+            dispatcher,
+        )
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterCypressOtaMode()
+        val testObserver = scanner.startCypressOta(byteArrayOf())
+        assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues).inOrder()
+    }
 
     @Test
     fun scanner_connectThenEnterStmOtaMode_callsConnectOnStmOtaMessageStreams() = runTest {
-
         val mockkMessageInputStream = mockk<StmOtaMessageInputStream> {
             justRun { connect(any()) }
             justRun { disconnect() }
@@ -454,13 +453,15 @@ dispatcher,
             mockk(),
             mockk(),
             StmOtaMessageChannel(
-                mockkMessageInputStream, mockkMessageOutputStream, dispatcher
+                mockkMessageInputStream,
+                mockkMessageOutputStream,
+                dispatcher,
             ),
             mockk(),
             mockk(),
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
@@ -486,16 +487,17 @@ dispatcher,
             mockk(),
             mockk(),
             StmOtaMessageChannel(
-                mockkMessageInputStream, mockk(relaxed = true), dispatcher
+                mockkMessageInputStream,
+                mockk(relaxed = true),
+                dispatcher,
             ),
             mockk(),
             mockk(),
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
-
 
         scanner.enterStmOtaMode()
 
@@ -522,14 +524,13 @@ dispatcher,
             mockkStmOtaController,
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
         scanner.enterStmOtaMode()
 
         val testObserver = scanner.startStmOta(byteArrayOf())
-
 
         assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues).inOrder()
     }
@@ -543,37 +544,36 @@ dispatcher,
     }
 
     @Test
-    fun scannerVeroEvents_differentKindsOfEventsCreated_forwardsOnlyTriggerEventsToObservers() =
-        runTest {
-            val eventsSubject = PublishSubject.create<VeroEvent>()
-            val messageInputStreamMock = setupMainMessageInputStreamMock()
-            every { messageInputStreamMock.veroEvents } returns eventsSubject.toFlowable(
-                BackpressureStrategy.BUFFER
-            )
+    fun scannerVeroEvents_differentKindsOfEventsCreated_forwardsOnlyTriggerEventsToObservers() = runTest {
+        val eventsSubject = PublishSubject.create<VeroEvent>()
+        val messageInputStreamMock = setupMainMessageInputStreamMock()
+        every { messageInputStreamMock.veroEvents } returns eventsSubject.toFlowable(
+            BackpressureStrategy.BUFFER,
+        )
 
-            scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
-            scanner.connect(mockkInputStream, mockkOutputStream)
-            scanner.enterMainMode()
+        scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
 
-            val testObserver = TestObserver<Unit>()
-            scanner.triggerButtonListeners.add(testObserver)
+        val testObserver = TestObserver<Unit>()
+        scanner.triggerButtonListeners.add(testObserver)
 
-            val numberOfEvents = 3
-            repeat(numberOfEvents) { eventsSubject.onNext(Un20StateChangeEvent(DigitalValue.TRUE)) }
-            repeat(numberOfEvents) { eventsSubject.onNext(TriggerButtonPressedEvent()) }
+        val numberOfEvents = 3
+        repeat(numberOfEvents) { eventsSubject.onNext(Un20StateChangeEvent(DigitalValue.TRUE)) }
+        repeat(numberOfEvents) { eventsSubject.onNext(TriggerButtonPressedEvent()) }
 
-            assertThat(testObserver.valueCount()).isEqualTo(numberOfEvents)
-
-        }
+        assertThat(testObserver.valueCount()).isEqualTo(numberOfEvents)
+    }
 
     @Test
     fun scanner_turnOnAndOffUn20_changesStateCorrectlyUponStateChangeEvent() = runTest {
         val messageInputStreamMock = setupMainMessageInputStreamMock(
             veroMessages = listOf(
                 SetUn20OnResponse(OperationResultCode.OK),
-            ), veroEventsMessages = listOf(
+            ),
+            veroEventsMessages = listOf(
                 Un20StateChangeEvent(DigitalValue.TRUE),
-            )
+            ),
         )
 
         val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
@@ -589,7 +589,6 @@ dispatcher,
 
     @Test
     fun scanner_setSmileLedState_changesStateCorrectly() = runTest {
-
         val messageInputStreamMock = setupMainMessageInputStreamMock()
 
         val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
@@ -602,7 +601,7 @@ dispatcher,
             LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
             LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
             LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04)
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
         )
         scanner.setSmileLedState(smileLedState)
         assertThat(scanner.state.smileLedState).isEqualTo(smileLedState)
@@ -662,7 +661,6 @@ dispatcher,
         val result = scanner.acquireImage()
         assertThat(result).isNotNull()
         assertThat(result?.image).isEqualTo(image)
-
     }
 
     @Test
@@ -683,6 +681,7 @@ dispatcher,
         scanner.disconnect()
         assertThat(scanner.state).isEqualTo(disconnectedScannerState())
     }
+
     @Test
     fun scanner_connectThenDisconnect_clearScannerInfo() {
         scanner.connect(mockkInputStream, mockkOutputStream)
@@ -722,7 +721,7 @@ dispatcher,
             mockk(),
             mockk(),
             scannerInfo,
-dispatcher,
+            dispatcher,
         )
         scanner.connect(mockkInputStream, mockkOutputStream)
 
@@ -744,7 +743,7 @@ dispatcher,
     private fun setupMainMessageInputStreamMock(
         veroMessages: List<VeroResponse> = emptyList(),
         un20Messages: List<Un20Response> = emptyList(),
-        veroEventsMessages: List<VeroEvent> = emptyList()
+        veroEventsMessages: List<VeroEvent> = emptyList(),
     ): MainMessageInputStream = mockk {
         justRun { connect(any()) }
         justRun { disconnect() }
@@ -758,9 +757,10 @@ dispatcher,
             justRun { connect(any()) }
             justRun { disconnect() }
             every { rootResponseStream } returns listOf(
-                EnterMainModeResponse(), EnterStmOtaModeResponse(), EnterCypressOtaModeResponse()
+                EnterMainModeResponse(),
+                EnterStmOtaModeResponse(),
+                EnterCypressOtaModeResponse(),
             ).toFlowable()
-
         }
         val mockRootMessageOutputStream = mockk<RootMessageOutputStream> {
             justRun { connect(any()) }
@@ -770,13 +770,13 @@ dispatcher,
         return RootMessageChannel(
             mockRootMessageInputStream,
             mockRootMessageOutputStream,
-            dispatcher
+            dispatcher,
         )
     }
 
     private fun createScanner(
         messageInputStreamMock: MainMessageInputStream,
-        mockkMessageOutputStream: MainMessageOutputStream
+        mockkMessageOutputStream: MainMessageOutputStream,
     ) = Scanner(
         MainMessageChannel(messageInputStreamMock, mockkMessageOutputStream, dispatcher),
         setupRootMessageChannelMock(),
@@ -787,7 +787,7 @@ dispatcher,
         mockk(),
         mockk(),
         scannerInfo,
-dispatcher,
+        dispatcher,
     )
 
     private fun createScanner(scannerInfoReaderMockk: ScannerExtendedInfoReaderHelper) = Scanner(
@@ -800,6 +800,6 @@ dispatcher,
         mockk(),
         mockk(),
         scannerInfo,
-dispatcher,
+        dispatcher,
     )
 }

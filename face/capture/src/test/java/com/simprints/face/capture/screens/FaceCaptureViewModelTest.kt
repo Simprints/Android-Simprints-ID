@@ -14,10 +14,10 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
-import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.license.models.License
 import com.simprints.infra.license.models.LicenseState
 import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
 import com.simprints.testtools.common.livedata.assertEventReceived
@@ -38,7 +38,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class FaceCaptureViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -75,7 +74,7 @@ class FaceCaptureViewModelTest {
         mockk(relaxed = true) {
             every { id } returns "FAKE_ID"
             every { bitmap } returns mockk {}
-        }
+        },
     )
 
     @Before
@@ -96,7 +95,7 @@ class FaceCaptureViewModelTest {
                 coEvery { this@mockk().initializer } returns faceBioSdkInitializer
             },
             saveLicenseCheckEvent,
-            "deviceId"
+            "deviceId",
         )
     }
 
@@ -188,7 +187,7 @@ class FaceCaptureViewModelTest {
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
-            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license,LicenseVersion("1.0")))
+            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))),
         )
         coEvery { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns false
 
@@ -196,7 +195,7 @@ class FaceCaptureViewModelTest {
         viewModel.initFaceBioSdk(mockk())
         // Then
         viewModel.invalidLicense.assertEventReceived()
-        coVerify { licenseRepository.redownloadLicence(any(), any(), any(),any()) }
+        coVerify { licenseRepository.redownloadLicence(any(), any(), any(), any()) }
         coVerify { licenseRepository.deleteCachedLicense(Vendor.RankOne) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.ERROR)
     }
@@ -213,8 +212,9 @@ class FaceCaptureViewModelTest {
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
-            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
-            )
+            LicenseState.FinishedWithSuccess(
+                License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0")),
+            ),
         )
         every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
         val licenseStatusSlot = slot<LicenseStatus>()
@@ -236,14 +236,15 @@ class FaceCaptureViewModelTest {
         val license = "license"
         coEvery {
             licenseRepository.getCachedLicense(Vendor.RankOne)
-        } returns License("2133-12-30T17:32:28Z", license,LicenseVersion("1.0"))
+        } returns License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
         coEvery {
-            licenseRepository.redownloadLicence(any(), any(), any(),any())
+            licenseRepository.redownloadLicence(any(), any(), any(), any())
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
-            LicenseState.FinishedWithSuccess(License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0"))
-            )
+            LicenseState.FinishedWithSuccess(
+                License("2133-12-30T17:32:28Z", license, LicenseVersion("1.0")),
+            ),
         )
         every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returnsMany listOf(false, true)
 
@@ -272,7 +273,7 @@ class FaceCaptureViewModelTest {
         } returns flowOf(
             LicenseState.Started,
             LicenseState.Downloading,
-            LicenseState.FinishedWithError("error")
+            LicenseState.FinishedWithError("error"),
         )
 
         val licenseStatusSlot = slot<LicenseStatus>()

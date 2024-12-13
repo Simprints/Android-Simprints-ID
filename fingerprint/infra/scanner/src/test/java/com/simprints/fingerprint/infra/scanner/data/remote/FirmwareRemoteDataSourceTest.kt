@@ -27,8 +27,8 @@ class FirmwareRemoteDataSourceTest {
         val bytes = firmwareRemoteDataSource.downloadFirmware(
             DownloadableFirmwareVersion(
                 DownloadableFirmwareVersion.Chip.STM,
-                STM_VERSION_HIGH
-            )
+                STM_VERSION_HIGH,
+            ),
         )
 
         assertThat(bytes.toList()).containsExactlyElementsIn(SOME_BIN.toList()).inOrder()

@@ -8,5 +8,5 @@ internal enum class ApiCalloutType {
     Enrolment,
     EnrolmentLastBiometrics,
     Identification,
-    Verification
+    Verification,
 }

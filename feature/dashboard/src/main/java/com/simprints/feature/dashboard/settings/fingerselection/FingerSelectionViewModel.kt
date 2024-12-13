@@ -14,7 +14,6 @@ import javax.inject.Inject
 internal class FingerSelectionViewModel @Inject constructor(
     private val configManager: ConfigManager,
 ) : ViewModel() {
-
     val fingerSelections: LiveData<List<FingerSelectionSection>>
         get() = _fingerSelections
     private val _fingerSelections = MutableLiveData<List<FingerSelectionSection>>()
@@ -51,10 +50,10 @@ internal class FingerSelectionViewModel @Inject constructor(
 
 data class FingerSelectionSection(
     val sdkName: String,
-    val items: List<FingerSelectionItem>
+    val items: List<FingerSelectionItem>,
 )
 
 data class FingerSelectionItem(
     var finger: Finger,
-    var quantity: Int
+    var quantity: Int,
 )

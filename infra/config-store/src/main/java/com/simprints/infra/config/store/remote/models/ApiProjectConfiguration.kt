@@ -16,7 +16,6 @@ internal data class ApiProjectConfiguration(
     val synchronization: ApiSynchronizationConfiguration,
     val custom: Map<String, Any>?,
 ) {
-
     fun toDomain(): ProjectConfiguration = ProjectConfiguration(
         id,
         projectId,

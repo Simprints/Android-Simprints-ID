@@ -9,7 +9,6 @@ import org.junit.Test
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 
 class ErrorCallbackEventTest {
-
     @Test
     fun create_ErrorCallbackEvent() {
         val event = ErrorCallbackEvent(CREATED_AT, ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN)

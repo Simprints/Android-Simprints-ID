@@ -5,8 +5,8 @@ import com.simprints.infra.logging.Simber.USER_PROPERTY_TAG
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import org.junit.Assert.assertEquals
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import timber.log.Timber
@@ -16,7 +16,6 @@ import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.SSLProtocolException
 
 class SimberTest {
-
     @Before
     fun setUp() {
         mockkObject(Timber.Forest)
@@ -81,7 +80,6 @@ class SimberTest {
         verify(exactly = 1) { Timber.Forest.e(any<Exception>(), any(), any()) }
     }
 
-
     @Test
     fun `skips false-positive crash reporting when logging warnings`() {
         val list = getListOfSkippableExceptions()
@@ -117,7 +115,6 @@ class SimberTest {
         verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any(), any()) }
         verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any(), any()) }
     }
-
 
     @Test
     fun `skips false-positive cause crash reporting when logging warnings`() {
@@ -155,7 +152,7 @@ class SimberTest {
         verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any(), any()) }
         verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any(), any()) }
     }
-    
+
     private fun getListOfSkippableExceptions() = listOf(
         SocketTimeoutException(),
         UnknownHostException(),
@@ -163,5 +160,4 @@ class SimberTest {
         SSLHandshakeException("Stub"),
         FirebaseNetworkException("Stub"),
     )
-
 }

@@ -8,9 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 /**
  * Configure base Kotlin with Android options
  */
-internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
-) {
+internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     commonExtension.apply {
         compileSdk = SdkVersions.TARGET
 
@@ -22,7 +20,6 @@ internal fun Project.configureKotlinAndroid(
             sourceCompatibility = SdkVersions.JAVA_TARGET
             targetCompatibility = SdkVersions.JAVA_TARGET
         }
-
 
         extensions.getByType(AndroidComponentsExtension::class.java).onVariants { variant ->
             afterEvaluate {

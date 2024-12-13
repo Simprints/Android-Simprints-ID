@@ -11,7 +11,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class OneToManyMatchEventTest {
-
     @Test
     fun create_OneToManyMatchEvent() {
         val poolArg = MatchPool(PROJECT, 100)

@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroC
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
-class SetUn20OnCommand(val value: DigitalValue) : VeroCommand(VeroMessageType.SET_UN20_ON) {
-
+class SetUn20OnCommand(
+    val value: DigitalValue,
+) : VeroCommand(VeroMessageType.SET_UN20_ON) {
     override fun getDataBytes(): ByteArray = byteArrayOf(value.byte)
 
     companion object {

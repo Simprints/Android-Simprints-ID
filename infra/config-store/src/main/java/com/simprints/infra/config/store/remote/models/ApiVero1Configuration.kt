@@ -7,9 +7,7 @@ import com.simprints.infra.config.store.models.Vero1Configuration
 internal data class ApiVero1Configuration(
     val qualityThreshold: Int,
 ) {
-
-    fun toDomain(): Vero1Configuration =
-        Vero1Configuration(
-            qualityThreshold
-        )
+    fun toDomain(): Vero1Configuration = Vero1Configuration(
+        qualityThreshold,
+    )
 }

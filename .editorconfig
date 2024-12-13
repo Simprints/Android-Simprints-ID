@@ -1,11 +1,27 @@
 [*]
-charset=utf-8
-end_of_line=lf
-insert_final_newline=true
-indent_style=space
-indent_size=4
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+max_line_length = 140
 
 [*.json]
-indent_style=space
-indent_size=2
+indent_size = 2
 
+[{*.kt,*.kts}]
+ktlint_code_style = ktlint_official
+
+# Inject annotation on a constructor causes the whole classes to have unnecessary
+# continuation indent which also looks very bad
+ktlint_standard_annotation = disabled
+
+# If enabled, this rules forces any multiline assignment to the new line regardless of length
+ktlint_standard_multiline-expression-wrapping = disabled
+
+# Default allows the expression body to be a single call to a wrapper
+# function (e.g. `runTest{}`) without a line break
+ktlint_function_signature_body_expression_wrapping = default
+
+# In tests star imports are fine since there could be lots helper functions
+ij_kotlin_packages_to_use_import_on_demand=androidx.test.**,io.mockk.**,com.google.common.truth.**

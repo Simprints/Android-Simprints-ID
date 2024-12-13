@@ -7,7 +7,6 @@ import javax.inject.Inject
 class ShouldScheduleFirmwareUpdateUseCase @Inject constructor(
     private val configManager: ConfigManager,
 ) {
-
     suspend operator fun invoke(): Boolean = configManager
         .getProjectConfiguration()
         .fingerprint

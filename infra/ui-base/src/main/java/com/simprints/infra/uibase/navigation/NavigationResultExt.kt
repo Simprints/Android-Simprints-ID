@@ -31,10 +31,11 @@ import java.io.Serializable
 fun <T : Serializable> FragmentContainerView.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes targetDestinationId: Int,
-    handler: (T) -> Unit
+    handler: (T) -> Unit,
 ) {
     val expectedResultKey = resultName(targetDestinationId)
-    getFragment<Fragment>().childFragmentManager
+    getFragment<Fragment>()
+        .childFragmentManager
         .setFragmentResultListener(expectedResultKey, lifecycleOwner) { key, resultBundle ->
             (resultBundle.getSerializable(key) as? T)?.let(handler)
         }
@@ -45,7 +46,10 @@ fun <T : Serializable> FragmentContainerView.handleResult(
  * This function should be used only in fragment tests to verify correct results are being returned.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> Fragment.handleResultDirectly(@IdRes targetDestinationId: Int, handler: (T) -> Unit) {
+fun <T : Serializable> Fragment.handleResultDirectly(
+    @IdRes targetDestinationId: Int,
+    handler: (T) -> Unit,
+) {
     val expectedResultKey = resultName(targetDestinationId)
     setFragmentResultListener(expectedResultKey) { key, resultBundle ->
         (resultBundle.getSerializable(key) as? T)?.let(handler)
@@ -66,7 +70,7 @@ fun <T : Serializable> NavController.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes currentDestinationId: Int,
     @IdRes targetDestinationId: Int,
-    handler: (T) -> Unit
+    handler: (T) -> Unit,
 ) {
     // Do not handle anything if current destination is not available in the stack or there is no backstack
     currentDestination ?: return
@@ -81,17 +85,19 @@ fun <T : Serializable> NavController.handleResult(
         }
     }
     currentEntry.lifecycle.addObserver(observer)
-    lifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
-        if (event == Lifecycle.Event.ON_DESTROY) {
-            currentEntry.lifecycle.removeObserver(observer)
-        }
-    })
+    lifecycleOwner.lifecycle.addObserver(
+        LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                currentEntry.lifecycle.removeObserver(observer)
+            }
+        },
+    )
 }
 
 private fun <T : Serializable> handleResultFromChild(
     @IdRes childDestinationId: Int,
     currentEntry: NavBackStackEntry,
-    handler: (T) -> Unit
+    handler: (T) -> Unit,
 ) {
     val expectedResultKey = resultName(childDestinationId)
 
@@ -115,10 +121,10 @@ private fun <T : Serializable> handleResultFromChild(
 fun NavController.navigateSafely(
     currentFragment: Fragment?,
     directions: NavDirections,
-    navOptions: NavOptions? = null
+    navOptions: NavOptions? = null,
 ) = navigateIfPossible(
     currentFragment = currentFragment,
-    navigation = { navigate(directions, navOptions) }
+    navigation = { navigate(directions, navOptions) },
 )
 
 /**
@@ -133,7 +139,7 @@ fun NavController.navigateSafely(
 fun NavController.navigateSafely(
     currentFragment: Fragment?,
     @IdRes actionId: Int,
-    args: Bundle? = null
+    args: Bundle? = null,
 ) = navigateIfPossible(currentFragment = currentFragment, navigation = { navigate(actionId, args) })
 
 /**
@@ -147,7 +153,7 @@ fun NavController.navigateSafely(
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 private fun NavController.navigateIfPossible(
     currentFragment: Fragment?,
-    navigation: () -> Unit
+    navigation: () -> Unit,
 ) {
     if (canNavigate(currentFragment)) {
         navigation()
@@ -192,7 +198,10 @@ private fun NavController.canNavigate(currentFragment: Fragment?): Boolean {
  * within and outside of the navigation graph.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> NavController.setResult(fragment: Fragment, result: T) {
+fun <T : Serializable> NavController.setResult(
+    fragment: Fragment,
+    result: T,
+) {
     val currentDestinationId = currentDestination?.id
     if (currentDestinationId != null) {
         val resultName = resultName(currentDestinationId)
@@ -210,7 +219,10 @@ fun <T : Serializable> NavController.setResult(fragment: Fragment, result: T) {
  * @return true if the stack was popped at least once
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Serializable> NavController.finishWithResult(fragment: Fragment, result: T): Boolean {
+fun <T : Serializable> NavController.finishWithResult(
+    fragment: Fragment,
+    result: T,
+): Boolean {
     val currentDestinationId = currentDestination?.id
     val saveHandle = previousBackStackEntry?.savedStateHandle
 

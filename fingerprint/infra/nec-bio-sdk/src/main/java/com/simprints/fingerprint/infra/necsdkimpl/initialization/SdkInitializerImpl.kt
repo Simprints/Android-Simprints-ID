@@ -18,7 +18,7 @@ internal class SdkInitializerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val necInstance: NEC,
     private val licenseRepository: LicenseRepository,
-    private val saveLicenseCheck: SaveLicenseCheckEventUseCase
+    private val saveLicenseCheck: SaveLicenseCheckEventUseCase,
 ) : SdkInitializer<Unit> {
     override suspend fun initialize(initializationParams: Unit?) {
         var licenseStatus: LicenseStatus? = null
@@ -39,8 +39,4 @@ internal class SdkInitializerImpl @Inject constructor(
     }
 }
 
-
-private fun String.encodeAndConvertToByteBuffer() =
-    EncodingUtilsImpl.base64ToBytes(this).toByteBuffer()
-
-
+private fun String.encodeAndConvertToByteBuffer() = EncodingUtilsImpl.base64ToBytes(this).toByteBuffer()

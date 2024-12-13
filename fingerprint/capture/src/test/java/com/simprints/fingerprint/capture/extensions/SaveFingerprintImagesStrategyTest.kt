@@ -8,7 +8,6 @@ import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStr
 import org.junit.Test
 
 internal class SaveFingerprintImagesStrategyTest {
-
     @Test
     fun deduceFileExtension() {
         mapOf(

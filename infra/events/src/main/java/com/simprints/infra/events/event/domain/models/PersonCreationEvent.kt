@@ -15,7 +15,6 @@ data class PersonCreationEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         startTime: Timestamp,
         fingerprintCaptureIds: List<String>?,
@@ -30,15 +29,14 @@ data class PersonCreationEvent(
             fingerprintCaptureIds = fingerprintCaptureIds,
             fingerprintReferenceId = fingerprintReferenceId,
             faceCaptureIds = faceCaptureIds,
-            faceReferenceId = faceReferenceId
+            faceReferenceId = faceReferenceId,
         ),
-        PERSON_CREATION
+        PERSON_CREATION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment, verification or identification
     @Keep
@@ -52,17 +50,16 @@ data class PersonCreationEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = PERSON_CREATION,
     ) : EventPayload() {
-
-        override fun toSafeString(): String =
-            "face reference: $faceReferenceId, fingerprint reference: $fingerprintReferenceId"
+        override fun toSafeString(): String = "face reference: $faceReferenceId, fingerprint reference: $fingerprintReferenceId"
     }
 
     fun hasFingerprintReference() = payload.fingerprintReferenceId != null
+
     fun hasFaceReference() = payload.faceReferenceId != null
+
     fun hasBiometricData() = hasFingerprintReference() || hasFaceReference()
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

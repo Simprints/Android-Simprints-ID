@@ -10,9 +10,9 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 class RecentUserActivitySerializerTest {
-
     companion object {
-        private val protoRecentUserActivity = ProtoRecentUserActivity.newBuilder()
+        private val protoRecentUserActivity = ProtoRecentUserActivity
+            .newBuilder()
             .setLastScannerVersion("version")
             .setLastScannerUsed("scanner")
             .setLastUserUsed("user")

@@ -7,7 +7,6 @@ import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.matcher.screen.MatchFragmentArgs
 
 object MatchContract {
-
     val DESTINATION = R.id.matcherFragment
 
     fun getArgs(
@@ -17,12 +16,14 @@ object MatchContract {
         flowType: FlowType,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
-    ) = MatchFragmentArgs(MatchParams(
-        faceSamples,
-        fingerprintSamples,
-        fingerprintSDK,
-        flowType,
-        subjectQuery,
-        biometricDataSource,
-    )).toBundle()
+    ) = MatchFragmentArgs(
+        MatchParams(
+            faceSamples,
+            fingerprintSamples,
+            fingerprintSDK,
+            flowType,
+            subjectQuery,
+            biometricDataSource,
+        ),
+    ).toBundle()
 }

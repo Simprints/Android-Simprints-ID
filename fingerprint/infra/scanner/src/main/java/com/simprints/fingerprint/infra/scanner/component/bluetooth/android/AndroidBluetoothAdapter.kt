@@ -5,8 +5,9 @@ import android.bluetooth.BluetoothAdapter
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 
-class AndroidBluetoothAdapter(private val adapter: BluetoothAdapter?) : ComponentBluetoothAdapter {
-
+class AndroidBluetoothAdapter(
+    private val adapter: BluetoothAdapter?,
+) : ComponentBluetoothAdapter {
     override fun isNull(): Boolean = adapter == null
 
     override fun isEnabled(): Boolean = adapter!!.isEnabled
@@ -23,8 +24,8 @@ class AndroidBluetoothAdapter(private val adapter: BluetoothAdapter?) : Componen
     override fun cancelDiscovery(): Boolean = adapter!!.cancelDiscovery()
 
     @SuppressLint("MissingPermission")
-    override fun getBondedDevices(): Set<ComponentBluetoothDevice> =
-        adapter!!.bondedDevices
-            .map { AndroidBluetoothDevice(it) }
-            .toSet()
+    override fun getBondedDevices(): Set<ComponentBluetoothDevice> = adapter!!
+        .bondedDevices
+        .map { AndroidBluetoothDevice(it) }
+        .toSet()
 }

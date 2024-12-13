@@ -11,14 +11,16 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports("Platform glue code, actual logic is in the use cases")
 @AndroidEntryPoint
 internal class SessionTerminationReceiver : BroadcastReceiver() {
-
     @Inject
     lateinit var timeHelper: TimeHelper
 
     @Inject
     lateinit var closeSessionUseCase: CloseSessionIfPresentUseCase
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         timeHelper.ensureTrustworthiness()
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
             closeSessionUseCase()

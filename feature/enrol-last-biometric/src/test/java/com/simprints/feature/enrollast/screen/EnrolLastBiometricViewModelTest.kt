@@ -14,10 +14,10 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -31,7 +31,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class EnrolLastBiometricViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -64,7 +63,6 @@ internal class EnrolLastBiometricViewModelTest {
 
     private lateinit var viewModel: EnrolLastBiometricViewModel
 
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -76,7 +74,7 @@ internal class EnrolLastBiometricViewModelTest {
             every { id } returns SESSION_ID
         }
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            mockk<PersonCreationEvent> { every { id } returns SESSION_ID }
+            mockk<PersonCreationEvent> { every { id } returns SESSION_ID },
         )
 
         viewModel = EnrolLastBiometricViewModel(
@@ -85,18 +83,26 @@ internal class EnrolLastBiometricViewModelTest {
             eventRepository,
             enrolmentRecordRepository,
             hasDuplicateEnrolments,
-            buildSubject
+            buildSubject,
         )
     }
 
     @Test
     fun `only calls enrol once`() = runTest {
-        viewModel.onViewCreated(createParams(listOf(
-            EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
-        )))
-        viewModel.onViewCreated(createParams(listOf(
-            EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
-        )))
+        viewModel.onViewCreated(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId"),
+                ),
+            ),
+        )
+        viewModel.onViewCreated(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId"),
+                ),
+            ),
+        )
 
         coVerify(exactly = 1) { configManager.getProjectConfiguration() }
     }
@@ -106,12 +112,15 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
-                )
-            )
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId"),
+                ),
+            ),
         )
 
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
         assertThat(result).isEqualTo(EnrolLastState.Success("previousSubjectId"))
     }
 
@@ -120,9 +129,9 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
-                )
-            )
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId"),
+                ),
+            ),
         )
 
         coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
@@ -134,13 +143,16 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null)
-                )
-            )
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
+                ),
+            ),
         )
 
         val result =
-            viewModel.finish.test().value().getContentIfNotHandled() as EnrolLastState.Failed
+            viewModel.finish
+                .test()
+                .value()
+                .getContentIfNotHandled() as EnrolLastState.Failed
         assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.GENERAL_ERROR)
     }
 
@@ -151,7 +163,10 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(createParams(listOf()))
 
         val result =
-            viewModel.finish.test().value().getContentIfNotHandled() as EnrolLastState.Failed
+            viewModel.finish
+                .test()
+                .value()
+                .getContentIfNotHandled() as EnrolLastState.Failed
 
         assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS)
     }
@@ -159,11 +174,14 @@ internal class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns success when no duplicate enrolments`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        coEvery {  buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
 
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
         assertThat(result).isInstanceOf(EnrolLastState.Success::class.java)
     }
 
@@ -187,7 +205,10 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(createParams(listOf()))
 
         val result =
-            viewModel.finish.test().value().getContentIfNotHandled() as EnrolLastState.Failed
+            viewModel.finish
+                .test()
+                .value()
+                .getContentIfNotHandled() as EnrolLastState.Failed
         assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.GENERAL_ERROR)
     }
 
@@ -208,14 +229,16 @@ internal class EnrolLastBiometricViewModelTest {
         }
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             personCreationEvent1,
-            personCreationEvent2
+            personCreationEvent2,
         )
 
         viewModel.enrolBiometric(createParams(listOf()))
 
-        coVerify { eventRepository.addOrUpdateEvent(
-            match { it is EnrolmentEventV2 && it.payload.personCreationEventId == personCreationId2 }
-        ) }
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                match { it is EnrolmentEventV2 && it.payload.personCreationEventId == personCreationId2 },
+            )
+        }
     }
 
     private fun createParams(steps: List<EnrolLastBiometricStepResult>) = EnrolLastBiometricParams(

@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroC
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
-class SetSmileLedStateCommand(val smileLedState: SmileLedState) : VeroCommand(VeroMessageType.SET_SMILE_LED_STATE) {
-
+class SetSmileLedStateCommand(
+    val smileLedState: SmileLedState,
+) : VeroCommand(VeroMessageType.SET_SMILE_LED_STATE) {
     override fun getDataBytes(): ByteArray = smileLedState.getBytes()
 
     companion object {

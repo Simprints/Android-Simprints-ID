@@ -26,7 +26,6 @@ class RealmWrapperImpl @Inject constructor(
     private val securityManager: SecurityManager,
     private val authStore: AuthStore,
 ) : RealmWrapper {
-
     // Kotlin-realm claims to be thread-safe and there is no need to handle closing manually
     // https://www.mongodb.com/docs/realm/sdk/kotlin/realm-database/frozen-arch/#thread-safe-realms
     private lateinit var realm: Realm
@@ -58,18 +57,18 @@ class RealmWrapperImpl @Inject constructor(
             }
         } catch (ex: Exception) {
             if (isFileCorruptException(ex)) {
-                //DB corruption detected; either DB file or key is corrupt
-                //1. Delete DB file in order to create a new one at next init
+                // DB corruption detected; either DB file or key is corrupt
+                // 1. Delete DB file in order to create a new one at next init
                 Realm.deleteRealm(config)
-                //2. Recreate the DB key
+                // 2. Recreate the DB key
                 recreateLocalDbKey()
-                //3. Log exception after recreating the key so we get extra info
+                // 3. Log exception after recreating the key so we get extra info
                 Simber.tag(DB_CORRUPTION.name).e(ex)
-                //4. Update Realm config with the new key
+                // 4. Update Realm config with the new key
                 config = createAndSaveRealmConfig()
-                //5. Delete "last sync" info and start new sync
+                // 5. Delete "last sync" info and start new sync
                 resetDownSyncState()
-                //6. Retry operation with new file and key
+                // 6. Retry operation with new file and key
                 Realm.open(config)
             } else {
                 throw ex
@@ -77,15 +76,13 @@ class RealmWrapperImpl @Inject constructor(
         }
     }
 
-    private fun isFileCorruptException(ex: Exception) = ex is IllegalStateException
-        && ex.message?.contains("RLM_ERR_INVALID_DATABASE") == true
+    private fun isFileCorruptException(ex: Exception) = ex is IllegalStateException &&
+        ex.message?.contains("RLM_ERR_INVALID_DATABASE") == true
 
     /**
      * Executes provided block ensuring a valid Realm instance is used and closed.
      */
-    override suspend fun <R> readRealm(block: (Realm) -> R): R {
-        return block(getRealm())
-    }
+    override suspend fun <R> readRealm(block: (Realm) -> R): R = block(getRealm())
 
     /**
      * Executes provided block in a transaction ensuring a valid Realm instance is used and closed.
@@ -99,36 +96,34 @@ class RealmWrapperImpl @Inject constructor(
         return configFactory.get(localDbKey.projectId, localDbKey.value)
     }
 
-    private fun getLocalDbKey(): LocalDbKey =
-        authStore.signedInProjectId.let {
-            return if (it.isNotEmpty()) {
-                try {
-                    securityManager.getLocalDbKeyOrThrow(it)
-                } catch (ex: Exception) {
-                    Simber.e(ex)
-                    securityManager.recreateLocalDatabaseKey(it)
-                    securityManager.getLocalDbKeyOrThrow(it)
-                }
-              } else {
-                  throw RealmUninitialisedException("No signed in project id found")
-              }
-        }
-
-    private fun recreateLocalDbKey() =
-        authStore.signedInProjectId.let {
-            if (it.isNotEmpty()) {
+    private fun getLocalDbKey(): LocalDbKey = authStore.signedInProjectId.let {
+        return if (it.isNotEmpty()) {
+            try {
+                securityManager.getLocalDbKeyOrThrow(it)
+            } catch (ex: Exception) {
+                Simber.e(ex)
                 securityManager.recreateLocalDatabaseKey(it)
-            } else {
-                throw RealmUninitialisedException("No signed in project id found")
+                securityManager.getLocalDbKeyOrThrow(it)
             }
+        } else {
+            throw RealmUninitialisedException("No signed in project id found")
         }
+    }
+
+    private fun recreateLocalDbKey() = authStore.signedInProjectId.let {
+        if (it.isNotEmpty()) {
+            securityManager.recreateLocalDatabaseKey(it)
+        } else {
+            throw RealmUninitialisedException("No signed in project id found")
+        }
+    }
 
     private fun resetDownSyncState() {
         // This is a workaround to avoid a circular module dependency
         val intent = Intent()
         intent.component = ComponentName(
             "com.simprints.id",
-            "com.simprints.id.services.sync.events.down.EventDownSyncResetService"
+            "com.simprints.id.services.sync.events.down.EventDownSyncResetService",
         )
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

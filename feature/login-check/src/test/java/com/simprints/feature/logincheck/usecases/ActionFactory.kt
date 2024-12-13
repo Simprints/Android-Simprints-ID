@@ -6,10 +6,7 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
 internal object ActionFactory {
-
-    fun getFlowRequest(
-        extras: Map<String, Any> = emptyMap(),
-    ) = ActionRequest.EnrolActionRequest(
+    fun getFlowRequest(extras: Map<String, Any> = emptyMap()) = ActionRequest.EnrolActionRequest(
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_ENROL,
@@ -38,7 +35,7 @@ internal object ActionFactory {
         sessionId = "sessionId",
         selectedGuid = "selectedGuid",
         metadata = "",
-        unknownExtras = emptyMap()
+        unknownExtras = emptyMap(),
     )
 
     val MOCK_USER_ID = "userId".asTokenizableRaw()

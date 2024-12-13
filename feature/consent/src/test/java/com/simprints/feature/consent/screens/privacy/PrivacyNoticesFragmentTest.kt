@@ -29,7 +29,6 @@ import com.simprints.infra.resources.R as IDR
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class PrivacyNoticesFragmentTest {
-
     companion object {
         private const val PRIVACY_NOTICE = "privacy notice"
     }
@@ -96,7 +95,9 @@ class PrivacyNoticesFragmentTest {
 
         onView(withId(R.id.privacyDownloadButton)).check(matches(isDisplayed()))
         onView(withId(R.id.privacyErrorCard)).check(matches(isDisplayed()))
-        onView(withId(R.id.privacyErrorText)).check(matches(withText(context.getString(IDR.string.error_backend_maintenance_with_time_message, "10"))))
+        onView(
+            withId(R.id.privacyErrorText),
+        ).check(matches(withText(context.getString(IDR.string.error_backend_maintenance_with_time_message, "10"))))
     }
 
     @Test
@@ -115,7 +116,7 @@ class PrivacyNoticesFragmentTest {
     }
 
     private fun mockPrivacyNoticeState(state: PrivacyNoticeState) {
-        every { viewModel.viewState() } returns mockk {
+        every { viewModel.viewState } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<PrivacyNoticeState>>().onChanged(state)
             }

@@ -10,7 +10,6 @@ import com.simprints.infra.eventsync.SampleSyncScopes.userDownSyncScope
 import org.junit.Test
 
 class EventDownSyncScopeTest {
-
     @Test
     fun projectScopeBuild() {
         with(projectDownSyncScope.operations) {
@@ -50,11 +49,13 @@ class EventDownSyncScopeTest {
 
             val query2 = this[1].queryEvent
             checkModuleScope(query2, DEFAULT_MODULE_ID_2.value)
-
         }
     }
 
-    private fun checkModuleScope(op: RemoteEventQuery, moduleId: String) {
+    private fun checkModuleScope(
+        op: RemoteEventQuery,
+        moduleId: String,
+    ) {
         assertThat(op.projectId).isEqualTo(projectDownSyncScope.projectId)
         assertThat(op.modes).isEqualTo(projectDownSyncScope.modes)
         assertThat(op.moduleId).isEqualTo(moduleId)

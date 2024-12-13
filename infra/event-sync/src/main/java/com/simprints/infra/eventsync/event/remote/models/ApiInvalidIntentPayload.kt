@@ -13,13 +13,11 @@ internal data class ApiInvalidIntentPayload(
     val action: String,
     val extras: Map<String, Any?>,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: InvalidIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.action,
         domainPayload.extras,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

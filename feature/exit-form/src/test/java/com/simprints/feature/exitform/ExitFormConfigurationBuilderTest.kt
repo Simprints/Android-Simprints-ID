@@ -8,7 +8,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ExitFormConfigurationBuilderTest {
-
     @Test
     fun `default config does not include ScannerNotWorking`() {
         assertThat(exitFormConfiguration { }.visibleOptions).doesNotContain(ExitFormOption.ScannerNotWorking)

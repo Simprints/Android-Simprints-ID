@@ -19,8 +19,8 @@ import com.simprints.feature.exitform.scannerOptions
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.resources.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +35,6 @@ internal class ConsentViewModel @Inject constructor(
     private val eventRepository: SessionEventRepository,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
-
     private val startConsentEventTime = timeHelper.now()
 
     val viewState: LiveData<ConsentViewState>
@@ -58,8 +57,8 @@ internal class ConsentViewModel @Inject constructor(
                 mapConfigToViewState(
                     projectConfig = projectConfig,
                     consentType = consentType,
-                    selectedTabIndex = selectedTab
-                )
+                    selectedTabIndex = selectedTab,
+                ),
             )
         }
     }
@@ -87,7 +86,7 @@ internal class ConsentViewModel @Inject constructor(
     private fun mapConfigToViewState(
         projectConfig: ProjectConfiguration,
         consentType: ConsentType,
-        selectedTabIndex: Int
+        selectedTabIndex: Int,
     ): ConsentViewState {
         val allowParentalConsent = projectConfig.consent.allowParentalConsent
 
@@ -99,26 +98,30 @@ internal class ConsentViewModel @Inject constructor(
                 projectConfig.general.modalities,
                 consentType,
             ),
-            parentalTextBuilder = if (allowParentalConsent) ParentalConsentTextHelper(
-                projectConfig.consent,
-                projectConfig.general.modalities,
-                consentType,
-            ) else null,
+            parentalTextBuilder = if (allowParentalConsent) {
+                ParentalConsentTextHelper(
+                    projectConfig.consent,
+                    projectConfig.general.modalities,
+                    consentType,
+                )
+            } else {
+                null
+            },
             selectedTab = selectedTabIndex,
         )
     }
 
     private fun saveConsentEvent(
         currentConsentTab: ConsentTab,
-        result: ConsentEvent.ConsentPayload.Result
+        result: ConsentEvent.ConsentPayload.Result,
     ) = sessionCoroutineScope.launch {
         eventRepository.addOrUpdateEvent(
             ConsentEvent(
                 startConsentEventTime,
                 timeHelper.now(),
                 currentConsentTab.asEventPayload(),
-                result
-            )
+                result,
+            ),
         )
     }
 
@@ -147,5 +150,4 @@ internal class ConsentViewModel @Inject constructor(
     fun setSelectedTab(index: Int) {
         selectedTab = index
     }
-
 }

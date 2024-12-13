@@ -5,5 +5,6 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroR
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.parsers.VeroResponseParser
 import javax.inject.Inject
 
-class VeroResponseAccumulator @Inject constructor(veroResponseParser: VeroResponseParser) :
-    PacketToMainMessageAccumulator<VeroResponse>(VeroMessageProtocol, veroResponseParser)
+class VeroResponseAccumulator @Inject constructor(
+    veroResponseParser: VeroResponseParser,
+) : PacketToMainMessageAccumulator<VeroResponse>(VeroMessageProtocol, veroResponseParser)

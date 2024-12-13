@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class CollectIdsUseCaseTest {
-
     @MockK
     private lateinit var authStore: AuthStore
 
@@ -37,7 +36,6 @@ class CollectIdsUseCaseTest {
     }
 
     companion object {
-
         private const val PROJECT_ID = "projectId"
         private const val DEVICE_ID = "deviceId"
         private const val USER_ID = "userId"

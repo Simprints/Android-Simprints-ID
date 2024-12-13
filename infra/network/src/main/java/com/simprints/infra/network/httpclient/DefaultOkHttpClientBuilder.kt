@@ -20,15 +20,12 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-
 internal class DefaultOkHttpClientBuilder @Inject constructor(
     @ApplicationContext private val ctx: Context,
     private val networkCache: Cache,
     private val persistentLogger: PersistentLogger,
 ) {
-
     companion object {
-
         const val DEVICE_ID_HEADER = "X-Device-ID"
         const val AUTHORIZATION_HEADER = "Authorization"
         const val USER_AGENT_HEADER = "User-Agent"
@@ -47,38 +44,40 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
         authToken: String? = null,
         deviceId: String,
         versionName: String,
-    ): OkHttpClient.Builder =
-        OkHttpClient.Builder()
-            .cache(networkCache)
-            .followRedirects(false)
-            .followSslRedirects(false)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .apply {
-                if (!authToken.isNullOrBlank()) {
-                    addInterceptor(buildAuthenticationInterceptor(authToken))
-                }
+    ): OkHttpClient.Builder = OkHttpClient
+        .Builder()
+        .cache(networkCache)
+        .followRedirects(false)
+        .followSslRedirects(false)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .apply {
+            if (!authToken.isNullOrBlank()) {
+                addInterceptor(buildAuthenticationInterceptor(authToken))
             }
-            .addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
-            .addInterceptor(buildDeviceIdInterceptor(deviceId))
-            .addInterceptor(buildVersionInterceptor(versionName))
-            .addInterceptor(buildGZipInterceptor())
-            .apply {
-                if (BuildConfig.DEBUG_MODE) {
-                    addInterceptor(buildSimberLoggingInterceptor())
-                }
+        }.addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
+        .addInterceptor(buildDeviceIdInterceptor(deviceId))
+        .addInterceptor(buildVersionInterceptor(versionName))
+        .addInterceptor(buildGZipInterceptor())
+        .apply {
+            if (BuildConfig.DEBUG_MODE) {
+                addInterceptor(buildSimberLoggingInterceptor())
             }
-            .addInterceptor(buildPersistentLoggerInterceptor())
+        }.addInterceptor(buildPersistentLoggerInterceptor())
 
     private fun buildAuthenticationInterceptor(authToken: String) = Interceptor { chain ->
-        val newRequest = chain.request().newBuilder()
+        val newRequest = chain
+            .request()
+            .newBuilder()
             .addHeader(AUTHORIZATION_HEADER, "Bearer $authToken")
             .build()
         return@Interceptor chain.proceed(newRequest)
     }
 
     private fun buildDeviceIdInterceptor(deviceId: String) = Interceptor { chain ->
-        val newRequest = chain.request().newBuilder()
+        val newRequest = chain
+            .request()
+            .newBuilder()
             .addHeader(DEVICE_ID_HEADER, deviceId)
             .build()
         return@Interceptor chain.proceed(newRequest)
@@ -93,11 +92,13 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
 
     private fun buildVersionInterceptor(versionName: String) = Interceptor { chain ->
         val originalRequest = chain.request()
-        val version = originalRequest.takeIf { BuildConfig.DEBUG }
+        val version = originalRequest
+            .takeIf { BuildConfig.DEBUG }
             ?.header(FORCE_VERSION_HEADER)
             ?: versionName
 
-        val newRequest = originalRequest.newBuilder()
+        val newRequest = originalRequest
+            .newBuilder()
             .addHeader(USER_AGENT_HEADER, "SimprintsID/$version")
             .build()
         return@Interceptor chain.proceed(newRequest)
@@ -111,7 +112,8 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
             return@Interceptor chain.proceed(originalRequest)
         }
 
-        val compressedRequest = originalRequest.newBuilder()
+        val compressedRequest = originalRequest
+            .newBuilder()
             .method(originalRequest.method, originalRequest.body?.let { gzip(it) })
             .build()
         return@Interceptor chain.proceed(compressedRequest)
@@ -124,11 +126,12 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
                 type = LogEntryType.Network,
                 timestampMs = response.sentRequestAtMillis,
                 title = "${originalRequest.method}: ${originalRequest.url.encodedPath}",
-                body = """
-                        Host: ${originalRequest.url.host}
-                        Request ID: ${originalRequest.header("X-Request-ID")}
-                        Response: ${response.code} - ${response.message}
-                        """.trimIndent(),
+                body =
+                    """
+                    Host: ${originalRequest.url.host}
+                    Request ID: ${originalRequest.header("X-Request-ID")}
+                    Response: ${response.code} - ${response.message}
+                    """.trimIndent(),
             )
         }
     }
@@ -152,8 +155,9 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
         }
     }
 
-    private class CompressedRequestBody(private val requestBody: RequestBody) : RequestBody() {
-
+    private class CompressedRequestBody(
+        private val requestBody: RequestBody,
+    ) : RequestBody() {
         override fun contentType(): MediaType? = requestBody.contentType()
 
         override fun contentLength(): Long = -1 // We don't know the compressed length in advance!

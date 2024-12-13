@@ -8,7 +8,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class IntentParsingEventTest {
-
     @Test
     fun create_IntentParsingEvent() {
         val event = IntentParsingEvent(CREATED_AT, COMMCARE)

@@ -15,7 +15,6 @@ data class AgeGroupSelectionEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endedAt: Timestamp,
@@ -23,13 +22,12 @@ data class AgeGroupSelectionEvent(
     ) : this(
         UUID.randomUUID().toString(),
         AgeGroupSelectionPayload(createdAt, EVENT_VERSION, endedAt, subjectAgeGroup),
-        AGE_GROUP_SELECTION
+        AGE_GROUP_SELECTION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class AgeGroupSelectionPayload(
@@ -39,7 +37,6 @@ data class AgeGroupSelectionEvent(
         val subjectAgeGroup: AgeGroup,
         override val type: EventType = AGE_GROUP_SELECTION,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "age group: [${subjectAgeGroup.startInclusive}, ${subjectAgeGroup.endExclusive})"
     }
 

@@ -25,7 +25,6 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     private val configManager: ConfigManager,
     private val tokenizationProcessor: TokenizationProcessor,
 ) {
-
     suspend fun getDownSyncScope(
         modes: List<Modes>,
         selectedModuleIDs: List<String>,
@@ -60,18 +59,20 @@ internal class EventDownSyncScopeRepository @Inject constructor(
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }
         return when (possibleUserId) {
-            is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-                decrypted = possibleUserId,
-                tokenKeyType = TokenKeyType.AttendantId,
-                project = configManager.getProject(projectId)
-            ).value
+            is TokenizableString.Raw ->
+                tokenizationProcessor
+                    .encrypt(
+                        decrypted = possibleUserId,
+                        tokenKeyType = TokenKeyType.AttendantId,
+                        project = configManager.getProject(projectId),
+                    ).value
             is TokenizableString.Tokenized -> possibleUserId.value
         }
     }
 
     suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
         downSyncOperationOperationDao.insertOrUpdate(
-            buildFromEventsDownSyncOperationState(syncScopeOperation)
+            buildFromEventsDownSyncOperationState(syncScopeOperation),
         )
     }
 
@@ -83,11 +84,14 @@ internal class EventDownSyncScopeRepository @Inject constructor(
             queryEvent = syncScopeOperation.queryEvent.copy(lastEventId = state?.lastEventId),
             lastEventId = state?.lastEventId,
             lastSyncTime = state?.lastUpdatedTime,
-            state = state?.lastState
+            state = state?.lastState,
         )
     }
 
-    suspend fun deleteOperations(moduleIds: List<String>, modes: List<Modes>) {
+    suspend fun deleteOperations(
+        moduleIds: List<String>,
+        modes: List<Modes>,
+    ) {
         val scope = SubjectModuleScope(getProjectId(), moduleIds, modes)
         scope.operations.forEach {
             downSyncOperationOperationDao.delete(it.getUniqueKey())

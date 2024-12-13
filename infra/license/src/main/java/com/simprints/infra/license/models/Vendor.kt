@@ -3,7 +3,9 @@ package com.simprints.infra.license.models
 import com.simprints.infra.license.models.comparators.DefaultVersionComparator
 import com.simprints.infra.license.models.comparators.SemanticVersionComparator
 
-sealed class Vendor(val value: String) {
+sealed class Vendor(
+    val value: String,
+) {
     abstract val versionComparator: Comparator<String>
 
     data object RankOne : Vendor("RANK_ONE_FACE") {

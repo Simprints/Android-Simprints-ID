@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class LiveDataEventTest {
-
     @Test
     fun liveDataShouldGetIfNotHandled() {
         val x = LiveDataEvent()
@@ -32,5 +31,4 @@ class LiveDataEventTest {
         assertThat(x.hasBeenHandled).isTrue()
         assertThat(null == x.getIfNotHandled()).isTrue()
     }
-
 }

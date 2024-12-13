@@ -6,7 +6,6 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toHexString
 import org.junit.Test
 
 class CypressOtaMessageSerializerTest {
-
     @Test
     fun cypressOtaCommand_serialized_producesCorrectPackets() {
         val message = DownloadCommand(5000)

@@ -9,9 +9,7 @@ import org.junit.Before
 import org.junit.Test
 
 class FingerprintCaptureWrapperFactoryTest {
-
     private lateinit var fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
-
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before

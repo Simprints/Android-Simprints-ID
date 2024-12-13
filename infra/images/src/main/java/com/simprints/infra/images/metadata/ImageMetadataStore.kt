@@ -8,8 +8,10 @@ import javax.inject.Inject
 internal class ImageMetadataStore @Inject constructor(
     private val imageMetadataDao: ImageMetadataDao,
 ) {
-
-    suspend fun storeMetadata(imageKey: Path, metadata: Map<String, String>) = metadata
+    suspend fun storeMetadata(
+        imageKey: Path,
+        metadata: Map<String, String>,
+    ) = metadata
         .takeIf { it.isNotEmpty() }
         ?.map { (k, v) -> DbImageMetadata(imageId = extractKey(imageKey), key = k, value = v) }
         ?.let { imageMetadataDao.save(it) }

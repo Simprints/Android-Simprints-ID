@@ -10,6 +10,4 @@ enum class ClientApiError {
     INVALID_SESSION_ID,
     INVALID_USER_ID,
     INVALID_VERIFY_ID,
-    ;
-
 }

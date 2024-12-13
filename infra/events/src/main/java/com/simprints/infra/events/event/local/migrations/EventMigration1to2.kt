@@ -20,7 +20,6 @@ import org.json.JSONObject
  * endedAt to mark a sessiona as closed.
  */
 internal class EventMigration1to2 : Migration(1, 2) {
-
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
             Simber.d("Migrating room db from schema 1 to schema 2.")
@@ -34,9 +33,10 @@ internal class EventMigration1to2 : Migration(1, 2) {
 
     private fun migrateEnrolments(database: SupportSQLiteDatabase) {
         val enrolmentEventsQuery = database.query(
-            "SELECT * FROM DbEvent WHERE type = ?", arrayOf(
-                OLD_ENROLMENT_EVENT_TYPE
-            )
+            "SELECT * FROM DbEvent WHERE type = ?",
+            arrayOf(
+                OLD_ENROLMENT_EVENT_TYPE,
+            ),
         )
         enrolmentEventsQuery.use {
             while (it.moveToNext()) {
@@ -54,20 +54,24 @@ internal class EventMigration1to2 : Migration(1, 2) {
     private fun migrateEnrolmentEventPayloadType(
         it: Cursor,
         database: SupportSQLiteDatabase,
-        id: String?
+        id: String?,
     ) {
         val jsonData = it.getStringWithColumnName(DB_EVENT_JSON_FIELD)
         jsonData?.let {
             val originalJson = JSONObject(jsonData).put(DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1)
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(
-                DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1
+                DB_EVENT_JSON_EVENT_TYPE,
+                ENROLMENT_V1,
             )
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
         }
     }
 
-    private fun migrateEnrolmentEventType(id: String?, database: SupportSQLiteDatabase) {
+    private fun migrateEnrolmentEventType(
+        id: String?,
+        database: SupportSQLiteDatabase,
+    ) {
         id?.let {
             database.execSQL("UPDATE DbEvent SET type = ? WHERE id = ?", arrayOf(ENROLMENT_V1, it))
         }
@@ -82,7 +86,7 @@ internal class EventMigration1to2 : Migration(1, 2) {
     private fun migrateSessionClosedInformation(database: SupportSQLiteDatabase) {
         val sessionCaptureEventsQuery = database.query(
             "SELECT * FROM DbEvent WHERE type = ? AND endedAt > 0",
-            arrayOf("SESSION_CAPTURE")
+            arrayOf("SESSION_CAPTURE"),
         )
 
         sessionCaptureEventsQuery.use {
@@ -92,12 +96,13 @@ internal class EventMigration1to2 : Migration(1, 2) {
                 jsonData?.let {
                     val originalJson = JSONObject(jsonData)
                     val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(
-                        DB_EVENT_PAYLOAD_SESSION_STATUS, true
+                        DB_EVENT_PAYLOAD_SESSION_STATUS,
+                        true,
                     )
                     val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
                     database.execSQL(
                         "UPDATE DbEvent SET eventJson = ? WHERE id = ?",
-                        arrayOf(newJson, id)
+                        arrayOf(newJson, id),
                     )
                 }
             }

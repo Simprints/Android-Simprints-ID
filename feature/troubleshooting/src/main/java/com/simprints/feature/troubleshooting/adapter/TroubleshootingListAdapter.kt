@@ -9,20 +9,24 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.troubleshooting.databinding.ItemTroubleshootingListBinding
 import com.simprints.infra.uibase.system.Clipboard
 
-
 @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
 internal class TroubleshootingListAdapter(
     private val items: List<TroubleshootingItemViewData>,
     private val onMoreClick: (String) -> Unit = {},
 ) : RecyclerView.Adapter<TroubleshootingListAdapter.ViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemTroubleshootingListBinding.inflate(layoutInflater, parent, false)
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         holder.bind(items[position])
     }
 
@@ -30,9 +34,8 @@ internal class TroubleshootingListAdapter(
 
     @ExcludedFromGeneratedTestCoverageReports("UI classes are not unit tested")
     inner class ViewHolder(
-        private val binding: ItemTroubleshootingListBinding
+        private val binding: ItemTroubleshootingListBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-
         fun bind(item: TroubleshootingItemViewData) {
             binding.troubleshootingItemTitle.text = item.title
             binding.troubleshootingItemSubtitle.text = item.subtitle

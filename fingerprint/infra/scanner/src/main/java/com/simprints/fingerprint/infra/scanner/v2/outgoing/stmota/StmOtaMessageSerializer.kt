@@ -5,7 +5,5 @@ import com.simprints.fingerprint.infra.scanner.v2.outgoing.common.MessageSeriali
 import javax.inject.Inject
 
 class StmOtaMessageSerializer @Inject constructor() : MessageSerializer<StmOtaCommand> {
-
-    override fun serialize(message: StmOtaCommand): List<ByteArray> =
-        listOf(message.getBytes())
+    override fun serialize(message: StmOtaCommand): List<ByteArray> = listOf(message.getBytes())
 }

@@ -1,6 +1,5 @@
 package com.simprints.feature.login.tools.camera
 
-
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -14,14 +13,14 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports(
-    reason = "This is just an injectable wrapper around MLKit barcode analyzer"
+    reason = "This is just an injectable wrapper around MLKit barcode analyzer",
 )
 internal class QrCodeDetector @Inject constructor() {
-
     private val scanner = BarcodeScanning.getClient(
-        BarcodeScannerOptions.Builder()
+        BarcodeScannerOptions
+            .Builder()
             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-            .build()
+            .build(),
     )
 
     suspend fun detectInImage(rawImage: RawImage): String? = try {
@@ -35,13 +34,11 @@ internal class QrCodeDetector @Inject constructor() {
         null
     }
 
-
     private suspend fun <T> Task<T>.awaitTask(): T = suspendCancellableCoroutine { continuation ->
         this
             .addOnSuccessListener(continuation::resumeSafely)
             .addOnFailureListener {
                 continuation.resumeWithExceptionSafely(it)
-            }
-            .addOnCanceledListener { continuation.cancel() }
+            }.addOnCanceledListener { continuation.cancel() }
     }
 }

@@ -3,7 +3,6 @@ package com.simprints.feature.troubleshooting.networking
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
-import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.logging.persistent.LogEntry
 import com.simprints.logging.persistent.LogEntryType
 import com.simprints.logging.persistent.PersistentLogger
@@ -17,7 +16,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class NetworkingLogViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -41,7 +39,7 @@ class NetworkingLogViewModelTest {
     @Test
     fun `sets list of logs on request`() = runTest {
         coEvery { persistentLogger.get(any()) } returns listOf(
-            LogEntry(0L, LogEntryType.Network, "", "")
+            LogEntry(0L, LogEntryType.Network, "", ""),
         )
 
         val scopes = viewModel.logs.test()
@@ -59,5 +57,4 @@ class NetworkingLogViewModelTest {
 
         assertThat(scopes.value()).isNotEmpty()
     }
-
 }

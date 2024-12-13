@@ -11,11 +11,9 @@ import androidx.fragment.app.viewModels
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
-import com.simprints.fingerprint.capture.resources.captureNumberTextId
 import com.simprints.fingerprint.capture.resources.directionTextColour
 import com.simprints.fingerprint.capture.resources.directionTextId
 import com.simprints.fingerprint.capture.resources.fingerDrawable
-import com.simprints.fingerprint.capture.resources.nameTextColour
 import com.simprints.fingerprint.capture.resources.nameTextId
 import com.simprints.fingerprint.capture.resources.resultTextColour
 import com.simprints.fingerprint.capture.resources.resultTextId
@@ -29,7 +27,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class FingerFragment : Fragment(R.layout.fragment_finger) {
-
     private val binding by viewBinding(FragmentFingerBinding::bind)
     private val vm: FingerprintCaptureViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
@@ -37,11 +34,16 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
     private lateinit var timeoutBars: List<ScanCountdownBar>
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
-        fingerId = IFingerIdentifier.entries.toTypedArray()[arguments?.getInt(FINGER_ID_BUNDLE_KEY)
-            ?: throw IllegalArgumentException()]
+        fingerId = IFingerIdentifier.entries.toTypedArray()[
+            arguments?.getInt(FINGER_ID_BUNDLE_KEY)
+                ?: throw IllegalArgumentException(),
+        ]
 
         initTimeoutBars()
 
@@ -60,11 +62,12 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                 progressDrawable =
                     ContextCompat.getDrawable(requireContext(), R.drawable.timer_progress_bar)
 
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    1f / captures.size
-                ).apply { if (index != 0) marginStart = PROGRESS_BAR_MARGIN }
+                layoutParams = LinearLayout
+                    .LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        1f / captures.size,
+                    ).apply { if (index != 0) marginStart = PROGRESS_BAR_MARGIN }
             }
         }.map { progressBar ->
             ScanCountdownBar(binding.progressBarContainer, vm.progressBarTimeout())
@@ -95,8 +98,8 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
         binding.fingerResultText.setTextColor(
             resources.getColor(
                 currentCapture().resultTextColour(),
-                null
-            )
+                null,
+            ),
         )
     }
 
@@ -106,8 +109,8 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
         binding.fingerDirectionText.setTextColor(
             resources.getColor(
                 directionTextColour(),
-                null
-            )
+                null,
+            ),
         )
     }
 
@@ -118,13 +121,14 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
                 progressBar.isVisible = fingerState is CaptureState.ScanProcess.Scanning
                 when (fingerState) {
                     is CaptureState.NotCollected,
-                    is CaptureState.Skipped -> {
+                    is CaptureState.Skipped,
+                    -> {
                         handleCancelled()
                     }
 
                     is CaptureState.ScanProcess.Scanning -> startTimeoutBar()
                     is CaptureState.ScanProcess.TransferringImage -> {
-                        //Do nothing
+                        // Do nothing
                     }
 
                     is CaptureState.ScanProcess.NotDetected -> {
@@ -142,7 +146,6 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     }
 
     companion object {
-
         private const val FINGER_ID_BUNDLE_KEY = "finger_id"
 
         private const val PROGRESS_BAR_MARGIN = 4

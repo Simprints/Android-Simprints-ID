@@ -9,13 +9,19 @@ import com.simprints.fingerprint.infra.scanner.nfc.ComponentMifareUltralight
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcTag
 
-internal class AndroidNfcAdapter(private val nfcAdapter: NfcAdapter?) : ComponentNfcAdapter {
-
+internal class AndroidNfcAdapter(
+    private val nfcAdapter: NfcAdapter?,
+) : ComponentNfcAdapter {
     override fun isNull(): Boolean = nfcAdapter == null
 
     override fun isEnabled(): Boolean = nfcAdapter!!.isEnabled
 
-    override fun enableReaderMode(activity: Activity, callback: (tag: ComponentNfcTag?) -> Unit, flags: Int, extras: Bundle?) {
+    override fun enableReaderMode(
+        activity: Activity,
+        callback: (tag: ComponentNfcTag?) -> Unit,
+        flags: Int,
+        extras: Bundle?,
+    ) {
         nfcAdapter!!.enableReaderMode(activity, { tag: Tag? -> callback(AndroidNfcTag(tag)) }, flags, extras)
     }
 
@@ -23,8 +29,7 @@ internal class AndroidNfcAdapter(private val nfcAdapter: NfcAdapter?) : Componen
         nfcAdapter!!.disableReaderMode(activity)
     }
 
-    override fun getMifareUltralight(tag: ComponentNfcTag?): ComponentMifareUltralight? =
-        tag
-            ?.let { MifareUltralight.get((tag as AndroidNfcTag).tag) }
-            ?.let { AndroidMifareUltralight(it) }
+    override fun getMifareUltralight(tag: ComponentNfcTag?): ComponentMifareUltralight? = tag
+        ?.let { MifareUltralight.get((tag as AndroidNfcTag).tag) }
+        ?.let { AndroidMifareUltralight(it) }
 }

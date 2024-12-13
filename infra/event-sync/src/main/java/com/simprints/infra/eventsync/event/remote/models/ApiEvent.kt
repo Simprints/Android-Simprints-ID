@@ -24,6 +24,6 @@ internal fun Event.fromDomainToApi(): ApiEvent {
         type = type.fromDomainToApi(),
         version = payload.eventVersion,
         payload = apiPayload,
-        tokenizedFields = tokenizedFields
+        tokenizedFields = tokenizedFields,
     )
 }

@@ -5,13 +5,15 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.Message
 import com.simprints.fingerprint.infra.scanner.v2.domain.OutgoingMessage
 
 sealed class StmOtaMessage : Message {
-
-    override fun getBytes(): ByteArray =
-        StmOtaMessageProtocol.buildMessageBytes(this)
+    override fun getBytes(): ByteArray = StmOtaMessageProtocol.buildMessageBytes(this)
 
     open fun getDataBytes() = byteArrayOf()
 }
 
-abstract class StmOtaCommand : StmOtaMessage(), OutgoingMessage
+abstract class StmOtaCommand :
+    StmOtaMessage(),
+    OutgoingMessage
 
-abstract class StmOtaResponse : StmOtaMessage(), IncomingMessage
+abstract class StmOtaResponse :
+    StmOtaMessage(),
+    IncomingMessage

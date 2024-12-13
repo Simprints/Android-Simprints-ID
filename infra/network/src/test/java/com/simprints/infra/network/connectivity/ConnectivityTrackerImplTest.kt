@@ -9,7 +9,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class ConnectivityTrackerImplTest {
-
     @MockK
     lateinit var connectivityManagerWrapper: ConnectivityManagerWrapper
 

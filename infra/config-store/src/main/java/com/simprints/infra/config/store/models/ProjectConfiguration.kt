@@ -40,16 +40,13 @@ fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
 fun ProjectConfiguration.isEventDownSyncAllowed(): Boolean =
     synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 
-fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean =
-    synchronization.up.simprints.imagesRequireUnmeteredConnection
+fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean = synchronization.up.simprints.imagesRequireUnmeteredConnection
 
-fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> {
-    return listOfNotNull(
-        face?.rankOne?.allowedAgeRange,
-        fingerprint?.secugenSimMatcher?.allowedAgeRange,
-        fingerprint?.nec?.allowedAgeRange
-    )
-}
+fun ProjectConfiguration.allowedAgeRanges(): List<AgeGroup> = listOfNotNull(
+    face?.rankOne?.allowedAgeRange,
+    fingerprint?.secugenSimMatcher?.allowedAgeRange,
+    fingerprint?.nec?.allowedAgeRange,
+)
 
 /**
  * Returns a list of all age groups a subject can fall into based on the allowed age ranges
@@ -69,10 +66,11 @@ fun ProjectConfiguration.sortedUniqueAgeGroups(): List<AgeGroup> {
     sortedUniqueAges = (listOf(0) + sortedUniqueAges).sorted().distinct()
     // Create age groups based on sorted unique ages
     return sortedUniqueAges.zipWithNext { start, end -> AgeGroup(start, end) } + AgeGroup(
-        sortedUniqueAges.last(), null
+        sortedUniqueAges.last(),
+        null,
     )
 }
 
-fun ProjectConfiguration.isAgeRestricted() = allowedAgeRanges().any { !it.isEmpty()}
+fun ProjectConfiguration.isAgeRestricted() = allowedAgeRanges().any { !it.isEmpty() }
 
 fun ProjectConfiguration.experimental(): ExperimentalProjectConfiguration = ExperimentalProjectConfiguration(custom)

@@ -9,7 +9,6 @@ data class ConsentConfiguration(
     val generalPrompt: ConsentPromptConfiguration?,
     val parentalPrompt: ConsentPromptConfiguration?,
 ) {
-
     data class ConsentPromptConfiguration(
         val enrolmentVariant: ConsentEnrolmentVariant,
         val dataSharedWithPartner: Boolean,
@@ -20,6 +19,6 @@ data class ConsentConfiguration(
 
     enum class ConsentEnrolmentVariant {
         STANDARD,
-        ENROLMENT_ONLY;
+        ENROLMENT_ONLY,
     }
 }

@@ -10,7 +10,6 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-
 /**
  * This class represents the firmware repository combining both local and remote data sources of
  * the firmware versions.
@@ -20,7 +19,6 @@ class FirmwareRepository @Inject internal constructor(
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val configManager: ConfigManager,
 ) {
-
     /**
      * This method is responsible for updating the firmware versions stored locally on the phone. It
      * first checks the local version and matches that against the remote versions, then subsequently updating the local versions that need to be updated.
@@ -41,7 +39,7 @@ class FirmwareRepository @Inject internal constructor(
     }
 
     private suspend fun updateStoredFirmwareFilesWithLatest(firmwareVersions: Vero2FirmwareVersions) {
-        val savedVersions =  firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
+        val savedVersions = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         Simber.d("Saved firmware versions: $savedVersions")
 
         val downloadableFirmwares = firmwareVersions.getMissingVersionsToDownload(savedVersions)
@@ -60,11 +58,8 @@ class FirmwareRepository @Inject internal constructor(
         un20ToDownload?.downloadAndSave()
     }
 
-    private fun List<DownloadableFirmwareVersion>.getVersionToDownloadOrNull(
-        chip: Chip,
-    ): DownloadableFirmwareVersion? {
-        return this.find { it.chip == chip }
-    }
+    private fun List<DownloadableFirmwareVersion>.getVersionToDownloadOrNull(chip: Chip): DownloadableFirmwareVersion? =
+        this.find { it.chip == chip }
 
     private suspend fun DownloadableFirmwareVersion.downloadAndSave() {
         val firmwareBytes = firmwareRemoteDataSource.downloadFirmware(this)
@@ -87,8 +82,20 @@ class FirmwareRepository @Inject internal constructor(
         val stmOfficialVersions = mutableSetOf<String>()
         val un20OfficialVersions = mutableSetOf<String>()
 
-        val secuGenFirmwareVersions = configManager.getProjectConfiguration().fingerprint?.secugenSimMatcher?.vero2?.firmwareVersions?.entries
-        val necFirmwareVersions = configManager.getProjectConfiguration().fingerprint?.nec?.vero2?.firmwareVersions?.entries
+        val secuGenFirmwareVersions = configManager
+            .getProjectConfiguration()
+            .fingerprint
+            ?.secugenSimMatcher
+            ?.vero2
+            ?.firmwareVersions
+            ?.entries
+        val necFirmwareVersions = configManager
+            .getProjectConfiguration()
+            .fingerprint
+            ?.nec
+            ?.vero2
+            ?.firmwareVersions
+            ?.entries
         (secuGenFirmwareVersions.orEmpty() + necFirmwareVersions.orEmpty()).forEach {
             cypressOfficialVersions.add(it.value.cypress)
             stmOfficialVersions.add(it.value.stm)
@@ -111,8 +118,10 @@ class FirmwareRepository @Inject internal constructor(
         }
     }
 
-    private fun obsoleteItems(localVersions: Set<String>, officialVersions: Set<String>) =
-        localVersions.filter { !officialVersions.contains(it) }
+    private fun obsoleteItems(
+        localVersions: Set<String>,
+        officialVersions: Set<String>,
+    ) = localVersions.filter { !officialVersions.contains(it) }
 
-    suspend fun deleteAllFirmwareFiles() =  firmwareLocalDataSource.deleteAllFirmware()
+    suspend fun deleteAllFirmwareFiles() = firmwareLocalDataSource.deleteAllFirmware()
 }

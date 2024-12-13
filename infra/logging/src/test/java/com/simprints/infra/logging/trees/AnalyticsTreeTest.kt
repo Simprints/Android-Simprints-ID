@@ -3,7 +3,7 @@ package com.simprints.infra.logging.trees
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.logging.trees.AnalyticsTree.Companion.defaultTag
+import com.simprints.infra.logging.trees.AnalyticsTree.Companion.DEFAULT_TAG
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
@@ -11,7 +11,6 @@ import org.junit.Test
 import timber.log.Timber
 
 class AnalyticsTreeTest {
-
     @Test
     fun `should return on VERBOSE priority`() {
         val faMock = mockk<FirebaseAnalytics>(relaxed = true)
@@ -43,9 +42,12 @@ class AnalyticsTreeTest {
         Simber.i("Test Message")
 
         verify {
-            faMock.logEvent(defaultTag, withArg {
-                it.getString(defaultTag).contentEquals("Test Message")
-            })
+            faMock.logEvent(
+                DEFAULT_TAG,
+                withArg {
+                    it.getString(DEFAULT_TAG).contentEquals("Test Message")
+                },
+            )
         }
     }
 
@@ -71,8 +73,7 @@ class AnalyticsTreeTest {
         Simber.tag(USER_ID, true).i("Test Message ID")
 
         verify {
-            faMock.setUserId( "Test Message ID")
+            faMock.setUserId("Test Message ID")
         }
     }
-
 }

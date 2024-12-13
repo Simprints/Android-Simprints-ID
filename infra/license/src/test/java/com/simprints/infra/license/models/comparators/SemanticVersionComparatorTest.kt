@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class SemanticVersionComparatorTest {
-
     private val comparator = SemanticVersionComparator()
 
     @Test

@@ -6,24 +6,22 @@ import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.infra.config.store.models.DecisionPolicy
 import org.junit.Test
 
-
 class AppMatchResultTest {
-
     @Test
     fun testAppMatchResultConstructor() {
         assertThat(
             AppMatchResult(
                 guid = "guid",
                 confidenceScore = 25.0f,
-                decisionPolicy = DecisionPolicy(low = 10, medium = 20, high = 30)
-            )
+                decisionPolicy = DecisionPolicy(low = 10, medium = 20, high = 30),
+            ),
         ).isEqualTo(
             AppMatchResult(
                 guid = "guid",
                 confidenceScore = 25,
                 tier = AppResponseTier.TIER_4,
                 matchConfidence = AppMatchConfidence.MEDIUM,
-            )
+            ),
         )
     }
 

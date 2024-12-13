@@ -2,8 +2,8 @@ package com.simprints.infra.license.remote
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.license.models.LicenseVersion
+import com.simprints.infra.license.models.Vendor
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -15,9 +15,8 @@ import javax.inject.Inject
 
 internal class LicenseRemoteDataSourceImpl @Inject constructor(
     private val authStore: AuthStore,
-    private val jsonHelper: JsonHelper
+    private val jsonHelper: JsonHelper,
 ) : LicenseRemoteDataSource {
-
     companion object {
         private const val AUTHORIZATION_ERROR = 403
         private const val UNKNOWN_ERROR_CODE = "000"
@@ -30,7 +29,8 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
         version: LicenseVersion,
     ): ApiLicenseResult = try {
         getProjectApiClient().executeCall {
-            it.getLicense(projectId, deviceId, vendor.value, version.value)
+            it
+                .getLicense(projectId, deviceId, vendor.value, version.value)
                 .parseApiLicense()
                 .getLicenseBasedOnVendor(vendor)
                 ?.let { apiLicense -> ApiLicenseResult.Success(apiLicense) }
@@ -64,12 +64,14 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
      * If it's an Authorization error we can check which error code BFSID returned.
      * Anything else we can't really recover.
      */
-    private fun handleCloudException(exception: SyncCloudIntegrationException): ApiLicenseResult {
-        return if (exception.httpStatusCode() == AUTHORIZATION_ERROR) handleRetrofitException(
-            exception.cause as HttpException
-        )
-        else ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
-    }
+    private fun handleCloudException(exception: SyncCloudIntegrationException): ApiLicenseResult =
+        if (exception.httpStatusCode() == AUTHORIZATION_ERROR) {
+            handleRetrofitException(
+                exception.cause as HttpException,
+            )
+        } else {
+            ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
+        }
 
     private fun handleRetrofitException(exception: HttpException): ApiLicenseResult {
         val errorCode =
@@ -77,9 +79,7 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
         return ApiLicenseResult.Error(errorCode)
     }
 
-    private fun getLicenseErrorCode(errorBody: ResponseBody): String {
-        return jsonHelper.fromJson<ApiLicenseError>(errorBody.string()).error
-    }
+    private fun getLicenseErrorCode(errorBody: ResponseBody): String = jsonHelper.fromJson<ApiLicenseError>(errorBody.string()).error
 
     private suspend fun getProjectApiClient(): SimNetwork.SimApiClient<LicenseRemoteInterface> =
         authStore.buildClient(LicenseRemoteInterface::class)

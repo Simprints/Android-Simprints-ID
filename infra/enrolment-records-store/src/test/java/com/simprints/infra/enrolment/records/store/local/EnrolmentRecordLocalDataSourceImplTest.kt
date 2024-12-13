@@ -31,7 +31,6 @@ import java.util.UUID
 import kotlin.random.Random
 
 class EnrolmentRecordLocalDataSourceImplTest {
-
     @MockK
     private lateinit var realm: Realm
 
@@ -127,13 +126,13 @@ class EnrolmentRecordLocalDataSourceImplTest {
         enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(fingerprintSampleFormat = format),
-                IntRange(0, 20)
-            )
-            .toList()
+                IntRange(0, 20),
+            ).toList()
 
         verify {
             realmQuery.query(
-                "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0", format
+                "ANY ${FINGERPRINT_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
+                format,
             )
         }
     }
@@ -148,7 +147,8 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
         verify {
             realmQuery.query(
-                "ANY ${FACE_SAMPLES_FIELD}.${FORMAT_FIELD} == $0", format
+                "ANY ${FACE_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
+                format,
             )
         }
     }
@@ -185,7 +185,8 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people =
-            enrolmentRecordLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId.value))
+            enrolmentRecordLocalDataSource
+                .load(SubjectQuery(attendantId = savedPersons[0].attendantId.value))
                 .toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
@@ -198,7 +199,8 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people =
-            enrolmentRecordLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId))
+            enrolmentRecordLocalDataSource
+                .load(SubjectQuery(moduleId = fakePerson.moduleId))
                 .toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
@@ -209,7 +211,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
     fun performSubjectCreationAction() = runTest {
         val subject = getFakePerson()
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.fromDbToDomain()))
+            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
@@ -220,7 +222,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Deletion(subject.subjectId.toString()))
+            listOf(SubjectAction.Deletion(subject.subjectId.toString())),
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
@@ -231,7 +233,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
         enrolmentRecordLocalDataSource.performActions(
-            listOf()
+            listOf(),
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
@@ -247,14 +249,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
         assertThat(peopleCount).isEqualTo(0)
     }
 
-    private fun getFakePerson(): DbSubject =
-        getRandomSubject().fromDomainToDb()
+    private fun getFakePerson(): DbSubject = getRandomSubject().fromDomainToDb()
 
-    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject =
-        fakeSubject.also { localSubjects.add(it.fromDbToDomain()) }
+    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also { localSubjects.add(it.fromDbToDomain()) }
 
-    private fun saveFakePeople(subjects: List<Subject>): List<Subject> =
-        subjects.toMutableList().also { localSubjects.addAll(it) }
+    private fun saveFakePeople(subjects: List<Subject>): List<Subject> = subjects.toMutableList().also { localSubjects.addAll(it) }
 
     private fun DbSubject.deepEquals(other: DbSubject): Boolean = when {
         this.subjectId != other.subjectId -> false
@@ -266,12 +265,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
         else -> true
     }
 
-    private fun getRandomPeople(numberOfPeople: Int): ArrayList<Subject> =
-        arrayListOf<Subject>().also { list ->
-            repeat(numberOfPeople) {
-                list.add(getRandomSubject(UUID.randomUUID().toString()))
-            }
+    private fun getRandomPeople(numberOfPeople: Int): ArrayList<Subject> = arrayListOf<Subject>().also { list ->
+        repeat(numberOfPeople) {
+            list.add(getRandomSubject(UUID.randomUUID().toString()))
         }
+    }
 
     private fun getRandomSubject(
         patientId: String = UUID.randomUUID().toString(),
@@ -280,13 +278,13 @@ class EnrolmentRecordLocalDataSourceImplTest {
         moduleId: String = UUID.randomUUID().toString(),
         faceSamples: Array<FaceSample> = arrayOf(
             FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
-            FaceSample(Random.nextBytes(64), "faceTemplateFormat")
+            FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
         ),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),
         moduleId = moduleId.asTokenizableRaw(),
-        faceSamples = faceSamples.toList()
+        faceSamples = faceSamples.toList(),
     )
 }

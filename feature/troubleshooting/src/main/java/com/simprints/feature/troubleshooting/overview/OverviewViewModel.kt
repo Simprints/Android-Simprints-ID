@@ -14,7 +14,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 internal class OverviewViewModel @Inject constructor(
     private val collectIds: CollectIdsUseCase,
@@ -23,7 +22,6 @@ internal class OverviewViewModel @Inject constructor(
     private val doServerPing: PingServerUseCase,
     private val collectScannerState: CollectScannerStateUseCase,
 ) : ViewModel() {
-
     val projectIds: LiveData<String>
         get() = _projectIds
     private val _projectIds = MutableLiveData("Collecting data")
@@ -48,7 +46,7 @@ internal class OverviewViewModel @Inject constructor(
         _projectIds.postValue(collectIds())
         viewModelScope.launch { _licenseStates.postValue(collectLicenseStates()) }
         _networkStates.postValue(collectNetworkInformation())
-        viewModelScope.launch {  _scannerState.postValue(collectScannerState()) }
+        viewModelScope.launch { _scannerState.postValue(collectScannerState()) }
     }
 
     fun pingServer() {

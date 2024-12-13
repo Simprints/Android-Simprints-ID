@@ -5,7 +5,6 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import org.junit.Test
 
 class ScannerGenerationDeterminerTest {
-
     private val scannerGenerationDeterminer = ScannerGenerationDeterminer()
 
     @Test

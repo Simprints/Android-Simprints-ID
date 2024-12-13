@@ -6,11 +6,9 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
 import javax.inject.Inject
 
 class StmOtaResponseParser @Inject constructor() : MessageParser<StmOtaResponse> {
-
-    override fun parse(messageBytes: ByteArray): StmOtaResponse =
-        try {
-            CommandAcknowledgement.fromBytes(messageBytes)
-        } catch (e: Exception) {
-            handleExceptionDuringParsing(e)
-        }
+    override fun parse(messageBytes: ByteArray): StmOtaResponse = try {
+        CommandAcknowledgement.fromBytes(messageBytes)
+    } catch (e: Exception) {
+        handleExceptionDuringParsing(e)
+    }
 }

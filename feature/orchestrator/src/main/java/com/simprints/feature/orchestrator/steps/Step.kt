@@ -22,7 +22,6 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
 
-
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = LoginResult::class, name = "LoginResult"),
@@ -32,23 +31,20 @@ import java.io.Serializable
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
     JsonSubTypes.Type(
         value = FingerprintCaptureResult.Item::class,
-        name = "FingerprintCaptureResult.Item"
+        name = "FingerprintCaptureResult.Item",
     ),
     JsonSubTypes.Type(
         value = FingerprintCaptureResult.Sample::class,
-        name = "FingerprintCaptureResult.Sample"
+        name = "FingerprintCaptureResult.Sample",
     ),
-
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
     JsonSubTypes.Type(
         value = FingerprintMatchResult.Item::class,
-        name = "FingerprintMatchResult.Item"
+        name = "FingerprintMatchResult.Item",
     ),
-
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
     JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
-
     JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
     JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
@@ -70,7 +66,6 @@ internal data class Step(
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: Serializable? = null,
 ) : Serializable {
-
     // Do not remove.
     // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
     @Suppress("unused")
@@ -80,7 +75,6 @@ internal data class Step(
 
 @Keep
 enum class StepStatus {
-
     NOT_STARTED,
     IN_PROGRESS,
     COMPLETED,

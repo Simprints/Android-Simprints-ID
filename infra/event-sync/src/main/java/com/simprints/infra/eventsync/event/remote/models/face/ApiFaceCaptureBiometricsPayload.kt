@@ -13,7 +13,6 @@ internal class ApiFaceCaptureBiometricsPayload(
     val id: String,
     val face: Face?,
 ) : ApiEventPayload(startTime) {
-
     @Keep
     data class Face(
         val yaw: Float,
@@ -22,22 +21,20 @@ internal class ApiFaceCaptureBiometricsPayload(
         val quality: Float,
         val format: String,
     ) {
-
         constructor(face: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face) : this(
             yaw = face.yaw,
             roll = face.roll,
             template = face.template,
             quality = face.quality,
-            format = face.format
+            format = face.format,
         )
     }
 
     constructor(domainPayload: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.id,
-        Face(domainPayload.face)
+        Face(domainPayload.face),
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

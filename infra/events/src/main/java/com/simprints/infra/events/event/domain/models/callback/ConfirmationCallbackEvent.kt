@@ -18,20 +18,18 @@ data class ConfirmationCallbackEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         identificationOutcome: Boolean,
     ) : this(
         UUID.randomUUID().toString(),
         ConfirmationCallbackPayload(createdAt, EVENT_VERSION, identificationOutcome),
-        CALLBACK_CONFIRMATION
+        CALLBACK_CONFIRMATION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ConfirmationCallbackPayload(
@@ -41,12 +39,10 @@ data class ConfirmationCallbackEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLBACK_CONFIRMATION,
     ) : EventPayload() {
-
         override fun toSafeString(): String = "outcome: $identificationOutcome"
     }
 
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

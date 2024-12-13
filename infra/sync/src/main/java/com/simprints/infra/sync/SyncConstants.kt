@@ -3,7 +3,6 @@ package com.simprints.infra.sync
 import java.util.concurrent.TimeUnit
 
 internal object SyncConstants {
-
     val SYNC_TIME_UNIT = TimeUnit.MINUTES
     const val DEFAULT_BACKOFF_INTERVAL_MINUTES = 5L
 

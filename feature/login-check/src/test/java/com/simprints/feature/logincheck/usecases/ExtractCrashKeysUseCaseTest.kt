@@ -19,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ExtractCrashKeysUseCaseTest {
-
     @MockK
     lateinit var configManager: ConfigManager
 
@@ -49,7 +48,7 @@ class ExtractCrashKeysUseCaseTest {
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(
                 "module1".asTokenizableRaw(),
-                "module2".asTokenizableRaw()
+                "module2".asTokenizableRaw(),
             )
         }
         every { authStore.signedInProjectId } returns "projectId"

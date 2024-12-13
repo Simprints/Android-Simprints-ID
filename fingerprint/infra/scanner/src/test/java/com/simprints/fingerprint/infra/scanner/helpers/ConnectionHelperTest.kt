@@ -22,7 +22,6 @@ import org.junit.Test
 import java.io.IOException
 
 class ConnectionHelperTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -122,7 +121,6 @@ class ConnectionHelperTest {
 
         connectionHelper.connectScanner(mockScanner, "mac address").collect()
         connectionHelper.disconnectScanner(mockScanner)
-
 
         verify { mockScanner.disconnect() }
         verify { mockSocket.close() }

@@ -10,7 +10,12 @@ import androidx.work.workDataOf
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.START_SYNC_REPORTER
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProvider
+import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
+import com.simprints.infra.eventsync.sync.common.TAG_SCHEDULED_AT
+import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS
+import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.master.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -24,13 +29,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
+import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 internal class EventSyncStateProcessorTest {
-
     companion object {
-
         const val UNIQUE_SYNC_ID = "UNIQUE_SYNC_ID"
         const val UNIQUE_DOWN_SYNC_ID = "UNIQUE_DOWN_SYNC_ID"
         const val UNIQUE_UP_SYNC_ID = "UNIQUE_UP_SYNC_ID"
@@ -47,7 +50,7 @@ internal class EventSyncStateProcessorTest {
     private val successfulMasterWorkers: List<WorkInfo> =
         listOf(
             createStartSyncReporterWorker(uniqueMasterSyncId = "${UNIQUE_SYNC_ID}_older"),
-            createStartSyncReporterWorker(uniqueMasterSyncId = UNIQUE_SYNC_ID)
+            createStartSyncReporterWorker(uniqueMasterSyncId = UNIQUE_SYNC_ID),
         )
 
     private val failedMasterWorkers: List<WorkInfo> =
@@ -74,7 +77,7 @@ internal class EventSyncStateProcessorTest {
 
     @Test
     fun processor_masterWorkerCompletes_shouldExtractTheUniqueSyncId() = runTest(
-        UnconfinedTestDispatcher()
+        UnconfinedTestDispatcher(),
     ) {
         startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForSuccessfulSync()
@@ -84,12 +87,11 @@ internal class EventSyncStateProcessorTest {
         verify {
             syncWorkersLiveDataProvider.getSyncWorkersLiveData(UNIQUE_SYNC_ID)
         }
-
     }
 
     @Test
     fun processor_masterWorkerFails_shouldNotExtractTheUniqueSyncId() = runTest(
-        UnconfinedTestDispatcher()
+        UnconfinedTestDispatcher(),
     ) {
         startSyncReporterWorker.value = failedMasterWorkers
 
@@ -99,38 +101,35 @@ internal class EventSyncStateProcessorTest {
     }
 
     @Test
-    fun processor_allWorkersSucceed_shouldSyncStateBeSuccess() =
-        runTest(UnconfinedTestDispatcher()) {
-            startSyncReporterWorker.value = successfulMasterWorkers
-            syncWorkersLiveData.value = createWorkInfosHistoryForSuccessfulSync()
+    fun processor_allWorkersSucceed_shouldSyncStateBeSuccess() = runTest(UnconfinedTestDispatcher()) {
+        startSyncReporterWorker.value = successfulMasterWorkers
+        syncWorkersLiveData.value = createWorkInfosHistoryForSuccessfulSync()
 
-            val syncStates = eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+        val syncStates = eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
 
-            syncStates.assertSuccessfulSyncState()
-        }
-
-    @Test
-    fun processor_oneWorkerStillRunning_shouldSyncStateBeRunning() =
-        runTest(UnconfinedTestDispatcher()) {
-            startSyncReporterWorker.value = successfulMasterWorkers
-            syncWorkersLiveData.value = createWorkInfosHistoryForRunningSync()
-
-            val syncStates =
-                eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
-            syncStates.assertRunningSyncState()
-        }
+        syncStates.assertSuccessfulSyncState()
+    }
 
     @Test
-    fun processor_oneWorkerRunning_shouldIgnoreCount() =
-        runTest(UnconfinedTestDispatcher()) {
-            coEvery { eventSyncCache.shouldIgnoreMax() } returns true
+    fun processor_oneWorkerStillRunning_shouldSyncStateBeRunning() = runTest(UnconfinedTestDispatcher()) {
+        startSyncReporterWorker.value = successfulMasterWorkers
+        syncWorkersLiveData.value = createWorkInfosHistoryForRunningSync()
 
-            startSyncReporterWorker.value = successfulMasterWorkers
-            syncWorkersLiveData.value = createWorkInfosHistoryForRunningSync()
+        val syncStates =
+            eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+        syncStates.assertRunningSyncState()
+    }
 
-            val syncStates = eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
-            syncStates.assertRunningSyncStateWithoutProgress()
-        }
+    @Test
+    fun processor_oneWorkerRunning_shouldIgnoreCount() = runTest(UnconfinedTestDispatcher()) {
+        coEvery { eventSyncCache.shouldIgnoreMax() } returns true
+
+        startSyncReporterWorker.value = successfulMasterWorkers
+        syncWorkersLiveData.value = createWorkInfosHistoryForRunningSync()
+
+        val syncStates = eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+        syncStates.assertRunningSyncStateWithoutProgress()
+    }
 
     @Test
     fun processor_oneWorkerFailed_shouldSyncStateBeFail() = runTest(UnconfinedTestDispatcher()) {
@@ -143,79 +142,83 @@ internal class EventSyncStateProcessorTest {
     }
 
     @Test
-    fun processor_oneWorkerEnqueued_shouldSyncStateBeConnecting() =
-        runTest(UnconfinedTestDispatcher()) {
-            startSyncReporterWorker.value = successfulMasterWorkers
-            syncWorkersLiveData.value = createWorkInfosHistoryForConnectingSync()
+    fun processor_oneWorkerEnqueued_shouldSyncStateBeConnecting() = runTest(UnconfinedTestDispatcher()) {
+        startSyncReporterWorker.value = successfulMasterWorkers
+        syncWorkersLiveData.value = createWorkInfosHistoryForConnectingSync()
 
-            val syncStates =
-                eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+        val syncStates =
+            eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
 
-            syncStates.assertConnectingSyncState()
-        }
-
-    @Test
-    fun getLastSyncState_shouldMapCorrectlyTheBackendMaintenanceFailed() =
-        runTest(UnconfinedTestDispatcher()) {
-            startSyncReporterWorker.value = successfulMasterWorkers
-            syncWorkersLiveData.value =
-                createWorkInfosHistoryForFailingSyncDueBackendMaintenanceError()
-
-            val syncStates = eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
-
-            val expectedState = EventSyncWorkerState.Failed(
-                failedBecauseBackendMaintenance = true,
-                estimatedOutage = 6
-            )
-            syncStates.downSyncWorkersInfo.first().state.assertEqualToFailedState(expectedState)
-        }
+        syncStates.assertConnectingSyncState()
+    }
 
     @Test
-    fun getLastSyncState_shouldMapCorrectlyTheTooManyRequestsFailed() =
-        runTest(UnconfinedTestDispatcher()) {
-            startSyncReporterWorker.value = successfulMasterWorkers
-            syncWorkersLiveData.value =
-                createWorkInfosHistoryForFailingSyncDueTooManyRequestsError()
+    fun getLastSyncState_shouldMapCorrectlyTheBackendMaintenanceFailed() = runTest(UnconfinedTestDispatcher()) {
+        startSyncReporterWorker.value = successfulMasterWorkers
+        syncWorkersLiveData.value =
+            createWorkInfosHistoryForFailingSyncDueBackendMaintenanceError()
 
-            val syncStates =
-                eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+        val syncStates = eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
 
-            val expectedState = EventSyncWorkerState.Failed(
-                failedBecauseTooManyRequest = true,
-            )
-            syncStates.downSyncWorkersInfo.first().state.assertEqualToFailedState(expectedState)
-        }
+        val expectedState = EventSyncWorkerState.Failed(
+            failedBecauseBackendMaintenance = true,
+            estimatedOutage = 6,
+        )
+        syncStates.downSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
 
     @Test
-    fun getLastSyncState_shouldMapCorrectlyTheCloudIntegrationFailed() =
-        runTest(UnconfinedTestDispatcher()) {
-            startSyncReporterWorker.value = successfulMasterWorkers
-            syncWorkersLiveData.value =
-                createWorkInfosHistoryForFailingSyncDueCloudIntegrationError()
+    fun getLastSyncState_shouldMapCorrectlyTheTooManyRequestsFailed() = runTest(UnconfinedTestDispatcher()) {
+        startSyncReporterWorker.value = successfulMasterWorkers
+        syncWorkersLiveData.value =
+            createWorkInfosHistoryForFailingSyncDueTooManyRequestsError()
 
-            val syncStates =
-                eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+        val syncStates =
+            eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
 
-            val expectedState = EventSyncWorkerState.Failed(
-                failedBecauseCloudIntegration = true,
-            )
-            syncStates.downSyncWorkersInfo.first().state.assertEqualToFailedState(expectedState)
-        }
+        val expectedState = EventSyncWorkerState.Failed(
+            failedBecauseTooManyRequest = true,
+        )
+        syncStates.downSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
+
+    @Test
+    fun getLastSyncState_shouldMapCorrectlyTheCloudIntegrationFailed() = runTest(UnconfinedTestDispatcher()) {
+        startSyncReporterWorker.value = successfulMasterWorkers
+        syncWorkersLiveData.value =
+            createWorkInfosHistoryForFailingSyncDueCloudIntegrationError()
+
+        val syncStates =
+            eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+
+        val expectedState = EventSyncWorkerState.Failed(
+            failedBecauseCloudIntegration = true,
+        )
+        syncStates.downSyncWorkersInfo
+            .first()
+            .state
+            .assertEqualToFailedState(expectedState)
+    }
 
     private fun createStartSyncReporterWorker(
         state: WorkInfo.State = SUCCEEDED,
         uniqueMasterSyncId: String,
-    ) =
-        createWorkInfo(
-            state,
-            workDataOf(SYNC_ID_STARTED to uniqueMasterSyncId),
-            setOf(
-                "$TAG_SCHEDULED_AT${Date().time}",
-                TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
-                TAG_SUBJECTS_SYNC_ALL_WORKERS,
-                "$TAG_MASTER_SYNC_ID${uniqueMasterSyncId}"
-            ) + listOf(tagForType(START_SYNC_REPORTER))
-        )
+    ) = createWorkInfo(
+        state,
+        workDataOf(SYNC_ID_STARTED to uniqueMasterSyncId),
+        setOf(
+            "$TAG_SCHEDULED_AT${Date().time}",
+            TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
+            TAG_SUBJECTS_SYNC_ALL_WORKERS,
+            "$TAG_MASTER_SYNC_ID$uniqueMasterSyncId",
+        ) + listOf(tagForType(START_SYNC_REPORTER)),
+    )
 
     private fun mockDependencies() {
         every { syncWorkersLiveDataProvider.getStartSyncReportersLiveData() } returns startSyncReporterWorker
@@ -223,6 +226,3 @@ internal class EventSyncStateProcessorTest {
         coEvery { eventSyncCache.readProgress(any()) } returns 0
     }
 }
-
-
-

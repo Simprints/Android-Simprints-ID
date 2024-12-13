@@ -6,8 +6,9 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import org.junit.Test
 
-internal abstract class ActionRequestValidatorTest(private val mockFactory: RequestActionFactory) {
-
+internal abstract class ActionRequestValidatorTest(
+    private val mockFactory: RequestActionFactory,
+) {
     @Test
     open fun `valid ActionRequest should not fail`() {
         mockFactory.getValidator(mockFactory.getMockExtractor()).validate()
