@@ -80,11 +80,11 @@ The version code is generated from 3 things:
 **Version Name**
 
 The version name follows our versioning convention:
-- `year`.`quarter`.`release`-`(optional) deployment`+`(optional) unix timestamp`.`run number`.`run attempt`
+- `year`.`quarter`.`release`-`(optional) deployment`+`run number`.`run attempt`
 
-The optional params are **only** used on none release builds. We add the unix timestamp so we can compute the `versionCode` from the filename if needed.  
+The optional params are **only** used on none release builds.  
 
-- Ex: `2024.1.0-dev+1733211.15.2`, Quarter 1 of 2024, dev deployment, time, run 15, attempt 2
+- Ex: `2024.1.0-dev+15.2`, Quarter 1 of 2024, dev deployment, time, run 15, attempt 2
 - Ex: `2024.1.0+15.2`, Quarter 1 of 2024, release, run 15, attempt 2
 
 Note: The `year`.`quarter`.`release` is take from the branch name. Ex: `release/2024.1.1` would be `2024.1.1`
