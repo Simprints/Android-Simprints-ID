@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class CropToTargetOverlayAnalyzerTest {
-
     @MockK
     lateinit var targetOverlay: CameraTargetOverlay
 
@@ -91,7 +90,6 @@ internal class CropToTargetOverlayAnalyzerTest {
         assertThat(capturedBitmap?.height).isEqualTo(600)
     }
 
-
     @Test
     fun `Correctly crops when camera resolution is larger than preview in landscape`() {
         // Target is a square 600x600px with 200px from top bounds
@@ -106,15 +104,20 @@ internal class CropToTargetOverlayAnalyzerTest {
         assertThat(capturedBitmap?.height).isEqualTo(600)
     }
 
-    private fun setupScreenSize(width: Int, height: Int) {
+    private fun setupScreenSize(
+        width: Int,
+        height: Int,
+    ) {
         every { targetOverlay.width } returns width
         every { targetOverlay.height } returns height
     }
 
-    private fun setupImageSize(width: Int, height: Int) {
+    private fun setupImageSize(
+        width: Int,
+        height: Int,
+    ) {
         every { imageProxy.toBitmap() } returns Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         every { imageProxy.width } returns width
         every { imageProxy.height } returns height
     }
-
 }

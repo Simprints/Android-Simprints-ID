@@ -12,10 +12,12 @@ import io.mockk.every
 import io.mockk.mockk
 
 internal object ConfirmIdentityActionFactory : RequestActionFactory() {
-
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
         actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
+        callerPackageName = "",
+        contractVersion = 1,
+        timestampMs = 0L,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.ConfirmIdentityActionRequest(
@@ -25,24 +27,22 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
         sessionId = MOCK_SESSION_ID,
         selectedGuid = MOCK_SELECTED_GUID,
         metadata = MOCK_METADATA,
-        unknownExtras = emptyMap()
+        unknownExtras = emptyMap(),
     )
 
-    override fun getValidator(extractor: ActionRequestExtractor): ConfirmIdentityValidator =
-        ConfirmIdentityValidator(
-            extractor as ConfirmIdentityRequestExtractor,
-            MOCK_SESSION_ID,
-            true
-        )
+    override fun getValidator(extractor: ActionRequestExtractor): ConfirmIdentityValidator = ConfirmIdentityValidator(
+        extractor as ConfirmIdentityRequestExtractor,
+        MOCK_SESSION_ID,
+        true,
+    )
 
-    override fun getBuilder(extractor: ActionRequestExtractor): ConfirmIdentifyRequestBuilder =
-        ConfirmIdentifyRequestBuilder(
-            actionIdentifier = getIdentifier(),
-            extractor = extractor as ConfirmIdentityRequestExtractor,
-            project = mockk(),
-            tokenizationProcessor = mockk(),
-            validator = getValidator(extractor),
-        )
+    override fun getBuilder(extractor: ActionRequestExtractor): ConfirmIdentifyRequestBuilder = ConfirmIdentifyRequestBuilder(
+        actionIdentifier = getIdentifier(),
+        extractor = extractor as ConfirmIdentityRequestExtractor,
+        project = mockk(),
+        tokenizationProcessor = mockk(),
+        validator = getValidator(extractor),
+    )
 
     override fun getMockExtractor(): ConfirmIdentityRequestExtractor {
         val mockConfirmIdentifyExtractor = mockk<ConfirmIdentityRequestExtractor>()

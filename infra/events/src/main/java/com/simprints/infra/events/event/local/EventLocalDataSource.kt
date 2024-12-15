@@ -30,64 +30,66 @@ internal open class EventLocalDataSource @Inject constructor(
     @DispatcherIO private val readingDispatcher: CoroutineDispatcher,
     @NonCancellableIO private val writingContext: CoroutineContext,
 ) {
-
     private var eventDao: EventRoomDao = eventDatabaseFactory.build().eventDao
 
     private var scopeDao: SessionScopeRoomDao = eventDatabaseFactory.build().scopeDao
 
     private val mutex = Mutex()
 
-    private suspend fun <R> useRoom(context: CoroutineContext, block: suspend () -> R): R =
-        withContext(context) {
-            try {
+    private suspend fun <R> useRoom(
+        context: CoroutineContext,
+        block: suspend () -> R,
+    ): R = withContext(context) {
+        try {
+            block()
+        } catch (ex: SQLiteException) {
+            if (isFileCorruption(ex)) {
+                rebuildDatabase(ex)
+                // Retry operation with new file and key
                 block()
-            } catch (ex: SQLiteException) {
-                if (isFileCorruption(ex)) {
-                    rebuildDatabase(ex)
-                    // Retry operation with new file and key
-                    block()
-                } else {
-                    throw ex
-                }
+            } else {
+                throw ex
             }
         }
+    }
 
-    private suspend fun <R> useRoomFlow(context: CoroutineContext, block: () -> Flow<R>): Flow<R> =
-        withContext(context) {
-            try {
-                block().catch { cause ->
-                    if (isFileCorruption(cause)) {
-                        rebuildDatabase(cause)
-                        // Recreate flow and re-emit values with the new file and key
-                        emitAll(block())
-                    } else {
-                        throw cause
-                    }
-                }
-            } catch (ex: SQLiteException) {
-                if (isFileCorruption(ex)) {
-                    rebuildDatabase(ex)
-                    // Recreate flow with the new file and key
-                    block()
+    private suspend fun <R> useRoomFlow(
+        context: CoroutineContext,
+        block: () -> Flow<R>,
+    ): Flow<R> = withContext(context) {
+        try {
+            block().catch { cause ->
+                if (isFileCorruption(cause)) {
+                    rebuildDatabase(cause)
+                    // Recreate flow and re-emit values with the new file and key
+                    emitAll(block())
                 } else {
-                    throw ex
+                    throw cause
                 }
             }
+        } catch (ex: SQLiteException) {
+            if (isFileCorruption(ex)) {
+                rebuildDatabase(ex)
+                // Recreate flow with the new file and key
+                block()
+            } else {
+                throw ex
+            }
         }
+    }
 
-    private fun isFileCorruption(ex: Throwable) =
-        ex is SQLiteDatabaseCorruptException ||
-            ex.let { it as? SQLiteException }?.message?.contains("file is not a database") == true
+    private fun isFileCorruption(ex: Throwable) = ex is SQLiteDatabaseCorruptException ||
+        ex.let { it as? SQLiteException }?.message?.contains("file is not a database") == true
 
     private suspend fun rebuildDatabase(ex: Throwable) = mutex.withLock {
-        //DB corruption detected; either DB file or key is corrupt
-        //1. Delete DB file in order to create a new one at next init
+        // DB corruption detected; either DB file or key is corrupt
+        // 1. Delete DB file in order to create a new one at next init
         eventDatabaseFactory.deleteDatabase()
-        //2. Recreate the DB key
+        // 2. Recreate the DB key
         eventDatabaseFactory.recreateDatabaseKey()
-        //3. Log exception after recreating the key so we get extra info
+        // 3. Log exception after recreating the key so we get extra info
         Simber.tag(DB_CORRUPTION.name).e(ex)
-        //4. Rebuild database
+        // 4. Rebuild database
         eventDao = eventDatabaseFactory.build().eventDao
         scopeDao = eventDatabaseFactory.build().scopeDao
     }
@@ -104,15 +106,20 @@ internal open class EventLocalDataSource @Inject constructor(
         scopeDao.countClosed(type)
     }
 
-    suspend fun loadOpenedScopes(type: EventScopeType): List<EventScope> =
-        useRoom(readingDispatcher) {
-            scopeDao.loadOpen(type).map { it.fromDbToDomain(jsonHelper) }
-        }
+    suspend fun loadAllScopes(): List<EventScope> = useRoom(readingDispatcher) {
+        scopeDao.loadAll().map { it.fromDbToDomain(jsonHelper) }
+    }
 
-    suspend fun loadClosedScopes(type: EventScopeType, limit: Int): List<EventScope> =
-        useRoom(readingDispatcher) {
-            scopeDao.loadClosed(type, limit).map { it.fromDbToDomain(jsonHelper) }
-        }
+    suspend fun loadOpenedScopes(type: EventScopeType): List<EventScope> = useRoom(readingDispatcher) {
+        scopeDao.loadOpen(type).map { it.fromDbToDomain(jsonHelper) }
+    }
+
+    suspend fun loadClosedScopes(
+        type: EventScopeType,
+        limit: Int,
+    ): List<EventScope> = useRoom(readingDispatcher) {
+        scopeDao.loadClosed(type, limit).map { it.fromDbToDomain(jsonHelper) }
+    }
 
     suspend fun loadEventScope(scopeId: String): EventScope? = useRoom(writingContext) {
         scopeDao.loadScope(scopeId)?.fromDbToDomain(jsonHelper)
@@ -168,7 +175,6 @@ internal open class EventLocalDataSource @Inject constructor(
     }
 
     companion object {
-
         // Actual limit is 999, but it is better to leave some wiggle room
         private const val SQLITE_VARIABLE_LIMIT = 900
     }

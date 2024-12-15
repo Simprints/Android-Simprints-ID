@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroC
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
 class GetBatteryCurrentCommand : VeroCommand(VeroMessageType.GET_BATTERY_CURRENT) {
-
     companion object {
-        fun fromBytes(@Suppress("unused_parameter") data: ByteArray) = GetBatteryCurrentCommand()
+        fun fromBytes(
+            @Suppress("unused_parameter") data: ByteArray,
+        ) = GetBatteryCurrentCommand()
     }
 }

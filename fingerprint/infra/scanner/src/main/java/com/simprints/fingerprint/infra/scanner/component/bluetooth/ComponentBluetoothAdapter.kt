@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.infra.scanner.component.bluetooth
 
-
 /**
  * Provides a one-to-one abstraction above [android.bluetooth.BluetoothAdapter] for use in mocking
  * or swapping for a component with different utility. Using this interface will give access to
@@ -11,7 +10,6 @@ package com.simprints.fingerprint.infra.scanner.component.bluetooth
  * interfaces.
  */
 interface ComponentBluetoothAdapter {
-
     fun isNull(): Boolean
 
     fun isEnabled(): Boolean

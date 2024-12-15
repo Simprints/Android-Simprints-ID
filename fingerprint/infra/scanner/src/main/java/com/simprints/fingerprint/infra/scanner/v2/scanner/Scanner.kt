@@ -1,5 +1,9 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+// This class uses entire vero API so import list would be extremely long without wildcards
+
 package com.simprints.fingerprint.infra.scanner.v2.scanner
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.RootMessageChannel
@@ -30,10 +34,13 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.*
 import io.reactivex.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.DigitalValue as Un20DigitalValue
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.DigitalValue as StmDigitalValue
 
@@ -43,8 +50,8 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.model
  * @throws IllegalStateException On attempting to call certain methods whilst in an incorrect state
  * @throws IllegalArgumentException On receiving unexpected or invalid bytes from the scanner
  */
-@Suppress("unused")
-class Scanner(
+@Singleton
+class Scanner @Inject constructor(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
     private val scannerInfoReaderHelper: ScannerExtendedInfoReaderHelper,
@@ -53,6 +60,8 @@ class Scanner(
     private val cypressOtaController: CypressOtaController,
     private val stmOtaController: StmOtaController,
     private val un20OtaController: Un20OtaController,
+    private val scannerInfo: ScannerInfo,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) {
     private lateinit var flowableDisposable: Disposable
 
@@ -64,8 +73,13 @@ class Scanner(
 
     private var scannerTriggerListenerDisposable: Disposable? = null
 
-    fun connect(inputStream: InputStream, outputStream: OutputStream) {
-        this.flowableInputStream = inputStream.toFlowable().subscribeOnIoAndPublish()
+    fun connect(
+        inputStream: InputStream,
+        outputStream: OutputStream,
+    ) {
+        this.flowableInputStream = inputStream
+            .toFlowable()
+            .subscribeOnIoAndPublish(ioDispatcher)
             .also { this.flowableDisposable = it.connect() }
         this.outputStream = outputStream
         state.connected = true
@@ -86,11 +100,12 @@ class Scanner(
 
                 CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
                 STM_OTA -> stmOtaMessageChannel.disconnect()
-                null -> {/* Do nothing */
+                null -> { // Do nothing
                 }
             }
             flowableDisposable.dispose()
             state = disconnectedScannerState()
+            scannerInfo.clear()
         }
     }
 
@@ -120,13 +135,6 @@ class Scanner(
         return scannerInfoReaderHelper.readScannerInfo()
     }
 
-    suspend fun getExtendedVersionInformation(): ExtendedVersionInformation {
-        assertConnected()
-        assertMode(ROOT)
-        return scannerInfoReaderHelper.getExtendedVersionInfo().version
-    }
-
-
     suspend fun setVersionInformation(versionInformation: ExtendedVersionInformation) {
         assertConnected()
         assertMode(ROOT)
@@ -149,7 +157,7 @@ class Scanner(
         assertConnected()
         assertMode(ROOT)
         rootMessageChannel.sendCommandAndReceiveResponse<EnterMainModeResponse>(
-            EnterMainModeCommand()
+            EnterMainModeCommand(),
         )
         handleMainModeEntered()
     }
@@ -158,7 +166,7 @@ class Scanner(
         assertConnected()
         assertMode(ROOT)
         rootMessageChannel.sendCommandAndReceiveResponse<EnterCypressOtaModeResponse>(
-            EnterCypressOtaModeCommand()
+            EnterCypressOtaModeCommand(),
         )
         handleCypressOtaModeEntered()
     }
@@ -167,7 +175,7 @@ class Scanner(
         assertConnected()
         assertMode(ROOT)
         rootMessageChannel.sendCommandAndReceiveResponse<EnterStmOtaModeResponse>(
-            EnterStmOtaModeCommand()
+            EnterStmOtaModeCommand(),
         )
         handleStmOtaModeEntered()
     }
@@ -181,12 +189,11 @@ class Scanner(
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
     }
 
-    private fun subscribeTriggerButtonListeners() =
-        mainMessageChannel.incoming.veroEvents
-            ?.filterCast<TriggerButtonPressedEvent>()
-            ?.subscribeBy(onNext = {
-                triggerButtonListeners.forEach { it.onNext(Unit) }
-            }, onError = { it.printStackTrace() })
+    private fun subscribeTriggerButtonListeners() = mainMessageChannel.incoming.veroEvents
+        ?.filterCast<TriggerButtonPressedEvent>()
+        ?.subscribeBy(onNext = {
+            triggerButtonListeners.forEach { it.onNext(Unit) }
+        }, onError = { it.printStackTrace() })
 
     private fun handleCypressOtaModeEntered() {
         rootMessageChannel.disconnect()
@@ -216,17 +223,15 @@ class Scanner(
         return un20Status
     }
 
-
     suspend fun turnUn20On() {
         assertConnected()
         assertMode(MAIN)
         mainMessageChannel.sendCommandAndReceiveResponse<SetUn20OnResponse>(
-            SetUn20OnCommand(StmDigitalValue.TRUE)
+            SetUn20OnCommand(StmDigitalValue.TRUE),
         )
         mainMessageChannel.receiveResponse<Un20StateChangeEvent>()
         state.un20On = true
     }
-
 
     suspend fun turnUn20Off() {
         assertConnected()
@@ -249,9 +254,11 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryPercentCharge =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
-                GetBatteryPercentChargeCommand()
-            ).batteryPercentCharge.percentCharge.unsignedToInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
+                    GetBatteryPercentChargeCommand(),
+                ).batteryPercentCharge.percentCharge
+                .unsignedToInt()
         return state.batteryPercentCharge!!
     }
 
@@ -259,9 +266,11 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryVoltageMilliVolts =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryVoltageResponse>(
-                GetBatteryVoltageCommand()
-            ).batteryVoltage.milliVolts.unsignedToInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryVoltageResponse>(
+                    GetBatteryVoltageCommand(),
+                ).batteryVoltage.milliVolts
+                .unsignedToInt()
 
         return state.batteryVoltageMilliVolts!!
     }
@@ -270,9 +279,11 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryCurrentMilliAmps =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryCurrentResponse>(
-                GetBatteryCurrentCommand()
-            ).batteryCurrent.milliAmps.toInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryCurrentResponse>(
+                    GetBatteryCurrentCommand(),
+                ).batteryCurrent.milliAmps
+                .toInt()
         return state.batteryCurrentMilliAmps!!
     }
 
@@ -280,12 +291,13 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         state.batteryTemperatureDeciKelvin =
-            mainMessageChannel.sendCommandAndReceiveResponse<GetBatteryTemperatureResponse>(
-                GetBatteryTemperatureCommand()
-            ).batteryTemperature.deciKelvin.unsignedToInt()
+            mainMessageChannel
+                .sendCommandAndReceiveResponse<GetBatteryTemperatureResponse>(
+                    GetBatteryTemperatureCommand(),
+                ).batteryTemperature.deciKelvin
+                .unsignedToInt()
         return state.batteryTemperatureDeciKelvin!!
     }
-
 
     suspend fun getUn20AppVersion(): Un20ExtendedAppVersion {
         assertConnected()
@@ -294,14 +306,14 @@ class Scanner(
         return scannerInfoReaderHelper.getUn20ExtendedAppVersion()
     }
 
-
     suspend fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): CaptureFingerprintResult {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<CaptureFingerprintResponse>(
-            CaptureFingerprintCommand(dpi)
-        ).captureFingerprintResult
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<CaptureFingerprintResponse>(
+                CaptureFingerprintCommand(dpi),
+            ).captureFingerprintResult
     }
 
     /** Requires UN20 API 1.1 */
@@ -310,7 +322,7 @@ class Scanner(
         assertMode(MAIN)
         assertUn20On()
         mainMessageChannel.sendCommandAndReceiveResponse<SetScanLedStateResponse>(
-            SetScanLedStateCommand(Un20DigitalValue.TRUE)
+            SetScanLedStateCommand(Un20DigitalValue.TRUE),
         )
         state.scanLedState = true
     }
@@ -321,7 +333,7 @@ class Scanner(
         assertMode(MAIN)
         assertUn20On()
         mainMessageChannel.sendCommandAndReceiveResponse<SetScanLedStateResponse>(
-            SetScanLedStateCommand(Un20DigitalValue.FALSE)
+            SetScanLedStateCommand(Un20DigitalValue.FALSE),
         )
         state.scanLedState = false
     }
@@ -332,9 +344,10 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
-            GetImageQualityPreviewCommand()
-        ).imageQualityScore
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
+                GetImageQualityPreviewCommand(),
+            ).imageQualityScore
     }
 
     /** No value emitted if an image has not been captured */
@@ -342,38 +355,41 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetTemplateResponse>(
-            GetTemplateCommand(templateType)
-        ).templateData
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetTemplateResponse>(
+                GetTemplateCommand(templateType),
+            ).templateData
     }
-
 
     /** No value emitted if an image has not been captured */
     suspend fun acquireImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): ImageData? {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageResponse>(
-            GetImageCommand(imageFormatData)
-        ).imageData
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageResponse>(
+                GetImageCommand(imageFormatData),
+            ).imageData
     }
 
     suspend fun acquireUnprocessedImage(imageFormatData: ImageFormatData = DEFAULT_IMAGE_FORMAT_DATA): ImageData? {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageResponse>(
-            GetUnprocessedImageCommand(imageFormatData)
-        ).imageData
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageResponse>(
+                GetUnprocessedImageCommand(imageFormatData),
+            ).imageData
     }
 
     suspend fun acquireImageDistortionConfigurationMatrix(): ByteArray? {
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageDistortionConfigurationMatrixResponse>(
-            GetImageDistortionConfigurationMatrixCommand()
-        ).imageConfigurationMatrix
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageDistortionConfigurationMatrixResponse>(
+                GetImageDistortionConfigurationMatrixCommand(),
+            ).imageConfigurationMatrix
     }
 
     /** No value emitted if an image has not been captured */
@@ -381,9 +397,10 @@ class Scanner(
         assertConnected()
         assertMode(MAIN)
         assertUn20On()
-        return mainMessageChannel.sendCommandAndReceiveResponse<GetImageQualityResponse>(
-            GetImageQualityCommand()
-        ).imageQualityScore
+        return mainMessageChannel
+            .sendCommandAndReceiveResponse<GetImageQualityResponse>(
+                GetImageQualityCommand(),
+            ).imageQualityScore
     }
 
     /** @throws OtaFailedException If a domain error occurs at any step during the OTA process */
@@ -391,7 +408,8 @@ class Scanner(
         assertConnected()
         assertMode(CYPRESS_OTA)
         return cypressOtaController.program(
-            cypressOtaMessageChannel, firmwareBinFile
+            cypressOtaMessageChannel,
+            firmwareBinFile,
         )
     }
 
@@ -400,7 +418,8 @@ class Scanner(
         assertConnected()
         assertMode(STM_OTA)
         return stmOtaController.program(
-            stmOtaMessageChannel, firmwareBinFile
+            stmOtaMessageChannel,
+            firmwareBinFile,
         )
     }
 
@@ -410,7 +429,8 @@ class Scanner(
         assertMode(MAIN)
         assertUn20On()
         return un20OtaController.program(
-            mainMessageChannel, firmwareBinFile
+            mainMessageChannel,
+            firmwareBinFile,
         )
     }
 

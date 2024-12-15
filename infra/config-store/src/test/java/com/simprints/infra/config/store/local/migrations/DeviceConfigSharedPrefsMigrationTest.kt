@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration.Companion.FINGERS_TO_COLLECT_KEY
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration.Companion.FINGERS_TO_COLLECT_OVERRIDDEN_KEY
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration.Companion.LANGUAGE_KEY
@@ -12,7 +13,6 @@ import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefs
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration.Companion.SELECTED_MODULES_KEY
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.store.testtools.protoDeviceConfiguration
-import com.simprints.infra.authstore.AuthStore
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -21,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 
 class DeviceConfigSharedPrefsMigrationTest {
-
     private val ctx = mockk<Context>()
     private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
     private val preferences = mockk<SharedPreferences>(relaxed = true) {
@@ -38,51 +37,48 @@ class DeviceConfigSharedPrefsMigrationTest {
     }
 
     @Test
-    fun `shouldMigrate should return true only if the project is signed in and the language preference is not empty`() =
-        runTest {
-            every { authStore.signedInProjectId } returns "project_id"
-            every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
+    fun `shouldMigrate should return true only if the project is signed in and the language preference is not empty`() = runTest {
+        every { authStore.signedInProjectId } returns "project_id"
+        every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
 
-            val shouldMigrate =
-                deviceConfigSharedPrefsMigration.shouldMigrate(ProtoDeviceConfiguration.getDefaultInstance())
-            assertThat(shouldMigrate).isTrue()
-        }
-
-    @Test
-    fun `shouldMigrate should return false if the project is not signed in`() =
-        runTest {
-            every { authStore.signedInProjectId } returns ""
-            every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
-
-            val shouldMigrate =
-                deviceConfigSharedPrefsMigration.shouldMigrate(ProtoDeviceConfiguration.getDefaultInstance())
-            assertThat(shouldMigrate).isFalse()
-        }
+        val shouldMigrate =
+            deviceConfigSharedPrefsMigration.shouldMigrate(ProtoDeviceConfiguration.getDefaultInstance())
+        assertThat(shouldMigrate).isTrue()
+    }
 
     @Test
-    fun `shouldMigrate should return false if the preference language is empty`() =
-        runTest {
-            every { authStore.signedInProjectId } returns "project_id"
-            every { preferences.getString(LANGUAGE_KEY, "") } returns ""
+    fun `shouldMigrate should return false if the project is not signed in`() = runTest {
+        every { authStore.signedInProjectId } returns ""
+        every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
 
-            val shouldMigrate = deviceConfigSharedPrefsMigration.shouldMigrate(
-                protoDeviceConfiguration
-            )
-            assertThat(shouldMigrate).isFalse()
-        }
+        val shouldMigrate =
+            deviceConfigSharedPrefsMigration.shouldMigrate(ProtoDeviceConfiguration.getDefaultInstance())
+        assertThat(shouldMigrate).isFalse()
+    }
+
+    @Test
+    fun `shouldMigrate should return false if the preference language is empty`() = runTest {
+        every { authStore.signedInProjectId } returns "project_id"
+        every { preferences.getString(LANGUAGE_KEY, "") } returns ""
+
+        val shouldMigrate = deviceConfigSharedPrefsMigration.shouldMigrate(
+            protoDeviceConfiguration,
+        )
+        assertThat(shouldMigrate).isFalse()
+    }
 
     @Test
     fun `should migrate the language when it exists`() = runTest {
         every {
             preferences.getString(
                 LANGUAGE_KEY,
-                ""
+                "",
             )
         } returns LANGUAGE
         every {
             preferences.getBoolean(
                 LANGUAGE_OVERRIDDEN_KEY,
-                false
+                false,
             )
         } returns true
 
@@ -92,10 +88,11 @@ class DeviceConfigSharedPrefsMigrationTest {
         val expectedDeviceConfiguration = ProtoDeviceConfiguration
             .newBuilder()
             .setLanguage(
-                ProtoDeviceConfiguration.Language.newBuilder().setLanguage(LANGUAGE)
-                    .setIsOverwritten(true)
-            )
-            .build()
+                ProtoDeviceConfiguration.Language
+                    .newBuilder()
+                    .setLanguage(LANGUAGE)
+                    .setIsOverwritten(true),
+            ).build()
         assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
     }
 
@@ -104,13 +101,13 @@ class DeviceConfigSharedPrefsMigrationTest {
         every {
             preferences.getString(
                 FINGERS_TO_COLLECT_KEY,
-                ""
+                "",
             )
         } returns "LEFT_THUMB,LEFT_THUMB,LEFT_INDEX_FINGER"
         every {
             preferences.getBoolean(
                 FINGERS_TO_COLLECT_OVERRIDDEN_KEY,
-                false
+                false,
             )
         } returns true
 
@@ -128,7 +125,7 @@ class DeviceConfigSharedPrefsMigrationTest {
         every {
             preferences.getString(
                 SELECTED_MODULES_KEY,
-                ""
+                "",
             )
         } returns "module1|module2"
 
@@ -147,7 +144,7 @@ class DeviceConfigSharedPrefsMigrationTest {
         every {
             preferences.getString(
                 LAST_INSTRUCTION_ID_KEY,
-                ""
+                "",
             )
         } returns "instruction"
         val deviceConfiguration =

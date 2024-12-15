@@ -13,7 +13,6 @@ class ModuleInfraConventionPlugin : Plugin<Project> {
                 apply("simprints.testing.unit")
             }
             extensions.configure<LibraryExtension> {
-
                 defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
                 testOptions {

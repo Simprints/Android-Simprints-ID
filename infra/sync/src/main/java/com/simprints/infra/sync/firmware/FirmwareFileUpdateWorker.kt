@@ -25,7 +25,6 @@ class FirmwareFileUpdateWorker @AssistedInject constructor(
     private val firmwareRepository: FirmwareRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
-
     override val tag: String = "FirmwareFileUpdateWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {

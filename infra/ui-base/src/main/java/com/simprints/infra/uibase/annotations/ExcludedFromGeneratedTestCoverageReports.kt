@@ -1,6 +1,5 @@
 package com.simprints.infra.uibase.annotations
 
-
 /*
 Use this annotation to ignore a class or function from test coverage reports.
 
@@ -13,6 +12,8 @@ Duplicate of annotation in core to avoid depending on core in ui-base module.
     AnnotationTarget.CONSTRUCTOR,
     AnnotationTarget.FUNCTION,
     AnnotationTarget.FIELD,
-    AnnotationTarget.TYPE
+    AnnotationTarget.TYPE,
 )
-annotation class ExcludedFromGeneratedTestCoverageReports(val reason: String)
+annotation class ExcludedFromGeneratedTestCoverageReports(
+    val reason: String,
+)

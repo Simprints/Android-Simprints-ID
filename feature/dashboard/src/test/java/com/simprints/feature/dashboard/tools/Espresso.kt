@@ -9,38 +9,32 @@ import com.google.android.material.chip.Chip
 import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf
 
-fun typeSearchViewText(text: String): ViewAction {
-    return object : ViewAction {
-        override fun getDescription(): String {
-            return "Change view text"
-        }
+fun typeSearchViewText(text: String): ViewAction = object : ViewAction {
+    override fun getDescription(): String = "Change view text"
 
-        override fun getConstraints(): Matcher<View> {
-            return AllOf.allOf(
-                ViewMatchers.isDisplayed(),
-                ViewMatchers.isAssignableFrom(EditText::class.java)
-            )
-        }
+    override fun getConstraints(): Matcher<View> = AllOf.allOf(
+        ViewMatchers.isDisplayed(),
+        ViewMatchers.isAssignableFrom(EditText::class.java),
+    )
 
-        override fun perform(uiController: UiController?, view: View?) {
-            (view as EditText).setText(text)
-        }
+    override fun perform(
+        uiController: UiController?,
+        view: View?,
+    ) {
+        (view as EditText).setText(text)
     }
 }
 
-fun clickCloseChipIcon(): ViewAction {
-    return object : ViewAction {
-        override fun getConstraints(): Matcher<View> {
-            return ViewMatchers.isAssignableFrom(Chip::class.java)
-        }
+fun clickCloseChipIcon(): ViewAction = object : ViewAction {
+    override fun getConstraints(): Matcher<View> = ViewMatchers.isAssignableFrom(Chip::class.java)
 
-        override fun getDescription(): String {
-            return "click drawable "
-        }
+    override fun getDescription(): String = "click drawable "
 
-        override fun perform(uiController: UiController, view: View) {
-            val chip = view as Chip
-            chip.performCloseIconClick()
-        }
+    override fun perform(
+        uiController: UiController,
+        view: View,
+    ) {
+        val chip = view as Chip
+        chip.performCloseIconClick()
     }
 }

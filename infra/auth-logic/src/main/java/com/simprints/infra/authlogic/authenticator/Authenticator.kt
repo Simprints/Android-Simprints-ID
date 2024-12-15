@@ -10,9 +10,9 @@ import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authlogic.model.toDomainResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -27,7 +27,6 @@ internal class Authenticator @Inject constructor(
     private val projectAuthenticator: ProjectAuthenticator,
     private val eventRepository: SessionEventRepository,
 ) {
-
     private var loginStartTime = timeHelper.now()
 
     suspend fun authenticate(
@@ -62,21 +61,19 @@ internal class Authenticator @Inject constructor(
         return result.also { addEventAndUpdateProjectIdIfRequired(it.toDomainResult(), projectId, userId) }
     }
 
-    private fun extractResultFromException(t: Throwable): AuthenticateDataResult {
-        return when (t) {
-            is IOException -> AuthenticateDataResult.Offline
-            is NetworkConnectionException -> AuthenticateDataResult.Offline
-            is AuthRequestInvalidCredentialsException -> AuthenticateDataResult.BadCredentials
-            is SyncCloudIntegrationException -> AuthenticateDataResult.TechnicalFailure
-            is BackendMaintenanceException -> {
-                AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
-            }
-
-            is RequestingIntegrityTokenException -> AuthenticateDataResult.IntegrityException
-            is MissingOrOutdatedGooglePlayStoreApp -> AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp
-            is IntegrityServiceTemporaryDown -> AuthenticateDataResult.IntegrityServiceTemporaryDown
-            else -> AuthenticateDataResult.Unknown
+    private fun extractResultFromException(t: Throwable): AuthenticateDataResult = when (t) {
+        is IOException -> AuthenticateDataResult.Offline
+        is NetworkConnectionException -> AuthenticateDataResult.Offline
+        is AuthRequestInvalidCredentialsException -> AuthenticateDataResult.BadCredentials
+        is SyncCloudIntegrationException -> AuthenticateDataResult.TechnicalFailure
+        is BackendMaintenanceException -> {
+            AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
         }
+
+        is RequestingIntegrityTokenException -> AuthenticateDataResult.IntegrityException
+        is MissingOrOutdatedGooglePlayStoreApp -> AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp
+        is IntegrityServiceTemporaryDown -> AuthenticateDataResult.IntegrityServiceTemporaryDown
+        else -> AuthenticateDataResult.Unknown
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
@@ -86,13 +83,13 @@ internal class Authenticator @Inject constructor(
     private suspend fun addEventAndUpdateProjectIdIfRequired(
         result: AuthenticationEvent.AuthenticationPayload.Result,
         projectId: String,
-        userId: TokenizableString.Raw
+        userId: TokenizableString.Raw,
     ) {
         val event = AuthenticationEvent(
             loginStartTime,
             timeHelper.now(),
             UserInfo(projectId, userId),
-            result
+            result,
         )
         eventRepository.addOrUpdateEvent(event)
     }

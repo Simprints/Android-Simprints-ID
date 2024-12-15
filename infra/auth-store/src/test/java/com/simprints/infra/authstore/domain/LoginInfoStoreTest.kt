@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 class LoginInfoStoreTest {
-
     @MockK
     private lateinit var ctx: Context
 

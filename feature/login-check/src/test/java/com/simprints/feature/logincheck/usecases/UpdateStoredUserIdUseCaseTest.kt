@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class UpdateStoredUserIdUseCaseTest {
-
     @MockK
     private lateinit var authStore: AuthStore
 
@@ -41,5 +40,4 @@ class UpdateStoredUserIdUseCaseTest {
 
         verify { authStore.setProperty("signedInUserId").value(any<TokenizableString.Raw>()) }
     }
-
 }

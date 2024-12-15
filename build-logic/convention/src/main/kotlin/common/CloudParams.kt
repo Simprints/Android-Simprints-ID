@@ -1,7 +1,6 @@
 package common
 
 object CloudParams {
-
     /**
      * The cloud project ids used in google integrity service
      *
@@ -11,4 +10,3 @@ object CloudParams {
     const val STAGING_CLOUD_PROJECT_ID = "\"423867324644\""
     const val DEV_CLOUD_PROJECT_ID = "\"79630518081\""
 }
-

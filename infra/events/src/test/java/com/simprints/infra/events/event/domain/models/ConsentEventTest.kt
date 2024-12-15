@@ -10,7 +10,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import org.junit.Test
 
 class ConsentEventTest {
-
     @Test
     fun create_ConsentEvent() {
         val event = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED)

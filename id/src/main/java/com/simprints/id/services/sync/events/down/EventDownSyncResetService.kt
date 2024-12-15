@@ -4,13 +4,11 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.app.ServiceCompat
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.ExternalScope
 import com.simprints.infra.eventsync.EventSyncManager
@@ -20,7 +18,6 @@ import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,7 +26,6 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports("Workaround for circular module dependency")
 @AndroidEntryPoint
 class EventDownSyncResetService : Service() {
-
     @Inject
     lateinit var eventSyncManager: EventSyncManager
 
@@ -42,7 +38,11 @@ class EventDownSyncResetService : Service() {
     @ExternalScope
     lateinit var externalScope: CoroutineScope
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         Simber.tag(SYNC.name).i("Reset downSync")
         resetJob = externalScope.launch {
             startForegroundIfNeeded()
@@ -50,18 +50,18 @@ class EventDownSyncResetService : Service() {
             eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
             syncOrchestrator.startEventSync()
-
         }
         resetJob?.invokeOnCompletion { stopSelf() }
 
         return START_REDELIVER_INTENT
     }
 
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(p0: Intent?): IBinder? = null
 
-    override fun onTimeout(startId: Int, fgsType: Int) {
+    override fun onTimeout(
+        startId: Int,
+        fgsType: Int,
+    ) {
         resetJob?.cancel()
         super.onTimeout(startId, fgsType)
     }
@@ -71,12 +71,13 @@ class EventDownSyncResetService : Service() {
             val chan = NotificationChannel(
                 CHANNEL_ID,
                 "Maintenance Service",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_LOW,
             )
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(chan)
 
-            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            val notification = NotificationCompat
+                .Builder(this, CHANNEL_ID)
                 .setPriority(NotificationManager.IMPORTANCE_LOW)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build()

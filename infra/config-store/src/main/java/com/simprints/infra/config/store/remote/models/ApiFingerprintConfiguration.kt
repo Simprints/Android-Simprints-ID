@@ -13,7 +13,6 @@ internal data class ApiFingerprintConfiguration(
     val secugenSimMatcher: ApiFingerprintSdkConfiguration?,
     val nec: ApiFingerprintSdkConfiguration?,
 ) {
-
     fun toDomain() = FingerprintConfiguration(
         allowedScanners.map { it.toDomain() },
         allowedSDKs.map { it.toDomain() },
@@ -31,7 +30,7 @@ internal data class ApiFingerprintConfiguration(
         val vero2: ApiVero2Configuration? = null,
         val allowedAgeRange: ApiAllowedAgeRange? = null,
         val verificationMatchThreshold: Float? = null,
-        val maxCaptureAttempts: ApiMaxCaptureAttempts? = null
+        val maxCaptureAttempts: ApiMaxCaptureAttempts? = null,
     ) {
         fun toDomain() = FingerprintConfiguration.FingerprintSdkConfiguration(
             fingersToCapture = fingersToCapture.map { it.toDomain() },
@@ -41,7 +40,7 @@ internal data class ApiFingerprintConfiguration(
             vero2 = vero2?.toDomain(),
             allowedAgeRange = allowedAgeRange?.toDomain() ?: AgeGroup(0, null),
             verificationMatchThreshold = verificationMatchThreshold,
-            maxCaptureAttempts = maxCaptureAttempts?.toDomain()
+            maxCaptureAttempts = maxCaptureAttempts?.toDomain(),
         )
     }
 
@@ -56,7 +55,8 @@ internal data class ApiFingerprintConfiguration(
         RIGHT_INDEX_FINGER,
         RIGHT_3RD_FINGER,
         RIGHT_4TH_FINGER,
-        RIGHT_5TH_FINGER;
+        RIGHT_5TH_FINGER,
+        ;
 
         fun toDomain() = when (this) {
             LEFT_THUMB -> DomainFingerprint.LEFT_THUMB
@@ -75,7 +75,8 @@ internal data class ApiFingerprintConfiguration(
     @Keep
     enum class VeroGeneration {
         VERO_1,
-        VERO_2;
+        VERO_2,
+        ;
 
         fun toDomain() = when (this) {
             VERO_1 -> FingerprintConfiguration.VeroGeneration.VERO_1
@@ -86,7 +87,8 @@ internal data class ApiFingerprintConfiguration(
     @Keep
     enum class BioSdk {
         SECUGEN_SIM_MATCHER,
-        NEC;
+        NEC,
+        ;
 
         fun toDomain() = when (this) {
             SECUGEN_SIM_MATCHER -> FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
@@ -97,7 +99,8 @@ internal data class ApiFingerprintConfiguration(
     @Keep
     enum class FingerComparisonStrategy {
         SAME_FINGER,
-        CROSS_FINGER_USING_MEAN_OF_MAX;
+        CROSS_FINGER_USING_MEAN_OF_MAX,
+        ;
 
         fun toDomain() = when (this) {
             SAME_FINGER -> FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER

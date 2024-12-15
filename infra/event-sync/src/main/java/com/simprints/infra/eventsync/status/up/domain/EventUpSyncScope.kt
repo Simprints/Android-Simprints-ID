@@ -7,12 +7,14 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope.ProjectSc
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = ProjectScope::class)
+    JsonSubTypes.Type(value = ProjectScope::class),
 )
 @Keep
-internal abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
-
+internal abstract class EventUpSyncScope(
+    var operation: EventUpSyncOperation,
+) {
     @Keep
-    data class ProjectScope(val projectId: String) :
-        EventUpSyncScope(EventUpSyncOperation(projectId = projectId))
+    data class ProjectScope(
+        val projectId: String,
+    ) : EventUpSyncScope(EventUpSyncOperation(projectId = projectId))
 }

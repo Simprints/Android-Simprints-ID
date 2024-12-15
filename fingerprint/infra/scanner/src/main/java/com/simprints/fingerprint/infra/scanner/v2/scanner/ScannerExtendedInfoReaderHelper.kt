@@ -24,63 +24,64 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetExten
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetHardwareVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.SetVersionResponse
+import javax.inject.Inject
 
-
-class ScannerExtendedInfoReaderHelper(
+class ScannerExtendedInfoReaderHelper @Inject constructor(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
 ) {
-
     suspend fun readScannerInfo(): ScannerInformation {
         val cypressVersion = getCypressVersion()
         val isLegacyApi =
-            cypressVersion.apiMajorVersion <= CYPRESS_HIGHEST_LEGACY_API_MAJOR_VERSION && cypressVersion.apiMinorVersion <= CYPRESS_HIGHEST_LEGACY_API_MINOR_VERSION
+            cypressVersion.apiMajorVersion <= CYPRESS_HIGHEST_LEGACY_API_MAJOR_VERSION &&
+                cypressVersion.apiMinorVersion <= CYPRESS_HIGHEST_LEGACY_API_MINOR_VERSION
         return readScannerInfoBasedOnApiVersion(isLegacyApi)
     }
 
-    private suspend fun readScannerInfoBasedOnApiVersion(isLegacyApi: Boolean): ScannerInformation =
-        if (isLegacyApi) getScannerInformationWithLegacyApi()
-        else getScannerInformationWithNewApi()
+    private suspend fun readScannerInfoBasedOnApiVersion(isLegacyApi: Boolean): ScannerInformation = if (isLegacyApi) {
+        getScannerInformationWithLegacyApi()
+    } else {
+        getScannerInformationWithNewApi()
+    }
 
-
-    suspend fun getCypressVersion(): CypressFirmwareVersion =
-        rootMessageChannel.sendCommandAndReceiveResponse<GetCypressVersionResponse>(
-            GetCypressVersionCommand()
+    suspend fun getCypressVersion(): CypressFirmwareVersion = rootMessageChannel
+        .sendCommandAndReceiveResponse<GetCypressVersionResponse>(
+            GetCypressVersionCommand(),
         ).version
 
-    suspend fun getCypressExtendedVersion(): CypressExtendedFirmwareVersion =
-        rootMessageChannel.sendCommandAndReceiveResponse<GetCypressExtendedVersionResponse>(
-            GetCypressExtendedVersionCommand()
+    suspend fun getCypressExtendedVersion(): CypressExtendedFirmwareVersion = rootMessageChannel
+        .sendCommandAndReceiveResponse<GetCypressExtendedVersionResponse>(
+            GetCypressExtendedVersionCommand(),
         ).version
 
-    suspend fun getStmExtendedFirmwareVersion(): StmExtendedFirmwareVersion =
-        mainMessageChannel.sendCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
-            GetStmExtendedFirmwareVersionCommand()
+    suspend fun getStmExtendedFirmwareVersion(): StmExtendedFirmwareVersion = mainMessageChannel
+        .sendCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
+            GetStmExtendedFirmwareVersionCommand(),
         ).stmFirmwareVersion
 
-    suspend fun getUn20ExtendedAppVersion(): Un20ExtendedAppVersion =
-        mainMessageChannel.sendCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
-            GetUn20ExtendedAppVersionCommand()
+    suspend fun getUn20ExtendedAppVersion(): Un20ExtendedAppVersion = mainMessageChannel
+        .sendCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
+            GetUn20ExtendedAppVersionCommand(),
         ).un20AppVersion
 
     suspend fun setExtendedVersionInformation(versionInformation: ExtendedVersionInformation): SetVersionResponse =
         rootMessageChannel.sendCommandAndReceiveResponse(
-            SetExtendedVersionCommand(versionInformation)
+            SetExtendedVersionCommand(versionInformation),
         )
 
     private suspend fun getScannerInformationWithLegacyApi(): ScannerInformation {
         val legacyUnifiedVersion =
             rootMessageChannel.sendCommandAndReceiveResponse<GetVersionResponse>(
-                GetVersionCommand()
+                GetVersionCommand(),
             )
 
         val extendedVersionInfo = legacyUnifiedVersion.version.toExtendedVersionInfo()
 
         return ScannerInformation(
-            hardwareVersion = DEFAULT_HARDWARE_VERSION, firmwareVersions = extendedVersionInfo
+            hardwareVersion = DEFAULT_HARDWARE_VERSION,
+            firmwareVersions = extendedVersionInfo,
         )
     }
-
 
     private suspend fun getScannerInformationWithNewApi(): ScannerInformation {
         val (unifiedVersion, hardwareVersion) = getExtendedVersionInfoAndHardwareVersionInfo()
@@ -89,17 +90,17 @@ class ScannerExtendedInfoReaderHelper(
 
         return ScannerInformation(
             hardwareVersion = hardwareVersion.version.versionIdentifier,
-            firmwareVersions = mergedUnifiedVersion
+            firmwareVersions = mergedUnifiedVersion,
         )
     }
 
     private suspend fun validateUnifiedVersionOrMergeWithOldVersion(
-        unifiedVersion: ExtendedVersionInformation
+        unifiedVersion: ExtendedVersionInformation,
     ): ExtendedVersionInformation {
         val requiresOldApiValues = listOf(
             unifiedVersion.cypressFirmwareVersion.versionAsString,
             unifiedVersion.stmFirmwareVersion.versionAsString,
-            unifiedVersion.un20AppVersion.versionAsString
+            unifiedVersion.un20AppVersion.versionAsString,
         ).any { it.isEmpty() }
 
         var mergedScannerInfo = unifiedVersion
@@ -109,19 +110,19 @@ class ScannerExtendedInfoReaderHelper(
 
             if (unifiedVersion.cypressFirmwareVersion.versionAsString.isEmpty()) {
                 mergedScannerInfo = mergedScannerInfo.copy(
-                    cypressFirmwareVersion = oldUnifiedVersionInformation.cypressFirmwareVersion
+                    cypressFirmwareVersion = oldUnifiedVersionInformation.cypressFirmwareVersion,
                 )
             }
 
             if (unifiedVersion.stmFirmwareVersion.versionAsString.isEmpty()) {
                 mergedScannerInfo = mergedScannerInfo.copy(
-                    stmFirmwareVersion = oldUnifiedVersionInformation.stmFirmwareVersion
+                    stmFirmwareVersion = oldUnifiedVersionInformation.stmFirmwareVersion,
                 )
             }
 
             if (unifiedVersion.un20AppVersion.versionAsString.isEmpty()) {
                 mergedScannerInfo = mergedScannerInfo.copy(
-                    un20AppVersion = oldUnifiedVersionInformation.un20AppVersion
+                    un20AppVersion = oldUnifiedVersionInformation.un20AppVersion,
                 )
             }
         }
@@ -137,12 +138,12 @@ class ScannerExtendedInfoReaderHelper(
 
     private suspend fun getHardwareVersionInfo(): GetHardwareVersionResponse =
         rootMessageChannel.sendCommandAndReceiveResponse<GetHardwareVersionResponse>(
-            GetHardwareVersionCommand()
+            GetHardwareVersionCommand(),
         )
 
     suspend fun getExtendedVersionInfo(): GetExtendedVersionResponse =
         rootMessageChannel.sendCommandAndReceiveResponse<GetExtendedVersionResponse>(
-            GetExtendedVersionCommand()
+            GetExtendedVersionCommand(),
         )
 
     companion object {

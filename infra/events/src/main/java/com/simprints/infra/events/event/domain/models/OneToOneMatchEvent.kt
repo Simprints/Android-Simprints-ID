@@ -15,7 +15,6 @@ data class OneToOneMatchEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endTime: Timestamp,
@@ -32,15 +31,14 @@ data class OneToOneMatchEvent(
             candidateId = candidateId,
             matcher = matcher,
             result = result,
-            fingerComparisonStrategy = fingerComparisonStrategy
+            fingerComparisonStrategy = fingerComparisonStrategy,
         ),
-        ONE_TO_ONE_MATCH
+        ONE_TO_ONE_MATCH,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class OneToOneMatchPayload(
@@ -52,10 +50,12 @@ data class OneToOneMatchEvent(
         val result: MatchEntry?,
         val fingerComparisonStrategy: FingerComparisonStrategy?,
         override val type: EventType = ONE_TO_ONE_MATCH,
-    ) : EventPayload()
+    ) : EventPayload() {
+        override fun toSafeString(): String = "matcher: $matcher, candidate ID: $candidateId, " +
+            "result: ${result?.score}, finger strategy: $fingerComparisonStrategy"
+    }
 
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

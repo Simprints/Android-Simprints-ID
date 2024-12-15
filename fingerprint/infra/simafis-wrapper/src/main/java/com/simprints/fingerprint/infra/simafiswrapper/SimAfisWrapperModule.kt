@@ -17,7 +17,6 @@ abstract class SimAfisWrapperModule {
 @Module
 @InstallIn(SingletonComponent::class)
 object JNILibAfisModule {
-
     @Provides
     @Singleton
     fun provideJNILibAfis(): JNILibAfis = JNILibAfis

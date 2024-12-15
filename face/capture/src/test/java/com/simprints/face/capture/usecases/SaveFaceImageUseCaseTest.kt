@@ -1,7 +1,7 @@
 package com.simprints.face.capture.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -16,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 
 class SaveFaceImageUseCaseTest {
-
     @MockK
     lateinit var imageRepo: ImageRepository
 
@@ -41,13 +40,15 @@ class SaveFaceImageUseCaseTest {
 
         val expectedPath = Path(
             arrayOf(
-                "sessions", "sessionId", "faces", "captureEventId.jpg"
-            )
+                "sessions",
+                "sessionId",
+                "faces",
+                "captureEventId.jpg",
+            ),
         )
         coEvery {
             imageRepo.storeImageSecurely(any(), "projectId", any())
         } returns SecuredImageRef(expectedPath)
-
 
         val imageBytes = byteArrayOf()
         val captureEventId = "captureEventId"
@@ -62,7 +63,8 @@ class SaveFaceImageUseCaseTest {
                 "projectId",
                 withArg {
                     assert(expectedPath.compose().contains(it.compose()))
-                })
+                },
+            )
         }
     }
 
@@ -92,5 +94,4 @@ class SaveFaceImageUseCaseTest {
         assertThat(useCase.invoke(imageBytes, captureEventId)).isNull()
         coVerify { imageRepo.storeImageSecurely(any(), "projectId", any()) }
     }
-
 }

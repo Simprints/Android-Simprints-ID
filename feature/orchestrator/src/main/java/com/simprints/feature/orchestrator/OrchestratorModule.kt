@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 internal annotation class ExecutorLockTimeoutSec
@@ -15,7 +14,6 @@ internal annotation class ExecutorLockTimeoutSec
 @Module
 @InstallIn(SingletonComponent::class)
 internal object OrchestratorModule {
-
     @Provides
     @Singleton
     @ExecutorLockTimeoutSec

@@ -18,7 +18,6 @@ import org.junit.Test
 import java.io.IOException
 
 class OtaRecoveryViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -47,10 +46,10 @@ class OtaRecoveryViewModelTest {
         // Given
         coEvery { scannerWrapper.disconnect() } just Runs
         coEvery { scannerWrapper.connect() } just Runs
-        //When
+        // When
         viewModel.handleTryAgainPressed()
         val connectScannerStatus = viewModel.isConnectionSuccess.getOrAwaitValue()
-        //Then
+        // Then
         assertThat(connectScannerStatus.peekContent()).isEqualTo(true)
     }
 
@@ -59,10 +58,10 @@ class OtaRecoveryViewModelTest {
         // Given
         coEvery { scannerWrapper.disconnect() } throws IOException()
         coEvery { scannerWrapper.connect() } just Runs
-        //When
+        // When
         viewModel.handleTryAgainPressed()
         val connectScannerStatus = viewModel.isConnectionSuccess.getOrAwaitValue()
-        //Then
+        // Then
         assertThat(connectScannerStatus.peekContent()).isEqualTo(false)
     }
 }

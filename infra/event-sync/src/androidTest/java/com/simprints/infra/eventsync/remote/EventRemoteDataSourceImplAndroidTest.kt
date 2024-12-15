@@ -1,8 +1,10 @@
+// TODO fix
+@file:Suppress("ktlint:standard:no-empty-file")
+
 package com.simprints.infra.eventsync.remote
 
-// TODO fix
-//@RunWith(AndroidJUnit4::class)
-//class EventRemoteDataSourceImplAndroidTest {
+// @RunWith(AndroidJUnit4::class)
+// class EventRemoteDataSourceImplAndroidTest {
 //
 //    companion object {
 //        const val URL = "https://dev.simprints-apis.com/androidapi/v2/"
@@ -696,5 +698,4 @@ package com.simprints.infra.eventsync.remote
 //            }
 //        }.safeSealedWhens
 //    }
-//}
-
+// }

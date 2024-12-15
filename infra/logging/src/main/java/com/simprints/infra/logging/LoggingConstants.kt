@@ -1,7 +1,6 @@
 package com.simprints.infra.logging
 
 object LoggingConstants {
-
     /**
      * These keys have been separate into two groups of constants because of legacy reasons.
      * They used to be captured in two separate managers, and in order not to break the backwards
@@ -44,5 +43,4 @@ object LoggingConstants {
         DB_CORRUPTION,
         ENROLMENT,
     }
-
 }

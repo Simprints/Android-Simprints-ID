@@ -6,7 +6,6 @@ import java.math.BigInteger
 import java.util.regex.Pattern
 
 object ScannerUtils {
-
     private val SCANNER_ADDR = Pattern.compile("F0:AC:D7:C\\p{XDigit}:\\p{XDigit}{2}:\\p{XDigit}{2}")
     private val MAC_ADDR = Pattern.compile("\\p{XDigit}{2}:\\p{XDigit}{2}:\\p{XDigit}{2}:\\p{XDigit}{2}:\\p{XDigit}{2}:\\p{XDigit}{2}")
     private const val SERIAL_PREFIX = "SP"
@@ -42,13 +41,13 @@ object ScannerUtils {
     }
 
     @JvmStatic
-    fun convertAddressToSerial(macAddress: String): String {
-        return SERIAL_PREFIX + BigInteger(macAddress
+    fun convertAddressToSerial(macAddress: String): String = SERIAL_PREFIX + BigInteger(
+        macAddress
             .replace(MAC_ADDRESS_PREFIX, "")
-            .replace(":", ""), 16)
-            .toString()
-            .padStart(6, '0')
-    }
+            .replace(":", ""),
+        16,
+    ).toString()
+        .padStart(6, '0')
 
     /**
      * READ THIS!
@@ -68,23 +67,24 @@ object ScannerUtils {
         serial.removePrefix(SERIAL_PREFIX).toInt().let {
             addresses.add(serialHexToMacAddress(getMacHexFromInt(it)))
 
-            if (it < (MAC_BLOCK_SIZE - SERIAL_BLOCK_SIZE))
+            if (it < (MAC_BLOCK_SIZE - SERIAL_BLOCK_SIZE)) {
                 addresses.add(serialHexToMacAddress(getMacHexFromInt(it + SERIAL_BLOCK_SIZE)))
+            }
         }
 
         return addresses
     }
 
-    private fun getMacHexFromInt(int: Int): String = Integer.toHexString(int)
-        .toUpperCase().padStart(5, '0')
+    private fun getMacHexFromInt(int: Int): String = Integer
+        .toHexString(int)
+        .toUpperCase()
+        .padStart(5, '0')
 
     private fun serialHexToMacAddress(hex: String): String = MAC_ADDRESS_PREFIX +
         StringBuilder(hex).insert(1, ":").insert(4, ":").toString()
 
-
     @JvmStatic
-    fun isBluetoothEnabled(bluetoothAdapter: ComponentBluetoothAdapter): Boolean =
-        bluetoothAdapter.isEnabled()
+    fun isBluetoothEnabled(bluetoothAdapter: ComponentBluetoothAdapter): Boolean = bluetoothAdapter.isEnabled()
 
     /**
      * Checks which ones of the paired bluetooth devices are Simprint's scanners
@@ -96,8 +96,9 @@ object ScannerUtils {
         val pairedScanners = arrayListOf<String>()
 
         for (device in bluetoothAdapter.getBondedDevices()) {
-            if (isScannerAddress(device.address))
+            if (isScannerAddress(device.address)) {
                 pairedScanners.add(device.address)
+            }
         }
 
         return pairedScanners.toList()
@@ -107,5 +108,4 @@ object ScannerUtils {
     fun log(s: String) {
         Log.d("fingerprintscanner", s)
     }
-
 }

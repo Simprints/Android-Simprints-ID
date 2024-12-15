@@ -20,7 +20,6 @@ internal class FirmwareLocalDataSource(
     private val dispatcher: CoroutineDispatcher,
     private val fileUtil: FileUtil = FileUtil,
 ) {
-
     @Inject
     constructor(
         @ApplicationContext context: Context,
@@ -31,34 +30,35 @@ internal class FirmwareLocalDataSource(
         mapOf(
             Chip.CYPRESS to getFirmwareVersionsInDir(CYPRESS_DIR),
             Chip.STM to getFirmwareVersionsInDir(STM_DIR),
-            Chip.UN20 to getFirmwareVersionsInDir(UN20_DIR)
+            Chip.UN20 to getFirmwareVersionsInDir(UN20_DIR),
         )
     }
 
-    private fun getFirmwareVersionsInDir(chipDirName: String): Set<String> =
-        (getDir(chipDirName).listFiles()?.mapNotNull {
+    private fun getFirmwareVersionsInDir(chipDirName: String): Set<String> = (
+        getDir(chipDirName).listFiles()?.mapNotNull {
             try {
                 it.name
             } catch (e: Exception) {
                 Simber.e(e, "Error encountered when parsing firmware file name")
                 null
             }
-        } ?: emptyList()).toSet()
+        } ?: emptyList()
+    ).toSet()
 
-    suspend fun loadCypressFirmwareBytes(chipVersion: String) =
-        loadFirmwareBytes(chipVersion, CYPRESS_DIR)
+    suspend fun loadCypressFirmwareBytes(chipVersion: String) = loadFirmwareBytes(chipVersion, CYPRESS_DIR)
 
     suspend fun loadStmFirmwareBytes(chipVersion: String) = loadFirmwareBytes(chipVersion, STM_DIR)
 
-    suspend fun loadUn20FirmwareBytes(chipVersion: String) =
-        loadFirmwareBytes(chipVersion, UN20_DIR)
+    suspend fun loadUn20FirmwareBytes(chipVersion: String) = loadFirmwareBytes(chipVersion, UN20_DIR)
 
-    private suspend fun loadFirmwareBytes(chipVersion: String, chipDirName: String): ByteArray =
-        withContext(dispatcher) {
-            val file = getFile(chipDirName, chipVersion)
-            if (!file.exists()) throw IllegalStateException("$chipVersion firmware file is not available in $FIRMWARE_DIR/$chipDirName/")
-            fileUtil.readBytes(file)
-        }
+    private suspend fun loadFirmwareBytes(
+        chipVersion: String,
+        chipDirName: String,
+    ): ByteArray = withContext(dispatcher) {
+        val file = getFile(chipDirName, chipVersion)
+        if (!file.exists()) throw IllegalStateException("$chipVersion firmware file is not available in $FIRMWARE_DIR/$chipDirName/")
+        fileUtil.readBytes(file)
+    }
 
     suspend fun deleteCypressFirmware(chipVersion: String) = withContext(dispatcher) {
         getFile(CYPRESS_DIR, chipVersion).delete()
@@ -86,8 +86,10 @@ internal class FirmwareLocalDataSource(
      *
      * @see [saveFirmwareBytes]
      */
-    suspend fun saveCypressFirmwareBytes(version: String, bytes: ByteArray) =
-        saveFirmwareBytes(CYPRESS_DIR, version, bytes)
+    suspend fun saveCypressFirmwareBytes(
+        version: String,
+        bytes: ByteArray,
+    ) = saveFirmwareBytes(CYPRESS_DIR, version, bytes)
 
     /**
      * This method is responsible for saving the provided Stm firmware bytes, with the specified
@@ -99,8 +101,10 @@ internal class FirmwareLocalDataSource(
      *
      * @see [saveFirmwareBytes]
      */
-    suspend fun saveStmFirmwareBytes(version: String, bytes: ByteArray) =
-        saveFirmwareBytes(STM_DIR, version, bytes)
+    suspend fun saveStmFirmwareBytes(
+        version: String,
+        bytes: ByteArray,
+    ) = saveFirmwareBytes(STM_DIR, version, bytes)
 
     /**
      * This method is responsible for saving the provided Un20 firmware bytes, with the specified
@@ -112,8 +116,10 @@ internal class FirmwareLocalDataSource(
      *
      * @see [saveFirmwareBytes]
      */
-    suspend fun saveUn20FirmwareBytes(version: String, bytes: ByteArray) =
-        saveFirmwareBytes(UN20_DIR, version, bytes)
+    suspend fun saveUn20FirmwareBytes(
+        version: String,
+        bytes: ByteArray,
+    ) = saveFirmwareBytes(UN20_DIR, version, bytes)
 
     /**
      * This method is responsible for saving the provided firmware bytes, to the specified
@@ -124,20 +130,23 @@ internal class FirmwareLocalDataSource(
      * @param version  the new [ChipFirmwareVersion] being saved
      * @param bytes   the binary data to be saved to the file system
      */
-    private suspend fun saveFirmwareBytes(chipDirName: String, version: String, bytes: ByteArray) =
-        withContext(dispatcher) {
-            Simber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/$version")
-            fileUtil.writeBytes(getFile(chipDirName, version), bytes)
-        }
+    private suspend fun saveFirmwareBytes(
+        chipDirName: String,
+        version: String,
+        bytes: ByteArray,
+    ) = withContext(dispatcher) {
+        Simber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/$version")
+        fileUtil.writeBytes(getFile(chipDirName, version), bytes)
+    }
 
-    private fun getDir(chipDirName: String): File =
-        fileUtil.createFile(context.filesDir, "$FIRMWARE_DIR/$chipDirName").also { it.mkdirs() }
+    private fun getDir(chipDirName: String): File = fileUtil.createFile(context.filesDir, "$FIRMWARE_DIR/$chipDirName").also { it.mkdirs() }
 
-    private fun getFile(chipDirName: String, version: String): File =
-        fileUtil.createFile(getDir(chipDirName), version)
+    private fun getFile(
+        chipDirName: String,
+        version: String,
+    ): File = fileUtil.createFile(getDir(chipDirName), version)
 
     companion object {
-
         const val FIRMWARE_DIR = "firmware"
         const val CYPRESS_DIR = "cypress"
         const val STM_DIR = "stm"

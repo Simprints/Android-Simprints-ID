@@ -10,7 +10,6 @@ import com.simprints.infra.events.event.domain.models.AuthorizationEvent.Authori
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthorizationPayload.ApiResult
 
-
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiAuthorizationPayload(
@@ -18,36 +17,34 @@ internal data class ApiAuthorizationPayload(
     val result: ApiResult,
     val userInfo: ApiUserInfo?,
 ) : ApiEventPayload(startTime) {
-
     @Keep
-    data class ApiUserInfo(val projectId: String, val userId: String) {
-
+    data class ApiUserInfo(
+        val projectId: String,
+        val userId: String,
+    ) {
         constructor(userInfoDomain: UserInfo) :
             this(userInfoDomain.projectId, userInfoDomain.userId.value)
     }
 
     @Keep
     enum class ApiResult {
-
-        AUTHORIZED, NOT_AUTHORIZED
+        AUTHORIZED,
+        NOT_AUTHORIZED,
     }
 
     constructor(domainPayload: AuthorizationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.result.fromDomainToApi(),
-        domainPayload.userInfo?.let { ApiUserInfo(it) }
+        domainPayload.userInfo?.let { ApiUserInfo(it) },
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        when (tokenKeyType) {
-            TokenKeyType.AttendantId -> "userInfo.userId"
-            else -> null
-        }
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
+        TokenKeyType.AttendantId -> "userInfo.userId"
+        else -> null
+    }
 }
 
-
-internal fun AuthorizationPayload.AuthorizationResult.fromDomainToApi() =
-    when (this) {
-        AUTHORIZED -> ApiResult.AUTHORIZED
-        NOT_AUTHORIZED -> ApiResult.NOT_AUTHORIZED
-    }
+internal fun AuthorizationPayload.AuthorizationResult.fromDomainToApi() = when (this) {
+    AUTHORIZED -> ApiResult.AUTHORIZED
+    NOT_AUTHORIZED -> ApiResult.NOT_AUTHORIZED
+}

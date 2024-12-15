@@ -11,7 +11,6 @@ import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.jetbrains.kotlin.konan.file.File
 
 class AndroidApplicationConventionPlugin : Plugin<Project> {
-
     override fun apply(target: Project) {
         with(target) {
             apply(from = "${rootDir}${File.separator}build-logic${File.separator}build_properties.gradle.kts")
@@ -75,7 +74,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 buildTypes {
-                    getByName(BuildTypes.release) {
+                    getByName(BuildTypes.RELEASE) {
                         isMinifyEnabled = true
                         isShrinkResources = true
                         isDebuggable = false
@@ -84,7 +83,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         buildConfigField("Boolean", "DEBUG_MODE", "false")
                     }
 
-                    create(BuildTypes.staging) {
+                    create(BuildTypes.STAGING) {
                         isMinifyEnabled = true
                         isShrinkResources = true
                         isDebuggable = propDebuggable
@@ -93,7 +92,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         buildConfigField("Boolean", "DEBUG_MODE", "true")
                     }
 
-                    getByName(BuildTypes.debug) {
+                    getByName(BuildTypes.DEBUG) {
                         isMinifyEnabled = false
                         isShrinkResources = false
                         isDebuggable = propDebuggable

@@ -7,7 +7,6 @@ import com.simprints.infra.config.store.testtools.protoConsentConfiguration
 import org.junit.Test
 
 class ConsentConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(protoConsentConfiguration.toDomain()).isEqualTo(consentConfiguration)

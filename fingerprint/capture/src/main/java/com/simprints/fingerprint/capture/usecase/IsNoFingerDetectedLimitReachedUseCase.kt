@@ -7,7 +7,7 @@ import javax.inject.Inject
 internal class IsNoFingerDetectedLimitReachedUseCase @Inject constructor() {
     operator fun invoke(
         fingerState: CaptureState,
-        sdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
+        sdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration,
     ): Boolean = when (fingerState) {
         is CaptureState.ScanProcess -> {
             val noFingerDetectedThreshold =
@@ -20,6 +20,6 @@ internal class IsNoFingerDetectedLimitReachedUseCase @Inject constructor() {
     }
 
     companion object {
-        const val MAXIMUM_LIMIT_OF_NO_FINGER_DETECTED_SCANS = 40  // current maximum value in Vulcan
+        const val MAXIMUM_LIMIT_OF_NO_FINGER_DETECTED_SCANS = 40 // current maximum value in Vulcan
     }
 }

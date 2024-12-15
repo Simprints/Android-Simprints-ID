@@ -51,7 +51,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ConnectScannerViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -92,7 +91,7 @@ class ConnectScannerViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         every { fingerprintConfiguration.allowedScanners } returns listOf(
             FingerprintConfiguration.VeroGeneration.VERO_1,
-            FingerprintConfiguration.VeroGeneration.VERO_2
+            FingerprintConfiguration.VeroGeneration.VERO_2,
         )
         coEvery { configManager.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
         coJustRun { scannerFactory.initScannerOperationWrappers(any()) }
@@ -115,13 +114,14 @@ class ConnectScannerViewModelTest {
 
     private fun mockScannerWrapper(
         scannerGeneration: FingerprintConfiguration.VeroGeneration,
-        connectFailException: Throwable? = null
+        connectFailException: Throwable? = null,
     ) = mockk<ScannerWrapper> {
         every { isConnected() } returns false
         coEvery { disconnect() } answers {}
         coEvery { connect() } answers {
-            if (connectFailException != null)
+            if (connectFailException != null) {
                 throw connectFailException
+            }
         }
         coJustRun { setScannerInfoAndCheckAvailableOta(fingerprintSdk = SECUGEN_SIM_MATCHER) }
         coJustRun { sensorWakeUp() }
@@ -151,7 +151,7 @@ class ConnectScannerViewModelTest {
         setupBluetooth(numberOfPairedScanners = 1)
         coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(
             FingerprintConfiguration.VeroGeneration.VERO_2,
-            connectFailException = BluetoothNotSupportedException()
+            connectFailException = BluetoothNotSupportedException(),
         )
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
@@ -201,13 +201,12 @@ class ConnectScannerViewModelTest {
         scannerConnectedObserver.assertEventReceivedWithContent(true)
         assertThat(scannerStepObserver.observedValues.size).isEqualTo(ConnectScannerViewModel.Step.Finish.ordinal + 1) // 1 at the start
 
-        verify(exactly = 1) { saveScannerConnectionEventsUseCase.invoke() }   // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
+        verify(exactly = 1) { saveScannerConnectionEventsUseCase.invoke() } // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
 
         val updatedActivity = updateActivityFn.captured(RecentUserActivity("", "", "".asTokenizableRaw(), 0, 0, 0, 0))
         assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
         assertThat(updatedActivity.lastScannerVersion).isEqualTo("E-1")
     }
-
 
     @Test
     fun start_noScannersPairedWithoutFingerprintConfigAndNfc_sendsSerialEntryIssueEvent() = runTest {
@@ -285,7 +284,7 @@ class ConnectScannerViewModelTest {
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
         every { fingerprintConfiguration.allowedScanners } returns listOf(
             FingerprintConfiguration.VeroGeneration.VERO_1,
-            FingerprintConfiguration.VeroGeneration.VERO_2
+            FingerprintConfiguration.VeroGeneration.VERO_2,
         )
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
@@ -315,7 +314,7 @@ class ConnectScannerViewModelTest {
         setupBluetooth(numberOfPairedScanners = 1)
         coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(
             FingerprintConfiguration.VeroGeneration.VERO_2,
-            ScannerDisconnectedException()
+            ScannerDisconnectedException(),
         )
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
@@ -331,7 +330,7 @@ class ConnectScannerViewModelTest {
         setupBluetooth(numberOfPairedScanners = 1)
         coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(
             FingerprintConfiguration.VeroGeneration.VERO_2,
-            Error("Oops")
+            Error("Oops"),
         )
 
         val scannerConnectedObserver = viewModel.showScannerIssueScreen.testObserver()
@@ -342,13 +341,12 @@ class ConnectScannerViewModelTest {
         scannerConnectedObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.UnexpectedError)
     }
 
-
     @Test
     fun start_scannerConnectFailsWithLowBatteryException_sendsAlertEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 1)
         coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(
             FingerprintConfiguration.VeroGeneration.VERO_2,
-            ScannerLowBatteryException()
+            ScannerLowBatteryException(),
         )
 
         val scannerConnectedObserver = viewModel.showScannerIssueScreen.testObserver()
@@ -358,7 +356,6 @@ class ConnectScannerViewModelTest {
 
         scannerConnectedObserver.assertEventReceivedWithContent(ConnectScannerIssueScreen.LowBattery)
     }
-
 
     @Test
     fun start_scannerConnectThrowsOtaAvailableException_sendsOtaAvailableScannerIssue() = runTest {
@@ -461,7 +458,6 @@ class ConnectScannerViewModelTest {
         viewModel.finish.assertEventWithContentNeverReceived()
     }
 
-
     @Test
     fun whenBackPressToExit_doesNotRequestsExitForm() = runTest {
         viewModel.setBackButtonToExitWithError()
@@ -471,8 +467,10 @@ class ConnectScannerViewModelTest {
         viewModel.finish.assertEventReceivedWithContent(false)
     }
 
-
-    private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {
+    private fun setupBluetooth(
+        isEnabled: Boolean = true,
+        numberOfPairedScanners: Int = 1,
+    ) {
         every { bluetoothAdapter.isEnabled() } returns isEnabled
         when (numberOfPairedScanners) {
             0 -> coEvery { pairingManager.getPairedScannerAddressToUse() } throws ScannerNotPairedException()
@@ -481,7 +479,10 @@ class ConnectScannerViewModelTest {
         }
     }
 
-    private fun setupNfc(doesDeviceHaveNfcCapability: Boolean? = null, isEnabled: Boolean? = null) {
+    private fun setupNfc(
+        doesDeviceHaveNfcCapability: Boolean? = null,
+        isEnabled: Boolean? = null,
+    ) {
         if (doesDeviceHaveNfcCapability != null) {
             every { nfcManager.doesDeviceHaveNfcCapability() } returns doesDeviceHaveNfcCapability
         }
@@ -497,7 +498,7 @@ class ConnectScannerViewModelTest {
             firmware = ScannerFirmwareVersions(
                 cypress = ScannerFirmwareVersions.UNKNOWN_VERSION,
                 stm = "6.E-1.0",
-                un20 = "1.E-1.0"
+                un20 = "1.E-1.0",
             ),
         )
 
@@ -507,7 +508,7 @@ class ConnectScannerViewModelTest {
             ScannerFirmwareVersions(
                 cypress = "1.E-1.2",
                 stm = "3.E-1.4",
-                un20 = "5. E-1.6"
+                un20 = "5. E-1.6",
             ),
         )
     }

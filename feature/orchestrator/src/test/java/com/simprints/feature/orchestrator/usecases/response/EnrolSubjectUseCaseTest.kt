@@ -7,10 +7,10 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
+import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,7 +22,6 @@ import org.junit.Before
 import org.junit.Test
 
 class EnrolSubjectUseCaseTest {
-
     @MockK
     private lateinit var eventRepository: SessionEventRepository
 
@@ -52,7 +51,7 @@ class EnrolSubjectUseCaseTest {
     @Test
     fun `Adds enrolment V2 event when called`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            mockk<PersonCreationEvent> { every { id } returns "personCreationId" }
+            mockk<PersonCreationEvent> { every { id } returns "personCreationId" },
         )
 
         useCase.invoke(
@@ -60,21 +59,23 @@ class EnrolSubjectUseCaseTest {
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),
-                moduleId = "attendantId".asTokenizableRaw()
-            )
+                moduleId = "attendantId".asTokenizableRaw(),
+            ),
         )
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it).isInstanceOf(EnrolmentEventV2::class.java)
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(EnrolmentEventV2::class.java)
+                },
+            )
         }
     }
 
     @Test
     fun `Saves enrolment record when called`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            mockk<PersonCreationEvent> { every { id } returns "personCreationId" }
+            mockk<PersonCreationEvent> { every { id } returns "personCreationId" },
         )
 
         useCase.invoke(
@@ -82,14 +83,16 @@ class EnrolSubjectUseCaseTest {
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),
-                moduleId = "attendantId".asTokenizableRaw()
-            )
+                moduleId = "attendantId".asTokenizableRaw(),
+            ),
         )
 
         coVerify {
-            enrolmentRecordRepository.performActions(withArg {
-                assertThat(it.first()).isInstanceOf(SubjectAction.Creation::class.java)
-            })
+            enrolmentRecordRepository.performActions(
+                withArg {
+                    assertThat(it.first()).isInstanceOf(SubjectAction.Creation::class.java)
+                },
+            )
         }
     }
 
@@ -110,7 +113,7 @@ class EnrolSubjectUseCaseTest {
         }
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
             personCreationEvent1,
-            personCreationEvent2
+            personCreationEvent2,
         )
 
         useCase.invoke(
@@ -118,12 +121,14 @@ class EnrolSubjectUseCaseTest {
                 subjectId = "subjectId",
                 projectId = "projectId",
                 attendantId = "moduleId".asTokenizableRaw(),
-                moduleId = "attendantId".asTokenizableRaw()
-            )
+                moduleId = "attendantId".asTokenizableRaw(),
+            ),
         )
 
-        coVerify { eventRepository.addOrUpdateEvent(
-            match { it is EnrolmentEventV2 && it.payload.personCreationEventId == personCreationId2 }
-        ) }
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                match { it is EnrolmentEventV2 && it.payload.personCreationEventId == personCreationId2 },
+            )
+        }
     }
 }

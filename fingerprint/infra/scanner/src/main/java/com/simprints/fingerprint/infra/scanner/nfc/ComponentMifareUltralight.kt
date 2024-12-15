@@ -4,7 +4,6 @@ import java.io.Closeable
 import java.io.IOException
 
 interface ComponentMifareUltralight : Closeable {
-
     @Throws(IOException::class)
     fun connect()
 

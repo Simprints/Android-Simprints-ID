@@ -21,5 +21,4 @@ private fun stripWhiteSpaceAndMakeLowercase(string: String) = string
     .replace("\r", "")
     .toLowerCase()
 
-fun byteArrayFromHexString(vararg strings: String): ByteArray =
-    hexStringToByteArray(strings.reduce { acc, bytes -> acc + bytes })
+fun byteArrayFromHexString(vararg strings: String): ByteArray = hexStringToByteArray(strings.reduce { acc, bytes -> acc + bytes })

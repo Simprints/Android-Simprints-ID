@@ -7,9 +7,9 @@ import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -22,7 +22,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class SaveScannerConnectionEventsUseCaseTest {
-
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
@@ -39,7 +38,6 @@ class SaveScannerConnectionEventsUseCaseTest {
     lateinit var eventRepository: SessionEventRepository
 
     private lateinit var useCase: SaveScannerConnectionEventsUseCase
-
 
     @Before
     fun setUp() {
@@ -66,11 +64,13 @@ class SaveScannerConnectionEventsUseCaseTest {
         useCase.invoke()
 
         coVerify(exactly = 1) {
-            eventRepository.addOrUpdateEvent(withArg<ScannerConnectionEvent> {
-                assertThat(it.payload.scannerInfo.scannerId).isEqualTo("id")
-                assertThat(it.payload.scannerInfo.macAddress).isEqualTo("mac")
-                assertThat(it.payload.scannerInfo.hardwareVersion).isEqualTo("smt")
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg<ScannerConnectionEvent> {
+                    assertThat(it.payload.scannerInfo.scannerId).isEqualTo("id")
+                    assertThat(it.payload.scannerInfo.macAddress).isEqualTo("mac")
+                    assertThat(it.payload.scannerInfo.hardwareVersion).isEqualTo("smt")
+                },
+            )
         }
     }
 
@@ -86,9 +86,11 @@ class SaveScannerConnectionEventsUseCaseTest {
         useCase.invoke()
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg<ScannerConnectionEvent> {
-                assertThat(it.payload.scannerInfo.hardwareVersion).isEqualTo("v2")
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg<ScannerConnectionEvent> {
+                    assertThat(it.payload.scannerInfo.hardwareVersion).isEqualTo("v2")
+                },
+            )
 
             eventRepository.addOrUpdateEvent(withArg<Vero2InfoSnapshotEvent> {})
         }

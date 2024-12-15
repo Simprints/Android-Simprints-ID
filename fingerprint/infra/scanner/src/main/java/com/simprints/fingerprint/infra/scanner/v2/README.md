@@ -24,10 +24,6 @@ custom exceptions.
 
 ### Scanner Setup and Teardown
 
-Use the [`createScanner()`](scanner/CreateScanner.kt) helper function to
-build and instance of the `Scanner` class. No work is done on class
-instantiation so this class can be created at any time.
-
 To connect the scanner, an `InputStream` and an `OutputStream` are
 required. These refer to the streams that become available when
 connecting a Bluetooth socket through the Android OS, which should be

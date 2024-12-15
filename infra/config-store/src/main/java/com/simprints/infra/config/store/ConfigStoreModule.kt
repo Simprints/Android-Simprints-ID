@@ -7,8 +7,8 @@ import androidx.datastore.dataStoreFile
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.store.local.migrations.DeviceConfigSharedPrefsMigration
-import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceSdkQualityThresholdMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceBioSdkMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigFaceSdkQualityThresholdMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigFingerprintBioSdkMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigLedsModeMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigMatchingModalitiesMigration
@@ -39,8 +39,6 @@ private const val DEVICE_CONFIG_DATA_STORE_FILE_NAME = "device_config_prefs.pb"
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ConfigStoreModule {
-
-
     @Binds
     internal abstract fun provideConfigRepository(service: ConfigRepositoryImpl): ConfigRepository
 
@@ -54,19 +52,16 @@ abstract class ConfigStoreModule {
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
-
     @Singleton
     @Provides
     internal fun provideProjectProtoDataStore(
         @ApplicationContext appContext: Context,
-        projectRealmMigration: ProjectRealmMigration
-    ): DataStore<ProtoProject> {
-        return DataStoreFactory.create(
-            serializer = ProjectSerializer,
-            produceFile = { appContext.dataStoreFile(PROJECT_DATA_STORE_FILE_NAME) },
-            migrations = listOf(projectRealmMigration)
-        )
-    }
+        projectRealmMigration: ProjectRealmMigration,
+    ): DataStore<ProtoProject> = DataStoreFactory.create(
+        serializer = ProjectSerializer,
+        produceFile = { appContext.dataStoreFile(PROJECT_DATA_STORE_FILE_NAME) },
+        migrations = listOf(projectRealmMigration),
+    )
 
     @Singleton
     @Provides
@@ -79,34 +74,30 @@ object DataStoreModule {
         projectConfigFaceSdkQualityThresholdMigration: ProjectConfigFaceSdkQualityThresholdMigration,
         projectConfigLedsModeMigration: ProjectConfigLedsModeMigration,
         projectConfigMatchingModalitiesMigration: ProjectConfigMatchingModalitiesMigration,
-    ): DataStore<ProtoProjectConfiguration> {
-        return DataStoreFactory.create(
-            serializer = ProjectConfigurationSerializer,
-            produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },
-            migrations = listOf(
-                projectConfigSharedPrefsMigration,
-                projectConfigQualityThresholdMigration,
-                projectConfigFingerprintBioSdkMigration,
-                projectConfigFaceBioSdkMigration,
-                projectConfigFaceSdkQualityThresholdMigration,
-                projectConfigLedsModeMigration,
-                projectConfigMatchingModalitiesMigration,
-            )
-        )
-    }
+    ): DataStore<ProtoProjectConfiguration> = DataStoreFactory.create(
+        serializer = ProjectConfigurationSerializer,
+        produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },
+        migrations = listOf(
+            projectConfigSharedPrefsMigration,
+            projectConfigQualityThresholdMigration,
+            projectConfigFingerprintBioSdkMigration,
+            projectConfigFaceBioSdkMigration,
+            projectConfigFaceSdkQualityThresholdMigration,
+            projectConfigLedsModeMigration,
+            projectConfigMatchingModalitiesMigration,
+        ),
+    )
 
     @Singleton
     @Provides
     internal fun provideDeviceConfigurationProtoDataStore(
         @ApplicationContext appContext: Context,
-        deviceConfigSharedPrefsMigration: DeviceConfigSharedPrefsMigration
-    ): DataStore<ProtoDeviceConfiguration> {
-        return DataStoreFactory.create(
-            serializer = DeviceConfigurationSerializer,
-            produceFile = { appContext.dataStoreFile(DEVICE_CONFIG_DATA_STORE_FILE_NAME) },
-            migrations = listOf(deviceConfigSharedPrefsMigration)
-        )
-    }
+        deviceConfigSharedPrefsMigration: DeviceConfigSharedPrefsMigration,
+    ): DataStore<ProtoDeviceConfiguration> = DataStoreFactory.create(
+        serializer = DeviceConfigurationSerializer,
+        produceFile = { appContext.dataStoreFile(DEVICE_CONFIG_DATA_STORE_FILE_NAME) },
+        migrations = listOf(deviceConfigSharedPrefsMigration),
+    )
 }
 
 @Qualifier
@@ -116,10 +107,10 @@ annotation class AbsolutePath
 @Module
 @InstallIn(SingletonComponent::class)
 object ConfigManagerDependencies {
-
     @AbsolutePath
     @Provides
     @Singleton
-    fun provideAbsolutePath(@ApplicationContext context: Context): String =
-        context.filesDir.absolutePath
+    fun provideAbsolutePath(
+        @ApplicationContext context: Context,
+    ): String = context.filesDir.absolutePath
 }

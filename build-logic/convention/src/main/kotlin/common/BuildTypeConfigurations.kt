@@ -10,13 +10,13 @@ import org.gradle.kotlin.dsl.extra
 import org.jetbrains.kotlin.konan.file.File
 
 fun NamedDomainObjectContainer<LibraryBuildType>.configureDebugModeBuildTypes() {
-    getByName(BuildTypes.release) {
+    getByName(BuildTypes.RELEASE) {
         buildConfigField("Boolean", "DEBUG_MODE", "false")
     }
-    getByName(BuildTypes.staging) {
+    getByName(BuildTypes.STAGING) {
         buildConfigField("Boolean", "DEBUG_MODE", "true")
     }
-    getByName(BuildTypes.debug) {
+    getByName(BuildTypes.DEBUG) {
         buildConfigField("Boolean", "DEBUG_MODE", "true")
     }
 }
@@ -28,15 +28,15 @@ fun Project.configureDbEncryptionBuild() {
 
     extensions.configure<LibraryExtension> {
         buildTypes {
-            getByName(BuildTypes.release) {
+            getByName(BuildTypes.RELEASE) {
                 buildConfigField("Boolean", "DB_ENCRYPTION", "$propDbEncrypted")
             }
 
-            getByName(BuildTypes.staging) {
+            getByName(BuildTypes.STAGING) {
                 buildConfigField("Boolean", "DB_ENCRYPTION", "$propDbEncrypted")
             }
 
-            getByName(BuildTypes.debug) {
+            getByName(BuildTypes.DEBUG) {
                 buildConfigField("Boolean", "DB_ENCRYPTION", "$propDbEncrypted")
             }
         }
@@ -44,25 +44,25 @@ fun Project.configureDbEncryptionBuild() {
 }
 
 fun NamedDomainObjectContainer<LibraryBuildType>.configureCloudAccessBuildTypes() {
-    getByName(BuildTypes.release) {
+    getByName(BuildTypes.RELEASE) {
         buildConfigField("String", "CLOUD_PROJECT_ID", CloudParams.RELEASE_CLOUD_PROJECT_ID)
     }
-    getByName(BuildTypes.staging) {
+    getByName(BuildTypes.STAGING) {
         buildConfigField("String", "CLOUD_PROJECT_ID", CloudParams.STAGING_CLOUD_PROJECT_ID)
     }
-    getByName(BuildTypes.debug) {
+    getByName(BuildTypes.DEBUG) {
         buildConfigField("String", "CLOUD_PROJECT_ID", CloudParams.DEV_CLOUD_PROJECT_ID)
     }
 }
 
 fun NamedDomainObjectContainer<LibraryBuildType>.configureNetworkBuildTypes() {
-    getByName(BuildTypes.release) {
+    getByName(BuildTypes.RELEASE) {
         buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
     }
-    getByName(BuildTypes.staging) {
+    getByName(BuildTypes.STAGING) {
         buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
     }
-    getByName(BuildTypes.debug) {
+    getByName(BuildTypes.DEBUG) {
         buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
     }
 }

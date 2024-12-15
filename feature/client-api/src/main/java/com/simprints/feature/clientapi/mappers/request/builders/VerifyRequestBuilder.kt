@@ -9,7 +9,6 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
-
 internal class VerifyRequestBuilder(
     private val actionIdentifier: ActionRequestIdentifier,
     private val extractor: VerifyRequestExtractor,
@@ -17,7 +16,6 @@ internal class VerifyRequestBuilder(
     private val tokenizationProcessor: TokenizationProcessor,
     validator: VerifyValidator,
 ) : ActionRequestBuilder(validator) {
-
     override fun encryptIfNecessary(actionRequest: ActionRequest): ActionRequest {
         val request = (actionRequest as? ActionRequest.VerifyActionRequest) ?: return actionRequest
         if (request.projectId != project?.id) return actionRequest
@@ -26,13 +24,13 @@ internal class VerifyRequestBuilder(
             value = request.userId,
             project = project,
             tokenKeyType = TokenKeyType.AttendantId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         val encryptedModuleId = encryptField(
             value = request.moduleId,
             project = project,
             tokenKeyType = TokenKeyType.ModuleId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }
@@ -44,9 +42,8 @@ internal class VerifyRequestBuilder(
         moduleId = extractor.getModuleId().asTokenizableRaw(),
         biometricDataSource = extractor.getBiometricDataSource(),
         subjectAge = extractor.getSubjectAge(),
-        callerPackageName = extractor.getCallerPackageName(),
         metadata = extractor.getMetadata(),
         verifyGuid = extractor.getVerifyGuid(),
-        unknownExtras = extractor.getUnknownExtras()
+        unknownExtras = extractor.getUnknownExtras(),
     )
 }

@@ -6,10 +6,10 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -17,7 +17,6 @@ import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -25,7 +24,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class AlertViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -63,13 +61,15 @@ internal class AlertViewModelTest {
         alertViewModel.saveAlertEvent(AlertScreenEventType.DISCONNECTED)
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                val payload = it.payload as AlertScreenEvent.AlertScreenPayload
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    val payload = it.payload as AlertScreenEvent.AlertScreenPayload
 
-                assertThat(payload.createdAt.ms).isEqualTo(42)
-                assertThat(payload.type).isEqualTo(EventType.ALERT_SCREEN)
-                assertThat(payload.alertType).isEqualTo(AlertScreenEventType.DISCONNECTED)
-            })
+                    assertThat(payload.createdAt.ms).isEqualTo(42)
+                    assertThat(payload.type).isEqualTo(EventType.ALERT_SCREEN)
+                    assertThat(payload.alertType).isEqualTo(AlertScreenEventType.DISCONNECTED)
+                },
+            )
         }
     }
 
@@ -93,7 +93,6 @@ internal class AlertViewModelTest {
     }
 
     companion object {
-
         private const val DEVICE_ID = "device-id"
         private const val PROJECT_ID = "project-id"
         private const val USER_ID = "user-id"

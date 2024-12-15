@@ -15,22 +15,21 @@ data class LicenseCheckEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
-constructor(
-    createdAt: Timestamp,
-    status: LicenseStatus,
-    vendor: String,
-
+    constructor(
+        createdAt: Timestamp,
+        status: LicenseStatus,
+        vendor: String,
     ) : this(
         UUID.randomUUID().toString(),
         LicenseCheckEventPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
             status = status,
-            vendor = vendor
+            vendor = vendor,
         ),
-        LICENSE_CHECK
+        LICENSE_CHECK,
     )
+
     enum class LicenseStatus {
         VALID,
         INVALID,
@@ -51,7 +50,10 @@ constructor(
         val vendor: String,
         override val endedAt: Timestamp? = null,
         override val type: EventType = LICENSE_CHECK,
-    ) : EventPayload()
+    ) : EventPayload() {
+        override fun toSafeString(): String = "vendor: $vendor, status: $status"
+    }
+
     companion object {
         const val EVENT_VERSION = 1
     }

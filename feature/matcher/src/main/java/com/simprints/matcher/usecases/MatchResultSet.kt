@@ -6,7 +6,6 @@ import java.util.TreeSet
 internal class MatchResultSet<T : MatchResultItem>(
     private val maxSize: Int = MAX_RESULTS,
 ) {
-
     private var lowestConfidence: Float = 0f
 
     private val treeSet = TreeSet { o1: T, o2: T ->
@@ -39,7 +38,6 @@ internal class MatchResultSet<T : MatchResultItem>(
     fun toList(): List<T> = treeSet.toList()
 
     companion object {
-
         /**
          * Default max size of the result set.
          */

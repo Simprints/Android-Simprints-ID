@@ -11,7 +11,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import org.junit.Test
 
 class AuthorizationEventTest {
-
     @Test
     fun create_AuthorizationEvent() {
         val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)

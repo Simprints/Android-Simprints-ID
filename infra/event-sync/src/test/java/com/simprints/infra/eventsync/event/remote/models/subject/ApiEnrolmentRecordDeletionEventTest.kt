@@ -5,7 +5,6 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDel
 import org.junit.Test
 
 class ApiEnrolmentRecordDeletionEventTest {
-
     @Test
     fun convert_EnrolmentRecordDeletionEvent() {
         val apiPayload = ApiEnrolmentRecordDeletionPayload(

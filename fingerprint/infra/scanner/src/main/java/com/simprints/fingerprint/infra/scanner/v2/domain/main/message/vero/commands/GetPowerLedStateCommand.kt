@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroC
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.VeroMessageType
 
 class GetPowerLedStateCommand : VeroCommand(VeroMessageType.GET_POWER_LED_STATE) {
-
     companion object {
-        fun fromBytes(@Suppress("unused_parameter") data: ByteArray) = GetPowerLedStateCommand()
+        fun fromBytes(
+            @Suppress("unused_parameter") data: ByteArray,
+        ) = GetPowerLedStateCommand()
     }
 }

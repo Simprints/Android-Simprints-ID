@@ -1,6 +1,5 @@
 package com.simprints.infra.events.event.domain.models
 
-
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
@@ -16,20 +15,18 @@ data class IntentParsingEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         integration: IntentParsingPayload.IntegrationInfo,
     ) : this(
         UUID.randomUUID().toString(),
         IntentParsingPayload(createdAt, EVENT_VERSION, integration),
-        INTENT_PARSING
+        INTENT_PARSING,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class IntentParsingPayload(
@@ -39,18 +36,17 @@ data class IntentParsingEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = INTENT_PARSING,
     ) : EventPayload() {
+        override fun toSafeString(): String = "integration: $integration"
 
         @Keep
         enum class IntegrationInfo {
-
             ODK,
             STANDARD,
-            COMMCARE
+            COMMCARE,
         }
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

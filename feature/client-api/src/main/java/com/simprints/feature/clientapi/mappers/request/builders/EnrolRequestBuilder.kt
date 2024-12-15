@@ -9,7 +9,6 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
-
 internal class EnrolRequestBuilder(
     private val actionIdentifier: ActionRequestIdentifier,
     private val extractor: EnrolRequestExtractor,
@@ -25,13 +24,13 @@ internal class EnrolRequestBuilder(
             value = request.userId,
             project = project,
             tokenKeyType = TokenKeyType.AttendantId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         val encryptedModuleId = encryptField(
             value = request.moduleId,
             project = project,
             tokenKeyType = TokenKeyType.ModuleId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }
@@ -43,8 +42,7 @@ internal class EnrolRequestBuilder(
         moduleId = extractor.getModuleId().asTokenizableRaw(),
         biometricDataSource = extractor.getBiometricDataSource(),
         subjectAge = extractor.getSubjectAge(),
-        callerPackageName = extractor.getCallerPackageName(),
         metadata = extractor.getMetadata(),
-        unknownExtras = extractor.getUnknownExtras()
+        unknownExtras = extractor.getUnknownExtras(),
     )
 }

@@ -9,7 +9,6 @@ import io.mockk.verify
 import org.junit.Test
 
 class PerformanceMonitoringTraceTest {
-
     @Test
     fun `calling trace should try to create a new FPM trace`() {
         val simber = Simber
@@ -78,14 +77,15 @@ class PerformanceMonitoringTraceTest {
         trace.stop()
 
         verify {
-            simberSpy.i(message = withArg {
-                it.contains("Trace time for $TRACE_NAME =")
-            })
+            simberSpy.i(
+                message = withArg {
+                    it.contains("Trace time for $TRACE_NAME =")
+                },
+            )
         }
     }
 
     companion object {
         private const val TRACE_NAME = "testTrace"
     }
-
 }

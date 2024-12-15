@@ -8,6 +8,5 @@ data class ApiAllowedAgeRange(
     val startInclusive: Int?,
     val endExclusive: Int?,
 ) {
-
     fun toDomain() = AgeGroup(startInclusive ?: 0, endExclusive)
 }

@@ -1,29 +1,26 @@
 package com.simprints.face.capture.screens.livefeedback
 
 import android.graphics.Bitmap
-import android.graphics.RectF
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
-import kotlin.also
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.takeUnless
 
 internal class CropToTargetOverlayAnalyzer(
     private val targetOverlay: CameraTargetOverlay,
-    private val onImageCropped: (Bitmap) -> Unit
+    private val onImageCropped: (Bitmap) -> Unit,
 ) : ImageAnalysis.Analyzer {
-
-
     override fun analyze(image: ImageProxy) {
-        val previewRect =  targetOverlay.circleRect
-        if(previewRect.isEmpty) return
+        val previewRect = targetOverlay.circleRect
+        if (previewRect.isEmpty) return
 
         // Adjust overlay size to be fit-center with the image size
         val scale = getSmallerRatio(
-            image.width, image.height,
-            targetOverlay.width, targetOverlay.height,
+            image.width,
+            image.height,
+            targetOverlay.width,
+            targetOverlay.height,
         )
         val scaledWidth = (targetOverlay.width * scale).toInt()
         val scaledHeight = (targetOverlay.height * scale).toInt()
@@ -38,15 +35,17 @@ internal class CropToTargetOverlayAnalyzer(
         val cropTop = offsetY + (previewRect.top * scale).toInt()
         val cropHeight = (previewRect.height() * scale).toInt()
 
-        onImageCropped(image.use {
-            Bitmap.createBitmap(
-                it.toBitmap(),
-                cropLeft,
-                cropTop,
-                cropWidth,
-                cropHeight
-            )
-        })
+        onImageCropped(
+            image.use {
+                Bitmap.createBitmap(
+                    it.toBitmap(),
+                    cropLeft,
+                    cropTop,
+                    cropWidth,
+                    cropHeight,
+                )
+            },
+        )
     }
 
     private fun getSmallerRatio(

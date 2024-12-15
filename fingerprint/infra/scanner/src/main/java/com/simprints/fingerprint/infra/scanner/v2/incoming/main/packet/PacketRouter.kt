@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v2.incoming.main.packet
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
 import com.simprints.fingerprint.infra.scanner.v2.incoming.IncomingConnectable
@@ -7,6 +8,8 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.subscribeOnIoAn
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.flowables.ConnectableFlowable
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
 /**
  * The PacketRouter takes an InputStream of bytes, converting it into a single stream of
@@ -14,10 +17,12 @@ import io.reactivex.flowables.ConnectableFlowable
  * and forwards them to a separate Flowable<Packet> dedicated to that route, which is exposed
  * in the map [incomingPacketRoutes].
  */
-class PacketRouter(private val routes: List<Route>,
-                   private val packetRouteDesignator: Packet.() -> Byte,
-                   private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {
-
+class PacketRouter @Inject constructor(
+    private val routes: List<Route>,
+    private val packetRouteDesignator: Packet.() -> Byte,
+    private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+) : IncomingConnectable {
     lateinit var incomingPacketRoutes: Map<Route, ConnectableFlowable<Packet>>
 
     private lateinit var incomingPacketsDisposable: Disposable
@@ -25,9 +30,9 @@ class PacketRouter(private val routes: List<Route>,
 
     override fun connect(flowableInputStream: Flowable<ByteArray>) {
         val rawPacketStream = transformToPacketStream(flowableInputStream)
-        val incomingPackets = rawPacketStream.subscribeOnIoAndPublish()
+        val incomingPackets = rawPacketStream.subscribeOnIoAndPublish(ioDispatcher)
         incomingPacketRoutes = routes.associateWith {
-            incomingPackets.filterRoute(it).subscribeOnIoAndPublish()
+            incomingPackets.filterRoute(it).subscribeOnIoAndPublish(ioDispatcher)
         }
         incomingPacketsDisposable = incomingPackets.connect()
         incomingPacketRoutesDisposable = incomingPacketRoutes.mapValues { it.value.connect() }

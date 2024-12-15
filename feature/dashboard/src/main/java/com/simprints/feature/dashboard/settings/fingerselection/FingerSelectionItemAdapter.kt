@@ -4,15 +4,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.simprints.feature.dashboard.databinding.ItemFingerSelectionBinding
 import com.simprints.feature.dashboard.databinding.HeaderSdkNameBinding
+import com.simprints.feature.dashboard.databinding.ItemFingerSelectionBinding
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.resources.R as IDR
 
 internal class FingerSelectionItemAdapter(
     private val getItems: () -> List<FingerSelectionSection>,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
     companion object {
         private const val TYPE_HEADER = 0
         private const val TYPE_ITEM = 1
@@ -34,7 +33,10 @@ internal class FingerSelectionItemAdapter(
         throw IllegalArgumentException("Invalid position")
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == TYPE_HEADER) {
             val binding = HeaderSdkNameBinding.inflate(inflater, parent, false)
@@ -45,7 +47,10 @@ internal class FingerSelectionItemAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         var totalItems = 0
         for (section in getItems()) {
             if (position == totalItems && holder is HeaderViewHolder) {
@@ -61,7 +66,7 @@ internal class FingerSelectionItemAdapter(
 
     class HeaderViewHolder(
         val context: Context,
-        binding: HeaderSdkNameBinding
+        binding: HeaderSdkNameBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
         private val textView = binding.headerText
 
@@ -72,9 +77,8 @@ internal class FingerSelectionItemAdapter(
 
     class FingerSelectionItemViewHolder(
         val context: Context,
-        binding: ItemFingerSelectionBinding
+        binding: ItemFingerSelectionBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-
         private val fingerNameTextView = binding.fingerNameTextView
         private val fingerQuantityTextView = binding.fingerQuantityTextView
 
@@ -85,18 +89,17 @@ internal class FingerSelectionItemAdapter(
     }
 }
 
-fun Finger.toString(context: Context) =
-    context.getString(
-        when (this) {
-            Finger.LEFT_THUMB -> IDR.string.fingerprint_capture_finger_l_1
-            Finger.LEFT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_l_2
-            Finger.LEFT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_l_3
-            Finger.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
-            Finger.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
-            Finger.RIGHT_THUMB -> IDR.string.fingerprint_capture_finger_r_1
-            Finger.RIGHT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_r_2
-            Finger.RIGHT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_r_3
-            Finger.RIGHT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_r_4
-            Finger.RIGHT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_r_5
-        }
-    )
+fun Finger.toString(context: Context) = context.getString(
+    when (this) {
+        Finger.LEFT_THUMB -> IDR.string.fingerprint_capture_finger_l_1
+        Finger.LEFT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_l_2
+        Finger.LEFT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_l_3
+        Finger.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
+        Finger.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
+        Finger.RIGHT_THUMB -> IDR.string.fingerprint_capture_finger_r_1
+        Finger.RIGHT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_r_2
+        Finger.RIGHT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_r_3
+        Finger.RIGHT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_r_4
+        Finger.RIGHT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_r_5
+    },
+)

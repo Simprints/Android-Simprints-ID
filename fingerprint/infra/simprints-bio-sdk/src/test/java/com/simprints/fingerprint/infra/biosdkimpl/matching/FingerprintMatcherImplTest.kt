@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class FingerprintMatcherImplTest {
-
     private var simAfisMatcher: SimAfisMatcher = mockk()
 
     @Test
@@ -19,7 +18,7 @@ class FingerprintMatcherImplTest {
         val probe: FingerprintIdentity = mockk()
         val candidates: List<FingerprintIdentity> = mockk()
         val simAfisMatcherSettings = SimAfisMatcherSettings()
-        simAfisMatcherSettings.crossFingerComparison=false
+        simAfisMatcherSettings.crossFingerComparison = false
         val matchResult: List<MatchResult> = mockk()
         every {
             simAfisMatcher.match(probe, candidates, false)

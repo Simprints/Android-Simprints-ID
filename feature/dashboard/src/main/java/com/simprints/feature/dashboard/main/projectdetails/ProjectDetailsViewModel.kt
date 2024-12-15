@@ -19,9 +19,8 @@ internal class ProjectDetailsViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
     private val recentUserActivityManager: RecentUserActivityManager,
-    private val tokenizationProcessor: TokenizationProcessor
+    private val tokenizationProcessor: TokenizationProcessor,
 ) : ViewModel() {
-
     val projectCardStateLiveData: LiveData<DashboardProjectState>
         get() = _projectCardStateLiveData
     private val _projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
@@ -35,19 +34,19 @@ internal class ProjectDetailsViewModel @Inject constructor(
             val projectId = authStore.signedInProjectId
             val cachedProject = configManager.getProject(projectId)
             val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
-            val decryptedUserId = when(val userId = recentUserActivity.lastUserUsed) {
+            val decryptedUserId = when (val userId = recentUserActivity.lastUserUsed) {
                 is TokenizableString.Raw -> userId
                 is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                     encrypted = userId,
                     tokenKeyType = TokenKeyType.AttendantId,
-                    project = cachedProject
+                    project = cachedProject,
                 )
             }
             DashboardProjectState(
                 title = cachedProject.name,
                 lastUser = decryptedUserId.value,
                 lastScanner = recentUserActivity.lastScannerUsed,
-                isLoaded = true
+                isLoaded = true,
             )
         } catch (_: Throwable) {
             DashboardProjectState(isLoaded = false)

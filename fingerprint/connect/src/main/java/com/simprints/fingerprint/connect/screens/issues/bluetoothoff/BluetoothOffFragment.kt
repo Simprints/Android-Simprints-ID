@@ -30,7 +30,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) {
-
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
 
     @Inject
@@ -42,19 +41,27 @@ internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) 
     private val binding by viewBinding(FragmentBluetoothOffBinding::bind)
 
     private val bluetoothOnReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
+        override fun onReceive(
+            context: Context?,
+            intent: Intent,
+        ) {
             if (intent.action == ComponentBluetoothAdapter.ACTION_STATE_CHANGED) {
-                when (intent.getIntExtra(
-                    ComponentBluetoothAdapter.EXTRA_STATE,
-                    ComponentBluetoothAdapter.ERROR
-                )) {
+                when (
+                    intent.getIntExtra(
+                        ComponentBluetoothAdapter.EXTRA_STATE,
+                        ComponentBluetoothAdapter.ERROR,
+                    )
+                ) {
                     ComponentBluetoothAdapter.STATE_ON -> handleBluetoothEnabled()
                 }
             }
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         screenReporter.reportBluetoothNotEnabled()
 
@@ -71,7 +78,7 @@ internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) 
         super.onStart()
         requireActivity().registerReceiver(
             bluetoothOnReceiver,
-            IntentFilter(ComponentBluetoothAdapter.ACTION_STATE_CHANGED)
+            IntentFilter(ComponentBluetoothAdapter.ACTION_STATE_CHANGED),
         )
     }
 
@@ -115,7 +122,7 @@ internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) 
         findNavController().navigateSafely(
             this,
             BluetoothOffFragmentDirections.actionIssueBluetoothOffFragmentToConnectProgressFragment(),
-            navOptions { popUpTo(R.id.connectProgressFragment) }
+            navOptions { popUpTo(R.id.connectProgressFragment) },
         )
         connectScannerViewModel.connect()
     }

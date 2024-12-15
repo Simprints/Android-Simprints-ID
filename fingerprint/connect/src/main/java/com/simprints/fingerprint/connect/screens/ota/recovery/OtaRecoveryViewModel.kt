@@ -14,9 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class OtaRecoveryViewModel @Inject constructor(
-    private val scannerManager: ScannerManager
+    private val scannerManager: ScannerManager,
 ) : ViewModel() {
-
     val isConnectionSuccess: LiveData<LiveDataEventWithContent<Boolean>>
         get() = _isConnectionSuccess
     private val _isConnectionSuccess = MutableLiveData<LiveDataEventWithContent<Boolean>>()

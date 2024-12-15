@@ -19,6 +19,7 @@ jobs:
                 infra:ui-base
                 infra:network
                 infra:logging
+                infra:logging-persistent
                 infra:security
             reportsId: core
 
@@ -86,7 +87,9 @@ jobs:
         uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
-            modules: feature:dashboard
+            modules: | 
+                feature:dashboard
+                feature:troubleshooting
             reportsId: dashboard
 
     face-unit-tests:

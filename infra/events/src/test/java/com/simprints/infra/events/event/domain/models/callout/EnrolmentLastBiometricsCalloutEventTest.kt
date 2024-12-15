@@ -14,7 +14,6 @@ import org.junit.Test
 
 @Keep
 class EnrolmentLastBiometricsCalloutEventTest {
-
     @Test
     fun create_EnrolmentLastBiometricsCalloutEvent() {
         val event = EnrolmentLastBiometricsCalloutEvent(

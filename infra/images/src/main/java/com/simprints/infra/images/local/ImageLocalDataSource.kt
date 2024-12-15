@@ -8,7 +8,6 @@ import java.io.FileInputStream
  * Interface for local image file operations
  */
 internal interface ImageLocalDataSource {
-
     /**
      * Encrypts and stores an image
      *
@@ -22,7 +21,11 @@ internal interface ImageLocalDataSource {
      * @see [Path]
      * @return a reference to the newly stored image, if successful, otherwise null
      */
-    suspend fun encryptAndStoreImage(imageBytes: ByteArray, projectId: String,relativePath: Path): SecuredImageRef?
+    suspend fun encryptAndStoreImage(
+        imageBytes: ByteArray,
+        projectId: String,
+        relativePath: Path,
+    ): SecuredImageRef?
 
     /**
      * Decrypts an image
@@ -47,6 +50,4 @@ internal interface ImageLocalDataSource {
      * @return true if the operation was successful
      */
     suspend fun deleteImage(image: SecuredImageRef): Boolean
-
 }
-

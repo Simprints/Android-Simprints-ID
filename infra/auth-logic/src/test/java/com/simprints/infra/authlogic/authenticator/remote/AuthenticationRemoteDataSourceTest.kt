@@ -24,7 +24,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 
 class AuthenticationRemoteDataSourceTest {
-
     companion object {
         private const val PROJECT_ID = "projectId"
         private const val DEVICE_ID = "deviceId"
@@ -44,70 +43,67 @@ class AuthenticationRemoteDataSourceTest {
             val args = this.args
             @Suppress("UNCHECKED_CAST")
             (args[0] as InterfaceInvocation<AuthenticationRemoteInterface, ApiAuthenticationData>).invoke(
-                remoteInterface
+                remoteInterface,
             )
         }
         coEvery { simApiClientFactory.build(AuthenticationRemoteInterface::class) } returns simApiClient
     }
 
     @Test
-    fun `Get successful authentication data`() =
-        runTest(StandardTestDispatcher()) {
-            coEvery {
-                remoteInterface.requestAuthenticationData(
-                    PROJECT_ID,
-                    DEVICE_ID
-                )
-            } returns ApiAuthenticationData( NONCE)
+    fun `Get successful authentication data`() = runTest(StandardTestDispatcher()) {
+        coEvery {
+            remoteInterface.requestAuthenticationData(
+                PROJECT_ID,
+                DEVICE_ID,
+            )
+        } returns ApiAuthenticationData(NONCE)
 
-            val actualAuthenticationData =
-                authenticationRemoteDataSource.requestAuthenticationData(
-                    PROJECT_ID,
-                    DEVICE_ID
-                )
-            val expectedAuthenticationData = AuthenticationData( NONCE)
-            assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
-        }
-
-    @Test
-    fun `Get no authentication data if backend maintenance exception`() =
-        runTest(StandardTestDispatcher()) {
-            val exception = BackendMaintenanceException(estimatedOutage = 100)
-            coEvery {
-                remoteInterface.requestAuthenticationData(
-                    PROJECT_ID,
-                    DEVICE_ID
-                )
-            } throws exception
-
-            val receivedException = assertThrows<BackendMaintenanceException> {
-                authenticationRemoteDataSource.requestAuthenticationData(
-                    PROJECT_ID,
-                    DEVICE_ID
-                )
-            }
-            assertThat(receivedException).isEqualTo(exception)
-        }
+        val actualAuthenticationData =
+            authenticationRemoteDataSource.requestAuthenticationData(
+                PROJECT_ID,
+                DEVICE_ID,
+            )
+        val expectedAuthenticationData = AuthenticationData(NONCE)
+        assertThat(actualAuthenticationData).isEqualTo(expectedAuthenticationData)
+    }
 
     @Test
-    fun `Get no authentication data if sync cloud integration exception`() =
-        runTest(StandardTestDispatcher()) {
-            val exception = SyncCloudIntegrationException(cause = Exception())
-            coEvery {
-                remoteInterface.requestAuthenticationData(
-                    PROJECT_ID,
-                    DEVICE_ID
-                )
-            } throws exception
+    fun `Get no authentication data if backend maintenance exception`() = runTest(StandardTestDispatcher()) {
+        val exception = BackendMaintenanceException(estimatedOutage = 100)
+        coEvery {
+            remoteInterface.requestAuthenticationData(
+                PROJECT_ID,
+                DEVICE_ID,
+            )
+        } throws exception
 
-            val receivedException = assertThrows<SyncCloudIntegrationException> {
-                authenticationRemoteDataSource.requestAuthenticationData(
-                    PROJECT_ID,
-                    DEVICE_ID
-                )
-            }
-            assertThat(receivedException).isEqualTo(exception)
+        val receivedException = assertThrows<BackendMaintenanceException> {
+            authenticationRemoteDataSource.requestAuthenticationData(
+                PROJECT_ID,
+                DEVICE_ID,
+            )
         }
+        assertThat(receivedException).isEqualTo(exception)
+    }
+
+    @Test
+    fun `Get no authentication data if sync cloud integration exception`() = runTest(StandardTestDispatcher()) {
+        val exception = SyncCloudIntegrationException(cause = Exception())
+        coEvery {
+            remoteInterface.requestAuthenticationData(
+                PROJECT_ID,
+                DEVICE_ID,
+            )
+        } throws exception
+
+        val receivedException = assertThrows<SyncCloudIntegrationException> {
+            authenticationRemoteDataSource.requestAuthenticationData(
+                PROJECT_ID,
+                DEVICE_ID,
+            )
+        }
+        assertThat(receivedException).isEqualTo(exception)
+    }
 
     @Test
     fun `Get authentication data should map the sync cloud integration maintenance exception to AuthRequestInvalidCredentialsException when the response is 404`() =
@@ -116,80 +112,77 @@ class AuthenticationRemoteDataSourceTest {
                 cause = HttpException(
                     Response.error<ApiAuthenticationData>(
                         404,
-                        "".toResponseBody()
-                    )
-                )
+                        "".toResponseBody(),
+                    ),
+                ),
             )
             coEvery {
                 remoteInterface.requestAuthenticationData(
                     PROJECT_ID,
-                    DEVICE_ID
+                    DEVICE_ID,
                 )
             } throws exception
 
             assertThrows<AuthRequestInvalidCredentialsException> {
                 authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
-                    DEVICE_ID
+                    DEVICE_ID,
                 )
             }
         }
 
     @Test
-    fun `Get successful auth token`() =
-        runTest(StandardTestDispatcher()) {
-            val apiToken = ApiToken(
-                "token",
-                ApiToken.FirebaseOptions("project", "api", "application", "url", "sender", "bucket")
-            )
-            coEvery {
-                remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
-            } returns apiToken
+    fun `Get successful auth token`() = runTest(StandardTestDispatcher()) {
+        val apiToken = ApiToken(
+            "token",
+            ApiToken.FirebaseOptions("project", "api", "application", "url", "sender", "bucket"),
+        )
+        coEvery {
+            remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
+        } returns apiToken
 
-            val actualToken = authenticationRemoteDataSource.requestAuthToken(
+        val actualToken = authenticationRemoteDataSource.requestAuthToken(
+            PROJECT_ID,
+            DEVICE_ID,
+            AUTH_REQUEST,
+        )
+        val expectedToken = Token("token", "project", "api", "application")
+        assertThat(actualToken).isEqualTo(expectedToken)
+    }
+
+    @Test
+    fun `Get no auth token if backend maintenance exception`() = runTest(StandardTestDispatcher()) {
+        val exception = BackendMaintenanceException(estimatedOutage = 100)
+        coEvery {
+            remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
+        } throws exception
+
+        val receivedException = assertThrows<BackendMaintenanceException> {
+            authenticationRemoteDataSource.requestAuthToken(
                 PROJECT_ID,
                 DEVICE_ID,
-                AUTH_REQUEST
+                AUTH_REQUEST,
             )
-            val expectedToken = Token("token", "project", "api", "application")
-            assertThat(actualToken).isEqualTo(expectedToken)
         }
+        assertThat(receivedException).isEqualTo(exception)
+    }
 
     @Test
-    fun `Get no auth token if backend maintenance exception`() =
-        runTest(StandardTestDispatcher()) {
-            val exception = BackendMaintenanceException(estimatedOutage = 100)
-            coEvery {
-                remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
-            } throws exception
+    fun `Get no auth token if sync cloud integration exception`() = runTest(StandardTestDispatcher()) {
+        val exception = SyncCloudIntegrationException(cause = Exception())
+        coEvery {
+            remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
+        } throws exception
 
-            val receivedException = assertThrows<BackendMaintenanceException> {
-                authenticationRemoteDataSource.requestAuthToken(
-                    PROJECT_ID,
-                    DEVICE_ID,
-                    AUTH_REQUEST
-                )
-            }
-            assertThat(receivedException).isEqualTo(exception)
+        val receivedException = assertThrows<SyncCloudIntegrationException> {
+            authenticationRemoteDataSource.requestAuthToken(
+                PROJECT_ID,
+                DEVICE_ID,
+                AUTH_REQUEST,
+            )
         }
-
-    @Test
-    fun `Get no auth token if sync cloud integration exception`() =
-        runTest(StandardTestDispatcher()) {
-            val exception = SyncCloudIntegrationException(cause = Exception())
-            coEvery {
-                remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
-            } throws exception
-
-            val receivedException = assertThrows<SyncCloudIntegrationException> {
-                authenticationRemoteDataSource.requestAuthToken(
-                    PROJECT_ID,
-                    DEVICE_ID,
-                    AUTH_REQUEST
-                )
-            }
-            assertThat(receivedException).isEqualTo(exception)
-        }
+        assertThat(receivedException).isEqualTo(exception)
+    }
 
     @Test
     fun `Get auth token should map the sync cloud integration maintenance exception to AuthRequestInvalidCredentialsException when the response is 401`() =
@@ -198,9 +191,9 @@ class AuthenticationRemoteDataSourceTest {
                 cause = HttpException(
                     Response.error<ApiToken>(
                         401,
-                        "".toResponseBody()
-                    )
-                )
+                        "".toResponseBody(),
+                    ),
+                ),
             )
             coEvery {
                 remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
@@ -210,7 +203,7 @@ class AuthenticationRemoteDataSourceTest {
                 authenticationRemoteDataSource.requestAuthToken(
                     PROJECT_ID,
                     DEVICE_ID,
-                    AUTH_REQUEST
+                    AUTH_REQUEST,
                 )
             }
         }

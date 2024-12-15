@@ -17,7 +17,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration13to14Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -43,7 +42,10 @@ class EventMigration13to14Test {
         helper.closeWhenFinished(db)
     }
 
-    private fun createSessionScope(id: String, ended: Long? = null) = ContentValues().apply {
+    private fun createSessionScope(
+        id: String,
+        ended: Long? = null,
+    ) = ContentValues().apply {
         put("id", id)
         put("projectId", "some-project-id")
         put("start_unixMs", 12)
@@ -56,7 +58,6 @@ class EventMigration13to14Test {
     }
 
     companion object {
-
         private const val TEST_DB = "some_db"
     }
 }

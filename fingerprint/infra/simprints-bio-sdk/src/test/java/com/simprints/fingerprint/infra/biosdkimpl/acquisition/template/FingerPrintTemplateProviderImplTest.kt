@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 class FingerPrintTemplateProviderImplTest {
-
     private lateinit var fingerprintTemplateProviderImpl: FingerprintTemplateProviderImpl
 
     @MockK
@@ -23,7 +22,6 @@ class FingerPrintTemplateProviderImplTest {
         MockKAnnotations.init(this)
         fingerprintTemplateProviderImpl =
             FingerprintTemplateProviderImpl(fingerprintCaptureWrapperFactory)
-
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -33,33 +31,34 @@ class FingerPrintTemplateProviderImplTest {
 
     @Test
     fun acquireFingerprintTemplate() = runTest {
-        //Given
+        // Given
         val settings = FingerprintTemplateAcquisitionSettings(
             Dpi(1000),
             1000,
-            100
+            100,
         )
         val templateResponse = AcquireFingerprintTemplateResponse(
             byteArrayOf(),
             "templateFormat",
-            100
+            100,
         )
         coEvery {
             fingerprintCaptureWrapperFactory.captureWrapper.acquireFingerprintTemplate(
                 settings.captureFingerprintDpi,
                 settings.timeOutMs,
                 settings.qualityThreshold,
-                settings.allowLowQualityExtraction
+                settings.allowLowQualityExtraction,
             )
         } returns templateResponse
-        //When
+        // When
         val response = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
-        //Then
+        // Then
         Truth.assertThat(response.template).isEqualTo(templateResponse.template)
-        Truth.assertThat(response.templateMetadata?.templateFormat)
+        Truth
+            .assertThat(response.templateMetadata?.templateFormat)
             .isEqualTo(templateResponse.templateFormat)
-        Truth.assertThat(response.templateMetadata?.imageQualityScore)
+        Truth
+            .assertThat(response.templateMetadata?.imageQualityScore)
             .isEqualTo(templateResponse.imageQualityScore)
-
     }
 }

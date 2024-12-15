@@ -9,11 +9,11 @@ data class DownSynchronizationConfiguration(
     val moduleOptions: List<TokenizableString>,
     val maxAge: String,
 ) {
-
     enum class PartitionType {
         PROJECT,
         MODULE,
-        USER;
+        USER,
+        ;
 
         fun toDomain(): Partitioning = when (this) {
             PROJECT -> Partitioning.GLOBAL
@@ -22,9 +22,7 @@ data class DownSynchronizationConfiguration(
         }
     }
 
-
     companion object {
-
         const val DEFAULT_DOWN_SYNC_MAX_AGE = "PT24H"
     }
 }

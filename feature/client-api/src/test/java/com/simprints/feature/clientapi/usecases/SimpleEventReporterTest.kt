@@ -2,9 +2,9 @@ package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -40,7 +40,7 @@ class SimpleEventReporterTest {
         simpleEventReporter = SimpleEventReporter(
             coreEventRepository,
             timeHelper,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
@@ -48,7 +48,7 @@ class SimpleEventReporterTest {
     fun `addInvalidIntentEvent adds event`() = runTest {
         // When
         simpleEventReporter.addInvalidIntentEvent("action", emptyMap())
-        //Then
+        // Then
         coVerify {
             coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(InvalidIntentEvent::class.java) })
         }
@@ -58,7 +58,7 @@ class SimpleEventReporterTest {
     fun `addCompletionCheckEvent adds event`() = runTest {
         // When
         simpleEventReporter.addCompletionCheckEvent(true)
-        //Then
+        // Then
         coVerify {
             coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(CompletionCheckEvent::class.java) })
         }
@@ -68,12 +68,11 @@ class SimpleEventReporterTest {
     fun `closeCurrentSessionNormally closes current session`() = runTest {
         // When
         simpleEventReporter.closeCurrentSessionNormally()
-        //Then
+        // Then
         coVerify { coreEventRepository.closeCurrentSession() }
     }
 
     companion object {
-
         private const val SESSION_ID = "sessionId"
     }
 }

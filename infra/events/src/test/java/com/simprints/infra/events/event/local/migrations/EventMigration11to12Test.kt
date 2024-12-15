@@ -15,7 +15,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration11to12Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
@@ -46,7 +45,7 @@ class EventMigration11to12Test {
             insert(
                 "DbSessionScope",
                 SQLiteDatabase.CONFLICT_NONE,
-                createSessionScope("session-id", 34)
+                createSessionScope("session-id", 34),
             )
             close()
         }
@@ -58,8 +57,10 @@ class EventMigration11to12Test {
         }
     }
 
-
-    private fun createSessionScope(id: String, ended: Long? = null) = ContentValues().apply {
+    private fun createSessionScope(
+        id: String,
+        ended: Long? = null,
+    ) = ContentValues().apply {
         put("id", id)
         put("projectId", "some-project-id")
         put("createdAt", 12)
@@ -68,7 +69,6 @@ class EventMigration11to12Test {
     }
 
     companion object {
-
         private const val TEST_DB = "some_db"
     }
 }

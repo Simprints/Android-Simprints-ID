@@ -7,7 +7,6 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 
 object Vibrate {
-
     fun vibrate(context: Context) {
         (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).let {
             if (Build.VERSION.SDK_INT >= 26) {

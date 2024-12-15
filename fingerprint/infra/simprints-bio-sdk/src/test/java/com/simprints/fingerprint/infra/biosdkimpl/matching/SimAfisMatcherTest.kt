@@ -16,9 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import java.nio.ByteBuffer
 
-
 class SimAfisMatcherTest {
-
     @MockK
     lateinit var jniLibAfis: JNILibAfisInterface
 
@@ -35,17 +33,18 @@ class SimAfisMatcherTest {
     fun `test same finger match`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
         val candidate = FingerprintIdentity(
-            "candidate", listOf(
+            "candidate",
+            listOf(
                 Fingerprint(
                     FingerIdentifier.RIGHT_THUMB,
                     IsoFingerprintTemplateGenerator.generate(1),
-                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT
-                )
-            )
+                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                ),
+            ),
         )
-        //When
+        // When
         val result = simAfisMatcher.match(candidate, listOf(candidate), false).last()
-        //Then
+        // Then
         verify { jniLibAfis.identify(any(), any(), any()) }
         assertThat(result.score).isEqualTo(1)
     }
@@ -54,17 +53,18 @@ class SimAfisMatcherTest {
     fun `test matching probe with other template format ignore candidate`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
         val candidate = FingerprintIdentity(
-            "candidate", listOf(
+            "candidate",
+            listOf(
                 Fingerprint(
                     FingerIdentifier.RIGHT_3RD_FINGER,
                     IsoFingerprintTemplateGenerator.generate(1),
-                    "NEC_1"
-                )
-            )
+                    "NEC_1",
+                ),
+            ),
         )
-        //When
+        // When
         val result = simAfisMatcher.match(candidate, listOf(candidate), false)
-        //Then
+        // Then
         assertThat(result).isEmpty()
     }
 
@@ -93,40 +93,43 @@ class SimAfisMatcherTest {
         every { jniLibAfis.verify(any(), any()) } answers {
             if (firstArg<ByteBuffer>() === secondArg<ByteBuffer>()) 1F else 0F
         }
-        //When
+        // When
         val matchingResult = simAfisMatcher.match(
-            probe, listOf(candidate1, candidate2), true
+            probe,
+            listOf(candidate1, candidate2),
+            true,
         )
         val maxScore = matchingResult.maxOf { it.score }
         val minScore = matchingResult.minOf { it.score }
-        //Then
+        // Then
         verify(exactly = 8) { jniLibAfis.verify(any(), any()) }
         assertThat(maxScore).isEqualTo(1)
         assertThat(minScore).isEqualTo(0.5f)
-
     }
 
     @Test
     fun `test crossFingerMatching zero fingers success`() {
-        //Given
+        // Given
         every { jniLibAfis.verify(any(), any()) } returns 1F
         val probe = FingerprintIdentity("probe", listOf())
         val candidate = FingerprintIdentity(
-            "candidate", listOf(
+            "candidate",
+            listOf(
                 Fingerprint(
                     FingerIdentifier.LEFT_THUMB,
                     IsoFingerprintTemplateGenerator.generate(1),
-                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT
-                ), Fingerprint(
+                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                ),
+                Fingerprint(
                     FingerIdentifier.LEFT_3RD_FINGER,
                     IsoFingerprintTemplateGenerator.generate(1),
-                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT
-                )
-            )
+                    SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT,
+                ),
+            ),
         )
-        //When
+        // When
         val result = simAfisMatcher.match(probe, listOf(candidate), true)
-        //Then
+        // Then
         verify(exactly = 0) { jniLibAfis.verify(any(), any()) }
         assertThat(result[0].score).isEqualTo(0)
     }

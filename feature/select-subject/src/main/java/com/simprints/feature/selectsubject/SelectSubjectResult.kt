@@ -7,4 +7,3 @@ import java.io.Serializable
 data class SelectSubjectResult(
     val success: Boolean,
 ) : Serializable
-

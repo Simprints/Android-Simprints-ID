@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ImageMetadataStoreTest {
-
     @MockK
     private lateinit var metadataDao: ImageMetadataDao
 
@@ -33,15 +32,15 @@ class ImageMetadataStoreTest {
 
         metadataStore.storeMetadata(
             Path("path/imageKey"),
-            mapOf("key1" to "value1", "key2" to "value2")
+            mapOf("key1" to "value1", "key2" to "value2"),
         )
 
         coVerify {
             metadataDao.save(
                 listOf(
                     DbImageMetadata("imageKey", "key1", "value1"),
-                    DbImageMetadata("imageKey", "key2", "value2")
-                )
+                    DbImageMetadata("imageKey", "key2", "value2"),
+                ),
             )
         }
     }
@@ -57,7 +56,7 @@ class ImageMetadataStoreTest {
     fun `getting metadata`() = runTest {
         coEvery { metadataDao.get("imageKey") } returns listOf(
             DbImageMetadata("imageKey", "key1", "value1"),
-            DbImageMetadata("imageKey", "key2", "value2")
+            DbImageMetadata("imageKey", "key2", "value2"),
         )
 
         assertThat(metadataStore.getMetadata(Path("imageKey")))

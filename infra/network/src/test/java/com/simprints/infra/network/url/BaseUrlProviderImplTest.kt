@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 class BaseUrlProviderImplTest {
-
     companion object {
         private const val URL_SUFFIX = "/androidapi/v2/"
 

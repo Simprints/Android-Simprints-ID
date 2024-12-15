@@ -14,10 +14,10 @@ enum class FingerIdentifier {
     LEFT_INDEX_FINGER,
     LEFT_3RD_FINGER,
     LEFT_4TH_FINGER,
-    LEFT_5TH_FINGER
+    LEFT_5TH_FINGER,
 }
 
-fun FingerIdentifier.fromDomainToModuleApi() =  when(this) {
+fun FingerIdentifier.fromDomainToModuleApi() = when (this) {
     FingerIdentifier.RIGHT_5TH_FINGER -> IFingerIdentifier.RIGHT_5TH_FINGER
     FingerIdentifier.RIGHT_4TH_FINGER -> IFingerIdentifier.RIGHT_4TH_FINGER
     FingerIdentifier.RIGHT_3RD_FINGER -> IFingerIdentifier.RIGHT_3RD_FINGER
@@ -30,8 +30,7 @@ fun FingerIdentifier.fromDomainToModuleApi() =  when(this) {
     FingerIdentifier.LEFT_5TH_FINGER -> IFingerIdentifier.LEFT_5TH_FINGER
 }
 
-
-fun IFingerIdentifier.fromModuleApiToDomain() = when(this) {
+fun IFingerIdentifier.fromModuleApiToDomain() = when (this) {
     IFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
     IFingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
     IFingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
@@ -43,4 +42,3 @@ fun IFingerIdentifier.fromModuleApiToDomain() = when(this) {
     IFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
     IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
 }
-

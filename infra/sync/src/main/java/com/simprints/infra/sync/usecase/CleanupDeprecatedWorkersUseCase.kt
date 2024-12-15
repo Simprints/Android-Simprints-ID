@@ -8,7 +8,6 @@ import javax.inject.Inject
 internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
     private val workManager: WorkManager,
 ) {
-
     /**
      * Removes deprecated workers from the work manager.
      *
@@ -40,5 +39,4 @@ internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
         "MASTER_SYNC_SCHEDULERS", // 2023.1.0
         "TAG_PEOPLE_SYNC_WORKER_TYPE_UP_COUNTER", // 2023.1.0
     )
-
 }

@@ -40,13 +40,11 @@ import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
 class OtaViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
 
     @MockK
     private lateinit var reportFirmwareUpdate: ReportFirmwareUpdateEventUseCase
@@ -76,13 +74,22 @@ class OtaViewModelTest {
         coEvery {
             recentUserActivityManager.getRecentUserActivity()
         } returns RecentUserActivity(HARDWARE_VERSION, "", "".asTokenizableRaw(), 0, 0, 0, 0)
-        coEvery { configManager.getProjectConfiguration().fingerprint?.getSdkConfiguration(SECUGEN_SIM_MATCHER)?.vero2?.firmwareVersions } returns mapOf(
-            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                NEW_CYPRESS_VERSION,
-                NEW_STM_VERSION,
-                NEW_UN20_VERSION
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .fingerprint
+                ?.getSdkConfiguration(
+                    SECUGEN_SIM_MATCHER,
+                )?.vero2
+                ?.firmwareVersions
+        } returns
+            mapOf(
+                HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                    NEW_CYPRESS_VERSION,
+                    NEW_STM_VERSION,
+                    NEW_UN20_VERSION,
+                ),
             )
-        )
 
         every { scannerOtaWrapper.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
         every { scannerOtaWrapper.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
@@ -94,7 +101,7 @@ class OtaViewModelTest {
             reportFirmwareUpdate,
             timeHelperMock,
             recentUserActivityManager,
-            configManager
+            configManager,
         )
     }
 
@@ -105,7 +112,7 @@ class OtaViewModelTest {
         otaViewModel.startOta(SECUGEN_SIM_MATCHER, listOf(AvailableOta.CYPRESS), 0)
 
         progressObserver.observedValues.assertAlmostContainsExactlyElementsIn(
-            listOf(0f) + CYPRESS_OTA_STEPS.map { it.totalProgress } + listOf(1f)
+            listOf(0f) + CYPRESS_OTA_STEPS.map { it.totalProgress } + listOf(1f),
         )
         otaViewModel.otaComplete.assertEventReceived()
 
@@ -127,7 +134,7 @@ class OtaViewModelTest {
                 CYPRESS_OTA_STEPS.map { it.totalProgress / 3f } +
                 STM_OTA_STEPS.map { (it.totalProgress + 1f) / 3f } +
                 UN20_OTA_STEPS.map { (it.totalProgress + 2f) / 3f } +
-                listOf(1f)
+                listOf(1f),
         )
         completeObserver.assertEventReceived()
 
@@ -167,7 +174,7 @@ class OtaViewModelTest {
         otaViewModel.startOta(
             SECUGEN_SIM_MATCHER,
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
-            OtaViewModel.MAX_RETRY_ATTEMPTS
+            OtaViewModel.MAX_RETRY_ATTEMPTS,
         )
 
         verify(exactly = 2) { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
@@ -187,7 +194,7 @@ class OtaViewModelTest {
         otaViewModel.startOta(
             SECUGEN_SIM_MATCHER,
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
-            OtaViewModel.MAX_RETRY_ATTEMPTS
+            OtaViewModel.MAX_RETRY_ATTEMPTS,
         )
 
         verify { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
@@ -207,7 +214,7 @@ class OtaViewModelTest {
         otaViewModel.startOta(
             SECUGEN_SIM_MATCHER,
             listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
-            0
+            0,
         )
 
         testCoroutineRule.testCoroutineDispatcher.scheduler.advanceTimeBy(11.seconds)
@@ -222,7 +229,7 @@ class OtaViewModelTest {
 
     private fun Iterable<Float?>.assertAlmostContainsExactlyElementsIn(
         expected: Iterable<Float>,
-        threshold: Float = 1e-5f
+        threshold: Float = 1e-5f,
     ) {
         this.zip(expected).forEach { (a, b) -> assertThat(a).isWithin(threshold).of(b) }
     }
@@ -242,12 +249,14 @@ class OtaViewModelTest {
                 listOf(
                     CypressOtaStep.ReconnectingAfterTransfer,
                     CypressOtaStep.ValidatingNewFirmwareVersion,
-                    CypressOtaStep.UpdatingUnifiedVersionInformation
+                    CypressOtaStep.UpdatingUnifiedVersionInformation,
                 )
 
         private val STM_OTA_STEPS = listOf(
-            StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
-            StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer
+            StmOtaStep.EnteringOtaModeFirstTime,
+            StmOtaStep.ReconnectingAfterEnteringOtaMode,
+            StmOtaStep.EnteringOtaModeSecondTime,
+            StmOtaStep.CommencingTransfer,
         ) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
             listOf(
@@ -255,14 +264,14 @@ class OtaViewModelTest {
                 StmOtaStep.EnteringMainMode,
                 StmOtaStep.ValidatingNewFirmwareVersion,
                 StmOtaStep.ReconnectingAfterValidating,
-                StmOtaStep.UpdatingUnifiedVersionInformation
+                StmOtaStep.UpdatingUnifiedVersionInformation,
             )
 
         private val UN20_OTA_STEPS =
             listOf(
                 Un20OtaStep.EnteringMainMode,
                 Un20OtaStep.TurningOnUn20BeforeTransfer,
-                Un20OtaStep.CommencingTransfer
+                Un20OtaStep.CommencingTransfer,
             ) +
                 OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
                 listOf(
@@ -271,8 +280,7 @@ class OtaViewModelTest {
                     Un20OtaStep.TurningOnUn20AfterTransfer,
                     Un20OtaStep.ValidatingNewFirmwareVersion,
                     Un20OtaStep.ReconnectingAfterValidating,
-                    Un20OtaStep.UpdatingUnifiedVersionInformation
+                    Un20OtaStep.UpdatingUnifiedVersionInformation,
                 )
     }
 }
-

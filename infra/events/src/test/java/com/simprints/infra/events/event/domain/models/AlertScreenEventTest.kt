@@ -8,7 +8,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class AlertScreenEventTest {
-
     @Test
     fun create_AlertScreenEvent() {
         val event = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED)

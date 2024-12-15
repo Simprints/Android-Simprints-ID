@@ -19,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class SettingsViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -93,8 +92,6 @@ class SettingsViewModelTest {
     }
 
     companion object {
-
         private const val LANGUAGE = "fr"
     }
-
 }

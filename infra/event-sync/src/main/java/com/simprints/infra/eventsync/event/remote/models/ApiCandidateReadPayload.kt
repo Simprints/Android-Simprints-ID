@@ -19,17 +19,16 @@ internal data class ApiCandidateReadPayload(
     val localResult: ApiLocalResult,
     val remoteResult: ApiRemoteResult?,
 ) : ApiEventPayload(startTime) {
-
     @Keep
     enum class ApiLocalResult {
-
-        FOUND, NOT_FOUND;
+        FOUND,
+        NOT_FOUND,
     }
 
     @Keep
     enum class ApiRemoteResult {
-
-        FOUND, NOT_FOUND;
+        FOUND,
+        NOT_FOUND,
     }
 
     constructor(domainPayload: CandidateReadPayload) : this(
@@ -37,24 +36,18 @@ internal data class ApiCandidateReadPayload(
         domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.candidateId,
         domainPayload.localResult.fromDomainToApi(),
-        domainPayload.remoteResult?.fromDomainToApi()
+        domainPayload.remoteResult?.fromDomainToApi(),
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
 
+internal fun LocalResult.fromDomainToApi() = when (this) {
+    LocalResult.FOUND -> ApiLocalResult.FOUND
+    LocalResult.NOT_FOUND -> ApiLocalResult.NOT_FOUND
+}
 
-internal fun LocalResult.fromDomainToApi() =
-    when (this) {
-        LocalResult.FOUND -> ApiLocalResult.FOUND
-        LocalResult.NOT_FOUND -> ApiLocalResult.NOT_FOUND
-    }
-
-internal fun RemoteResult.fromDomainToApi() =
-    when (this) {
-        RemoteResult.FOUND -> ApiRemoteResult.FOUND
-        RemoteResult.NOT_FOUND -> ApiRemoteResult.NOT_FOUND
-    }
-
-
+internal fun RemoteResult.fromDomainToApi() = when (this) {
+    RemoteResult.FOUND -> ApiRemoteResult.FOUND
+    RemoteResult.NOT_FOUND -> ApiRemoteResult.NOT_FOUND
+}

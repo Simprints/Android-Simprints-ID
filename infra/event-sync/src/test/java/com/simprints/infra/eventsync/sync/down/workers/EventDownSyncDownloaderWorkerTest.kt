@@ -42,7 +42,6 @@ import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 internal class EventDownSyncDownloaderWorkerTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -66,7 +65,6 @@ internal class EventDownSyncDownloaderWorkerTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
 
         eventDownSyncDownloaderWorker = EventDownSyncDownloaderWorker(
             mockk(relaxed = true),
@@ -106,9 +104,9 @@ internal class EventDownSyncDownloaderWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
                 workDataOf(
-                    OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true
-                )
-            )
+                    OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true,
+                ),
+            ),
         )
     }
 
@@ -125,9 +123,9 @@ internal class EventDownSyncDownloaderWorkerTest {
             ListenableWorker.Result.failure(
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to null
-                )
-            )
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to null,
+                ),
+            ),
         )
     }
 
@@ -144,9 +142,9 @@ internal class EventDownSyncDownloaderWorkerTest {
             ListenableWorker.Result.failure(
                 workDataOf(
                     OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L
-                )
-            )
+                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to 600L,
+                ),
+            ),
         )
     }
 
@@ -162,9 +160,9 @@ internal class EventDownSyncDownloaderWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
                 workDataOf(
-                    OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
-                )
-            )
+                    OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true,
+                ),
+            ),
         )
     }
 
@@ -180,9 +178,9 @@ internal class EventDownSyncDownloaderWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
                 workDataOf(
-                    OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true
-                )
-            )
+                    OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true,
+                ),
+            ),
         )
     }
 
@@ -212,7 +210,7 @@ internal class EventDownSyncDownloaderWorkerTest {
             workDataOf(),
             workDataOf(PROGRESS_DOWN_SYNC to progress),
             2,
-            0
+            0,
         )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
@@ -231,7 +229,7 @@ internal class EventDownSyncDownloaderWorkerTest {
             workDataOf(OUTPUT_DOWN_SYNC to progress),
             workDataOf(),
             2,
-            1
+            1,
         )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
@@ -250,9 +248,8 @@ internal class EventDownSyncDownloaderWorkerTest {
             workDataOf(),
             workDataOf(),
             2,
-            1
+            1,
         )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
 }
-

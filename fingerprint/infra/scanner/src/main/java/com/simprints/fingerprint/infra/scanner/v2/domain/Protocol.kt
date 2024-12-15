@@ -10,7 +10,6 @@ import java.nio.ByteOrder
  * headers for the various APIs as necessary.
  */
 interface Protocol {
-
     /**
      * Whether this protocol uses little-endian or big-endian byte order
      */
@@ -19,12 +18,12 @@ interface Protocol {
     /**
      * Interpret bytes in a certain position within a ByteArray as a number (byte, short, int, long)
      */
-    fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = null): T =
-        extract(getType, position, byteOrder)
+    fun <T> ByteArray.extract(
+        getType: ByteBuffer.() -> T,
+        position: IntRange? = null,
+    ): T = extract(getType, position, byteOrder)
 
-    fun Short.toByteArray() =
-        toByteArray(byteOrder)
+    fun Short.toByteArray() = toByteArray(byteOrder)
 
-    fun Int.toByteArray() =
-        toByteArray(byteOrder)
+    fun Int.toByteArray() = toByteArray(byteOrder)
 }

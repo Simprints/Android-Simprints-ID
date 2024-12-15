@@ -7,9 +7,8 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.feature.dashboard.R
-import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.infra.config.store.models.Finger
-import com.simprints.infra.resources.R as IDR
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -22,6 +21,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import com.simprints.infra.resources.R as IDR
 
 private const val SIM_MATCHER_NAME = "SimMatcher"
 
@@ -29,7 +29,6 @@ private const val SIM_MATCHER_NAME = "SimMatcher"
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 class FingerSelectionFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -46,10 +45,10 @@ class FingerSelectionFragmentTest {
                     items = listOf(
                         FingerSelectionItem(Finger.LEFT_THUMB, 1),
                         FingerSelectionItem(Finger.RIGHT_THUMB, 2),
-                        FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 3)
-                    )
+                        FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 3),
+                    ),
                 ),
-            )
+            ),
         )
         launchFragmentInHiltContainer<FingerSelectionFragment>()
 
@@ -80,10 +79,8 @@ class FingerSelectionFragmentTest {
         }
     }
 
-    private fun nThFingerSelection(position: Int): Matcher<View> {
-        return allOf(
-            withParent(withId(R.id.fingerSelectionRecyclerView)),
-            withParentIndex(position)
-        )
-    }
+    private fun nThFingerSelection(position: Int): Matcher<View> = allOf(
+        withParent(withId(R.id.fingerSelectionRecyclerView)),
+        withParentIndex(position),
+    )
 }

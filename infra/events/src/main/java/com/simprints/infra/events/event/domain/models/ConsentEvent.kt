@@ -15,7 +15,6 @@ data class ConsentEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endTime: Timestamp,
@@ -29,8 +28,7 @@ data class ConsentEvent(
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ConsentPayload(
@@ -41,22 +39,23 @@ data class ConsentEvent(
         var result: Result,
         override val type: EventType = CONSENT,
     ) : EventPayload() {
+        override fun toSafeString(): String = "consent: $consentType, result: $result"
 
         @Keep
         enum class Type {
-
-            INDIVIDUAL, PARENTAL
+            INDIVIDUAL,
+            PARENTAL,
         }
 
         @Keep
         enum class Result {
-
-            ACCEPTED, DECLINED, NO_RESPONSE
+            ACCEPTED,
+            DECLINED,
+            NO_RESPONSE,
         }
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

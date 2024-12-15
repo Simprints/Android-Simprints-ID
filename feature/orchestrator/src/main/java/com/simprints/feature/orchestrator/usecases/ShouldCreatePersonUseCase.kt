@@ -5,8 +5,8 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
@@ -14,14 +14,14 @@ import javax.inject.Inject
 internal class ShouldCreatePersonUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
 ) {
-
     suspend operator fun invoke(
         actionRequest: ActionRequest?,
         modalities: Set<GeneralConfiguration.Modality>,
-        results: List<Step>
+        results: List<Step>,
     ): Boolean {
         if (actionRequest !is ActionRequest.FlowAction &&
-            actionRequest !is ActionRequest.EnrolLastBiometricActionRequest) {
+            actionRequest !is ActionRequest.EnrolLastBiometricActionRequest
+        ) {
             return false
         }
 
@@ -66,6 +66,6 @@ internal class ShouldCreatePersonUseCase @Inject constructor(
         // (due to matching modalities configuration) and the other modality is scheduled for capture in the
         // following enrol last request
         return (faceCaptureIsScheduled && !currentPersonCreationEvent.hasFaceReference()) ||
-                (fingerprintCaptureIsScheduled && !currentPersonCreationEvent.hasFingerprintReference())
+            (fingerprintCaptureIsScheduled && !currentPersonCreationEvent.hasFingerprintReference())
     }
 }

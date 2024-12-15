@@ -11,5 +11,4 @@ internal data class ApiDevice(
     var id: String = "",
 )
 
-internal fun Device.fromDomainToApi() =
-    ApiDevice(androidSdkVersion, deviceModel, deviceId)
+internal fun Device.fromDomainToApi() = ApiDevice(androidSdkVersion, deviceModel, deviceId)

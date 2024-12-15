@@ -3,10 +3,10 @@ package com.simprints.feature.logincheck.usecases
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -23,7 +23,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ReportActionRequestEventsUseCaseTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -35,7 +34,6 @@ internal class ReportActionRequestEventsUseCaseTest {
 
     @MockK
     private lateinit var simNetworkUtils: SimNetworkUtils
-
 
     @MockK
     lateinit var recentUserActivityManager: RecentUserActivityManager
@@ -56,7 +54,7 @@ internal class ReportActionRequestEventsUseCaseTest {
             timeHelper,
             simNetworkUtils,
             recentUserActivityManager,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
@@ -64,7 +62,7 @@ internal class ReportActionRequestEventsUseCaseTest {
     fun `Adds event if there are unknown extras`() = runTest {
         // When
         useCase.invoke(ActionFactory.getFlowRequest(extras = mapOf("key" to "value")))
-        //Then
+        // Then
         coVerify {
             sessionEventRepository.addOrUpdateEvent(withArg { it is SuspiciousIntentEvent })
         }
@@ -74,7 +72,7 @@ internal class ReportActionRequestEventsUseCaseTest {
     fun `Does not add event if no extras`() = runTest {
         // When
         useCase.invoke(ActionFactory.getFlowRequest(extras = emptyMap()))
-        //Then
+        // Then
         coVerify { sessionEventRepository.addOrUpdateEvent(withArg { it !is SuspiciousIntentEvent }) }
     }
 
@@ -97,7 +95,7 @@ internal class ReportActionRequestEventsUseCaseTest {
             sessionEventRepository.addOrUpdateEvent(withArg { it is EnrolmentCalloutEvent })
             recentUserActivityManager.updateRecentUserActivity(any())
         }
-        coVerify{
+        coVerify {
             sessionEventRepository.addOrUpdateEvent(withArg { it !is ConnectivitySnapshotEvent })
         }
     }
@@ -111,6 +109,4 @@ internal class ReportActionRequestEventsUseCaseTest {
         verificationsToday = 0,
         lastActivityTime = 0,
     )
-
-
 }

@@ -19,14 +19,13 @@ import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test
 
 class ProjectConfigurationTest {
-
     @Test
     fun `canCoSyncAllData should return the correct value`() {
         val values = mapOf(
             ALL to true,
             ONLY_ANALYTICS to false,
             ONLY_BIOMETRICS to false,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -34,10 +33,10 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         coSync = CoSyncUpSynchronizationConfiguration(
-                            kind = it.key
-                        )
-                    )
-                )
+                            kind = it.key,
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canCoSyncAllData()).isEqualTo(it.value)
         }
@@ -49,7 +48,7 @@ class ProjectConfigurationTest {
             ALL to false,
             ONLY_ANALYTICS to false,
             ONLY_BIOMETRICS to true,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -57,10 +56,10 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         coSync = CoSyncUpSynchronizationConfiguration(
-                            kind = it.key
-                        )
-                    )
-                )
+                            kind = it.key,
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canCoSyncBiometricData()).isEqualTo(it.value)
         }
@@ -72,7 +71,7 @@ class ProjectConfigurationTest {
             ALL to false,
             ONLY_ANALYTICS to true,
             ONLY_BIOMETRICS to false,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -80,10 +79,10 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         coSync = CoSyncUpSynchronizationConfiguration(
-                            kind = it.key
-                        )
-                    )
-                )
+                            kind = it.key,
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canCoSyncAnalyticsData()).isEqualTo(it.value)
         }
@@ -95,7 +94,7 @@ class ProjectConfigurationTest {
             ALL to true,
             ONLY_ANALYTICS to true,
             ONLY_BIOMETRICS to true,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -103,10 +102,10 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         coSync = CoSyncUpSynchronizationConfiguration(
-                            kind = it.key
-                        )
-                    )
-                )
+                            kind = it.key,
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canCoSyncData()).isEqualTo(it.value)
         }
@@ -118,7 +117,7 @@ class ProjectConfigurationTest {
             ALL to true,
             ONLY_ANALYTICS to false,
             ONLY_BIOMETRICS to false,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -127,9 +126,9 @@ class ProjectConfigurationTest {
                     up = synchronizationConfiguration.up.copy(
                         simprints = simprintsUpSyncConfigurationConfiguration.copy(
                             kind = it.key,
-                        )
-                    )
-                )
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canSyncAllDataToSimprints()).isEqualTo(it.value)
         }
@@ -141,7 +140,7 @@ class ProjectConfigurationTest {
             ALL to false,
             ONLY_ANALYTICS to false,
             ONLY_BIOMETRICS to true,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -150,9 +149,9 @@ class ProjectConfigurationTest {
                     up = synchronizationConfiguration.up.copy(
                         simprints = simprintsUpSyncConfigurationConfiguration.copy(
                             kind = it.key,
-                        )
-                    )
-                )
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canSyncBiometricDataToSimprints()).isEqualTo(it.value)
         }
@@ -164,7 +163,7 @@ class ProjectConfigurationTest {
             ALL to false,
             ONLY_ANALYTICS to true,
             ONLY_BIOMETRICS to false,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -174,10 +173,10 @@ class ProjectConfigurationTest {
                         simprints = SimprintsUpSynchronizationConfiguration(
                             kind = it.key,
                             batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
-                            imagesRequireUnmeteredConnection = false
-                        )
-                    )
-                )
+                            imagesRequireUnmeteredConnection = false,
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canSyncAnalyticsDataToSimprints()).isEqualTo(it.value)
         }
@@ -189,7 +188,7 @@ class ProjectConfigurationTest {
             ALL to true,
             ONLY_ANALYTICS to true,
             ONLY_BIOMETRICS to true,
-            NONE to false
+            NONE to false,
         )
 
         values.forEach {
@@ -198,9 +197,9 @@ class ProjectConfigurationTest {
                     up = synchronizationConfiguration.up.copy(
                         simprints = simprintsUpSyncConfigurationConfiguration.copy(
                             kind = it.key,
-                        )
-                    )
-                )
+                        ),
+                    ),
+                ),
             )
             assertThat(config.canSyncDataToSimprints()).isEqualTo(it.value)
         }
@@ -211,14 +210,14 @@ class ProjectConfigurationTest {
         val values = mapOf(
             ONLY_PERIODICALLY_UP_SYNC to false,
             PERIODICALLY to true,
-            PERIODICALLY_AND_ON_SESSION_START to true
+            PERIODICALLY_AND_ON_SESSION_START to true,
         )
 
         values.forEach {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
-                    frequency = it.key
-                )
+                    frequency = it.key,
+                ),
             )
             assertThat(config.isEventDownSyncAllowed()).isEqualTo(it.value)
         }
@@ -233,10 +232,10 @@ class ProjectConfigurationTest {
                 synchronization = synchronizationConfiguration.copy(
                     up = synchronizationConfiguration.up.copy(
                         simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                            imagesRequireUnmeteredConnection = it
+                            imagesRequireUnmeteredConnection = it,
                         ),
-                    )
-                )
+                    ),
+                ),
             )
             assertThat(config.imagesUploadRequiresUnmeteredConnection()).isEqualTo(it)
         }
@@ -250,15 +249,15 @@ class ProjectConfigurationTest {
         val projectConfiguration = projectConfiguration.copy(
             face = faceConfiguration.copy(
                 rankOne = faceConfiguration.rankOne?.copy(
-                    allowedAgeRange = faceAgeRange
-                )
+                    allowedAgeRange = faceAgeRange,
+                ),
             ),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
-                    allowedAgeRange = secugenSimMatcherAgeRange
+                    allowedAgeRange = secugenSimMatcherAgeRange,
                 ),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         // Act
@@ -275,8 +274,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = AgeGroup(0, null))),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = AgeGroup(0, null)),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         // Act
@@ -295,8 +294,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = emptyAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = emptyAgeRange),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         // Act
@@ -316,8 +315,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         // Act
@@ -333,8 +332,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = null),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = null,
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         val result = projectConfiguration.sortedUniqueAgeGroups()
@@ -352,8 +351,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         val result = projectConfiguration.sortedUniqueAgeGroups()
@@ -361,7 +360,7 @@ class ProjectConfigurationTest {
             AgeGroup(0, faceAgeRange.startInclusive),
             faceAgeRange,
             secugenSimMatcherAgeRange,
-            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null),
         )
 
         assertThat(result).isEqualTo(expected)
@@ -376,8 +375,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         val result = projectConfiguration.sortedUniqueAgeGroups()
@@ -386,7 +385,7 @@ class ProjectConfigurationTest {
             AgeGroup(faceAgeRange.startInclusive, secugenSimMatcherAgeRange.startInclusive),
             AgeGroup(secugenSimMatcherAgeRange.startInclusive, faceAgeRange.endExclusive),
             AgeGroup(faceAgeRange.endExclusive!!, secugenSimMatcherAgeRange.endExclusive!!),
-            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null),
         )
 
         assertThat(result).isEqualTo(expected)
@@ -402,8 +401,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
-                nec = fingerprintConfiguration.nec?.copy(allowedAgeRange = duplicateAgeRange)
-            )
+                nec = fingerprintConfiguration.nec?.copy(allowedAgeRange = duplicateAgeRange),
+            ),
         )
 
         val result = projectConfiguration.sortedUniqueAgeGroups()
@@ -411,7 +410,7 @@ class ProjectConfigurationTest {
             AgeGroup(0, faceAgeRange.startInclusive),
             faceAgeRange,
             secugenSimMatcherAgeRange,
-            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null),
         )
 
         assertThat(result).isEqualTo(expected)
@@ -426,15 +425,15 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         val result = projectConfiguration.sortedUniqueAgeGroups()
         val expected = listOf(
             AgeGroup(0, secugenSimMatcherAgeRange.startInclusive),
             secugenSimMatcherAgeRange,
-            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null)
+            AgeGroup(secugenSimMatcherAgeRange.endExclusive!!, null),
         )
 
         assertThat(result).isEqualTo(expected)
@@ -449,8 +448,8 @@ class ProjectConfigurationTest {
             face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
-                nec = null
-            )
+                nec = null,
+            ),
         )
 
         val result = projectConfiguration.sortedUniqueAgeGroups()

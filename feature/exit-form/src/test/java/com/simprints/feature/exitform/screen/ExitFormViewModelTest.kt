@@ -6,7 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.config.ExitFormOption
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -19,13 +19,11 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class ExitFormViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -129,5 +127,4 @@ internal class ExitFormViewModelTest {
         val optionDoesNotRequiresInfo = ExitFormOption.ReligiousConcerns
         val optionRequiresInfo = ExitFormOption.Other
     }
-
 }

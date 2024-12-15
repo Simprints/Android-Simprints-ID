@@ -13,17 +13,18 @@ class RocV3Matcher @Inject constructor() : FaceMatcher() {
     override val matcherName
         get() = "RANK_ONE"
 
-
     override val supportedTemplateFormat
         get() = RANK_ONE_TEMPLATE_FORMAT_3_1
 
     // Ignore this method from test coverage calculations
     // because it uses jni native code which is hard to test
     @ExcludedFromGeneratedTestCoverageReports(
-        reason = "This function uses roc class that has native functions and can't be mocked"
+        reason = "This function uses roc class that has native functions and can't be mocked",
     )
-    override suspend fun getComparisonScore(probe: ByteArray, matchAgainst: ByteArray): Float {
-
+    override suspend fun getComparisonScore(
+        probe: ByteArray,
+        matchAgainst: ByteArray,
+    ): Float {
         val probeTemplate = roc.new_uint8_t_array(ROC_FACE_FAST_FV_SIZE.toInt())
         roc.memmove(roc.roc_cast(probeTemplate), probe)
 
@@ -34,7 +35,7 @@ class RocV3Matcher @Inject constructor() : FaceMatcher() {
             probeTemplate,
             ROC_FACE_FAST_FV_SIZE,
             matchTemplate,
-            ROC_FACE_FAST_FV_SIZE
+            ROC_FACE_FAST_FV_SIZE,
         )
 
         roc.delete_uint8_t_array(probeTemplate)
@@ -42,5 +43,4 @@ class RocV3Matcher @Inject constructor() : FaceMatcher() {
 
         return (similarity * 100)
     }
-
 }

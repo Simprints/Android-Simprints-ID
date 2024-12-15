@@ -10,10 +10,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class ExtractNecTemplateUseCase @Inject constructor(
-    private val nec: NEC, @DispatcherBG private val dispatcher: CoroutineDispatcher
+    private val nec: NEC,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(
-        fingerprintImage: FingerprintImage, qualityScore: Int
+        fingerprintImage: FingerprintImage,
+        qualityScore: Int,
     ): TemplateResponse<FingerprintTemplateMetadata> = withContext(dispatcher) {
         try {
             val template = nec.extract(
@@ -21,13 +23,15 @@ internal class ExtractNecTemplateUseCase @Inject constructor(
                     width = fingerprintImage.width,
                     height = fingerprintImage.height,
                     resolution = fingerprintImage.resolution,
-                    imageBytes = fingerprintImage.imageBytes
-                )
+                    imageBytes = fingerprintImage.imageBytes,
+                ),
             )
             TemplateResponse(
-                template.bytes, FingerprintTemplateMetadata(
-                    templateFormat = NEC_TEMPLATE_FORMAT, imageQualityScore = qualityScore
-                )
+                template.bytes,
+                FingerprintTemplateMetadata(
+                    templateFormat = NEC_TEMPLATE_FORMAT,
+                    imageQualityScore = qualityScore,
+                ),
             )
         } catch (e: Exception) {
             throw BioSdkException.TemplateExtractionException(e)

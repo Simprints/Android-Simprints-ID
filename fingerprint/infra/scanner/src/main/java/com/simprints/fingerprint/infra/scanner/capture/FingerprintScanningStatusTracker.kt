@@ -13,10 +13,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class FingerprintScanningStatusTracker @Inject constructor(
-    @DispatcherBG private val dispatcherBG: CoroutineDispatcher
+    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) {
     private val coroutineScope = CoroutineScope(dispatcherBG)
     private val _state =
@@ -30,8 +29,7 @@ class FingerprintScanningStatusTracker @Inject constructor(
 
     suspend fun completeScan() = _scanCompleted.emit(Unit)
 
-    fun setImageQualityCheckingResult(isQualityOk: Boolean) =
-        emitState(if (isQualityOk) Good else Bad)
+    fun setImageQualityCheckingResult(isQualityOk: Boolean) = emitState(if (isQualityOk) Good else Bad)
 
     fun resetToIdle() = emitState(Idle)
 

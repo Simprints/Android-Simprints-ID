@@ -8,7 +8,6 @@ import com.simprints.infra.security.keyprovider.LocalDbKey
 import java.io.File
 
 interface SecurityManager {
-
     companion object {
         /**
          * This is a global shared prefs file other modules can use to store values. Keep in mind
@@ -32,6 +31,8 @@ interface SecurityManager {
      */
     fun checkIfDeviceIsRooted()
 
-    fun getEncryptedFileBuilder(file: File, context: Context): EncryptedFile
-
+    fun getEncryptedFileBuilder(
+        file: File,
+        context: Context,
+    ): EncryptedFile
 }

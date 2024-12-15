@@ -1,8 +1,8 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class AppResponseBuilderUseCaseTest {
-
     @MockK
     lateinit var isNewEnrolment: IsNewEnrolmentUseCase
 
@@ -51,7 +50,7 @@ internal class AppResponseBuilderUseCaseTest {
             handleIdentify,
             handleVerify,
             handleConfirmIdentity,
-            handleEnrolLastBiometric
+            handleEnrolLastBiometric,
         )
     }
 
@@ -98,4 +97,3 @@ internal class AppResponseBuilderUseCaseTest {
         assertThat(useCase(mockk(), null, mockk())).isInstanceOf(AppErrorResponse::class.java)
     }
 }
-

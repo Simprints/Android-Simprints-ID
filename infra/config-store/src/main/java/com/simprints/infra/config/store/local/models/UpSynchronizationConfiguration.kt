@@ -3,21 +3,23 @@ package com.simprints.infra.config.store.local.models
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 
-internal fun UpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration =
-    ProtoUpSynchronizationConfiguration.newBuilder()
-        .setSimprints(simprints.toProto())
-        .setCoSync(coSync.toProto())
-        .build()
+internal fun UpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration = ProtoUpSynchronizationConfiguration
+    .newBuilder()
+    .setSimprints(simprints.toProto())
+    .setCoSync(coSync.toProto())
+    .build()
 
 internal fun UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
-    ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
+    ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
+        .newBuilder()
         .setKind(kind.toProto())
         .setBatchSizes(batchSizes.toProto())
         .setImagesRequireUnmeteredConnection(imagesRequireUnmeteredConnection)
         .build()
 
 internal fun UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.toProto(): ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration =
-    ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.newBuilder()
+    ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
+        .newBuilder()
         .setKind(kind.toProto())
         .build()
 
@@ -29,17 +31,22 @@ internal fun UpSynchronizationConfiguration.UpSynchronizationKind.toProto(): Pro
         UpSynchronizationConfiguration.UpSynchronizationKind.ALL -> ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL
     }
 
-internal fun UpSynchronizationConfiguration.UpSyncBatchSizes.toProto(): ProtoUpSyncBatchSizes = ProtoUpSyncBatchSizes.newBuilder()
-        .setSessions(sessions)
-        .setUpSyncs(upSyncs)
-        .setDownSyncs(downSyncs)
-        .build()
+internal fun UpSynchronizationConfiguration.UpSyncBatchSizes.toProto(): ProtoUpSyncBatchSizes = ProtoUpSyncBatchSizes
+    .newBuilder()
+    .setSessions(sessions)
+    .setUpSyncs(upSyncs)
+    .setDownSyncs(downSyncs)
+    .build()
 
 internal fun ProtoUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration =
     UpSynchronizationConfiguration(simprints.toDomain(), coSync.toDomain())
 
 internal fun ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
-    UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(kind.toDomain(), batchSizes.toDomain(), imagesRequireUnmeteredConnection)
+    UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
+        kind.toDomain(),
+        batchSizes.toDomain(),
+        imagesRequireUnmeteredConnection,
+    )
 
 internal fun ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.toDomain(): UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration =
     UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(kind.toDomain())
@@ -51,7 +58,7 @@ internal fun ProtoUpSynchronizationConfiguration.UpSynchronizationKind.toDomain(
         ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS -> UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL -> UpSynchronizationConfiguration.UpSynchronizationKind.ALL
         ProtoUpSynchronizationConfiguration.UpSynchronizationKind.UNRECOGNIZED -> throw InvalidProtobufEnumException(
-            "invalid UpSynchronizationKind $name"
+            "invalid UpSynchronizationKind $name",
         )
     }
 

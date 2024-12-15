@@ -7,7 +7,6 @@ data class EventCount(
     val count: Int,
     val isLowerBound: Boolean,
 ) {
-
     /**
      * Returns exact count or null if the count is a lower bound.
      */

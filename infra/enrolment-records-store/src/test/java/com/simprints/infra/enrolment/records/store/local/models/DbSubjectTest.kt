@@ -17,9 +17,7 @@ import java.util.Date
 import kotlin.random.Random
 
 class DbSubjectTest {
-
     companion object {
-
         private const val GUID = "3f0f8e9a-0a0c-456c-846e-577b1440b6fb"
         private const val PROJECT_ID = "projectId"
         private val ATTENDANT_ID = "user1".asTokenizableEncrypted()

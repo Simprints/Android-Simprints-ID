@@ -16,10 +16,10 @@ import io.reactivex.Flowable
 import io.reactivex.rxkotlin.subscribeBy
 import java.io.OutputStream
 
-class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
-                         val scannerState: SimulatedScannerStateV2 = SimulatedScannerStateV2())
-    : SimulatedScanner(simulatedScannerManager) {
-
+class SimulatedScannerV2(
+    simulatedScannerManager: SimulatedScannerManager,
+    val scannerState: SimulatedScannerStateV2 = SimulatedScannerStateV2(),
+) : SimulatedScanner(simulatedScannerManager) {
     private lateinit var returnStream: OutputStream
 
     private val simulatedCommandInputStream = SimulatedCommandInputStream()
@@ -37,7 +37,10 @@ class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
     private val simulatedUn20ResponseHelper = SimulatedUn20ResponseHelper(simulatedScannerManager)
         .apply { respondToCommands(simulatedCommandInputStream.un20Commands) }
 
-    override fun handleAppToScannerEvent(bytes: ByteArray, returnStream: OutputStream) {
+    override fun handleAppToScannerEvent(
+        bytes: ByteArray,
+        returnStream: OutputStream,
+    ) {
         this.returnStream = returnStream
         simulatedCommandInputStream.updateWithNewBytes(bytes, scannerState.mode)
     }

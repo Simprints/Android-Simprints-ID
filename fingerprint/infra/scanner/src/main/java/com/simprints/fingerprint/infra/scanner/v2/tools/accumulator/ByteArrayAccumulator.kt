@@ -12,13 +12,13 @@ abstract class ByteArrayAccumulator<in Fragment, Element>(
     val fragmentAsByteArray: (Fragment) -> ByteArray,
     canComputeElementLength: (ByteArray) -> Boolean,
     computeElementLength: (ByteArray) -> Int,
-    buildElement: (ByteArray) -> Element
+    buildElement: (ByteArray) -> Element,
 ) : Accumulator<Fragment, ByteArray, Element>(
-    byteArrayOf(),
-    { fragment -> this + fragmentAsByteArray(fragment) },
-    canComputeElementLength,
-    computeElementLength,
-    { this.size },
-    ByteArray::sliceArray,
-    buildElement
-)
+        byteArrayOf(),
+        { fragment -> this + fragmentAsByteArray(fragment) },
+        canComputeElementLength,
+        computeElementLength,
+        { this.size },
+        ByteArray::sliceArray,
+        buildElement,
+    )

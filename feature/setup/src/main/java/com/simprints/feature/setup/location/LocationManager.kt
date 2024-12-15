@@ -16,7 +16,6 @@ import javax.inject.Inject
 internal class LocationManager @Inject constructor(
     @ApplicationContext val ctx: Context,
 ) {
-
     private val locationClient = LocationServices.getFusedLocationProviderClient(ctx)
 
     @SuppressLint("MissingPermission")

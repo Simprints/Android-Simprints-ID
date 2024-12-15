@@ -37,7 +37,6 @@ import org.junit.Test
 import java.util.UUID
 
 class SyncOrchestratorImplTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -99,7 +98,9 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with any connection if not specified`() = runTest {
         coEvery {
-            configManager.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
+            configManager
+                .getProjectConfiguration()
+                .synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns false
         every { authStore.signedInProjectId } returns "projectId"
 
@@ -109,7 +110,7 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniquePeriodicWork(
                 IMAGE_UP_SYNC_WORK_NAME,
                 any(),
-                match { it.workSpec.constraints.requiredNetworkType == NetworkType.CONNECTED }
+                match { it.workSpec.constraints.requiredNetworkType == NetworkType.CONNECTED },
             )
         }
     }
@@ -117,7 +118,9 @@ class SyncOrchestratorImplTest {
     @Test
     fun `schedules images with unmetered constraint if requested`() = runTest {
         coEvery {
-            configManager.getProjectConfiguration().synchronization.up.simprints.imagesRequireUnmeteredConnection
+            configManager
+                .getProjectConfiguration()
+                .synchronization.up.simprints.imagesRequireUnmeteredConnection
         } returns true
         every { authStore.signedInProjectId } returns "projectId"
         coEvery { shouldScheduleFirmwareUpdate.invoke() } returns false
@@ -128,7 +131,7 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniquePeriodicWork(
                 IMAGE_UP_SYNC_WORK_NAME,
                 any(),
-                match { it.workSpec.constraints.requiredNetworkType == NetworkType.UNMETERED }
+                match { it.workSpec.constraints.requiredNetworkType == NetworkType.UNMETERED },
             )
         }
     }
@@ -171,7 +174,7 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniqueWork(
                 DEVICE_SYNC_WORK_NAME_ONE_TIME,
                 any(),
-                any<OneTimeWorkRequest>()
+                any<OneTimeWorkRequest>(),
             )
         }
     }
@@ -186,7 +189,8 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniquePeriodicWork(
                 EVENT_SYNC_WORK_NAME,
                 any(),
-                match { it.tags.containsAll(setOf("tag1", "tag2")) })
+                match { it.tags.containsAll(setOf("tag1", "tag2")) },
+            )
         }
     }
 
@@ -213,7 +217,7 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniqueWork(
                 EVENT_SYNC_WORK_NAME_ONE_TIME,
                 any(),
-                match<OneTimeWorkRequest> { it.tags.containsAll(setOf("tag1", "tag2")) }
+                match<OneTimeWorkRequest> { it.tags.containsAll(setOf("tag1", "tag2")) },
             )
         }
     }
@@ -253,14 +257,14 @@ class SyncOrchestratorImplTest {
                 any(),
                 match<OneTimeWorkRequest> { oneTimeWorkRequest ->
                     val subjectIdsInput = oneTimeWorkRequest.workSpec.input.getStringArray(
-                        RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
+                        RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME,
                     )
                     val instructionIdInput = oneTimeWorkRequest.workSpec.input.getString(
-                        RECORD_UPLOAD_INPUT_ID_NAME
+                        RECORD_UPLOAD_INPUT_ID_NAME,
                     )
                     instructionIdInput == INSTRUCTION_ID &&
                         subjectIdsInput.contentEquals(arrayOf(SUBJECT_ID))
-                }
+                },
             )
         }
     }
@@ -293,7 +297,7 @@ class SyncOrchestratorImplTest {
             workManager.enqueueUniquePeriodicWork(
                 IMAGE_UP_SYNC_WORK_NAME,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-                any()
+                any(),
             )
         }
     }
@@ -323,15 +327,13 @@ class SyncOrchestratorImplTest {
         CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
     )
 
-    private fun mockFuture(workInfo: List<WorkInfo>) =
-        mockk<ListenableFuture<List<WorkInfo>>> { every { get() } returns workInfo }
+    private fun mockFuture(workInfo: List<WorkInfo>) = mockk<ListenableFuture<List<WorkInfo>>> { every { get() } returns workInfo }
 
     private fun createWorkInfo(state: WorkInfo.State) = listOf(
-        WorkInfo(UUID.randomUUID(), state, emptySet())
+        WorkInfo(UUID.randomUUID(), state, emptySet()),
     )
 
     companion object {
-
         private const val INSTRUCTION_ID = "id"
         private const val SUBJECT_ID = "subjectId"
     }

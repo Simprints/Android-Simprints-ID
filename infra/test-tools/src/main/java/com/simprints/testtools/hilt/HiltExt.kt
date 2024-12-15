@@ -32,22 +32,23 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     initialState: Lifecycle.State = Lifecycle.State.RESUMED,
     @StyleRes themeResId: Int = MR.style.Theme_MaterialComponents,
     navController: NavController? = null,
-    crossinline action: Fragment.() -> Unit = {}
+    crossinline action: Fragment.() -> Unit = {},
 ) {
-    val startActivityIntent = Intent.makeMainActivity(
-        ComponentName(
-            ApplicationProvider.getApplicationContext(),
-            HiltTestActivity::class.java
+    val startActivityIntent = Intent
+        .makeMainActivity(
+            ComponentName(
+                ApplicationProvider.getApplicationContext(),
+                HiltTestActivity::class.java,
+            ),
+        ).putExtra(
+            "androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY",
+            themeResId,
         )
-    ).putExtra(
-        "androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY",
-        themeResId
-    )
 
     ActivityScenario.launch<HiltTestActivity>(startActivityIntent).onActivity { activity ->
         val fragment: Fragment = activity.supportFragmentManager.fragmentFactory.instantiate(
             checkNotNull(T::class.java.classLoader),
-            T::class.java.name
+            T::class.java.name,
         )
         fragment.arguments = fragmentArgs
         fragment.viewLifecycleOwnerLiveData.observeForever { owner ->
@@ -73,7 +74,10 @@ fun FragmentActivity.moveToState(state: Lifecycle.State) {
     }
 }
 
-fun testNavController(graph: Int, startDestination: Int? = null): TestNavHostController {
+fun testNavController(
+    graph: Int,
+    startDestination: Int? = null,
+): TestNavHostController {
     val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
     navController.setGraph(graph)
     startDestination?.also { navController.setCurrentDestination(it) }

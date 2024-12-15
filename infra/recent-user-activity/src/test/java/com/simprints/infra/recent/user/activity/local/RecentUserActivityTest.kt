@@ -7,7 +7,6 @@ import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import org.junit.Test
 
 class RecentUserActivityTest {
-
     companion object {
         private val recentUserActivity = RecentUserActivity(
             "version",
@@ -16,10 +15,11 @@ class RecentUserActivityTest {
             10,
             20,
             30,
-            50L
+            50L,
         )
 
-        private val protoRecentUserActivity = ProtoRecentUserActivity.newBuilder()
+        private val protoRecentUserActivity = ProtoRecentUserActivity
+            .newBuilder()
             .setLastScannerVersion("version")
             .setLastScannerUsed("scanner")
             .setLastUserUsed("user")

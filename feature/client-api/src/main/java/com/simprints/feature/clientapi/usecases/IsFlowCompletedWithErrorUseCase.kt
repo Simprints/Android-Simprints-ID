@@ -7,7 +7,6 @@ import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Code is basically a just mapping of constants to boolean")
 internal class IsFlowCompletedWithErrorUseCase @Inject constructor() {
-
     operator fun invoke(errorResponse: AppErrorResponse) = when (errorResponse.reason) {
         AppErrorReason.UNEXPECTED_ERROR,
         AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,

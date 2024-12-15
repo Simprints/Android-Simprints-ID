@@ -2,11 +2,10 @@ package com.simprints.fingerprint.infra.scannermock.simulated.common
 
 enum class SimulationSpeedBehaviour {
     INSTANT,
-    REALISTIC
+    REALISTIC,
 }
 
 object RealisticSpeedBehaviour {
-
     const val DEFAULT_RESPONSE_DELAY_MS = 100L
     const val CAPTURE_FINGERPRINT_DELAY_MS = 2000L
 

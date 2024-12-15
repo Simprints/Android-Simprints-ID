@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class ScannerOtaOperationsWrapperTest {
-
     private lateinit var scannerWrapper: ScannerOtaOperationsWrapper
 
     @MockK
@@ -35,7 +34,7 @@ internal class ScannerOtaOperationsWrapperTest {
             cypressOtaHelper,
             stmOtaHelper,
             un20OtaHelper,
-            UnconfinedTestDispatcher()
+            UnconfinedTestDispatcher(),
         )
     }
 
@@ -50,7 +49,6 @@ internal class ScannerOtaOperationsWrapperTest {
         every { cypressOtaHelper.performOtaSteps(any(), any(), any()) } returns mockk()
         scannerWrapper.performCypressOta("")
     }
-
 
     @Test(expected = OtaFailedException::class)
     fun `should throw OtaFailedException if stm performOtaSteps throws `(): Unit = runTest {
@@ -75,5 +73,4 @@ internal class ScannerOtaOperationsWrapperTest {
         every { un20OtaHelper.performOtaSteps(any(), any(), any()) } returns mockk()
         scannerWrapper.performUn20Ota("")
     }
-
 }

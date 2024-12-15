@@ -1,6 +1,6 @@
 package com.simprints.face.capture.usecases
 
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -11,22 +11,23 @@ internal class SaveFaceImageUseCase @Inject constructor(
     private val coreImageRepository: ImageRepository,
     private val sessionEventRepository: SessionEventRepository,
 ) {
+    suspend operator fun invoke(
+        imageBytes: ByteArray,
+        captureEventId: String,
+    ): SecuredImageRef? = determinePath(captureEventId)?.let { path ->
+        Simber.d("Saving face image ${path.compose()}")
+        val sessionScope = sessionEventRepository.getCurrentSessionScope()
+        val projectId = sessionScope.projectId
+        val securedImageRef =
+            coreImageRepository.storeImageSecurely(imageBytes, projectId, path)
 
-    suspend operator fun invoke(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
-        determinePath(captureEventId)?.let { path ->
-            Simber.d("Saving face image ${path.compose()}")
-            val sessionScope = sessionEventRepository.getCurrentSessionScope()
-            val projectId = sessionScope.projectId
-            val securedImageRef =
-                coreImageRepository.storeImageSecurely(imageBytes, projectId, path)
-
-            if (securedImageRef != null) {
-                SecuredImageRef(securedImageRef.relativePath)
-            } else {
-                Simber.e("Saving image failed for captureId $captureEventId")
-                null
-            }
+        if (securedImageRef != null) {
+            SecuredImageRef(securedImageRef.relativePath)
+        } else {
+            Simber.e("Saving image failed for captureId $captureEventId")
+            null
         }
+    }
 
     private suspend fun determinePath(captureEventId: String): Path? = try {
         val sessionScope = sessionEventRepository.getCurrentSessionScope()
@@ -36,8 +37,8 @@ internal class SaveFaceImageUseCase @Inject constructor(
                 SESSIONS_PATH,
                 sessionId,
                 FACES_PATH,
-                "$captureEventId.jpg"
-            )
+                "$captureEventId.jpg",
+            ),
         )
     } catch (t: Throwable) {
         Simber.e(t)
@@ -45,7 +46,6 @@ internal class SaveFaceImageUseCase @Inject constructor(
     }
 
     companion object {
-
         const val SESSIONS_PATH = "sessions"
         const val FACES_PATH = "faces"
     }

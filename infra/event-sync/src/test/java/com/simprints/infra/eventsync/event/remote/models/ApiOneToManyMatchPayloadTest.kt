@@ -6,7 +6,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class ApiOneToManyMatchPayloadTest {
-
     @Test
     fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
         val payload = ApiOneToManyMatchPayload(
@@ -14,7 +13,7 @@ class ApiOneToManyMatchPayloadTest {
             endTime = ApiTimestamp(0L, false, 0L),
             pool = mockk(),
             matcher = "",
-            result = null
+            result = null,
         )
         TokenKeyType.values().forEach {
             assertThat(payload.getTokenizedFieldJsonPath(it)).isNull()

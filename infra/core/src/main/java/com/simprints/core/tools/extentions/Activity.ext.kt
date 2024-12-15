@@ -13,28 +13,29 @@ import com.simprints.core.domain.permission.PermissionStatus
 fun Activity.hideKeyboard() {
     val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     var focusedView = currentFocus
-    if (focusedView == null)
+    if (focusedView == null) {
         focusedView = View(this)
+    }
     val flags = 0
     inputMethodManager.hideSoftInputFromWindow(focusedView.windowToken, flags)
 }
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-fun Activity.hasPermission(permission: String): Boolean {
-    return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
-}
+fun Activity.hasPermission(permission: String): Boolean = checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 fun Activity.hasPermissions(permissions: Array<String>): Boolean = permissions.all(::hasPermission)
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-fun Activity.permissionFromResult(permission: String, grantResult: Boolean): PermissionStatus =
-    when (grantResult) {
-        true -> PermissionStatus.Granted
-        else -> {
-            when (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-                true -> PermissionStatus.Denied
-                false -> PermissionStatus.DeniedNeverAskAgain
-            }
+fun Activity.permissionFromResult(
+    permission: String,
+    grantResult: Boolean,
+): PermissionStatus = when (grantResult) {
+    true -> PermissionStatus.Granted
+    else -> {
+        when (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+            true -> PermissionStatus.Denied
+            false -> PermissionStatus.DeniedNeverAskAgain
         }
     }
+}

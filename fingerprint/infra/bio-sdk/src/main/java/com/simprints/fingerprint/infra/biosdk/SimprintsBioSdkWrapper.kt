@@ -11,46 +11,46 @@ import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerp
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import javax.inject.Inject
 
-
 class SimprintsBioSdkWrapper @Inject constructor(
-    private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings>
+    private val bioSdk:
+        FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings>,
 ) : BioSdkWrapper {
-
     override val scanningTimeoutMs
         get() = 3000L
     override val imageTransferTimeoutMs
         get() = 3000L
 
     override val matcherName: String
-        get()= bioSdk.matcherName
+        get() = bioSdk.matcherName
     override val supportedTemplateFormat: String
         get() = bioSdk.supportedTemplateFormat
+
     override suspend fun initialize() {
         bioSdk.initialize()
     }
 
     override suspend fun match(
         probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>, isCrossFingerMatchingEnabled: Boolean
+        candidates: List<FingerprintIdentity>,
+        isCrossFingerMatchingEnabled: Boolean,
     ) = bioSdk.match(probe, candidates, SimAfisMatcherSettings(isCrossFingerMatchingEnabled))
 
     override suspend fun acquireFingerprintTemplate(
         capturingResolution: Int?,
         timeOutMs: Int,
         qualityThreshold: Int,
-        allowLowQualityExtraction: Boolean
+        allowLowQualityExtraction: Boolean,
     ): AcquireFingerprintTemplateResponse {
         val settings = FingerprintTemplateAcquisitionSettings(
             capturingResolution?.let { Dpi(it.toShort()) },
             timeOutMs,
             qualityThreshold,
-            allowLowQualityExtraction
+            allowLowQualityExtraction,
         )
         return bioSdk.acquireFingerprintTemplate(settings).toDomain()
     }
 
     override suspend fun acquireFingerprintImage() = bioSdk.acquireFingerprintImage().toDomain()
-
 }
 
 private fun TemplateResponse<FingerprintTemplateMetadata>.toDomain(): AcquireFingerprintTemplateResponse {
@@ -60,6 +60,6 @@ private fun TemplateResponse<FingerprintTemplateMetadata>.toDomain(): AcquireFin
     return AcquireFingerprintTemplateResponse(
         template,
         templateMetadata!!.templateFormat,
-        templateMetadata!!.imageQualityScore
+        templateMetadata!!.imageQualityScore,
     )
 }

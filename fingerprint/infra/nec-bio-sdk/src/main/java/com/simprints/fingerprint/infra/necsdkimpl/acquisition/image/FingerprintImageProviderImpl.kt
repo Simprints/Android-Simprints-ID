@@ -6,9 +6,8 @@ import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import javax.inject.Inject
 
 internal class FingerprintImageProviderImpl @Inject constructor(
-    private val imageCache: ProcessedImageCache
+    private val imageCache: ProcessedImageCache,
 ) : FingerprintImageProvider<Unit, Unit> {
-
     /**
      * Acquire fingerprint image from the image cache
      * The image should be already captured by the time this method is called

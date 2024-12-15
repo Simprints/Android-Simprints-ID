@@ -19,12 +19,14 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate_subject_pool) {
-
     private val viewModel: ValidateSubjectPoolViewModel by viewModels()
     private val binding by viewBinding(FragmentValidateSubjectPoolBinding::bind)
     private val args: ValidateSubjectPoolFragmentArgs by navArgs()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.state.observe(viewLifecycleOwner, LiveDataEventWithContentObserver(::renderState))

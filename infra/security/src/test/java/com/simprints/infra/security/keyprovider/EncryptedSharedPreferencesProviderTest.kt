@@ -13,9 +13,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-
 internal class EncryptedSharedPreferencesProviderTest {
-
     @MockK
     lateinit var context: Context
     private lateinit var provider: EncryptedSharedPreferencesProvider
@@ -40,9 +38,8 @@ internal class EncryptedSharedPreferencesProviderTest {
         every { EncryptedSharedPreferences.create(any(), any(), any(), any(), any()) } returns spy
         provider.provideEncryptedSharedPreferences(
             filename = filename,
-            masterKeyAlias = masterKeyAlias
+            masterKeyAlias = masterKeyAlias,
         )
         verify(exactly = 1) { EncryptedSharedPreferences.create(any(), any(), any(), any(), any()) }
     }
-
 }

@@ -15,7 +15,6 @@ data class CandidateReadEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endTime: Timestamp,
@@ -30,9 +29,9 @@ data class CandidateReadEvent(
             endedAt = endTime,
             candidateId = candidateId,
             localResult = localResult,
-            remoteResult = remoteResult
+            remoteResult = remoteResult,
         ),
-        CANDIDATE_READ
+        CANDIDATE_READ,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
@@ -47,17 +46,20 @@ data class CandidateReadEvent(
         val localResult: LocalResult,
         val remoteResult: RemoteResult?,
         override val endedAt: Timestamp?,
-        override val type: EventType = CANDIDATE_READ
+        override val type: EventType = CANDIDATE_READ,
     ) : EventPayload() {
+        override fun toSafeString(): String = "guid: $candidateId, local: $localResult, remote: $remoteResult"
 
         @Keep
         enum class LocalResult {
-            FOUND, NOT_FOUND
+            FOUND,
+            NOT_FOUND,
         }
 
         @Keep
         enum class RemoteResult {
-            FOUND, NOT_FOUND
+            FOUND,
+            NOT_FOUND,
         }
     }
 

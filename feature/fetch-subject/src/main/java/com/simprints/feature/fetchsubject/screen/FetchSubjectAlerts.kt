@@ -11,7 +11,6 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal object FetchSubjectAlerts {
-
     const val ACTION_CLOSE = "action_close"
     const val ACTION_RETRY = "action_retry"
 
@@ -23,7 +22,7 @@ internal object FetchSubjectAlerts {
         appErrorReason = AppErrorReason.GUID_NOT_FOUND_ONLINE
         eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.GUID_NOT_FOUND_ONLINE
 
-        leftButton =  AlertButtonConfig.Close.copy(resultKey = ACTION_CLOSE)
+        leftButton = AlertButtonConfig.Close.copy(resultKey = ACTION_CLOSE)
     }
 
     fun subjectNotFoundOffline() = alertConfiguration {

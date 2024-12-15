@@ -15,5 +15,5 @@ enum class IFingerIdentifier {
     LEFT_INDEX_FINGER,
     LEFT_3RD_FINGER,
     LEFT_4TH_FINGER,
-    LEFT_5TH_FINGER
+    LEFT_5TH_FINGER,
 }

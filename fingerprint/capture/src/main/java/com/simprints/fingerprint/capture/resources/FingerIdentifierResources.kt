@@ -1,12 +1,11 @@
 package com.simprints.fingerprint.capture.resources
 
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.simprints.infra.resources.R as IDR
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.capture.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
@@ -37,8 +36,3 @@ internal fun IFingerIdentifier.nameTextId(): Int = when (this) {
     IFingerIdentifier.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
     IFingerIdentifier.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
 }
-
-@ExcludedFromGeneratedTestCoverageReports("UI code")
-@Suppress("unused")
-@ColorRes
-internal fun IFingerIdentifier.nameTextColour(): Int = IDR.color.simprints_blue

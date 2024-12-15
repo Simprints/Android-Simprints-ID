@@ -11,7 +11,6 @@ data class LoginResult(
 
 @Keep
 enum class LoginError {
-
     LoginNotCompleted,
 
     IntegrityServiceError,
@@ -19,6 +18,4 @@ enum class LoginError {
     OutdatedPlayServices,
     MissingOrOutdatedPlayServices,
     Unknown,
-    ;
-
 }

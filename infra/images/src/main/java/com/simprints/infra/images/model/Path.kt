@@ -16,7 +16,10 @@ import java.io.Serializable
  */
 @Keep
 @Parcelize
-data class Path(val parts: Array<String>) : Parcelable, Serializable {
+data class Path(
+    val parts: Array<String>,
+) : Parcelable,
+    Serializable {
     /**
      * Constructor with a string path
      * @param pathString the path as a string
@@ -54,25 +57,26 @@ data class Path(val parts: Array<String>) : Parcelable, Serializable {
      * @return the path without the subset
      */
     fun remove(subset: Array<String>): Path {
-        val resultParts = parts.toMutableList().apply {
-            removeAll(subset.toSet())
-        }.toTypedArray()
+        val resultParts = parts
+            .toMutableList()
+            .apply {
+                removeAll(subset.toSet())
+            }.toTypedArray()
 
         return Path(resultParts)
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other == null || other !is Path)
+        if (other == null || other !is Path) {
             return false
+        }
 
         return parts.contentEquals(other.parts)
     }
 
     override fun hashCode(): Int = parts.contentHashCode() * 2 + 27
 
-    override fun toString(): String {
-        return super.toString()
-    }
+    override fun toString(): String = super.toString()
 
     companion object {
         /**
@@ -82,7 +86,10 @@ data class Path(val parts: Array<String>) : Parcelable, Serializable {
          * @param last the last part.
          * @return a Path object combining both parts
          */
-        fun combine(first: String, last: Path): Path {
+        fun combine(
+            first: String,
+            last: Path,
+        ): Path {
             val parts = arrayOf(first, *last.parts)
             return Path(parts)
         }
@@ -98,5 +105,4 @@ data class Path(val parts: Array<String>) : Parcelable, Serializable {
             return Path(parts)
         }
     }
-
 }

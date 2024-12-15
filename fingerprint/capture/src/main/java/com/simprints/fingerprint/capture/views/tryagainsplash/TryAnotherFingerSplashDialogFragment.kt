@@ -10,18 +10,18 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class TryAnotherFingerSplashDialogFragment : DialogFragment(R.layout.activity_splash_screen) {
-
     private val vm: TryAnotherFingerViewModel by viewModels()
 
     override fun getTheme() = IDR.style.Theme_Simprints_Dialog_FullScreen
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         vm.dismiss.observe(viewLifecycleOwner) {
             if (it) dismissAllowingStateLoss()
         }
     }
-
 }
-

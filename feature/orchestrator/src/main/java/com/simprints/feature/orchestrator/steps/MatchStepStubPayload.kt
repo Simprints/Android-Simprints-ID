@@ -23,7 +23,6 @@ internal data class MatchStepStubPayload(
     val biometricDataSource: BiometricDataSource,
     val fingerprintSDK: FingerprintConfiguration.BioSdk?,
 ) : Parcelable {
-
     fun toFaceStepArgs(samples: List<MatchParams.FaceSample>) = MatchContract.getArgs(
         faceSamples = samples,
         flowType = flowType,
@@ -35,7 +34,7 @@ internal data class MatchStepStubPayload(
         fingerprintSamples = samples,
         fingerprintSDK = fingerprintSDK,
         flowType = flowType,
-        subjectQuery =    subjectQuery,
+        subjectQuery = subjectQuery,
         biometricDataSource = biometricDataSource,
     )
 

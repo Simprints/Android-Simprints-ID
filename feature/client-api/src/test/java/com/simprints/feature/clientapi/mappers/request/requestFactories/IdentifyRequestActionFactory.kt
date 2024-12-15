@@ -11,10 +11,12 @@ import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.mockk
 
 internal object IdentifyRequestActionFactory : RequestActionFactory() {
-
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
         actionName = ActionConstants.ACTION_IDENTIFY,
+        callerPackageName = "",
+        contractVersion = 1,
+        timestampMs = 0L,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.IdentifyActionRequest(
@@ -24,26 +26,23 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
         userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
-        callerPackageName = MOCK_CALLER_PACKAGE_NAME,
-        unknownExtras = emptyMap()
+        unknownExtras = emptyMap(),
     )
 
     override fun getValidator(extractor: ActionRequestExtractor): IdentifyValidator =
         IdentifyValidator(extractor as IdentifyRequestExtractor)
 
-    override fun getBuilder(extractor: ActionRequestExtractor): IdentifyRequestBuilder =
-        IdentifyRequestBuilder(
-            actionIdentifier = getIdentifier(),
-            extractor = extractor as IdentifyRequestExtractor,
-            project = mockk(),
-            tokenizationProcessor = mockk(),
-            validator = getValidator(extractor)
-        )
+    override fun getBuilder(extractor: ActionRequestExtractor): IdentifyRequestBuilder = IdentifyRequestBuilder(
+        actionIdentifier = getIdentifier(),
+        extractor = extractor as IdentifyRequestExtractor,
+        project = mockk(),
+        tokenizationProcessor = mockk(),
+        validator = getValidator(extractor),
+    )
 
     override fun getMockExtractor(): IdentifyRequestExtractor {
         val mockIdentifyExtractor = mockk<IdentifyRequestExtractor>()
         setMockDefaultExtractor(mockIdentifyExtractor)
         return mockIdentifyExtractor
     }
-
 }

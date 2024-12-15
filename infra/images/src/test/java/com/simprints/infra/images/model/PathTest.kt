@@ -5,7 +5,6 @@ import org.junit.Test
 import java.io.File
 
 class PathTest {
-
     @Test
     fun shouldComposePathOutOfString() {
         val path = Path("dir${File.separator}file.txt")
@@ -28,13 +27,15 @@ class PathTest {
             arrayOf(
                 "dir1",
                 "dir2",
-                "file.txt"
-            )
+                "file.txt",
+            ),
         )
 
         val result = Path.combine(first, subDirs)
 
-        assertThat(result.compose()).isEqualTo("${File.separator}home${File.separator}test${File.separator}dir1${File.separator}dir2${File.separator}file.txt")
+        assertThat(
+            result.compose(),
+        ).isEqualTo("${File.separator}home${File.separator}test${File.separator}dir1${File.separator}dir2${File.separator}file.txt")
     }
 
     @Test
@@ -54,8 +55,8 @@ class PathTest {
                 "dir1",
                 "dir2",
                 "dir3",
-                "file.txt"
-            )
+                "file.txt",
+            ),
         )
 
         val subset = arrayOf("dir1", "dir2")
@@ -71,8 +72,8 @@ class PathTest {
                 "dir1",
                 "dir2",
                 "dir3",
-                "file.txt"
-            )
+                "file.txt",
+            ),
         )
 
         val actual = originalPath.remove("dir700").compose()
@@ -87,8 +88,8 @@ class PathTest {
                 "dir1",
                 "dir2",
                 "dir3",
-                "file.txt"
-            )
+                "file.txt",
+            ),
         )
 
         val subPath =
@@ -105,8 +106,8 @@ class PathTest {
                 "dir1",
                 "dir2",
                 "dir3",
-                "file.txt"
-            )
+                "file.txt",
+            ),
         )
 
         val subPath = Path("dir700")
@@ -114,5 +115,4 @@ class PathTest {
 
         assertThat(actual).isEqualTo("dir1${File.separator}dir2${File.separator}dir3${File.separator}file.txt")
     }
-
 }

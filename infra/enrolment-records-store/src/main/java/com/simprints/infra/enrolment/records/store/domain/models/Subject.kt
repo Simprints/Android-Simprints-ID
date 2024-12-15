@@ -5,7 +5,7 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import java.util.Date
 
 @Parcelize
 data class Subject(
@@ -17,7 +17,6 @@ data class Subject(
     val updatedAt: Date? = null,
     var fingerprintSamples: List<FingerprintSample> = emptyList(),
     var faceSamples: List<FaceSample> = emptyList(),
-
     @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
-    val toSync: Boolean = false
+    val toSync: Boolean = false,
 ) : Parcelable

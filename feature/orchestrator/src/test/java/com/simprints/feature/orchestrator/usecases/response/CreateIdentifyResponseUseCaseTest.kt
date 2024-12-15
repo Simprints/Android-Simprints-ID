@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases.response
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -18,7 +18,6 @@ import org.junit.Test
 import java.io.Serializable
 
 class CreateIdentifyResponseUseCaseTest {
-
     @MockK
     lateinit var eventRepository: SessionEventRepository
 
@@ -40,7 +39,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { face?.decisionPolicy } returns null
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
-            results = listOf(createFaceMatchResult(10f, 20f, 30f))
+            results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isEmpty()
@@ -54,7 +53,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
-            results = listOf(createFaceMatchResult(10f, 20f, 30f))
+            results = listOf(createFaceMatchResult(10f, 20f, 30f)),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -69,7 +68,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
-            results = listOf(createFaceMatchResult(20f, 25f, 30f, 40f))
+            results = listOf(createFaceMatchResult(20f, 25f, 30f, 40f)),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -84,7 +83,7 @@ class CreateIdentifyResponseUseCaseTest {
                 every { face?.decisionPolicy } returns DecisionPolicy(20, 50, 100)
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns null
             },
-            results = listOf(createFaceMatchResult(15f, 30f, 100f))
+            results = listOf(createFaceMatchResult(15f, 30f, 100f)),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -100,10 +99,10 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
-                    100
+                    100,
                 )
             },
-            results = listOf(createFingerprintMatchResult(10f, 20f, 30f))
+            results = listOf(createFingerprintMatchResult(10f, 20f, 30f)),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -119,10 +118,10 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
-                    100
+                    100,
                 )
             },
-            results = listOf(createFingerprintMatchResult(20f, 25f, 30f, 40f))
+            results = listOf(createFingerprintMatchResult(20f, 25f, 30f, 40f)),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -138,10 +137,10 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
-                    100
+                    100,
                 )
             },
-            results = listOf(createFingerprintMatchResult(15f, 30f, 100f))
+            results = listOf(createFingerprintMatchResult(15f, 30f, 100f)),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -157,19 +156,18 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
-                    100
+                    100,
                 )
             },
             results = listOf(
                 createFaceMatchResult(15f, 30f, 100f),
                 createFingerprintMatchResult(15f, 30f, 105f),
-            )
+            ),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
         assertThat(result.identifications.map { it.confidenceScore }).isEqualTo(listOf(105))
     }
-
 
     @Test
     fun `Returns face matches if both modalities available and face has higher confidence`() = runTest {
@@ -180,13 +178,13 @@ class CreateIdentifyResponseUseCaseTest {
                 every { fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns DecisionPolicy(
                     20,
                     50,
-                    100
+                    100,
                 )
             },
             results = listOf(
                 createFaceMatchResult(15f, 30f, 105f),
                 createFingerprintMatchResult(15f, 30f, 100f),
-            )
+            ),
         )
 
         assertThat((result as AppIdentifyResponse).identifications).isNotEmpty()
@@ -194,11 +192,11 @@ class CreateIdentifyResponseUseCaseTest {
     }
 
     private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) }
+        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) },
     )
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
         confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) },
-        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER,
     )
 }

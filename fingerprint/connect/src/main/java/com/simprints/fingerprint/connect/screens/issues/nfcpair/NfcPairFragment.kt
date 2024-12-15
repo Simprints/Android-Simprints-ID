@@ -38,7 +38,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
-
     private val binding by viewBinding(FragmentNfcPairBinding::bind)
     private val viewModel: NfcPairViewModel by viewModels()
     private val connectViewModel: ConnectScannerViewModel by activityViewModels()
@@ -58,13 +57,15 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
     @Inject
     lateinit var recentUserActivityManager: RecentUserActivityManager
 
-
     private lateinit var bluetoothPairStateChangeReceiver: BroadcastReceiver
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
     private var determineWhetherPairingWasSuccessfulJob: Job? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         screenReporter.reportNfcPairing()
 
@@ -73,12 +74,18 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
         binding.couldNotPairTextView.paintFlags = binding.couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         binding.couldNotPairTextView.setOnClickListener { goToSerialEntryPair() }
 
-        viewModel.showToastWithStringRes.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            requireContext().showToast(it)
-        })
-        viewModel.awaitingToPairToMacAddress.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            handleAwaitingPair(it)
-        })
+        viewModel.showToastWithStringRes.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                requireContext().showToast(it)
+            },
+        )
+        viewModel.awaitingToPairToMacAddress.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                handleAwaitingPair(it)
+            },
+        )
     }
 
     private fun setupScannerPhoneTappingAnimation() {
@@ -98,11 +105,11 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
         super.onStart()
         bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
             onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
-            onPairFailed = ::handlePairingAttemptFailed
+            onPairFailed = ::handlePairingAttemptFailed,
         )
         requireActivity().registerReceiver(
             bluetoothPairStateChangeReceiver,
-            IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED)
+            IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED),
         )
     }
 
@@ -141,7 +148,7 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
             nfcPairingProgressBar.visibility = View.VISIBLE
             nfcPairInstructionsTextView.text = String.format(
                 getString(IDR.string.fingerprint_connect_nfc_pairing_in_progress),
-                serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
+                serialNumberConverter.convertMacAddressToSerialNumber(macAddress),
             )
         }
 
@@ -181,7 +188,7 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
                 } else {
                     getString(
                         IDR.string.fingerprint_connect_nfc_pairing_try_again_instruction,
-                        serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
+                        serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()),
                     )
                 }
                 tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
@@ -199,7 +206,6 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
     }
 
     companion object {
-
         private const val PAIRING_WAIT_TIMEOUT = 6000L
     }
 }

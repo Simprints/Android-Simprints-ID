@@ -9,7 +9,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class ScannerConnectionEventTest {
-
     @Test
     fun create_ScannerConnectionEvent() {
         val scannerInfoArg = ScannerInfo("scanner_id", "mac_address", VERO_1, "hardware_version")
@@ -19,8 +18,8 @@ class ScannerConnectionEventTest {
                 "scanner_id",
                 "mac_address",
                 ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1,
-                "hardware_version"
-            )
+                "hardware_version",
+            ),
         )
 
         assertThat(event.id).isNotNull()

@@ -17,7 +17,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 internal class ConfirmIdentifyRequestBuilderTest {
-
     @Test
     fun `ConfirmActionRequest should contain mandatory fields`() {
         val extractor = ConfirmIdentityActionFactory.getMockExtractor()
@@ -31,11 +30,14 @@ internal class ConfirmIdentifyRequestBuilderTest {
             actionIdentifier = ActionRequestIdentifier(
                 actionName = RequestActionFactory.MOCK_PACKAGE,
                 packageName = ActionConstants.ACTION_CONFIRM_IDENTITY,
+                callerPackageName = "",
+                contractVersion = 1,
+                timestampMs = 0L,
             ),
             extractor = extractor,
             project = project,
             tokenizationProcessor = tokenizationProcessor,
-            validator = validator
+            validator = validator,
         ).build() as ActionRequest.ConfirmIdentityActionRequest
 
         assertThat(action.projectId).isEqualTo(MOCK_PROJECT_ID)

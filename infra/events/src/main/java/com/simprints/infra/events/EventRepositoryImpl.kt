@@ -37,9 +37,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     validatorsFactory: SessionEventValidatorsFactory,
     private val configRepository: ConfigRepository,
 ) : EventRepository {
-
     companion object {
-
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
     }
 
@@ -50,7 +48,10 @@ internal open class EventRepositoryImpl @Inject constructor(
             PROJECT_ID_FOR_NOT_SIGNED_IN
         }
 
-    override suspend fun createEventScope(type: EventScopeType, scopeId: String?): EventScope {
+    override suspend fun createEventScope(
+        type: EventScopeType,
+        scopeId: String?,
+    ): EventScope {
         val eventScope = reportException {
             val projectConfiguration = configRepository.getProjectConfiguration()
             val deviceConfiguration = configRepository.getDeviceConfiguration()
@@ -70,12 +71,12 @@ internal open class EventRepositoryImpl @Inject constructor(
                     device = Device(
                         VERSION.SDK_INT.toString(),
                         Build.MANUFACTURER + "_" + Build.MODEL,
-                        deviceId
+                        deviceId,
                     ),
                     databaseInfo = DatabaseInfo(sessionCount),
                     projectConfigurationUpdatedAt = projectConfiguration.updatedAt,
                     projectConfigurationId = projectConfiguration.id,
-                )
+                ),
             )
         }
 
@@ -86,7 +87,10 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun getEventScope(downSyncEventScopeId: String): EventScope? =
         eventLocalDataSource.loadEventScope(downSyncEventScopeId)
 
-    override suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?) {
+    override suspend fun closeEventScope(
+        eventScope: EventScope,
+        reason: EventScopeEndCause?,
+    ) {
         if (eventScope.projectId == PROJECT_ID_FOR_NOT_SIGNED_IN) {
             eventLocalDataSource.deleteEventScope(scopeId = eventScope.id)
             eventLocalDataSource.deleteEventsInScope(scopeId = eventScope.id)
@@ -99,24 +103,32 @@ internal open class EventRepositoryImpl @Inject constructor(
             return
         }
 
-        val maxTimestamp = eventLocalDataSource.loadEventsInScope(eventScope.id)
+        val maxTimestamp = eventLocalDataSource
+            .loadEventsInScope(eventScope.id)
             .maxOf { event -> event.payload.let { it.endedAt ?: it.createdAt } }
 
         val updatedSessionScope = eventScope.copy(
             endedAt = maxTimestamp,
             payload = eventScope.payload.copy(
-                endCause = reason ?: EventScopeEndCause.WORKFLOW_ENDED
-            )
+                endCause = reason ?: EventScopeEndCause.WORKFLOW_ENDED,
+            ),
         )
         saveEventScope(updatedSessionScope)
     }
 
-    override suspend fun closeEventScope(eventScopeId: String, reason: EventScopeEndCause?) {
+    override suspend fun closeEventScope(
+        eventScopeId: String,
+        reason: EventScopeEndCause?,
+    ) {
         getEventScope(eventScopeId)?.let { closeEventScope(it, reason) }
     }
 
-    override suspend fun closeAllOpenScopes(type: EventScopeType, reason: EventScopeEndCause?) {
-        eventLocalDataSource.loadOpenedScopes(type)
+    override suspend fun closeAllOpenScopes(
+        type: EventScopeType,
+        reason: EventScopeEndCause?,
+    ) {
+        eventLocalDataSource
+            .loadOpenedScopes(type)
             .forEach { eventScope -> closeEventScope(eventScope, reason) }
     }
 
@@ -124,14 +136,16 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.saveEventScope(eventScope)
     }
 
-    override suspend fun getOpenEventScopes(type: EventScopeType): List<EventScope> =
-        eventLocalDataSource.loadOpenedScopes(type)
+    override suspend fun getAllScopes(): List<EventScope> = eventLocalDataSource.loadAllScopes()
 
-    override suspend fun getClosedEventScopes(type: EventScopeType, limit: Int): List<EventScope> =
-        eventLocalDataSource.loadClosedScopes(type, limit)
+    override suspend fun getOpenEventScopes(type: EventScopeType): List<EventScope> = eventLocalDataSource.loadOpenedScopes(type)
 
-    override suspend fun getClosedEventScopesCount(type: EventScopeType): Int =
-        eventLocalDataSource.countClosedEventScopes(type)
+    override suspend fun getClosedEventScopes(
+        type: EventScopeType,
+        limit: Int,
+    ): List<EventScope> = eventLocalDataSource.loadClosedScopes(type, limit)
+
+    override suspend fun getClosedEventScopesCount(type: EventScopeType): Int = eventLocalDataSource.countClosedEventScopes(type)
 
     override suspend fun deleteEventScope(scopeId: String) = reportException {
         eventLocalDataSource.deleteEventScope(scopeId = scopeId)
@@ -143,17 +157,17 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.deleteEventsInScopes(scopeIds = scopeIds)
     }
 
-    override suspend fun getEventsFromScope(scopeId: String): List<Event> =
-        eventLocalDataSource.loadEventsInScope(scopeId)
+    override suspend fun getEventsFromScope(scopeId: String): List<Event> = eventLocalDataSource.loadEventsInScope(scopeId)
 
-    override suspend fun getEventsJsonFromScope(scopeId: String): List<String> =
-        eventLocalDataSource.loadEventJsonInScope(scopeId)
+    override suspend fun getEventsJsonFromScope(scopeId: String): List<String> = eventLocalDataSource.loadEventJsonInScope(scopeId)
 
     override suspend fun getAllEvents(): Flow<Event> = eventLocalDataSource.loadAllEvents()
 
-    override suspend fun observeEventCount(type: EventType?): Flow<Int> =
-        if (type != null) eventLocalDataSource.observeEventCount(type)
-        else eventLocalDataSource.observeEventCount()
+    override suspend fun observeEventCount(type: EventType?): Flow<Int> = if (type != null) {
+        eventLocalDataSource.observeEventCount(type)
+    } else {
+        eventLocalDataSource.observeEventCount()
+    }
 
     override suspend fun addOrUpdateEvent(
         scope: EventScope,
@@ -179,16 +193,16 @@ internal open class EventRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
 
-
-    private suspend fun <T> reportException(block: suspend () -> T): T =
-        try {
-            block()
-        } catch (t: Throwable) {
-            // prevent crashlytics logging of duplicate guid-selection
-            if (t is DuplicateGuidSelectEventValidatorException) Simber.d(t)
-            else Simber.e(t)
-
-            throw t
+    private suspend fun <T> reportException(block: suspend () -> T): T = try {
+        block()
+    } catch (t: Throwable) {
+        // prevent crashlytics logging of duplicate guid-selection
+        if (t is DuplicateGuidSelectEventValidatorException) {
+            Simber.d(t)
+        } else {
+            Simber.e(t)
         }
 
+        throw t
+    }
 }

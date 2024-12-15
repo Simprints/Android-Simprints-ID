@@ -5,17 +5,21 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.events.event.local.SessionScopeRoomDao.EventScopeConstants.CLOSED_SCOPES_LIMIT
 import com.simprints.infra.events.event.local.models.DbEventScope
 
 @Dao
 internal interface SessionScopeRoomDao {
+    @Query("select * from DbEventScope order by start_unixMs desc")
+    suspend fun loadAll(): List<DbEventScope>
 
     @Query("select * from DbEventScope where type = :type AND end_unixMs IS NULL order by start_unixMs desc")
     suspend fun loadOpen(type: EventScopeType): List<DbEventScope>
 
     @Query("select * from DbEventScope where type = :type AND end_unixMs IS NOT NULL order by start_unixMs desc limit :limit")
-    suspend fun loadClosed(type: EventScopeType, limit: Int): List<DbEventScope>
+    suspend fun loadClosed(
+        type: EventScopeType,
+        limit: Int,
+    ): List<DbEventScope>
 
     @Query("select * from DbEventScope where id = :scopeId order by start_unixMs desc limit 1")
     suspend fun loadScope(scopeId: String): DbEventScope?

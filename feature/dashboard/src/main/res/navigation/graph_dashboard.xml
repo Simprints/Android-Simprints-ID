@@ -7,6 +7,7 @@
 
     <include app:graph="@navigation/graph_privacy" />
     <include app:graph="@navigation/graph_login" />
+    <include app:graph="@navigation/graph_troubleshooting" />
 
     <fragment
         android:id="@+id/requestLoginFragment"
@@ -23,6 +24,9 @@
             app:destination="@id/mainFragment"
             app:popUpTo="@id/dashboard_navigation"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_requestLoginFragment_to_troubleshooting"
+            app:destination="@id/graph_troubleshooting" />
     </fragment>
     <fragment
         android:id="@+id/baseFragment"
@@ -71,6 +75,7 @@
         android:name="com.simprints.feature.dashboard.debug.DebugFragment"
         android:label="DebugFragment"
         tools:layout="@layout/fragment_debug" />
+
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.simprints.feature.dashboard.settings.SettingsFragment"
@@ -99,6 +104,9 @@
             app:destination="@id/requestLoginFragment"
             app:popUpTo="@id/dashboard_navigation"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_aboutFragment_to_troubleshooting"
+            app:destination="@id/graph_troubleshooting" />
     </fragment>
     <fragment
         android:id="@+id/syncInfoFragment"
@@ -159,4 +167,5 @@
                 app:popUpToInclusive="true" />
         </fragment>
     </navigation>
+
 </navigation>

@@ -26,7 +26,6 @@ import org.junit.Test
 import java.util.Date
 
 class EnrolmentRecordRepositoryImplTest {
-
     companion object {
         private const val BATCH_SIZE = 2
         private const val SUBJECT_ID_1 = "SUBJECT_ID_1"
@@ -87,7 +86,7 @@ class EnrolmentRecordRepositoryImplTest {
         coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
-            SUBJECT_3
+            SUBJECT_3,
         )
 
         repository.uploadRecords(listOf())
@@ -104,7 +103,7 @@ class EnrolmentRecordRepositoryImplTest {
         every { prefs.getString(any(), null) } returns null
         coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
-            SUBJECT_2
+            SUBJECT_2,
         )
 
         repository.uploadRecords(listOf())
@@ -157,7 +156,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should upload the records correctly when it has failed before`() = runTest {
         val expectedSubjectQuery = SubjectQuery(
             sort = true,
-            afterSubjectId = SUBJECT_ID_3
+            afterSubjectId = SUBJECT_ID_3,
         )
         every { prefs.getString(any(), null) } returns SUBJECT_ID_3
         coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
@@ -189,7 +188,7 @@ class EnrolmentRecordRepositoryImplTest {
                 createdAt = Date(),
                 updatedAt = null,
                 fingerprintSamples = emptyList(),
-                faceSamples = emptyList()
+                faceSamples = emptyList(),
             )
             every { project.id } returns projectId
             coEvery { localDataSource.load(any()) } returns listOf(subject)
@@ -197,60 +196,58 @@ class EnrolmentRecordRepositoryImplTest {
                 tokenizationProcessor.encrypt(
                     decrypted = attendantIdRaw,
                     tokenKeyType = TokenKeyType.AttendantId,
-                    project = project
+                    project = project,
                 )
             } returns attendantIdTokenized
             every {
                 tokenizationProcessor.encrypt(
                     decrypted = moduleIdRaw,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    project = project
+                    project = project,
                 )
             } returns moduleIdTokenized
 
             repository.tokenizeExistingRecords(project)
             val expectedSubject = subject.copy(
                 attendantId = attendantIdTokenized,
-                moduleId = moduleIdTokenized
+                moduleId = moduleIdTokenized,
             )
             val expectedSubjectActions = listOf(SubjectAction.Creation(expectedSubject))
             coVerify { localDataSource.performActions(expectedSubjectActions) }
         }
 
     @Test
-    fun `given the different project, when tokenizing existing subjects, the untokenized existing subjects are not tokenized`() =
-        runTest {
-            val projectId = "projectId"
-            val attendantIdRaw = "attendantId".asTokenizableRaw()
-            val moduleIdRaw = "moduleId".asTokenizableRaw()
-            val project = mockk<Project>()
-            val subject = Subject(
-                subjectId = "subjectId",
-                projectId = "another project id",
-                attendantId = attendantIdRaw,
-                moduleId = moduleIdRaw,
-                createdAt = Date(),
-                updatedAt = null,
-                fingerprintSamples = emptyList(),
-                faceSamples = emptyList()
-            )
-            every { project.id } returns projectId
-            coEvery { localDataSource.load(any()) } returns listOf(subject)
+    fun `given the different project, when tokenizing existing subjects, the untokenized existing subjects are not tokenized`() = runTest {
+        val projectId = "projectId"
+        val attendantIdRaw = "attendantId".asTokenizableRaw()
+        val moduleIdRaw = "moduleId".asTokenizableRaw()
+        val project = mockk<Project>()
+        val subject = Subject(
+            subjectId = "subjectId",
+            projectId = "another project id",
+            attendantId = attendantIdRaw,
+            moduleId = moduleIdRaw,
+            createdAt = Date(),
+            updatedAt = null,
+            fingerprintSamples = emptyList(),
+            faceSamples = emptyList(),
+        )
+        every { project.id } returns projectId
+        coEvery { localDataSource.load(any()) } returns listOf(subject)
 
-            repository.tokenizeExistingRecords(project)
-            coVerify { localDataSource.performActions(emptyList()) }
-        }
+        repository.tokenizeExistingRecords(project)
+        coVerify { localDataSource.performActions(emptyList()) }
+    }
 
     @Test
-    fun `when tokenizing existing subjects throws exception, then it is captured and not thrown up the calling chain`() =
-        runTest {
-            val projectId = "projectId"
-            val project = mockk<Project>()
-            every { project.id } returns projectId
-            coEvery { localDataSource.load(any()) } throws Exception()
+    fun `when tokenizing existing subjects throws exception, then it is captured and not thrown up the calling chain`() = runTest {
+        val projectId = "projectId"
+        val project = mockk<Project>()
+        every { project.id } returns projectId
+        coEvery { localDataSource.load(any()) } throws Exception()
 
-            repository.tokenizeExistingRecords(project)
-        }
+        repository.tokenizeExistingRecords(project)
+    }
 
     @Test
     fun `should return the correct count of subjects when dataSource is Simprints`() = runTest {
@@ -284,7 +281,7 @@ class EnrolmentRecordRepositoryImplTest {
         val fingerprintIdentities = repository.loadFingerprintIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.Simprints
+            dataSource = BiometricDataSource.Simprints,
         )
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
@@ -301,7 +298,7 @@ class EnrolmentRecordRepositoryImplTest {
         val fingerprintIdentities = repository.loadFingerprintIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.CommCare("")
+            dataSource = BiometricDataSource.CommCare(""),
         )
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
@@ -318,7 +315,7 @@ class EnrolmentRecordRepositoryImplTest {
         val faceIdentities = repository.loadFaceIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.Simprints
+            dataSource = BiometricDataSource.Simprints,
         )
 
         assert(faceIdentities == expectedFaceIdentities)
@@ -335,7 +332,7 @@ class EnrolmentRecordRepositoryImplTest {
         val faceIdentities = repository.loadFaceIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
-            dataSource = BiometricDataSource.CommCare("")
+            dataSource = BiometricDataSource.CommCare(""),
         )
 
         assert(faceIdentities == expectedFaceIdentities)

@@ -16,7 +16,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 internal class EnrolRequestBuilderTest {
-
     @Test
     fun `EnrolActionRequest should contain mandatory fields`() {
         val extractor = EnrolActionFactory.getMockExtractor()
@@ -30,11 +29,14 @@ internal class EnrolRequestBuilderTest {
             actionIdentifier = ActionRequestIdentifier(
                 actionName = RequestActionFactory.MOCK_PACKAGE,
                 packageName = ActionConstants.ACTION_ENROL,
+                callerPackageName = "",
+                contractVersion = 1,
+                timestampMs = 0L,
             ),
             extractor = extractor,
             project = project,
             tokenizationProcessor = tokenizationProcessor,
-            validator = validator
+            validator = validator,
         ).build() as ActionRequest.EnrolActionRequest
 
         assertThat(action.projectId).isEqualTo(MOCK_PROJECT_ID)

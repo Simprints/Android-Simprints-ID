@@ -18,7 +18,6 @@ internal class QrCodeAnalyzer @Inject constructor(
     private val qrCodeDetector: QrCodeDetector,
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ImageAnalysis.Analyzer {
-
     private val _scannedCode = MutableStateFlow<String?>(null)
     val scannedCode: Flow<String> = _scannedCode
         .filterNotNull()
@@ -40,5 +39,4 @@ internal class QrCodeAnalyzer @Inject constructor(
             }
         }
     }
-
 }

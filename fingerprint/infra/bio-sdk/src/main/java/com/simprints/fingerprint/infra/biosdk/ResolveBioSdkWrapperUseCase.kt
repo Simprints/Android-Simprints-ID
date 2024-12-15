@@ -9,11 +9,9 @@ class ResolveBioSdkWrapperUseCase @Inject constructor(
     @SimprintsSdk private val simprintsWrapper: BioSdkWrapper,
     @NecSdk private val necWrapper: BioSdkWrapper,
 ) {
-
-    operator fun invoke(fingerprintSdk: FingerprintConfiguration.BioSdk): BioSdkWrapper =
-        when (fingerprintSdk) {
-            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> simprintsWrapper
-            FingerprintConfiguration.BioSdk.NEC -> necWrapper
-            else -> error("Unknown fingerprint configuration")
-        }
+    operator fun invoke(fingerprintSdk: FingerprintConfiguration.BioSdk): BioSdkWrapper = when (fingerprintSdk) {
+        FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> simprintsWrapper
+        FingerprintConfiguration.BioSdk.NEC -> necWrapper
+        else -> error("Unknown fingerprint configuration")
+    }
 }

@@ -8,7 +8,6 @@ import com.simprints.infra.config.store.testtools.faceConfiguration
 import org.junit.Test
 
 class ApiFaceConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiFaceConfiguration.toDomain()).isEqualTo(faceConfiguration)
@@ -18,13 +17,13 @@ class ApiFaceConfigurationTest {
     fun `should map correctly the model with allowedAgeRange present`() {
         val apiFaceConfigurationWithAgeRange = apiFaceConfiguration.copy(
             rankOne = apiFaceConfiguration.rankOne.copy(
-                allowedAgeRange = ApiAllowedAgeRange(10, 20)
-            )
+                allowedAgeRange = ApiAllowedAgeRange(10, 20),
+            ),
         )
         val faceConfigurationWithAgeRange = faceConfiguration.copy(
             rankOne = faceConfiguration.rankOne!!.copy(
-                allowedAgeRange = AgeGroup(10, 20)
-            )
+                allowedAgeRange = AgeGroup(10, 20),
+            ),
         )
         assertThat(apiFaceConfigurationWithAgeRange.toDomain()).isEqualTo(faceConfigurationWithAgeRange)
     }

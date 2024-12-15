@@ -29,11 +29,13 @@ internal class SignerManager @Inject constructor(
     private val scannerManager: ScannerManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
-
     val signedInProjectId: String
         get() = authStore.signedInProjectId
 
-    suspend fun signIn(projectId: String, token: Token) = withContext(dispatcher) {
+    suspend fun signIn(
+        projectId: String,
+        token: Token,
+    ) = withContext(dispatcher) {
         try {
             // Store Firebase token so it can be used by ConfigManager
             authStore.storeFirebaseToken(token)
@@ -52,7 +54,6 @@ internal class SignerManager @Inject constructor(
     }
 
     suspend fun signOut() = withContext(dispatcher) {
-
         simNetwork.resetApiBaseUrl()
         configManager.clearData()
         recentUserActivityManager.clearRecentActivity()
@@ -68,5 +69,4 @@ internal class SignerManager @Inject constructor(
 
         Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
     }
-
 }

@@ -1,16 +1,19 @@
 package com.simprints.infra.license
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.LicenseCheckEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.license.models.Vendor
 import javax.inject.Inject
 
 class SaveLicenseCheckEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
 ) {
-    suspend operator fun invoke(vendor: Vendor, status: LicenseStatus) {
+    suspend operator fun invoke(
+        vendor: Vendor,
+        status: LicenseStatus,
+    ) {
         val licenseCheckEvent = LicenseCheckEvent(timeHelper.now(), status.toEventStatus(), vendor.value)
         eventRepository.addOrUpdateEvent(licenseCheckEvent)
     }
@@ -22,8 +25,8 @@ class SaveLicenseCheckEventUseCase @Inject constructor(
         LicenseStatus.MISSING -> LicenseCheckEvent.LicenseStatus.MISSING
         LicenseStatus.ERROR -> LicenseCheckEvent.LicenseStatus.ERROR
     }
-
 }
+
 /**
  * Represents the status of a license.
  */

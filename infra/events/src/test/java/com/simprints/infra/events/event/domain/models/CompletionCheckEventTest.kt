@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class CompletionCheckEventTest {
-
     @Test
     fun create_CompletionCheckEvent() {
         val event = CompletionCheckEvent(CREATED_AT, true)

@@ -6,7 +6,5 @@ internal class OdkVerifyRequestExtractor(
     extras: Map<String, Any>,
     acceptableExtras: List<String>,
 ) : VerifyRequestExtractor(extras) {
-
     override val expectedKeys: List<String> = super.expectedKeys + acceptableExtras
-
 }

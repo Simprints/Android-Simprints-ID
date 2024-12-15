@@ -35,7 +35,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ModuleSelectionViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -73,7 +72,7 @@ class ModuleSelectionViewModelTest {
             Module("a".asTokenizableEncrypted(), false),
             Module("b".asTokenizableEncrypted(), false),
             Module("c".asTokenizableEncrypted(), true),
-            Module("d".asTokenizableEncrypted(), false)
+            Module("d".asTokenizableEncrypted(), false),
         )
         coEvery { repository.getModules() } returns modulesDefault
         coEvery { repository.getMaxNumberOfModules() } returns 2
@@ -87,7 +86,7 @@ class ModuleSelectionViewModelTest {
                 tokenizationProcessor.decrypt(
                     encrypted = it.name as TokenizableString.Tokenized,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    project = project
+                    project = project,
                 )
             } returns it.name.value.asTokenizableRaw()
         }
@@ -109,8 +108,8 @@ class ModuleSelectionViewModelTest {
                 Module("a".asTokenizableRaw(), false),
                 Module("b".asTokenizableRaw(), false),
                 Module("c".asTokenizableRaw(), true),
-                Module("d".asTokenizableRaw(), false)
-            )
+                Module("d".asTokenizableRaw(), false),
+            ),
         )
     }
 
@@ -137,7 +136,7 @@ class ModuleSelectionViewModelTest {
             Module("a".asTokenizableRaw(), false),
             Module("b".asTokenizableRaw(), true),
             Module("c".asTokenizableRaw(), true),
-            Module("d".asTokenizableRaw(), false)
+            Module("d".asTokenizableRaw(), false),
         )
         viewModel.updateModuleSelection(Module("b".asTokenizableRaw(), false))
 
@@ -173,14 +172,14 @@ class ModuleSelectionViewModelTest {
             Module("a".asTokenizableRaw(), true),
             Module("b".asTokenizableRaw(), false),
             Module("c".asTokenizableRaw(), true),
-            Module("d".asTokenizableRaw(), false)
+            Module("d".asTokenizableRaw(), false),
         )
         updatedModules.forEach { module ->
             every {
                 tokenizationProcessor.encrypt(
                     decrypted = module.name as TokenizableString.Raw,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    project = project
+                    project = project,
                 )
             } returns module.name.value.asTokenizableEncrypted()
         }
@@ -197,7 +196,7 @@ class ModuleSelectionViewModelTest {
         viewModel.loadPasswordSettings()
 
         assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
-            SettingsPasswordConfig.Locked("1234")
+            SettingsPasswordConfig.Locked("1234"),
         )
     }
 
@@ -206,12 +205,11 @@ class ModuleSelectionViewModelTest {
         viewModel.unlockScreen()
 
         assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
-            SettingsPasswordConfig.Unlocked
+            SettingsPasswordConfig.Unlocked,
         )
     }
 
     companion object {
-
         private const val PROJECT_ID = "projectId"
     }
 }

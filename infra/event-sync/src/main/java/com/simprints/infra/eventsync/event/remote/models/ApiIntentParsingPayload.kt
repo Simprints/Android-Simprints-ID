@@ -14,7 +14,6 @@ internal data class ApiIntentParsingPayload(
     override val startTime: ApiTimestamp,
     val integration: ApiIntegrationInfo,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: IntentParsingPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.integration.fromDomainToApi(),
@@ -22,16 +21,13 @@ internal data class ApiIntentParsingPayload(
 
     @Keep
     enum class ApiIntegrationInfo {
-
         ODK,
         STANDARD,
-        COMMCARE;
+        COMMCARE,
     }
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
-
 
 internal fun IntegrationInfo.fromDomainToApi() = when (this) {
     ODK -> ApiIntegrationInfo.ODK

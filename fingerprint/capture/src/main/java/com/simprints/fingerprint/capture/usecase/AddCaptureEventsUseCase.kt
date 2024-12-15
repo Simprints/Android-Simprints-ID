@@ -7,11 +7,11 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result
+import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
 internal class AddCaptureEventsUseCase @Inject constructor(
@@ -19,7 +19,6 @@ internal class AddCaptureEventsUseCase @Inject constructor(
     private val encoder: EncodingUtils,
     private val eventRepository: SessionEventRepository,
 ) {
-
     suspend operator fun invoke(
         lastCaptureStartedAt: Timestamp,
         fingerState: FingerState,
@@ -36,20 +35,24 @@ internal class AddCaptureEventsUseCase @Inject constructor(
             qualityThreshold = qualityThreshold,
             result = mapCaptureStateToResult(captureState),
             fingerprint = mapCaptureStateToFingerprint(captureState, fingerState),
-            payloadId = payloadId
+            payloadId = payloadId,
         )
 
         val fingerprintCaptureBiometricsEvent =
-            if (captureState is CaptureState.ScanProcess.Collected && (captureEvent.payload.result == Result.GOOD_SCAN || tooManyBadScans))
+            if (captureState is CaptureState.ScanProcess.Collected &&
+                (captureEvent.payload.result == Result.GOOD_SCAN || tooManyBadScans)
+            ) {
                 FingerprintCaptureBiometricsEvent(
                     createdAt = lastCaptureStartedAt,
                     fingerprint = mapCaptureToBiometricFingerprint(
                         fingerState,
-                        captureState.scanResult
+                        captureState.scanResult,
                     ),
-                    payloadId = payloadId
+                    payloadId = payloadId,
                 )
-            else null
+            } else {
+                null
+            }
 
         eventRepository.addOrUpdateEvent(captureEvent)
         // Because we don't need biometric data that is not used for matching
@@ -57,7 +60,6 @@ internal class AddCaptureEventsUseCase @Inject constructor(
 
         return payloadId
     }
-
 
     private fun mapCaptureStateToResult(captureState: CaptureState) = when (captureState) {
         is CaptureState.Skipped -> Result.SKIPPED
@@ -71,23 +73,27 @@ internal class AddCaptureEventsUseCase @Inject constructor(
         else -> Result.FAILURE_TO_ACQUIRE
     }
 
-    private fun mapCaptureStateToFingerprint(captureState: CaptureState, fingerState: FingerState) =
-        captureState
-            .let { it as? CaptureState.ScanProcess.Collected }
-            ?.scanResult
-            ?.let {
-                FingerprintCapturePayload.Fingerprint(
-                    fingerState.id,
-                    it.qualityScore,
-                    it.templateFormat
-                )
-            }
+    private fun mapCaptureStateToFingerprint(
+        captureState: CaptureState,
+        fingerState: FingerState,
+    ) = captureState
+        .let { it as? CaptureState.ScanProcess.Collected }
+        ?.scanResult
+        ?.let {
+            FingerprintCapturePayload.Fingerprint(
+                fingerState.id,
+                it.qualityScore,
+                it.templateFormat,
+            )
+        }
 
-    private fun mapCaptureToBiometricFingerprint(fingerState: FingerState, it: ScanResult) =
-        FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-            finger = fingerState.id,
-            quality = it.qualityScore,
-            template = encoder.byteArrayToBase64(it.template),
-            format = it.templateFormat
-        )
+    private fun mapCaptureToBiometricFingerprint(
+        fingerState: FingerState,
+        it: ScanResult,
+    ) = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
+        finger = fingerState.id,
+        quality = it.qualityScore,
+        template = encoder.byteArrayToBase64(it.template),
+        format = it.templateFormat,
+    )
 }

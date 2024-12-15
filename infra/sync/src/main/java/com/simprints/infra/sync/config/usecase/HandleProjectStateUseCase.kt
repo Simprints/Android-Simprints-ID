@@ -9,7 +9,6 @@ internal class HandleProjectStateUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val logoutUseCase: LogoutUseCase,
 ) {
-
     suspend operator fun invoke(state: ProjectState) {
         if (shouldSignOut(state)) {
             logoutUseCase()
@@ -23,5 +22,4 @@ internal class HandleProjectStateUseCase @Inject constructor(
 
         return isProjectEnded || (isProjectEnding && hasNoEventsToUpload)
     }
-
 }

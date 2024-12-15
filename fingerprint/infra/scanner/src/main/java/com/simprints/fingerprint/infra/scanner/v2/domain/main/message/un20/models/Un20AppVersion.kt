@@ -9,14 +9,13 @@ class Un20AppVersion(
     apiMajorVersion: Short,
     apiMinorVersion: Short,
     firmwareMajorVersion: Short,
-    firmwareMinorVersion: Short
+    firmwareMinorVersion: Short,
 ) : FirmwareVersion(
-    apiMajorVersion,
-    apiMinorVersion,
-    firmwareMajorVersion,
-    firmwareMinorVersion
-) {
-
+        apiMajorVersion,
+        apiMinorVersion,
+        firmwareMajorVersion,
+        firmwareMinorVersion,
+    ) {
     fun getBytes() = with(Un20MessageProtocol) {
         apiMajorVersion.toByteArray(byteOrder) +
             apiMinorVersion.toByteArray(byteOrder) +
@@ -25,14 +24,13 @@ class Un20AppVersion(
     }
 
     companion object {
-        fun fromBytes(bytes: ByteArray) =
-            with(Un20MessageProtocol) {
-                Un20AppVersion(
-                    apiMajorVersion = bytes.extract({ short }, 0..1),
-                    apiMinorVersion = bytes.extract({ short }, 2..3),
-                    firmwareMajorVersion = bytes.extract({ short }, 4..5),
-                    firmwareMinorVersion = bytes.extract({ short }, 6..7)
-                )
-            }
+        fun fromBytes(bytes: ByteArray) = with(Un20MessageProtocol) {
+            Un20AppVersion(
+                apiMajorVersion = bytes.extract({ short }, 0..1),
+                apiMinorVersion = bytes.extract({ short }, 2..3),
+                firmwareMajorVersion = bytes.extract({ short }, 4..5),
+                firmwareMinorVersion = bytes.extract({ short }, 6..7),
+            )
+        }
     }
 }

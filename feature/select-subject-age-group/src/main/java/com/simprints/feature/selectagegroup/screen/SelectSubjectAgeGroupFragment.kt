@@ -23,10 +23,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_group_selection) {
-
     private val viewModel: SelectSubjectAgeGroupViewModel by viewModels()
     private val binding by viewBinding(FragmentAgeGroupSelectionBinding::bind)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.ageGroups.observe(viewLifecycleOwner) { ageGroupsList ->
@@ -42,7 +45,9 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
         viewModel.showExitForm.observe(viewLifecycleOwner) { exitFormConfig ->
             exitFormConfig.getContentIfNotHandled()?.let {
                 findNavController().navigateSafely(
-                    this, R.id.action_selectSubjectAgeGroupFragment_to_refusalFragment, it.toArgs()
+                    this,
+                    R.id.action_selectSubjectAgeGroupFragment_to_refusalFragment,
+                    it.toArgs(),
                 )
             }
         }
@@ -66,7 +71,8 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
         with(binding.ageGroupRecyclerView) {
             layoutManager = LinearLayoutManager(requireContext())
             val dividerItemDecoration = DividerItemDecoration(
-                this.context, (layoutManager as LinearLayoutManager).orientation
+                this.context,
+                (layoutManager as LinearLayoutManager).orientation,
             )
             this.addItemDecoration(dividerItemDecoration)
             adapter = AgeGroupAdapter(ageGroupsList) { ageGroup ->

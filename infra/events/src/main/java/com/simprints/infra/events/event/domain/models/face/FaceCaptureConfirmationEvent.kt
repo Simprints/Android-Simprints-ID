@@ -19,7 +19,6 @@ data class FaceCaptureConfirmationEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         startTime: Timestamp,
         endTime: Timestamp,
@@ -27,13 +26,12 @@ data class FaceCaptureConfirmationEvent(
     ) : this(
         UUID.randomUUID().toString(),
         FaceCaptureConfirmationPayload(startTime, endTime, EVENT_VERSION, result),
-        FACE_CAPTURE_CONFIRMATION
+        FACE_CAPTURE_CONFIRMATION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FaceCaptureConfirmationPayload(
@@ -43,16 +41,15 @@ data class FaceCaptureConfirmationEvent(
         val result: Result,
         override val type: EventType = FACE_CAPTURE_CONFIRMATION,
     ) : EventPayload() {
+        override fun toSafeString(): String = "result: $result"
 
         enum class Result {
             CONTINUE,
-            RECAPTURE
+            RECAPTURE,
         }
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }
-

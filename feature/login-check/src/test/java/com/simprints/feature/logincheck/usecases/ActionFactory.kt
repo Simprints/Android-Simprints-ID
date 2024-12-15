@@ -6,20 +6,19 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
 internal object ActionFactory {
-
-    fun getFlowRequest(
-        extras: Map<String, Any> = emptyMap(),
-    ) = ActionRequest.EnrolActionRequest(
+    fun getFlowRequest(extras: Map<String, Any> = emptyMap()) = ActionRequest.EnrolActionRequest(
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_ENROL,
+            callerPackageName = "",
+            contractVersion = 1,
+            timestampMs = 0L,
         ),
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
         unknownExtras = extras,
         biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
-        callerPackageName = "",
         metadata = "",
     )
 
@@ -27,13 +26,16 @@ internal object ActionFactory {
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
+            callerPackageName = "",
+            contractVersion = 1,
+            timestampMs = 0L,
         ),
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         sessionId = "sessionId",
         selectedGuid = "selectedGuid",
         metadata = "",
-        unknownExtras = emptyMap()
+        unknownExtras = emptyMap(),
     )
 
     val MOCK_USER_ID = "userId".asTokenizableRaw()

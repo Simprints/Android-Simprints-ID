@@ -22,26 +22,25 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetHardw
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.SetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
+import javax.inject.Inject
 
-class RootResponseParser : MessageParser<RootResponse> {
-
-    override fun parse(messageBytes: ByteArray): RootResponse =
-        try {
-            RootMessageProtocol.getDataBytes(messageBytes).let { data ->
-                when (RootMessageProtocol.getMessageType(messageBytes)) {
-                    ENTER_MAIN_MODE -> EnterMainModeResponse.fromBytes(data)
-                    ENTER_CYPRESS_OTA_MODE -> EnterCypressOtaModeResponse.fromBytes(data)
-                    ENTER_STM_OTA_MODE -> EnterStmOtaModeResponse.fromBytes(data)
-                    GET_CYPRESS_VERSION -> GetCypressVersionResponse.fromBytes(data)
-                    GET_VERSION -> GetVersionResponse.fromBytes(data)
-                    SET_VERSION -> SetVersionResponse.fromBytes(data)
-                    GET_HARDWARE_VERSION -> GetHardwareVersionResponse.fromBytes(data)
-                    GET_EXTENDED_VERSION -> GetExtendedVersionResponse.fromBytes(data)
-                    GET_CYPRESS_EXTENDED_VERSION -> GetCypressExtendedVersionResponse.fromBytes(data)
-                    SET_EXTENDED_VERSION -> SetVersionResponse.fromBytes(data)
-                }
+class RootResponseParser @Inject constructor() : MessageParser<RootResponse> {
+    override fun parse(messageBytes: ByteArray): RootResponse = try {
+        RootMessageProtocol.getDataBytes(messageBytes).let { data ->
+            when (RootMessageProtocol.getMessageType(messageBytes)) {
+                ENTER_MAIN_MODE -> EnterMainModeResponse.fromBytes(data)
+                ENTER_CYPRESS_OTA_MODE -> EnterCypressOtaModeResponse.fromBytes(data)
+                ENTER_STM_OTA_MODE -> EnterStmOtaModeResponse.fromBytes(data)
+                GET_CYPRESS_VERSION -> GetCypressVersionResponse.fromBytes(data)
+                GET_VERSION -> GetVersionResponse.fromBytes(data)
+                SET_VERSION -> SetVersionResponse.fromBytes(data)
+                GET_HARDWARE_VERSION -> GetHardwareVersionResponse.fromBytes(data)
+                GET_EXTENDED_VERSION -> GetExtendedVersionResponse.fromBytes(data)
+                GET_CYPRESS_EXTENDED_VERSION -> GetCypressExtendedVersionResponse.fromBytes(data)
+                SET_EXTENDED_VERSION -> SetVersionResponse.fromBytes(data)
             }
-        } catch (e: Exception) {
-            handleExceptionDuringParsing(e)
         }
+    } catch (e: Exception) {
+        handleExceptionDuringParsing(e)
+    }
 }

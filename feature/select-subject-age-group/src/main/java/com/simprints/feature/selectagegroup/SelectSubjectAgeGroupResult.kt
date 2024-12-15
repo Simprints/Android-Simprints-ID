@@ -8,4 +8,3 @@ import java.io.Serializable
 data class SelectSubjectAgeGroupResult(
     val ageGroup: AgeGroup,
 ) : Serializable
-

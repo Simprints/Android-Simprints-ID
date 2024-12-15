@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class FingerprintSampleTest {
-
     @Test
     fun testUniqueId() {
         assertThat(listOf<FingerprintSample>().uniqueId()).isNull()
@@ -14,9 +13,9 @@ class FingerprintSampleTest {
                     fingerIdentifier = IFingerIdentifier.LEFT_3RD_FINGER,
                     template = byteArrayOf(1, 2),
                     templateQualityScore = 1,
-                    format = ""
+                    format = "",
                 ),
-            ).uniqueId()
+            ).uniqueId(),
         ).isNotNull()
     }
 
@@ -27,22 +26,21 @@ class FingerprintSampleTest {
                 fingerIdentifier = IFingerIdentifier.LEFT_3RD_FINGER,
                 template = byteArrayOf(31, 32),
                 templateQualityScore = 3,
-                format = ""
+                format = "",
             ),
             FingerprintSample(
                 fingerIdentifier = IFingerIdentifier.LEFT_3RD_FINGER,
                 template = byteArrayOf(1, 2),
                 templateQualityScore = 1,
-                format = ""
+                format = "",
             ),
             FingerprintSample(
                 fingerIdentifier = IFingerIdentifier.LEFT_3RD_FINGER,
                 template = byteArrayOf(21, 22),
                 templateQualityScore = 2,
-                format = ""
+                format = "",
             ),
         )
         assertThat(fingerprintSample.concatTemplates()).isEqualTo(byteArrayOf(1, 2, 21, 22, 31, 32))
     }
-
 }

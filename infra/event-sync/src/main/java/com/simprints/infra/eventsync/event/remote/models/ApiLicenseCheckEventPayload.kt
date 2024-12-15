@@ -10,13 +10,11 @@ internal data class ApiLicenseCheckEventPayload(
     val status: LicenseCheckEvent.LicenseStatus,
     val vendor: String,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: LicenseCheckEvent.LicenseCheckEventPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.status,
         domainPayload.vendor,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

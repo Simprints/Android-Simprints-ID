@@ -12,10 +12,9 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [EventSyncModule::class]
+    replaces = [EventSyncModule::class],
 )
 object FakeEventSyncModule {
-
     @Provides
     @Singleton
     fun provideEventSyncManager(): EventSyncManager = mockk()

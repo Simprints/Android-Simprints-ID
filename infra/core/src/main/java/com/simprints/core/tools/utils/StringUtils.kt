@@ -1,13 +1,11 @@
 package com.simprints.core.tools.utils
 
-import java.util.*
+import java.util.UUID
 
 private const val REGEX_GUID =
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}"
 
-fun randomUUID(): String {
-    return UUID.randomUUID().toString()
-}
+fun randomUUID(): String = UUID.randomUUID().toString()
 
 /**
  * For a detailed description of what defines a UUID,

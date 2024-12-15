@@ -8,7 +8,6 @@ import org.junit.Test
 import java.nio.ByteOrder
 
 class PrimitiveConversionToolsTest {
-
     @Test
     fun byteUnsignedToInt_worksForWholeRange() {
         assertEquals(10, 10.toByte().unsignedToInt())

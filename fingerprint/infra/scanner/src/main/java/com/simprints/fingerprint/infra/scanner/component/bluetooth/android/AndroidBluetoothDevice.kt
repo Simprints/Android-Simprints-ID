@@ -5,8 +5,9 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothSocket
 import java.util.UUID
 
-internal class AndroidBluetoothDevice(private val device: BluetoothDevice) : ComponentBluetoothDevice {
-
+internal class AndroidBluetoothDevice(
+    private val device: BluetoothDevice,
+) : ComponentBluetoothDevice {
     override val name: String? = device.name
 
     override fun isBonded(): Boolean = device.bondState == BluetoothDevice.BOND_BONDED

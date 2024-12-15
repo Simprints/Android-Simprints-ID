@@ -20,7 +20,7 @@ internal class SyncCardView : MaterialCardView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     var onSyncButtonClick: () -> Unit = {}
@@ -71,7 +71,7 @@ internal class SyncCardView : MaterialCardView {
             resources.getQuantityString(
                 R.plurals.dashboard_sync_card_records_to_upload,
                 itemsToSync,
-                itemsToSync
+                itemsToSync,
             )
         }
     }
@@ -90,13 +90,14 @@ internal class SyncCardView : MaterialCardView {
     private fun prepareSyncFailedBecauseBackendMaintenanceView(state: SyncCardState.SyncFailedBackendMaintenance) {
         binding.syncCardFailedMessage.visibility = View.VISIBLE
         binding.syncCardFailedMessage.text =
-            if (state.estimatedOutage != null && state.estimatedOutage != 0L)
+            if (state.estimatedOutage != null && state.estimatedOutage != 0L) {
                 resources.getString(
                     R.string.error_backend_maintenance_with_time_message,
-                    TimeUtils.getFormattedEstimatedOutage(state.estimatedOutage)
+                    TimeUtils.getFormattedEstimatedOutage(state.estimatedOutage),
                 )
-            else
+            } else {
                 resources.getString(R.string.error_backend_maintenance_message)
+            }
     }
 
     private fun prepareSyncTooManyRequestsView() {
@@ -125,13 +126,14 @@ internal class SyncCardView : MaterialCardView {
     private fun prepareProgressView(state: SyncCardState.SyncProgress) {
         binding.syncCardProgress.visibility = View.VISIBLE
 
-        val percentage = if (state.progress != null && state.total != null)
+        val percentage = if (state.progress != null && state.total != null) {
             "${calculatePercentage(state.progress, state.total)}%"
-        else
+        } else {
             ""
+        }
         binding.syncCardProgressMessage.text = resources.getString(
             R.string.dashboard_sync_card_progress,
-            percentage
+            percentage,
         )
         binding.syncCardProgressMessage.setTextColor(getDefaultGrayTextColor())
 
@@ -165,12 +167,16 @@ internal class SyncCardView : MaterialCardView {
             binding.syncCardLastSync.visibility = View.VISIBLE
             binding.syncCardLastSync.text = String.format(
                 resources.getString(R.string.dashboard_sync_card_last_sync),
-                lastSync
+                lastSync,
             )
         }
     }
 
-    private fun setProgress(progress: Int?, total: Int?, color: Int) {
+    private fun setProgress(
+        progress: Int?,
+        total: Int?,
+        color: Int,
+    ) {
         with(binding.syncCardProgressSyncProgressBar) {
             if (progress != null && total != null) {
                 setProgressBarIndeterminate(this, false)
@@ -182,36 +188,42 @@ internal class SyncCardView : MaterialCardView {
         }
     }
 
-    private fun setProgressColor(color: Int, progressBar: ProgressBar) {
+    private fun setProgressColor(
+        color: Int,
+        progressBar: ProgressBar,
+    ) {
         context?.getColorStateList(color)?.defaultColor?.let {
             progressBar.progressDrawable.colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
                     color,
-                    BlendModeCompat.SRC_IN
+                    BlendModeCompat.SRC_IN,
                 )
             progressBar.indeterminateDrawable.colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
                     color,
-                    BlendModeCompat.SRC_IN
+                    BlendModeCompat.SRC_IN,
                 )
         }
     }
 
-    private fun setProgressBarIndeterminate(progressBar: ProgressBar, value: Boolean) {
+    private fun setProgressBarIndeterminate(
+        progressBar: ProgressBar,
+        value: Boolean,
+    ) {
         // Setting it only when required otherwise it creates glitches
         if (progressBar.isIndeterminate != value) {
             progressBar.isIndeterminate = value
         }
     }
 
-    private fun calculatePercentage(progressValue: Int, totalValue: Int) =
-        min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
+    private fun calculatePercentage(
+        progressValue: Int,
+        totalValue: Int,
+    ) = min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
 
     // I couldn't find a way to get from Android SDK the default text color (in line with the theme).
     // So I change a color for a TextView, then I can't set back to the default.
     // The card's title has always the same color - the default one.
     // Hacky way to extract the color from the title and use for the other TextViews
-    private fun getDefaultGrayTextColor(): Int =
-        binding.syncCardTitle.textColors.defaultColor
-
+    private fun getDefaultGrayTextColor(): Int = binding.syncCardTitle.textColors.defaultColor
 }

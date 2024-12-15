@@ -17,58 +17,70 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import java.util.UUID
+import javax.inject.Inject
 
-class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
-
+class Un20OtaController @Inject constructor(
+    private val crc32Calculator: Crc32Calculator,
+) {
     suspend fun program(
         mainMessageChannel: MainMessageChannel,
-        firmwareBinFile: ByteArray
+        firmwareBinFile: ByteArray,
     ): Flow<Float> {
         startOta(mainMessageChannel)
         val chunks = firmwareBinFile.chunked(MAX_UN20_OTA_CHUNK_SIZE)
-        return chunks.pairWithProgress().asFlow().map { (chunk, progress) ->
-            writeOtaChunk(mainMessageChannel, chunk)
-            progress
-        }.onCompletion {
-            verifyOta(mainMessageChannel, crc32Calculator.calculateCrc32(firmwareBinFile))
-        }
+        return chunks
+            .pairWithProgress()
+            .asFlow()
+            .map { (chunk, progress) ->
+                writeOtaChunk(mainMessageChannel, chunk)
+                progress
+            }.onCompletion {
+                verifyOta(mainMessageChannel, crc32Calculator.calculateCrc32(firmwareBinFile))
+            }
     }
 
-    private suspend fun startOta(
-        mainMessageChannel: MainMessageChannel
-    ) = mainMessageChannel.sendCommandAndReceiveResponse<StartOtaResponse>(
-        StartOtaCommand(UUID.randomUUID().toString())
-    ).verifyResultOk()
+    private suspend fun startOta(mainMessageChannel: MainMessageChannel) = mainMessageChannel
+        .sendCommandAndReceiveResponse<StartOtaResponse>(
+            StartOtaCommand(UUID.randomUUID().toString()),
+        ).verifyResultOk()
 
     private suspend fun writeOtaChunk(
         mainMessageChannel: MainMessageChannel,
-        chunk: ByteArray
-    ) = mainMessageChannel.sendCommandAndReceiveResponse<WriteOtaChunkResponse>(
-        WriteOtaChunkCommand(chunk)
-    ).verifyResultOk()
+        chunk: ByteArray,
+    ) = mainMessageChannel
+        .sendCommandAndReceiveResponse<WriteOtaChunkResponse>(
+            WriteOtaChunkCommand(chunk),
+        ).verifyResultOk()
 
     private suspend fun verifyOta(
-        mainMessageChannel: MainMessageChannel, crc32: Int
-    ) = mainMessageChannel.sendCommandAndReceiveResponse<VerifyOtaResponse>(
-        VerifyOtaCommand(crc32)
-    ).verifyResultOk()
-
+        mainMessageChannel: MainMessageChannel,
+        crc32: Int,
+    ) = mainMessageChannel
+        .sendCommandAndReceiveResponse<VerifyOtaResponse>(
+            VerifyOtaCommand(crc32),
+        ).verifyResultOk()
 
     private fun StartOtaResponse.verifyResultOk() {
         if (operationResultCode != OperationResultCode.OK) {
-            throw OtaFailedException("Received unexpected response code: $operationResultCode during UN20 OTA inside response ${this::class.java.simpleName}")
+            throw OtaFailedException(
+                "Received unexpected response code: $operationResultCode during UN20 OTA inside response ${this::class.java.simpleName}",
+            )
         }
     }
 
     private fun WriteOtaChunkResponse.verifyResultOk() {
         if (operationResultCode != OperationResultCode.OK) {
-            throw OtaFailedException("Received unexpected response code: $operationResultCode during UN20 OTA inside response ${this::class.java.simpleName}")
+            throw OtaFailedException(
+                "Received unexpected response code: $operationResultCode during UN20 OTA inside response ${this::class.java.simpleName}",
+            )
         }
     }
 
     private fun VerifyOtaResponse.verifyResultOk() {
         if (operationResultCode != OperationResultCode.OK) {
-            throw OtaFailedException("Received unexpected response code: $operationResultCode during UN20 OTA inside response ${this::class.java.simpleName}")
+            throw OtaFailedException(
+                "Received unexpected response code: $operationResultCode during UN20 OTA inside response ${this::class.java.simpleName}",
+            )
         }
     }
 
@@ -76,4 +88,3 @@ class Un20OtaController(private val crc32Calculator: Crc32Calculator) {
         const val MAX_UN20_OTA_CHUNK_SIZE = 894
     }
 }
-

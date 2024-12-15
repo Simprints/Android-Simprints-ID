@@ -19,6 +19,8 @@ internal object ProjectConfigurationSerializer : Serializer<ProtoProjectConfigur
         }
     }
 
-    override suspend fun writeTo(t: ProtoProjectConfiguration, output: OutputStream) =
-        t.writeTo(output)
+    override suspend fun writeTo(
+        t: ProtoProjectConfiguration,
+        output: OutputStream,
+    ) = t.writeTo(output)
 }

@@ -9,7 +9,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class BaseFragment : Fragment(R.layout.fragment_base) {
-
     @Inject
     lateinit var authStore: AuthStore
 

@@ -9,8 +9,7 @@ import javax.inject.Inject
 /**
  * Can be removed once all the devices have been updated to 2023.4.0
  */
-class ProjectConfigLedsModeMigration @Inject constructor() :
-    DataMigration<ProtoProjectConfiguration> {
+class ProjectConfigLedsModeMigration @Inject constructor() : DataMigration<ProtoProjectConfiguration> {
     override suspend fun cleanUp() {
         Simber.i("Migration of project configuration displayLiveFeedback to leds mode is done")
     }
@@ -26,15 +25,19 @@ class ProjectConfigLedsModeMigration @Inject constructor() :
         val oldVero2Configuration = fingerprintProto.secugenSimMatcher.vero2
 
         val newVero2Configuration =
-            oldVero2Configuration.toBuilder()
+            oldVero2Configuration
+                .toBuilder()
                 .setLedsMode(LIVE_QUALITY_FEEDBACK)
-                .clearDisplayLiveFeedback().build()
+                .clearDisplayLiveFeedback()
+                .build()
 
         val secugenSimMatcher =
-            fingerprintProto.secugenSimMatcher.toBuilder().setVero2(newVero2Configuration).build()
+            fingerprintProto.secugenSimMatcher
+                .toBuilder()
+                .setVero2(newVero2Configuration)
+                .build()
         fingerprintProto.setSecugenSimMatcher(secugenSimMatcher)
 
         return currentData.toBuilder().setFingerprint(fingerprintProto).build()
     }
-
 }

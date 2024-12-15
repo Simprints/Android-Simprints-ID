@@ -7,7 +7,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class AppendUtilKtTest {
-
     @Test
     fun `should append first sentence without leading space`() {
         val initialTextStringBuilder = StringBuilder()
@@ -25,5 +24,4 @@ class AppendUtilKtTest {
 
         assertThat(actualText).isEqualTo(expectedText)
     }
-
 }

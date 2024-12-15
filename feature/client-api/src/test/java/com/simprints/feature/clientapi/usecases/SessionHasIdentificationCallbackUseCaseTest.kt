@@ -29,14 +29,15 @@ class SessionHasIdentificationCallbackUseCaseTest {
         useCase = SessionHasIdentificationCallbackUseCase(eventRepository)
     }
 
-
     @Test
     fun `sessionHasIdentificationCallback return true if session has IdentificationCallbackEvent`() = runTest {
         // Given
         coEvery { eventRepository.getEventsFromScope(any()) } returns listOf(
-            mockk(), mockk(), mockk<IdentificationCallbackEvent>()
+            mockk(),
+            mockk(),
+            mockk<IdentificationCallbackEvent>(),
         )
-        //Then
+        // Then
         assertThat(useCase("sessionId")).isTrue()
     }
 
@@ -44,9 +45,11 @@ class SessionHasIdentificationCallbackUseCaseTest {
     fun `sessionHasIdentificationCallback return false if session doesn't have IdentificationCallbackEvent`() = runTest {
         // Given
         coEvery { eventRepository.getEventsFromScope(any()) } returns listOf(
-            mockk(), mockk(), mockk()
+            mockk(),
+            mockk(),
+            mockk(),
         )
-        //Then
+        // Then
         assertThat(useCase("sessionId")).isFalse()
     }
 
@@ -54,7 +57,7 @@ class SessionHasIdentificationCallbackUseCaseTest {
     fun `sessionHasIdentificationCallback return false if session events is empty`() = runTest {
         // Given
         coEvery { eventRepository.getEventsFromScope(any()) } returns emptyList()
-        //Then
+        // Then
         assertThat(useCase("sessionId")).isFalse()
     }
 }

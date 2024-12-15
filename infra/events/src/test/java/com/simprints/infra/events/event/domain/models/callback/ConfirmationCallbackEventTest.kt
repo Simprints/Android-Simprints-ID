@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import org.junit.Test
 
 class ConfirmationCallbackEventTest {
-
     @Test
     fun create_ConfirmationCallbackEvent() {
         val event = ConfirmationCallbackEvent(CREATED_AT, true)

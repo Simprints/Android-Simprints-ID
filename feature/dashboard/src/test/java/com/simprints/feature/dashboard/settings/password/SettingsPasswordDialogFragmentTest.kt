@@ -9,11 +9,9 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.feature.dashboard.R
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.fail
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import com.google.android.material.R as MR
 import com.simprints.infra.resources.R as IDR
@@ -21,13 +19,12 @@ import com.simprints.infra.resources.R as IDR
 @Ignore("launchFragment does not support fragments built with factory methods")
 @RunWith(AndroidJUnit4::class)
 class SettingsPasswordDialogFragmentTest {
-
     @Test
     fun `closes without success on cancel`() {
         launchFragment(themeResId = MR.style.Theme_MaterialComponents) {
             SettingsPasswordDialogFragment.newInstance(
                 passwordToMatch = "1234",
-                //onSuccess = { fail() }
+                // onSuccess = { fail() }
             )
         }
         onView(withId(android.R.id.button2))

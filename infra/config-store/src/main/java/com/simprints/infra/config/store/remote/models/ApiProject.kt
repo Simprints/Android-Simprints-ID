@@ -16,7 +16,6 @@ internal data class ApiProject(
     val configuration: ApiProjectConfiguration,
     val tokenizationKeys: Map<String, String>?,
 ) {
-
     fun toDomain(): Project = Project(
         id = id,
         name = name,
@@ -25,6 +24,6 @@ internal data class ApiProject(
         creator = creator,
         imageBucket = imageBucket,
         baseUrl = baseUrl,
-        tokenizationKeys = tokenizationKeys.mapTokenizationKeysToDomain()
+        tokenizationKeys = tokenizationKeys.mapTokenizationKeysToDomain(),
     )
 }

@@ -17,7 +17,6 @@ import org.junit.Test
 import java.io.IOException
 
 class FirmwareFileUpdateWorkerTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -34,7 +33,7 @@ class FirmwareFileUpdateWorkerTest {
             mockk(relaxed = true),
             mockk(relaxed = true),
             firmwareRepository,
-            testCoroutineRule.testCoroutineDispatcher
+            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 

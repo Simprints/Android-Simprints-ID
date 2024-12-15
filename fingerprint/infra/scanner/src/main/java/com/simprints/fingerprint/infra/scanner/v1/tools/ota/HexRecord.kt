@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.infra.scanner.v1.tools.ota
 
-class HexRecord(val string: String) {
+class HexRecord(
+    val string: String,
+) {
     var type = 0
     var rawString = ""
     var addr = 0

@@ -15,20 +15,18 @@ data class ScannerConnectionEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         scannerInfo: ScannerConnectionPayload.ScannerInfo,
     ) : this(
         UUID.randomUUID().toString(),
         ScannerConnectionPayload(createdAt, EVENT_VERSION, scannerInfo),
-        SCANNER_CONNECTION
+        SCANNER_CONNECTION,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ScannerConnectionPayload(
@@ -38,6 +36,8 @@ data class ScannerConnectionEvent(
         override val endedAt: Timestamp? = null,
         override val type: EventType = SCANNER_CONNECTION,
     ) : EventPayload() {
+        override fun toSafeString(): String = "scanner: ${scannerInfo.scannerId}, mac: ${scannerInfo.macAddress}, " +
+            "generation: ${scannerInfo.generation}, hardware version: ${scannerInfo.hardwareVersion}"
 
         @Keep
         data class ScannerInfo(
@@ -49,14 +49,12 @@ data class ScannerConnectionEvent(
 
         @Keep
         enum class ScannerGeneration {
-
             VERO_1,
-            VERO_2
+            VERO_2,
         }
     }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

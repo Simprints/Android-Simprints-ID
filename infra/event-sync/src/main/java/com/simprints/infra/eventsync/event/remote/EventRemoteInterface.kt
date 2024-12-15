@@ -13,10 +13,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Streaming
 
-
 @JvmSuppressWildcards
 internal interface EventRemoteInterface : SimRemoteInterface {
-
     @HEAD("projects/{projectId}/events")
     suspend fun countEvents(
         @Path("projectId") projectId: String,
@@ -53,5 +51,4 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("type") type: String = "CORRUPTED_EVENTS",
         @Body events: List<String>,
     )
-
 }

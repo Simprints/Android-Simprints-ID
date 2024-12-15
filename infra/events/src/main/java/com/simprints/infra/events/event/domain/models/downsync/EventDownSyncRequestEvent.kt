@@ -17,7 +17,6 @@ data class EventDownSyncRequestEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         endedAt: Timestamp,
@@ -38,15 +37,16 @@ data class EventDownSyncRequestEvent(
             errorType,
             msToFirstResponseByte,
             eventRead,
-            EVENT_VERSION
+            EVENT_VERSION,
         ),
-        EventType.EVENT_DOWN_SYNC_REQUEST
+        EventType.EVENT_DOWN_SYNC_REQUEST,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = listOf(
         payload.queryParameters.attendantId?.let { TokenKeyType.AttendantId to TokenizableString.Tokenized(it) },
-        payload.queryParameters.moduleId?.let { TokenKeyType.ModuleId to TokenizableString.Tokenized(it) }
+        payload.queryParameters.moduleId?.let { TokenKeyType.ModuleId to TokenizableString.Tokenized(it) },
     ).mapNotNull { it }.toMap()
+
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event = this
 
     @Keep
@@ -61,7 +61,10 @@ data class EventDownSyncRequestEvent(
         val eventsRead: Int?,
         override val eventVersion: Int,
         override val type: EventType = EventType.EVENT_DOWN_SYNC_REQUEST,
-    ) : EventPayload()
+    ) : EventPayload() {
+        override fun toSafeString(): String = "request ID: $requestId, status: $responseStatus, error: $errorType, " +
+            "ms to response: $msToFirstResponseByte, events read: $eventsRead"
+    }
 
     @Keep
     data class QueryParameters(
@@ -73,7 +76,6 @@ data class EventDownSyncRequestEvent(
     )
 
     companion object {
-
         const val EVENT_VERSION = 0
     }
 }

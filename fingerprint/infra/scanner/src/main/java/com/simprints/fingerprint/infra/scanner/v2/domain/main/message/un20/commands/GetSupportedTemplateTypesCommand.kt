@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20C
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 
 class GetSupportedTemplateTypesCommand : Un20Command(Un20MessageType.GetSupportedTemplateTypes) {
-
     companion object {
-        fun fromBytes(@Suppress("unused_parameter") data: ByteArray) = GetSupportedTemplateTypesCommand()
+        fun fromBytes(
+            @Suppress("unused_parameter") data: ByteArray,
+        ) = GetSupportedTemplateTypesCommand()
     }
 }

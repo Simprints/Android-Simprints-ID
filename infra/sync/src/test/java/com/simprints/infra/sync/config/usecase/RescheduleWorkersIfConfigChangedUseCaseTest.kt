@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 class RescheduleWorkersIfConfigChangedUseCaseTest {
-
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
 
@@ -26,57 +25,54 @@ class RescheduleWorkersIfConfigChangedUseCaseTest {
     }
 
     @Test
-    fun `should not reschedule image upload when unmetered connection flag not changes`() =
-        runTest {
-            useCase(
-                projectConfiguration.copy(
-                    synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(
-                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                                imagesRequireUnmeteredConnection = true
-                            )
-                        )
-                    )
+    fun `should not reschedule image upload when unmetered connection flag not changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    up = synchronizationConfiguration.up.copy(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            imagesRequireUnmeteredConnection = true,
+                        ),
+                    ),
                 ),
-                projectConfiguration.copy(
-                    synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(
-                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                                imagesRequireUnmeteredConnection = true
-                            )
-                        )
-                    )
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    up = synchronizationConfiguration.up.copy(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            imagesRequireUnmeteredConnection = true,
+                        ),
+                    ),
                 ),
-            )
+            ),
+        )
 
-            coVerify(exactly = 0) { syncOrchestrator.rescheduleImageUpSync() }
-        }
+        coVerify(exactly = 0) { syncOrchestrator.rescheduleImageUpSync() }
+    }
 
     @Test
-    fun `should reschedule image upload when unmetered connection flag changes`() =
-        runTest {
-            useCase(
-                projectConfiguration.copy(
-                    synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(
-                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                                imagesRequireUnmeteredConnection = false
-                            )
-                        )
-                    )
+    fun `should reschedule image upload when unmetered connection flag changes`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    up = synchronizationConfiguration.up.copy(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            imagesRequireUnmeteredConnection = false,
+                        ),
+                    ),
                 ),
-                projectConfiguration.copy(
-                    synchronization = synchronizationConfiguration.copy(
-                        up = synchronizationConfiguration.up.copy(
-                            simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                                imagesRequireUnmeteredConnection = true
-                            )
-                        )
-                    )
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    up = synchronizationConfiguration.up.copy(
+                        simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                            imagesRequireUnmeteredConnection = true,
+                        ),
+                    ),
                 ),
-            )
+            ),
+        )
 
-            coVerify { syncOrchestrator.rescheduleImageUpSync() }
-        }
-
+        coVerify { syncOrchestrator.rescheduleImageUpSync() }
+    }
 }

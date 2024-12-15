@@ -13,7 +13,6 @@ import org.json.JSONObject
  * payload.
  */
 internal class EventMigration3to4 : Migration(3, 4) {
-
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
             Simber.d("Migrating room db from schema 3 to schema 4.")
@@ -26,7 +25,8 @@ internal class EventMigration3to4 : Migration(3, 4) {
 
     fun migrateConnectivityEvents(database: SupportSQLiteDatabase) {
         val enrolmentEventsQuery = database.query(
-            "SELECT * FROM DbEvent WHERE type = ?", arrayOf("CONNECTIVITY_SNAPSHOT")
+            "SELECT * FROM DbEvent WHERE type = ?",
+            arrayOf("CONNECTIVITY_SNAPSHOT"),
         )
         enrolmentEventsQuery.use {
             while (it.moveToNext()) {
@@ -42,7 +42,7 @@ internal class EventMigration3to4 : Migration(3, 4) {
     fun migrateEnrolmentEventPayloadType(
         it: Cursor,
         database: SupportSQLiteDatabase,
-        id: String?
+        id: String?,
     ) {
         val jsonData = it.getStringWithColumnName(DB_EVENT_JSON_FIELD)
         jsonData?.let {
@@ -64,5 +64,4 @@ internal class EventMigration3to4 : Migration(3, 4) {
         private const val VERSION_PAYLOAD_NAME = "eventVersion"
         private const val NEW_EVENT_VERSION_VALUE = 2
     }
-
 }
