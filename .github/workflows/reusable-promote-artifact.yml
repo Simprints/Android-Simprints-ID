@@ -52,7 +52,7 @@ jobs:
                         TRACK="qa"
                     elif [ "${{inputs.deployment-track}}" == "Alpha" ]; then
                         STATUS="completed"
-                        USER_FRACTION=0.33
+                        USER_FRACTION=1.0
                         TRACK="alpha"
                     elif [ "${{inputs.deployment-track}}" == "Prod-25-Percent-Rollout" ]; then
                         STATUS="inProgress"
