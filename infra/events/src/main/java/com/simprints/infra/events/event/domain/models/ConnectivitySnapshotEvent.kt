@@ -16,20 +16,18 @@ data class ConnectivitySnapshotEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         connections: List<SimNetworkUtils.Connection>,
     ) : this(
         UUID.randomUUID().toString(),
         ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, connections),
-        CONNECTIVITY_SNAPSHOT
+        CONNECTIVITY_SNAPSHOT,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ConnectivitySnapshotPayload(
@@ -38,10 +36,11 @@ data class ConnectivitySnapshotEvent(
         val connections: List<SimNetworkUtils.Connection>,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CONNECTIVITY_SNAPSHOT,
-    ) : EventPayload()
+    ) : EventPayload() {
+        override fun toSafeString(): String = connections.joinToString(", ") { "${it.type}: ${it.state}" }
+    }
 
     companion object {
-
         const val EVENT_VERSION = 3
     }
 }

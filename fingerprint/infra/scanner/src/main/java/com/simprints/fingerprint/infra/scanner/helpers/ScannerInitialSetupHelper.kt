@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.infra.scanner.helpers
 
-import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.infra.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
@@ -13,10 +12,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -28,9 +24,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
     private val batteryLevelChecker: BatteryLevelChecker,
     private val configManager: ConfigManager,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) {
-
     private lateinit var scannerVersion: ScannerVersion
 
     /**
@@ -50,15 +44,15 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         macAddress: String,
         withScannerVersion: (ScannerVersion) -> Unit,
         withBatteryInfo: (BatteryInfo) -> Unit,
-    ) = withContext(dispatcher) {
+    ) {
         delay(100) // Speculatively needed
-        val unifiedVersionInfo = scanner.getVersionInformation().await()
+        val unifiedVersionInfo = scanner.getVersionInformation()
         unifiedVersionInfo.toScannerVersion().also {
             withScannerVersion(it)
             scannerVersion = it
         }
 
-        scanner.enterMainMode().await()
+        scanner.enterMainMode()
         delay(100) // Speculatively needed
         val batteryInfo = getBatteryInfo(scanner, withBatteryInfo)
         ifAvailableOtasPrepareScannerThenThrow(
@@ -66,7 +60,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
             scannerVersion.hardwareVersion,
             scanner,
             macAddress,
-            batteryInfo
+            batteryInfo,
         )
     }
 
@@ -74,16 +68,16 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         scanner: Scanner,
         withBatteryInfo: (BatteryInfo) -> Unit,
     ): BatteryInfo {
-        val batteryPercent = scanner.getBatteryPercentCharge().await()
-        val batteryVoltage = scanner.getBatteryVoltageMilliVolts().await()
-        val batteryMilliAmps = scanner.getBatteryCurrentMilliAmps().await()
-        val batteryTemperature = scanner.getBatteryTemperatureDeciKelvin().await()
+        val batteryPercent = scanner.getBatteryPercentCharge()
+        val batteryVoltage = scanner.getBatteryVoltageMilliVolts()
+        val batteryMilliAmps = scanner.getBatteryCurrentMilliAmps()
+        val batteryTemperature = scanner.getBatteryTemperatureDeciKelvin()
 
         return BatteryInfo(
             batteryPercent,
             batteryVoltage,
             batteryMilliAmps,
-            batteryTemperature
+            batteryTemperature,
         ).also {
             withBatteryInfo(it)
         }
@@ -96,15 +90,17 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         macAddress: String,
         batteryInfo: BatteryInfo,
     ) {
-        val configuredVersions =  configManager.getProjectConfiguration().fingerprint
-                ?.getSdkConfiguration(fingerprintSdk)
-                ?.vero2
-                ?.firmwareVersions
-                ?.get(hardwareVersion)
+        val configuredVersions = configManager
+            .getProjectConfiguration()
+            .fingerprint
+            ?.getSdkConfiguration(fingerprintSdk)
+            ?.vero2
+            ?.firmwareVersions
+            ?.get(hardwareVersion)
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, configuredVersions)
-        val requiresOtaUpdate = availableOtas.isNotEmpty()
-            && !batteryInfo.isLowBattery()
-            && !batteryLevelChecker.isLowBattery()
+        val requiresOtaUpdate = availableOtas.isNotEmpty() &&
+            !batteryInfo.isLowBattery() &&
+            !batteryLevelChecker.isLowBattery()
 
         if (requiresOtaUpdate) {
             connectionHelper.reconnect(scanner, macAddress)
@@ -122,15 +118,27 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         val localFiles = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         return listOfNotNull(
             if (
-                localFiles[Chip.CYPRESS]?.contains(configured.cypress) == true
-                && current.cypress != configured.cypress
-            ) AvailableOta.CYPRESS else null,
+                localFiles[Chip.CYPRESS]?.contains(configured.cypress) == true &&
+                current.cypress != configured.cypress
+            ) {
+                AvailableOta.CYPRESS
+            } else {
+                null
+            },
             if (localFiles[Chip.STM]?.contains(configured.stm) == true &&
                 current.stm != configured.stm
-            ) AvailableOta.STM else null,
+            ) {
+                AvailableOta.STM
+            } else {
+                null
+            },
             if (localFiles[Chip.UN20]?.contains(configured.un20) == true &&
                 current.un20 != configured.un20
-            ) AvailableOta.UN20 else null
+            ) {
+                AvailableOta.UN20
+            } else {
+                null
+            },
         )
     }
 }

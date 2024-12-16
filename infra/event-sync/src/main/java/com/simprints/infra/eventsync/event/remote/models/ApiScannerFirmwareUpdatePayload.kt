@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
 
-
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiScannerFirmwareUpdatePayload(
@@ -16,7 +15,6 @@ internal data class ApiScannerFirmwareUpdatePayload(
     val targetAppVersion: String,
     val failureReason: String?,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: ScannerFirmwareUpdatePayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
@@ -25,6 +23,5 @@ internal data class ApiScannerFirmwareUpdatePayload(
         domainPayload.failureReason,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

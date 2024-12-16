@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.connect.screens.issues.nfcpair
 
+import android.nfc.TagLostException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,9 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class NfcPairViewModel @Inject constructor(
     private val nfcManager: NfcManager,
-    private val scannerPairingManager: ScannerPairingManager
+    private val scannerPairingManager: ScannerPairingManager,
 ) : ViewModel() {
-
     val awaitingToPairToMacAddress: LiveData<LiveDataEventWithContent<String>>
         get() = _awaitingToPairToMacAddress
     private val _awaitingToPairToMacAddress = MutableLiveData<LiveDataEventWithContent<String>>()
@@ -38,6 +38,10 @@ internal class NfcPairViewModel @Inject constructor(
             _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_try_again)
         } catch (e: IllegalArgumentException) {
             _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_invalid)
+        } catch (e: SecurityException) {
+            _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_try_again)
+        } catch (e: TagLostException) {
+            _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_try_again)
         }
     }
 

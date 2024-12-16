@@ -1,12 +1,10 @@
 package com.simprints.feature.clientapi.models
 
- object ClientApiConstants {
-
+object ClientApiConstants {
     const val CALLER_PACKAGE_NAME = "callerPackageName"
 }
 
 internal object OdkConstants {
-
     const val PACKAGE_NAME = "com.simprints.simodkadapter"
 
     const val ODK_GUIDS_KEY = "odk-guids"
@@ -29,9 +27,9 @@ internal object OdkConstants {
 
     const val ODK_VERIFY_BIOMETRICS_COMPLETE = "odk-verify-biometrics-complete"
 
-    //For some reason, Survey CTO sends the callback field in the callout Intent.
-    //Because SID doesn't expect these fields, the intent is marked as suspicious.
-    //Added these fields as "acceptable", so a Suspicious event is not generated.
+    // For some reason, Survey CTO sends the callback field in the callout Intent.
+    // Because SID doesn't expect these fields, the intent is marked as suspicious.
+    // Added these fields as "acceptable", so a Suspicious event is not generated.
     val acceptableExtras = listOf(
         ODK_REGISTRATION_ID_KEY,
         ODK_GUIDS_KEY,
@@ -47,7 +45,7 @@ internal object OdkConstants {
         ODK_MATCH_CONFIDENCE_FLAGS_KEY,
         ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY,
         ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE,
-        ODK_VERIFY_BIOMETRICS_COMPLETE
+        ODK_VERIFY_BIOMETRICS_COMPLETE,
     )
 }
 
@@ -69,6 +67,5 @@ internal object CommCareConstants {
 }
 
 internal object LibSimprintsConstants {
-
     const val PACKAGE_NAME = "com.simprints.id"
 }

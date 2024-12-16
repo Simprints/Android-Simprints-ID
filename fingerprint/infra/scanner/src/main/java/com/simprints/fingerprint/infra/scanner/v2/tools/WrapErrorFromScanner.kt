@@ -6,19 +6,23 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedExcept
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.infra.logging.Simber
 import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
+    is CancellationException -> e // Propagate cancellation
     is NotConnectedException,
-    is IOException -> { // Disconnected or timed-out communications with Scanner
+    is IOException,
+    -> { // Disconnected or timed-out communications with Scanner
         Simber.d(
             e,
-            "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException"
+            "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException",
         )
         ScannerDisconnectedException()
     }
 
     is IllegalStateException, // We're calling scanner methods out of order somehow
-    is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
+    is IllegalArgumentException,
+    -> { // We've received unexpected/invalid bytes from the scanner
         Simber.e(e)
         UnexpectedScannerException(throwable = e)
     }
@@ -30,4 +34,10 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     else -> { // Propagate error
         e
     }
+}
+
+suspend fun <T> runWithErrorWrapping(block: suspend () -> T): T = try {
+    block()
+} catch (e: Exception) {
+    throw wrapErrorFromScanner(e)
 }

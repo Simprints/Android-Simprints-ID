@@ -1,49 +1,51 @@
 package com.simprints.fingerprint.infra.scanner.v2.scanner
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.RootMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.domain.Mode
+import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.CypressOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20Response
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.CaptureFingerprintCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageDistortionConfigurationMatrixCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetTemplateCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetUnprocessedImageCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageData
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormat
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.TemplateData
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageDistortionConfigurationMatrixResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageQualityPreviewResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageQualityResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetTemplateResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroEvent
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.SetSmileLedStateCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.SetUn20OnCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.BatteryCurrent
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.BatteryPercentCharge
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.BatteryTemperature
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.BatteryVoltage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.LedState
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.OperationResultCode
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.SetSmileLedStateResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryCurrentResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryPercentChargeResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryTemperatureResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryVoltageResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetUn20OnResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.RootCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.RootResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.EnterCypressOtaModeCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.EnterMainModeCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.EnterStmOtaModeCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressExtendedFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ExtendedVersionInformation
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.EnterCypressOtaModeResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.EnterMainModeResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.EnterStmOtaModeResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetExtendedVersionResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.IllegalUn20StateException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.IncorrectModeException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
@@ -54,63 +56,62 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.stmota.StmOtaMessageI
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.stmota.StmOtaMessageOutputStream
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm.StmOtaController
-import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.un20.Un20OtaController
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.unit.reactive.testSubscribe
-import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.just
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.runs
-import io.mockk.spyk
 import io.mockk.verify
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
-import io.reactivex.rxkotlin.toObservable
+import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.InputStream
 import java.io.OutputStream
 
 class ScannerTest {
-
-    private lateinit var eventsSubject: PublishSubject<VeroEvent>
     private lateinit var mockkMessageOutputStream: MainMessageOutputStream
     private lateinit var mockkMessageInputStream: MainMessageInputStream
-    private val responseErrorHandler = ResponseErrorHandler(ResponseErrorHandlingStrategy.NONE)
     private lateinit var scanner: Scanner
     private lateinit var flowableDisposable: Disposable
     private lateinit var flowable: Flowable<ByteArray>
     private lateinit var mockkInputStream: InputStream
+    private val un20OtaController: Un20OtaController = mockk()
+    private val mockkOutputStream = mockk<OutputStream>()
+    private val scannerInfo = ScannerInfo()
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val dispatcher = Dispatchers.IO
 
     @Before
     fun setup() {
-        eventsSubject = PublishSubject.create()
-
-        mockkMessageInputStream = mockk {
-            every { connect(any()) } just Runs
-            every { disconnect() } just Runs
-            every { veroEvents } returns eventsSubject.toFlowable(BackpressureStrategy.BUFFER)
-        }
+        mockkMessageInputStream = setupMainMessageInputStreamMock()
         mockkMessageOutputStream = mockk {
-            every { connect(any()) } just Runs
-            every { disconnect() } just Runs
+            justRun { connect(any()) }
+            justRun { disconnect() }
+            every { sendMessage(any()) } returns Completable.complete()
         }
-
         flowableDisposable = mockk(relaxed = true)
         flowable = mockk {
             every { subscribeOn(any()) } returns this
@@ -123,39 +124,169 @@ class ScannerTest {
             every { toFlowable() } returns flowable
         }
         scanner = Scanner(
-            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
+            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
+            setupRootMessageChannelMock(),
             mockk(),
             mockk(),
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
-            responseErrorHandler
+            un20OtaController,
+            scannerInfo,
+            dispatcher,
+        )
+    }
+
+    @Test(expected = NotConnectedException::class)
+    fun scanner_callEnterModeBeforeConnect_throwsException() = runTest {
+        scanner.enterMainMode()
+    }
+
+    @Test
+    fun scanner_call_batteryInfo() = runTest {
+        val expectedPercentCharge = 1
+        val expectedVoltageMilliVolts = 2
+        val expectedCurrentMilliAmps = 3
+        val expectedTemperatureDeciKelvin = 4
+
+        val messageInputStreamMock = setupMainMessageInputStreamMock(
+            veroMessages = listOf<VeroResponse>(
+                GetBatteryPercentChargeResponse(BatteryPercentCharge(expectedPercentCharge.toByte())),
+                GetBatteryTemperatureResponse(BatteryTemperature(expectedTemperatureDeciKelvin.toShort())),
+                GetBatteryVoltageResponse(BatteryVoltage(expectedVoltageMilliVolts.toShort())),
+                GetBatteryCurrentResponse(BatteryCurrent(expectedCurrentMilliAmps.toShort())),
+            ),
+        )
+
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        assertThat(scanner.getBatteryPercentCharge()).isEqualTo(expectedPercentCharge)
+        assertThat(scanner.getBatteryVoltageMilliVolts()).isEqualTo(expectedVoltageMilliVolts)
+        assertThat(scanner.getBatteryCurrentMilliAmps()).isEqualTo(expectedCurrentMilliAmps)
+        assertThat(scanner.getBatteryTemperatureDeciKelvin()).isEqualTo(
+            expectedTemperatureDeciKelvin,
         )
     }
 
     @Test
-    fun scanner_callEnterModeBeforeConnect_throwsException() {
-        scanner.enterMainMode().testSubscribe().await()
-            .assertError(NotConnectedException::class.java)
+    fun scanner_call_getUn20Status() = runTest {
+        val expectedValue = true
+
+        val messageInputStreamMock =
+            setupMainMessageInputStreamMock(veroMessages = listOf(GetUn20OnResponse(DigitalValue.TRUE)))
+
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+
+        val result = scanner.getUn20Status()
+        assertThat(result).isEqualTo(expectedValue)
     }
 
     @Test
-    fun scanner_connectThenDisconnectThenEnterMainMode_throwsException() {
-        scanner.connect(mockk(), mockk()).blockingAwait()
-        scanner.disconnect().blockingAwait()
-        scanner.enterMainMode().testSubscribe().await()
-            .assertError(NotConnectedException::class.java)
+    fun scanner_call_getImageQualityScore() = runTest {
+        val expectedValue = GetImageQualityResponse(1)
+
+        val messageInputStreamMock =
+            setupMainMessageInputStreamMock(un20Messages = listOf(expectedValue))
+
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
+        val result = scanner.getImageQualityScore()
+        assertThat(result).isEqualTo(expectedValue.imageQualityScore)
     }
 
     @Test
-    fun scanner_connect_callsConnectOnRootMessageStreams() {
+    fun scanner_call_getUn20AppVersion() = runTest {
+        val expectedValue = Un20ExtendedAppVersion("un20Version")
+        val scannerInfoReaderMockk = mockk<ScannerExtendedInfoReaderHelper> {
+            coEvery { getUn20ExtendedAppVersion() } returns expectedValue
+        }
+        val scanner = createScanner(scannerInfoReaderMockk)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
+        val result = scanner.getUn20AppVersion()
+        assertThat(result).isEqualTo(expectedValue)
+    }
+
+    @Test
+    fun scanner_call_getVersionInformation() = runTest {
+        val expectedValue = mockk<ScannerInformation>()
+
+        val scannerInfoReaderMockk = mockk<ScannerExtendedInfoReaderHelper> {
+            coEvery { readScannerInfo() } returns expectedValue
+        }
+        val scanner = createScanner(scannerInfoReaderMockk)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+
+        val result = scanner.getVersionInformation()
+        assertThat(result).isEqualTo(expectedValue)
+    }
+
+    @Test
+    fun scanner_call_setVersionInformation() = runTest {
+        val expectedValue = mockk<ExtendedVersionInformation>()
+
+        val scannerInfoReaderMockk = mockk<ScannerExtendedInfoReaderHelper> {
+            coJustRun { setExtendedVersionInformation(expectedValue) }
+        }
+        val scanner = createScanner(scannerInfoReaderMockk)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+
+        scanner.setVersionInformation(expectedValue)
+        coVerify { scannerInfoReaderMockk.setExtendedVersionInformation(expectedValue) }
+    }
+
+    @Test
+    fun scanner_call_getCypressFirmwareVersion() = runTest {
+        val expectedValue = mockk<CypressFirmwareVersion>()
+
+        val scannerInfoReaderMockk = mockk<ScannerExtendedInfoReaderHelper> {
+            coEvery { getCypressVersion() } returns expectedValue
+        }
+        val scanner = createScanner(scannerInfoReaderMockk)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+
+        val result = scanner.getCypressFirmwareVersion()
+        assertThat(result).isEqualTo(expectedValue)
+    }
+
+    @Test
+    fun scanner_call_getImageQualityPreview() = runTest {
+        val expectedValue = GetImageQualityPreviewResponse(1)
+
+        val messageInputStreamMock =
+            setupMainMessageInputStreamMock(un20Messages = listOf(expectedValue))
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
+
+        val result = scanner.getImageQualityPreview()
+        assertThat(result).isEqualTo(expectedValue.imageQualityScore)
+    }
+
+    @Test(expected = NotConnectedException::class)
+    fun scanner_connectThenDisconnectThenEnterMainMode_throwsException() = runTest {
+        scanner.connect(mockk(), mockk())
+        scanner.disconnect()
+        scanner.enterMainMode()
+    }
+
+    @Test
+    fun scanner_connect_callsConnectOnRootMessageStreams() = runTest {
         val rootMessageChannel: RootMessageChannel = mockk {
-            every { connect(any(), any()) } just runs
+            justRun { connect(any(), any()) }
         }
         scanner = Scanner(
-            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
+            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
             rootMessageChannel,
             mockk(),
             mockk(),
@@ -163,41 +294,34 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-
+        scanner.connect(mockkInputStream, mockkOutputStream)
         verify { rootMessageChannel.connect(any(), any()) }
     }
 
     @Test
     fun scanner_connect_stateIsInRootMode() {
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
+        scanner.connect(mockkInputStream, mockkOutputStream)
         assertThat(scanner.state.mode).isEqualTo(Mode.ROOT)
     }
 
     @Test
-    fun scanner_connectThenEnterMainMode_callsConnectOnMainMessageStreams() {
-        val mockkOutputStream = mockk<OutputStream>()
-        scanner.connect(mockkInputStream, mockkOutputStream).blockingAwait()
-
-        scanner.enterMainMode().blockingAwait()
+    fun scanner_connectThenEnterMainMode_callsConnectOnMainMessageStreams() = runTest {
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
         verify { mockkMessageInputStream.connect(any()) }
         verify { mockkMessageOutputStream.connect(mockkOutputStream) }
-
-        scanner.disconnect().blockingAwait()
+        scanner.disconnect()
         verify { mockkMessageInputStream.disconnect() }
         verify { mockkMessageOutputStream.disconnect() }
-
     }
 
     @Test
-    fun scanner_connectThenEnterMainMode_stateIsInMainMode() {
-
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-
-        scanner.enterMainMode().blockingAwait()
-
+    fun scanner_connectThenEnterMainMode_stateIsInMainMode() = runTest {
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
         assertThat(scanner.state.mode).isEqualTo(Mode.MAIN)
     }
 
@@ -216,236 +340,220 @@ class ScannerTest {
             mockk(),
             mockk(),
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.disconnect().blockingAwait()
+        scanner.disconnect()
         verify(exactly = 0) { mockRootMessageChannel.disconnect() }
         verify(exactly = 0) { mockMainMessageChannel.disconnect() }
         verify(exactly = 0) { mockStmOtaMessageChannel.disconnect() }
         verify(exactly = 0) { mockCypressOtaMessageChannel.disconnect() }
     }
 
-    @Test
-    fun scanner_connectThenEnterCypressOtaMode_callsConnectOnCypressOtaMessageStreams() {
-
-        val mockCypressOtaMessageChannel = mockk<CypressOtaMessageChannel> {
-            every { connect(any(), any()) } just Runs
-            every { disconnect() } just Runs
-        }
-        val mockkOutputStream = mockk<OutputStream>()
-
+    @Test()
+    fun scanner_connectThenEnterCypressOtaMode_callsConnectOnCypressOtaMessageStreams() = runTest {
+        val mockCypressOtaMessageChannel =
+            CypressOtaMessageChannel(mockk(relaxed = true), mockk(relaxed = true), dispatcher)
         scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMockk(),
+            setupRootMessageChannelMock(),
             mockk(),
             mockCypressOtaMessageChannel,
             mockk(),
             mockk(),
             mockk(),
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockkOutputStream).blockingAwait()
-
-        scanner.enterCypressOtaMode().blockingAwait()
-
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterCypressOtaMode()
         verify { mockCypressOtaMessageChannel.connect(any(), any()) }
-        scanner.disconnect().blockingAwait()
+        scanner.disconnect()
         verify { mockCypressOtaMessageChannel.disconnect() }
     }
 
     @Test
-    fun scanner_connectThenEnterCypressOtaMode_stateIsInCypressOtaMode() {
-
+    fun scanner_connectThenEnterCypressOtaMode_stateIsInCypressOtaMode() = runTest {
         val mockkCypressOtaMessageChannel: CypressOtaMessageChannel = mockk {
-            every { connect(any(), any()) } just Runs
+            justRun { connect(any(), any()) }
         }
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMockk(),
+            setupRootMessageChannelMock(),
             mockk(),
             mockkCypressOtaMessageChannel,
             mockk(),
             mockk(),
             mockk(),
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
+        scanner.connect(mockkInputStream, mockkOutputStream)
 
-        scanner.enterCypressOtaMode().blockingAwait()
+        scanner.enterCypressOtaMode()
 
         assertThat(scanner.state.mode).isEqualTo(Mode.CYPRESS_OTA)
     }
 
     @Test
-    fun scanner_connectThenEnterCypressOtaModeThenStartCypressOta_receivesProgressCorrectly() {
+    fun scanner_connectThenEnterCypressOtaModeThenStartCypressOta_receivesProgressCorrectly() = runTest {
         val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
 
         val mockkCypressOtaController = mockk<CypressOtaController> {
-            every {
-                program(
-                    any(),
-                    any(),
-                    any()
-                )
-            } returns Observable.defer { progressValues.toObservable() }
+            coEvery {
+                program(any(), any())
+            } returns progressValues.asFlow()
         }
 
         val mockkMessageInputStream = mockk<CypressOtaMessageInputStream>(relaxed = true) {
-            every { cypressOtaResponseStream } returns Flowable.empty()
+            every { cypressOtaResponseStream } returns emptyList<CypressOtaResponse>().toFlowable()
         }
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMockk(),
+            setupRootMessageChannelMock(),
             mockk(),
-            CypressOtaMessageChannel(mockkMessageInputStream, mockk(relaxed = true)),
+            CypressOtaMessageChannel(
+                mockkMessageInputStream,
+                mockk(relaxed = true),
+                dispatcher,
+            ),
             mockk(),
             mockkCypressOtaController,
             mockk(),
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        scanner.enterCypressOtaMode().blockingAwait()
-
-        val testObserver = scanner.startCypressOta(byteArrayOf()).testSubscribe()
-
-        testObserver.awaitAndAssertSuccess()
-
-        assertThat(testObserver.values()).containsExactlyElementsIn(progressValues).inOrder()
-        testObserver.assertComplete()
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterCypressOtaMode()
+        val testObserver = scanner.startCypressOta(byteArrayOf())
+        assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues).inOrder()
     }
 
     @Test
-    fun scanner_connectThenEnterStmOtaMode_callsConnectOnStmOtaMessageStreams() {
-
+    fun scanner_connectThenEnterStmOtaMode_callsConnectOnStmOtaMessageStreams() = runTest {
         val mockkMessageInputStream = mockk<StmOtaMessageInputStream> {
-            every { connect(any()) } just Runs
-            every { disconnect() } just Runs
-            every { stmOtaResponseStream } returns Flowable.empty()
+            justRun { connect(any()) }
+            justRun { disconnect() }
+            every { stmOtaResponseStream } returns emptyList<StmOtaResponse>().toFlowable()
         }
         val mockkMessageOutputStream = mockk<StmOtaMessageOutputStream> {
-            every { connect(any()) } just Runs
-            every { disconnect() } just Runs
+            justRun { connect(any()) }
+            justRun { disconnect() }
         }
 
         val mockkOutputStream = mockk<OutputStream>()
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMockk(),
+            setupRootMessageChannelMock(),
             mockk(),
             mockk(),
-            StmOtaMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
+            StmOtaMessageChannel(
+                mockkMessageInputStream,
+                mockkMessageOutputStream,
+                dispatcher,
+            ),
             mockk(),
             mockk(),
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockkOutputStream).blockingAwait()
+        scanner.connect(mockkInputStream, mockkOutputStream)
 
-        scanner.enterStmOtaMode().blockingAwait()
+        scanner.enterStmOtaMode()
 
         verify { mockkMessageInputStream.connect(any()) }
         verify { mockkMessageOutputStream.connect(mockkOutputStream) }
-        scanner.disconnect().blockingAwait()
+        scanner.disconnect()
         verify { mockkMessageInputStream.disconnect() }
         verify { mockkMessageOutputStream.disconnect() }
     }
 
     @Test
-    fun scanner_connectThenEnterStmOtaMode_stateIsInStmOtaMode() {
+    fun scanner_connectThenEnterStmOtaMode_stateIsInStmOtaMode() = runTest {
         val mockkMessageInputStream = mockk<StmOtaMessageInputStream> {
-            every { connect(any()) } just Runs
-            every { stmOtaResponseStream } returns Flowable.empty()
+            justRun { connect(any()) }
+            every { stmOtaResponseStream } returns emptyList<StmOtaResponse>().toFlowable()
         }
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMockk(),
+            setupRootMessageChannelMock(),
             mockk(),
             mockk(),
-            StmOtaMessageChannel(mockkMessageInputStream, mockk(relaxed = true)),
+            StmOtaMessageChannel(
+                mockkMessageInputStream,
+                mockk(relaxed = true),
+                dispatcher,
+            ),
             mockk(),
             mockk(),
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
+        scanner.connect(mockkInputStream, mockkOutputStream)
 
-        scanner.enterStmOtaMode().blockingAwait()
+        scanner.enterStmOtaMode()
 
         assertThat(scanner.state.mode).isEqualTo(Mode.STM_OTA)
     }
 
     @Test
-    fun scanner_connectThenEnterStmOtaModeThenStartStmOta_receivesProgressCorrectly() {
+    fun scanner_connectThenEnterStmOtaModeThenStartStmOta_receivesProgressCorrectly() = runTest {
         val progressValues = listOf(0.25f, 0.50f, 0.75f, 1.00f)
 
         val mockkStmOtaController = mockk<StmOtaController> {
-            every {
-                program(
-                    any(),
-                    any(),
-                    any()
-                )
-            } returns Observable.defer { progressValues.toObservable() }
+            coEvery {
+                program(any(), any())
+            } returns progressValues.asFlow()
         }
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMockk(),
+            setupRootMessageChannelMock(),
             mockk(),
             mockk(),
-            StmOtaMessageChannel(mockk(relaxed = true), mockk(relaxed = true)),
+            mockk(relaxed = true),
             mockk(),
             mockkStmOtaController,
             mockk(),
-            responseErrorHandler
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        scanner.enterStmOtaMode().blockingAwait()
+        scanner.connect(mockkInputStream, mockkOutputStream)
 
-        val testObserver = scanner.startStmOta(byteArrayOf()).testSubscribe()
+        scanner.enterStmOtaMode()
 
-        testObserver.awaitAndAssertSuccess()
+        val testObserver = scanner.startStmOta(byteArrayOf())
 
-        assertThat(testObserver.values()).containsExactlyElementsIn(progressValues).inOrder()
-        testObserver.assertComplete()
+        assertThat(testObserver.toList()).containsExactlyElementsIn(progressValues).inOrder()
+    }
+
+    @Test(expected = IncorrectModeException::class)
+    fun scanner_connectThenTurnUn20On_throwsException() = runTest {
+        val scanner = createScanner(setupMainMessageInputStreamMock(), mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.turnUn20On()
+        assertThat(scanner.state).isNull()
     }
 
     @Test
-    fun scanner_connectThenTurnUn20On_throwsException() {
-        val mockkMainMessageChannel = mockk<MainMessageChannel> {
-            every {
-                sendMainModeCommandAndReceiveResponse<SetUn20OnResponse>(any<SetUn20OnCommand>())
-            } returns Single.just(SetUn20OnResponse(OperationResultCode.OK))
-        }
-        val scanner = Scanner(
-            mockkMainMessageChannel,
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
+    fun scannerVeroEvents_differentKindsOfEventsCreated_forwardsOnlyTriggerEventsToObservers() = runTest {
+        val eventsSubject = PublishSubject.create<VeroEvent>()
+        val messageInputStreamMock = setupMainMessageInputStreamMock()
+        every { messageInputStreamMock.veroEvents } returns eventsSubject.toFlowable(
+            BackpressureStrategy.BUFFER,
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
 
-        scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().await()
-            .assertError(IncorrectModeException::class.java)
-    }
-
-    @Test
-    fun scannerVeroEvents_differentKindsOfEventsCreated_forwardsOnlyTriggerEventsToObservers() {
-
-
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        scanner.enterMainMode().blockingAwait()
+        scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
 
         val testObserver = TestObserver<Unit>()
         scanner.triggerButtonListeners.add(testObserver)
@@ -458,544 +566,240 @@ class ScannerTest {
     }
 
     @Test
-    fun scanner_turnOnAndOffUn20_changesStateCorrectlyUponStateChangeEvent() {
-        val eventsSubject = PublishSubject.create<VeroEvent>()
-        val responseSubject = PublishSubject.create<VeroResponse>()
-
-        val messageInputStreamMock = mockk<MainMessageInputStream> {
-            every { connect(any()) } just Runs
-            every { veroResponses } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-            every { veroEvents } returns eventsSubject.toFlowable(BackpressureStrategy.BUFFER)
-        }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
-            every { sendMessage(any<SetUn20OnCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(SetUn20OnResponse(OperationResultCode.OK))
-                    eventsSubject.onNext(Un20StateChangeEvent((args[0] as SetUn20OnCommand).value))
-                }
-            }
-        }
-
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamMock, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
+    fun scanner_turnOnAndOffUn20_changesStateCorrectlyUponStateChangeEvent() = runTest {
+        val messageInputStreamMock = setupMainMessageInputStreamMock(
+            veroMessages = listOf(
+                SetUn20OnResponse(OperationResultCode.OK),
+            ),
+            veroEventsMessages = listOf(
+                Un20StateChangeEvent(DigitalValue.TRUE),
+            ),
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        scanner.enterMainMode().blockingAwait()
 
-        scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().awaitAndAssertSuccess()
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.turnUn20On()
         assertThat(scanner.state.un20On).isTrue()
 
-        scanner.turnUn20OffAndAwaitStateChangeEvent().testSubscribe().awaitAndAssertSuccess()
+        scanner.turnUn20Off()
         assertThat(scanner.state.un20On).isFalse()
     }
 
     @Test
-    fun scanner_setSmileLedState_changesStateCorrectly() {
-        val responseSubject = PublishSubject.create<VeroResponse>()
+    fun scanner_setSmileLedState_changesStateCorrectly() = runTest {
+        val messageInputStreamMock = setupMainMessageInputStreamMock()
 
-        val messageInputStreamSpyk =
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
-                every { connect(any()) } just Runs
-                veroResponses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-                veroEvents = Flowable.empty()
-            }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream> {
-            every { connect(any()) } just Runs
-            every { sendMessage(any<SetSmileLedStateCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(SetSmileLedStateResponse(OperationResultCode.OK))
-                }
-            }
-        }
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
 
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        scanner.enterMainMode().blockingAwait()
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
 
         val smileLedState = SmileLedState(
             LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
             LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
             LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
             LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
-            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04)
+            LedState(DigitalValue.FALSE, 0x00, 0x00, 0x04),
         )
-
-        scanner.setSmileLedState(smileLedState).testSubscribe().awaitAndAssertSuccess()
+        scanner.setSmileLedState(smileLedState)
         assertThat(scanner.state.smileLedState).isEqualTo(smileLedState)
     }
 
     @Test
-    fun scanner_captureFingerprintWithUn20On_receivesFingerprint() {
-        val responseSubject = PublishSubject.create<Un20Response>()
+    fun scanner_captureFingerprintWithUn20On_receivesFingerprint() = runTest {
+        val captureResponse = CaptureFingerprintResponse(CaptureFingerprintResult.OK)
+        val messageInputStreamMock =
+            setupMainMessageInputStreamMock(un20Messages = listOf(captureResponse))
+        val mockkMessageOutputStream = mockkMessageOutputStream
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
+        val result = scanner.captureFingerprint()
+        assertThat(result).isEqualTo(captureResponse.captureFingerprintResult)
+    }
 
-        val messageInputStreamSpyk =
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
-                every { connect(any()) } just Runs
-                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-                veroEvents = Flowable.empty()
-            }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream> {
-            every { connect(any()) } just Runs
-            every { sendMessage(any<CaptureFingerprintCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
-                }
-            }
-        }
-
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        ).apply {
-            connect(mockk(), mockk()).blockingAwait()
-            enterMainMode().blockingAwait()
-            state.un20On = true
-        }
-
-        scanner.captureFingerprint().testSubscribe().awaitAndAssertSuccess()
+    @Test(expected = IllegalUn20StateException::class)
+    fun scanner_captureFingerprintWithUn20Off_throwsException() = runTest {
+        val responseSubject = listOf(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
+        val messageInputStreamMock = setupMainMessageInputStreamMock(un20Messages = responseSubject)
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.captureFingerprint()
     }
 
     @Test
-    fun scanner_captureFingerprintWithUn20Off_throwsException() {
-        val responseSubject = PublishSubject.create<Un20Response>()
-
-        val messageInputStreamSpyk = mockk<MainMessageInputStream> {
-            every { connect(any()) } just Runs
-            every { un20Responses } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-            every { veroEvents } returns Flowable.empty()
-        }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
-            every { sendMessage(any<CaptureFingerprintCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
-                }
-            }
-        }
-
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        ).apply {
-            connect(mockk(), mockk()).blockingAwait()
-            enterMainMode().blockingAwait()
-            state.un20On = null
-        }
-
-        scanner.captureFingerprint().testSubscribe().await()
-            .assertError(IllegalUn20StateException::class.java)
-    }
-
-    @Test
-    fun scanner_acquireTemplateWithUn20On_receivesTemplate() {
+    fun scanner_acquireTemplateWithUn20On_receivesTemplate() = runTest {
         val template = byteArrayOf(0x10, 0x20, 0x30, 0x40)
-        val expectedResponseData = byteArrayOf(template)
-
-        val responseSubject = PublishSubject.create<Un20Response>()
-
-        val messageInputStreamSpyk =
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
-                every { connect(any()) } just Runs
-                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-                veroEvents = Flowable.empty()
-            }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
-            every { sendMessage(any<GetTemplateCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(
-                        GetTemplateResponse(
-                            Scanner.DEFAULT_TEMPLATE_TYPE,
-                            TemplateData(template)
-                        )
-                    )
-                }
-            }
-        }
-
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        ).apply {
-            connect(mockk(), mockk()).blockingAwait()
-            enterMainMode().blockingAwait()
-            state.un20On = true
-        }
-
-        val testObserver = scanner.acquireTemplate().testSubscribe()
-        testObserver.awaitAndAssertSuccess()
-        testObserver.assertValueCount(1)
-        testObserver.values().first().let {
-            assertThat(byteArrayOf(it.template)).isEqualTo(expectedResponseData)
-        }
-
+        val expectedResponseData = template
+        val responseSubject =
+            listOf(GetTemplateResponse(Scanner.DEFAULT_TEMPLATE_TYPE, TemplateData(template)))
+        val messageInputStreamMock = setupMainMessageInputStreamMock(un20Messages = responseSubject)
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
+        val result = scanner.acquireTemplate()
+        assertThat(result).isNotNull()
+        assertThat(result?.template).isEqualTo(expectedResponseData)
     }
 
     @Test
-    fun scanner_acquireImageWithUn20On_receivesImage() {
+    fun scanner_acquireImageWithUn20On_receivesImage() = runTest {
         val image = byteArrayOf(0x10, 0x20, 0x30, 0x40)
         val crcCheck = -42
+        val responseSubject = listOf(GetImageResponse(ImageFormat.RAW, ImageData(image, crcCheck)))
+        val messageInputStreamMock = setupMainMessageInputStreamMock(un20Messages = responseSubject)
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
 
-        val responseSubject = PublishSubject.create<Un20Response>()
-
-        val messageInputStreamSpyk =
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
-                every { connect(any()) } just Runs
-                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-                veroEvents = Flowable.empty()
-            }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
-            every { sendMessage(any<GetImageCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(
-                        GetImageResponse(
-                            ImageFormat.RAW,
-                            ImageData(image, crcCheck)
-                        )
-                    )
-                }
-            }
-        }
-
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        ).apply {
-            connect(mockk(), mockk()).blockingAwait()
-            enterMainMode().blockingAwait()
-            state.un20On = true
-        }
-
-        val testObserver = scanner.acquireImage().testSubscribe()
-        testObserver.awaitAndAssertSuccess()
-        testObserver.assertValueCount(1)
-        assertThat(testObserver.values().first().image).isEqualTo(image)
+        val result = scanner.acquireImage()
+        assertThat(result).isNotNull()
+        assertThat(result?.image).isEqualTo(image)
     }
 
     @Test
-    fun scanner_acquireUnprocessedImageWithUn20On_receivesImage() {
-        val image = byteArrayOf(0x10, 0x20, 0x30, 0x40)
-        val crcCheck = -42
-
-        val responseSubject = PublishSubject.create<Un20Response>()
-
-        val messageInputStreamSpyk =
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
-                every { connect(any()) } just Runs
-                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-                veroEvents = Flowable.empty()
-            }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
-            every { sendMessage(any<GetUnprocessedImageCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(
-                        GetImageResponse(
-                            ImageFormat.RAW,
-                            ImageData(image, crcCheck)
-                        )
-                    )
-                }
-            }
-        }
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        ).apply {
-            connect(mockk(), mockk()).blockingAwait()
-            enterMainMode().blockingAwait()
-            state.un20On = true
-        }
-        val testObserver = scanner.acquireUnprocessedImage().testSubscribe()
-        testObserver.awaitAndAssertSuccess()
-        testObserver.assertValueCount(1)
-        assertThat(testObserver.values().first().image).isEqualTo(image)
-
-    }
-
-    @Test
-    fun scanner_acquireImageDistortionConfigurationMatrix_receivesConfigData() {
-        val imageDistortionConfigurationMatrix = kotlin.byteArrayOf(0x10, 0x20, 0x30, 0x40)
-        val expectedResponseData = byteArrayOf(imageDistortionConfigurationMatrix)
-
-        val responseSubject = PublishSubject.create<Un20Response>()
-
-        val messageInputStreamSpyk =
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
-                every { connect(any()) } just Runs
-                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-                veroEvents = Flowable.empty()
-            }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream>(relaxed = true) {
-            every { sendMessage(any<GetImageDistortionConfigurationMatrixCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(
-                        GetImageDistortionConfigurationMatrixResponse(
-                            imageDistortionConfigurationMatrix
-                        )
-                    )
-                }
-            }
-        }
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        ).apply {
-            connect(mockk(), mockk()).blockingAwait()
-            enterMainMode().blockingAwait()
-            state.un20On = true
-        }
-        val testObserver = scanner.acquireImageDistortionConfigurationMatrix().testSubscribe()
-        testObserver.awaitAndAssertSuccess()
-        testObserver.assertValueCount(1)
-        testObserver.values().first().let {
-            assertThat(byteArrayOf(it)).isEqualTo(expectedResponseData)
-        }
-
-    }
-
-    @Test
-    fun scanner_acquireImage_noImageTakenCallsComplete() {
-        val responseSubject = PublishSubject.create<Un20Response>()
-
-        val messageInputStreamSpyk =
-            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
-                every { connect(any()) } just Runs
-                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-                veroEvents = Flowable.empty()
-            }
-        val mockkMessageOutputStream = mockk<MainMessageOutputStream> {
-            every { connect(any()) } just Runs
-            every { sendMessage(any<GetImageCommand>()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(GetImageResponse(ImageFormat.RAW, null))
-                }
-            }
-        }
-
-        val scanner = Scanner(
-            MainMessageChannel(messageInputStreamSpyk, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        ).apply {
-            connect(mockkInputStream, mockk()).blockingAwait()
-            enterMainMode().blockingAwait()
-            state.un20On = true
-        }
-
-        val testObserver = scanner.acquireImage().testSubscribe()
-        testObserver.awaitAndAssertSuccess()
-        testObserver.assertValueCount(0)
-        testObserver.assertComplete()
+    fun scanner_acquireImage_noImageTakenCallsComplete() = runTest {
+        val responseSubject = listOf(GetImageResponse(ImageFormat.RAW, null))
+        val messageInputStreamMock = setupMainMessageInputStreamMock(un20Messages = responseSubject)
+        val scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
+        val result = scanner.acquireImage()
+        assertThat(result).isNull()
     }
 
     @Test
     fun scanner_connectThenDisconnect_resetsToDisconnectedState() {
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        scanner.disconnect().blockingAwait()
-
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.disconnect()
         assertThat(scanner.state).isEqualTo(disconnectedScannerState())
     }
 
     @Test
-    fun `test scanner disconnect disposes flowableInputStream`() {
-        //Given
-        val scanner = Scanner(
-            mockk(),
-            mockk(relaxed = true),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
-        )
-
-        //When
-        scanner.connect(mockkInputStream, mockk(relaxed = true)).blockingAwait()
-        scanner.disconnect().blockingAwait()
-        //Then
-        verify { flowableDisposable.dispose() }
+    fun scanner_connectThenDisconnect_clearScannerInfo() {
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scannerInfo.setScannerId("123")
+        scanner.disconnect()
+        assertThat(scanner.state).isEqualTo(disconnectedScannerState())
+        assertThat(scannerInfo.scannerId).isNull()
     }
 
     @Test
-    fun scanner_getStmVersion_shouldReturnStmExtendedVersion() {
+    fun scanner_getStmVersion_shouldReturnStmExtendedVersion() = runTest {
         val expectedVersion = StmExtendedFirmwareVersion("1.E-1.1")
         val scannerInfoReaderMockk = mockk<ScannerExtendedInfoReaderHelper> {
-            every { getStmExtendedFirmwareVersion() } returns Single.just(expectedVersion)
+            coEvery { getStmExtendedFirmwareVersion() } returns expectedVersion
         }
-
-
-        val scanner = Scanner(
-            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
-            setupRootMessageChannelMockk(),
-            scannerInfoReaderMockk,
-            mockk(), mockk(), mockk(), mockk(), mockk(),
-            responseErrorHandler
-        )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        scanner.enterMainMode().blockingAwait()
-
-        val testObserver = scanner.getStmFirmwareVersion().test()
-        testObserver.awaitAndAssertSuccess()
-
-        assertThat(testObserver.values().first()).isEqualTo(expectedVersion)
+        val scanner = createScanner(scannerInfoReaderMockk)
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        val result = scanner.getStmFirmwareVersion()
+        assertThat(result).isEqualTo(expectedVersion)
     }
 
-
     @Test
-    fun scanner_getCypressExtendedVersion_shouldReturnCypressExtendedVersion() {
+    fun scanner_getCypressExtendedVersion_shouldReturnCypressExtendedVersion() = runTest {
         val expectedVersion = CypressExtendedFirmwareVersion("1.E-1.1")
         val scannerInfoReaderMockk = mockk<ScannerExtendedInfoReaderHelper> {
-            every { getCypressExtendedVersion() } returns Single.just(expectedVersion)
+            coEvery { getCypressExtendedVersion() } returns expectedVersion
         }
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMockk(),
+            setupRootMessageChannelMock(),
             scannerInfoReaderMockk,
-            mockk(), mockk(), mockk(), mockk(), mockk(),
-            responseErrorHandler
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            scannerInfo,
+            dispatcher,
         )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
+        scanner.connect(mockkInputStream, mockkOutputStream)
 
-        val testObserver = scanner.getCypressExtendedFirmwareVersion().test()
-        testObserver.awaitAndAssertSuccess()
-
-        assertThat(testObserver.values().first()).isEqualTo(expectedVersion)
+        val result = scanner.getCypressExtendedFirmwareVersion()
+        assertThat(result).isEqualTo(expectedVersion)
     }
 
     @Test
-    fun scanner_getExtendedVersion_shouldReturn_ExtendedVersionInformation() = runTest {
-        val expectedVersion = mockk<ExtendedVersionInformation>()
-        val scannerInfoReaderMockk = mockk<ScannerExtendedInfoReaderHelper> {
-            coEvery { getExtendedVersionInfo() } returns GetExtendedVersionResponse(expectedVersion)
-        }
-
-        val scanner = Scanner(
-            mockk(),
-            setupRootMessageChannelMockk(),
-            scannerInfoReaderMockk,
-            mockk(), mockk(), mockk(), mockk(), mockk(),
-            responseErrorHandler
-        )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-
-        val testObserver = scanner.getExtendedVersionInformation().test()
-        testObserver.awaitAndAssertSuccess()
-
-        assertThat(testObserver.values().first()).isEqualTo(expectedVersion)
+    fun test_startUn20Ota() = runTest {
+        val otaBinary = byteArrayOf()
+        coEvery { un20OtaController.program(any(), otaBinary) } returns flowOf()
+        scanner.connect(mockkInputStream, mockkOutputStream)
+        scanner.enterMainMode()
+        scanner.state.un20On = true
+        scanner.startUn20Ota(otaBinary)
+        coVerify { un20OtaController.program(any(), otaBinary) }
     }
 
-    @Test
-    fun `isConnected() correctly passes scanner connection state`() = runTest {
-        val scanner = Scanner(
-            mockk(),
-            setupRootMessageChannelMockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            responseErrorHandler
-        )
-        scanner.connect(mockkInputStream, mockk()).blockingAwait()
-        assertThat(scanner.isConnected()).isTrue()
-
-        scanner.disconnect().blockingAwait()
-        assertThat(scanner.isConnected()).isFalse()
+    private fun setupMainMessageInputStreamMock(
+        veroMessages: List<VeroResponse> = emptyList(),
+        un20Messages: List<Un20Response> = emptyList(),
+        veroEventsMessages: List<VeroEvent> = emptyList(),
+    ): MainMessageInputStream = mockk {
+        justRun { connect(any()) }
+        justRun { disconnect() }
+        every { un20Responses } returns un20Messages.toFlowable()
+        every { veroResponses } returns veroMessages.toFlowable()
+        every { veroEvents } returns veroEventsMessages.toFlowable()
     }
 
-    private fun setupRootMessageChannelMockk(): RootMessageChannel {
-
-        val responseSubject = PublishSubject.create<RootResponse>()
+    private fun setupRootMessageChannelMock(): RootMessageChannel {
         val mockRootMessageInputStream = mockk<RootMessageInputStream> {
-            every { connect(any()) } just Runs
-            every { disconnect() } just Runs
-            every { rootResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+            justRun { connect(any()) }
+            justRun { disconnect() }
+            every { rootResponseStream } returns listOf(
+                EnterMainModeResponse(),
+                EnterStmOtaModeResponse(),
+                EnterCypressOtaModeResponse(),
+            ).toFlowable()
         }
         val mockRootMessageOutputStream = mockk<RootMessageOutputStream> {
-            every { connect(any()) } just Runs
-            every { disconnect() } just Runs
-            every { sendMessage(any()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(
-                        when (args[0] as RootCommand) {
-                            is EnterMainModeCommand -> EnterMainModeResponse()
-                            is EnterStmOtaModeCommand -> EnterStmOtaModeResponse()
-                            is EnterCypressOtaModeCommand -> EnterCypressOtaModeResponse()
-                            else -> throw IllegalArgumentException()
-                        }
-                    )
-                }
-            }
-
+            justRun { connect(any()) }
+            justRun { disconnect() }
+            every { sendMessage(any()) } returns Completable.complete()
         }
-        return RootMessageChannel(mockRootMessageInputStream, mockRootMessageOutputStream)
+        return RootMessageChannel(
+            mockRootMessageInputStream,
+            mockRootMessageOutputStream,
+            dispatcher,
+        )
     }
+
+    private fun createScanner(
+        messageInputStreamMock: MainMessageInputStream,
+        mockkMessageOutputStream: MainMessageOutputStream,
+    ) = Scanner(
+        MainMessageChannel(messageInputStreamMock, mockkMessageOutputStream, dispatcher),
+        setupRootMessageChannelMock(),
+        mockk(),
+        mockk(),
+        mockk(),
+        mockk(),
+        mockk(),
+        mockk(),
+        scannerInfo,
+        dispatcher,
+    )
+
+    private fun createScanner(scannerInfoReaderMockk: ScannerExtendedInfoReaderHelper) = Scanner(
+        MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
+        setupRootMessageChannelMock(),
+        scannerInfoReaderMockk,
+        mockk(),
+        mockk(),
+        mockk(),
+        mockk(),
+        mockk(),
+        scannerInfo,
+        dispatcher,
+    )
 }

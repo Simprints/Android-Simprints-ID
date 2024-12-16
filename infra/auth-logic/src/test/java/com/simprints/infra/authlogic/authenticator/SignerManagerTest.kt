@@ -29,7 +29,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class SignerManagerTest {
-
     @MockK
     lateinit var configManager: ConfigManager
 
@@ -63,7 +62,7 @@ internal class SignerManagerTest {
         "some_token",
         "some_project_id",
         "some_api_key",
-        "some_application_id"
+        "some_application_id",
     )
 
     @Before
@@ -203,42 +202,46 @@ internal class SignerManagerTest {
 
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, token)
 
-    private fun mockStoreCredentialsLocally() =
-        every { mockAuthStore.signedInProjectId } returns (DEFAULT_PROJECT_ID)
+    private fun mockStoreCredentialsLocally() = every { mockAuthStore.signedInProjectId } returns (DEFAULT_PROJECT_ID)
 
-    private fun mockRemoteSignedIn(error: Boolean = false) =
-        coEvery { mockAuthStore.storeFirebaseToken(token) }.apply {
-            if (error) {
-                this.throws(Throwable("Failed to store credentials"))
-            } else {
-                this.returns(Unit)
-            }
+    private fun mockRemoteSignedIn(error: Boolean = false) = coEvery { mockAuthStore.storeFirebaseToken(token) }.apply {
+        if (error) {
+            this.throws(Throwable("Failed to store credentials"))
+        } else {
+            this.returns(Unit)
         }
+    }
 
-    private fun mockFetchingProjectInfo(error: Boolean = false) =
-        coEvery { configManager.refreshProject(any()) }.apply {
-            if (!error) {
-                this.returns(
-                    ProjectWithConfig(
-                        Project(
-                            DEFAULT_PROJECT_ID,
-                            "local",
-                            ProjectState.RUNNING,
-                            "",
-                            "",
-                            "some_bucket_url",
-                            "",
-                            tokenizationKeys = emptyMap()
-                        ),
-                        ProjectConfiguration(
-                            DEFAULT_PROJECT_ID, "", mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), null,
-                        ),
-
-                    )
-                )
-            } else {
-                this.throws(Exception("Failed to fetch project info"))
-            }
+    private fun mockFetchingProjectInfo(error: Boolean = false) = coEvery { configManager.refreshProject(any()) }.apply {
+        if (!error) {
+            this.returns(
+                ProjectWithConfig(
+                    Project(
+                        DEFAULT_PROJECT_ID,
+                        "local",
+                        ProjectState.RUNNING,
+                        "",
+                        "",
+                        "some_bucket_url",
+                        "",
+                        tokenizationKeys = emptyMap(),
+                    ),
+                    ProjectConfiguration(
+                        "id",
+                        DEFAULT_PROJECT_ID,
+                        "",
+                        mockk(),
+                        mockk(),
+                        mockk(),
+                        mockk(),
+                        mockk(),
+                        mockk(),
+                        null,
+                    ),
+                ),
+            )
+        } else {
+            this.throws(Exception("Failed to fetch project info"))
         }
-
+    }
 }

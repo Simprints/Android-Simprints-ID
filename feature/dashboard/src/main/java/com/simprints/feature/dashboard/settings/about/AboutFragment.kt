@@ -13,6 +13,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
@@ -27,7 +28,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class AboutFragment : PreferenceFragmentCompat() {
-
     @Inject
     @PackageVersionName
     lateinit var packageVersionName: String
@@ -43,19 +43,24 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(IDR.string.dashboard_logout_confirmation_title))
             .setMessage(getString(IDR.string.dashboard_logout_confirmation_message))
-            .setPositiveButton(getString(IDR.string.dashboard_logout_confirmation_log_out_button)) { _, _ -> viewModel.processLogoutRequest() }
+            .setPositiveButton(
+                getString(IDR.string.dashboard_logout_confirmation_log_out_button),
+            ) { _, _ -> viewModel.processLogoutRequest() }
             .setNegativeButton(getString(IDR.string.dashboard_logout_confirmation_cancel_button), null)
             .create()
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         addPreferencesFromResource(R.xml.preference_about)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val settingsView =
             inflater.inflate(R.layout.fragment_settings_about, container, false) as ViewGroup
@@ -63,7 +68,10 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         return settingsView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.settingsAboutToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
@@ -88,7 +96,26 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                     LogoutDestination.LoginScreen -> R.id.action_aboutFragment_to_requestLoginFragment
                 }
                 findNavController().navigate(destination)
-            })
+            },
+        )
+        viewModel.openTroubleshooting.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                showPasswordIfRequired(ACTION_TROUBLESHOOTING) { openTroubleshooting() }
+            },
+        )
+
+        SettingsPasswordDialogFragment.registerForResult(
+            fragmentManager = childFragmentManager,
+            lifecycleOwner = this,
+            onSuccess = { action ->
+                viewModel.unlockSettings()
+                when (action) {
+                    ACTION_LOGOUT -> viewModel.processLogoutRequest()
+                    ACTION_TROUBLESHOOTING -> openTroubleshooting()
+                }
+            },
+        )
     }
 
     private fun initLayout() {
@@ -96,24 +123,26 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         getDeviceIdPreference()?.let { preference ->
             preference.summary = deviceId
             preference.setOnPreferenceClickListener {
-                Toast.makeText(
-                    requireContext(),
-                    IDR.string.dashboard_preference_copied_to_clipboard,
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast
+                    .makeText(
+                        requireContext(),
+                        IDR.string.dashboard_preference_copied_to_clipboard,
+                        Toast.LENGTH_SHORT,
+                    ).show()
                 Clipboard.copyToClipboard(requireContext(), deviceId)
                 true
             }
         }
+        getSyncAndSearchConfigurationPreference()?.setOnPreferenceClickListener {
+            viewModel.troubleshootingClick()
+            true
+        }
+
         getLogoutPreference()?.setOnPreferenceClickListener {
             activity?.runOnUiThread {
                 val password = viewModel.settingsLocked.value?.getNullablePassword()
                 if (password != null) {
-                    SettingsPasswordDialogFragment(
-                        title = IDR.string.dashboard_password_lock_title_logout,
-                        passwordToMatch = password,
-                        onSuccess = { viewModel.processLogoutRequest() }
-                    ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+                    showPasswordIfRequired(ACTION_LOGOUT) { viewModel.processLogoutRequest() }
                 } else {
                     confirmationDialogForLogout.show()
                 }
@@ -122,21 +151,41 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun getAppVersionPreference(): Preference? =
-        findPreference(getString(R.string.preference_app_version_key))
+    private fun openTroubleshooting() {
+        findNavController().navigate(R.id.action_aboutFragment_to_troubleshooting)
+    }
 
-    private fun getDeviceIdPreference(): Preference? =
-        findPreference(getString(R.string.preference_device_id_key))
+    private fun getAppVersionPreference(): Preference? = findPreference(getString(R.string.preference_app_version_key))
 
-    private fun getScannerVersionPreference(): Preference? =
-        findPreference(getString(R.string.preference_scanner_version_key))
+    private fun getDeviceIdPreference(): Preference? = findPreference(getString(R.string.preference_device_id_key))
 
-    private fun getSyncAndSearchConfigurationPreference(): Preference? =
-        findPreference(getString(R.string.preference_sync_and_search_key))
+    private fun getScannerVersionPreference(): Preference? = findPreference(getString(R.string.preference_scanner_version_key))
 
-    private fun getLogoutPreference(): Preference? =
-        findPreference(getString(R.string.preference_logout_key))
+    private fun getSyncAndSearchConfigurationPreference(): Preference? = findPreference(getString(R.string.preference_sync_and_search_key))
+
+    private fun getLogoutPreference(): Preference? = findPreference(getString(R.string.preference_logout_key))
 
     private fun String.lowerCaseCapitalized() =
         lowercase(Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
+    private fun showPasswordIfRequired(
+        action: String,
+        cb: () -> Unit,
+    ) {
+        val password = viewModel.settingsLocked.value?.getNullablePassword()
+        if (password != null) {
+            SettingsPasswordDialogFragment
+                .newInstance(
+                    passwordToMatch = password,
+                    action = action,
+                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+        } else {
+            cb()
+        }
+    }
+
+    companion object {
+        private const val ACTION_LOGOUT = "logout"
+        private const val ACTION_TROUBLESHOOTING = "troubleshooting"
+    }
 }

@@ -18,39 +18,36 @@ internal data class ApiConsentPayload(
     val consentType: ApiType,
     var result: ApiResult,
 ) : ApiEventPayload(startTime) {
-
     @Keep
     enum class ApiType {
-
-        INDIVIDUAL, PARENTAL
+        INDIVIDUAL,
+        PARENTAL,
     }
 
     @Keep
     enum class ApiResult {
-
-        ACCEPTED, DECLINED, NO_RESPONSE
+        ACCEPTED,
+        DECLINED,
+        NO_RESPONSE,
     }
 
     constructor(domainPayload: ConsentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.consentType.fromDomainToApi(),
-        domainPayload.result.fromDomainToApi()
+        domainPayload.result.fromDomainToApi(),
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
 
-internal fun ConsentPayload.Type.fromDomainToApi() =
-    when (this) {
-        INDIVIDUAL -> ApiType.INDIVIDUAL
-        PARENTAL -> ApiType.PARENTAL
-    }
+internal fun ConsentPayload.Type.fromDomainToApi() = when (this) {
+    INDIVIDUAL -> ApiType.INDIVIDUAL
+    PARENTAL -> ApiType.PARENTAL
+}
 
-internal fun ConsentPayload.Result.fromDomainToApi() =
-    when (this) {
-        ACCEPTED -> ApiResult.ACCEPTED
-        DECLINED -> ApiResult.DECLINED
-        NO_RESPONSE -> ApiResult.NO_RESPONSE
-    }
+internal fun ConsentPayload.Result.fromDomainToApi() = when (this) {
+    ACCEPTED -> ApiResult.ACCEPTED
+    DECLINED -> ApiResult.DECLINED
+    NO_RESPONSE -> ApiResult.NO_RESPONSE
+}

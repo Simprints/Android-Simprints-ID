@@ -21,7 +21,6 @@ import org.junit.Test
 import java.io.FileInputStream
 
 internal class ImageRepositoryImplTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -148,7 +147,7 @@ internal class ImageRepositoryImplTest {
             remoteDataSource.uploadImage(mockStream, validImage, emptyMap())
         } returns UploadResult(
             validImage,
-            UploadResult.Status.SUCCESSFUL
+            UploadResult.Status.SUCCESSFUL,
         )
     }
 
@@ -164,18 +163,22 @@ internal class ImageRepositoryImplTest {
             remoteDataSource.uploadImage(mockStream, invalidImage, emptyMap())
         } returns UploadResult(
             invalidImage,
-            UploadResult.Status.FAILED
+            UploadResult.Status.FAILED,
         )
     }
 
-    private fun configureLocalImageFiles(numberOfValidFiles: Int = 3, includeInvalidFile: Boolean) {
+    private fun configureLocalImageFiles(
+        numberOfValidFiles: Int = 3,
+        includeInvalidFile: Boolean,
+    ) {
         val files = mutableListOf<SecuredImageRef>().apply {
             repeat(numberOfValidFiles) {
                 add(mockValidImage())
             }
 
-            if (includeInvalidFile)
+            if (includeInvalidFile) {
                 add(mockInvalidImage())
+            }
         }
 
         coEvery { localDataSource.listImages(PROJECT_ID) } returns files
@@ -194,6 +197,4 @@ internal class ImageRepositoryImplTest {
         private const val THROWING_PATH = "throw.exe"
         private const val PROJECT_ID = "projectId"
     }
-
 }
-

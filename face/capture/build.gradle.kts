@@ -18,6 +18,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation(project(":infra:orchestrator-data"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
     implementation(project(":infra:enrolment-records-store"))

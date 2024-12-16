@@ -33,7 +33,7 @@ class LicenseRepositoryImplTest {
                 "invalidProject",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns ApiLicenseResult.Error("001")
         coEvery {
@@ -41,7 +41,7 @@ class LicenseRepositoryImplTest {
                 "validProjectBackendErrorTimed",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns ApiLicenseResult.BackendMaintenanceError(600L)
         coEvery {
@@ -49,7 +49,7 @@ class LicenseRepositoryImplTest {
                 "validProjectBackendError",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns ApiLicenseResult.BackendMaintenanceError()
         coEvery {
@@ -57,7 +57,7 @@ class LicenseRepositoryImplTest {
                 "validProject",
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns ApiLicenseResult.Success(licenseValue)
 
@@ -72,7 +72,8 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns license
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
+        licenseRepositoryImpl
+            .getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -83,11 +84,48 @@ class LicenseRepositoryImplTest {
     }
 
     @Test
+    fun `re-download license flow `() = runTest {
+        coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
+
+        val licenseStates = mutableListOf<LicenseState>()
+        licenseRepositoryImpl
+            .redownloadLicence("validProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
+            .toCollection(licenseStates)
+
+        with(licenseStates) {
+            assertThat(size).isEqualTo(3)
+            assertThat(get(0)).isEqualTo(LicenseState.Started)
+            assertThat(get(1)).isEqualTo(LicenseState.Downloading)
+            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithSuccess(license))
+        }
+        coVerify { licenseLocalDataSource.deleteCachedLicense(any()) }
+    }
+
+    @Test
+    fun `get error if re-downloading go wrong`() = runTest {
+        coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
+
+        val licenseStates = mutableListOf<LicenseState>()
+        licenseRepositoryImpl
+            .redownloadLicence("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
+            .toCollection(licenseStates)
+
+        with(licenseStates) {
+            assertThat(size).isEqualTo(3)
+            assertThat(get(0)).isEqualTo(LicenseState.Started)
+            assertThat(get(1)).isEqualTo(LicenseState.Downloading)
+            assertThat(get(2)).isEqualTo(LicenseState.FinishedWithError("001"))
+        }
+        coVerify { licenseLocalDataSource.deleteCachedLicense(any()) }
+    }
+
+    @Test
     fun `get license flow from remote`() = runTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("validProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
+        licenseRepositoryImpl
+            .getLicenseStates("validProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -103,7 +141,8 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
+        licenseRepositoryImpl
+            .getLicenseStates("invalidProject", "deviceId", RANK_ONE_FACE, LicenseVersion.UNLIMITED)
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -119,13 +158,13 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates(
-            "validProjectBackendErrorTimed",
-            "deviceId",
-            RANK_ONE_FACE,
-            LicenseVersion.UNLIMITED
-        )
-            .toCollection(licenseStates)
+        licenseRepositoryImpl
+            .getLicenseStates(
+                "validProjectBackendErrorTimed",
+                "deviceId",
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
+            ).toCollection(licenseStates)
 
         with(licenseStates) {
             assertThat(size).isEqualTo(3)
@@ -140,13 +179,13 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates(
-            "validProjectBackendError",
-            "deviceId",
-            RANK_ONE_FACE,
-            LicenseVersion.UNLIMITED
-        )
-            .toCollection(licenseStates)
+        licenseRepositoryImpl
+            .getLicenseStates(
+                "validProjectBackendError",
+                "deviceId",
+                RANK_ONE_FACE,
+                LicenseVersion.UNLIMITED,
+            ).toCollection(licenseStates)
 
         with(licenseStates) {
             assertThat(size).isEqualTo(3)

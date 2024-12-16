@@ -9,7 +9,7 @@ import java.io.InputStream
  * are to be used for setting-up and releasing resources appropriately.
  */
 interface IncomingConnectable {
-
     fun connect(flowableInputStream: Flowable<ByteArray>)
+
     fun disconnect()
 }

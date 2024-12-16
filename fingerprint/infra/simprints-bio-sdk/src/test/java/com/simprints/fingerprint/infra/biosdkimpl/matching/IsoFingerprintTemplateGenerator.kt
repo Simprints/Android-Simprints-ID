@@ -15,7 +15,6 @@ object IsoFingerprintTemplateGenerator {
     private const val SECUGEN_HAMSTER_HEIGHT: Short = 400
     private const val SECUGEN_HAMSTER_PPCM: Short = 500
 
-
     private const val HEADER_SIZE = 28
     private const val MINUTIAE_SIZE = 6
 
@@ -57,9 +56,7 @@ object IsoFingerprintTemplateGenerator {
      * @param qualityScore
      * @return
      */
-    fun generate(
-        qualityScore: Byte
-    ): ByteArray {
+    fun generate(qualityScore: Byte): ByteArray {
         val nbMinutiae: Byte = RANDOM_GENERATOR.nextInt(128).toByte()
         val length: Int =
             HEADER_SIZE + nbMinutiae * MINUTIAE_SIZE
@@ -79,28 +76,30 @@ object IsoFingerprintTemplateGenerator {
         for (minutiaNo in 0 until nbMinutiae) {
             val type: Short = (RANDOM_GENERATOR.nextInt(3) shl 14).toShort()
             val x: Short =
-                RANDOM_GENERATOR.nextInt(SECUGEN_HAMSTER_WIDTH.toInt())
+                RANDOM_GENERATOR
+                    .nextInt(SECUGEN_HAMSTER_WIDTH.toInt())
                     .toShort()
             val y: Short =
-                RANDOM_GENERATOR.nextInt(SECUGEN_HAMSTER_HEIGHT.toInt())
+                RANDOM_GENERATOR
+                    .nextInt(SECUGEN_HAMSTER_HEIGHT.toInt())
                     .toShort()
             val angle: Byte = RANDOM_GENERATOR.nextInt(256).toByte()
             val quality: Byte = RANDOM_GENERATOR.nextInt(101).toByte()
             bb.putShort(
                 FIRST_MINUTIAE_START + minutiaNo * MINUTIAE_SIZE + TYPE_AND_X_SHIFT,
-                (type + x).toShort()
+                (type + x).toShort(),
             )
             bb.putShort(
                 FIRST_MINUTIAE_START + minutiaNo * MINUTIAE_SIZE + ZEROS_AND_Y_SHIFT,
-                y
+                y,
             )
             bb.put(
                 FIRST_MINUTIAE_START + minutiaNo * MINUTIAE_SIZE + ANGLE_SHIFT,
-                angle
+                angle,
             )
             bb.put(
                 FIRST_MINUTIAE_START + minutiaNo * MINUTIAE_SIZE + QUALITY_SHIFT,
-                quality
+                quality,
             )
         }
         bb.position(0)
@@ -108,5 +107,4 @@ object IsoFingerprintTemplateGenerator {
         bb[templateBytes]
         return templateBytes
     }
-
 }

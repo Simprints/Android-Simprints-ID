@@ -26,37 +26,34 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     private val eventRepository: EventRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
-
     override val tag: String = EventEndSyncReporterWorker::class.java.simpleName
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            try {
-                showProgressNotification()
-                val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
-                crashlyticsLog("Start - Params: $syncId")
+    override suspend fun doWork(): Result = withContext(dispatcher) {
+        try {
+            showProgressNotification()
+            val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
+            crashlyticsLog("Start - Params: $syncId")
 
-                inputData.getString(EVENT_DOWN_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
-                    eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
-                }
-
-                inputData.getString(EVENT_UP_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
-                    eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
-                }
-
-                if (!syncId.isNullOrEmpty()) {
-                    syncCache.storeLastSuccessfulSyncTime(Date())
-                    success()
-                } else {
-                    throw IllegalArgumentException("SyncId missed")
-                }
-            } catch (t: Throwable) {
-                fail(t)
+            inputData.getString(EVENT_DOWN_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
+                eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
             }
+
+            inputData.getString(EVENT_UP_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
+                eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
+            }
+
+            if (!syncId.isNullOrEmpty()) {
+                syncCache.storeLastSuccessfulSyncTime(Date())
+                success()
+            } else {
+                throw IllegalArgumentException("SyncId missed")
+            }
+        } catch (t: Throwable) {
+            fail(t)
         }
+    }
 
     companion object {
-
         const val SYNC_ID_TO_MARK_AS_COMPLETED = "SYNC_ID_TO_MARK_AS_COMPLETED"
         const val EVENT_DOWN_SYNC_SCOPE_TO_CLOSE = "EVENT_DOWN_SYNC_SCOPE_TO_CLOSE "
         const val EVENT_UP_SYNC_SCOPE_TO_CLOSE = "EVENT_UP_SYNC_SCOPE_TO_CLOSE "

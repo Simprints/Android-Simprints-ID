@@ -6,7 +6,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiModality.FINGERPRINT
 
 internal enum class ApiModality {
     FACE,
-    FINGERPRINT
+    FINGERPRINT,
 }
 
 internal fun Modality.fromDomainToApi(): ApiModality = when (this) {

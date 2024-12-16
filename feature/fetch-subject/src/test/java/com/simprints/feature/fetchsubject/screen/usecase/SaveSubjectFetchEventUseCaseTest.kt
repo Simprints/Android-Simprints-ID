@@ -3,10 +3,10 @@ package com.simprints.feature.fetchsubject.screen.usecase
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
@@ -14,9 +14,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-
 internal class SaveSubjectFetchEventUseCaseTest {
-
     @MockK
     private lateinit var eventRepository: SessionEventRepository
 
@@ -34,10 +32,12 @@ internal class SaveSubjectFetchEventUseCaseTest {
         useCase(FetchSubjectState.FoundLocal, TIMESTAMP, TIMESTAMP, SUBJECT_ID)
 
         coVerify {
-            eventRepository.addOrUpdateEvent(coWithArg<CandidateReadEvent> {
-                assertThat(it.payload.localResult).isEqualTo(LocalResult.FOUND)
-                assertThat(it.payload.remoteResult).isNull()
-            })
+            eventRepository.addOrUpdateEvent(
+                coWithArg<CandidateReadEvent> {
+                    assertThat(it.payload.localResult).isEqualTo(LocalResult.FOUND)
+                    assertThat(it.payload.remoteResult).isNull()
+                },
+            )
         }
     }
 
@@ -46,10 +46,12 @@ internal class SaveSubjectFetchEventUseCaseTest {
         useCase(FetchSubjectState.FoundRemote, TIMESTAMP, TIMESTAMP, SUBJECT_ID)
 
         coVerify {
-            eventRepository.addOrUpdateEvent(coWithArg<CandidateReadEvent> {
-                assertThat(it.payload.localResult).isEqualTo(LocalResult.NOT_FOUND)
-                assertThat(it.payload.remoteResult).isEqualTo(RemoteResult.FOUND)
-            })
+            eventRepository.addOrUpdateEvent(
+                coWithArg<CandidateReadEvent> {
+                    assertThat(it.payload.localResult).isEqualTo(LocalResult.NOT_FOUND)
+                    assertThat(it.payload.remoteResult).isEqualTo(RemoteResult.FOUND)
+                },
+            )
         }
     }
 
@@ -58,10 +60,12 @@ internal class SaveSubjectFetchEventUseCaseTest {
         useCase(FetchSubjectState.NotFound, TIMESTAMP, TIMESTAMP, SUBJECT_ID)
 
         coVerify {
-            eventRepository.addOrUpdateEvent(coWithArg<CandidateReadEvent> {
-                assertThat(it.payload.localResult).isEqualTo(LocalResult.NOT_FOUND)
-                assertThat(it.payload.remoteResult).isEqualTo(RemoteResult.NOT_FOUND)
-            })
+            eventRepository.addOrUpdateEvent(
+                coWithArg<CandidateReadEvent> {
+                    assertThat(it.payload.localResult).isEqualTo(LocalResult.NOT_FOUND)
+                    assertThat(it.payload.remoteResult).isEqualTo(RemoteResult.NOT_FOUND)
+                },
+            )
         }
     }
 
@@ -70,15 +74,16 @@ internal class SaveSubjectFetchEventUseCaseTest {
         useCase(FetchSubjectState.ConnectionError, TIMESTAMP, TIMESTAMP, SUBJECT_ID)
 
         coVerify {
-            eventRepository.addOrUpdateEvent(coWithArg<CandidateReadEvent> {
-                assertThat(it.payload.localResult).isEqualTo(LocalResult.NOT_FOUND)
-                assertThat(it.payload.remoteResult).isNull()
-            })
+            eventRepository.addOrUpdateEvent(
+                coWithArg<CandidateReadEvent> {
+                    assertThat(it.payload.localResult).isEqualTo(LocalResult.NOT_FOUND)
+                    assertThat(it.payload.remoteResult).isNull()
+                },
+            )
         }
     }
 
     companion object {
-
         private val TIMESTAMP = Timestamp(1L)
         private const val SUBJECT_ID = "subjectID"
     }

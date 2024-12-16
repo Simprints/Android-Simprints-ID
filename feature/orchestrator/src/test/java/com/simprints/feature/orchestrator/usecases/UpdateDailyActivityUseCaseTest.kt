@@ -20,7 +20,6 @@ import org.junit.Before
 import org.junit.Test
 
 class UpdateDailyActivityUseCaseTest {
-
     @MockK
     lateinit var recentUserActivityManager: RecentUserActivityManager
 

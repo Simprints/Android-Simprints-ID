@@ -6,7 +6,6 @@ import com.simprints.feature.exitform.config.ExitFormOption
 import org.junit.Test
 
 class AppRefusalResponseTest {
-
     @Test
     fun testFromResult() {
         mapOf(

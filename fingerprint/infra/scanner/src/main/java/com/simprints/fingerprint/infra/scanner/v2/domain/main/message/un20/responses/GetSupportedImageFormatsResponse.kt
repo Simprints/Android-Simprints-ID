@@ -4,16 +4,17 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20R
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormat
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 
-class GetSupportedImageFormatsResponse(val supportedImageFormats: Set<ImageFormat>) : Un20Response(Un20MessageType.GetSupportedImageFormats) {
-
+class GetSupportedImageFormatsResponse(
+    val supportedImageFormats: Set<ImageFormat>,
+) : Un20Response(Un20MessageType.GetSupportedImageFormats) {
     override fun getDataBytes(): ByteArray = supportedImageFormats.map { it.getBytes() }.reduce { acc, bytes -> acc + bytes }
 
     companion object {
-        fun fromBytes(data: ByteArray) =
-            GetSupportedImageFormatsResponse(
-                data.toList()
-                    .map { ImageFormat.fromByte(it) }
-                    .toSet()
-            )
+        fun fromBytes(data: ByteArray) = GetSupportedImageFormatsResponse(
+            data
+                .toList()
+                .map { ImageFormat.fromByte(it) }
+                .toSet(),
+        )
     }
 }

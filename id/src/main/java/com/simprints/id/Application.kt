@@ -22,8 +22,9 @@ import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("There is no complex business logic to test")
 @HiltAndroidApp
-open class Application : CoreApplication(), Configuration.Provider {
-
+open class Application :
+    CoreApplication(),
+    Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
@@ -51,10 +52,10 @@ open class Application : CoreApplication(), Configuration.Provider {
     }
 
     override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
+        get() = Configuration
+            .Builder()
             .setWorkerFactory(workerFactory)
             .build()
-
 
     open fun initApplication() {
         handleUndeliverableExceptionInRxJava()

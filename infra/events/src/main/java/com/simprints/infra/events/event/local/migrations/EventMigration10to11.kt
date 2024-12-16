@@ -18,7 +18,6 @@ import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration10to11 : Migration(10, 11) {
-
     override fun migrate(db: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 10 to schema 11.")
 
@@ -33,22 +32,22 @@ internal class EventMigration10to11 : Migration(10, 11) {
     private fun createSessionScopeTable(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
-                CREATE TABLE IF NOT EXISTS `$SCOPE_TABLE_NAME` (
-                    `id` TEXT NOT NULL,
-                    `projectId` TEXT NOT NULL,
-                    `createdAt` INTEGER NOT NULL,
-                    `endedAt` INTEGER,
-                    `payloadJson` TEXT NOT NULL,
-                    PRIMARY KEY(`id`)
-                )
-            """.trimIndent()
+            CREATE TABLE IF NOT EXISTS `$SCOPE_TABLE_NAME` (
+                `id` TEXT NOT NULL,
+                `projectId` TEXT NOT NULL,
+                `createdAt` INTEGER NOT NULL,
+                `endedAt` INTEGER,
+                `payloadJson` TEXT NOT NULL,
+                PRIMARY KEY(`id`)
+            )
+            """.trimIndent(),
         )
     }
 
     private fun convertAllSessionCaptureEventsToScopes(database: SupportSQLiteDatabase) {
         val cursor = database.query(
             "SELECT * FROM $EVENT_TABLE_NAME WHERE type = ?",
-            arrayOf(KEY_EVENT_TYPE_SESSION_CAPTURE)
+            arrayOf(KEY_EVENT_TYPE_SESSION_CAPTURE),
         )
         cursor.use {
             while (it.moveToNext()) {
@@ -83,7 +82,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
                 device = event.payload.device,
                 databaseInfo = event.payload.databaseInfo,
                 location = event.payload.location,
-            )
+            ),
         )
 
         return ContentValues().apply {
@@ -99,32 +98,29 @@ internal class EventMigration10to11 : Migration(10, 11) {
 
     private fun fromJsonToDomain(eventJson: String): OldSessionCaptureEvent = JsonHelper.fromJson(
         json = eventJson,
-        type = object : TypeReference<OldSessionCaptureEvent>() {}
+        type = object : TypeReference<OldSessionCaptureEvent>() {},
     )
 
     private fun deleteSessionCaptureEvents(database: SupportSQLiteDatabase) {
         database.execSQL(
             "DELETE FROM DbEvent WHERE type = ?",
-            arrayOf(KEY_EVENT_TYPE_SESSION_CAPTURE)
+            arrayOf(KEY_EVENT_TYPE_SESSION_CAPTURE),
         )
-
     }
 
     private fun deleteArtificialTerminationEvents(database: SupportSQLiteDatabase) {
         database.execSQL(
             "DELETE FROM DbEvent WHERE type = ?",
-            arrayOf(KEY_EVENT_TYPE_TERMINATION)
+            arrayOf(KEY_EVENT_TYPE_TERMINATION),
         )
     }
 
     companion object {
-
         private const val SCOPE_TABLE_NAME = "DbSessionScope"
         private const val EVENT_TABLE_NAME = "DbEvent"
 
         private const val KEY_EVENT_TYPE_SESSION_CAPTURE = "SESSION_CAPTURE"
         private const val KEY_EVENT_TYPE_TERMINATION = "ARTIFICIAL_TERMINATION"
-
     }
 
     // Snapshot of the session capture event structure at the moment when this migration was
@@ -135,7 +131,6 @@ internal class EventMigration10to11 : Migration(10, 11) {
         var labels: EventLabels,
         val payload: SessionCapturePayload,
     ) {
-
         @Keep
         data class EventLabels(
             val sessionId: String? = null,
@@ -155,6 +150,4 @@ internal class EventMigration10to11 : Migration(10, 11) {
             var endedAt: Long = 0,
         )
     }
-
 }
-

@@ -33,7 +33,6 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     private val configDataStore: DataStore<ProtoProjectConfiguration>,
     private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>,
 ) : ConfigLocalDataSource {
-
     override suspend fun saveProject(project: Project) {
         projectDataStore.updateData { project.toProto() }
     }
@@ -57,7 +56,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 if (!protoDeviceConfiguration.language.isOverwritten) {
                     proto
                         .setLanguage(
-                            it.language.toBuilder().setLanguage(config.general.defaultLanguage)
+                            it.language.toBuilder().setLanguage(config.general.defaultLanguage),
                         ).build()
                     LanguageHelper.language = it.language.language
                 }
@@ -66,15 +65,13 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getProjectConfiguration(): ProjectConfiguration =
-        configDataStore.data.first().toDomain()
+    override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
 
     override suspend fun clearProjectConfiguration() {
         configDataStore.updateData { it.toBuilder().clear().build() }
     }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        deviceConfigDataStore.data.first().toDomain()
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration = deviceConfigDataStore.data.first().toDomain()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) {
         deviceConfigDataStore.updateData { currentData ->
@@ -82,7 +79,10 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
             val updatedProtoBuilder = updatedProto.toBuilder()
             if (updatedProto.language.language != currentData.language.language) {
                 updatedProtoBuilder.language =
-                    updatedProto.language.toBuilder().setIsOverwritten(true).build()
+                    updatedProto.language
+                        .toBuilder()
+                        .setIsOverwritten(true)
+                        .build()
                 LanguageHelper.language = updatedProto.language.language
             }
             updatedProtoBuilder.build()
@@ -93,7 +93,11 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         deviceConfigDataStore.updateData { it.toBuilder().clear().build() }
     }
 
-    override fun storePrivacyNotice(projectId: String, language: String, content: String) {
+    override fun storePrivacyNotice(
+        projectId: String,
+        language: String,
+        content: String,
+    ) {
         val projectDir = File(filePathForPrivacyNoticeDirectory(projectId))
         if (!projectDir.exists()) {
             projectDir.mkdirs()
@@ -102,30 +106,35 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         privacyNoticeFile.writeText(content)
     }
 
-    override fun getPrivacyNotice(projectId: String, language: String): String {
-        return fileForPrivacyNotice(projectId, language).readText()
-    }
+    override fun getPrivacyNotice(
+        projectId: String,
+        language: String,
+    ): String = fileForPrivacyNotice(projectId, language).readText()
 
-    override fun hasPrivacyNoticeFor(projectId: String, language: String): Boolean =
-        fileForPrivacyNotice(projectId, language).exists()
+    override fun hasPrivacyNoticeFor(
+        projectId: String,
+        language: String,
+    ): Boolean = fileForPrivacyNotice(projectId, language).exists()
 
     override fun deletePrivacyNotices() {
         File("$absolutePath${File.separator}$PRIVACY_NOTICE_FOLDER").deleteRecursively()
     }
 
-    private fun fileForPrivacyNotice(projectId: String, language: String): File =
-        File(
-            filePathForPrivacyNoticeDirectory(projectId),
-            "$language.$FILE_TYPE"
-        )
+    private fun fileForPrivacyNotice(
+        projectId: String,
+        language: String,
+    ): File = File(
+        filePathForPrivacyNoticeDirectory(projectId),
+        "$language.$FILE_TYPE",
+    )
 
     private fun filePathForPrivacyNoticeDirectory(projectId: String): String =
         "$absolutePath${File.separator}$PRIVACY_NOTICE_FOLDER${File.separator}$projectId"
 
     companion object {
-
         val defaultProjectConfiguration: ProtoProjectConfiguration =
             ProjectConfiguration(
+                id = "",
                 projectId = "",
                 updatedAt = "",
                 general = GeneralConfiguration(
@@ -139,24 +148,24 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 ),
                 face = null,
                 fingerprint = FingerprintConfiguration(
-
                     allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
                     displayHandIcons = true,
                     allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
                     secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
                         fingersToCapture = listOf(
                             Finger.LEFT_THUMB,
-                            Finger.LEFT_INDEX_FINGER
+                            Finger.LEFT_INDEX_FINGER,
                         ),
                         decisionPolicy = DecisionPolicy(
                             0,
                             0,
-                            700
+                            700,
                         ),
                         comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                         vero1 = Vero1Configuration(60),
                         vero2 = null,
                         version = "",
+                        maxCaptureAttempts = null,
                     ),
                     nec = null,
                 ),
@@ -188,7 +197,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                             imagesRequireUnmeteredConnection = false,
                         ),
                         coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
-                            kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                            kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
                         ),
                     ),
                     down = DownSynchronizationConfiguration(
@@ -203,11 +212,10 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         val defaultDeviceConfiguration: ProtoDeviceConfiguration = DeviceConfiguration(
             language = "",
             selectedModules = listOf(),
-            lastInstructionId = ""
+            lastInstructionId = "",
         ).toProto()
 
         private const val PRIVACY_NOTICE_FOLDER = "long-consents"
         private const val FILE_TYPE = "txt"
     }
-
 }

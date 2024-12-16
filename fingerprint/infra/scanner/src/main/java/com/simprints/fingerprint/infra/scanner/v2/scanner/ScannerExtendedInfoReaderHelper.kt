@@ -2,16 +2,12 @@ package com.simprints.fingerprint.infra.scanner.v2.scanner
 
 import com.simprints.fingerprint.infra.scanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.RootMessageChannel
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.IncomingMainMessage
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.OutgoingMainMessage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetUn20ExtendedAppVersionCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetUn20ExtendedAppVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.GetStmExtendedFirmwareVersionCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetStmExtendedFirmwareVersionResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.RootCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.RootResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetCypressExtendedVersionCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetCypressVersionCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetExtendedVersionCommand
@@ -28,116 +24,105 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetExten
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetHardwareVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.SetVersionResponse
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.handleErrorsWith
-import io.reactivex.Single
-import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxSingle
+import javax.inject.Inject
 
-class ScannerExtendedInfoReaderHelper(
+class ScannerExtendedInfoReaderHelper @Inject constructor(
     private val mainMessageChannel: MainMessageChannel,
     private val rootMessageChannel: RootMessageChannel,
-    private val responseErrorHandler: ResponseErrorHandler
 ) {
-
-    fun readScannerInfo(): Single<ScannerInformation> {
-        return getCypressVersion().flatMap { cypressVersion ->
-            val isLegacyApi = cypressVersion.apiMajorVersion <= CYPRESS_HIGHEST_LEGACY_API_MAJOR_VERSION
-                && cypressVersion.apiMinorVersion <= CYPRESS_HIGHEST_LEGACY_API_MINOR_VERSION
-
-            rxSingle { readScannerInfoBasedOnApiVersion(isLegacyApi) }
-        }
+    suspend fun readScannerInfo(): ScannerInformation {
+        val cypressVersion = getCypressVersion()
+        val isLegacyApi =
+            cypressVersion.apiMajorVersion <= CYPRESS_HIGHEST_LEGACY_API_MAJOR_VERSION &&
+                cypressVersion.apiMinorVersion <= CYPRESS_HIGHEST_LEGACY_API_MINOR_VERSION
+        return readScannerInfoBasedOnApiVersion(isLegacyApi)
     }
 
-    private suspend fun readScannerInfoBasedOnApiVersion(isLegacyApi: Boolean): ScannerInformation {
-        return if (isLegacyApi) getScannerInformationWithLegacyApi()
-        else getScannerInformationWithNewApi()
+    private suspend fun readScannerInfoBasedOnApiVersion(isLegacyApi: Boolean): ScannerInformation = if (isLegacyApi) {
+        getScannerInformationWithLegacyApi()
+    } else {
+        getScannerInformationWithNewApi()
     }
 
-    fun getCypressVersion(): Single<CypressFirmwareVersion> {
-        return sendRootModeCommandAndReceiveResponse<GetCypressVersionResponse>(
-            GetCypressVersionCommand()
-        ).map { it.version }
-    }
+    suspend fun getCypressVersion(): CypressFirmwareVersion = rootMessageChannel
+        .sendCommandAndReceiveResponse<GetCypressVersionResponse>(
+            GetCypressVersionCommand(),
+        ).version
 
-    fun getCypressExtendedVersion(): Single<CypressExtendedFirmwareVersion> {
-        return sendRootModeCommandAndReceiveResponse<GetCypressExtendedVersionResponse>(
-            GetCypressExtendedVersionCommand()
-        ).map { it.version }
-    }
+    suspend fun getCypressExtendedVersion(): CypressExtendedFirmwareVersion = rootMessageChannel
+        .sendCommandAndReceiveResponse<GetCypressExtendedVersionResponse>(
+            GetCypressExtendedVersionCommand(),
+        ).version
 
-    fun getStmExtendedFirmwareVersion(): Single<StmExtendedFirmwareVersion> {
-        return sendMainModeCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
-            GetStmExtendedFirmwareVersionCommand()
-        ).map { it.stmFirmwareVersion }
-    }
+    suspend fun getStmExtendedFirmwareVersion(): StmExtendedFirmwareVersion = mainMessageChannel
+        .sendCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
+            GetStmExtendedFirmwareVersionCommand(),
+        ).stmFirmwareVersion
 
-    fun getUn20ExtendedAppVersion(): Single<Un20ExtendedAppVersion> {
-        return sendMainModeCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
-            GetUn20ExtendedAppVersionCommand()
-        ).map { it.un20AppVersion }
-    }
+    suspend fun getUn20ExtendedAppVersion(): Un20ExtendedAppVersion = mainMessageChannel
+        .sendCommandAndReceiveResponse<GetUn20ExtendedAppVersionResponse>(
+            GetUn20ExtendedAppVersionCommand(),
+        ).un20AppVersion
 
-    fun setExtendedVersionInformation(versionInformation: ExtendedVersionInformation): Single<SetVersionResponse> {
-        return sendRootModeCommandAndReceiveResponse(
-            SetExtendedVersionCommand(versionInformation)
+    suspend fun setExtendedVersionInformation(versionInformation: ExtendedVersionInformation): SetVersionResponse =
+        rootMessageChannel.sendCommandAndReceiveResponse(
+            SetExtendedVersionCommand(versionInformation),
         )
-    }
 
     private suspend fun getScannerInformationWithLegacyApi(): ScannerInformation {
-        val legacyUnifiedVersion = sendRootModeCommandAndReceiveResponse<GetVersionResponse>(
-            GetVersionCommand()
-        ).await()
+        val legacyUnifiedVersion =
+            rootMessageChannel.sendCommandAndReceiveResponse<GetVersionResponse>(
+                GetVersionCommand(),
+            )
 
         val extendedVersionInfo = legacyUnifiedVersion.version.toExtendedVersionInfo()
 
         return ScannerInformation(
             hardwareVersion = DEFAULT_HARDWARE_VERSION,
-            firmwareVersions = extendedVersionInfo
+            firmwareVersions = extendedVersionInfo,
         )
     }
 
-
     private suspend fun getScannerInformationWithNewApi(): ScannerInformation {
         val (unifiedVersion, hardwareVersion) = getExtendedVersionInfoAndHardwareVersionInfo()
-        val mergedUnifiedVersion = validateUnifiedVersionOrMergeWithOldVersion(unifiedVersion.version)
+        val mergedUnifiedVersion =
+            validateUnifiedVersionOrMergeWithOldVersion(unifiedVersion.version)
 
         return ScannerInformation(
             hardwareVersion = hardwareVersion.version.versionIdentifier,
-            firmwareVersions = mergedUnifiedVersion
+            firmwareVersions = mergedUnifiedVersion,
         )
     }
 
     private suspend fun validateUnifiedVersionOrMergeWithOldVersion(
-        unifiedVersion: ExtendedVersionInformation
+        unifiedVersion: ExtendedVersionInformation,
     ): ExtendedVersionInformation {
         val requiresOldApiValues = listOf(
             unifiedVersion.cypressFirmwareVersion.versionAsString,
             unifiedVersion.stmFirmwareVersion.versionAsString,
-            unifiedVersion.un20AppVersion.versionAsString
+            unifiedVersion.un20AppVersion.versionAsString,
         ).any { it.isEmpty() }
 
         var mergedScannerInfo = unifiedVersion
 
         if (requiresOldApiValues) {
-            val oldUnifiedVersionInformation =
-                getScannerInformationWithLegacyApi().firmwareVersions
+            val oldUnifiedVersionInformation = getScannerInformationWithLegacyApi().firmwareVersions
 
             if (unifiedVersion.cypressFirmwareVersion.versionAsString.isEmpty()) {
                 mergedScannerInfo = mergedScannerInfo.copy(
-                    cypressFirmwareVersion = oldUnifiedVersionInformation.cypressFirmwareVersion
+                    cypressFirmwareVersion = oldUnifiedVersionInformation.cypressFirmwareVersion,
                 )
             }
 
             if (unifiedVersion.stmFirmwareVersion.versionAsString.isEmpty()) {
                 mergedScannerInfo = mergedScannerInfo.copy(
-                    stmFirmwareVersion = oldUnifiedVersionInformation.stmFirmwareVersion
+                    stmFirmwareVersion = oldUnifiedVersionInformation.stmFirmwareVersion,
                 )
             }
 
             if (unifiedVersion.un20AppVersion.versionAsString.isEmpty()) {
                 mergedScannerInfo = mergedScannerInfo.copy(
-                    un20AppVersion = oldUnifiedVersionInformation.un20AppVersion
+                    un20AppVersion = oldUnifiedVersionInformation.un20AppVersion,
                 )
             }
         }
@@ -151,26 +136,15 @@ class ScannerExtendedInfoReaderHelper(
         return Pair(unifiedVersion, hardwareVersionResponse)
     }
 
-    private suspend fun getHardwareVersionInfo(): GetHardwareVersionResponse {
-        return sendRootModeCommandAndReceiveResponse<GetHardwareVersionResponse>(
-            GetHardwareVersionCommand()
-        ).await()
-    }
+    private suspend fun getHardwareVersionInfo(): GetHardwareVersionResponse =
+        rootMessageChannel.sendCommandAndReceiveResponse<GetHardwareVersionResponse>(
+            GetHardwareVersionCommand(),
+        )
 
-    suspend fun getExtendedVersionInfo(): GetExtendedVersionResponse {
-        return sendRootModeCommandAndReceiveResponse<GetExtendedVersionResponse>(
-            GetExtendedVersionCommand()
-        ).await()
-    }
-
-    private inline fun <reified R : RootResponse> sendRootModeCommandAndReceiveResponse(command: RootCommand): Single<R> =
-        rootMessageChannel.sendRootModeCommandAndReceiveResponse<R>(command)
-            .handleErrorsWith(responseErrorHandler)
-
-    private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
-        mainMessageChannel.sendMainModeCommandAndReceiveResponse<R>(command)
-            .handleErrorsWith(responseErrorHandler)
-
+    suspend fun getExtendedVersionInfo(): GetExtendedVersionResponse =
+        rootMessageChannel.sendCommandAndReceiveResponse<GetExtendedVersionResponse>(
+            GetExtendedVersionCommand(),
+        )
 
     companion object {
         private const val CYPRESS_HIGHEST_LEGACY_API_MAJOR_VERSION = 1

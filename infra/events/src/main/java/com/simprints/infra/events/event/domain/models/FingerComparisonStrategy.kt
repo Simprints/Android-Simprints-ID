@@ -5,5 +5,5 @@ import androidx.annotation.Keep
 @Keep
 enum class FingerComparisonStrategy {
     SAME_FINGER,
-    CROSS_FINGER_USING_MEAN_OF_MAX;
+    CROSS_FINGER_USING_MEAN_OF_MAX,
 }

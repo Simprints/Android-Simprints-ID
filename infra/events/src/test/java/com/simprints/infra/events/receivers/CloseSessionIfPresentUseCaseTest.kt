@@ -1,6 +1,6 @@
 package com.simprints.infra.events.receivers
 
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class CloseSessionIfPresentUseCaseTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 

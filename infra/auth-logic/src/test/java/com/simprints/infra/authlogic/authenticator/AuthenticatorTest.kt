@@ -10,7 +10,7 @@ import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTok
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -23,7 +23,6 @@ import org.junit.Test
 import java.io.IOException
 
 internal class AuthenticatorTest {
-
     @MockK
     private lateinit var authStore: AuthStore
 
@@ -37,7 +36,6 @@ internal class AuthenticatorTest {
     private lateinit var eventRepository: SessionEventRepository
 
     private lateinit var authenticator: Authenticator
-
 
     @Before
     fun setUp() {
@@ -69,8 +67,8 @@ internal class AuthenticatorTest {
     fun shouldSetOfflineIfNetworkConnectionException() = runTest {
         val result = mockException(
             NetworkConnectionException(
-                cause = Throwable()
-            )
+                cause = Throwable(),
+            ),
         )
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.Offline::class.java)
@@ -82,7 +80,6 @@ internal class AuthenticatorTest {
             mockException(MissingOrOutdatedGooglePlayStoreApp(IntegrityErrorCode.PLAY_STORE_VERSION_OUTDATED))
         assertThat(result).isInstanceOf(AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp::class.java)
     }
-
 
     @Test
     fun shouldSetIntegrityServiceTemporaryDownIfIntegrityServiceTemporaryDown() = runTest {
@@ -126,7 +123,7 @@ internal class AuthenticatorTest {
             userId = "".asTokenizableRaw(),
             projectId = "",
             projectSecret = "",
-            deviceId = ""
+            deviceId = "",
         )
     }
 
@@ -136,7 +133,7 @@ internal class AuthenticatorTest {
             userId = "".asTokenizableRaw(),
             projectId = "",
             projectSecret = "",
-            deviceId = ""
+            deviceId = "",
         )
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.Authenticated::class.java)

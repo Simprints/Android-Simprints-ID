@@ -7,7 +7,10 @@ import com.google.android.play.core.integrity.IntegrityManager
 import com.google.android.play.core.integrity.IntegrityServiceException
 import com.google.android.play.core.integrity.IntegrityTokenRequest
 import com.google.android.play.core.integrity.IntegrityTokenResponse
-import com.google.android.play.core.integrity.model.IntegrityErrorCode.*
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.CLOUD_PROJECT_NUMBER_IS_INVALID
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.GOOGLE_SERVER_UNAVAILABLE
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.NETWORK_ERROR
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.PLAY_STORE_NOT_FOUND
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authlogic.BuildConfig
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
@@ -28,7 +31,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class IntegrityTokenRequesterTest {
-
     companion object {
         private const val NONCE = "nonce"
         private const val VALID_INTEGRITY_TOKEN =
@@ -53,91 +55,95 @@ class IntegrityTokenRequesterTest {
     fun `should return the integrity token`() = runTest(UnconfinedTestDispatcher()) {
         every {
             integrityManager.requestIntegrityToken(
-                IntegrityTokenRequest.builder().setNonce(NONCE)
+                IntegrityTokenRequest
+                    .builder()
+                    .setNonce(NONCE)
                     .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
-                    .build()
+                    .build(),
             )
         } returns integrityTokenResponseTask
         every { integrityTokenResponse.token() } returns VALID_INTEGRITY_TOKEN
-
 
         val token = integrityTokenRequester.getToken(NONCE)
         assertThat(token).isEqualTo(VALID_INTEGRITY_TOKEN)
     }
 
     @Test
-    fun `should throw a RequestingIntegrityTokenException when failing to retrieve integrity token`() =
-        runTest {
-            every {
-                integrityManager.requestIntegrityToken(
-                    IntegrityTokenRequest.builder().setNonce(NONCE)
-                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
-                        .build()
-                )
-            } throws mockk<IntegrityServiceException> {
-                every { errorCode } returns CLOUD_PROJECT_NUMBER_IS_INVALID
-                every { cause } returns null
-            }
-            val exception = assertThrows<RequestingIntegrityTokenException> {
-                integrityTokenRequester.getToken(NONCE)
-            }
-            assertThat(exception.errorCode).isEqualTo(CLOUD_PROJECT_NUMBER_IS_INVALID)
+    fun `should throw a RequestingIntegrityTokenException when failing to retrieve integrity token`() = runTest {
+        every {
+            integrityManager.requestIntegrityToken(
+                IntegrityTokenRequest
+                    .builder()
+                    .setNonce(NONCE)
+                    .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                    .build(),
+            )
+        } throws mockk<IntegrityServiceException> {
+            every { errorCode } returns CLOUD_PROJECT_NUMBER_IS_INVALID
+            every { cause } returns null
         }
+        val exception = assertThrows<RequestingIntegrityTokenException> {
+            integrityTokenRequester.getToken(NONCE)
+        }
+        assertThat(exception.errorCode).isEqualTo(CLOUD_PROJECT_NUMBER_IS_INVALID)
+    }
 
     @Test
-    fun `should throw a MissingOrOutdatedGooglePlayStoreApp when google play store not found`() =
-        runTest {
-            every {
-                integrityManager.requestIntegrityToken(
-                    IntegrityTokenRequest.builder().setNonce(NONCE)
-                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
-                        .build()
-                )
-            } throws mockk<IntegrityServiceException> {
-                every { errorCode } returns PLAY_STORE_NOT_FOUND
-                every { cause } returns null
-            }
-            val exception = assertThrows<MissingOrOutdatedGooglePlayStoreApp> {
-                integrityTokenRequester.getToken(NONCE)
-            }
-            assertThat(exception.errorCode).isEqualTo(PLAY_STORE_NOT_FOUND)
+    fun `should throw a MissingOrOutdatedGooglePlayStoreApp when google play store not found`() = runTest {
+        every {
+            integrityManager.requestIntegrityToken(
+                IntegrityTokenRequest
+                    .builder()
+                    .setNonce(NONCE)
+                    .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                    .build(),
+            )
+        } throws mockk<IntegrityServiceException> {
+            every { errorCode } returns PLAY_STORE_NOT_FOUND
+            every { cause } returns null
         }
+        val exception = assertThrows<MissingOrOutdatedGooglePlayStoreApp> {
+            integrityTokenRequester.getToken(NONCE)
+        }
+        assertThat(exception.errorCode).isEqualTo(PLAY_STORE_NOT_FOUND)
+    }
 
     @Test
-    fun `should throw a IntegrityServiceTemporaryDown when integrity service is down`() =
-        runTest {
-            every {
-                integrityManager.requestIntegrityToken(
-                    IntegrityTokenRequest.builder().setNonce(NONCE)
-                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
-                        .build()
-                )
-            } throws mockk<IntegrityServiceException> {
-                every { errorCode } returns GOOGLE_SERVER_UNAVAILABLE
-                every { cause } returns null
-            }
-            val exception = assertThrows<IntegrityServiceTemporaryDown> {
-                integrityTokenRequester.getToken(NONCE)
-            }
-            assertThat(exception.errorCode).isEqualTo(GOOGLE_SERVER_UNAVAILABLE)
+    fun `should throw a IntegrityServiceTemporaryDown when integrity service is down`() = runTest {
+        every {
+            integrityManager.requestIntegrityToken(
+                IntegrityTokenRequest
+                    .builder()
+                    .setNonce(NONCE)
+                    .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                    .build(),
+            )
+        } throws mockk<IntegrityServiceException> {
+            every { errorCode } returns GOOGLE_SERVER_UNAVAILABLE
+            every { cause } returns null
         }
+        val exception = assertThrows<IntegrityServiceTemporaryDown> {
+            integrityTokenRequester.getToken(NONCE)
+        }
+        assertThat(exception.errorCode).isEqualTo(GOOGLE_SERVER_UNAVAILABLE)
+    }
 
     @Test
-    fun `should throw a NetworkConnectionException when network error happens`() =
-        runTest {
-            every {
-                integrityManager.requestIntegrityToken(
-                    IntegrityTokenRequest.builder().setNonce(NONCE)
-                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
-                        .build()
-                )
-            } throws mockk<IntegrityServiceException> {
-                every { errorCode } returns NETWORK_ERROR
-                every { cause } returns null
-            }
-            val exception = assertThrows<NetworkConnectionException> {
-                integrityTokenRequester.getToken(NONCE)
-            }
+    fun `should throw a NetworkConnectionException when network error happens`() = runTest {
+        every {
+            integrityManager.requestIntegrityToken(
+                IntegrityTokenRequest
+                    .builder()
+                    .setNonce(NONCE)
+                    .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                    .build(),
+            )
+        } throws mockk<IntegrityServiceException> {
+            every { errorCode } returns NETWORK_ERROR
+            every { cause } returns null
         }
-
+        val exception = assertThrows<NetworkConnectionException> {
+            integrityTokenRequester.getToken(NONCE)
+        }
+    }
 }

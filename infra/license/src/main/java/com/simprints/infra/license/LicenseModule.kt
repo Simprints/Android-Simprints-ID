@@ -12,7 +12,6 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class LicenseModule {
-
     @Binds
     internal abstract fun bindLicenseRepository(impl: LicenseRepositoryImpl): LicenseRepository
 
@@ -21,5 +20,4 @@ abstract class LicenseModule {
 
     @Binds
     internal abstract fun bindLicenseRemoteDataSource(impl: LicenseRemoteDataSourceImpl): LicenseRemoteDataSource
-
 }

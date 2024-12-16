@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class EnrolmentEventValidatorTest {
-
     lateinit var validator: EnrolmentEventValidator
 
     @Before
@@ -41,5 +40,4 @@ internal class EnrolmentEventValidatorTest {
             validator.validate(currentEvents, createEnrolmentEventV2())
         }
     }
-
 }

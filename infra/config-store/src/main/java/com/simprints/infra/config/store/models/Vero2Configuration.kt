@@ -10,25 +10,24 @@ data class Vero2Configuration(
     val ledsMode: LedsMode,
     val firmwareVersions: Map<String, Vero2FirmwareVersions>,
 ) {
-
     enum class ImageSavingStrategy {
         NEVER,
         ONLY_GOOD_SCAN,
         ONLY_USED_IN_REFERENCE,
-        EAGER;
+        EAGER,
     }
 
     enum class CaptureStrategy {
         SECUGEN_ISO_500_DPI,
         SECUGEN_ISO_1000_DPI,
         SECUGEN_ISO_1300_DPI,
-        SECUGEN_ISO_1700_DPI;
+        SECUGEN_ISO_1700_DPI,
     }
 
     enum class LedsMode {
         BASIC,
         LIVE_QUALITY_FEEDBACK,
-        VISUAL_SCAN_FEEDBACK;
+        VISUAL_SCAN_FEEDBACK,
     }
 
     @Keep

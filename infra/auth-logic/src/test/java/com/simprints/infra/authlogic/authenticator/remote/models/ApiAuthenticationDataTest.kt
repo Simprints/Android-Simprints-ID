@@ -5,7 +5,6 @@ import com.simprints.infra.authstore.domain.models.AuthenticationData
 import org.junit.Test
 
 class ApiAuthenticationDataTest {
-
     @Test
     fun `should map the model correctly`() {
         val apiAuthenticationData = ApiAuthenticationData(nonce = "nonce")

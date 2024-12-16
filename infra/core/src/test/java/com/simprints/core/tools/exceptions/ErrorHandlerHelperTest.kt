@@ -8,11 +8,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class ErrorHandlerHelperTest {
-
     @Test
     fun `Ignoring an exception should not throw`() = runTest {
         ignoreException {
-           throwException()
+            throwException()
         }
     }
 
@@ -29,12 +28,10 @@ class ErrorHandlerHelperTest {
 
             verify(exactly = 1) { this@spyk.d(exception) }
         }
-
     }
 
     @Test
     fun `Ignoring an exception should return null`() = runTest {
-
         val rtn = ignoreException {
             throwException()
         }
@@ -42,8 +39,5 @@ class ErrorHandlerHelperTest {
         assert(rtn == null)
     }
 
-    private fun throwException() {
-        throw IllegalStateException()
-    }
-
+    private fun throwException(): Unit = throw IllegalStateException()
 }

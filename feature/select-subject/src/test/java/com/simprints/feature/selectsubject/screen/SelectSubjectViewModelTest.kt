@@ -6,7 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -20,7 +20,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class SelectSubjectViewModelTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -57,7 +56,10 @@ internal class SelectSubjectViewModelTest {
         every { authStore.isProjectIdSignedIn(any()) } returns true
 
         viewModel.saveGuidSelection(PROJECT_ID, SUBJECT_ID)
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
 
         assertThat(result).isTrue()
         coVerify { eventRepository.addOrUpdateEvent(any()) }
@@ -68,7 +70,10 @@ internal class SelectSubjectViewModelTest {
         every { authStore.isProjectIdSignedIn(any()) } returns false
 
         viewModel.saveGuidSelection(PROJECT_ID, SUBJECT_ID)
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
 
         assertThat(result).isFalse()
         coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
@@ -80,13 +85,15 @@ internal class SelectSubjectViewModelTest {
         coEvery { eventRepository.addOrUpdateEvent(any()) } throws Exception()
 
         viewModel.saveGuidSelection(PROJECT_ID, SUBJECT_ID)
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
+        val result = viewModel.finish
+            .test()
+            .value()
+            .getContentIfNotHandled()
 
         assertThat(result).isFalse()
     }
 
     companion object {
-
         private val TIMESTAMP = Timestamp(1L)
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"

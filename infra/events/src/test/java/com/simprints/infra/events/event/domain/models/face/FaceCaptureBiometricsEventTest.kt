@@ -7,7 +7,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test
 
 class FaceCaptureBiometricsEventTest {
-
     @Test
     fun create_FaceCaptureBiometricsEvent() {
         val faceArg = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
@@ -15,12 +14,12 @@ class FaceCaptureBiometricsEventTest {
             roll = 1.0f,
             template = "template",
             quality = 1.0f,
-            format = FACE_TEMPLATE_FORMAT
+            format = FACE_TEMPLATE_FORMAT,
         )
         val event = FaceCaptureBiometricsEvent(
             startTime = SampleDefaults.CREATED_AT,
             face = faceArg,
-            id = "someId"
+            id = "someId",
         )
 
         assertThat(event.id).isEqualTo("someId")

@@ -9,7 +9,6 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
-
 internal class ConfirmIdentifyRequestBuilder(
     private val actionIdentifier: ActionRequestIdentifier,
     val extractor: ConfirmIdentityRequestExtractor,
@@ -25,7 +24,7 @@ internal class ConfirmIdentifyRequestBuilder(
             value = request.userId,
             project = project,
             tokenKeyType = TokenKeyType.AttendantId,
-            tokenizationProcessor = tokenizationProcessor
+            tokenizationProcessor = tokenizationProcessor,
         )
         return request.copy(userId = encryptedUserId)
     }
@@ -36,6 +35,7 @@ internal class ConfirmIdentifyRequestBuilder(
         userId = extractor.getUserId().asTokenizableRaw(),
         sessionId = extractor.getSessionId(),
         selectedGuid = extractor.getSelectedGuid(),
+        metadata = extractor.getMetadata(),
         unknownExtras = extractor.getUnknownExtras(),
     )
 }

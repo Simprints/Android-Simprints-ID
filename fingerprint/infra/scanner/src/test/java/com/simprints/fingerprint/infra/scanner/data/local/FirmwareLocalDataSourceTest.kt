@@ -21,7 +21,6 @@ import org.junit.Test
 import java.io.File
 
 internal class FirmwareLocalDataSourceTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -60,11 +59,11 @@ internal class FirmwareLocalDataSourceTest {
 
     @Test
     fun getAvailableScannerFirmwareVersions() = runTest {
-        //Given
+        // Given
         every { cypressDir.listFiles() } returns null
         every { stmDir.listFiles() } returns arrayOf<File>(mockk(relaxed = true))
         every { un20Dir.listFiles() } returns arrayOf<File>(mockk(relaxed = true))
-        //When
+        // When
         val result = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         // Then
         Truth.assertThat(result[Chip.CYPRESS]).isEmpty()
@@ -74,142 +73,140 @@ internal class FirmwareLocalDataSourceTest {
 
     @Test
     fun loadCypressFirmwareBytes() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         val firmwareBytes = byteArrayOf(0x1)
         every { mockkFirmwareFile.exists() } returns true
         every { fileUtil.readBytes(mockkFirmwareFile) } returns firmwareBytes
         every { fileUtil.createFile(cypressDir, firmwareVersion) } returns mockkFirmwareFile
-        //when
+        // when
         val result = firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion)
-        //Then
+        // Then
         Truth.assertThat(result).isEqualTo(firmwareBytes)
     }
 
     @Test(expected = IllegalStateException::class)
     fun `loadCypressFirmwareBytes file not exist throws IllegalStateException`() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         every { mockkFirmwareFile.exists() } returns false
         every { fileUtil.createFile(cypressDir, firmwareVersion) } returns mockkFirmwareFile
 
-        //when
+        // when
         firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion)
-        //Then throws
-
+        // Then throws
     }
 
     @Test
     fun loadStmFirmwareBytes() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         val firmwareBytes = byteArrayOf(0x1)
         every { mockkFirmwareFile.exists() } returns true
         every { fileUtil.readBytes(mockkFirmwareFile) } returns firmwareBytes
         every { fileUtil.createFile(stmDir, firmwareVersion) } returns mockkFirmwareFile
-        //when
+        // when
         val result = firmwareLocalDataSource.loadStmFirmwareBytes(firmwareVersion)
-        //Then
+        // Then
         Truth.assertThat(result).isEqualTo(firmwareBytes)
     }
 
     @Test
     fun loadUn20FirmwareBytes() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         val firmwareBytes = byteArrayOf(0x1)
         every { mockkFirmwareFile.exists() } returns true
         every { fileUtil.readBytes(mockkFirmwareFile) } returns firmwareBytes
         every { fileUtil.createFile(un20Dir, firmwareVersion) } returns mockkFirmwareFile
-        //when
+        // when
         val result = firmwareLocalDataSource.loadUn20FirmwareBytes(firmwareVersion)
-        //Then
+        // Then
         Truth.assertThat(result).isEqualTo(firmwareBytes)
-
     }
 
     @Test
     fun deleteCypressFirmware() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         every { fileUtil.createFile(cypressDir, firmwareVersion) } returns mockkFirmwareFile
-        //When
+        // When
         firmwareLocalDataSource.deleteCypressFirmware(firmwareVersion)
-        //Then
+        // Then
         verify { mockkFirmwareFile.delete() }
     }
 
     @Test
     fun deleteUn20Firmware() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         every { fileUtil.createFile(un20Dir, firmwareVersion) } returns mockkFirmwareFile
-        //When
+        // When
         firmwareLocalDataSource.deleteUn20Firmware(firmwareVersion)
-        //Then
+        // Then
         verify { mockkFirmwareFile.delete() }
     }
 
     @Test
     fun deleteStmFirmware() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         every { fileUtil.createFile(stmDir, firmwareVersion) } returns mockkFirmwareFile
-        //When
+        // When
         firmwareLocalDataSource.deleteStmFirmware(firmwareVersion)
-        //Then
+        // Then
         verify { mockkFirmwareFile.delete() }
     }
 
     @Test
     fun saveCypressFirmwareBytes() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         val firmwareBytes = byteArrayOf(0x1)
         every { fileUtil.createFile(cypressDir, firmwareVersion) } returns mockkFirmwareFile
         every { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) } just Runs
 
-        //when
+        // when
         firmwareLocalDataSource.saveCypressFirmwareBytes(firmwareVersion, firmwareBytes)
-        //Then
+        // Then
         verify { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) }
     }
 
     @Test
     fun saveStmFirmwareBytes() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         val firmwareBytes = byteArrayOf(0x1)
         every { fileUtil.createFile(stmDir, firmwareVersion) } returns mockkFirmwareFile
         every { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) } just Runs
 
-        //when
+        // when
         firmwareLocalDataSource.saveStmFirmwareBytes(firmwareVersion, firmwareBytes)
-        //Then
+        // Then
         verify { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) }
     }
 
     @Test
     fun saveUn20FirmwareBytes() = runTest {
-        //Given
+        // Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
         val firmwareBytes = byteArrayOf(0x1)
         every { fileUtil.createFile(un20Dir, firmwareVersion) } returns mockkFirmwareFile
         every { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) } just Runs
 
-        //when
+        // when
         firmwareLocalDataSource.saveUn20FirmwareBytes(firmwareVersion, firmwareBytes)
-        //Then
+        // Then
         verify { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) }
     }
 
@@ -219,5 +216,4 @@ internal class FirmwareLocalDataSourceTest {
 
         verify { rootDir.deleteRecursively() }
     }
-
 }

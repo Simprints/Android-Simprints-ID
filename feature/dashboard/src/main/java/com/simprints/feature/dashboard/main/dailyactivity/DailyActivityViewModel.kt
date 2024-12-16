@@ -15,7 +15,6 @@ internal class DailyActivityViewModel @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
-
     val dailyActivity: LiveData<DashboardDailyActivityState>
         get() = _dailyActivity
     private val _dailyActivity = MutableLiveData<DashboardDailyActivityState>()
@@ -31,7 +30,7 @@ internal class DailyActivityViewModel @Inject constructor(
         val state = DashboardDailyActivityState(
             userActivity.enrolmentsToday,
             userActivity.identificationsToday,
-            userActivity.verificationsToday
+            userActivity.verificationsToday,
         )
         _dailyActivity.postValue(state)
     }

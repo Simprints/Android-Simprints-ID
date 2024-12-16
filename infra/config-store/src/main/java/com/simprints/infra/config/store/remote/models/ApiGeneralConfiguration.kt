@@ -14,29 +14,27 @@ internal data class ApiGeneralConfiguration(
     val duplicateBiometricEnrolmentCheck: Boolean,
     val settingsPassword: String?,
 ) {
-
-    fun toDomain(): GeneralConfiguration =
-        GeneralConfiguration(
-            modalities.map { it.toDomain() },
-            matchingModalities.map { it.toDomain() },
-            languageOptions,
-            defaultLanguage,
-            collectLocation,
-            duplicateBiometricEnrolmentCheck,
-            SettingsPasswordConfig.toDomain(
-                settingsPassword
-            ),
-        )
+    fun toDomain(): GeneralConfiguration = GeneralConfiguration(
+        modalities.map { it.toDomain() },
+        matchingModalities.map { it.toDomain() },
+        languageOptions,
+        defaultLanguage,
+        collectLocation,
+        duplicateBiometricEnrolmentCheck,
+        SettingsPasswordConfig.toDomain(
+            settingsPassword,
+        ),
+    )
 
     @Keep
     enum class Modality {
         FACE,
-        FINGERPRINT;
+        FINGERPRINT,
+        ;
 
-        fun toDomain(): GeneralConfiguration.Modality =
-            when (this) {
-                FACE -> GeneralConfiguration.Modality.FACE
-                FINGERPRINT -> GeneralConfiguration.Modality.FINGERPRINT
-            }
+        fun toDomain(): GeneralConfiguration.Modality = when (this) {
+            FACE -> GeneralConfiguration.Modality.FACE
+            FINGERPRINT -> GeneralConfiguration.Modality.FINGERPRINT
+        }
     }
 }

@@ -5,9 +5,6 @@ plugins {
 android {
     namespace = "com.simprints.fingerprint.infra.scanner"
 
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {
@@ -26,9 +23,6 @@ dependencies {
     // RxJava
     api(libs.rxJava2.core)
     implementation(libs.rxJava2.kotlin)
-
-    // If mock/dummy BT adapter is required test implementation can be switched to regular one
     testImplementation(project(":fingerprint:infra:scannermock"))
-    //implementation(project(":fingerprint:infra:scannermock"))
 
 }

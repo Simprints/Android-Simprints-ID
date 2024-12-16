@@ -7,8 +7,9 @@ package com.simprints.fingerprint.infra.scanner.domain.fingerprint
  * @property imageBytes
  *
  */
-class RawUnprocessedImage(private val imageBytes: ByteArray) {
-    fun isValidFormat() = imageBytes.size > IMAGE_HEADER_SIZE
+class RawUnprocessedImage(
+    private val imageBytes: ByteArray,
+) {
     val imageData
         get() = with(imageBytes) { copyOfRange(IMAGE_HEADER_SIZE, imageBytes.size) }
     val brightness
@@ -20,6 +21,5 @@ class RawUnprocessedImage(private val imageBytes: ByteArray) {
         private const val UN20_SERIAL_SIZE = 15
         private const val BRIGHTNESS_INDEX = 15
         private const val IMAGE_HEADER_SIZE = 20
-
     }
 }

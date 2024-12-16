@@ -4,7 +4,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 
 interface RealmWrapper {
-
     /**
      * Returns read-only Realm instance for data fetching.
      */
@@ -15,5 +14,4 @@ interface RealmWrapper {
      * that modifications are handled in a transaction.
      */
     suspend fun <R> writeRealm(block: (MutableRealm) -> R)
-
 }

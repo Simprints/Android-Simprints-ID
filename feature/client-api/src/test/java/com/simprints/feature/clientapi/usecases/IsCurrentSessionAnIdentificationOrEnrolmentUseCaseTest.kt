@@ -1,9 +1,9 @@
 package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -34,54 +34,56 @@ class IsCurrentSessionAnIdentificationOrEnrolmentUseCaseTest {
         useCase = IsCurrentSessionAnIdentificationOrEnrolmentUseCase(eventRepository)
     }
 
+    @Test
+    fun `isCurrentSessionAnIdentificationOrEnrolment return true if current session has an Identification`() = runTest {
+        // Given
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            mockk(),
+            mockk(),
+            mockk<IdentificationCalloutEvent>(),
+        )
+        // When
+        val result = useCase()
+        // Then
+        assertThat(result).isTrue()
+    }
 
     @Test
-    fun `isCurrentSessionAnIdentificationOrEnrolment return true if current session has an Identification`() =
-        runTest {
-            // Given
-            coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-                mockk(), mockk(), mockk<IdentificationCalloutEvent>()
-            )
-            // When
-            val result = useCase()
-            //Then
-            assertThat(result).isTrue()
-        }
-
-    @Test
-    fun `isCurrentSessionAnIdentificationOrEnrolment return true if current session has an Enrolment`() =
-        runTest {
-            // Given
-            coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-                mockk(), mockk(), mockk<EnrolmentCalloutEvent>()
-            )
-            // When
-            val result = useCase()
-            //Then
-            assertThat(result).isTrue()
-        }
+    fun `isCurrentSessionAnIdentificationOrEnrolment return true if current session has an Enrolment`() = runTest {
+        // Given
+        coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
+            mockk(),
+            mockk(),
+            mockk<EnrolmentCalloutEvent>(),
+        )
+        // When
+        val result = useCase()
+        // Then
+        assertThat(result).isTrue()
+    }
 
     @Test
     fun `isCurrentSessionAnIdentificationOrEnrolment returns false if current session doesn't have an Identification or Enrolment`() =
         runTest {
             // Given
             coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-                mockk(), mockk(), mockk()
+                mockk(),
+                mockk(),
+                mockk(),
             )
             // When
             val result = useCase()
-            //Then
+            // Then
             assertThat(result).isFalse()
         }
 
     @Test
-    fun `isCurrentSessionAnIdentificationOrEnrolment returns false if session is empty`() =
-        runTest {
-            // Given
-            coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
-            // When
-            val result = useCase()
-            //Then
-            assertThat(result).isFalse()
-        }
+    fun `isCurrentSessionAnIdentificationOrEnrolment returns false if session is empty`() = runTest {
+        // Given
+        coEvery { eventRepository.getEventsInCurrentSession() } returns emptyList()
+        // When
+        val result = useCase()
+        // Then
+        assertThat(result).isFalse()
+    }
 }

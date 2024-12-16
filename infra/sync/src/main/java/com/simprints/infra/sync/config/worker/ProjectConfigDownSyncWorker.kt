@@ -24,7 +24,6 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     private val rescheduleWorkersIfConfigChanged: RescheduleWorkersIfConfigChangedUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
-
     override val tag = "ProjectConfigWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
@@ -49,6 +48,4 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
             fail(t)
         }
     }
-
 }
-

@@ -9,11 +9,11 @@ import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperation
 import org.junit.Test
 
 class DbEventsDownSyncOperationStateTest {
-
     @Test
     fun buildDbEventsDownSyncOperationState_fromEventDownSyncOperation() {
         val op = projectDownSyncScope.operations
-            .first().copy(lastSyncTime = TIME1, lastEventId = GUID1, state = COMPLETE)
+            .first()
+            .copy(lastSyncTime = TIME1, lastEventId = GUID1, state = COMPLETE)
         val downSyncState = buildFromEventsDownSyncOperationState(op)
 
         with(downSyncState) {

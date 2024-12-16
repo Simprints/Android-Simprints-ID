@@ -18,8 +18,8 @@ internal class OrchestratorCache @Inject constructor(
     securityManager: SecurityManager,
     private val jsonHelper: JsonHelper,
 ) {
-
     private val prefs = securityManager.buildEncryptedSharedPreferences(ORCHESTRATION_CACHE)
+
     private fun List<Step>.asJsonArray(jsonHelper: JsonHelper): String = with(jsonHelper) {
         addMixin(Serializable::class.java, SerializableMixin::class.java)
         return@with joinToString(separator = ",") {
@@ -33,7 +33,8 @@ internal class OrchestratorCache @Inject constructor(
                 putString(KEY_STEPS, value.asJsonArray(jsonHelper))
             }
         }
-        get() = prefs.getString(KEY_STEPS, null)
+        get() = prefs
+            .getString(KEY_STEPS, null)
             ?.let { jsonArray ->
                 jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
                 jsonHelper.fromJson(

@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
 
-
 @Keep
 internal data class ApiPersonCreationPayload(
     override val startTime: ApiTimestamp,
@@ -13,15 +12,13 @@ internal data class ApiPersonCreationPayload(
     val faceCaptureIds: List<String>?,
     val faceReferenceId: String?,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: PersonCreationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.fingerprintCaptureIds,
         domainPayload.fingerprintReferenceId,
         domainPayload.faceCaptureIds,
-        domainPayload.faceReferenceId
+        domainPayload.faceReferenceId,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

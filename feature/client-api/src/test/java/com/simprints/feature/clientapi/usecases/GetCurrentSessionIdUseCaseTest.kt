@@ -1,7 +1,7 @@
 package com.simprints.feature.clientapi.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.SessionEventRepository
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class GetCurrentSessionIdUseCaseTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -25,7 +24,6 @@ class GetCurrentSessionIdUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
 
         useCase = GetCurrentSessionIdUseCase(eventRepository)
     }

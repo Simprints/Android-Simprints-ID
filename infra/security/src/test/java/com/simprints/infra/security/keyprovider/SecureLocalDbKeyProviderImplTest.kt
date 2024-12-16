@@ -19,7 +19,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SecureLocalDbKeyProviderImplTest {
-
     companion object {
         private const val DB_NAME = "name"
         private const val KEY_NAME = "REALM_KEY_$DB_NAME"
@@ -102,7 +101,6 @@ class SecureLocalDbKeyProviderImplTest {
             keyHashEditor.putString(KEY_NAME, any())
             Simber.i(ofType<MissingLocalDatabaseKeyHashException>())
         }
-
     }
 
     @Test
@@ -110,7 +108,8 @@ class SecureLocalDbKeyProviderImplTest {
         every { dbKeySharedPrefs.getString(KEY_NAME, null) } returns "name"
         every {
             hashSharedPrefs.getString(KEY_NAME, null)
-        } returns "b114f311db0e009ca2a88a9b97b1d7b362ddb27dc3dd214c6d20327a1fc3add8cc488cca4cc3565a876f6040f8b73a7b92475be1d0b1bc453f6140fba7183b9a"
+        } returns
+            "b114f311db0e009ca2a88a9b97b1d7b362ddb27dc3dd214c6d20327a1fc3add8cc488cca4cc3565a876f6040f8b73a7b92475be1d0b1bc453f6140fba7183b9a"
 
         dbKeyProvider.recreateLocalDatabaseKey(DB_NAME)
 

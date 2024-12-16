@@ -44,9 +44,7 @@ import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 
 class EventDownSyncTaskTest {
-
     companion object {
-
         val ENROLMENT_RECORD_DELETION = EnrolmentRecordDeletionEvent(
             "subjectId",
             "projectId",
@@ -66,14 +64,14 @@ class EventDownSyncTaskTest {
                 "projectId",
                 DEFAULT_MODULE_ID_2,
                 "attendantId".asTokenizableRaw(),
-                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format"))
+                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
                 "projectId",
                 DEFAULT_MODULE_ID,
                 "attendantId".asTokenizableRaw(),
-            )
+            ),
         )
     }
 
@@ -139,7 +137,7 @@ class EventDownSyncTaskTest {
 
         assertThat(progress.first().progress).isEqualTo(1)
         assertThat(progress.first().operation.state).isEqualTo(RUNNING)
-        //Shifted by 1 since the first batch is immediately emitted with only 1 element
+        // Shifted by 1 since the first batch is immediately emitted with only 1 element
         assertThat(progress[1].progress).isEqualTo(EVENTS_BATCH_SIZE + 2)
         assertThat(progress[1].operation.state).isEqualTo(RUNNING)
         assertThat(progress[2].progress).isEqualTo(2 * EVENTS_BATCH_SIZE)
@@ -164,7 +162,7 @@ class EventDownSyncTaskTest {
                         UUID.fromString(it.payload.requestId) != null &&
                         it.payload.eventsRead == eventsToDownload.size &&
                         it.payload.responseStatus == 200
-                }
+                },
             )
         }
     }
@@ -207,7 +205,7 @@ class EventDownSyncTaskTest {
                 eventScope,
                 match {
                     it is EventDownSyncRequestEvent && !it.payload.errorType.isNullOrEmpty()
-                }
+                },
             )
         }
     }
@@ -224,10 +222,10 @@ class EventDownSyncTaskTest {
                 listOf(
                     Creation(
                         subjectFactory.buildSubjectFromCreationPayload(
-                            event.payload
-                        )
-                    )
-                )
+                            event.payload,
+                        ),
+                    ),
+                ),
             )
         }
     }
@@ -255,7 +253,7 @@ class EventDownSyncTaskTest {
                 match {
                     it is EventDownSyncRequestEvent &&
                         it.payload.errorType == expectedException.javaClass.simpleName
-                }
+                },
             )
         }
     }
@@ -267,7 +265,7 @@ class EventDownSyncTaskTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } returns EventDownSyncResult(
             0,
             status = 200,
-            downloadEventsChannel
+            downloadEventsChannel,
         )
         downloadEventsChannel.cancel(expectedException)
 
@@ -279,7 +277,7 @@ class EventDownSyncTaskTest {
                 match {
                     it is EventDownSyncRequestEvent &&
                         it.payload.errorType == expectedException.javaClass.simpleName
-                }
+                },
             )
         }
     }
@@ -291,7 +289,7 @@ class EventDownSyncTaskTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-            ""
+            "",
         )
 
         eventDownSyncTask.downSync(this, moduleOp, eventScope).toList()
@@ -302,31 +300,30 @@ class EventDownSyncTaskTest {
     }
 
     @Test
-    fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() =
-        runTest {
-            val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
-            mockProgressEmission(listOf(eventToMoveToModule2))
-            coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-                "",
-                listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                ""
-            )
+    fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() = runTest {
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+        mockProgressEmission(listOf(eventToMoveToModule2))
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+            "",
+        )
 
-            val syncByModule2 = moduleOp.copy(
-                queryEvent = moduleOp.queryEvent.copy(
-                    moduleId = DEFAULT_MODULE_ID_2.value
-                )
-            )
-            eventDownSyncTask.downSync(this, syncByModule2, eventScope).toList()
+        val syncByModule2 = moduleOp.copy(
+            queryEvent = moduleOp.queryEvent.copy(
+                moduleId = DEFAULT_MODULE_ID_2.value,
+            ),
+        )
+        eventDownSyncTask.downSync(this, syncByModule2, eventScope).toList()
 
-            coVerify {
-                enrolmentRecordRepository.performActions(
-                    listOf(
-                        Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
-                    )
-                )
-            }
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                listOf(
+                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                ),
+            )
         }
+    }
 
     @Test
     fun moveSubjectToAModuleNotUnderSyncing_shouldPerformDeletionOnly() = runTest {
@@ -335,7 +332,7 @@ class EventDownSyncTaskTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             language = "",
             selectedModules = listOf(DEFAULT_MODULE_ID),
-            lastInstructionId = ""
+            lastInstructionId = "",
         )
 
         eventDownSyncTask.downSync(this, moduleOp, eventScope).toList()
@@ -343,8 +340,8 @@ class EventDownSyncTaskTest {
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
-                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId)
-                )
+                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
+                ),
             )
         }
     }
@@ -356,21 +353,21 @@ class EventDownSyncTaskTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(DEFAULT_MODULE_ID_2),
-            ""
+            "",
         )
 
         val syncByModule2 = moduleOp.copy(
             queryEvent = moduleOp.queryEvent.copy(
-                moduleId = DEFAULT_MODULE_ID_2.value
-            )
+                moduleId = DEFAULT_MODULE_ID_2.value,
+            ),
         )
         eventDownSyncTask.downSync(this, syncByModule2, eventScope).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
-                )
+                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                ),
             )
         }
     }
@@ -380,7 +377,7 @@ class EventDownSyncTaskTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } returns EventDownSyncResult(
             0,
             status = 200,
-            downloadEventsChannel
+            downloadEventsChannel,
         )
 
         progressEvents.forEach {

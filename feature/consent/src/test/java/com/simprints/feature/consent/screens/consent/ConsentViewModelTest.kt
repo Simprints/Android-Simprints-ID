@@ -10,8 +10,8 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -28,9 +28,7 @@ import org.junit.Rule
 import org.junit.Test
 import com.simprints.infra.resources.R as IDR
 
-
 class ConsentViewModelTest {
-
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
@@ -45,7 +43,6 @@ class ConsentViewModelTest {
 
     @MockK
     private lateinit var projectConfig: ProjectConfiguration
-
 
     @MockK
     private lateinit var eventRepository: SessionEventRepository
@@ -65,7 +62,7 @@ class ConsentViewModelTest {
             timeHelper,
             configManager,
             eventRepository,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
@@ -86,7 +83,6 @@ class ConsentViewModelTest {
         assertThat(state.parentalTextBuilder).isNotNull()
     }
 
-
     @Test
     fun `loadConfiguration passes correct values from config without parental consent to state`() = runTest {
         every { projectConfig.consent.allowParentalConsent } returns false
@@ -98,7 +94,6 @@ class ConsentViewModelTest {
         assertThat(state.showParentalConsent).isFalse()
         assertThat(state.parentalTextBuilder).isNull()
     }
-
 
     @Test
     fun `selected tab index is saved in the state`() = runTest {

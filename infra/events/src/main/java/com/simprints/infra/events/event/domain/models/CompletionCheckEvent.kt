@@ -15,20 +15,18 @@ data class CompletionCheckEvent(
     override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
-
     constructor(
         createdAt: Timestamp,
         completed: Boolean,
     ) : this(
         UUID.randomUUID().toString(),
         CompletionCheckPayload(createdAt, EVENT_VERSION, completed),
-        COMPLETION_CHECK
+        COMPLETION_CHECK,
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
-        this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class CompletionCheckPayload(
@@ -37,10 +35,11 @@ data class CompletionCheckEvent(
         val completed: Boolean,
         override val endedAt: Timestamp? = null,
         override val type: EventType = COMPLETION_CHECK,
-    ) : EventPayload()
+    ) : EventPayload() {
+        override fun toSafeString(): String = "completed: $completed"
+    }
 
     companion object {
-
         const val EVENT_VERSION = 2
     }
 }

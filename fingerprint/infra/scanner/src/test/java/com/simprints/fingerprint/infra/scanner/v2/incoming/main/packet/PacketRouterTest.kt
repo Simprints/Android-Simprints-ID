@@ -8,24 +8,33 @@ import com.simprints.fingerprint.infra.scanner.v2.tools.lang.objects
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.failTest
 import com.simprints.testtools.unit.reactive.testSubscribe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class PacketRouterTest {
-
     private lateinit var outputStream: PipedOutputStream
     private lateinit var inputStream: PipedInputStream
     private lateinit var router: PacketRouter
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
         outputStream = PipedOutputStream()
         inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        router = PacketRouter(Route.Remote::class.objects(), { source }, ByteArrayToPacketAccumulator(PacketParser()))
+        router = PacketRouter(
+            Route.Remote::class.objects(),
+            { source },
+            ByteArrayToPacketAccumulator(
+                PacketParser(),
+            ),
+            Dispatchers.IO,
+        )
 
         router.connect(inputStream.toFlowable())
     }

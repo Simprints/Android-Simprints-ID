@@ -6,7 +6,6 @@ import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import org.junit.Test
 
 class ApiEventScopeTest {
-
     @Test
     fun `projectConfigurationUpdatedAt is not included in JSON when empty`() {
         // Arrange
@@ -24,7 +23,8 @@ class ApiEventScopeTest {
             databaseInfo = ApiDatabaseInfo(0, 0),
             location = null,
             projectConfigurationUpdatedAt = "",
-            events = emptyList()
+            projectConfigurationId = "",
+            events = emptyList(),
         )
 
         // Act
@@ -51,7 +51,8 @@ class ApiEventScopeTest {
             databaseInfo = ApiDatabaseInfo(0, 0),
             location = null,
             projectConfigurationUpdatedAt = "123",
-            events = emptyList()
+            projectConfigurationId = "",
+            events = emptyList(),
         )
 
         // Act

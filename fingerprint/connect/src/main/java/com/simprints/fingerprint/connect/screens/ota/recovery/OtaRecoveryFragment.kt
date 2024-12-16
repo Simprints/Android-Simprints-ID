@@ -24,7 +24,6 @@ import com.simprints.infra.resources.R as IDR
  */
 @AndroidEntryPoint
 internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
-
     private val viewModel: OtaRecoveryViewModel by viewModels()
     private val binding by viewBinding(FragmentOtaRecoveryBinding::bind)
     private val args: OtaRecoveryFragmentArgs by navArgs()
@@ -32,16 +31,22 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
     @Inject
     lateinit var screenReporter: ReportAlertScreenEventUseCase
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         screenReporter.reportOtaRecovery()
 
         setRecoveryStrategyInstructions()
         setupTryAgainButton()
 
-        viewModel.isConnectionSuccess.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { connectionSuccessful ->
-            if (connectionSuccessful) retryOta() else goToOtaFailed()
-        })
+        viewModel.isConnectionSuccess.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { connectionSuccessful ->
+                if (connectionSuccessful) retryOta() else goToOtaFailed()
+            },
+        )
     }
 
     private fun setRecoveryStrategyInstructions() {
@@ -49,8 +54,9 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
             when (args.params.recoveryStrategy) {
                 OtaRecoveryStrategy.HARD_RESET -> IDR.string.fingerprint_connect_ota_recovery_hard_reset
                 OtaRecoveryStrategy.SOFT_RESET,
-                OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> IDR.string.fingerprint_connect_ota_recovery_soft_reset
-            }
+                OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY,
+                -> IDR.string.fingerprint_connect_ota_recovery_soft_reset
+            },
         )
     }
 
@@ -67,18 +73,20 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
     private fun retryOta() {
         findNavController().navigateSafely(
             this,
-            OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFragment(OtaFragmentParams(
-                fingerprintSDK = args.params.fingerprintSDK,
-                availableOtas = args.params.remainingOtas,
-                currentRetryAttempt = args.params.currentRetryAttempt + 1
-            ))
+            OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFragment(
+                OtaFragmentParams(
+                    fingerprintSDK = args.params.fingerprintSDK,
+                    availableOtas = args.params.remainingOtas,
+                    currentRetryAttempt = args.params.currentRetryAttempt + 1,
+                ),
+            ),
         )
     }
 
     private fun goToOtaFailed() {
         findNavController().navigateSafely(
             this,
-            OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFailedFragment(null)
+            OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFailedFragment(null),
         )
     }
 }

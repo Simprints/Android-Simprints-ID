@@ -26,11 +26,10 @@ internal data class ApiEventScope(
     val location: ApiLocation?,
     @JsonInclude(Include.NON_EMPTY)
     val projectConfigurationUpdatedAt: String,
+    val projectConfigurationId: String,
     val events: List<ApiEvent>,
 ) {
-
     companion object {
-
         fun fromDomain(
             scope: EventScope,
             events: List<Event>,
@@ -48,7 +47,8 @@ internal data class ApiEventScope(
             databaseInfo = scope.payload.databaseInfo.fromDomainToApi(),
             location = scope.payload.location?.fromDomainToApi(),
             projectConfigurationUpdatedAt = scope.payload.projectConfigurationUpdatedAt,
-            events = events.map { it.fromDomainToApi() }
+            projectConfigurationId = scope.payload.projectConfigurationId.orEmpty(),
+            events = events.map { it.fromDomainToApi() },
         )
     }
 }

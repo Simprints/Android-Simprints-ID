@@ -9,23 +9,25 @@ import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mapping code")
 internal class BuildMatcherSubjectQueryUseCase @Inject constructor() {
-
     operator fun invoke(
         projectConfiguration: ProjectConfiguration,
         actionRequest: ActionRequest,
     ) = when (projectConfiguration.identification.poolType) {
         IdentificationConfiguration.PoolType.PROJECT -> SubjectQuery(
-            projectId = actionRequest.projectId
+            projectId = actionRequest.projectId,
+            metadata = actionRequest.metadata,
         )
 
         IdentificationConfiguration.PoolType.USER -> SubjectQuery(
             projectId = actionRequest.projectId,
-            attendantId = actionRequest.userId.value
+            attendantId = actionRequest.userId.value,
+            metadata = actionRequest.metadata,
         )
 
         IdentificationConfiguration.PoolType.MODULE -> SubjectQuery(
             projectId = actionRequest.projectId,
-            moduleId = (actionRequest as ActionRequest.FlowAction).moduleId.value
+            moduleId = (actionRequest as ActionRequest.FlowAction).moduleId.value,
+            metadata = actionRequest.metadata,
         )
     }
 }

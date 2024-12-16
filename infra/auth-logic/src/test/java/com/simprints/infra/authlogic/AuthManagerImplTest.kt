@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-
 internal class AuthManagerImplTest {
     @MockK
     lateinit var authenticator: Authenticator
@@ -26,7 +25,7 @@ internal class AuthManagerImplTest {
 
         authManager = AuthManagerImpl(
             authenticator = authenticator,
-            signerManager = signerManager
+            signerManager = signerManager,
         )
     }
 
@@ -41,14 +40,14 @@ internal class AuthManagerImplTest {
                 userId = userId,
                 projectId = projectId,
                 projectSecret = projectSecret,
-                deviceId = deviceId
+                deviceId = deviceId,
             )
             coVerify(exactly = 1) {
                 authenticator.authenticate(
                     userId = userId.asTokenizableRaw(),
                     projectId = projectId,
                     projectSecret = projectSecret,
-                    deviceId = deviceId
+                    deviceId = deviceId,
                 )
             }
         }
@@ -61,5 +60,4 @@ internal class AuthManagerImplTest {
             coVerify(exactly = 1) { signerManager.signOut() }
         }
     }
-
 }

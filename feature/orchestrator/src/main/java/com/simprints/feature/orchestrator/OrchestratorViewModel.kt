@@ -61,7 +61,6 @@ internal class OrchestratorViewModel @Inject constructor(
     private val updateDailyActivity: UpdateDailyActivityUseCase,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) : ViewModel() {
-
     var isRequestProcessed = false
     private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
@@ -120,7 +119,7 @@ internal class OrchestratorViewModel @Inject constructor(
             val captureAndMatchSteps = stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(
                 actionRequest!!,
                 projectConfiguration,
-                result.ageGroup
+                result.ageGroup,
             )
             steps = steps + captureAndMatchSteps
         }
@@ -128,7 +127,7 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
-    private fun handleErrorResponse(errorResponse: AppResponse) {
+    fun handleErrorResponse(errorResponse: AppResponse) {
         addCallbackEvent(errorResponse)
         _appResponse.send(OrchestratorResult(actionRequest, errorResponse))
     }
@@ -179,7 +178,7 @@ internal class OrchestratorViewModel @Inject constructor(
         if (step.id == StepId.ENROL_LAST_BIOMETRIC) {
             step.payload.getParcelable<EnrolLastBiometricParams>("params")?.let { params ->
                 val updatedParams = params.copy(
-                    steps = mapStepsForLastBiometrics(steps.mapNotNull { it.result })
+                    steps = mapStepsForLastBiometrics(steps.mapNotNull { it.result }),
                 )
                 step.payload = EnrolLastBiometricContract.getArgs(
                     projectId = updatedParams.projectId,
@@ -204,12 +203,16 @@ internal class OrchestratorViewModel @Inject constructor(
         _appResponse.send(OrchestratorResult(actionRequest, appResponse))
     }
 
-    private fun updateMatcherStepPayload(currentStep: Step, result: Serializable) {
+    private fun updateMatcherStepPayload(
+        currentStep: Step,
+        result: Serializable,
+    ) {
         if (currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult) {
             val matchingStep = steps.firstOrNull { it.id == StepId.FACE_MATCHER }
 
             if (matchingStep != null) {
-                val faceSamples = result.results.mapNotNull { it.sample }
+                val faceSamples = result.results
+                    .mapNotNull { it.sample }
                     .map { MatchParams.FaceSample(it.faceId, it.template) }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
@@ -226,20 +229,20 @@ internal class OrchestratorViewModel @Inject constructor(
             val matchingStep = steps.firstOrNull { step ->
                 if (step.id != StepId.FINGERPRINT_MATCHER) {
                     false
-                }
-                else {
+                } else {
                     val stepSdk = step.payload.getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)?.fingerprintSDK
                     stepSdk == captureParams?.fingerprintSDK
                 }
             }
 
             if (matchingStep != null) {
-                val fingerprintSamples = result.results.mapNotNull { it.sample }
+                val fingerprintSamples = result.results
+                    .mapNotNull { it.sample }
                     .map {
                         MatchParams.FingerprintSample(
                             fingerId = it.fingerIdentifier,
                             format = it.format,
-                            template = it.template
+                            template = it.template,
                         )
                     }
                 val newPayload = matchingStep.payload
@@ -258,21 +261,20 @@ internal class OrchestratorViewModel @Inject constructor(
             actionRequest = JsonHelper.fromJson(
                 json = json,
                 module = dbSerializationModule,
-                type = object : TypeReference<ActionRequest>() {})
+                type = object : TypeReference<ActionRequest>() {},
+            )
         } catch (e: Exception) {
             Simber.e(e)
         }
     }
 
-    fun getActionRequestJson(): String? {
-        return try {
-            actionRequest?.let {
-                JsonHelper.toJson(it, dbSerializationModule)
-            }
-        } catch (e: Exception) {
-            Simber.e(e)
-            null
+    fun getActionRequestJson(): String? = try {
+        actionRequest?.let {
+            JsonHelper.toJson(it, dbSerializationModule)
         }
+    } catch (e: Exception) {
+        Simber.e(e)
+        null
     }
 
     companion object {

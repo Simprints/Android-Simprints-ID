@@ -4,12 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -19,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class UpdateSessionScopePayloadUseCaseTest {
-
     @MockK
     lateinit var eventRepository: SessionEventRepository
 
@@ -38,7 +37,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
         useCase = UpdateSessionScopePayloadUseCase(
             eventRepository,
             enrolmentRecordRepository,
-            configManager
+            configManager,
         )
     }
 
@@ -52,10 +51,12 @@ internal class UpdateSessionScopePayloadUseCaseTest {
         useCase()
 
         coVerify {
-            eventRepository.saveSessionScope(withArg {
-                assertThat(it.payload.databaseInfo.recordCount).isEqualTo(42)
-                assertThat(it.payload.projectConfigurationUpdatedAt).isEqualTo("configUpdatedAt")
-            })
+            eventRepository.saveSessionScope(
+                withArg {
+                    assertThat(it.payload.databaseInfo.recordCount).isEqualTo(42)
+                    assertThat(it.payload.projectConfigurationUpdatedAt).isEqualTo("configUpdatedAt")
+                },
+            )
         }
     }
 
@@ -74,6 +75,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
             device = Device("deviceId", "deviceModel", "deviceManufacturer"),
             databaseInfo = DatabaseInfo(0, 0),
             projectConfigurationUpdatedAt = "",
+            projectConfigurationId = "",
             location = null,
         ),
     )

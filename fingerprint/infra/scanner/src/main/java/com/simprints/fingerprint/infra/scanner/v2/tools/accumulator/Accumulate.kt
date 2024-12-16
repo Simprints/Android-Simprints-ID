@@ -11,13 +11,13 @@ import io.reactivex.Flowable
  * The same instance of the Accumulator is used for the lifetime of the stream.
  */
 fun <Fragment, FragmentCollection, Element> Flowable<out Fragment>.accumulateAndTakeElements(
-    accumulator: Accumulator<Fragment, FragmentCollection, Element>
+    accumulator: Accumulator<Fragment, FragmentCollection, Element>,
 ): Flowable<Element> = this
     .accumulate(accumulator)
     .takeElements()
 
 private fun <Fragment, FragmentCollection, Element> Flowable<out Fragment>.accumulate(
-    accumulator: Accumulator<Fragment, FragmentCollection, Element>
+    accumulator: Accumulator<Fragment, FragmentCollection, Element>,
 ): Flowable<Accumulator<Fragment, FragmentCollection, Element>> =
     scan(accumulator) { acc: Accumulator<Fragment, FragmentCollection, Element>, newFragment: Fragment ->
         acc.apply { updateWithNewFragment(newFragment) }

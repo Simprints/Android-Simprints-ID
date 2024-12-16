@@ -30,7 +30,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
-
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
     private var qualityThreshold: Float = 0f
@@ -39,7 +38,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
         SymmetricTarget(VALID_ROLL_DELTA),
-        0.20f..0.5f
+        0.20f..0.5f,
     )
     private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
@@ -75,7 +74,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
                 }
             }
 
-            else -> {//no-op
+            else -> { // no-op
             }
         }
     }
@@ -118,22 +117,23 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private fun getFaceDetectionFromPotentialFace(
         bitmap: Bitmap,
         potentialFace: Face?,
-    ): FaceDetection {
-        return if (potentialFace == null) {
-            bitmap.recycle()
-            FaceDetection(
-                bitmap = bitmap,
-                face = null,
-                status = FaceDetection.Status.NOFACE,
-                detectionStartTime = timeHelper.now(),
-                detectionEndTime = timeHelper.now()
-            )
-        } else {
-            getFaceDetection(bitmap, potentialFace)
-        }
+    ): FaceDetection = if (potentialFace == null) {
+        bitmap.recycle()
+        FaceDetection(
+            bitmap = bitmap,
+            face = null,
+            status = FaceDetection.Status.NOFACE,
+            detectionStartTime = timeHelper.now(),
+            detectionEndTime = timeHelper.now(),
+        )
+    } else {
+        getFaceDetection(bitmap, potentialFace)
     }
 
-    private fun getFaceDetection(bitmap: Bitmap, potentialFace: Face): FaceDetection {
+    private fun getFaceDetection(
+        bitmap: Bitmap,
+        potentialFace: Face,
+    ): FaceDetection {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
         val status = when {
             areaOccupied < faceTarget.areaRange.start -> FaceDetection.Status.TOOFAR
@@ -146,7 +146,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         }
 
         return FaceDetection(
-            bitmap = bitmap, face = potentialFace,
+            bitmap = bitmap,
+            face = potentialFace,
             status = status,
             detectionStartTime = timeHelper.now(),
             detectionEndTime = timeHelper.now(),
@@ -176,7 +177,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         if (shouldSendFallbackCaptureEvent.getAndSet(false)) {
             eventReporter.addFallbackCaptureEvent(
                 fallbackCaptureEventStartTime,
-                faceDetection.detectionEndTime
+                faceDetection.detectionEndTime,
             )
         }
     }
@@ -186,12 +187,16 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * to speed things up this method creates multiple async jobs and run them all in parallel.
      */
     private fun sendAllCaptureEvents(attemptNumber: Int) = runBlocking {
-        userCaptures.map { async { sendCaptureEvent(it, attemptNumber) } }
+        userCaptures
+            .map { async { sendCaptureEvent(it, attemptNumber) } }
             .plus(async { sendCaptureEvent(fallbackCapture, attemptNumber) })
             .awaitAll()
     }
 
-    private suspend fun sendCaptureEvent(faceDetection: FaceDetection?, attemptNumber: Int) {
+    private suspend fun sendCaptureEvent(
+        faceDetection: FaceDetection?,
+        attemptNumber: Int,
+    ) {
         if (faceDetection == null) return
         eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
@@ -199,7 +204,6 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
 
     companion object {
-
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
     }

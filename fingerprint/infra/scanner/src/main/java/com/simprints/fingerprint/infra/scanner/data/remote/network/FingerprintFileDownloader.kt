@@ -9,7 +9,6 @@ import java.io.IOException
 import java.net.URL
 import javax.inject.Inject
 
-
 /**
  * This class is responsible for downloading the firmware updates.
  */
@@ -18,7 +17,6 @@ internal class FingerprintFileDownloader @Inject constructor(
     private val authStore: AuthStore,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
-
     private val projectId by lazy {
         authStore.signedInProjectId
     }
@@ -27,7 +25,7 @@ internal class FingerprintFileDownloader @Inject constructor(
      * This method downloads the firmware bytes using the provided url
      *
      * @param url  the url location for the file to be downloaded
-     * @return  the bytes of the downloaded file
+     * @return the bytes of the downloaded file
      *
      * @throws IOException
      */
@@ -43,8 +41,6 @@ internal class FingerprintFileDownloader @Inject constructor(
         return fileUrlRemoteApi.getFileUrl(projectId, fileId).url
     }
 
-    private suspend fun getFileUrlRemoteApi(): FingerprintApiClient<FileUrlRemoteInterface> {
-        return fingerprintApiClientFactory.buildClient(FileUrlRemoteInterface::class)
-    }
-
+    private suspend fun getFileUrlRemoteApi(): FingerprintApiClient<FileUrlRemoteInterface> =
+        fingerprintApiClientFactory.buildClient(FileUrlRemoteInterface::class)
 }

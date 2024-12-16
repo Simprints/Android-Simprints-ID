@@ -58,6 +58,5 @@ enum class ExitFormOption(
         requiresInfo = true,
         logName = "Other",
         answer = RefusalEvent.RefusalPayload.Answer.OTHER,
-    );
-
+    ),
 }

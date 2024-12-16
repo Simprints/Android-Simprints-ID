@@ -47,9 +47,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
     private val securityManager: SecurityManager,
 ) : SimCoroutineWorker(appContext, params) {
-
     companion object {
-
         const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
     }
 
@@ -68,83 +66,87 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
         UUID.randomUUID().toString()
     }
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            try {
-                showProgressNotification()
-                // check if device is rooted before starting the sync
-                securityManager.checkIfDeviceIsRooted()
-                crashlyticsLog("Start")
-                val configuration = configManager.getProjectConfiguration()
+    override suspend fun doWork(): Result = withContext(dispatcher) {
+        try {
+            showProgressNotification()
+            // check if device is rooted before starting the sync
+            securityManager.checkIfDeviceIsRooted()
+            crashlyticsLog("Start")
+            val configuration = configManager.getProjectConfiguration()
 
-                if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed(configuration)) return@withContext success(
-                    message = "Can't sync to SimprintsID, skip"
+            if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed(configuration)) {
+                return@withContext success(
+                    message = "Can't sync to SimprintsID, skip",
                 )
+            }
 
-                // Requests NTP sync now as device is surely ONLINE,
-                timeHelper.ensureTrustworthiness()
+            // Requests NTP sync now as device is surely ONLINE,
+            timeHelper.ensureTrustworthiness()
 
-                val downSyncWorkerScopeId = UUID.randomUUID().toString()
-                val upSyncWorkerScopeId = UUID.randomUUID().toString()
+            val downSyncWorkerScopeId = UUID.randomUUID().toString()
+            val upSyncWorkerScopeId = UUID.randomUUID().toString()
 
-                if (!isSyncRunning()) {
-                    val startSyncReporterWorker =
-                        eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
-                    val workerChain = mutableListOf<OneTimeWorkRequest>()
-                    if (configuration.canSyncDataToSimprints()) {
-                        eventRepository.createEventScope(
-                            EventScopeType.UP_SYNC,
-                            upSyncWorkerScopeId
-                        )
+            if (!isSyncRunning()) {
+                val startSyncReporterWorker =
+                    eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
+                val workerChain = mutableListOf<OneTimeWorkRequest>()
+                if (configuration.canSyncDataToSimprints()) {
+                    eventRepository.createEventScope(
+                        EventScopeType.UP_SYNC,
+                        upSyncWorkerScopeId,
+                    )
 
-                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(
+                    workerChain += upSyncWorkerBuilder
+                        .buildUpSyncWorkerChain(
                             uniqueSyncId,
                             upSyncWorkerScopeId,
                         ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers") }
-                    }
+                }
 
-                    if (configuration.isEventDownSyncAllowed()) {
-                        eventRepository.createEventScope(
-                            EventScopeType.DOWN_SYNC,
-                            downSyncWorkerScopeId
-                        )
+                if (configuration.isEventDownSyncAllowed()) {
+                    eventRepository.createEventScope(
+                        EventScopeType.DOWN_SYNC,
+                        downSyncWorkerScopeId,
+                    )
 
-                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(
-                            uniqueSyncId,
-                            downSyncWorkerScopeId
-                        ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers") }
-                    }
-
-                    val endSyncReporterWorker =
-                        eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
+                    workerChain += downSyncWorkerBuilder
+                        .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
-                            upSyncWorkerScopeId
-                        )
-
-                    wm.beginWith(startSyncReporterWorker)
-                        .then(workerChain)
-                        .then(endSyncReporterWorker)
-                        .enqueue()
-
-                    eventSyncCache.clearProgresses()
-
-                    success(
-                        workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
-                        "Master work done: new id $uniqueSyncId"
-                    )
-                } else {
-                    val lastSyncId = getLastSyncId()
-
-                    success(
-                        workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId),
-                        "Master work done: id already exists $lastSyncId"
-                    )
+                        ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers") }
                 }
-            } catch (t: Throwable) {
-                fail(t)
+
+                val endSyncReporterWorker =
+                    eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
+                        uniqueSyncId,
+                        downSyncWorkerScopeId,
+                        upSyncWorkerScopeId,
+                    )
+
+                wm
+                    .beginWith(startSyncReporterWorker)
+                    .then(workerChain)
+                    .then(endSyncReporterWorker)
+                    .enqueue()
+
+                eventSyncCache.clearProgresses()
+
+                success(
+                    workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId),
+                    "Master work done: new id $uniqueSyncId",
+                )
+            } else {
+                val lastSyncId = getLastSyncId()
+
+                success(
+                    workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId),
+                    "Master work done: id already exists $lastSyncId",
+                )
             }
+        } catch (t: Throwable) {
+            fail(t)
         }
+    }
 
     private suspend fun isEventDownSyncAllowed(configuration: ProjectConfiguration): Boolean {
         val isProjectPaused =
@@ -156,13 +158,11 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
         return !isProjectPaused && isDownSyncConfigEnabled
     }
 
-    private fun getLastSyncId(): String? {
-        return syncWorkers.last()?.getUniqueSyncId()
-    }
+    private fun getLastSyncId(): String? = syncWorkers.last().getUniqueSyncId()
 
     private fun isSyncRunning(): Boolean = !getWorkInfoForRunningSyncWorkers().isNullOrEmpty()
 
-    private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? {
-        return syncWorkers?.filter { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
+    private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? = syncWorkers?.filter {
+        it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED
     }
 }

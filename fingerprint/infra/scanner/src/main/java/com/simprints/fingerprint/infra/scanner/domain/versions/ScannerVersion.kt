@@ -2,7 +2,6 @@ package com.simprints.fingerprint.infra.scanner.domain.versions
 
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 
-
 /**
  * This class represents the unified versions of the modules on the scanner and the generation of the
  * vero scanner.
@@ -15,5 +14,5 @@ import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 data class ScannerVersion(
     val hardwareVersion: String,
     val generation: ScannerGeneration,
-    val firmware: ScannerFirmwareVersions
+    val firmware: ScannerFirmwareVersions,
 )

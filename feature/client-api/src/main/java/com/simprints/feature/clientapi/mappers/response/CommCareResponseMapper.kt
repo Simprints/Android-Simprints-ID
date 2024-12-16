@@ -5,12 +5,11 @@ import androidx.core.os.bundleOf
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Tier
 import javax.inject.Inject
+import com.simprints.libsimprints.Identification as LegacyIdentification
+import com.simprints.libsimprints.Tier as LegacyTier
 
 internal class CommCareResponseMapper @Inject constructor() {
-
     operator fun invoke(response: ActionResponse): Bundle = when (response) {
         is ActionResponse.EnrolActionResponse -> bundleOf(
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
@@ -25,11 +24,11 @@ internal class CommCareResponseMapper @Inject constructor() {
          */
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
-            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<Identification>(
+            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<LegacyIdentification>(
                 response.identifications.map {
-                    Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
-                }
-            )
+                    LegacyIdentification(it.guid, it.confidenceScore, LegacyTier.valueOf(it.tier.name))
+                },
+            ),
         )
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
@@ -72,6 +71,6 @@ internal class CommCareResponseMapper @Inject constructor() {
     // error message. That is because commcare can't find [CommCareConstants.COMMCARE_DATA_KEY]
     private fun Bundle.toCommCareBundle(): Bundle = bundleOf(
         CommCareConstants.COMMCARE_DATA_KEY to "",
-        CommCareConstants.COMMCARE_BUNDLE_KEY to this
+        CommCareConstants.COMMCARE_BUNDLE_KEY to this,
     )
 }

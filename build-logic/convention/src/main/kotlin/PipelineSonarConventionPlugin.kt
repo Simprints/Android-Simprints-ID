@@ -5,7 +5,6 @@ import org.sonarqube.gradle.SonarExtension
 import java.io.File
 
 class PipelineSonarConventionPlugin : Plugin<Project> {
-
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {

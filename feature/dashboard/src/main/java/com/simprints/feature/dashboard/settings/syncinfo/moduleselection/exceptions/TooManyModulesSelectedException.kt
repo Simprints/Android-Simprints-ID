@@ -2,6 +2,5 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.except
 
 internal class TooManyModulesSelectedException(
     message: String = "TooManyModulesSelectedException",
-    val maxNumberOfModules: Int
-) :
-    RuntimeException(message)
+    val maxNumberOfModules: Int,
+) : RuntimeException(message)

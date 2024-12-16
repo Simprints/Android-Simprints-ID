@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 class DeviceConfigurationSerializerTest {
-
     @Test
     fun `readFrom should return the ProtoDeviceConfiguration when it's valid proto`() = runTest {
         val outputStream = ByteArrayOutputStream()

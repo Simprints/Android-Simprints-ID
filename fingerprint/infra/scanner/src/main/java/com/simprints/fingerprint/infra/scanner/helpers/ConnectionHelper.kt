@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retry
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
@@ -33,9 +32,8 @@ import javax.inject.Inject
  */
 internal class ConnectionHelper @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
-
     private var socket: ComponentBluetoothSocket? = null
 
     /**
@@ -45,7 +43,7 @@ internal class ConnectionHelper @Inject constructor(
      * @param scanner   the scanner object that will be connected to via bluetooth socket
      * @param macAddress  the string value representing the scanner's mac address
      *
-     * @return  a flow [Flow] representing the connection process that could occur multiple times
+     * @return a flow [Flow] representing the connection process that could occur multiple times
      *                 with retries, hence a flow is primarily used to handle connection retries
      *
      * @throws ScannerDisconnectedException if could not connect with the scanner
@@ -56,30 +54,27 @@ internal class ConnectionHelper @Inject constructor(
     fun connectScanner(
         scanner: Scanner,
         macAddress: String,
-        maxRetries: Long = CONNECT_MAX_RETRIES
-    ): Flow<Unit> =
-        establishConnectedSocket(macAddress, maxRetries).map { socket ->
-            connectScannerObjectWithSocket(scanner, socket)
-        }
+        maxRetries: Long = CONNECT_MAX_RETRIES,
+    ): Flow<Unit> = establishConnectedSocket(macAddress, maxRetries).map { socket ->
+        connectScannerObjectWithSocket(scanner, socket)
+    }
 
     private fun establishConnectedSocket(
         macAddress: String,
-        maxRetries: Long = CONNECT_MAX_RETRIES
-    ): Flow<ComponentBluetoothSocket> =
-        getPairedDevice(macAddress)
-            .map(::initiateAndReturnSocketConnection)
-            .retry(maxRetries)
+        maxRetries: Long = CONNECT_MAX_RETRIES,
+    ): Flow<ComponentBluetoothSocket> = getPairedDevice(macAddress)
+        .map(::initiateAndReturnSocketConnection)
+        .retry(maxRetries)
 
-    private fun getPairedDevice(macAddress: String): Flow<ComponentBluetoothDevice> =
-        flow {
-            if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
-            if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
+    private fun getPairedDevice(macAddress: String): Flow<ComponentBluetoothDevice> = flow {
+        if (bluetoothAdapter.isNull()) throw BluetoothNotSupportedException()
+        if (!bluetoothAdapter.isEnabled()) throw BluetoothNotEnabledException()
 
-            val device = bluetoothAdapter.getRemoteDevice(macAddress)
+        val device = bluetoothAdapter.getRemoteDevice(macAddress)
 
-            if (!device.isBonded()) throw ScannerNotPairedException()
-            emit(device)
-        }
+        if (!device.isBonded()) throw ScannerNotPairedException()
+        emit(device)
+    }
 
     private suspend fun initiateAndReturnSocketConnection(device: ComponentBluetoothDevice): ComponentBluetoothSocket {
         try {
@@ -91,29 +86,29 @@ internal class ConnectionHelper @Inject constructor(
             withContext(dispatcher) { socket.connect() }
             this.socket = socket
             return socket
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             throw ScannerDisconnectedException()
         }
     }
 
-    private suspend fun connectScannerObjectWithSocket(
+    private fun connectScannerObjectWithSocket(
         scanner: Scanner,
-        socket: ComponentBluetoothSocket
-    ) = withContext(dispatcher) {
+        socket: ComponentBluetoothSocket,
+    ) {
         Simber.d("Socket connected. Setting up scanner...")
-        scanner.connect(socket.getInputStream(), socket.getOutputStream()).await()
+        scanner.connect(socket.getInputStream(), socket.getOutputStream())
     }
 
-    suspend fun disconnectScanner(scanner: Scanner): Unit = withContext(dispatcher) {
-        scanner.disconnect().await()
+    fun disconnectScanner(scanner: Scanner) {
+        scanner.disconnect()
         socket?.close()
     }
 
     suspend fun reconnect(
         scanner: Scanner,
         macAddress: String,
-        maxRetries: Long = CONNECT_MAX_RETRIES
-    )= withContext(dispatcher) {
+        maxRetries: Long = CONNECT_MAX_RETRIES,
+    ) {
         disconnectScanner(scanner)
         delay(RECONNECT_DELAY_MS)
         connectScanner(scanner, macAddress, maxRetries).collect()

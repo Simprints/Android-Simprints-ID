@@ -12,7 +12,6 @@ import kotlin.reflect.KClass
 internal class FingerprintApiClientFactory @Inject constructor(
     private val authStore: AuthStore,
 ) {
-
     suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): FingerprintApiClient<T> =
         FingerprintApiClientImpl(authStore.buildClient(remoteInterface))
 }

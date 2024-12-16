@@ -13,17 +13,17 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyAc
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.RefusalForm
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Tier
-import com.simprints.libsimprints.Verification
+import com.simprints.libsimprints.contracts.VersionsList
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.simprints.libsimprints.Identification as LegacyIdentification
+import com.simprints.libsimprints.RefusalForm as LegacyRefusalForm
+import com.simprints.libsimprints.Registration as LegacyEnrolment
+import com.simprints.libsimprints.Tier as LegacyTier
+import com.simprints.libsimprints.Verification as LegacyVerification
 
 @RunWith(AndroidJUnit4::class)
 class LibSimprintsResponseMapperTest {
-
     private val mapper = LibSimprintsResponseMapper()
 
     @Test
@@ -33,15 +33,33 @@ class LibSimprintsResponseMapperTest {
                 actionIdentifier = EnrolActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 enrolledGuid = "guid",
-                subjectActions = "subjects"
-            )
+                subjectActions = "subjects",
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelable<Registration>(Constants.SIMPRINTS_REGISTRATION)).isEqualTo(
-            Registration("guid")
+        assertThat(extras.getParcelable<LegacyEnrolment>(Constants.SIMPRINTS_REGISTRATION)).isEqualTo(
+            LegacyEnrolment("guid"),
         )
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+    }
+
+    @Test
+    fun `correctly maps enrol response after LibSimprints refactoring`() {
+        val extras = mapper(
+            ActionResponse.EnrolActionResponse(
+                actionIdentifier = EnrolActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.INITIAL_REWORK),
+                sessionId = "sessionId",
+                enrolledGuid = "guid",
+                subjectActions = "subjects",
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_ENROLMENT)).isEqualTo("""{"guid":"guid"}""")
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
 
     @Test
@@ -63,15 +81,43 @@ class LibSimprintsResponseMapperTest {
                         tier = AppResponseTier.TIER_3,
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
-                )
-            )
+                ),
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelableArrayList<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
-            Identification("guid-1", 100, Tier.TIER_5),
-            Identification("guid-2", 75, Tier.TIER_3),
+        assertThat(extras.getParcelableArrayList<LegacyIdentification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
+            LegacyIdentification("guid-1", 100, LegacyTier.TIER_5),
+            LegacyIdentification("guid-2", 75, LegacyTier.TIER_3),
         )
+    }
+
+    @Test
+    fun `correctly maps identify response after LibSimprints refactoring`() {
+        val extras = mapper(
+            ActionResponse.IdentifyActionResponse(
+                actionIdentifier = IdentifyRequestActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.INITIAL_REWORK),
+                sessionId = "sessionId",
+                identifications = listOf(
+                    AppMatchResult(
+                        guid = "guid-1",
+                        confidenceScore = 100,
+                        tier = AppResponseTier.TIER_5,
+                        matchConfidence = AppMatchConfidence.MEDIUM,
+                    ),
+                ),
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
+            """
+            [{"guid":"guid-1","tier":"TIER_5","confidence":100}]
+            """.trimIndent(),
+        )
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
 
     @Test
@@ -81,11 +127,11 @@ class LibSimprintsResponseMapperTest {
                 actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 confirmed = true,
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
 
     @Test
@@ -101,17 +147,17 @@ class LibSimprintsResponseMapperTest {
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = null,
                 ),
-            )
+            ),
         )
 
         // Verification does not implement equals, so we have to check each field individually
-        val extraVerification = extras.getParcelable<Verification>(Constants.SIMPRINTS_VERIFICATION)
+        val extraVerification = extras.getParcelable<LegacyVerification>(Constants.SIMPRINTS_VERIFICATION)
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extraVerification?.guid).isEqualTo("guid")
-        assertThat(extraVerification?.tier).isEqualTo(Tier.TIER_2)
-        assertThat(extraVerification?.confidence).isEqualTo(50)
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
+        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_2)
+        assertThat(extraVerification?.getConfidence()).isEqualTo(50)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isFalse() // Default value
     }
 
@@ -128,17 +174,17 @@ class LibSimprintsResponseMapperTest {
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = false,
                 ),
-            )
+            ),
         )
 
         // Verification does not implement equals, so we have to check each field individually
-        val extraVerification = extras.getParcelable<Verification>(Constants.SIMPRINTS_VERIFICATION)
+        val extraVerification = extras.getParcelable<LegacyVerification>(Constants.SIMPRINTS_VERIFICATION)
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extraVerification?.guid).isEqualTo("guid")
-        assertThat(extraVerification?.tier).isEqualTo(Tier.TIER_2)
-        assertThat(extraVerification?.confidence).isEqualTo(50)
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
+        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_2)
+        assertThat(extraVerification?.getConfidence()).isEqualTo(50)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isEqualTo(false)
     }
 
@@ -146,7 +192,7 @@ class LibSimprintsResponseMapperTest {
     fun `correctly maps verify response with verificationSuccess = true`() {
         val extras = mapper(
             ActionResponse.VerifyActionResponse(
-                actionIdentifier = VerifyActionFactory.getIdentifier(),
+                actionIdentifier = VerifyActionFactory.getIdentifier().copy(contractVersion = 2),
                 sessionId = "sessionId",
                 matchResult = AppMatchResult(
                     guid = "guid",
@@ -155,18 +201,46 @@ class LibSimprintsResponseMapperTest {
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = true,
                 ),
-            )
+            ),
         )
 
         // Verification does not implement equals, so we have to check each field individually
-        val extraVerification = extras.getParcelable<Verification>(Constants.SIMPRINTS_VERIFICATION)
+        val extraVerification = extras.getParcelable<LegacyVerification>(Constants.SIMPRINTS_VERIFICATION)
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extraVerification?.guid).isEqualTo("guid")
-        assertThat(extraVerification?.tier).isEqualTo(Tier.TIER_2)
-        assertThat(extraVerification?.confidence).isEqualTo(50)
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isEqualTo(true)
+        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_2)
+        assertThat(extraVerification?.getConfidence()).isEqualTo(50)
+        // assertThat(extraVerification?.isSuccess).isTrue()
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isTrue()
+    }
+
+    @Test
+    fun `correctly maps verify response after LibSimprints refactoring`() {
+        val extras = mapper(
+            ActionResponse.VerifyActionResponse(
+                actionIdentifier = VerifyActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.INITIAL_REWORK),
+                sessionId = "sessionId",
+                matchResult = AppMatchResult(
+                    guid = "guid",
+                    confidenceScore = 50,
+                    tier = AppResponseTier.TIER_2,
+                    matchConfidence = AppMatchConfidence.HIGH,
+                    verificationSuccess = true,
+                ),
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
+            """
+            {"guid":"guid","tier":"TIER_2","confidence":50,"isSuccess":true}
+            """.trimIndent(),
+        )
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
 
     @Test
@@ -177,14 +251,36 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 reason = "reason",
                 extraText = "extra",
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelable<RefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
-            RefusalForm("reason", "extra")
+        assertThat(extras.getParcelable<LegacyRefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
+            LegacyRefusalForm("reason", "extra"),
         )
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+    }
+
+    @Test
+    fun `correctly maps exit form response after LibSimprints refactoring`() {
+        val extras = mapper(
+            ActionResponse.ExitFormActionResponse(
+                actionIdentifier = EnrolLastBiometricsActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.INITIAL_REWORK),
+                sessionId = "sessionId",
+                reason = "reason",
+                extraText = "extra",
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
+            """
+            {"reason":"reason","extra":"extra"}
+            """.trimIndent(),
+        )
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
     }
 
     @Test
@@ -195,13 +291,13 @@ class LibSimprintsResponseMapperTest {
                 sessionId = "sessionId",
                 reason = AppErrorReason.UNEXPECTED_ERROR,
                 flowCompleted = true,
-            )
+            ),
         )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(
-            Constants.SIMPRINTS_UNEXPECTED_ERROR
+            Constants.SIMPRINTS_UNEXPECTED_ERROR,
         )
     }
 
@@ -233,11 +329,11 @@ class LibSimprintsResponseMapperTest {
                     sessionId = "sessionId",
                     reason = reason,
                     flowCompleted = true,
-                )
+                ),
             )
 
             assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(
-                expectedCode
+                expectedCode,
             )
         }
     }

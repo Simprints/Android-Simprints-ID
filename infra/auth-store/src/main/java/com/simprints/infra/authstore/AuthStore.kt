@@ -8,14 +8,15 @@ import com.simprints.infra.network.SimRemoteInterface
 import kotlin.reflect.KClass
 
 interface AuthStore {
-
     var signedInUserId: TokenizableString?
     var signedInProjectId: String
 
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
+
     fun cleanCredentials()
 
     suspend fun storeFirebaseToken(token: Token)
+
     fun clearFirebaseToken()
 
     fun isFirebaseSignedIn(projectId: String): Boolean
@@ -31,7 +32,7 @@ interface AuthStore {
 
     @Deprecated(
         message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
-        replaceWith = ReplaceWith("getCoreApp()")
+        replaceWith = ReplaceWith("getCoreApp()"),
     )
     fun getLegacyAppFallback(): FirebaseApp
 

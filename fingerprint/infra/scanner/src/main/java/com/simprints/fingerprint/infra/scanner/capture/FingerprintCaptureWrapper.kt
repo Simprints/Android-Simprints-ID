@@ -14,7 +14,7 @@ interface FingerprintCaptureWrapper {
         captureDpi: Dpi?,
         timeOutMs: Int,
         qualityThreshold: Int,
-        allowLowQualityExtraction: Boolean
+        allowLowQualityExtraction: Boolean,
     ): AcquireFingerprintTemplateResponse
 
     val templateFormat: String

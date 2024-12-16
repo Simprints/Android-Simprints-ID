@@ -4,6 +4,8 @@
     <!-- Alert -->
     <string name="alert_title_fallback">Alert</string>
     <string name="alert_button_close">Close</string>
+    <string name="alert_export_data">Copy details</string>
+    <string name="alert_export_copied">Copied data to clipboard</string>
 
     <!-- Consent -->
     <string name="consent_general_title">General Consent</string>
@@ -295,7 +297,7 @@
     <string name="fingerprint_capture_rescan_question">Re-scan?</string>
     <string name="fingerprint_capture_scan">Scan</string>
     <string name="fingerprint_capture_please_wait">Please Wait</string>
-    <string name="fingerprint_capture_missing_finger_button"><u>Missing Finger</u></string>
+    <string name="fingerprint_capture_missing_finger_button">Skip Finger</string>
     <string name="fingerprint_capture_try_another_title">Get Ready</string>
     <string name="fingerprint_capture_try_another_finger">Let\'s Try Another Finger!</string>
 
@@ -367,12 +369,15 @@
     <string name="dashboard_preference_select_modules_title">Select modules</string>
     <string name="dashboard_preference_app_version_title">App Version</string>
     <string name="dashboard_preference_sync_information_title">Sync Information</string>
+    <string name="dashboard_preference_update_config_title">Update configuration</string>
     <string name="dashboard_preference_scanner_version_title">Scanner Version</string>
     <string name="dashboard_preference_device_id_title">Device ID</string>
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
+    <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
     <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Audio alerts for scan completion, prompting the user to remove the subject’s finger from the scanner.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
+    <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">Audio Alert</string>
 
     <!-- Dashboard - Sync info -->

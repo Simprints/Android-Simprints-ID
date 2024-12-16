@@ -4,15 +4,16 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.MaxCaptureAttempts
 import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.testtools.apiDecisionPolicy
 import com.simprints.infra.config.store.testtools.apiFingerprintConfiguration
+import com.simprints.infra.config.store.testtools.apiMaxCaptureAttempts
 import com.simprints.infra.config.store.testtools.decisionPolicy
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import org.junit.Test
 
 class ApiFingerprintConfigurationTest {
-
     @Test
     fun `should map correctly the model`() {
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
@@ -22,13 +23,13 @@ class ApiFingerprintConfigurationTest {
     fun `should map correctly the model with allowedAgeRange null`() {
         val apiFingerprintConfigurationWithAgeRange = apiFingerprintConfiguration.copy(
             secugenSimMatcher = apiFingerprintConfiguration.secugenSimMatcher?.copy(
-                allowedAgeRange = null
-            )
+                allowedAgeRange = null,
+            ),
         )
         val fingerprintConfigurationWithAgeRange = fingerprintConfiguration.copy(
             secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(
-                allowedAgeRange = AgeGroup(0, null)
-            )
+                allowedAgeRange = AgeGroup(0, null),
+            ),
         )
         assertThat(apiFingerprintConfigurationWithAgeRange.toDomain()).isEqualTo(fingerprintConfigurationWithAgeRange)
     }
@@ -40,12 +41,13 @@ class ApiFingerprintConfigurationTest {
             listOf(ApiFingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
             true,
             ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
-                listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
-                apiDecisionPolicy,
-                ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-                null,
-                apiFingerprintConfiguration.secugenSimMatcher?.vero2,
-                apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
+                fingersToCapture = listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+                decisionPolicy = apiDecisionPolicy,
+                comparisonStrategyForVerification = ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                vero1 = null,
+                vero2 = apiFingerprintConfiguration.secugenSimMatcher?.vero2,
+                allowedAgeRange = apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
+                maxCaptureAttempts = apiMaxCaptureAttempts,
             ),
             null,
         )
@@ -54,12 +56,14 @@ class ApiFingerprintConfigurationTest {
             listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
             true,
             FingerprintConfiguration.FingerprintSdkConfiguration(
-                listOf(Finger.LEFT_3RD_FINGER),
-                decisionPolicy,
-                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-                null,
-                fingerprintConfiguration.secugenSimMatcher?.vero2,
-                fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
+                fingersToCapture = listOf(Finger.LEFT_3RD_FINGER),
+                decisionPolicy = decisionPolicy,
+                comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                vero1 = null,
+                vero2 = fingerprintConfiguration.secugenSimMatcher?.vero2,
+                allowedAgeRange = fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
+                verificationMatchThreshold = null,
+                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
             ),
             null,
         )
@@ -75,30 +79,31 @@ class ApiFingerprintConfigurationTest {
             true,
             null,
             ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
-                listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
-                apiDecisionPolicy,
-                ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-                ApiVero1Configuration(10),
-                null,
-                apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!
+                fingersToCapture = listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+                decisionPolicy = apiDecisionPolicy,
+                comparisonStrategyForVerification = ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                vero1 = ApiVero1Configuration(10),
+                vero2 = null,
+                allowedAgeRange = apiFingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
+                maxCaptureAttempts = apiMaxCaptureAttempts,
             ),
-
-            )
+        )
         val fingerprintConfiguration = FingerprintConfiguration(
             listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
             listOf(FingerprintConfiguration.BioSdk.NEC),
             true,
             null,
             FingerprintConfiguration.FingerprintSdkConfiguration(
-                listOf(Finger.LEFT_3RD_FINGER),
-                decisionPolicy,
-                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-                Vero1Configuration(10),
-                null,
-                fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!
+                fingersToCapture = listOf(Finger.LEFT_3RD_FINGER),
+                decisionPolicy = decisionPolicy,
+                comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                vero1 = Vero1Configuration(10),
+                vero2 = null,
+                allowedAgeRange = fingerprintConfiguration.secugenSimMatcher?.allowedAgeRange!!,
+                verificationMatchThreshold = null,
+                maxCaptureAttempts = MaxCaptureAttempts(noFingerDetected = 17),
             ),
-
-            )
+        )
 
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
     }
@@ -138,8 +143,10 @@ class ApiFingerprintConfigurationTest {
     @Test
     fun `should map correctly the FingerComparisonStrategy enums`() {
         val mapping = mapOf(
-            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER to FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-            ApiFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX to FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
+            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER to
+                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            ApiFingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX to
+                FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
         )
 
         mapping.forEach {

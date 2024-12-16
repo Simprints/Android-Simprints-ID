@@ -24,7 +24,6 @@ internal class FaceMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
-
     private lateinit var faceMatcher: FaceMatcher
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING.name
 
@@ -38,10 +37,11 @@ internal class FaceMatcherUseCase @Inject constructor(
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = faceMatcher.supportedTemplateFormat
+            faceSampleFormat = faceMatcher.supportedTemplateFormat,
         )
         val totalCandidates = enrolmentRecordRepository.count(
-            queryWithSupportedFormat, dataSource = matchParams.biometricDataSource
+            queryWithSupportedFormat,
+            dataSource = matchParams.biometricDataSource,
         )
         if (totalCandidates == 0) {
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
@@ -54,19 +54,17 @@ internal class FaceMatcherUseCase @Inject constructor(
                     val batchCandidates = getCandidates(
                         queryWithSupportedFormat,
                         range,
-                        dataSource = matchParams.biometricDataSource
+                        dataSource = matchParams.biometricDataSource,
                     )
                     match(batchCandidates, samples)
                 }
-            }
-            .awaitAll()
+            }.awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
         MatcherResult(resultItems, totalCandidates, faceMatcher.matcherName)
     }
 
-    private fun mapSamples(probes: List<MatchParams.FaceSample>) =
-        probes.map { FaceSample(it.faceId, it.template) }
+    private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
 
     private suspend fun getCandidates(
         query: SubjectQuery,
@@ -77,7 +75,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         .map {
             FaceIdentity(
                 it.subjectId,
-                it.faces.map { face -> FaceSample(face.id, face.template) }
+                it.faces.map { face -> FaceSample(face.id, face.template) },
             )
         }
 
@@ -88,9 +86,8 @@ internal class FaceMatcherUseCase @Inject constructor(
         acc.add(
             FaceMatchResult.Item(
                 item.subjectId,
-                faceMatcher.getHighestComparisonScoreForCandidate(samples, item)
-            )
+                faceMatcher.getHighestComparisonScoreForCandidate(samples, item),
+            ),
         )
     }
-
 }

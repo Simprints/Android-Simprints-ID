@@ -12,7 +12,6 @@ import org.junit.Test
 
 @Keep
 class ConfirmationCalloutEventTest {
-
     @Test
     fun create_ConfirmationCalloutEvent() {
         val event = ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2)

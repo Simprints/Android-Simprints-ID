@@ -1,7 +1,6 @@
 package com.simprints.infra.events.session
 
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
@@ -17,7 +16,6 @@ internal class SessionEventRepositoryImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val sessionDataCache: SessionDataCache,
 ) : SessionEventRepository {
-
     private val eventsLock = Mutex()
 
     override suspend fun createSession(): EventScope = withLockedContext {
@@ -41,7 +39,7 @@ internal class SessionEventRepositoryImpl @Inject constructor(
         val sessionScope = getCurrentScopeInternal()
         if (sessionScope.payload.location != null) {
             val updatedSessionScope = sessionScope.copy(
-                payload = sessionScope.payload.copy(location = null)
+                payload = sessionScope.payload.copy(location = null),
             )
             saveSessionScopeInternal(updatedSessionScope)
         }
@@ -77,10 +75,8 @@ internal class SessionEventRepositoryImpl @Inject constructor(
      */
     private object LockedContext
 
-    private suspend inline fun <T> withLockedContext(
-        crossinline block: suspend LockedContext.() -> T,
-    ) = eventsLock.withLock { LockedContext.block() }
-
+    private suspend inline fun <T> withLockedContext(crossinline block: suspend LockedContext.() -> T) =
+        eventsLock.withLock { LockedContext.block() }
 
     private suspend fun LockedContext.createSessionInternal(): EventScope {
         closeAllSessions(EventScopeEndCause.NEW_SESSION)

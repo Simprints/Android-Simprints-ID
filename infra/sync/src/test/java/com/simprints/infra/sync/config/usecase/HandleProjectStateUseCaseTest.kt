@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class HandleProjectStateUseCaseTest {
-
     @MockK
     private lateinit var eventSyncManager: EventSyncManager
 
@@ -66,5 +65,4 @@ internal class HandleProjectStateUseCaseTest {
 
         coVerify(exactly = 0) { logoutUseCase.invoke() }
     }
-
 }

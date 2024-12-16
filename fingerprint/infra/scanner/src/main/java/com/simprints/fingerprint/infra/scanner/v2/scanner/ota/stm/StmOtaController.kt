@@ -1,9 +1,7 @@
 package com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm
 
 import com.simprints.fingerprint.infra.scanner.v2.channel.StmOtaMessageChannel
-import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaMessageProtocol
-import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands.EraseMemoryAddressCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands.EraseMemoryStartCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands.GoAddressCommand
@@ -14,18 +12,14 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands.WriteMe
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands.WriteMemoryStartCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.responses.CommandAcknowledgement
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
-import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.handleErrorsWith
-import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm.StmOtaController.Companion.GO_ADDRESS
-import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm.StmOtaController.Companion.START_ADDRESS
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toByteArray
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.completable
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.single
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import javax.inject.Inject
 
 /**
  * Conducts OTA for the STM module in accordance to
@@ -37,92 +31,88 @@ import io.reactivex.Single
  * There are some particular memory address involved which reference specific parts in memory on
  * the STM32 - [START_ADDRESS] and [GO_ADDRESS].
  */
-class StmOtaController {
-
-    private inline fun <reified R : StmOtaResponse> sendStmOtaModeCommandAndReceiveResponse(
-        stmOtaMessageChannel: StmOtaMessageChannel,
-        errorHandler: ResponseErrorHandler,
-        command: StmOtaCommand
-    ): Single<R> =
-        stmOtaMessageChannel.sendStmOtaModeCommandAndReceiveResponse<R>(command)
-            .handleErrorsWith(errorHandler)
-
+class StmOtaController @Inject constructor() {
     /**
      * @throws OtaFailedException if received a NACK when communicating with STM
      */
-    fun program(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler, firmwareBinFile: ByteArray): Observable<Float> =
-        sendInitBootloaderCommand(stmOtaMessageChannel, errorHandler)
-            .andThen(eraseMemory(stmOtaMessageChannel, errorHandler))
-            .andThen(calculateFirmwareFileChunks(firmwareBinFile))
+    suspend fun program(
+        stmOtaMessageChannel: StmOtaMessageChannel,
+        firmwareBinFile: ByteArray,
+    ): Flow<Float> {
+        sendInitBootloaderCommand(stmOtaMessageChannel)
+        eraseMemory(stmOtaMessageChannel)
+        val chunks = createFirmwareChunks(firmwareBinFile)
+        return chunks
             .pairWithProgress()
-            .flattenAsObservable { it }
-            .concatMap { (chunk, progress) ->
-                sendOtaPacket(stmOtaMessageChannel, errorHandler, chunk)
-                    .andThen(Observable.just(progress))
-            }
-            .concatWith(sendGoCommandAndAddress(stmOtaMessageChannel, errorHandler))
+            .asFlow()
+            .map { (chunk, progress) ->
+                sendOtaPacket(stmOtaMessageChannel, chunk)
+                progress
+            }.onCompletion { sendGoCommandAndAddress(stmOtaMessageChannel) }
+    }
 
-    private fun sendInitBootloaderCommand(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
-        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
-            InitBootloaderCommand()
-        ).verifyResponseIsAck()
+    private fun List<FirmwareByteChunk>.pairWithProgress() = mapIndexed { index, chunk ->
+        Pair(chunk, (index + 1).toFloat() / this.size.toFloat())
+    }
 
-    private fun eraseMemory(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
-        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
-            EraseMemoryStartCommand()
-        ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
-                EraseMemoryAddressCommand(ERASE_ALL_ADDRESS)
-            )
-        ).verifyResponseIsAck()
+    private suspend fun sendInitBootloaderCommand(stmOtaMessageChannel: StmOtaMessageChannel) {
+        stmOtaMessageChannel
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(
+                InitBootloaderCommand(),
+            ).verifyResponseIsAck()
+    }
 
-    private fun calculateFirmwareFileChunks(firmwareBinFile: ByteArray): Single<List<FirmwareByteChunk>> =
-        single {
-            firmwareBinFile.chunked(MAX_STM_OTA_CHUNK_SIZE)
-                .mapIndexed { idx, chunk ->
-                    val addressInt = START_ADDRESS + idx * MAX_STM_OTA_CHUNK_SIZE
-                    val address = addressInt.toByteArray(StmOtaMessageProtocol.byteOrder)
-                    FirmwareByteChunk(address, chunk)
-                }
+    private suspend fun eraseMemory(stmOtaMessageChannel: StmOtaMessageChannel) {
+        stmOtaMessageChannel
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(
+                EraseMemoryStartCommand(),
+            ).verifyResponseIsAck()
+        stmOtaMessageChannel
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(
+                EraseMemoryAddressCommand(ERASE_ALL_ADDRESS),
+            ).verifyResponseIsAck()
+    }
+
+    private fun createFirmwareChunks(firmwareBinFile: ByteArray): List<FirmwareByteChunk> = firmwareBinFile
+        .chunked(MAX_STM_OTA_CHUNK_SIZE)
+        .mapIndexed { idx, chunk ->
+            val addressInt = START_ADDRESS + idx * MAX_STM_OTA_CHUNK_SIZE
+            val address = addressInt.toByteArray(StmOtaMessageProtocol.byteOrder)
+            FirmwareByteChunk(address, chunk)
         }
 
-    private fun Single<out List<FirmwareByteChunk>>.pairWithProgress() =
-        map { chunkList ->
-            chunkList.mapIndexed { index, chunk ->
-                Pair(chunk, (index + 1).toFloat() / chunkList.size.toFloat())
-            }
-        }
+    private suspend fun sendOtaPacket(
+        stmOtaMessageChannel: StmOtaMessageChannel,
+        firmwareByteChunk: FirmwareByteChunk,
+    ) {
+        stmOtaMessageChannel
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(
+                WriteMemoryStartCommand(),
+            ).verifyResponseIsAck()
+        stmOtaMessageChannel
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(
+                WriteMemoryAddressCommand(firmwareByteChunk.address),
+            ).verifyResponseIsAck()
+        stmOtaMessageChannel
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(
+                WriteMemoryDataCommand(firmwareByteChunk.data),
+            ).verifyResponseIsAck()
+    }
 
-    private fun sendOtaPacket(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler, firmwareByteChunk: FirmwareByteChunk): Completable =
-        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
-            WriteMemoryStartCommand()
-        ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
-                WriteMemoryAddressCommand(firmwareByteChunk.address)
-            )
-        ).verifyResponseIsAck().andThen(
-            sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
-                WriteMemoryDataCommand(firmwareByteChunk.data)
-            )
-        ).verifyResponseIsAck()
-
-    private fun sendGoCommandAndAddress(stmOtaMessageChannel: StmOtaMessageChannel, errorHandler: ResponseErrorHandler): Completable =
-        sendStmOtaModeCommandAndReceiveResponse<CommandAcknowledgement>(stmOtaMessageChannel, errorHandler,
-            GoCommand()
-        ).verifyResponseIsAck().andThen(
-            stmOtaMessageChannel.outgoing.sendMessage( // The ACK sometimes doesn't make it back before the Cypress module disconnects
-                GoAddressCommand(GO_ADDRESS.toByteArray(StmOtaMessageProtocol.byteOrder))
-            )
+    private suspend fun sendGoCommandAndAddress(stmOtaMessageChannel: StmOtaMessageChannel) {
+        stmOtaMessageChannel
+            .sendCommandAndReceiveResponse<CommandAcknowledgement>(GoCommand())
+            .verifyResponseIsAck()
+        stmOtaMessageChannel.sendStmOtaModeCommand( // The ACK sometimes doesn't make it back before the Cypress module disconnects
+            GoAddressCommand(GO_ADDRESS.toByteArray(StmOtaMessageProtocol.byteOrder)),
         )
+    }
 
-    private fun Single<out CommandAcknowledgement>.verifyResponseIsAck(): Completable =
-        flatMapCompletable {
-            completable {
-                if (it.kind != CommandAcknowledgement.Kind.ACK) {
-                    throw OtaFailedException("Received NACK response during STM OTA")
-                }
-            }
+    private fun CommandAcknowledgement.verifyResponseIsAck() {
+        if (this.kind != CommandAcknowledgement.Kind.ACK) {
+            throw OtaFailedException("Received NACK response during STM OTA")
         }
+    }
 
     companion object {
         val ERASE_ALL_ADDRESS = byteArrayOf(0xFF, 0xFF)

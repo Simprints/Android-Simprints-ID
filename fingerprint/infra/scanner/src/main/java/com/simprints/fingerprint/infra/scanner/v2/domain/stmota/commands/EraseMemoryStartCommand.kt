@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.stmota.commands
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaCommand
 
 class EraseMemoryStartCommand : StmOtaCommand() {
-
     override fun getDataBytes(): ByteArray = byteArrayOf(WRITE_MEMORY_COMMAND_BYTE)
 
     companion object {

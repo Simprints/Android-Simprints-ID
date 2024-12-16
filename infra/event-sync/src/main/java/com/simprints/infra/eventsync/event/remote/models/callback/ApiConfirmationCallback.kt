@@ -4,5 +4,5 @@ import androidx.annotation.Keep
 
 @Keep
 internal data class ApiConfirmationCallback(
-    val received: Boolean
+    val received: Boolean,
 ) : ApiCallback(ApiCallbackType.Confirmation)

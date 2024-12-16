@@ -6,5 +6,5 @@ import androidx.annotation.Keep
 data class EventLabels(
     val projectId: String? = null,
     val sessionId: String? = null,
-    val deviceId: String? = null
+    val deviceId: String? = null,
 )

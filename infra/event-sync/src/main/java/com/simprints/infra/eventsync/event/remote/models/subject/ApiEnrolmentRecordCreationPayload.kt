@@ -15,17 +15,13 @@ internal data class ApiEnrolmentRecordCreationPayload(
     val projectId: String,
     val moduleId: String,
     val attendantId: String,
-    val biometricReferences: List<ApiBiometricReference>?
-) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation) {
+    val biometricReferences: List<ApiBiometricReference>?,
+) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation)
 
-}
-
-
-internal fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
-    EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
-        subjectId,
-        projectId,
-        moduleId.asTokenizableEncrypted(),
-        attendantId.asTokenizableEncrypted(),
-        biometricReferences?.map { it.fromApiToDomain() } ?: emptyList()
-    )
+internal fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
+    subjectId,
+    projectId,
+    moduleId.asTokenizableEncrypted(),
+    attendantId.asTokenizableEncrypted(),
+    biometricReferences?.map { it.fromApiToDomain() } ?: emptyList(),
+)

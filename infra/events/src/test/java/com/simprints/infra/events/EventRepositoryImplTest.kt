@@ -36,7 +36,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class EventRepositoryImplTest {
-
     private lateinit var eventRepo: EventRepository
 
     @MockK
@@ -93,9 +92,11 @@ internal class EventRepositoryImplTest {
         eventRepo.createEventScope(EventScopeType.SESSION)
 
         coVerify {
-            eventLocalDataSource.saveEventScope(match {
-                it.payload.databaseInfo.sessionCount == N_SESSIONS_DB
-            })
+            eventLocalDataSource.saveEventScope(
+                match {
+                    it.payload.databaseInfo.sessionCount == N_SESSIONS_DB
+                },
+            )
         }
     }
 
@@ -109,14 +110,13 @@ internal class EventRepositoryImplTest {
     }
 
     @Test(expected = DuplicateGuidSelectEventValidatorException::class)
-    fun `create event scope report duplicate GUID select EventValidatorExceptionException`() =
-        runTest {
-            coEvery { eventLocalDataSource.countEventScopes(any()) } returns N_SESSIONS_DB
-            coEvery {
-                eventLocalDataSource.saveEventScope(any())
-            } throws DuplicateGuidSelectEventValidatorException("oops...")
-            eventRepo.createEventScope(EventScopeType.SESSION)
-        }
+    fun `create event scope report duplicate GUID select EventValidatorExceptionException`() = runTest {
+        coEvery { eventLocalDataSource.countEventScopes(any()) } returns N_SESSIONS_DB
+        coEvery {
+            eventLocalDataSource.saveEventScope(any())
+        } throws DuplicateGuidSelectEventValidatorException("oops...")
+        eventRepo.createEventScope(EventScopeType.SESSION)
+    }
 
     @Test
     fun `create event scope should add a new session event`() = runTest {
@@ -147,10 +147,12 @@ internal class EventRepositoryImplTest {
         eventRepo.closeEventScope(scope, null)
 
         coVerify {
-            eventLocalDataSource.saveEventScope(match {
-                assertThat(it.endedAt).isEqualTo(Timestamp(5L))
-                true
-            })
+            eventLocalDataSource.saveEventScope(
+                match {
+                    assertThat(it.endedAt).isEqualTo(Timestamp(5L))
+                    true
+                },
+            )
         }
     }
 
@@ -179,30 +181,31 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
-    fun `add event to current session should add event related to current session into DB`() =
-        runTest {
-            val scope = createSessionScope("scopeId", isClosed = false)
-            val event = createAlertScreenEvent()
+    fun `add event to current session should add event related to current session into DB`() = runTest {
+        val scope = createSessionScope("scopeId", isClosed = false)
+        val event = createAlertScreenEvent()
 
-            coEvery { eventLocalDataSource.loadEventScope(any()) } returns scope
-            coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
-                event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
-            )
-            eventRepo.closeEventScope("scopeId", null)
+        coEvery { eventLocalDataSource.loadEventScope(any()) } returns scope
+        coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns listOf(
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+        )
+        eventRepo.closeEventScope("scopeId", null)
 
-            coVerify {
-                eventLocalDataSource.saveEventScope(match {
+        coVerify {
+            eventLocalDataSource.saveEventScope(
+                match {
                     assertThat(it.endedAt).isEqualTo(Timestamp(5L))
                     true
-                })
-            }
+                },
+            )
         }
+    }
 
     @Test
     fun `adding event to should not override existing session id in the event`() = runTest {
         val scope = createSessionScope("scopeId", isClosed = false)
         val event = createAlertScreenEvent().copy(
-            scopeId = GUID2
+            scopeId = GUID2,
         )
 
         coEvery { eventLocalDataSource.loadEventScope(any()) } returns scope
@@ -227,10 +230,12 @@ internal class EventRepositoryImplTest {
         eventRepo.closeAllOpenScopes(EventScopeType.SESSION, null)
 
         coVerify(exactly = 2) {
-            eventLocalDataSource.saveEventScope(withArg {
-                assertThat(it.endedAt).isNotNull()
-                assertThat(it.payload.endCause).isNotNull()
-            })
+            eventLocalDataSource.saveEventScope(
+                withArg {
+                    assertThat(it.endedAt).isNotNull()
+                    assertThat(it.payload.endCause).isNotNull()
+                },
+            )
         }
     }
 
@@ -240,6 +245,13 @@ internal class EventRepositoryImplTest {
         eventRepo.saveEventScope(scope)
 
         coVerify { eventLocalDataSource.saveEventScope(any()) }
+    }
+
+    @Test
+    fun `should delegate all scope fetch`() = runTest {
+        eventRepo.getAllScopes()
+
+        coVerify { eventLocalDataSource.loadAllScopes() }
     }
 
     @Test
@@ -254,6 +266,13 @@ internal class EventRepositoryImplTest {
         eventRepo.getClosedEventScopes(type = EventScopeType.SESSION, limit = 10)
 
         coVerify { eventLocalDataSource.loadClosedScopes(EventScopeType.SESSION, limit = 10) }
+    }
+
+    @Test
+    fun `should delegate closed scope count fetch`() = runTest {
+        eventRepo.getClosedEventScopesCount(type = EventScopeType.SESSION)
+
+        coVerify { eventLocalDataSource.countClosedEventScopes(EventScopeType.SESSION) }
     }
 
     @Test
@@ -312,7 +331,7 @@ internal class EventRepositoryImplTest {
         coEvery { eventLocalDataSource.observeEventCount(any()) } returns flowOf(7)
 
         assertThat(
-            eventRepo.observeEventCount(EventType.CALLBACK_ENROLMENT).firstOrNull()
+            eventRepo.observeEventCount(EventType.CALLBACK_ENROLMENT).firstOrNull(),
         ).isEqualTo(7)
 
         coVerify(exactly = 0) { eventLocalDataSource.observeEventCount() }
@@ -330,7 +349,7 @@ internal class EventRepositoryImplTest {
                 withArg {
                     assertThat(it.scopeId).isEqualTo(scope.id)
                     assertThat(it.projectId).isEqualTo(DEFAULT_PROJECT_ID)
-                }
+                },
             )
         }
         assertThat(updatedEvent.scopeId).isEqualTo(scope.id)
@@ -378,21 +397,20 @@ internal class EventRepositoryImplTest {
         coVerify { eventLocalDataSource.deleteAll() }
     }
 
-    private fun assertANewSessionCaptureWasAdded(scope: EventScope): Boolean =
-        scope.projectId == DEFAULT_PROJECT_ID &&
-            scope.createdAt == NOW &&
-            scope.endedAt == null &&
-            scope.payload.modalities == listOf(Modality.FINGERPRINT, Modality.FACE) &&
-            scope.payload.sidVersion == APP_VERSION_NAME &&
-            scope.payload.language == LANGUAGE &&
-            scope.payload.device == Device(
+    private fun assertANewSessionCaptureWasAdded(scope: EventScope): Boolean = scope.projectId == DEFAULT_PROJECT_ID &&
+        scope.createdAt == NOW &&
+        scope.endedAt == null &&
+        scope.payload.modalities == listOf(Modality.FINGERPRINT, Modality.FACE) &&
+        scope.payload.sidVersion == APP_VERSION_NAME &&
+        scope.payload.language == LANGUAGE &&
+        scope.payload.device == Device(
             Build.VERSION.SDK_INT.toString(),
             Build.MANUFACTURER + "_" + Build.MODEL,
-            DEVICE_ID
-        ) && scope.payload.databaseInfo == DatabaseInfo(0)
+            DEVICE_ID,
+        ) &&
+        scope.payload.databaseInfo == DatabaseInfo(0)
 
     companion object {
-
         const val DEVICE_ID = "DEVICE_ID"
         const val APP_VERSION_NAME = "APP_VERSION_NAME"
         const val LIB_VERSION_NAME = "LIB_VERSION_NAME"

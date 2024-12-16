@@ -19,11 +19,10 @@ import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.reactivex.Completable
-import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -32,7 +31,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ScannerInitialSetupHelperTest {
-
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val batteryLevelChecker = mockk<BatteryLevelChecker>()
@@ -48,42 +46,41 @@ class ScannerInitialSetupHelperTest {
         connectionHelperMock,
         batteryLevelChecker,
         configManager,
-        firmwareLocalDataSource, dispatcher
+        firmwareLocalDataSource,
     )
 
     @Before
     fun setup() {
         coEvery { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns LOCAL_SCANNER_VERSION
-        every { scannerMock.enterMainMode() } returns Completable.complete()
+        coJustRun { scannerMock.enterMainMode() }
         coEvery {
             connectionHelperMock.reconnect(
                 eq(scannerMock),
-                any()
+                any(),
             )
         } answers {}
     }
 
     private fun setupScannerWithBatteryInfo(batteryInfo: BatteryInfo) {
-        every { scannerMock.getBatteryPercentCharge() } returns Single.just(batteryInfo.charge)
-        every { scannerMock.getBatteryVoltageMilliVolts() } returns Single.just(batteryInfo.voltage)
-        every { scannerMock.getBatteryCurrentMilliAmps() } returns Single.just(batteryInfo.current)
-        every { scannerMock.getBatteryTemperatureDeciKelvin() } returns Single.just(batteryInfo.temperature)
+        coEvery { scannerMock.getBatteryPercentCharge() } returns batteryInfo.charge
+        coEvery { scannerMock.getBatteryVoltageMilliVolts() } returns batteryInfo.voltage
+        coEvery { scannerMock.getBatteryCurrentMilliAmps() } returns batteryInfo.current
+        coEvery { scannerMock.getBatteryTemperatureDeciKelvin() } returns batteryInfo.temperature
     }
 
     @Test
     fun ifNoAvailableVersions_completesNormally() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
         every { vero2Configuration.firmwareVersions } returns mapOf()
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
-
 
         scannerInitialSetupHelper.setupScannerWithOtaCheck(
             fingerprintSdk = SECUGEN_SIM_MATCHER,
             scanner = scannerMock,
             macAddress = MAC_ADDRESS,
             withScannerVersion = {},
-            withBatteryInfo = {}
+            withBatteryInfo = {},
         )
 
         coVerify(exactly = 0) { connectionHelperMock.reconnect(any(), any()) }
@@ -91,11 +88,13 @@ class ScannerInitialSetupHelperTest {
 
     @Test
     fun ifVersionsContainsUnknowns_throwsCorrectOtaAvailableException() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
         every { vero2Configuration.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                CYPRESS_VERSION_STRING, "", ""
-            )
+                CYPRESS_VERSION_STRING,
+                "",
+                "",
+            ),
         )
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
@@ -106,7 +105,7 @@ class ScannerInitialSetupHelperTest {
                 scanner = scannerMock,
                 macAddress = MAC_ADDRESS,
                 withScannerVersion = {},
-                withBatteryInfo = {}
+                withBatteryInfo = {},
             )
         }
 
@@ -115,11 +114,13 @@ class ScannerInitialSetupHelperTest {
 
     @Test
     fun setupScannerWithOtaCheck_savesVersionAndBatteryInfo() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
         every { vero2Configuration.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                "", "", ""
-            )
+                "",
+                "",
+                "",
+            ),
         )
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
@@ -132,7 +133,8 @@ class ScannerInitialSetupHelperTest {
             scanner = scannerMock,
             macAddress = MAC_ADDRESS,
             withScannerVersion = { version = it },
-            withBatteryInfo = { batteryInfo = it })
+            withBatteryInfo = { batteryInfo = it },
+        )
 
         assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
         assertThat(batteryInfo).isEqualTo(HIGH_BATTERY_INFO)
@@ -140,144 +142,144 @@ class ScannerInitialSetupHelperTest {
 
     @Test
     fun ifAvailableVersionMatchesExistingVersion_completesNormally() = runTest(dispatcher) {
-        every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
         every { vero2Configuration.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                 SCANNER_VERSION_LOW.firmwareVersions.cypressFirmwareVersion.versionAsString,
                 SCANNER_VERSION_LOW.firmwareVersions.stmFirmwareVersion.versionAsString,
                 SCANNER_VERSION_LOW.firmwareVersions.un20AppVersion.versionAsString,
-            )
+            ),
         )
         every { batteryLevelChecker.isLowBattery() } returns false
         setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
-
 
         scannerInitialSetupHelper.setupScannerWithOtaCheck(
             fingerprintSdk = SECUGEN_SIM_MATCHER,
             scanner = scannerMock,
             macAddress = MAC_ADDRESS,
             withScannerVersion = {},
-            withBatteryInfo = {}
+            withBatteryInfo = {},
         )
     }
 
     @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_throwsOtaAvailableExceptionAndReconnects() =
-        runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-            every { vero2Configuration.firmwareVersions } returns mapOf(
-                HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                    CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING
-                )
-            )
+    fun ifAvailableVersionGreaterThanExistingVersion_throwsOtaAvailableExceptionAndReconnects() = runTest(dispatcher) {
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
+        every { vero2Configuration.firmwareVersions } returns mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                CYPRESS_VERSION_STRING,
+                STM_VERSION_STRING,
+                UN20_VERSION_STRING,
+            ),
+        )
 
-            every { batteryLevelChecker.isLowBattery() } returns false
-            setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
+        every { batteryLevelChecker.isLowBattery() } returns false
+        setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
 
-            val exception = assertThrows<OtaAvailableException> {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(
-                    fingerprintSdk = SECUGEN_SIM_MATCHER,
-                    scanner = scannerMock,
-                    macAddress = MAC_ADDRESS,
-                    withScannerVersion = {},
-                    withBatteryInfo = {}
-                )
-            }
-
-            assertThat(exception.availableOtas).isEqualTo(
-                listOf(
-                    AvailableOta.CYPRESS,
-                    AvailableOta.STM,
-                    AvailableOta.UN20
-                )
-            )
-            coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
-        }
-
-    @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_lowScannerBattery_completesNormally() =
-        runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-            every { vero2Configuration.firmwareVersions } returns mapOf(
-                HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                    CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING
-                )
-            )
-            every { batteryLevelChecker.isLowBattery() } returns false
-            setupScannerWithBatteryInfo(LOW_BATTERY_INFO)
-
-
+        val exception = assertThrows<OtaAvailableException> {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(
                 fingerprintSdk = SECUGEN_SIM_MATCHER,
                 scanner = scannerMock,
                 macAddress = MAC_ADDRESS,
                 withScannerVersion = {},
-                withBatteryInfo = {}
+                withBatteryInfo = {},
             )
         }
 
+        assertThat(exception.availableOtas).isEqualTo(
+            listOf(
+                AvailableOta.CYPRESS,
+                AvailableOta.STM,
+                AvailableOta.UN20,
+            ),
+        )
+        coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
+    }
+
     @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_lowPhoneBattery_completesNormally() =
-        runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-            every { vero2Configuration.firmwareVersions } returns mapOf(
-                HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                    CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING
-                )
-            )
-            every { batteryLevelChecker.isLowBattery() } returns true
-            setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
+    fun ifAvailableVersionGreaterThanExistingVersion_lowScannerBattery_completesNormally() = runTest(dispatcher) {
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
+        every { vero2Configuration.firmwareVersions } returns mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                CYPRESS_VERSION_STRING,
+                STM_VERSION_STRING,
+                UN20_VERSION_STRING,
+            ),
+        )
+        every { batteryLevelChecker.isLowBattery() } returns false
+        setupScannerWithBatteryInfo(LOW_BATTERY_INFO)
 
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(
+            fingerprintSdk = SECUGEN_SIM_MATCHER,
+            scanner = scannerMock,
+            macAddress = MAC_ADDRESS,
+            withScannerVersion = {},
+            withBatteryInfo = {},
+        )
+    }
 
+    @Test
+    fun ifAvailableVersionGreaterThanExistingVersion_lowPhoneBattery_completesNormally() = runTest(dispatcher) {
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
+        every { vero2Configuration.firmwareVersions } returns mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                CYPRESS_VERSION_STRING,
+                STM_VERSION_STRING,
+                UN20_VERSION_STRING,
+            ),
+        )
+        every { batteryLevelChecker.isLowBattery() } returns true
+        setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
+
+        scannerInitialSetupHelper.setupScannerWithOtaCheck(
+            fingerprintSdk = SECUGEN_SIM_MATCHER,
+            scanner = scannerMock,
+            macAddress = MAC_ADDRESS,
+            withScannerVersion = {},
+            withBatteryInfo = {},
+        )
+    }
+
+    @Test
+    fun ifAvailableVersionGreaterThanExistingVersion_stillSavesVersionAndBatteryInfo() = runTest(dispatcher) {
+        coEvery { scannerMock.getVersionInformation() } returns SCANNER_VERSION_LOW
+        every { vero2Configuration.firmwareVersions } returns mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                CYPRESS_VERSION_STRING,
+                STM_VERSION_STRING,
+                UN20_VERSION_STRING,
+            ),
+        )
+        every { batteryLevelChecker.isLowBattery() } returns false
+        setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
+
+        var version: ScannerVersion? = null
+        var batteryInfo: BatteryInfo? = null
+
+        val exception = assertThrows<OtaAvailableException> {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(
                 fingerprintSdk = SECUGEN_SIM_MATCHER,
                 scanner = scannerMock,
                 macAddress = MAC_ADDRESS,
-                withScannerVersion = {},
-                withBatteryInfo = {}
+                withScannerVersion = { version = it },
+                withBatteryInfo = { batteryInfo = it },
             )
         }
 
-    @Test
-    fun ifAvailableVersionGreaterThanExistingVersion_stillSavesVersionAndBatteryInfo() =
-        runTest(dispatcher) {
-            every { scannerMock.getVersionInformation() } returns Single.just(SCANNER_VERSION_LOW)
-            every { vero2Configuration.firmwareVersions } returns mapOf(
-                HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                    CYPRESS_VERSION_STRING, STM_VERSION_STRING, UN20_VERSION_STRING
-                )
-            )
-            every { batteryLevelChecker.isLowBattery() } returns false
-            setupScannerWithBatteryInfo(HIGH_BATTERY_INFO)
+        assertThat(exception.availableOtas).isEqualTo(
+            listOf(
+                AvailableOta.CYPRESS,
+                AvailableOta.STM,
+                AvailableOta.UN20,
+            ),
+        )
+        coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
 
-            var version: ScannerVersion? = null
-            var batteryInfo: BatteryInfo? = null
-
-
-            val exception = assertThrows<OtaAvailableException> {
-                scannerInitialSetupHelper.setupScannerWithOtaCheck(
-                    fingerprintSdk = SECUGEN_SIM_MATCHER,
-                    scanner = scannerMock,
-                    macAddress = MAC_ADDRESS,
-                    withScannerVersion = { version = it },
-                    withBatteryInfo = { batteryInfo = it })
-            }
-
-            assertThat(exception.availableOtas).isEqualTo(
-                listOf(
-                    AvailableOta.CYPRESS,
-                    AvailableOta.STM,
-                    AvailableOta.UN20
-                )
-            )
-            coVerify { connectionHelperMock.reconnect(eq(scannerMock), any()) }
-
-            assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
-            assertThat(batteryInfo).isEqualTo(HIGH_BATTERY_INFO)
-        }
+        assertThat(version).isEqualTo(SCANNER_VERSION_LOW.toScannerVersion())
+        assertThat(batteryInfo).isEqualTo(HIGH_BATTERY_INFO)
+    }
 
     companion object {
-
         const val MAC_ADDRESS = "mac address"
         private const val HARDWARE_VERSION = "E-1"
 
@@ -294,15 +296,14 @@ class ScannerInitialSetupHelperTest {
                 10L,
                 CypressFirmwareVersion(12, 13, 14, 15),
                 StmFirmwareVersion(1, 2, 3, 2),
-                Un20AppVersion(5, 6, 7, 2)
-            ).toExtendedVersionInfo()
+                Un20AppVersion(5, 6, 7, 2),
+            ).toExtendedVersionInfo(),
         )
-
 
         val LOCAL_SCANNER_VERSION = mapOf(
             DownloadableFirmwareVersion.Chip.CYPRESS to setOf(CYPRESS_VERSION_STRING),
             DownloadableFirmwareVersion.Chip.STM to setOf(STM_VERSION_STRING),
-            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_STRING)
+            DownloadableFirmwareVersion.Chip.UN20 to setOf(UN20_VERSION_STRING),
         )
     }
 }

@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -19,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ReportFirmwareUpdateEventUseCaseTest {
-
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
@@ -52,21 +51,24 @@ class ReportFirmwareUpdateEventUseCaseTest {
         useCase(Timestamp(0L), AvailableOta.CYPRESS, "v1")
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {
-                assertThat(it.payload.chip).isEqualTo("cypress")
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg<ScannerFirmwareUpdateEvent> {
+                    assertThat(it.payload.chip).isEqualTo("cypress")
+                },
+            )
         }
     }
-
 
     @Test
     fun `Correctly maps stm chip name`() = runTest {
         useCase(Timestamp(0L), AvailableOta.STM, "v1")
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {
-                assertThat(it.payload.chip).isEqualTo("stm")
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg<ScannerFirmwareUpdateEvent> {
+                    assertThat(it.payload.chip).isEqualTo("stm")
+                },
+            )
         }
     }
 
@@ -75,9 +77,11 @@ class ReportFirmwareUpdateEventUseCaseTest {
         useCase(Timestamp(0L), AvailableOta.UN20, "v1")
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {
-                assertThat(it.payload.chip).isEqualTo("un20")
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg<ScannerFirmwareUpdateEvent> {
+                    assertThat(it.payload.chip).isEqualTo("un20")
+                },
+            )
         }
     }
 
@@ -86,9 +90,11 @@ class ReportFirmwareUpdateEventUseCaseTest {
         useCase(Timestamp(0L), AvailableOta.UN20, "v1", RuntimeException("message"))
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {
-                assertThat(it.payload.failureReason).isEqualTo("RuntimeException : message")
-            })
+            eventRepository.addOrUpdateEvent(
+                withArg<ScannerFirmwareUpdateEvent> {
+                    assertThat(it.payload.failureReason).isEqualTo("RuntimeException : message")
+                },
+            )
         }
     }
 }

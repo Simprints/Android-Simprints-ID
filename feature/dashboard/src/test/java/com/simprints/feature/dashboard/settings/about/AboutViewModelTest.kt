@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.settings.about
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -20,13 +21,14 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
 class AboutViewModelTest {
-
     companion object {
         private val MODALITIES = listOf(GeneralConfiguration.Modality.FINGERPRINT)
         private val POOL_TYPE = IdentificationConfiguration.PoolType.MODULE
@@ -70,7 +72,7 @@ class AboutViewModelTest {
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
         assertThat(viewModel.syncAndSearchConfig.value).isEqualTo(
-            SyncAndSearchConfig(PARTITION_TYPE.name, POOL_TYPE.name)
+            SyncAndSearchConfig(PARTITION_TYPE.name, POOL_TYPE.name),
         )
         assertThat(viewModel.recentUserActivity.value).isEqualTo(recentUserActivity)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
@@ -79,7 +81,7 @@ class AboutViewModelTest {
     @Test
     fun `should sign out from signer manager when cannot sync data to simprints`() {
         val viewModel =
-            buildLogoutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
+            buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
             coVerify(exactly = 1) { logoutUseCase.invoke() }
@@ -89,7 +91,7 @@ class AboutViewModelTest {
     @Test
     fun `should sign out from signer manager when can sync data to simprints but there are no events to upload`() {
         val viewModel =
-            buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
+            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
         runTest {
             viewModel.processLogoutRequest()
             coVerify(exactly = 1) { logoutUseCase.invoke() }
@@ -99,7 +101,7 @@ class AboutViewModelTest {
     @Test
     fun `should not sign out from signer manager when can sync data to simprints and there are events to upload`() {
         val viewModel =
-            buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
+            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
             coVerify(exactly = 0) { logoutUseCase.invoke() }
@@ -109,11 +111,11 @@ class AboutViewModelTest {
     @Test
     fun `should emit LogoutDestination_LogoutDataSyncScreen when can sync data to simprints and there are events to upload`() {
         val viewModel =
-            buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
+            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
-                LogoutDestination.LogoutDataSyncScreen
+                LogoutDestination.LogoutDataSyncScreen,
             )
         }
     }
@@ -121,11 +123,11 @@ class AboutViewModelTest {
     @Test
     fun `should emit LogoutDestination_LoginScreen when can sync data to simprints but there are no events to upload`() {
         val viewModel =
-            buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
+            buildAboutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
         runTest {
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
-                LogoutDestination.LoginScreen
+                LogoutDestination.LoginScreen,
             )
         }
     }
@@ -133,38 +135,65 @@ class AboutViewModelTest {
     @Test
     fun `should emit LogoutDestination_LoginScreen when cannot sync data to simprints`() {
         val viewModel =
-            buildLogoutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
+            buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
             assertThat(viewModel.logoutDestinationEvent.getOrAwaitValue().peekContent()).isEqualTo(
-                LogoutDestination.LoginScreen
+                LogoutDestination.LoginScreen,
             )
         }
     }
 
-    private fun buildProjectConfigurationMock(upSyncKind: UpSynchronizationConfiguration.UpSynchronizationKind = UpSynchronizationConfiguration.UpSynchronizationKind.ALL): ProjectConfiguration =
-        mockk {
-            every { general } returns mockk {
-                every { modalities } returns MODALITIES
-                every { settingsPassword } returns SettingsPasswordConfig.Locked("1234")
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should emit reset troubleshooting counter`() {
+        val viewModel = buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
+        runTest {
+            val navigationEvent = viewModel.openTroubleshooting.test()
+            repeat(3) { viewModel.troubleshootingClick() }
+            advanceTimeBy(5000L)
+            repeat(2) { viewModel.troubleshootingClick() }
+            navigationEvent.assertNoValue()
+            repeat(3) { viewModel.troubleshootingClick() }
+            navigationEvent.assertHasValue()
+        }
+    }
+
+    @Test
+    fun `mark settings as unlocked when called`() {
+        val viewModel = buildAboutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
+        runTest {
+            assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
+            viewModel.unlockSettings()
+            assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Unlocked)
+        }
+    }
+
+    private fun buildProjectConfigurationMock(
+        upSyncKind: UpSynchronizationConfiguration.UpSynchronizationKind = UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+    ): ProjectConfiguration = mockk {
+        every { general } returns mockk {
+            every { modalities } returns MODALITIES
+            every { settingsPassword } returns SettingsPasswordConfig.Locked("1234")
+        }
+        every { identification } returns mockk {
+            every { poolType } returns POOL_TYPE
+        }
+        every { synchronization } returns mockk {
+            every { down } returns mockk {
+                every { partitionType } returns PARTITION_TYPE
             }
-            every { identification } returns mockk {
-                every { poolType } returns POOL_TYPE
-            }
-            every { synchronization } returns mockk {
-                every { down } returns mockk {
-                    every { partitionType } returns PARTITION_TYPE
-                }
-                every { up } returns mockk {
-                    every { simprints } returns mockk {
-                        every { kind } returns upSyncKind
-                    }
+            every { up } returns mockk {
+                every { simprints } returns mockk {
+                    every { kind } returns upSyncKind
                 }
             }
         }
+    }
 
-    private fun buildLogoutViewModel(
-        canSyncDataToSimprints: Boolean, hasEventsToUpload: Boolean
+    private fun buildAboutViewModel(
+        canSyncDataToSimprints: Boolean,
+        hasEventsToUpload: Boolean,
     ): AboutViewModel {
         val upSyncKind = when (canSyncDataToSimprints) {
             true -> UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -175,10 +204,10 @@ class AboutViewModelTest {
             false -> 0
         }
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(
-            countEventsToUpload
+            countEventsToUpload,
         )
         coEvery { configManager.getProjectConfiguration() } returns buildProjectConfigurationMock(
-            upSyncKind
+            upSyncKind,
         )
         return AboutViewModel(
             configManager = configManager,

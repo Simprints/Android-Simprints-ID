@@ -16,24 +16,24 @@ internal class ModuleRepositoryImpl @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventSyncManager: EventSyncManager,
 ) : ModuleRepository {
-
-    override suspend fun getModules(): List<Module> =
-        configManager.getProjectConfiguration().synchronization.down.moduleOptions.map {
-            Module(it, isModuleSelected(it.value))
-        }
+    override suspend fun getModules(): List<Module> = configManager.getProjectConfiguration().synchronization.down.moduleOptions.map {
+        Module(it, isModuleSelected(it.value))
+    }
 
     override suspend fun saveModules(modules: List<Module>) {
         setSelectedModules(modules.filter { it.isSelected })
         handleUnselectedModules(modules.filter { !it.isSelected })
     }
 
-    override suspend fun getMaxNumberOfModules(): Int =
-        configManager.getProjectConfiguration().synchronization.down.maxNbOfModules
+    override suspend fun getMaxNumberOfModules(): Int = configManager
+        .getProjectConfiguration()
+        .synchronization.down.maxNbOfModules
 
-    private suspend fun isModuleSelected(moduleName: String): Boolean {
-        return configManager.getDeviceConfiguration().selectedModules.values()
-            .contains(moduleName)
-    }
+    private suspend fun isModuleSelected(moduleName: String): Boolean = configManager
+        .getDeviceConfiguration()
+        .selectedModules
+        .values()
+        .contains(moduleName)
 
     private suspend fun setSelectedModules(selectedModules: List<Module>) {
         configManager.updateDeviceConfiguration {
@@ -57,7 +57,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
     }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {
-        Simber.tag(MODULE_IDS, true).i(modules.toString())
+        Simber.tag(MODULE_IDS, true).i(modules.toString().take(80))
     }
 
     private fun logMessageForCrashReport(message: String) {

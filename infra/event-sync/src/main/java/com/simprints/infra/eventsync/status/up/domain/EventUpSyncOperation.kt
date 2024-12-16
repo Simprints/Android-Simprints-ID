@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.status.up.domain
 
 import androidx.annotation.Keep
-import java.util.*
+import java.util.UUID
 
 @Keep
 internal data class EventUpSyncOperation(
@@ -13,7 +13,7 @@ internal data class EventUpSyncOperation(
     enum class UpSyncState {
         RUNNING,
         COMPLETE,
-        FAILED
+        FAILED,
     }
 
     fun getUniqueKey() = UUID.nameUUIDFromBytes(projectId.toByteArray()).toString()

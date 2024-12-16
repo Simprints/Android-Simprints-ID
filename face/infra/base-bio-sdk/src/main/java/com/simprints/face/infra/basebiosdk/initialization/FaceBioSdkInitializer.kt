@@ -10,5 +10,8 @@ fun interface FaceBioSdkInitializer {
      * @param license the license string
      * @return true if the sdk is initialized successfully
      */
-    fun tryInitWithLicense(activity: Activity, license: String): Boolean
+    fun tryInitWithLicense(
+        activity: Activity,
+        license: String,
+    ): Boolean
 }

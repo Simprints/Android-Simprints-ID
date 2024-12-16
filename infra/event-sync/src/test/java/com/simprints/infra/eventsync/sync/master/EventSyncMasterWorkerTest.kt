@@ -1,12 +1,16 @@
 package com.simprints.infra.eventsync.sync.master
 
 import android.content.Context
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.ListenableWorker.Result.Success
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkContinuation
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.testing.WorkManagerTestInitHelper
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
@@ -15,7 +19,6 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
@@ -38,25 +41,25 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
-import io.mockk.mockkStatic
+import io.mockk.mockkObject
+import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 internal class EventSyncMasterWorkerTest {
-
     companion object {
-
         private const val UNIQUE_SYNC_ID = "uniqueId"
     }
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @MockK
-    lateinit var ctx: Context
+    val ctx: Context = getApplicationContext()
 
     @MockK
     lateinit var workContinuation: WorkContinuation
@@ -115,7 +118,11 @@ internal class EventSyncMasterWorkerTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        mockkStatic(WorkManager::class)
+        val config = Configuration.Builder().build()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx, config)
+
+        workManager = spyk(WorkManager.getInstance(ctx))
+        mockkObject(WorkManager.Companion)
 
         every { workContinuation.then(any<OneTimeWorkRequest>()) } returns workContinuation
         every { workContinuation.then(any<List<OneTimeWorkRequest>>()) } returns workContinuation
@@ -123,7 +130,7 @@ internal class EventSyncMasterWorkerTest {
         every { WorkManager.getInstance(ctx) } returns workManager
 
         coEvery { downSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
-            downSyncWorker
+            downSyncWorker,
         )
         coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any(), any()) } returns listOf(upSyncWorker)
         every { eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns startSyncReporterWorker
@@ -188,9 +195,9 @@ internal class EventSyncMasterWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.success(
                 workDataOf(
-                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId
-                )
-            )
+                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId,
+                ),
+            ),
         )
 
         coVerify(exactly = 1) {
@@ -214,9 +221,9 @@ internal class EventSyncMasterWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.success(
                 workDataOf(
-                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId
-                )
-            )
+                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId,
+                ),
+            ),
         )
 
         coVerify(exactly = 1) {
@@ -240,9 +247,9 @@ internal class EventSyncMasterWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.success(
                 workDataOf(
-                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId
-                )
-            )
+                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId,
+                ),
+            ),
         )
 
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
@@ -264,9 +271,9 @@ internal class EventSyncMasterWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.success(
                 workDataOf(
-                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to UNIQUE_SYNC_ID
-                )
-            )
+                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to UNIQUE_SYNC_ID,
+                ),
+            ),
         )
 
         coVerify(exactly = 0) { eventSyncCache.clearProgresses() }
@@ -287,22 +294,21 @@ internal class EventSyncMasterWorkerTest {
     fun `event down sync should be disabled when project state is paused`() = runTest {
         val result = getIsEventDownSyncAllowedResult(
             projectState = ProjectState.PROJECT_PAUSED,
-            syncConfig = PERIODICALLY
+            syncConfig = PERIODICALLY,
         )
         assertThat(result).isInstanceOf(Success::class.java)
         verify(exactly = 0) { timeHelper.now() }
     }
 
     @Test
-    fun `event down sync should be disabled when sync config is ONLY_PERIODICALLY_UP_SYNC`() =
-        runTest {
-            val result = getIsEventDownSyncAllowedResult(
-                projectState = ProjectState.RUNNING,
-                syncConfig = ONLY_PERIODICALLY_UP_SYNC
-            )
-            assertThat(result).isInstanceOf(Success::class.java)
-            verify(exactly = 0) { timeHelper.now() }
-        }
+    fun `event down sync should be disabled when sync config is ONLY_PERIODICALLY_UP_SYNC`() = runTest {
+        val result = getIsEventDownSyncAllowedResult(
+            projectState = ProjectState.RUNNING,
+            syncConfig = ONLY_PERIODICALLY_UP_SYNC,
+        )
+        assertThat(result).isInstanceOf(Success::class.java)
+        verify(exactly = 0) { timeHelper.now() }
+    }
 
     private suspend fun getIsEventDownSyncAllowedResult(
         projectState: ProjectState,
@@ -313,7 +319,7 @@ internal class EventSyncMasterWorkerTest {
             every { projectId } returns "projectId"
             every { synchronization } returns mockk {
                 every { frequency } returns syncConfig
-                every { up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                every { up.simprints.kind } returns NONE
             }
         }
         return masterWorker.doWork()
@@ -326,7 +332,7 @@ internal class EventSyncMasterWorkerTest {
                 mockk {
                     every { state } returns workerState
                     every { tags } returns setOf("$TAG_MASTER_SYNC_ID$UNIQUE_SYNC_ID")
-                }
+                },
             )
         }
     }
@@ -339,40 +345,53 @@ internal class EventSyncMasterWorkerTest {
         every { bfsidUpSynchronizationConfiguration.kind } returns if (should) ALL else NONE
     }
 
-    private fun assertWorkerChainBuild(isBuilt: Boolean, uniqueSyncId: String) {
+    private fun assertWorkerChainBuild(
+        isBuilt: Boolean,
+        uniqueSyncId: String,
+    ) {
         val times = if (isBuilt) 1 else 0
         verify(exactly = times) {
             eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(
-                uniqueSyncId
+                uniqueSyncId,
             )
         }
         verify(exactly = times) {
             eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(
                 uniqueSyncId,
                 any(),
-                any()
+                any(),
             )
         }
         verify(exactly = times) { workManager.beginWith(any<OneTimeWorkRequest>()) }
     }
 
-    private fun assertUpSyncWorkerPresence(isPresent: Boolean, uniqueSyncId: String) {
+    private fun assertUpSyncWorkerPresence(
+        isPresent: Boolean,
+        uniqueSyncId: String,
+    ) {
         val times = if (isPresent) 1 else 0
         coVerify(exactly = times) { upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId, any()) }
         verify(exactly = times) {
-            workContinuation.then(match<List<OneTimeWorkRequest>> {
-                it.contains(upSyncWorker)
-            })
+            workContinuation.then(
+                match<List<OneTimeWorkRequest>> {
+                    it.contains(upSyncWorker)
+                },
+            )
         }
     }
 
-    private fun assertDownSyncWorkerPresence(isPresent: Boolean, uniqueSyncId: String) {
+    private fun assertDownSyncWorkerPresence(
+        isPresent: Boolean,
+        uniqueSyncId: String,
+    ) {
         val times = if (isPresent) 1 else 0
         coVerify(exactly = times) { downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
         verify(exactly = times) {
-            workContinuation.then(match<List<OneTimeWorkRequest>> {
-                it.contains(downSyncWorker)
-            })
+            workContinuation.then(
+                match<List<OneTimeWorkRequest>> {
+                    it.contains(downSyncWorker)
+                },
+            )
         }
     }
 }

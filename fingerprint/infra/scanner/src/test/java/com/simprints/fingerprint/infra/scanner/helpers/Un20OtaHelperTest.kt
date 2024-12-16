@@ -10,13 +10,12 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import io.mockk.CapturingSlot
 import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.coJustRun
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -26,7 +25,6 @@ import java.io.IOException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 
 class Un20OtaHelperTest {
-
     private val scannerMock = mockk<Scanner>()
     private val connectionHelperMock = mockk<ConnectionHelper>()
     private val firmwareFileManagerMock = mockk<FirmwareLocalDataSource>()
@@ -36,25 +34,43 @@ class Un20OtaHelperTest {
     fun setup() {
         coEvery { connectionHelperMock.reconnect(any(), any()) } answers {}
 
-        every { scannerMock.enterMainMode() } returns Completable.complete()
-        every { scannerMock.turnUn20OnAndAwaitStateChangeEvent() } returns Completable.complete()
-        every { scannerMock.startUn20Ota(any()) } returns Observable.fromIterable(OTA_PROGRESS_VALUES)
-        every { scannerMock.turnUn20OffAndAwaitStateChangeEvent() } returns Completable.complete()
-        every { scannerMock.getVersionInformation() } returns Single.just(OLD_SCANNER_INFORMATION)
-        every { scannerMock.setVersionInformation(any()) } returns Completable.complete()
-        every { scannerMock.getUn20AppVersion() } returns Single.just(NEW_UN20_VERSION)
+        coJustRun { scannerMock.enterMainMode() }
+        coJustRun { scannerMock.turnUn20On() }
+        coEvery { scannerMock.startUn20Ota(any()) } returns OTA_PROGRESS_VALUES.asFlow()
+        coJustRun { scannerMock.turnUn20Off() }
+        coEvery { scannerMock.getVersionInformation() } returns OLD_SCANNER_INFORMATION
+        coJustRun { scannerMock.setVersionInformation(any()) }
+        coEvery { scannerMock.getUn20AppVersion() } returns NEW_UN20_VERSION
 
-        coEvery { firmwareFileManagerMock.loadUn20FirmwareBytes(NEW_UN20_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        coEvery { firmwareFileManagerMock.loadUn20FirmwareBytes(NEW_UN20_VERSION_STRING) } returns byteArrayOf(
+            0x00,
+            0x01,
+            0x02,
+            0xFF.toByte(),
+        )
     }
 
     @Test
     fun performUn20Ota_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runTest {
-        val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
+        val expectedSteps = listOf(
+            Un20OtaStep.EnteringMainMode,
+            Un20OtaStep.TurningOnUn20BeforeTransfer,
+            Un20OtaStep.CommencingTransfer,
+        ) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
-            listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
-                Un20OtaStep.ValidatingNewFirmwareVersion, Un20OtaStep.ReconnectingAfterValidating, Un20OtaStep.UpdatingUnifiedVersionInformation)
+            listOf(
+                Un20OtaStep.AwaitingCacheCommit,
+                Un20OtaStep.TurningOffUn20AfterTransfer,
+                Un20OtaStep.TurningOnUn20AfterTransfer,
+                Un20OtaStep.ValidatingNewFirmwareVersion,
+                Un20OtaStep.ReconnectingAfterValidating,
+                Un20OtaStep.UpdatingUnifiedVersionInformation,
+            )
 
-        val actualSteps = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING).toList()
+        val actualSteps =
+            un20OtaHelper
+                .performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING)
+                .toList()
 
         assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
         assertThat(actualSteps.map { it.totalProgress })
@@ -62,21 +78,29 @@ class Un20OtaHelperTest {
             .inOrder()
 
         val sentUnifiedVersion = CapturingSlot<ExtendedVersionInformation>()
-        verify { scannerMock.setVersionInformation(capture(sentUnifiedVersion)) }
-        assertThat(sentUnifiedVersion.captured.toScannerFirmwareVersions()).isEqualTo(NEW_SCANNER_VERSION.toScannerFirmwareVersions())
+        coVerify { scannerMock.setVersionInformation(capture(sentUnifiedVersion)) }
+        assertThat(sentUnifiedVersion.captured.toScannerFirmwareVersions()).isEqualTo(
+            NEW_SCANNER_VERSION.toScannerFirmwareVersions(),
+        )
     }
 
     @Test(expected = ScannerV2OtaFailedException::class)
     fun un20OtaFailsDuringTransfer_propagatesError() = runTest {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
-        val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
-            progressValues.map { Un20OtaStep.TransferInProgress(it) }
+        val expectedSteps = listOf(
+            Un20OtaStep.EnteringMainMode,
+            Un20OtaStep.TurningOnUn20BeforeTransfer,
+            Un20OtaStep.CommencingTransfer,
+        )
+        progressValues.map { Un20OtaStep.TransferInProgress(it) }
         val error = ScannerV2OtaFailedException("oops!")
 
-        every { scannerMock.startUn20Ota(any()) } returns
-            Observable.fromIterable(progressValues).concatWith(Observable.error(error))
+        coEvery { scannerMock.startUn20Ota(any()) } returns (progressValues)
+            .asFlow()
+            .onCompletion { throw error }
 
-        val otaFlow = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING)
+        val otaFlow =
+            un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING)
         val actualSteps = otaFlow.take(expectedSteps.size).toList()
 
         assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
@@ -90,22 +114,29 @@ class Un20OtaHelperTest {
 
     @Test(expected = IOException::class)
     fun un20OtaFailsDuringTurningUn20OnSecondTime_propagatesError() = runTest {
-        val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
+        val expectedSteps = listOf(
+            Un20OtaStep.EnteringMainMode,
+            Un20OtaStep.TurningOnUn20BeforeTransfer,
+            Un20OtaStep.CommencingTransfer,
+        ) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
-            listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer)
+            listOf(
+                Un20OtaStep.AwaitingCacheCommit,
+                Un20OtaStep.TurningOffUn20AfterTransfer,
+                Un20OtaStep.TurningOnUn20AfterTransfer,
+            )
         val error = IOException("oops!")
 
-        every { scannerMock.turnUn20OnAndAwaitStateChangeEvent() } returnsMany listOf(Completable.complete(), Completable.error(error))
+        coEvery { scannerMock.turnUn20On() } returnsMany listOf(Unit, throw error)
 
-        val otaFlow = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING)
+        val otaFlow =
+            un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING)
         val actualSteps = otaFlow.take(expectedSteps.size).toList()
-
 
         assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
         assertThat(actualSteps.map { it.totalProgress })
             .containsExactlyElementsIn(expectedSteps.map { it.totalProgress })
             .inOrder()
-
 
         // throws ioException
         otaFlow.last()
@@ -113,14 +144,23 @@ class Un20OtaHelperTest {
 
     @Test(expected = OtaFailedException::class)
     fun un20OtaFailsToValidate_throwsOtaError() = runTest {
-        val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
+        val expectedSteps = listOf(
+            Un20OtaStep.EnteringMainMode,
+            Un20OtaStep.TurningOnUn20BeforeTransfer,
+            Un20OtaStep.CommencingTransfer,
+        ) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
-            listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
-                Un20OtaStep.ValidatingNewFirmwareVersion)
+            listOf(
+                Un20OtaStep.AwaitingCacheCommit,
+                Un20OtaStep.TurningOffUn20AfterTransfer,
+                Un20OtaStep.TurningOnUn20AfterTransfer,
+                Un20OtaStep.ValidatingNewFirmwareVersion,
+            )
 
-        every { scannerMock.getUn20AppVersion() } returns Single.just(OLD_UN20_VERSION)
+        coEvery { scannerMock.getUn20AppVersion() } returns OLD_UN20_VERSION
 
-        val otaFlow = un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING)
+        val otaFlow =
+            un20OtaHelper.performOtaSteps(scannerMock, "mac address", NEW_UN20_VERSION_STRING)
         val actualSteps = otaFlow.take(expectedSteps.size).toList()
 
         assertThat(actualSteps).containsExactlyElementsIn(expectedSteps).inOrder()
@@ -145,13 +185,13 @@ class Un20OtaHelperTest {
                 firmwareVersions = ExtendedVersionInformation(
                     mockk(relaxed = true),
                     mockk(relaxed = true),
-                    OLD_UN20_VERSION
-                )
+                    OLD_UN20_VERSION,
+                ),
             )
         private val NEW_SCANNER_VERSION = ExtendedVersionInformation(
             mockk(relaxed = true),
             mockk(relaxed = true),
-            NEW_UN20_VERSION
+            NEW_UN20_VERSION,
         )
     }
 }

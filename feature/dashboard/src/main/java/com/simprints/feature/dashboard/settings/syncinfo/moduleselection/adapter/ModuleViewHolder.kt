@@ -6,11 +6,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 
-internal class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
+internal class ModuleViewHolder(
+    itemView: View,
+) : RecyclerView.ViewHolder(itemView) {
     private val txtModuleName: TextView = itemView.findViewById(R.id.txtModuleName)
 
-    fun bindTo(module: Module, listener: ModuleSelectionListener) {
+    fun bindTo(
+        module: Module,
+        listener: ModuleSelectionListener,
+    ) {
         with(txtModuleName) {
             text = module.name.value
 
@@ -19,5 +23,4 @@ internal class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
             }
         }
     }
-
 }

@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class IsModuleIdNotSyncedUseCaseTest {
-
     @MockK
     lateinit var configRepository: ConfigRepository
 

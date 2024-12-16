@@ -26,11 +26,9 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_capture) {
-
     private val args: FaceCaptureControllerFragmentArgs by navArgs()
 
     private val viewModel: FaceCaptureViewModel by activityViewModels()
-
 
     private val hostFragment: Fragment?
         get() = childFragmentManager
@@ -42,14 +40,16 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
     private val currentlyDisplayedInternalFragment: Fragment?
         get() = hostFragment?.childFragmentManager?.fragments?.first()
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         findNavController().handleResult<ExitFormResult>(
             this,
             R.id.faceCaptureControllerFragment,
-            ExitFormContract.DESTINATION
+            ExitFormContract.DESTINATION,
         ) {
             val option = it.submittedOption()
             if (option != null) {
@@ -69,33 +69,46 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
 
         viewModel.setupCapture(args.samplesToCapture)
         initFaceBioSdk()
-        viewModel.recaptureEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
-            internalNavController?.navigateSafely(currentlyDisplayedInternalFragment, R.id.action_global_faceLiveFeedback)
-        })
+        viewModel.recaptureEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                internalNavController?.navigateSafely(currentlyDisplayedInternalFragment, R.id.action_global_faceLiveFeedback)
+            },
+        )
 
-        viewModel.exitFormEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
-            findNavController().navigateSafely(
-                this,
-                R.id.action_global_refusalFragment,
-                exitFormConfiguration {
-                    titleRes = IDR.string.exit_form_title_face
-                    backButtonRes = IDR.string.exit_form_continue_face_button
-                }.toArgs()
-            )
-        })
+        viewModel.exitFormEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                findNavController().navigateSafely(
+                    this,
+                    R.id.action_global_refusalFragment,
+                    exitFormConfiguration {
+                        titleRes = IDR.string.exit_form_title_face
+                        backButtonRes = IDR.string.exit_form_continue_face_button
+                    }.toArgs(),
+                )
+            },
+        )
 
-        viewModel.unexpectedErrorEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
-            findNavController().navigateUp()
-        })
+        viewModel.unexpectedErrorEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                findNavController().navigateUp()
+            },
+        )
 
-        viewModel.finishFlowEvent.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            findNavController().finishWithResult(this, it)
-        })
+        viewModel.finishFlowEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                findNavController().finishWithResult(this, it)
+            },
+        )
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when (internalNavController?.currentDestination?.id) {
                 R.id.facePreparationFragment,
-                R.id.faceLiveFeedbackFragment -> viewModel.handleBackButton()
+                R.id.faceLiveFeedbackFragment,
+                -> viewModel.handleBackButton()
 
                 else -> findNavController().popBackStack()
             }
@@ -109,11 +122,9 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             findNavController().navigateSafely(
                 this,
                 R.id.action_global_errorFragment,
-                InvalidFaceLicenseAlert.toAlertArgs()
+                InvalidFaceLicenseAlert.toAlertArgs(),
             )
         }
         viewModel.initFaceBioSdk(requireActivity())
     }
 }
-
-

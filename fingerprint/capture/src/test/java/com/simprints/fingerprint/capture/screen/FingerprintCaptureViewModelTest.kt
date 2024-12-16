@@ -19,6 +19,7 @@ import com.simprints.fingerprint.capture.state.ScanResult
 import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
+import com.simprints.fingerprint.capture.usecase.IsNoFingerDetectedLimitReachedUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
@@ -69,13 +70,11 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
 class FingerprintCaptureViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
 
     @MockK
     private lateinit var vero2Configuration: Vero2Configuration
@@ -104,9 +103,11 @@ class FingerprintCaptureViewModelTest {
     @MockK
     private lateinit var addCaptureEventsUseCase: AddCaptureEventsUseCase
 
+    @MockK
+    private lateinit var isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase
+
     private val getStartStateUseCase = GetStartStateUseCase()
     private val getNextFingerToAddUseCase = GetNextFingerToAddUseCase()
-
 
     @RelaxedMockK
     private lateinit var tracker: FingerprintScanningStatusTracker
@@ -128,6 +129,7 @@ class FingerprintCaptureViewModelTest {
         }
 
         coEvery { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) } returns "payloadId"
+        coEvery { isNoFingerDetectedLimitReachedUseCase.invoke(any(), any()) } returns false
 
         every { scanner.isLiveFeedbackAvailable() } returns false
         every { scanner.isImageTransferSupported() } returns true
@@ -149,6 +151,7 @@ class FingerprintCaptureViewModelTest {
             getStartState = getStartStateUseCase,
             addCaptureEvents = addCaptureEventsUseCase,
             tracker = tracker,
+            isNoFingerDetectedLimitReachedUseCase = isNoFingerDetectedLimitReachedUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
@@ -165,7 +168,7 @@ class FingerprintCaptureViewModelTest {
                 isShowingConfirmDialog = false,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
     }
 
@@ -194,16 +197,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Scanning())
+        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.ScanProcess.Scanning(0, 0))
     }
 
     @Test
-    fun `test scanner supports image transfer then isImageTransferRequired should be equal to scanningTimeoutMs + imageTransferTimeoutMs`() = runTest {
-        withImageTransfer()
-        every { scanner.isImageTransferSupported() } returns true
-        vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
-        assertThat(vm.progressBarTimeout()).isEqualTo(bioSdkWrapper.scanningTimeoutMs + bioSdkWrapper.imageTransferTimeoutMs)
-    }
+    fun `test scanner supports image transfer then isImageTransferRequired should be equal to scanningTimeoutMs + imageTransferTimeoutMs`() =
+        runTest {
+            withImageTransfer()
+            every { scanner.isImageTransferSupported() } returns true
+            vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
+            assertThat(vm.progressBarTimeout()).isEqualTo(bioSdkWrapper.scanningTimeoutMs + bioSdkWrapper.imageTransferTimeoutMs)
+        }
 
     @Test
     fun `test scanner doesn't support imageTransfer then progressBarTimeout should be equal to scanningTimeoutMs`() = runTest {
@@ -225,11 +229,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.TransferringImage(
-                ScanResult(
-                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                )
-            )
+            CaptureState.ScanProcess.TransferringImage(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    GOOD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
     }
 
@@ -244,11 +254,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                )
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    GOOD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
         vm.vibrate.assertEventReceived()
 
@@ -270,9 +286,11 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60)
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+            ),
         )
         vm.vibrate.assertEventReceived()
         coVerify { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -292,11 +310,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                ), 1
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 1,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    BAD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
         vm.vibrate.assertEventReceived()
         coVerify { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -313,11 +337,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                ), 1
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 1,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    BAD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
         vm.vibrate.assertEventReceived()
         coVerify { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -333,7 +363,12 @@ class FingerprintCaptureViewModelTest {
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotDetected())
+        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
+            CaptureState.ScanProcess.NotDetected(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 1,
+            ),
+        )
         vm.vibrate.assertEventReceived()
         coVerify { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
     }
@@ -342,7 +377,7 @@ class FingerprintCaptureViewModelTest {
     fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() = runTest {
         mockScannerTurnSmileLedsOff()
         coEvery {
-            bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(),any())
+            bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(), any())
         } throws ScannerDisconnectedException()
         withImageTransfer()
 
@@ -379,32 +414,54 @@ class FingerprintCaptureViewModelTest {
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                ), 1
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 1,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    BAD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                ), 2
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 2,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    BAD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60
-                ), 3
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 3,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    BAD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    IMAGE,
+                    60,
+                ),
+            ),
         )
 
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isTrue()
         advanceTimeBy(TIME_SKIP_MS)
-        assertThat(vm.stateLiveData.value?.fingerStates?.size).isEqualTo(3)
+        assertThat(
+            vm.stateLiveData.value
+                ?.fingerStates
+                ?.size,
+        ).isEqualTo(3)
         advanceTimeBy(TIME_SKIP_MS)
         advanceTimeBy(TIME_SKIP_MS)
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isFalse()
@@ -425,7 +482,8 @@ class FingerprintCaptureViewModelTest {
         withImageTransfer()
 
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
-        repeat(12) { // 3 times for each of the 4 fingers (2 original + 2 auto-added)
+        repeat(12) {
+            // 3 times for each of the 4 fingers (2 original + 2 auto-added)
             vm.handleScanButtonPressed()
             advanceTimeBy(TIME_SKIP_MS)
         }
@@ -433,12 +491,14 @@ class FingerprintCaptureViewModelTest {
             CollectFingerprintsState(
                 fingerStates = FOUR_FINGERS_IDS.map {
                     FingerState(
-                        it, listOf(
-                        CaptureState.Collected(
-                            ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                            numberOfBadScans = 3
-                        )
-                    )
+                        it,
+                        listOf(
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 3,
+                                numberOfNoFingerDetectedScans = 0,
+                                ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                            ),
+                        ),
                     )
                 },
                 currentFingerIndex = 3,
@@ -446,7 +506,7 @@ class FingerprintCaptureViewModelTest {
                 isShowingConfirmDialog = true,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
         coVerify(exactly = 12) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
         vm.handleConfirmFingerprintsAndContinue()
@@ -455,7 +515,7 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(FOUR_FINGERS_IDS.size)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactlyElementsIn(
-                FOUR_FINGERS_IDS
+                FOUR_FINGERS_IDS,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -482,13 +542,20 @@ class FingerprintCaptureViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it, listOf(
-                        CaptureState.Collected(
-                            ScanResult(
-                                GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60
-                            )
-                        )
-                    )
+                        it,
+                        listOf(
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 0,
+                                numberOfNoFingerDetectedScans = 0,
+                                scanResult = ScanResult(
+                                    GOOD_QUALITY,
+                                    TEMPLATE,
+                                    TEMPLATE_FORMAT,
+                                    IMAGE,
+                                    60,
+                                ),
+                            ),
+                        ),
                     )
                 },
                 currentFingerIndex = 1,
@@ -496,7 +563,7 @@ class FingerprintCaptureViewModelTest {
                 isShowingConfirmDialog = true,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
 
@@ -506,7 +573,7 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactlyElementsIn(
-                TWO_FINGERS_IDS
+                TWO_FINGERS_IDS,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -532,13 +599,20 @@ class FingerprintCaptureViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it, listOf(
-                        CaptureState.Collected(
-                            ScanResult(
-                                GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                            )
-                        )
-                    )
+                        it,
+                        listOf(
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 0,
+                                numberOfNoFingerDetectedScans = 0,
+                                scanResult = ScanResult(
+                                    GOOD_QUALITY,
+                                    TEMPLATE,
+                                    TEMPLATE_FORMAT,
+                                    null,
+                                    60,
+                                ),
+                            ),
+                        ),
                     )
                 },
                 currentFingerIndex = 1,
@@ -546,7 +620,7 @@ class FingerprintCaptureViewModelTest {
                 isShowingConfirmDialog = true,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
         vm.handleConfirmFingerprintsAndContinue()
@@ -555,7 +629,7 @@ class FingerprintCaptureViewModelTest {
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactlyElementsIn(
-                TWO_FINGERS_IDS
+                TWO_FINGERS_IDS,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -585,11 +659,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.isAskingRescan).isFalse()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    DIFFERENT_GOOD_QUALITY, DIFFERENT_TEMPLATE, TEMPLATE_FORMAT, null, 60
-                )
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    DIFFERENT_GOOD_QUALITY,
+                    DIFFERENT_TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
 
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -604,7 +684,11 @@ class FingerprintCaptureViewModelTest {
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Skipped)
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isTrue()
         advanceTimeBy(TIME_SKIP_MS)
-        assertThat(vm.stateLiveData.value?.fingerStates?.size).isEqualTo(3)
+        assertThat(
+            vm.stateLiveData.value
+                ?.fingerStates
+                ?.size,
+        ).isEqualTo(3)
         advanceTimeBy(TIME_SKIP_MS)
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isFalse()
         assertThat(vm.stateLiveData.value?.currentFingerIndex).isEqualTo(1)
@@ -617,7 +701,8 @@ class FingerprintCaptureViewModelTest {
         mockScannerTurnSmileLedsOff()
 
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
-        repeat(4) { // 2 original + 2 auto-added
+        repeat(4) {
+            // 2 original + 2 auto-added
             vm.handleMissingFingerButtonPressed()
             advanceTimeBy(TIME_SKIP_MS)
         }
@@ -626,7 +711,8 @@ class FingerprintCaptureViewModelTest {
             CollectFingerprintsState(
                 fingerStates = FOUR_FINGERS_IDS.map {
                     FingerState(
-                        it, listOf(CaptureState.Skipped)
+                        it,
+                        listOf(CaptureState.Skipped),
                     )
                 },
                 currentFingerIndex = 3,
@@ -634,7 +720,7 @@ class FingerprintCaptureViewModelTest {
                 isShowingConfirmDialog = true,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
         coVerify(exactly = 4) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
 
@@ -645,7 +731,8 @@ class FingerprintCaptureViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it, listOf(CaptureState.NotCollected)
+                        it,
+                        listOf(CaptureState.NotCollected),
                     )
                 },
                 currentFingerIndex = 0,
@@ -653,7 +740,7 @@ class FingerprintCaptureViewModelTest {
                 isShowingConfirmDialog = false,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
     }
 
@@ -674,7 +761,7 @@ class FingerprintCaptureViewModelTest {
             BAD_SCAN,
             BAD_SCAN,
             NO_FINGER_DETECTED,
-            GOOD_SCAN
+            GOOD_SCAN,
         )
         acquireImageResponses(OK)
         withImageTransfer()
@@ -712,38 +799,41 @@ class FingerprintCaptureViewModelTest {
                     FingerState(
                         FOUR_FINGERS_IDS[0],
                         listOf(
-                            CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 2
-                            )
-                        )
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 2,
+                                numberOfNoFingerDetectedScans = 1,
+                                scanResult = ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                            ),
+                        ),
                     ),
                     FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Skipped)),
                     FingerState(
                         FOUR_FINGERS_IDS[2],
                         listOf(
-                            CaptureState.Collected(
-                                ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 3
-                            )
-                        )
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 3,
+                                numberOfNoFingerDetectedScans = 1,
+                                scanResult = ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                            ),
+                        ),
                     ),
                     FingerState(
                         FOUR_FINGERS_IDS[3],
                         listOf(
-                            CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 0
-                            )
-                        )
-                    )
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 0,
+                                numberOfNoFingerDetectedScans = 1,
+                                scanResult = ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                            ),
+                        ),
+                    ),
                 ),
                 currentFingerIndex = 3,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
         coVerify(exactly = 14) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
 
@@ -755,7 +845,7 @@ class FingerprintCaptureViewModelTest {
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
                 IFingerIdentifier.LEFT_THUMB,
                 IFingerIdentifier.RIGHT_THUMB,
-                IFingerIdentifier.RIGHT_INDEX_FINGER
+                IFingerIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -781,7 +871,7 @@ class FingerprintCaptureViewModelTest {
             BAD_SCAN,
             BAD_SCAN,
             NO_FINGER_DETECTED,
-            GOOD_SCAN
+            GOOD_SCAN,
         )
         acquireImageResponses(OK)
         withImageTransfer(strategy = ImageSavingStrategy.EAGER)
@@ -820,38 +910,41 @@ class FingerprintCaptureViewModelTest {
                     FingerState(
                         FOUR_FINGERS_IDS[0],
                         listOf(
-                            CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 2
-                            )
-                        )
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 2,
+                                numberOfNoFingerDetectedScans = 1,
+                                scanResult = ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                            ),
+                        ),
                     ),
                     FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Skipped)),
                     FingerState(
                         FOUR_FINGERS_IDS[2],
                         listOf(
-                            CaptureState.Collected(
-                                ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 3
-                            )
-                        )
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 3,
+                                numberOfNoFingerDetectedScans = 1,
+                                scanResult = ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                            ),
+                        ),
                     ),
                     FingerState(
                         FOUR_FINGERS_IDS[3],
                         listOf(
-                            CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 0
-                            )
-                        )
-                    )
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 0,
+                                numberOfNoFingerDetectedScans = 1,
+                                scanResult = ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
+                            ),
+                        ),
+                    ),
                 ),
                 currentFingerIndex = 3,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
 
         coVerify(exactly = 14) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -865,7 +958,7 @@ class FingerprintCaptureViewModelTest {
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
                 IFingerIdentifier.LEFT_THUMB,
                 IFingerIdentifier.RIGHT_THUMB,
-                IFingerIdentifier.RIGHT_INDEX_FINGER
+                IFingerIdentifier.RIGHT_INDEX_FINGER,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -873,7 +966,6 @@ class FingerprintCaptureViewModelTest {
             }
         }
     }
-
 
     @Test
     @ExperimentalTime
@@ -883,10 +975,8 @@ class FingerprintCaptureViewModelTest {
             BAD_SCAN,
             BAD_SCAN,
             BAD_SCAN,
-
             BAD_SCAN,
             GOOD_SCAN,
-
             GOOD_SCAN,
         )
         acquireImageResponses(OK)
@@ -898,7 +988,7 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
-       // vm.handleScanButtonPressed()
+        // vm.handleScanButtonPressed()
         advanceTimeBy(TIME_SKIP_MS)
 
         // Finger 3
@@ -907,7 +997,7 @@ class FingerprintCaptureViewModelTest {
         advanceTimeBy(TIME_SKIP_MS)
 
         // Finger 4
-       // vm.handleScanButtonPressed()
+        // vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
         advanceTimeBy(TIME_SKIP_MS)
 
@@ -917,50 +1007,53 @@ class FingerprintCaptureViewModelTest {
                     FingerState(
                         FOUR_FINGERS_IDS[0],
                         listOf(
-                            CaptureState.Collected(
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 3,
+                                numberOfNoFingerDetectedScans = 0,
                                 ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60),
-                                numberOfBadScans = 3
-                            )
-                        )
+                            ),
+                        ),
                     ),
                     FingerState(
                         FOUR_FINGERS_IDS[1],
                         listOf(
-                            CaptureState.Collected(
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 1,
+                                numberOfNoFingerDetectedScans = 0,
                                 ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 1
-                            )
-                        )
+                            ),
+                        ),
                     ),
                     FingerState(
                         FOUR_FINGERS_IDS[2],
                         listOf(
-                            CaptureState.Collected(
+                            CaptureState.ScanProcess.Collected(
+                                numberOfBadScans = 0,
+                                numberOfNoFingerDetectedScans = 0,
                                 ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
-                                numberOfBadScans = 0
-                            )
-                        )
-                    )
+                            ),
+                        ),
+                    ),
                 ),
                 currentFingerIndex = 2,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
         coVerify(exactly = 6) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
         // Save image is called even if scanResult.image == null
-        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any(),any()) }
+        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
                 IFingerIdentifier.LEFT_THUMB,
                 IFingerIdentifier.LEFT_INDEX_FINGER,
-                IFingerIdentifier.RIGHT_THUMB
+                IFingerIdentifier.RIGHT_THUMB,
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -978,7 +1071,12 @@ class FingerprintCaptureViewModelTest {
 
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.handleScanButtonPressed()
-        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Scanning())
+        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
+            CaptureState.ScanProcess.Scanning(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
+            ),
+        )
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
     }
@@ -994,19 +1092,31 @@ class FingerprintCaptureViewModelTest {
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.TransferringImage(
-                ScanResult(
-                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                )
-            )
+            CaptureState.ScanProcess.TransferringImage(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    qualityScore = GOOD_QUALITY,
+                    template = TEMPLATE,
+                    templateFormat = TEMPLATE_FORMAT,
+                    image = null,
+                    qualityThreshold = 60,
+                ),
+            ),
         )
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.TransferringImage(
+            CaptureState.ScanProcess.TransferringImage(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
                 ScanResult(
-                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                )
-            )
+                    GOOD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
     }
 
@@ -1038,7 +1148,7 @@ class FingerprintCaptureViewModelTest {
                 isShowingConfirmDialog = false,
                 isShowingSplashScreen = false,
                 isShowingConnectionScreen = false,
-            )
+            ),
         )
     }
 
@@ -1051,7 +1161,7 @@ class FingerprintCaptureViewModelTest {
 
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.handleScanButtonPressed()
-        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Scanning())
+        assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.ScanProcess.Scanning(0, 0))
         vm.handleOnBackPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
     }
@@ -1066,7 +1176,6 @@ class FingerprintCaptureViewModelTest {
         vm.launchReconnect.assertEventReceived()
     }
 
-
     @Test
     @ExperimentalTime
     fun backPressed_whileTransferringImage_cancelsTransfer() = runTest {
@@ -1078,11 +1187,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.TransferringImage(
+            CaptureState.ScanProcess.TransferringImage(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
                 ScanResult(
-                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                )
-            )
+                    GOOD_QUALITY,
+                    TEMPLATE,
+                    TEMPLATE_FORMAT,
+                    null,
+                    60,
+                ),
+            ),
         )
         vm.handleOnBackPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
@@ -1099,11 +1214,17 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
         vm.handleOnBackPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.Collected(
-                ScanResult(
-                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
-                )
-            )
+            CaptureState.ScanProcess.Collected(
+                numberOfBadScans = 0,
+                numberOfNoFingerDetectedScans = 0,
+                scanResult = ScanResult(
+                    qualityScore = GOOD_QUALITY,
+                    template = TEMPLATE,
+                    templateFormat = TEMPLATE_FORMAT,
+                    image = null,
+                    qualityThreshold = 60,
+                ),
+            ),
         )
     }
 
@@ -1158,7 +1279,7 @@ class FingerprintCaptureViewModelTest {
     fun `test init bioSDK success should show invalid license dialog if init fail`() = runTest {
         coEvery {
             bioSdkWrapper.initialize()
-        } throws  BioSdkException.BioSdkInitializationException(Exception())
+        } throws BioSdkException.BioSdkInitializationException(Exception())
         vm.handleOnViewCreated(TWO_FINGERS_IDS, SECUGEN_SIM_MATCHER)
 
         vm.invalidLicense.assertEventReceived()
@@ -1295,7 +1416,11 @@ class FingerprintCaptureViewModelTest {
 
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isTrue()
         advanceTimeBy(TIME_SKIP_MS)
-        assertThat(vm.stateLiveData.value?.fingerStates?.size).isEqualTo(3)
+        assertThat(
+            vm.stateLiveData.value
+                ?.fingerStates
+                ?.size,
+        ).isEqualTo(3)
         advanceTimeBy(TIME_SKIP_MS)
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isFalse()
         assertThat(vm.stateLiveData.value?.currentFingerIndex).isEqualTo(1)
@@ -1306,11 +1431,14 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
-            CaptureState.NotDetected(3)
+            // expected =
+            CaptureState.ScanProcess.NotDetected(
+                numberOfBadScans = 3,
+                numberOfNoFingerDetectedScans = 1,
+            ),
         )
 
         coVerify(exactly = 4) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
-
     }
 
     @ExperimentalTime
@@ -1340,7 +1468,7 @@ class FingerprintCaptureViewModelTest {
 
     @ExperimentalTime
     private fun setupCaptureFingerprintResponses(vararg mockResponses: MockCaptureFingerprintResponse) {
-        val initialMock = coEvery { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(),any()) }
+        val initialMock = coEvery { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any(), any()) }
         val fingerprintResponses = mockResponses.map { it.toCaptureFingerprintResponse() }
 
         // capture the first response in the list
@@ -1388,13 +1516,21 @@ class FingerprintCaptureViewModelTest {
     }
 
     private enum class MockCaptureFingerprintResponse {
-        GOOD_SCAN, DIFFERENT_GOOD_SCAN, BAD_SCAN, NO_FINGER_DETECTED, DISCONNECTED, UNKNOWN_ERROR, NEVER_RETURNS;
-
+        GOOD_SCAN,
+        DIFFERENT_GOOD_SCAN,
+        BAD_SCAN,
+        NO_FINGER_DETECTED,
+        DISCONNECTED,
+        UNKNOWN_ERROR,
+        NEVER_RETURNS,
+        ;
 
         fun toCaptureFingerprintResponse(): Any = when (this) {
             GOOD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
             DIFFERENT_GOOD_SCAN -> AcquireFingerprintTemplateResponse(
-                DIFFERENT_TEMPLATE, TEMPLATE_FORMAT, DIFFERENT_GOOD_QUALITY
+                DIFFERENT_TEMPLATE,
+                TEMPLATE_FORMAT,
+                DIFFERENT_GOOD_QUALITY,
             )
 
             BAD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
@@ -1409,19 +1545,21 @@ class FingerprintCaptureViewModelTest {
     }
 
     private enum class MockAcquireImageResult {
-        OK, DISCONNECTED, NEVER_RETURNS
+        OK,
+        DISCONNECTED,
+        NEVER_RETURNS,
     }
 
     companion object {
         val TWO_FINGERS_IDS = listOf(
             IFingerIdentifier.LEFT_THUMB,
-            IFingerIdentifier.LEFT_INDEX_FINGER
+            IFingerIdentifier.LEFT_INDEX_FINGER,
         )
         val FOUR_FINGERS_IDS = listOf(
             IFingerIdentifier.LEFT_THUMB,
             IFingerIdentifier.LEFT_INDEX_FINGER,
             IFingerIdentifier.RIGHT_THUMB,
-            IFingerIdentifier.RIGHT_INDEX_FINGER
+            IFingerIdentifier.RIGHT_INDEX_FINGER,
         )
 
         const val GOOD_QUALITY = 80

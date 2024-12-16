@@ -1,15 +1,20 @@
 package com.simprints.infra.sync
 
 interface SyncOrchestrator {
-
     suspend fun scheduleBackgroundWork()
+
     suspend fun cancelBackgroundWork()
+
+    fun startProjectSync()
 
     fun startDeviceSync()
 
     fun rescheduleEventSync()
+
     fun cancelEventSync()
+
     fun startEventSync()
+
     fun stopEventSync()
 
     /**
@@ -21,8 +26,12 @@ interface SyncOrchestrator {
     /**
      * Schedule a worker to upload subjects with IDs in the provided list.
      */
-    fun uploadEnrolmentRecords(id: String, subjectIds: List<String>)
+    fun uploadEnrolmentRecords(
+        id: String,
+        subjectIds: List<String>,
+    )
 
     suspend fun deleteEventSyncInfo()
+
     fun cleanupWorkers()
 }

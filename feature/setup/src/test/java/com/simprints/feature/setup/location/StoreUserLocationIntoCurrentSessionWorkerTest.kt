@@ -1,7 +1,7 @@
 package com.simprints.feature.setup.location
 
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.sampledata.createSessionScope
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -16,7 +16,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class StoreUserLocationIntoCurrentSessionWorkerTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -58,23 +57,20 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     }
 
     @Test(expected = Test.None::class)
-    fun `storeUserLocationIntoCurrentSession can't save event should not crash the app`() =
-        runTest {
-            every { locationManager.requestLocation(any()) } returns flowOf(TestLocationData.buildFakeLocation())
-            coEvery {
-                eventRepository.getCurrentSessionScope()
-            } throws Exception("No session capture event found")
-            worker.doWork()
-            coVerify(exactly = 0) { eventRepository.saveSessionScope(any()) }
-        }
+    fun `storeUserLocationIntoCurrentSession can't save event should not crash the app`() = runTest {
+        every { locationManager.requestLocation(any()) } returns flowOf(TestLocationData.buildFakeLocation())
+        coEvery {
+            eventRepository.getCurrentSessionScope()
+        } throws Exception("No session capture event found")
+        worker.doWork()
+        coVerify(exactly = 0) { eventRepository.saveSessionScope(any()) }
+    }
 
     @Test
-    fun `storeUserLocationIntoCurrentSession can't save events if the worker is canceled`() =
-        runTest {
-            every { locationManager.requestLocation(any()) } returns flowOf(TestLocationData.buildFakeLocation())
-            worker.stop(0)
-            worker.doWork()
-            coVerify(exactly = 0) { eventRepository.saveSessionScope(any()) }
-        }
-
+    fun `storeUserLocationIntoCurrentSession can't save events if the worker is canceled`() = runTest {
+        every { locationManager.requestLocation(any()) } returns flowOf(TestLocationData.buildFakeLocation())
+        worker.stop(0)
+        worker.doWork()
+        coVerify(exactly = 0) { eventRepository.saveSessionScope(any()) }
+    }
 }

@@ -9,12 +9,10 @@ internal data class ApiGuidSelectionPayload(
     override val startTime: ApiTimestamp,
     val selectedId: String,
 ) : ApiEventPayload(startTime) {
-
     constructor(domainPayload: GuidSelectionPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
         domainPayload.selectedId,
     )
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }

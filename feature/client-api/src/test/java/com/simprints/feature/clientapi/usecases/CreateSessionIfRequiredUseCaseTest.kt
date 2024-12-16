@@ -5,8 +5,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.ActionConstants
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -16,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class CreateSessionIfRequiredUseCaseTest {
-
     @MockK
     private lateinit var sessionEventRepository: SessionEventRepository
 

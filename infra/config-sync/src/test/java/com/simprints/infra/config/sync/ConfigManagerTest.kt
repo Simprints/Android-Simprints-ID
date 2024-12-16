@@ -47,7 +47,7 @@ class ConfigManagerTest {
         MockKAnnotations.init(this, relaxed = true)
         configManager = ConfigManager(
             configRepository = configRepository,
-            enrolmentRecordRepository = enrolmentRecordRepository
+            enrolmentRecordRepository = enrolmentRecordRepository,
         )
     }
 
@@ -113,5 +113,4 @@ class ConfigManagerTest {
         configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE)
         coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE) }
     }
-
 }

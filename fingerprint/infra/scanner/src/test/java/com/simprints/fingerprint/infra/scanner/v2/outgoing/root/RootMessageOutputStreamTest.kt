@@ -13,7 +13,6 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class RootMessageOutputStreamTest {
-
     private val rootMessageSerializerMock: RootMessageSerializer = mockk()
 
     @Test

@@ -15,25 +15,21 @@ internal class SecurityManagerImpl @Inject constructor(
     private val encryptedSharedPreferencesBuilder: EncryptedSharedPreferencesBuilder,
     private val secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
     private val rootManager: RootManager,
-    private val masterKeyHelper: MasterKeyHelper
+    private val masterKeyHelper: MasterKeyHelper,
 ) : SecurityManager {
-
     override fun buildEncryptedSharedPreferences(filename: String): SharedPreferences =
         encryptedSharedPreferencesBuilder.buildEncryptedSharedPreferences(filename)
 
-    override fun createLocalDatabaseKeyIfMissing(dbName: String) =
-        secureLocalDbKeyProvider.createLocalDatabaseKeyIfMissing(dbName)
+    override fun createLocalDatabaseKeyIfMissing(dbName: String) = secureLocalDbKeyProvider.createLocalDatabaseKeyIfMissing(dbName)
 
-    override fun recreateLocalDatabaseKey(dbName: String) =
-        secureLocalDbKeyProvider.recreateLocalDatabaseKey(dbName)
+    override fun recreateLocalDatabaseKey(dbName: String) = secureLocalDbKeyProvider.recreateLocalDatabaseKey(dbName)
 
-    override fun getLocalDbKeyOrThrow(dbName: String): LocalDbKey =
-        secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
+    override fun getLocalDbKeyOrThrow(dbName: String): LocalDbKey = secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
 
-    override fun checkIfDeviceIsRooted() =
-        rootManager.checkIfDeviceIsRooted()
+    override fun checkIfDeviceIsRooted() = rootManager.checkIfDeviceIsRooted()
 
-    override fun getEncryptedFileBuilder(file: File, context: Context): EncryptedFile =
-        masterKeyHelper.getEncryptedFileBuilder(file, context)
-
+    override fun getEncryptedFileBuilder(
+        file: File,
+        context: Context,
+    ): EncryptedFile = masterKeyHelper.getEncryptedFileBuilder(file, context)
 }

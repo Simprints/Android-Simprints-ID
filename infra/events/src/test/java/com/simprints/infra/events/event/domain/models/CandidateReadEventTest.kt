@@ -12,7 +12,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class CandidateReadEventTest {
-
     @Test
     fun create_CandidateReadEvent() {
         val event = CandidateReadEvent(CREATED_AT, ENDED_AT, GUID1, LocalResult.NOT_FOUND, NOT_FOUND)

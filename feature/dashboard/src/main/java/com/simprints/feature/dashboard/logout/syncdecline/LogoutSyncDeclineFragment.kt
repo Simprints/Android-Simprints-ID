@@ -18,10 +18,13 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline) {
-
     private val viewModel by viewModels<LogoutSyncViewModel>()
     private val binding by viewBinding(FragmentLogoutSyncDeclineBinding::bind)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
     }
@@ -32,7 +35,8 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
             .setMessage(getString(IDR.string.dashboard_logout_confirmation_message))
             .setPositiveButton(getString(IDR.string.dashboard_logout_confirmation_log_out_button)) { _, _ -> processLogoutConfirmation() }
             .setNegativeButton(
-                getString(IDR.string.dashboard_logout_confirmation_cancel_button), null
+                getString(IDR.string.dashboard_logout_confirmation_cancel_button),
+                null,
             ).create()
     }
 
@@ -43,21 +47,28 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
         logoutWithoutSyncCancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
+        SettingsPasswordDialogFragment.registerForResult(
+            fragmentManager = childFragmentManager,
+            lifecycleOwner = this@LogoutSyncDeclineFragment,
+            onSuccess = { processLogoutConfirmation() },
+        )
+
         logoutWithoutSyncConfirmButton.setOnClickListener {
             viewModel.settingsLocked.observe(
                 viewLifecycleOwner,
                 LiveDataEventWithContentObserver { config ->
                     val password = config.getNullablePassword()
                     if (password != null) {
-                        SettingsPasswordDialogFragment(
-                            title = IDR.string.dashboard_password_lock_title_logout,
-                            passwordToMatch = password,
-                            onSuccess = { processLogoutConfirmation() }
-                        ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+                        SettingsPasswordDialogFragment
+                            .newInstance(
+                                title = IDR.string.dashboard_password_lock_title_logout,
+                                passwordToMatch = password,
+                            ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                     } else {
                         confirmationDialogForLogout.show()
                     }
-                })
+                },
+            )
         }
     }
 

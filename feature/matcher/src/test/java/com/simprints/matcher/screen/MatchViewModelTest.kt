@@ -36,7 +36,6 @@ import java.util.UUID
 import kotlin.random.Random
 
 internal class MatchViewModelTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -71,7 +70,7 @@ internal class MatchViewModelTest {
             faceMatcherUseCase,
             fingerprintMatcherUseCase,
             saveMatchEvent,
-            timeHelper
+            timeHelper,
         )
     }
 
@@ -86,7 +85,7 @@ internal class MatchViewModelTest {
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
-                matcherName = "MatcherName"
+                matcherName = "MatcherName",
             )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
@@ -94,12 +93,14 @@ internal class MatchViewModelTest {
         assertThat(viewModel.isInitialized).isFalse()
 
         viewModel.matchState.test()
-        viewModel.setupMatch(MatchParams(
-            probeFaceSamples = listOf(getFaceSample()),
-            flowType = FlowType.ENROL,
-            queryForCandidates = mockk {},
-            biometricDataSource = BiometricDataSource.Simprints,
-        ))
+        viewModel.setupMatch(
+            MatchParams(
+                probeFaceSamples = listOf(getFaceSample()),
+                flowType = FlowType.ENROL,
+                queryForCandidates = mockk {},
+                biometricDataSource = BiometricDataSource.Simprints,
+            ),
+        )
 
         assertThat(viewModel.isInitialized).isTrue()
     }
@@ -128,7 +129,7 @@ internal class MatchViewModelTest {
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
-                matcherName = MATCHER_NAME
+                matcherName = MATCHER_NAME,
             )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
@@ -140,7 +141,7 @@ internal class MatchViewModelTest {
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
-            )
+            ),
         )
         // Waiting for the ::delay in viewModel::setupMatch
         advanceUntilIdle()
@@ -149,11 +150,11 @@ internal class MatchViewModelTest {
             listOf(
                 MatchViewModel.MatchState.NotStarted,
                 MatchViewModel.MatchState.LoadingCandidates,
-                MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
-            )
+                MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1),
+            ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FaceMatchResult(responseItems)
+            FaceMatchResult(responseItems),
         )
 
         verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
@@ -176,7 +177,7 @@ internal class MatchViewModelTest {
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
-                matcherName = MATCHER_NAME
+                matcherName = MATCHER_NAME,
             )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
@@ -190,7 +191,7 @@ internal class MatchViewModelTest {
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
-            )
+            ),
         )
         // Waiting for the ::delay in viewModel::setupMatch
         advanceUntilIdle()
@@ -199,25 +200,23 @@ internal class MatchViewModelTest {
             listOf(
                 MatchViewModel.MatchState.NotStarted,
                 MatchViewModel.MatchState.LoadingCandidates,
-                MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
-            )
+                MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1),
+            ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FingerprintMatchResult(responseItems, SECUGEN_SIM_MATCHER)
+            FingerprintMatchResult(responseItems, SECUGEN_SIM_MATCHER),
         )
 
         verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
     }
 
-    private fun getFaceSample(): MatchParams.FaceSample =
-        MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
+    private fun getFaceSample(): MatchParams.FaceSample = MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
 
-    private fun getFingerprintSample(): MatchParams.FingerprintSample =
-        MatchParams.FingerprintSample(
-            IFingerIdentifier.LEFT_3RD_FINGER,
-            "format",
-            Random.nextBytes(20)
-        )
+    private fun getFingerprintSample(): MatchParams.FingerprintSample = MatchParams.FingerprintSample(
+        IFingerIdentifier.LEFT_3RD_FINGER,
+        "format",
+        Random.nextBytes(20),
+    )
 
     companion object {
         const val MATCHER_NAME = "any matcher"

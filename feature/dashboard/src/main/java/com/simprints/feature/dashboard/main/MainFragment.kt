@@ -14,11 +14,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class MainFragment : Fragment(R.layout.fragment_main) {
-
     private val viewModel by viewModels<MainViewModel>()
     private val binding by viewBinding(FragmentMainBinding::bind)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.dashboardToolbar.setOnMenuItemClickListener {
             menuItemClicked(it)
@@ -27,20 +29,21 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
             binding.dashboardToolbar.menu.removeItem(R.id.debug)
         }
         viewModel.consentRequired.observe(viewLifecycleOwner) {
-            binding.dashboardToolbar.menu.findItem(R.id.menuPrivacyNotice).isVisible = it
+            binding.dashboardToolbar.menu
+                .findItem(R.id.menuPrivacyNotice)
+                .isVisible = it
         }
         viewModel.rootedDeviceDetected.observe(viewLifecycleOwner) {
             binding.rootedDeviceError.visibility = View.VISIBLE
         }
     }
 
-    private fun menuItemClicked(item: MenuItem): Boolean =
-        with(findNavController()) {
-            when (item.itemId) {
-                R.id.menuSettings -> navigate(R.id.action_mainFragment_to_settingsFragment)
-                R.id.debug -> navigate(R.id.action_mainFragment_to_debugFragment)
-                R.id.menuPrivacyNotice -> navigate(R.id.action_mainFragment_to_privacyNoticesFragment)
-            }
-            true
+    private fun menuItemClicked(item: MenuItem): Boolean = with(findNavController()) {
+        when (item.itemId) {
+            R.id.menuSettings -> navigate(R.id.action_mainFragment_to_settingsFragment)
+            R.id.debug -> navigate(R.id.action_mainFragment_to_debugFragment)
+            R.id.menuPrivacyNotice -> navigate(R.id.action_mainFragment_to_privacyNoticesFragment)
         }
+        true
+    }
 }

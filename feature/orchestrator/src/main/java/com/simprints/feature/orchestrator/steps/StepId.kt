@@ -7,7 +7,6 @@ package com.simprints.feature.orchestrator.steps
  * (e.g. common steps are 101+, fingerprint - 301+, face steps 501+)
  */
 internal object StepId {
-
     // Common step ids
     private const val STEP_BASE_CORE = 100
     const val SETUP = STEP_BASE_CORE + 1

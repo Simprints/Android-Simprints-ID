@@ -12,7 +12,6 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class RxInputStreamTest {
-
     @Test
     fun inputStreamToFlowable_writingByteArraysUnderBufferAndClosing_combinesItemsOnNextAndThenCompletes() {
         val outputStream = PipedOutputStream()

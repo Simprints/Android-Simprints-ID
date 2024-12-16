@@ -3,17 +3,14 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message
 import com.simprints.fingerprint.infra.scanner.v2.domain.Protocol
 
 interface MessageProtocol : Protocol {
-
-    val HEADER_SIZE: Int
-    val HEADER_INDICES: IntRange
-    val LENGTH_INDICES_IN_HEADER: IntRange
-    val MESSAGE_TYPE_INDICES_IN_HEADER: IntRange
+    val headerSize: Int
+    val headerIndices: IntRange
+    val lengthIndicesInHeader: IntRange
+    val messageTypeIndicesInHeader: IntRange
 
     fun getDataLengthFromHeader(header: ByteArray): Int
 
-    fun getTotalLengthFromHeader(header: ByteArray): Int =
-        getDataLengthFromHeader(header) + HEADER_SIZE
+    fun getTotalLengthFromHeader(header: ByteArray): Int = getDataLengthFromHeader(header) + headerSize
 
-    fun getDataBytes(messageBytes: ByteArray): ByteArray =
-        messageBytes.sliceArray(HEADER_SIZE until messageBytes.size)
+    fun getDataBytes(messageBytes: ByteArray): ByteArray = messageBytes.sliceArray(headerSize until messageBytes.size)
 }

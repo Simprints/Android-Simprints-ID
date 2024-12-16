@@ -63,7 +63,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
-
     @Inject
     lateinit var alertConfigurationMapper: AlertConfigurationMapper
 
@@ -80,14 +79,18 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
             orchestratorVm.isRequestProcessed = savedInstanceState.getBoolean(KEY_REQUEST_PROCESSED)
-            savedInstanceState.getString(KEY_ACTION_REQUEST)
+            savedInstanceState
+                .getString(KEY_ACTION_REQUEST)
                 ?.run(orchestratorVm::setActionRequestFromJson)
             orchestratorVm.restoreStepsIfNeeded()
             orchestratorVm.restoreModalitiesIfNeeded()
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         observeLoginCheckVm()
@@ -95,9 +98,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         observeOrchestratorVm()
 
         handleResult<AlertResult>(AlertContract.DESTINATION) { alertResult ->
-            clientApiVm.handleErrorResponse(
-                args.requestAction,
-                AppErrorResponse(alertResult.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR)
+            orchestratorVm.handleErrorResponse(
+                AppErrorResponse(alertResult.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR),
             )
         }
 
@@ -120,12 +122,15 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(SelectSubjectAgeGroupContract.DESTINATION, orchestratorVm::handleResult)
     }
 
-    private fun <T : Serializable> handleResult(destination: Int, block: (T) -> Unit) {
+    private fun <T : Serializable> handleResult(
+        destination: Int,
+        block: (T) -> Unit,
+    ) {
         findNavController().handleResult(
             lifecycleOwner = viewLifecycleOwner,
             currentDestinationId = R.id.orchestratorRootFragment,
             targetDestinationId = destination,
-            handler = block
+            handler = block,
         )
     }
 
@@ -136,9 +141,10 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                 findNavController().navigateSafely(
                     currentFragment = this,
                     actionId = R.id.action_orchestratorFragment_to_alert,
-                    args = alertConfigurationMapper.buildAlertConfig(error).toArgs()
+                    args = alertConfigurationMapper.buildAlertConfig(error).toArgs(),
                 )
-            })
+            },
+        )
 
         loginCheckVm.showLoginFlow.observe(
             viewLifecycleOwner,
@@ -148,41 +154,50 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                     actionId = R.id.action_orchestratorFragment_to_login,
                     args = LoginContract.toArgs(request.projectId, request.userId),
                 )
-            })
+            },
+        )
 
-        loginCheckVm.returnLoginNotComplete.observe(viewLifecycleOwner, LiveDataEventObserver {
-            clientApiVm.handleErrorResponse(
-                args.requestAction,
-                AppErrorResponse(AppErrorReason.LOGIN_NOT_COMPLETE)
-            )
-        })
+        loginCheckVm.returnLoginNotComplete.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                orchestratorVm.handleErrorResponse(
+                    AppErrorResponse(AppErrorReason.LOGIN_NOT_COMPLETE),
+                )
+            },
+        )
 
         loginCheckVm.proceedWithAction.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { action ->
                 orchestratorVm.handleAction(action)
-            })
+            },
+        )
     }
 
     private fun observeClientApiVm() {
-        clientApiVm.newSessionCreated.observe(viewLifecycleOwner, LiveDataEventObserver {
-            orchestratorCache.clearCache()
-        })
+        clientApiVm.newSessionCreated.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                orchestratorCache.clearCache()
+            },
+        )
         clientApiVm.showAlert.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { error ->
                 findNavController().navigateSafely(
                     currentFragment = this,
                     actionId = R.id.action_orchestratorFragment_to_alert,
-                    args = alertConfigurationMapper.buildAlertConfig(error).toArgs()
+                    args = alertConfigurationMapper.buildAlertConfig(error).toArgs(),
                 )
-            })
+            },
+        )
         clientApiVm.returnResponse.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { responseExtras ->
                 val resultCode = responseExtras.getResultCodeFromExtras()
                 findNavController().finishWithResult(this, AppResult(resultCode, responseExtras))
-            })
+            },
+        )
     }
 
     private fun observeOrchestratorVm() {
@@ -192,14 +207,15 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                 if (step != null) {
                     findNavController().navigateSafely(this, step.navigationActionId, step.payload)
                 }
-            })
+            },
+        )
         orchestratorVm.appResponse.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { response ->
                 if (response.request == null) {
                     clientApiVm.handleErrorResponse(
                         args.requestAction,
-                        AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
+                        AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR),
                     )
                 } else {
                     when (response.response) {
@@ -228,7 +244,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                         }
                     }
                 }
-            })
+            },
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

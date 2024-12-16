@@ -8,7 +8,6 @@ import javax.inject.Singleton
 
 @Singleton
 internal class SessionDataCache @Inject constructor() {
-
     private val scopeLock = Any()
 
     var eventScope: EventScope? = null

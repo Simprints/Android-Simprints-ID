@@ -6,7 +6,6 @@ import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.
 import kotlin.test.Test
 
 internal class ExperimentalProjectConfigurationTest {
-
     @Test
     fun `check pool validation flag correctly`() {
         mapOf<Map<String, Any>, Boolean>(
@@ -38,5 +37,4 @@ internal class ExperimentalProjectConfigurationTest {
             assertThat(ExperimentalProjectConfiguration(config).singleQualityFallbackRequired).isEqualTo(result)
         }
     }
-
 }

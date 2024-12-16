@@ -8,10 +8,12 @@ import io.mockk.every
 import org.junit.Test
 
 internal class ConfirmIdentityValidatorTest : ActionRequestValidatorTest(ConfirmIdentityActionFactory) {
-
     override fun `should fail if no moduleId`() {}
+
     override fun `should fail with illegal moduleId`() {}
+
     override fun `should fail if no userId`() {}
+
     override fun `should fail with illegal metadata`() {}
 
     @Test

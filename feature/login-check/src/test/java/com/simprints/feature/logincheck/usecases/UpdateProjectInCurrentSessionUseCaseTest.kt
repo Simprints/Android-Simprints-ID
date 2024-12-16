@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
@@ -13,6 +12,7 @@ import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -24,7 +24,6 @@ import org.junit.Before
 import org.junit.Test
 
 internal class UpdateProjectInCurrentSessionUseCaseTest {
-
     @MockK
     lateinit var eventRepository: SessionEventRepository
 
@@ -66,9 +65,11 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         useCase()
 
         coVerify {
-            eventRepository.saveSessionScope(withArg {
-                assertThat(it.projectId).isEqualTo(SIGNED_PROJECT_ID)
-            })
+            eventRepository.saveSessionScope(
+                withArg {
+                    assertThat(it.projectId).isEqualTo(SIGNED_PROJECT_ID)
+                },
+            )
         }
     }
 
@@ -96,9 +97,11 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         useCase()
 
         coVerify {
-            eventRepository.saveSessionScope(withArg {
-                assertThat(it.payload.language).isEqualTo(language)
-            })
+            eventRepository.saveSessionScope(
+                withArg {
+                    assertThat(it.payload.language).isEqualTo(language)
+                },
+            )
         }
     }
 
@@ -117,7 +120,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
             projectConfigurationUpdatedAt = "projectConfigurationUpdatedAt",
             device = Device("deviceId", "deviceModel", "deviceManufacturer"),
             databaseInfo = DatabaseInfo(0, 0),
-        )
+        ),
     )
 
     private fun createBlankSessionEvent(projectId: String): Event = IntentParsingEvent(
@@ -132,7 +135,6 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     )
 
     companion object {
-
         private const val SIGNED_PROJECT_ID = "projectId"
         private const val OTHER_PROJECT_ID = "otherProjectId"
     }

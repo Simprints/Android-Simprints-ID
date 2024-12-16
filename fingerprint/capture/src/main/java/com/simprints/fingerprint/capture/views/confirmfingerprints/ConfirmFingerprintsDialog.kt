@@ -5,8 +5,8 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.fingerprint.capture.resources.nameTextId
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.fingerprint.capture.resources.nameTextId
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
@@ -16,7 +16,6 @@ internal class ConfirmFingerprintsDialog(
     private val onConfirm: () -> Unit,
     private val onRestart: () -> Unit,
 ) {
-
     fun create(): AlertDialog = MaterialAlertDialogBuilder(context)
         .setTitle(context.getString(IDR.string.fingerprint_capture_confirm_fingers_dialog_title))
         .setMessage(getMapOfFingersAndQualityAsText())
@@ -26,8 +25,8 @@ internal class ConfirmFingerprintsDialog(
         .create()
 
     @SuppressLint("DefaultLocale")
-    private fun getMapOfFingersAndQualityAsText(): String =
-        StringBuilder().also {
+    private fun getMapOfFingersAndQualityAsText(): String = StringBuilder()
+        .also {
             scannedFingers.forEach { (fingerName, successes, scans) ->
                 if (scans == 1) {
                     it.append(if (successes == 1) "✓ " else "× ")
@@ -38,5 +37,9 @@ internal class ConfirmFingerprintsDialog(
             }
         }.toString()
 
-    data class Item(val finger: IFingerIdentifier, val numberOfSuccessfulScans: Int, val numberOfScans: Int)
+    data class Item(
+        val finger: IFingerIdentifier,
+        val numberOfSuccessfulScans: Int,
+        val numberOfScans: Int,
+    )
 }

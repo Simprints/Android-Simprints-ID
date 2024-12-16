@@ -12,7 +12,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ImageUpSyncWorkerTest {
-
     companion object {
         private const val PROJECT_ID = "projectId"
     }
@@ -32,7 +31,6 @@ class ImageUpSyncWorkerTest {
         authStore,
         testCoroutineRule.testCoroutineDispatcher,
     )
-
 
     @Test
     fun whenAllUploadsAreSuccessful_shouldReturnSuccess() = runTest {

@@ -7,7 +7,6 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class CreateRangesUseCaseTest {
-
     private val useCase = CreateRangesUseCase()
 
     @Test
@@ -31,7 +30,7 @@ class CreateRangesUseCaseTest {
             listOf(
                 0..10,
                 10..17,
-            )
+            ),
         )
     }
 
@@ -39,14 +38,14 @@ class CreateRangesUseCaseTest {
     fun `Correctly calculates ranges for exact batches`() {
         assertThat(useCase.invoke(210, 10)).isEqualTo(
             listOf(
-                0..10,    // size=10
-                10..20,   // size=10
-                20..40,   // size=20
-                40..70,   // size=30
-                70..110,  // size=40
+                0..10, // size=10
+                10..20, // size=10
+                20..40, // size=20
+                40..70, // size=30
+                70..110, // size=40
                 110..160, // size=50
                 160..210, // size=50
-            )
+            ),
         )
     }
 }

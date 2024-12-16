@@ -22,15 +22,26 @@ fun byteArrayOf(vararg elements: Any): ByteArray {
  * @throws IndexOutOfBoundsException if position includes a range outside of the buffer
  * @throws java.nio.BufferUnderflowException if position includes a range that is too short
  */
-fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = null, byteOrder: ByteOrder): T =
-    ByteBuffer.wrap(
-        if (position != null)
+fun <T> ByteArray.extract(
+    getType: ByteBuffer.() -> T,
+    position: IntRange? = null,
+    byteOrder: ByteOrder,
+): T = ByteBuffer
+    .wrap(
+        if (position != null) {
             this.sliceArray(position)
-        else
+        } else {
             this
-    ).apply { order(byteOrder) }.getType()
+        },
+    ).apply { order(byteOrder) }
+    .getType()
 
 fun ByteArray.chunked(size: Int) = toList().chunked(size).map { it.toByteArray() }
 
 fun ByteArray.xorAll() = reduce { acc, byte -> acc xor byte }
+
 fun ByteArray.nxorAll() = xorAll().inv()
+
+fun List<ByteArray>.pairWithProgress(): List<Pair<ByteArray, Float>> = mapIndexed { index, chunk ->
+    Pair(chunk, (index + 1).toFloat() / this.size.toFloat())
+}

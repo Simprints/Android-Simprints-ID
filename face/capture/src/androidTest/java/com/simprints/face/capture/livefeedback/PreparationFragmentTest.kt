@@ -17,11 +17,10 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class PreparationFragmentTest {
-
     @Test
     fun testNavigationFromPreparationToLiveFeedBackFragment() {
         val navController: NavHostController = TestNavHostController(
-            ApplicationProvider.getApplicationContext()
+            ApplicationProvider.getApplicationContext(),
         )
         val prepFragScenario =
             launchFragmentInContainer<PreparationFragment>()

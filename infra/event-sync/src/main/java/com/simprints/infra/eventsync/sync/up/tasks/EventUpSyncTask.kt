@@ -53,7 +53,6 @@ internal class EventUpSyncTask @Inject constructor(
     private val configManager: ConfigManager,
     private val jsonHelper: JsonHelper,
 ) {
-
     fun upSync(
         operation: EventUpSyncOperation,
         eventScope: EventScope,
@@ -72,7 +71,7 @@ internal class EventUpSyncTask @Inject constructor(
         try {
             lastOperation = lastOperation.copy(
                 lastState = RUNNING,
-                lastSyncTime = timeHelper.now().ms
+                lastSyncTime = timeHelper.now().ms,
             )
 
             uploadEventScopeType(
@@ -93,7 +92,7 @@ internal class EventUpSyncTask @Inject constructor(
                 count = it
                 lastOperation = lastOperation.copy(
                     lastState = RUNNING,
-                    lastSyncTime = timeHelper.now().ms
+                    lastSyncTime = timeHelper.now().ms,
                 )
                 emitProgress(lastOperation, count)
             }
@@ -110,7 +109,7 @@ internal class EventUpSyncTask @Inject constructor(
                 count = it
                 lastOperation = lastOperation.copy(
                     lastState = RUNNING,
-                    lastSyncTime = timeHelper.now().ms
+                    lastSyncTime = timeHelper.now().ms,
                 )
                 emitProgress(lastOperation, count)
             }
@@ -122,20 +121,20 @@ internal class EventUpSyncTask @Inject constructor(
                 createUpSyncContentContent = {
                     // Only tracking up-sync if there have been ay events in other scopes.
                     EventUpSyncRequestEvent.UpSyncContent(
-                        eventUpSyncCount = if (isUsefulUpload) it else 0
+                        eventUpSyncCount = if (isUsefulUpload) it else 0,
                     )
                 },
             ).collect {
                 count = it
                 lastOperation = lastOperation.copy(
                     lastState = RUNNING,
-                    lastSyncTime = timeHelper.now().ms
+                    lastSyncTime = timeHelper.now().ms,
                 )
                 emitProgress(lastOperation, count)
             }
             lastOperation = lastOperation.copy(
                 lastState = COMPLETE,
-                lastSyncTime = timeHelper.now().ms
+                lastSyncTime = timeHelper.now().ms,
             )
 
             emitProgress(lastOperation, count)
@@ -147,7 +146,7 @@ internal class EventUpSyncTask @Inject constructor(
             Simber.e(t)
             lastOperation = lastOperation.copy(
                 lastState = FAILED,
-                lastSyncTime = timeHelper.now().ms
+                lastSyncTime = timeHelper.now().ms,
             )
 
             emitProgress(lastOperation, count)
@@ -170,7 +169,8 @@ internal class EventUpSyncTask @Inject constructor(
         eventFilter: (Map<EventScope, List<Event>?>) -> Map<EventScope, List<Event>?> = { it },
         createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
-        Simber.tag(SYNC_LOG_TAG)
+        Simber
+            .tag(SYNC_LOG_TAG)
             .d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
 
         while (eventRepository.getClosedEventScopesCount(eventScopeTypeToUpload) > 0 && currentCoroutineContext().isActive) {
@@ -179,7 +179,7 @@ internal class EventUpSyncTask @Inject constructor(
             // Re-emitting the number of uploaded corrupted events
             attemptInvalidEventUpload(
                 projectId,
-                sessionScopes.getCorruptedScopes()
+                sessionScopes.getCorruptedScopes(),
             ).collect { emit(it) }
 
             val scopesToUpload = sessionScopes
@@ -189,14 +189,14 @@ internal class EventUpSyncTask @Inject constructor(
             val uploadedScopes = mutableListOf<String>()
 
             scopesToUpload.takeIf { it.isNotEmpty() }?.apply {
-            val requestId = UUID.randomUUID().toString()
+                val requestId = UUID.randomUUID().toString()
 
                 val requestStartTime = timeHelper.now()
                 try {
                     val result = eventRemoteDataSource.post(
                         requestId,
                         projectId,
-                        this.asApiUploadEventsBody(eventScopeTypeToUpload)
+                        this.asApiUploadEventsBody(eventScopeTypeToUpload),
                     )
                     addRequestEvent(
                         requestId = requestId,
@@ -216,16 +216,13 @@ internal class EventUpSyncTask @Inject constructor(
         }
     }
 
-    private fun List<ApiEventScope>.asApiUploadEventsBody(
-        eventScopeTypeToUpload: EventScopeType,
-    ) = when (eventScopeTypeToUpload) {
+    private fun List<ApiEventScope>.asApiUploadEventsBody(eventScopeTypeToUpload: EventScopeType) = when (eventScopeTypeToUpload) {
         EventScopeType.SESSION -> ApiUploadEventsBody(sessions = this)
         EventScopeType.DOWN_SYNC -> ApiUploadEventsBody(eventDownSyncs = this)
         EventScopeType.UP_SYNC -> ApiUploadEventsBody(eventUpSyncs = this)
     }
 
-    private fun Map<EventScope, List<Event>?>.getCorruptedScopes() =
-        filterValues { it == null }.keys
+    private fun Map<EventScope, List<Event>?>.getCorruptedScopes() = filterValues { it == null }.keys
 
     /**
      * Returns a map of closed event scopes with associated events.
@@ -238,19 +235,20 @@ internal class EventUpSyncTask @Inject constructor(
         type: EventScopeType,
         limit: Int,
     ) = eventRepository.getClosedEventScopes(type, limit).associateWith {
-            try {
-                eventRepository.getEventsFromScope(it.id)
-                    .also { listOfEvents -> emit(listOfEvents.size) }
-            } catch (ex: Exception) {
-                if (ex is JsonParseException || ex is JsonMappingException) {
-                    Simber.i("Failed to un-marshal events")
-                    Simber.i(ex)
-                } else {
-                    throw ex
-                }
-                null
+        try {
+            eventRepository
+                .getEventsFromScope(it.id)
+                .also { listOfEvents -> emit(listOfEvents.size) }
+        } catch (ex: Exception) {
+            if (ex is JsonParseException || ex is JsonMappingException) {
+                Simber.i("Failed to un-marshal events")
+                Simber.i(ex)
+            } else {
+                throw ex
             }
+            null
         }
+    }
 
     private suspend fun addRequestEvent(
         requestId: String,
@@ -268,7 +266,7 @@ internal class EventUpSyncTask @Inject constructor(
                     requestId = requestId,
                     content = content,
                     responseStatus = result.status,
-                )
+                ),
             )
         }
     }
@@ -303,7 +301,7 @@ internal class EventUpSyncTask @Inject constructor(
                 requestId = requestId,
                 responseStatus = result?.status,
                 errorType = ex.javaClass.simpleName,
-            )
+            ),
         )
     }
 
@@ -340,7 +338,7 @@ internal class EventUpSyncTask @Inject constructor(
 
                 eventRemoteDataSource.dumpInvalidEvents(
                     projectId,
-                    listOf(scopeString) + eventJsons
+                    listOf(scopeString) + eventJsons,
                 )
                 eventRepository.deleteEventScope(scope.id)
             } catch (t: Throwable) {
@@ -353,5 +351,4 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
     }
-
 }

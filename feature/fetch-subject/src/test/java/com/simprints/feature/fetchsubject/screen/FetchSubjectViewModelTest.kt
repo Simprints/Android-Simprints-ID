@@ -21,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class FetchSubjectViewModelTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -100,11 +99,14 @@ internal class FetchSubjectViewModelTest {
     @Test
     fun `startExitForm returns list of modalities`() {
         coEvery { configManager.getProjectConfiguration().general.modalities } returns listOf(
-            GeneralConfiguration.Modality.FACE
+            GeneralConfiguration.Modality.FACE,
         )
 
         viewModel.startExitForm()
-        val result = viewModel.subjectState.test().value().getContentIfNotHandled()
+        val result = viewModel.subjectState
+            .test()
+            .value()
+            .getContentIfNotHandled()
 
         assertThat(result).isInstanceOf(FetchSubjectState.ShowExitForm::class.java)
         assertThat((result as FetchSubjectState.ShowExitForm).modalities.size).isEqualTo(1)

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.ExternalScope
+import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -15,8 +15,8 @@ import com.simprints.feature.exitform.scannerOptions
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
@@ -31,9 +31,8 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val buildAgeGroups: BuildAgeGroupsUseCase,
     private val configurationRepo: ConfigRepository,
-    @ExternalScope private val externalScope: CoroutineScope,
+    @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,
 ) : ViewModel() {
-
     val finish: LiveData<LiveDataEventWithContent<AgeGroup>>
         get() = _finish
     private var _finish = MutableLiveData<LiveDataEventWithContent<AgeGroup>>()
@@ -54,11 +53,11 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
         _ageGroups.value = ageGroups
     }
 
-    fun saveAgeGroupSelection(ageRange: AgeGroup) = externalScope.launch {
+    fun saveAgeGroupSelection(ageRange: AgeGroup) = sessionCoroutineScope.launch {
         val event = AgeGroupSelectionEvent(
             startTime,
             timeHelper.now(),
-            AgeGroupSelectionEvent.AgeGroup(ageRange.startInclusive, ageRange.endExclusive)
+            AgeGroupSelectionEvent.AgeGroup(ageRange.startInclusive, ageRange.endExclusive),
         )
         eventRepository.addOrUpdateEvent(event)
         Simber.tag(SESSION.name).i("Added Age Group Selection Event")

@@ -8,6 +8,5 @@ data class Timestamp(
     val isTrustworthy: Boolean = false,
     val msSinceBoot: Long? = null,
 ) : Comparable<Timestamp> {
-
     override fun compareTo(other: Timestamp): Int = ms.compareTo(other.ms)
 }

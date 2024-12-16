@@ -7,7 +7,6 @@ data class FingerprintConfiguration(
     val secugenSimMatcher: FingerprintSdkConfiguration?,
     val nec: FingerprintSdkConfiguration?,
 ) {
-
     data class FingerprintSdkConfiguration(
         val fingersToCapture: List<Finger>,
         val decisionPolicy: DecisionPolicy,
@@ -16,22 +15,26 @@ data class FingerprintConfiguration(
         val vero2: Vero2Configuration? = null,
         val allowedAgeRange: AgeGroup = AgeGroup(0, null),
         val verificationMatchThreshold: Float? = null,
+        /**
+         * Allowed amount of 'No Finger Detected' scans before proceeding further
+         */
+        val maxCaptureAttempts: MaxCaptureAttempts?,
         val version: String = "",
     )
 
     enum class VeroGeneration {
         VERO_1,
-        VERO_2;
+        VERO_2,
     }
 
     enum class BioSdk {
         SECUGEN_SIM_MATCHER,
-        NEC;
+        NEC,
     }
 
     enum class FingerComparisonStrategy {
         SAME_FINGER,
-        CROSS_FINGER_USING_MEAN_OF_MAX;
+        CROSS_FINGER_USING_MEAN_OF_MAX,
     }
 
     fun getSdkConfiguration(sdk: BioSdk): FingerprintSdkConfiguration? = when (sdk) {

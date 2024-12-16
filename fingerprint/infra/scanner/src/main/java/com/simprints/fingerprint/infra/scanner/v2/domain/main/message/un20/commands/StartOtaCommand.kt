@@ -3,8 +3,9 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.comm
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20Command
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 
-class StartOtaCommand(val fileName: String) : Un20Command(Un20MessageType.StartOta) {
-
+class StartOtaCommand(
+    val fileName: String,
+) : Un20Command(Un20MessageType.StartOta) {
     override fun getDataBytes(): ByteArray = fileName.toByteArray(Charsets.UTF_8)
 
     companion object {

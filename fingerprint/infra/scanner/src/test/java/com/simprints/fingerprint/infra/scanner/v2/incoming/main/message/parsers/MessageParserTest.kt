@@ -12,7 +12,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class MessageParserTest {
-
     @Test
     fun parseVeroResponse_buildsMessageCorrectlyFromProtocol() {
         val messageParser = VeroResponseParser()

@@ -5,9 +5,15 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.simprints.infra.logging.Simber.USER_PROPERTY_TAG
 import timber.log.Timber
 
-internal class CrashReportingTree(private val crashlytics: FirebaseCrashlytics) : Timber.Tree() {
-
-    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+internal class CrashReportingTree(
+    private val crashlytics: FirebaseCrashlytics,
+) : Timber.Tree() {
+    override fun log(
+        priority: Int,
+        tag: String?,
+        message: String,
+        t: Throwable?,
+    ) {
         if (priority == Log.VERBOSE || priority == Log.DEBUG) return
 
         if (tag != null && tag.contains(USER_PROPERTY_TAG)) {
@@ -27,7 +33,5 @@ internal class CrashReportingTree(private val crashlytics: FirebaseCrashlytics) 
                 crashlytics.recordException(Exception(message))
             }
         }
-
     }
-
 }

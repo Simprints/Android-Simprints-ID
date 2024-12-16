@@ -3,9 +3,9 @@ package com.simprints.fingerprint.infra.simafiswrapper.models
 import java.nio.ByteBuffer
 
 object TemplateGenerator {
-
     val validTemplate: ByteArray = createValidTemplate()
     val validTemplateWithLowQuality: ByteArray = createValidTemplate(50)
+
     fun createValidTemplate(quality: Int = 100): ByteArray {
         val template = ByteBuffer.allocate(30)
         template.putInt(FORMAT_ID, ISO_FORMAT_ID)
@@ -24,4 +24,3 @@ object TemplateGenerator {
     const val NB_FINGERPRINTS = 22 // BYTE
     const val FIRST_QUALITY = 26 // BYTE
 }
-

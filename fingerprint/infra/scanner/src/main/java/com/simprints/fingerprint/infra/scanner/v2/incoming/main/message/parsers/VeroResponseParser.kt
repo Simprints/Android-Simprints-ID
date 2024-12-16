@@ -32,35 +32,33 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.respo
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
+import javax.inject.Inject
 
-class VeroResponseParser : MessageParser<VeroResponse> {
+class VeroResponseParser @Inject constructor() : MessageParser<VeroResponse> {
+    override fun parse(messageBytes: ByteArray): VeroResponse = try {
+        VeroMessageProtocol.getDataBytes(messageBytes).let { data ->
+            when (val type = VeroMessageProtocol.getMessageType(messageBytes)) {
+                GET_UN20_ON -> GetUn20OnResponse.fromBytes(data)
+                SET_UN20_ON -> SetUn20OnResponse.fromBytes(data)
+                GET_TRIGGER_BUTTON_ACTIVE -> GetTriggerButtonActiveResponse.fromBytes(data)
+                SET_TRIGGER_BUTTON_ACTIVE -> SetTriggerButtonActiveResponse.fromBytes(data)
+                GET_SMILE_LED_STATE -> GetSmileLedStateResponse.fromBytes(data)
+                GET_BLUETOOTH_LED_STATE -> GetBluetoothLedStateResponse.fromBytes(data)
+                GET_POWER_LED_STATE -> GetPowerLedStateResponse.fromBytes(data)
+                SET_SMILE_LED_STATE -> SetSmileLedStateResponse.fromBytes(data)
+                GET_BATTERY_PERCENT_CHARGE -> GetBatteryPercentChargeResponse.fromBytes(data)
+                GET_BATTERY_VOLTAGE -> GetBatteryVoltageResponse.fromBytes(data)
+                GET_BATTERY_CURRENT -> GetBatteryCurrentResponse.fromBytes(data)
+                GET_BATTERY_TEMPERATURE -> GetBatteryTemperatureResponse.fromBytes(data)
 
-    override fun parse(messageBytes: ByteArray): VeroResponse =
-        try {
-            VeroMessageProtocol.getDataBytes(messageBytes).let { data ->
-                when (val type = VeroMessageProtocol.getMessageType(messageBytes)) {
-                    GET_UN20_ON -> GetUn20OnResponse.fromBytes(data)
-                    SET_UN20_ON -> SetUn20OnResponse.fromBytes(data)
-                    GET_TRIGGER_BUTTON_ACTIVE -> GetTriggerButtonActiveResponse.fromBytes(data)
-                    SET_TRIGGER_BUTTON_ACTIVE -> SetTriggerButtonActiveResponse.fromBytes(data)
-                    GET_SMILE_LED_STATE -> GetSmileLedStateResponse.fromBytes(data)
-                    GET_BLUETOOTH_LED_STATE -> GetBluetoothLedStateResponse.fromBytes(data)
-                    GET_POWER_LED_STATE -> GetPowerLedStateResponse.fromBytes(data)
-                    SET_SMILE_LED_STATE -> SetSmileLedStateResponse.fromBytes(data)
-                    GET_BATTERY_PERCENT_CHARGE -> GetBatteryPercentChargeResponse.fromBytes(data)
-                    GET_BATTERY_VOLTAGE -> GetBatteryVoltageResponse.fromBytes(data)
-                    GET_BATTERY_CURRENT -> GetBatteryCurrentResponse.fromBytes(data)
-                    GET_BATTERY_TEMPERATURE -> GetBatteryTemperatureResponse.fromBytes(data)
+                // extension api
+                GET_STM_EXTENDED_FIRMWARE_VERSION -> GetStmExtendedFirmwareVersionResponse.fromBytes(data)
 
-                    // extension api
-                    GET_STM_EXTENDED_FIRMWARE_VERSION -> GetStmExtendedFirmwareVersionResponse.fromBytes(data)
-
-
-                    UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED ->
-                        throw InvalidMessageException("Illegal message $type received in Vero events route")
-                }
+                UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED ->
+                    throw InvalidMessageException("Illegal message $type received in Vero events route")
             }
-        } catch (e: Exception) {
-            handleExceptionDuringParsing(e)
         }
+    } catch (e: Exception) {
+        handleExceptionDuringParsing(e)
+    }
 }

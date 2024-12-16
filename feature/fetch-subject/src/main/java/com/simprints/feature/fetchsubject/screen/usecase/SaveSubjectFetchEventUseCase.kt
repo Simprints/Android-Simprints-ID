@@ -2,27 +2,28 @@ package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
 internal class SaveSubjectFetchEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
 ) {
-
     suspend operator fun invoke(
         subjectState: FetchSubjectState,
         fetchStartTime: Timestamp,
         fetchEndTime: Timestamp,
-        subjectId: String
+        subjectId: String,
     ) {
-        eventRepository.addOrUpdateEvent(CandidateReadEvent(
-            createdAt = fetchStartTime,
-            endTime = fetchEndTime,
-            candidateId = subjectId,
-            localResult = getLocalResultForFetchEvent(subjectState),
-            remoteResult = getRemoteResultForFetchEvent(subjectState),
-        ))
+        eventRepository.addOrUpdateEvent(
+            CandidateReadEvent(
+                createdAt = fetchStartTime,
+                endTime = fetchEndTime,
+                candidateId = subjectId,
+                localResult = getLocalResultForFetchEvent(subjectState),
+                remoteResult = getRemoteResultForFetchEvent(subjectState),
+            ),
+        )
     }
 
     private fun getLocalResultForFetchEvent(state: FetchSubjectState) = when (state) {

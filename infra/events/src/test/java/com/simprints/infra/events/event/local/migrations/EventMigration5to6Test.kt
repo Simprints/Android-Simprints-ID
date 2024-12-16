@@ -5,33 +5,27 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQuery
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.local.EventRoomDatabase
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.spyk
 import io.mockk.verify
 import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class EventMigration5to6Test {
-
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
         EventRoomDatabase::class.java,
     )
-
 
     @Test
     @Throws(IOException::class)
@@ -42,7 +36,8 @@ class EventMigration5to6Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration5to6())
 
-        val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+        val eventJson = MigrationTestingTools
+            .retrieveCursorWithEventById(db, eventId)
             .getStringWithColumnName("eventJson")!!
             .let { JSONObject(it) }
 
@@ -74,14 +69,14 @@ class EventMigration5to6Test {
             migrationSpy.migrateConnectivityEventPayloadType(
                 any(),
                 any(),
-                eventId1
+                eventId1,
             )
         }
         verify(exactly = 1) {
             migrationSpy.migrateConnectivityEventPayloadType(
                 any(),
                 any(),
-                eventId2
+                eventId2,
             )
         }
     }
@@ -101,7 +96,8 @@ class EventMigration5to6Test {
         this.put("id", id)
         this.put("type", "CONNECTIVITY_SNAPSHOT")
         this.put(
-            "eventJson", """
+            "eventJson",
+            """
             {
                 "id":"$id",
                 "labels":{
@@ -118,7 +114,7 @@ class EventMigration5to6Test {
                 },
                 "type": "CONNECTIVITY_SNAPSHOT"
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
         this.put("createdAt", 1611584017198)
         this.put("endedAt", 0)
@@ -128,20 +124,17 @@ class EventMigration5to6Test {
     private fun setupV5DbWithEvent(
         vararg eventId: String,
         close: Boolean = true,
-    ): SupportSQLiteDatabase =
-        helper.createDatabase(TEST_DB, 5).apply {
-            eventId.forEach {
-                val event = createEvent(it)
-                this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
-            }
-            if (close)
-                close()
+    ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 5).apply {
+        eventId.forEach {
+            val event = createEvent(it)
+            this.insert("DbEvent", SQLiteDatabase.CONFLICT_NONE, event)
         }
-
-    companion object {
-
-        private const val TEST_DB = "test"
+        if (close) {
+            close()
+        }
     }
 
+    companion object {
+        private const val TEST_DB = "test"
+    }
 }
-

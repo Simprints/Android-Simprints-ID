@@ -7,7 +7,6 @@ import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test
 
 class AccumulatorTest {
-
     @Test
     fun accumulator_usedInRxStream_producesCorrectElements() {
         val fragmentSize = 4
@@ -45,15 +44,16 @@ class AccumulatorTest {
             .inOrder()
     }
 
-    class StringAccumulator : Accumulator<String, String, String>(
-        initialFragmentCollection = "",
-        addFragmentToCollection = { this + it },
-        canComputeElementLengthFromCollection = { it.length >= LENGTH_INDICES.count() },
-        computeElementLengthFromCollection = ::computeLength,
-        getCollectionLength = { length },
-        sliceCollection = { slice(it) },
-        buildElementFromCompleteCollection = { it }
-    ) {
+    class StringAccumulator :
+        Accumulator<String, String, String>(
+            initialFragmentCollection = "",
+            addFragmentToCollection = { this + it },
+            canComputeElementLengthFromCollection = { it.length >= LENGTH_INDICES.count() },
+            computeElementLengthFromCollection = ::computeLength,
+            getCollectionLength = { length },
+            sliceCollection = { slice(it) },
+            buildElementFromCompleteCollection = { it },
+        ) {
         companion object {
             val LENGTH_INDICES = 0..1
 

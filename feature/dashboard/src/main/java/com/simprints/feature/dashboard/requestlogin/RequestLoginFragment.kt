@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentRequestLoginBinding
+import com.simprints.feature.troubleshooting.AutoResettingClickCounter
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,7 +20,6 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) {
-
     private val binding by viewBinding(FragmentRequestLoginBinding::bind)
     private val args: RequestLoginFragmentArgs by navArgs()
 
@@ -35,13 +36,25 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
     private var wasLogoutReasonDisplayed = false
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    // Requires so many clicks in short window to make it less likely to open on accident
+    private val clickCounter = AutoResettingClickCounter(requiredClicks = 10)
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         wasLogoutReasonDisplayed = savedInstanceState?.getBoolean(KEY_WAS_LOGOUT_REASON_DISPLAYED) ?: false
         binding.tvDeviceId.text = getString(IDR.string.dashboard_request_login_device_id, deviceId)
         binding.simprintsIdVersionTextView.text =
             String.format(getString(IDR.string.dashboard_request_login_simprints_version), packageVersionName)
         args.logoutReason?.takeIf { !wasLogoutReasonDisplayed }?.run(::displayLogoutReasonDialog)
+
+        binding.loginImageViewLogo.setOnClickListener {
+            if (clickCounter.handleClick(lifecycleScope)) {
+                findNavController().navigate(R.id.action_aboutFragment_to_troubleshooting)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -51,18 +64,21 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
     override fun onResume() {
         super.onResume()
-        if (authStore.signedInProjectId.isNotEmpty())
+        if (authStore.signedInProjectId.isNotEmpty()) {
             findNavController().navigate(R.id.action_requestLoginFragment_to_mainFragment)
+        }
     }
 
     private fun displayLogoutReasonDialog(logoutReason: LogoutReason) {
         wasLogoutReasonDisplayed = true
-        AlertDialog.Builder(requireContext())
+        AlertDialog
+            .Builder(requireContext())
             .setTitle(logoutReason.title)
             .setMessage(logoutReason.body)
             .setPositiveButton(
-                getString(IDR.string.dashboard_request_login_close_reason_dialog)
-            ) { di, _ -> di.dismiss() }.create()
+                getString(IDR.string.dashboard_request_login_close_reason_dialog),
+            ) { di, _ -> di.dismiss() }
+            .create()
             .show()
     }
 

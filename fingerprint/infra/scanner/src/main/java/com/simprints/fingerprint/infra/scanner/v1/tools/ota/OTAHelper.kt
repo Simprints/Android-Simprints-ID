@@ -1,15 +1,17 @@
 package com.simprints.fingerprint.infra.scanner.v1.tools.ota
 
 class OTAHelper {
-    private val PACKET_BIN_SIZE = 256
+    fun splitByLines(input: String): List<String> = input.split("\n")
 
-    fun splitByLines(input: String): List<String> =
-        input.split("\n")
-
-
-    private fun addToNullableString(add: String, line: String?): String {
-        if (line == null) return add + "\n"
-        else return line + add + "\n"
+    private fun addToNullableString(
+        add: String,
+        line: String?,
+    ): String {
+        if (line == null) {
+            return add + "\n"
+        } else {
+            return line + add + "\n"
+        }
     }
 
     fun splitByPackets(input: String): Array<String?> {
@@ -21,12 +23,17 @@ class OTAHelper {
         var refPacketNo = 0
         var currentPacketNo = 0
 
-        fun appendToPacket(string: String, packetNumber: Int) {
+        fun appendToPacket(
+            string: String,
+            packetNumber: Int,
+        ) {
             packets[packetNumber] = addToNullableString((string), packets[packetNumber])
         }
 
         fun isFirstLine() = ((packets[currentPacketNo] == null) && currentPacketNo == 0)
+
         fun isValidLine(string: String) = (!((string == "\n") or string.isEmpty()))
+
         fun populatePackets(hex: HexRecord) {
             when (hex.type) {
                 HexRecord.DATA_RECORD -> {
@@ -57,4 +64,7 @@ class OTAHelper {
         return linesSplit.map { it[1].toInt() }
     }
 
+    companion object {
+        private const val PACKET_BIN_SIZE = 256
+    }
 }

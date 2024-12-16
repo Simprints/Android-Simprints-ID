@@ -2,8 +2,8 @@ package com.simprints.feature.logincheck.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
+import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -14,7 +14,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class AddAuthorizationEventUseCaseTest {
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -37,12 +36,16 @@ class AddAuthorizationEventUseCaseTest {
     fun `Adds not authorised event`() = runTest {
         // When
         useCase(ActionFactory.getFlowRequest(), false)
-        //Then
+        // Then
         coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg {
-                assertThat((it as AuthorizationEvent).payload.result).isEqualTo(AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED)
-                assertThat(it.payload.userInfo).isNull()
-            })
+            coreEventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(
+                        (it as AuthorizationEvent).payload.result,
+                    ).isEqualTo(AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED)
+                    assertThat(it.payload.userInfo).isNull()
+                },
+            )
         }
     }
 
@@ -50,12 +53,16 @@ class AddAuthorizationEventUseCaseTest {
     fun `Adds authorised event`() = runTest {
         // When
         useCase(ActionFactory.getFlowRequest(), true)
-        //Then
+        // Then
         coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg {
-                assertThat((it as AuthorizationEvent).payload.result).isEqualTo(AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED)
-                assertThat(it.payload.userInfo).isNotNull()
-            })
+            coreEventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(
+                        (it as AuthorizationEvent).payload.result,
+                    ).isEqualTo(AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED)
+                    assertThat(it.payload.userInfo).isNotNull()
+                },
+            )
         }
     }
 }

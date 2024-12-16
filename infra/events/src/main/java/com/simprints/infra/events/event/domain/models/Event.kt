@@ -68,12 +68,11 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 
-
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
     property = "type",
-    visible = true
+    visible = true,
 )
 @JsonSubTypes(
     JsonSubTypes.Type(value = ConfirmationCallbackEvent::class, name = CALLBACK_CONFIRMATION_KEY),
@@ -81,7 +80,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = ErrorCallbackEvent::class, name = CALLBACK_ERROR_KEY),
     JsonSubTypes.Type(
         value = IdentificationCallbackEvent::class,
-        name = CALLBACK_IDENTIFICATION_KEY
+        name = CALLBACK_IDENTIFICATION_KEY,
     ),
     JsonSubTypes.Type(value = RefusalCallbackEvent::class, name = CALLBACK_REFUSAL_KEY),
     JsonSubTypes.Type(value = VerificationCallbackEvent::class, name = CALLBACK_VERIFICATION_KEY),
@@ -89,23 +88,23 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = EnrolmentCalloutEvent::class, name = CALLOUT_ENROLMENT_KEY),
     JsonSubTypes.Type(
         value = EnrolmentLastBiometricsCalloutEvent::class,
-        name = CALLOUT_LAST_BIOMETRICS_KEY
+        name = CALLOUT_LAST_BIOMETRICS_KEY,
     ),
     JsonSubTypes.Type(value = IdentificationCalloutEvent::class, name = CALLOUT_IDENTIFICATION_KEY),
     JsonSubTypes.Type(value = VerificationCalloutEvent::class, name = CALLOUT_VERIFICATION_KEY),
     JsonSubTypes.Type(
         value = FaceCaptureConfirmationEvent::class,
-        name = FACE_CAPTURE_CONFIRMATION_KEY
+        name = FACE_CAPTURE_CONFIRMATION_KEY,
     ),
     JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FaceCaptureBiometricsEvent::class,
-        name = FACE_CAPTURE_BIOMETRICS_KEY
+        name = FACE_CAPTURE_BIOMETRICS_KEY,
     ),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FaceOnboardingCompleteEvent::class,
-        name = FACE_ONBOARDING_COMPLETE_KEY
+        name = FACE_ONBOARDING_COMPLETE_KEY,
     ),
     JsonSubTypes.Type(value = AlertScreenEvent::class, name = ALERT_SCREEN_KEY),
     JsonSubTypes.Type(value = AuthenticationEvent::class, name = AUTHENTICATION_KEY),
@@ -119,7 +118,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FingerprintCaptureBiometricsEvent::class,
-        name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY
+        name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY,
     ),
     JsonSubTypes.Type(value = GuidSelectionEvent::class, name = GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingEvent::class, name = INTENT_PARSING_KEY),
@@ -131,7 +130,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = ScannerConnectionEvent::class, name = SCANNER_CONNECTION_KEY),
     JsonSubTypes.Type(
         value = ScannerFirmwareUpdateEvent::class,
-        name = SCANNER_FIRMWARE_UPDATE_KEY
+        name = SCANNER_FIRMWARE_UPDATE_KEY,
     ),
     JsonSubTypes.Type(value = SuspiciousIntentEvent::class, name = SUSPICIOUS_INTENT_KEY),
     JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY),
@@ -141,7 +140,6 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = AgeGroupSelectionEvent::class, name = AGE_GROUP_SELECTION_KEY),
 )
 abstract class Event {
-
     abstract val id: String
     abstract val type: EventType
     abstract val payload: EventPayload
@@ -151,14 +149,10 @@ abstract class Event {
 
     @JsonIgnore
     abstract fun getTokenizedFields(): Map<TokenKeyType, TokenizableString>
+
     abstract fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event
 
-    override fun equals(other: Any?): Boolean {
-        return other is Event && other.id == id
-    }
+    override fun equals(other: Any?): Boolean = other is Event && other.id == id
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
-
+    override fun hashCode(): Int = id.hashCode()
 }

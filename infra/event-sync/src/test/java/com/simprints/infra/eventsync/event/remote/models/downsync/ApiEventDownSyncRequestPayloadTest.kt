@@ -6,7 +6,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ApiEventDownSyncRequestPayloadTest {
-
     @Test
     fun testGetTokenizedFieldJsonPath() {
         // Arrange
@@ -24,7 +23,7 @@ class ApiEventDownSyncRequestPayloadTest {
             responseStatus = 200,
             errorType = null,
             msToFirstResponseByte = 1000L,
-            eventsRead = 10
+            eventsRead = 10,
         )
 
         // Act & Assert

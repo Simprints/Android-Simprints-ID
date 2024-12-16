@@ -3,10 +3,12 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.mode
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.parsing.InvalidMessageException
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.toHexString
 
-enum class OperationResultCode(val byte: Byte) {
-
+enum class OperationResultCode(
+    val byte: Byte,
+) {
     OK(0x00),
-    UNKNOWN_ERROR(0xFF.toByte());
+    UNKNOWN_ERROR(0xFF.toByte()),
+    ;
 
     companion object {
         fun fromBytes(bytes: ByteArray) = values().find { it.byte == bytes[0] }

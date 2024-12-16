@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 class TestObserver<T> : Observer<T?> {
-
     val observedValues = mutableListOf<T?>()
 
     override fun onChanged(value: T?) {
@@ -35,7 +34,7 @@ fun <T> MutableLiveData<T>.testObserver() = TestObserver<T>().also {
 fun <T> LiveData<T>.getOrAwaitValue(
     time: Long = 5,
     timeUnit: TimeUnit = TimeUnit.SECONDS,
-    afterObserve: () -> Unit = {}
+    afterObserve: () -> Unit = {},
 ): T {
     var data: T? = null
     val latch = CountDownLatch(1)
@@ -64,7 +63,7 @@ fun <T> LiveData<T>.getOrAwaitValues(
     number: Int,
     time: Long = 5,
     timeUnit: TimeUnit = TimeUnit.SECONDS,
-    afterObserve: () -> Unit = {}
+    afterObserve: () -> Unit = {},
 ): List<T> {
     val data: MutableList<T> = mutableListOf()
     val latch = CountDownLatch(number)
@@ -72,7 +71,7 @@ fun <T> LiveData<T>.getOrAwaitValues(
         override fun onChanged(o: T) {
             data.add(o)
             latch.countDown()
-            if(data.size >= number) {
+            if (data.size >= number) {
                 this@getOrAwaitValues.removeObserver(this)
             }
         }

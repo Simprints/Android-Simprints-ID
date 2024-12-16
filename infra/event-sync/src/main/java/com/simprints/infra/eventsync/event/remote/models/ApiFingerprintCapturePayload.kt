@@ -24,18 +24,16 @@ internal data class ApiFingerprintCapturePayload(
     val result: ApiResult,
     val fingerprint: ApiFingerprint?,
 ) : ApiEventPayload(startTime) {
-
     @Keep
     data class ApiFingerprint(
         val finger: IFingerIdentifier,
         val quality: Int,
         val format: String,
     ) {
-
         constructor(finger: FingerprintCapturePayload.Fingerprint) : this(
             finger.finger,
             finger.quality,
-            finger.format
+            finger.format,
         )
     }
 
@@ -51,23 +49,20 @@ internal data class ApiFingerprintCapturePayload(
 
     @Keep
     enum class ApiResult {
-
         GOOD_SCAN,
         BAD_QUALITY,
         NO_FINGER_DETECTED,
         SKIPPED,
-        FAILURE_TO_ACQUIRE
+        FAILURE_TO_ACQUIRE,
     }
 
-    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
-        null // this payload doesn't have tokenizable fields
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields
 }
 
-internal fun FingerprintCapturePayload.Result.fromDomainToApi() =
-    when (this) {
-        GOOD_SCAN -> ApiResult.GOOD_SCAN
-        BAD_QUALITY -> ApiResult.BAD_QUALITY
-        NO_FINGER_DETECTED -> ApiResult.NO_FINGER_DETECTED
-        SKIPPED -> ApiResult.SKIPPED
-        FAILURE_TO_ACQUIRE -> ApiResult.FAILURE_TO_ACQUIRE
-    }
+internal fun FingerprintCapturePayload.Result.fromDomainToApi() = when (this) {
+    GOOD_SCAN -> ApiResult.GOOD_SCAN
+    BAD_QUALITY -> ApiResult.BAD_QUALITY
+    NO_FINGER_DETECTED -> ApiResult.NO_FINGER_DETECTED
+    SKIPPED -> ApiResult.SKIPPED
+    FAILURE_TO_ACQUIRE -> ApiResult.FAILURE_TO_ACQUIRE
+}

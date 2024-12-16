@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class LocalDbKeyTest {
-
     @Test
     fun `equal should return true if the object is the same`() {
         val key = LocalDbKey("project1", "byte".toByteArray())

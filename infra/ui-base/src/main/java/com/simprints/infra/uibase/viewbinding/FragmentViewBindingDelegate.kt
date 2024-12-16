@@ -10,7 +10,6 @@ import androidx.viewbinding.ViewBinding
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-
 /**
  * This class to work as a delegate to view bindings to fragments.
  * for context on this approach see the link below
@@ -18,14 +17,11 @@ import kotlin.reflect.KProperty
  */
 class FragmentViewBindingDelegate<T : ViewBinding>(
     val fragment: Fragment,
-    val viewBindingFactory: (View) -> T
+    val viewBindingFactory: (View) -> T,
 ) : ReadOnlyProperty<Fragment, T> {
-
-
     private var binding: T? = null
 
-    private val fragmentObserver = object: DefaultLifecycleObserver {
-
+    private val fragmentObserver = object : DefaultLifecycleObserver {
         val viewLifecycleOwnerLiveDataObserver = Observer<LifecycleOwner?> {
             val viewLifecycleOwner = it ?: return@Observer
 
@@ -49,7 +45,10 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
         fragment.lifecycle.addObserver(fragmentObserver)
     }
 
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
+    override fun getValue(
+        thisRef: Fragment,
+        property: KProperty<*>,
+    ): T {
         val binding = binding
         if (binding != null) {
             return binding
@@ -65,4 +64,3 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
         return viewBindingFactory(thisRef.requireView()).also { this.binding = it }
     }
 }
-
