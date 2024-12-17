@@ -21,5 +21,5 @@ dependencies {
 
     testImplementation(project(":fingerprint:infra:scannermock"))
     // Uncomment the line below to use the mock scanner implementation
-    // implementation(project(":fingerprint:infra:scannermock"))
+    implementation(project(":fingerprint:infra:scannermock"))
 }

@@ -1,11 +1,13 @@
 package com.simprints.fingerprint.connect
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprint.infra.scanner.component.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.fingerprint.infra.scannermock.record.AndroidRecordBluetoothAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -35,5 +37,7 @@ object ScannerConnectModule {
      */
     @Provides
     @Singleton
-    fun provideComponentBluetoothAdapter(): ComponentBluetoothAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
+    fun provideComponentBluetoothAdapter(
+        @ApplicationContext ctx: Context,
+    ): ComponentBluetoothAdapter = AndroidRecordBluetoothAdapter(BluetoothAdapter.getDefaultAdapter(), ctx)
 }
