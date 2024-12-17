@@ -1,0 +1,80 @@
+# Please follow the specified deployment order: alpha -> prod-25 -> prod-50 -> prod-100
+# Failing to adhere to this order will result in an exception.
+# TODO The execution for this workflow should be restricted to the "deployment leads"  github team.
+
+name: "[Reusable] Promote Release"
+
+on:
+    workflow_call:
+        inputs:
+            deployment-track:
+                required: true
+                type: string
+            upload-artifact:
+                required: true
+                type: string
+            mapping-file:
+                required: true
+                type: string
+
+jobs:
+    promote-artifact:
+        runs-on: ubuntu-latest
+
+        environment: ${{inputs.deployment-track}}
+
+        concurrency:
+            group: promote-release-workflow
+
+        env:
+            STATUS: inProgress
+            USER_FRACTION: 0.0
+            TRACK: internal
+
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Download APK artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: ${{ inputs.upload-artifact }}
+
+            -   name: Download mapping file
+                uses: actions/download-artifact@v4
+                with:
+                    name: ${{ inputs.mapping-file }}
+
+            -   name: Set vars
+                run: |
+                    if [ "${{inputs.deployment-track}}" == "Internal" ]; then
+                        STATUS="completed"
+                        USER_FRACTION=1.0
+                        TRACK="qa"
+                    elif [ "${{inputs.deployment-track}}" == "Alpha" ]; then
+                        STATUS="completed"
+                        USER_FRACTION=1.0
+                        TRACK="alpha"
+                    elif [ "${{inputs.deployment-track}}" == "Prod-25-Percent-Rollout" ]; then
+                        STATUS="inProgress"
+                        USER_FRACTION=0.25
+                        TRACK="production"
+                    elif [ "${{inputs.deployment-track}}" == "Prod-50-Percent-Rollout" ]; then
+                        STATUS="inProgress"
+                        USER_FRACTION=0.5
+                        TRACK="production"
+                    elif [ "${{inputs.deployment-track}}" == "Prod-100-Percent-Rollout" ]; then
+                        STATUS="completed"
+                        USER_FRACTION=1.0
+                        TRACK="production"
+                    fi
+
+            -   name: Publish app to track
+                uses: r0adkll/upload-google-play@v1
+                with:
+                    serviceAccountJsonPlainText: ${{secrets.GOOGLE_API_KEY_JSON}}
+                    packageName: com.simprints.id
+                    releaseFiles: ${{ inputs.upload-artifact }}
+                    track: $TRACK
+                    status: $STATUS
+                    userFraction: $USER_FRACTION
+                    mappingFile: ${{ inputs.mapping-file }}

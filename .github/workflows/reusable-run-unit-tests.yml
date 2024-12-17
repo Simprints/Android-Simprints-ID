@@ -1,5 +1,5 @@
 #This is a reusable workflow that receives a list of modules as input and runs the unit tests for each module.
-name: Test Android modules
+name: "[Reusable] Android Module Unit Tests"
 
 on:
     workflow_call:
@@ -15,17 +15,15 @@ on:
                 description: |
                     The id of the reports artifact. For example: "face reports"
 jobs:
-
     test-modules:
+
         runs-on: ubuntu-latest
         timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
-
-        env:
-            GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
 
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
+
             -   name: Set up JDK 17
                 uses: actions/setup-java@v4
                 with:
@@ -43,15 +41,12 @@ jobs:
                     key: global-gradle-
                     restore-keys: global-gradle-
 
-
-            -   name: Set up local.properties
-                run: |
-                    source ci/pipeline/setup
-                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
-                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
-
-            -   name: Write Google Services file
-                run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
+            -   name: Set up build files
+                uses: ./.github/actions/setup-gradle-build-files
+                with:
+                    gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
+                    gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
 
             -   name: Create modules array
                 id: create-modules-array
@@ -61,6 +56,7 @@ jobs:
                     modules_array=(${modules//,/ })
                     # output the array in the step output so that it can be used in the next step
                     echo "modules_array=${modules_array[@]}">> $GITHUB_OUTPUT
+
             -   name: Run tests
                 run: |
                     # Get the modules array from the previous step
