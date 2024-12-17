@@ -187,7 +187,7 @@ internal open class EventRepositoryImpl @Inject constructor(
                 eventLocalDataSource.saveEvent(event)
             }
         }
-        Simber.v("Save session event: ${event.type} = ${duration.inWholeMilliseconds}ms")
+        Simber.d("Save session event: ${event.type} = ${duration.inWholeMilliseconds}ms")
         return event
     }
 
@@ -198,9 +198,9 @@ internal open class EventRepositoryImpl @Inject constructor(
     } catch (t: Throwable) {
         // prevent crashlytics logging of duplicate guid-selection
         if (t is DuplicateGuidSelectEventValidatorException) {
-            Simber.d(t)
+            Simber.d("Duplicate guid exception", t)
         } else {
-            Simber.e(t)
+            Simber.e("Failed to save the event", t)
         }
 
         throw t

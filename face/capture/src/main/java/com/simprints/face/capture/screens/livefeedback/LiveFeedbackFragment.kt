@@ -182,7 +182,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         try {
             vm.process(croppedBitmap = image)
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Image analysis crashed", t)
             // Image analysis is running in bg thread
             lifecycleScope.launch {
                 mainVm.submitError(t)

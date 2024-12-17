@@ -14,16 +14,16 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     is IOException,
     -> { // Disconnected or timed-out communications with Scanner
         Simber.d(
-            e,
             "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException",
+            e,
         )
         ScannerDisconnectedException()
     }
 
     is IllegalStateException, // We're calling scanner methods out of order somehow
     is IllegalArgumentException,
-    -> { // We've received unexpected/invalid bytes from the scanner
-        Simber.e(e)
+    -> {
+        Simber.e("Received unexpected/invalid bytes from the scanner", e)
         UnexpectedScannerException(throwable = e)
     }
 

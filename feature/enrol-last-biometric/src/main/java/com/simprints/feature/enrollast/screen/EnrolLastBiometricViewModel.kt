@@ -78,7 +78,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
             _finish.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
-            Simber.tag(ENROLMENT.name).e(t)
+            Simber.tag(ENROLMENT.name).e("Enrolment failed", t)
             _finish.send(EnrolLastState.Failed(GENERAL_ERROR, modalities))
         }
     }

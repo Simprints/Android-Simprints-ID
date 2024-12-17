@@ -35,7 +35,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
 
             AppEnrolResponse(subject.subjectId)
         } catch (e: Exception) {
-            Simber.e(e)
+            Simber.e("Error creating enrol response", e)
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
         }
     }

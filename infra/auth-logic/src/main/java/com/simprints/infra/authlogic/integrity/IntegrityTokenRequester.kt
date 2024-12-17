@@ -48,7 +48,7 @@ internal class IntegrityTokenRequester @Inject constructor(
                     ),
                 ).token()
         } catch (integrityServiceException: IntegrityServiceException) {
-            Simber.e(integrityServiceException)
+            Simber.e("Integrity token request failed", integrityServiceException)
             throw mapException(
                 integrityServiceException,
             )

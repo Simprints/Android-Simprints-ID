@@ -1,4 +1,4 @@
-package com.simprints.infra.events.local.migrations
+package com.simprints.infra.events.event.local.migrations
 
 import android.database.Cursor
 import androidx.room.migration.Migration
@@ -18,7 +18,7 @@ internal class EventMigration6to7 : Migration(6, 7) {
             migrateOneToOneMatchEvents(database)
             Simber.d("Migration from schema 5 to schema 6 done.")
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to migrate room db from schema 6 to schema 7.", t)
         }
     }
 

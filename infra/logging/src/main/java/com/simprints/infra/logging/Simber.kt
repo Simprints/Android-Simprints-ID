@@ -20,26 +20,6 @@ object Simber {
     private val firebaseInvalidCharactersRegex = Regex("[^a-zA-Z0-9_]")
 
     /**
-     * Use this when you want to go absolutely nuts with your logging. If for some reason you've
-     * decided to log every little thing in a particular part of your app, use the Simber.v tag.
-     * DEBUG: Is sent to Log.v
-     * STAGING: Is sent to Log.v
-     * RELEASE: Is ignored
-     */
-    fun v(t: Throwable) = Timber.v(t)
-
-    fun v(
-        message: String,
-        vararg args: Any?,
-    ) = Timber.v(message, *args)
-
-    fun v(
-        t: Throwable,
-        message: String,
-        args: Any? = null,
-    ) = Timber.v(t, message, args)
-
-    /**
      * Use this for debugging purposes. If you want to print out a bunch of messages so you can log
      * the exact flow of your program, use this. If you want to keep a log of variable values,
      * use this.
@@ -48,18 +28,10 @@ object Simber {
      * RELEASE: Is ignored
      */
     @JvmStatic
-    fun d(t: Throwable) = Timber.d(t)
-
     fun d(
         message: String,
-        vararg args: Any?,
-    ) = Timber.d(message, *args)
-
-    fun d(
-        t: Throwable,
-        message: String,
-        args: Any? = null,
-    ) = Timber.d(t, message, args)
+        t: Throwable? = null,
+    ) = Timber.d(t, message)
 
     /**
      * Use this to post useful information to the log. For example: that you have successfully
@@ -69,18 +41,10 @@ object Simber {
      * STAGING: Is sent to Log.i & sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
-    fun i(t: Throwable) = Timber.i(t)
-
     fun i(
         message: String,
-        vararg args: Any?,
-    ) = Timber.i(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
-
-    fun i(
-        t: Throwable,
-        message: String,
-        args: Any? = null,
-    ) = Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        t: Throwable? = null,
+    ) = Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -96,28 +60,14 @@ object Simber {
      * STAGING: Is sent to Log.w & sent to Firebase Crashlytics
      * RELEASE: Is sent to Firebase Crashlytics
      */
-    fun w(t: Throwable) {
-        if (shouldSkipThrowableReporting(t)) {
-            Timber.i(t)
-        } else {
-            Timber.w(t)
-        }
-    }
-
     fun w(
         message: String,
-        vararg args: Any?,
-    ) = Timber.w(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
-
-    fun w(
-        t: Throwable,
-        message: String,
-        args: Any? = null,
+        t: Throwable? = null,
     ) {
-        if (shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        if (t != null && shouldSkipThrowableReporting(t)) {
+            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
         } else {
-            Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+            Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
         }
     }
 
@@ -135,61 +85,48 @@ object Simber {
      * STAGING: Is sent to Log.e & sent to Firebase Crashlytics
      * RELEASE: Is sent to Firebase Crashlytics
      */
-    fun e(t: Throwable) {
-        if (shouldSkipThrowableReporting(t)) {
-            Timber.i(t)
-        } else {
-            Timber.e(t)
-        }
-    }
-
     fun e(
         message: String,
-        vararg args: Any?,
-    ) = Timber.e(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
-
-    fun e(
-        t: Throwable,
-        message: String,
-        args: Any? = null,
+        t: Throwable? = null,
     ) {
-        if (shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        if (t != null && shouldSkipThrowableReporting(t)) {
+            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
         } else {
-            Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+            Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
         }
     }
 
     /**
      * Adds a custom tag to the log.
      * @param tag Custom tag to add to log
-     * @param isUserProperty Marks the tag as a user property. Default is false. If you set this
-     * value to true your log will be added as a custom key to Crashlytics, and as a user property
-     * to Firebase Analytics. The tag will be the Key and the message will be the Value. This param
-     * respects the BuildType settings, so a user property set with Simber.d or Simber.v will not
-     * be reported in production.
+     */
+    fun tag(tag: String): Simber {
+        val conformingTag = limitLength(ensureCharactersAreValid(tag), FIREBASE_ANALYTICS_MAX_TAG_LENGTH)
+        Timber.tag(conformingTag)
+        return Simber
+    }
+
+    /**
+     * Adds a custom user property to analytics services.
+     *
+     * @param key of the user property
+     * @param value will be added as a custom property to Crashlytics, and as a user property to Firebase Analytics.
      *
      * @see <a href="URL#https://firebase.google.com/docs/crashlytics/customize-crash-reports?platform=android">Crashlytics</a>
      * @see <a href="URL#https://firebase.google.com/docs/analytics/user-properties?platform=android">Firebase Analytics</a>
      *
-     * NOTE!! "Crashlytics supports a maximum of 64 key/value pairs. After
-     * you reach this threshold, additional values are not saved. Each key/value pair can be up to
-     * 1 kB in size."
+     * NOTE!! "Crashlytics supports a maximum of 64 key/value pairs. After you reach this threshold,
+     * additional values are not saved. Each key/value pair can be up to 1 kB in size."
      */
-    fun tag(
-        tag: String,
-        isUserProperty: Boolean = false,
-    ): Simber {
-        var conformingTag = ensureCharactersAreValid(tag)
-
-        conformingTag = if (isUserProperty) {
-            limitLength(USER_PROPERTY_TAG + conformingTag, FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH)
-        } else {
-            limitLength(conformingTag, FIREBASE_ANALYTICS_MAX_TAG_LENGTH)
-        }
-
-        Timber.tag(conformingTag)
-        return Simber
+    fun setUserProperty(
+        key: String,
+        value: String,
+    ) {
+        var conformingTag = limitLength(
+            USER_PROPERTY_TAG + ensureCharactersAreValid(key),
+            FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH,
+        )
+        Timber.tag(conformingTag).i(limitLength(value, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
     }
 
     /*

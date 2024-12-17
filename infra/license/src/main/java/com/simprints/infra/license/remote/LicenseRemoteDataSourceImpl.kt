@@ -38,22 +38,22 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     } catch (t: Throwable) {
         when (t) {
             is NetworkConnectionException -> {
-                Simber.i(t)
+                Simber.i("Licence download failed due to network error", t)
                 ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
             }
 
             is BackendMaintenanceException -> {
-                Simber.i(t)
+                Simber.i("Licence download failed due to backend maintenance", t)
                 ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
             }
 
             is SyncCloudIntegrationException -> {
-                Simber.e(t)
+                Simber.e("Licence download failed due to cloud integration error", t)
                 handleCloudException(t)
             }
 
             else -> {
-                Simber.e(t)
+                Simber.e("Licence download failed due to unknown error", t)
                 ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
             }
         }

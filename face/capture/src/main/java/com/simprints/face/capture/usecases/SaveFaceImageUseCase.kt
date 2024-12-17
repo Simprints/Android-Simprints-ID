@@ -41,7 +41,7 @@ internal class SaveFaceImageUseCase @Inject constructor(
             ),
         )
     } catch (t: Throwable) {
-        Simber.e(t)
+        Simber.e("Error determining path for captureId=$captureEventId", t)
         null
     }
 

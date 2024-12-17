@@ -201,7 +201,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun submitError(throwable: Throwable) {
-        Simber.e(throwable)
+        Simber.e("Face capture failed", throwable)
         _unexpectedErrorEvent.send()
     }
 

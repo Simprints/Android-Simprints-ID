@@ -27,8 +27,8 @@ class SimberTest {
     }
 
     @Test
-    fun `tag() sets correctly the user property tag`() {
-        Simber.tag("test", true)
+    fun `setUserProperty() sets correctly the user property tag`() {
+        Simber.setUserProperty("test", "value")
         verify(exactly = 1) { Timber.tag(USER_PROPERTY_TAG + "test") }
     }
 
@@ -49,7 +49,7 @@ class SimberTest {
     @Test
     fun `in debug mode tag() throws an exception for tags longer than 40 characters`() {
         val exception = kotlin.runCatching {
-            Simber.tag("01234567890123456789012345678901234567890", true)
+            Simber.setUserProperty("01234567890123456789012345678901234567890", "value")
         }
 
         assertEquals(IllegalArgumentException::class.java, exception.exceptionOrNull()?.javaClass)
@@ -57,100 +57,51 @@ class SimberTest {
     }
 
     @Test
-    fun `reports crash reporting when logging warnings`() {
-        Simber.w(IllegalStateException("Test"))
-        verify(exactly = 1) { Timber.Forest.w(any<Exception>()) }
-    }
-
-    @Test
     fun `reports crash reporting when logging warnings with message`() {
-        Simber.w(IllegalStateException("Test"), "test", null)
-        verify(exactly = 1) { Timber.Forest.w(any<Exception>(), any(), any()) }
-    }
-
-    @Test
-    fun `reports crash reporting when logging error`() {
-        Simber.e(IllegalStateException("Test"))
-        verify(exactly = 1) { Timber.Forest.e(any<Exception>()) }
+        Simber.w("test", IllegalStateException("Test"))
+        verify(exactly = 1) { Timber.Forest.w(any<Exception>(), any()) }
     }
 
     @Test
     fun `reports crash reporting when logging error with message`() {
-        Simber.e(IllegalStateException("Test"), "test", null)
-        verify(exactly = 1) { Timber.Forest.e(any<Exception>(), any(), any()) }
-    }
-
-    @Test
-    fun `skips false-positive crash reporting when logging warnings`() {
-        val list = getListOfSkippableExceptions()
-        list.forEach { Simber.w(it) }
-
-        verify(exactly = 0) { Timber.Forest.w(any<Exception>()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>()) }
+        Simber.e("test", IllegalStateException("Test"))
+        verify(exactly = 1) { Timber.Forest.e(any<Exception>(), any()) }
     }
 
     @Test
     fun `skips false-positive crash reporting when logging warnings with message`() {
         val list = getListOfSkippableExceptions()
-        list.forEach { Simber.w(it, "test", null) }
+        list.forEach { Simber.w("test", it) }
 
-        verify(exactly = 0) { Timber.Forest.w(any<Exception>(), any(), any()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any(), any()) }
-    }
-
-    @Test
-    fun `skips false-positive crash reporting when logging error`() {
-        val list = getListOfSkippableExceptions()
-        list.forEach { Simber.e(it) }
-
-        verify(exactly = 0) { Timber.Forest.e(any<Exception>()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>()) }
+        verify(exactly = 0) { Timber.Forest.w(any<Exception>(), any()) }
+        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any()) }
     }
 
     @Test
     fun `skips false-positive crash reporting when logging error with message`() {
         val list = getListOfSkippableExceptions()
-        list.forEach { Simber.e(it, "test", null) }
+        list.forEach { Simber.e("test", it) }
 
-        verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any(), any()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any(), any()) }
-    }
-
-    @Test
-    fun `skips false-positive cause crash reporting when logging warnings`() {
-        val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
-
-        list.forEach { Simber.w(it) }
-
-        verify(exactly = 0) { Timber.Forest.w(any<Exception>()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>()) }
+        verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any()) }
+        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any()) }
     }
 
     @Test
     fun `skips false-positive cause crash reporting when logging warnings with message`() {
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
-        list.forEach { Simber.w(it, "test", null) }
+        list.forEach { Simber.w("test", it) }
 
-        verify(exactly = 0) { Timber.Forest.w(any<Exception>(), any(), any()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any(), any()) }
-    }
-
-    @Test
-    fun `skips false-positive cause crash reporting when logging error`() {
-        val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
-        list.forEach { Simber.e(it) }
-
-        verify(exactly = 0) { Timber.Forest.e(any<Exception>()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>()) }
+        verify(exactly = 0) { Timber.Forest.w(any<Exception>(), any()) }
+        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any()) }
     }
 
     @Test
     fun `skips false-positive cause crash reporting when logging error with message`() {
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
-        list.forEach { Simber.e(it, "test", null) }
+        list.forEach { Simber.e("test", it) }
 
-        verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any(), any()) }
-        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any(), any()) }
+        verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any()) }
+        verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any()) }
     }
 
     private fun getListOfSkippableExceptions() = listOf(

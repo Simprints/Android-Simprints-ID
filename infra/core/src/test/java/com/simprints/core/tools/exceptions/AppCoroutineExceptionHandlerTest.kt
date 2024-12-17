@@ -16,6 +16,6 @@ class AppCoroutineExceptionHandlerTest {
         mockkObject(Simber)
 
         appCoroutineExceptionHandler.handleException(coroutineContext, exception)
-        verify { Simber.e(exception) }
+        verify { Simber.e(any(), exception) }
     }
 }

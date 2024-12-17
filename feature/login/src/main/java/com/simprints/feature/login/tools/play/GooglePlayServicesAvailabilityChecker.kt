@@ -73,6 +73,7 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
     ) {
         errorCallback(LoginError.MissingPlayServices)
         Simber.e(
+            "Missing GooglePlay services",
             MissingGooglePlayServices(
                 "Error with GooglePlayServices version. Error code=$statusCode",
             ),
@@ -85,6 +86,7 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
     ) {
         errorCallback(LoginError.OutdatedPlayServices)
         Simber.e(
+            "Outdated GooglePlay services",
             OutdatedGooglePlayServices(
                 "Error with GooglePlayServices version. Error code=$statusCode",
             ),

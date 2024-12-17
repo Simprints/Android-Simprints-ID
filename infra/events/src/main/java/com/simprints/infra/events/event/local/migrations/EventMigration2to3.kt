@@ -29,8 +29,7 @@ internal class EventMigration2to3 : Migration(2, 3) {
              */
             updateTableToCloseClosedSessions(database)
         } catch (ex: Exception) {
-            Simber.e(ex)
-            throw ex
+            Simber.e("Failed to migrate room db from schema 2 to schema 3.", ex)
         }
     }
 

@@ -60,7 +60,7 @@ open class Application :
     open fun initApplication() {
         handleUndeliverableExceptionInRxJava()
         SimberBuilder.initialize(this)
-        Simber.tag(DEVICE_ID, true).i(deviceHardwareId)
+        Simber.setUserProperty(DEVICE_ID, deviceHardwareId)
         appScope.launch {
             syncOrchestrator.cleanupWorkers()
             syncOrchestrator.scheduleBackgroundWork()
@@ -79,8 +79,7 @@ open class Application :
             if (e is UndeliverableException) {
                 exceptionToPrint = e.cause
             }
-            Simber.e(e)
-            Simber.d("Undeliverable exception received", exceptionToPrint)
+            Simber.e("Undeliverable exception received", e)
             exceptionToPrint.printStackTrace()
         }
     }

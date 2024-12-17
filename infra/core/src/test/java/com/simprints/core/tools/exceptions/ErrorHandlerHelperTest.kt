@@ -26,7 +26,7 @@ class ErrorHandlerHelperTest {
                 throw exception
             }
 
-            verify(exactly = 1) { this@spyk.d(exception) }
+            verify(exactly = 1) { this@spyk.d(any(), exception) }
         }
     }
 

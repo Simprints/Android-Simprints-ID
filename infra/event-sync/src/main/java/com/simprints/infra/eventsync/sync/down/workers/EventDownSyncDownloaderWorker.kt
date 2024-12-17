@@ -100,8 +100,8 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 "Total downloaded: $count / $max",
             )
         } catch (t: Throwable) {
-            Simber.d(t)
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed ${t.message}")
+            Simber.d("[DOWNLOADER] Unexpected error", t)
+            Simber.tag(SYNC_LOG_TAG).i("[DOWNLOADER] Failed ${t.message}")
             handleSyncException(t)
         }
     }

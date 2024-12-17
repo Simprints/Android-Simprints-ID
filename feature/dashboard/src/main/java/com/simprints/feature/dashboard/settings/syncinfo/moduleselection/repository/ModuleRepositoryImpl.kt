@@ -57,7 +57,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
     }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {
-        Simber.tag(MODULE_IDS, true).i(modules.toString().take(80))
+        Simber.setUserProperty(MODULE_IDS, modules.toString().take(80))
     }
 
     private fun logMessageForCrashReport(message: String) {

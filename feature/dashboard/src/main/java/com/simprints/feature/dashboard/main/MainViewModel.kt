@@ -39,7 +39,7 @@ internal class MainViewModel @Inject constructor(
     private fun checkIfDeviceIsSafe() = try {
         securityManager.checkIfDeviceIsRooted()
     } catch (ex: RootedDeviceException) {
-        Simber.e(ex)
+        Simber.e("Rooted device detected", ex)
         _rootedDeviceDetected.send()
     }
 }

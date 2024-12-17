@@ -27,7 +27,7 @@ internal class EventMigration1to2 : Migration(1, 2) {
             migrateSessionClosedInformation(database)
             Simber.d("Migration from schema 1 to schema 2 done.")
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to migrate room db from schema 1 to schema 2.", t)
         }
     }
 

@@ -10,17 +10,6 @@ import timber.log.Timber
 
 class CrashReportingTreeTest {
     @Test
-    fun `should return on VERBOSE priority`() {
-        val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
-        val spyCrashReportingTree = spyk(CrashReportingTree(crashMock))
-
-        Timber.plant(spyCrashReportingTree)
-        Simber.v("Test Message")
-
-        verify(exactly = 0) { crashMock.log(any()) }
-    }
-
-    @Test
     fun `should return on DEBUG priority`() {
         val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
         val spyCrashReportingTree = spyk(CrashReportingTree(crashMock))
@@ -67,7 +56,7 @@ class CrashReportingTreeTest {
         val custException = Exception("Custom Exception")
 
         Timber.plant(spyCrashReportingTree)
-        Simber.w(custException, "Test Message")
+        Simber.w("Test Message", custException)
 
         verify {
             crashMock.log(withArg { it.contains("Test Message") })
@@ -102,7 +91,7 @@ class CrashReportingTreeTest {
         val custException = Exception("Custom Exception")
 
         Timber.plant(spyCrashReportingTree)
-        Simber.e(custException, "Test Message")
+        Simber.e("Test Message", custException)
 
         verify {
             crashMock.log(withArg { it.contains("Test Message") })
@@ -118,7 +107,7 @@ class CrashReportingTreeTest {
         val spyCrashReportingTree = spyk(CrashReportingTree(crashMock))
 
         Timber.plant(spyCrashReportingTree)
-        Simber.tag("Custom_Tag", true).i("Test Message")
+        Simber.setUserProperty("Custom_Tag", "Test Message")
 
         verify {
             crashMock.setCustomKey("Custom_Tag", "Test Message")

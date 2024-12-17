@@ -100,7 +100,7 @@ internal class EnrolmentRecordRepositoryImpl(
         } catch (e: Exception) {
             when (e) {
                 is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
-                else -> Simber.e(e)
+                else -> Simber.e("Failed to tokenize existing records", e)
             }
         }
     }

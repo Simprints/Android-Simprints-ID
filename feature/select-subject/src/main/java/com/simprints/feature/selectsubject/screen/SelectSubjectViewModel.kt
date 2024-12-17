@@ -48,7 +48,7 @@ internal class SelectSubjectViewModel @Inject constructor(
             _finish.send(true)
         } catch (t: Throwable) {
             // It doesn't matter if it was an error, we always return a result
-            Simber.tag(SESSION.name).e(t)
+            Simber.tag(SESSION.name).e("Failed to save Guid Selection Event", t)
             _finish.send(false)
         }
     }

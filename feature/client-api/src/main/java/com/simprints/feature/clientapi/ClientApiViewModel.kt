@@ -79,7 +79,7 @@ class ClientApiViewModel @Inject internal constructor(
             }
             intentMapper(action = action, extras = extrasMap, project = getProject())
         } catch (validationException: InvalidRequestException) {
-            Simber.e(validationException)
+            Simber.e("Cannot parse intent data", validationException)
             simpleEventReporter.addInvalidIntentEvent(action, extrasMap)
             _showAlert.send(validationException.error)
             null

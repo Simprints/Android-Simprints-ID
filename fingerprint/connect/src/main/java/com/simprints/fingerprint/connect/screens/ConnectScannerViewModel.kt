@@ -119,7 +119,9 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     fun handleBackPress() {
         when (backButtonBehaviour.value) {
-            BackButtonBehaviour.DISABLED, null -> { /* Do nothing */ }
+            BackButtonBehaviour.DISABLED, null -> { // Do nothing
+            }
+
             BackButtonBehaviour.EXIT_WITH_ERROR -> _finish.send(false)
             BackButtonBehaviour.EXIT_FORM -> {
                 _scannerConnected.send(false)
@@ -194,18 +196,20 @@ internal class ConnectScannerViewModel @Inject constructor(
         saveScannerConnectionEvents()
         _currentStep.postValue(Step.Finish)
 
-        Simber
-            .tag(AnalyticsUserProperties.MAC_ADDRESS, true)
-            .i(scannerManager.currentMacAddress ?: "")
-        Simber
-            .tag(AnalyticsUserProperties.SCANNER_ID, true)
-            .i(scannerManager.currentScannerId ?: "")
+        Simber.setUserProperty(
+            AnalyticsUserProperties.MAC_ADDRESS,
+            scannerManager.currentMacAddress.orEmpty(),
+        )
+        Simber.setUserProperty(
+            AnalyticsUserProperties.SCANNER_ID,
+            scannerManager.currentScannerId.orEmpty(),
+        )
 
         _scannerConnected.send(true)
     }
 
     private suspend fun manageVeroErrors(e: Throwable) {
-        Simber.i(e)
+        Simber.i("Vero connection issue", e)
         _scannerConnected.send(false)
 
         launchAlertOrScannerIssueOrShowDialog(e)
@@ -224,6 +228,7 @@ internal class ConnectScannerViewModel @Inject constructor(
             is ScannerDisconnectedException, is UnknownScannerIssueException -> ConnectScannerIssueScreen.ScannerError(
                 scannerManager.currentScannerId,
             )
+
             is ScannerNotPairedException, is MultiplePossibleScannersPairedException -> determineAppropriateScannerIssueForPairing()
             is ScannerLowBatteryException -> ConnectScannerIssueScreen.LowBattery
 

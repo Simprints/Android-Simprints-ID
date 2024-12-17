@@ -49,8 +49,8 @@ internal class Authenticator @Inject constructor(
             AuthenticateDataResult.Authenticated
         } catch (t: Throwable) {
             when (t) {
-                is NetworkConnectionException -> Simber.i(t)
-                else -> Simber.e(t)
+                is NetworkConnectionException -> Simber.i("Authentication failed due to network error", t)
+                else -> Simber.e("Authentication failed due to unknown error", t)
             }
 
             extractResultFromException(t).also { signInResult ->

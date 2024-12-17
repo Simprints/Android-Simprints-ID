@@ -14,9 +14,12 @@ internal class ExtractCrashKeysUseCase @Inject constructor(
     suspend operator fun invoke(action: ActionRequest) {
         val projectConfiguration = configManager.getProjectConfiguration()
         val deviceConfiguration = configManager.getDeviceConfiguration()
-        Simber.tag(CrashReportingCustomKeys.PROJECT_ID, true).i(authStore.signedInProjectId)
-        Simber.tag(CrashReportingCustomKeys.USER_ID, true).i(action.userId.toString())
-        Simber.tag(CrashReportingCustomKeys.MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
-        Simber.tag(CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS, true).i(projectConfiguration.synchronization.frequency.toString())
+        Simber.setUserProperty(CrashReportingCustomKeys.PROJECT_ID, authStore.signedInProjectId)
+        Simber.setUserProperty(CrashReportingCustomKeys.USER_ID, action.userId.toString())
+        Simber.setUserProperty(CrashReportingCustomKeys.MODULE_IDS, deviceConfiguration.selectedModules.toString())
+        Simber.setUserProperty(
+            CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS,
+            projectConfiguration.synchronization.frequency.toString(),
+        )
     }
 }

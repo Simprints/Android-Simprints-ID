@@ -15,7 +15,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.EventRoomDatabase
-import com.simprints.infra.events.local.migrations.EventMigration6to7
 import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test

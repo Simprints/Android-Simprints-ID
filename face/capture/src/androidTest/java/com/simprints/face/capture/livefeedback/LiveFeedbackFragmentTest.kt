@@ -67,7 +67,7 @@ class LiveFeedbackFragmentTest {
                 try {
                     allowPermissions.click()
                 } catch (e: UiObjectNotFoundException) {
-                    Simber.e(e, "There is no permissions dialog to interact with.")
+                    Simber.e("There is no permissions dialog to interact with.", e)
                 }
             }
         }

@@ -44,7 +44,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
-                Simber.e(t)
+                Simber.e("Failed to upload images", t)
             }
         }
 

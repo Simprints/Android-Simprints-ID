@@ -71,7 +71,7 @@ internal class FirebaseAuthManager @Inject constructor(
                 ?.getIdToken(false)
                 ?.await()
         } catch (ex: Exception) {
-            Simber.e(ex, "Failed to get access token")
+            Simber.e("Failed to get access token", ex)
             throw transformFirebaseExceptionIfNeeded(ex)
         }
 
@@ -128,7 +128,7 @@ internal class FirebaseAuthManager @Inject constructor(
         try {
             getCoreApp().delete()
         } catch (ex: IllegalStateException) {
-            Simber.d(ex)
+            Simber.d("Failed to delete core app", ex)
         }
     }
 

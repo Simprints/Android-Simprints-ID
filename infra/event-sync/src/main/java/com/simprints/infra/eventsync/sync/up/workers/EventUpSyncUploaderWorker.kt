@@ -100,8 +100,8 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                 "Total uploaded: $count / $max",
             )
         } catch (t: Throwable) {
-            Simber.d(t)
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
+            Simber.d("[UPLOADER] Unexpected error", t)
+            Simber.tag(SYNC_LOG_TAG).i("[UPLOADER] Failed ${t.message}")
             retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
         }
     }

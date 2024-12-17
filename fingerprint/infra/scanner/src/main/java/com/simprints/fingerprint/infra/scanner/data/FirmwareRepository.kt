@@ -47,7 +47,7 @@ class FirmwareRepository @Inject internal constructor(
         // issue with timber logging URLs when interpolated in kotlin, check out this article
         // https://proandroiddev.com/be-careful-what-you-log-it-could-crash-your-app-5fc67a44c842
         val versionString = downloadableFirmwares.joinToString()
-        Simber.d("Firmwares available for download: %s", versionString)
+        Simber.d("Firmwares available for download: $versionString")
 
         val cypressToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.CYPRESS)
         val stmToDownload = downloadableFirmwares.getVersionToDownloadOrNull(Chip.STM)

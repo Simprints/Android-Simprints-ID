@@ -88,7 +88,7 @@ internal open class EventLocalDataSource @Inject constructor(
         // 2. Recreate the DB key
         eventDatabaseFactory.recreateDatabaseKey()
         // 3. Log exception after recreating the key so we get extra info
-        Simber.tag(DB_CORRUPTION.name).e(ex)
+        Simber.tag(DB_CORRUPTION.name).e("Rebuilt event DB due to error", ex)
         // 4. Rebuild database
         eventDao = eventDatabaseFactory.build().eventDao
         scopeDao = eventDatabaseFactory.build().scopeDao

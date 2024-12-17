@@ -61,7 +61,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         try {
             encryptedFile.openFileInput()
         } catch (t: Throwable) {
-            Simber.d(t)
+            Simber.d("Image decryption failed", t)
             null
         }
     }

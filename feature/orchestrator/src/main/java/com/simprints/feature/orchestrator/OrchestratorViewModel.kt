@@ -264,7 +264,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 type = object : TypeReference<ActionRequest>() {},
             )
         } catch (e: Exception) {
-            Simber.e(e)
+            Simber.e("Action request deserialization failed", e)
         }
     }
 
@@ -273,7 +273,7 @@ internal class OrchestratorViewModel @Inject constructor(
             JsonHelper.toJson(it, dbSerializationModule)
         }
     } catch (e: Exception) {
-        Simber.e(e)
+        Simber.e("Action request serialization failed", e)
         null
     }
 

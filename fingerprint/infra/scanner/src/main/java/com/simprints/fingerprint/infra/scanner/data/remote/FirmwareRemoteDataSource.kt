@@ -18,7 +18,7 @@ internal class FirmwareRemoteDataSource @Inject constructor(
      */
     suspend fun downloadFirmware(firmwareVersion: DownloadableFirmwareVersion): ByteArray {
         val fileUrl = fingerprintFileDownloader.getFileUrl(firmwareVersion.toStringForApi())
-        Simber.d("Downloading firmware file at %s", fileUrl)
+        Simber.d("Downloading firmware file at $fileUrl")
         return fingerprintFileDownloader.download(fileUrl)
     }
 }

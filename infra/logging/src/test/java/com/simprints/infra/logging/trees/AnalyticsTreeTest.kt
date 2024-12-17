@@ -12,17 +12,6 @@ import timber.log.Timber
 
 class AnalyticsTreeTest {
     @Test
-    fun `should return on VERBOSE priority`() {
-        val faMock = mockk<FirebaseAnalytics>(relaxed = true)
-        val spyAnalyticsTree = spyk(AnalyticsTree(faMock))
-
-        Timber.plant(spyAnalyticsTree)
-        Simber.v("Test Message")
-
-        verify(exactly = 0) { faMock.logEvent(any(), any()) }
-    }
-
-    @Test
     fun `should return on DEBUG priority`() {
         val faMock = mockk<FirebaseAnalytics>(relaxed = true)
         val spyAnalyticsTree = spyk(AnalyticsTree(faMock))
@@ -57,7 +46,7 @@ class AnalyticsTreeTest {
         val spyAnalyticsTree = spyk(AnalyticsTree(faMock))
 
         Timber.plant(spyAnalyticsTree)
-        Simber.tag("Test_Tag", true).i("Test Message")
+        Simber.setUserProperty("Test_Tag", "Test Message")
 
         verify {
             faMock.setUserProperty("Test_Tag", "Test Message")
@@ -70,7 +59,7 @@ class AnalyticsTreeTest {
         val spyAnalyticsTree = spyk(AnalyticsTree(faMock))
 
         Timber.plant(spyAnalyticsTree)
-        Simber.tag(USER_ID, true).i("Test Message ID")
+        Simber.setUserProperty(USER_ID, "Test Message ID")
 
         verify {
             faMock.setUserId("Test Message ID")
