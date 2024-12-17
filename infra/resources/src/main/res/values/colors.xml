@@ -35,4 +35,7 @@
     <color name="simprints_text_blue">#DE00B3D1</color>
     <color name="simprints_text_orange">#DEFF7C00</color>
 
+    <color name="divider">@color/simprints_off_white</color>
+    <color name="error">@color/simprints_red_dark</color>
+
 </resources>
