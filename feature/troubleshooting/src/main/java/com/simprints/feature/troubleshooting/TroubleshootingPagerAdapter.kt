@@ -3,7 +3,6 @@ package com.simprints.feature.troubleshooting
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.simprints.feature.troubleshooting.events.EventScopeLogFragment
 import com.simprints.feature.troubleshooting.intents.IntentLogFragment
 import com.simprints.feature.troubleshooting.networking.NetworkingLogFragment
 import com.simprints.feature.troubleshooting.overview.OverviewFragment
@@ -26,6 +25,5 @@ internal class TroubleshootingPagerAdapter(
         Intents("Intents", { IntentLogFragment() }),
         Network("Network", { NetworkingLogFragment() }),
         Workers("Workers", { WorkerLogFragment() }),
-        Events("Scopes", { EventScopeLogFragment() }),
     }
 }
