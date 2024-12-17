@@ -52,7 +52,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
         binding.loginImageViewLogo.setOnClickListener {
             if (clickCounter.handleClick(lifecycleScope)) {
-                findNavController().navigate(R.id.action_aboutFragment_to_troubleshooting)
+                findNavController().navigate(R.id.action_requestLoginFragment_to_troubleshooting)
             }
         }
     }
