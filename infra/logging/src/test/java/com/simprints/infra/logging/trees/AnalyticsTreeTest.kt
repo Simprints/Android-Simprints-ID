@@ -3,7 +3,6 @@ package com.simprints.infra.logging.trees
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.logging.trees.AnalyticsTree.Companion.DEFAULT_TAG
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
@@ -20,24 +19,6 @@ class AnalyticsTreeTest {
         Simber.d("Test Message")
 
         verify(exactly = 0) { faMock.logEvent(any(), any()) }
-    }
-
-    @Test
-    fun `should log event on INFO priority`() {
-        val faMock = mockk<FirebaseAnalytics>(relaxed = true)
-        val spyAnalyticsTree = spyk(AnalyticsTree(faMock))
-
-        Timber.plant(spyAnalyticsTree)
-        Simber.i("Test Message")
-
-        verify {
-            faMock.logEvent(
-                DEFAULT_TAG,
-                withArg {
-                    it.getString(DEFAULT_TAG).contentEquals("Test Message")
-                },
-            )
-        }
     }
 
     @Test

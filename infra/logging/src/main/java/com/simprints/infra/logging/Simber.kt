@@ -38,7 +38,7 @@ object Simber {
      * connected to a server. Basically use it to report events that we need to be
      * aware of.
      * DEBUG: Is sent to Log.i
-     * STAGING: Is sent to Log.i & sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
+     * STAGING: Is sent to Log.i and Crashlytics as a breadcrumb
      * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
     fun i(
