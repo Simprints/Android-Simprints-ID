@@ -15,7 +15,7 @@ import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult.QrScannerError
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -89,7 +89,7 @@ internal class LoginFormViewModel @Inject constructor(
         } else if (!result.content.isNullOrEmpty()) {
             try {
                 val qrContent = jsonHelper.fromJson<QrCodeContent>(result.content)
-                Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning successful")
+                Simber.tag(LOGIN.name).i("QR scanning successful")
 
                 if (projectId != qrContent.projectId) {
                     _signInState.send(SignInState.ProjectIdMismatch)
@@ -103,11 +103,11 @@ internal class LoginFormViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning unsuccessful")
+                Simber.tag(LOGIN.name).i("QR scanning unsuccessful")
                 _signInState.send(SignInState.QrInvalidCode)
             }
         } else {
-            Simber.tag(CrashReportTag.LOGIN.name).i("QR code missing")
+            Simber.tag(LOGIN.name).i("QR code missing")
             _signInState.send(SignInState.QrInvalidCode)
         }
     }

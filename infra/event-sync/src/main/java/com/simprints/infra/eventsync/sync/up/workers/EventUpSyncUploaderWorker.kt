@@ -20,13 +20,13 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TI
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_MAX_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_MAX_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -74,7 +74,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
             showProgressNotification()
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
+            Simber.tag(SYNC.name).d("[UPLOADER] Started")
 
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
@@ -86,12 +86,12 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             upSyncTask.upSync(upSyncScope.operation, getEventScope()).collect {
                 count += it.progress
                 eventSyncCache.saveProgress(workerId, count)
-                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
+                Simber.tag(SYNC.name).d("[UPLOADER] Uploaded $count for batch : $it")
 
                 reportCount(count, max)
             }
 
-            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
+            Simber.tag(SYNC.name).d("[UPLOADER] Done")
             success(
                 workDataOf(
                     OUTPUT_UP_SYNC to count,
@@ -101,7 +101,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             )
         } catch (t: Throwable) {
             Simber.d("[UPLOADER] Unexpected error", t)
-            Simber.tag(SYNC_LOG_TAG).i("[UPLOADER] Failed ${t.message}")
+            Simber.tag(SYNC.name).i("[UPLOADER] Failed ${t.message}")
             retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
         }
     }

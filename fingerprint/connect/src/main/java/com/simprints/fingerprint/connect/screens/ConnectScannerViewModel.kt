@@ -23,8 +23,8 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedE
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SCANNER_SETUP
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.resources.R
@@ -253,7 +253,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(LoggingConstants.CrashReportTag.SCANNER_SETUP.name).i(message)
+        Simber.tag(SCANNER_SETUP.name).i(message)
     }
 
     fun handleScannerDisconnectedYesClick() {

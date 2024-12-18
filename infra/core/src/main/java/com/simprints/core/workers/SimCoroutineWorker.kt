@@ -14,7 +14,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.utils.BatteryOptimizationUtils
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.resources.R
@@ -110,7 +110,7 @@ abstract class SimCoroutineWorker(
     }
 
     protected fun crashlyticsLog(message: String) {
-        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message".take(99))
+        Simber.tag(SYNC.name).i("$tag - $message".take(99))
     }
 
     private fun logExceptionIfRequired(t: Throwable?) {

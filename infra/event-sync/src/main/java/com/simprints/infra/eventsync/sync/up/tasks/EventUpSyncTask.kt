@@ -31,8 +31,8 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyn
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.FAILED
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.currentCoroutineContext
@@ -170,7 +170,7 @@ internal class EventUpSyncTask @Inject constructor(
         createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
         Simber
-            .tag(SYNC_LOG_TAG)
+            .tag(SYNC.name)
             .d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
 
         while (eventRepository.getClosedEventScopesCount(eventScopeTypeToUpload) > 0 && currentCoroutineContext().isActive) {
@@ -211,7 +211,7 @@ internal class EventUpSyncTask @Inject constructor(
                 }
             }
 
-            Simber.tag(SYNC_LOG_TAG).d("Deleting ${uploadedScopes.size} session scopes")
+            Simber.tag(SYNC.name).d("Deleting ${uploadedScopes.size} session scopes")
             eventRepository.deleteEventScopes(uploadedScopes)
         }
     }

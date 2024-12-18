@@ -15,7 +15,6 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.END_SYNC_
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.START_SYNC_REPORTER
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProvider
 import com.simprints.infra.eventsync.sync.common.didFailBecauseBackendMaintenance
 import com.simprints.infra.eventsync.sync.common.didFailBecauseCloudIntegration
@@ -29,6 +28,7 @@ import com.simprints.infra.eventsync.sync.down.workers.extractDownSyncProgress
 import com.simprints.infra.eventsync.sync.master.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.infra.eventsync.sync.up.workers.extractUpSyncMaxCount
 import com.simprints.infra.eventsync.sync.up.workers.extractUpSyncProgress
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -57,7 +57,7 @@ internal class EventSyncStateProcessor @Inject constructor(
                 )
 
                 emit(syncState)
-                Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Emitting for UI $syncState")
+                Simber.tag(SYNC.name).d("[PROCESSOR] Emitting for UI $syncState")
             }
         }
     }
@@ -65,7 +65,7 @@ internal class EventSyncStateProcessor @Inject constructor(
     private fun observerForLastSyncId(): LiveData<String> = syncWorkersLiveDataProvider
         .getStartSyncReportersLiveData()
         .switchMap { startSyncReporters ->
-            Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received updated from Master Scheduler")
+            Simber.tag(SYNC.name).d("[PROCESSOR] Received updated from Master Scheduler")
 
             val completedSyncMaster = completedWorkers(startSyncReporters)
             val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
@@ -74,7 +74,7 @@ internal class EventSyncStateProcessor @Inject constructor(
                 if (mostRecentSyncMaster != null) {
                     val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
                     if (!lastSyncId.isNullOrBlank()) {
-                        Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received sync id: $lastSyncId")
+                        Simber.tag(SYNC.name).d("[PROCESSOR] Received sync id: $lastSyncId")
                         this.postValue(lastSyncId)
                     }
                 }

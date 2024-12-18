@@ -14,6 +14,7 @@ import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRec
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -74,7 +75,7 @@ internal class EventRemoteDataSource @Inject constructor(
         val eventCount = getEventCountFromHeader(response)
 
         val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
-        Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
+        Simber.tag(SYNC.name).d("[EVENT_REMOTE_SOURCE] Stream taken")
 
         EventDownSyncResult(
             totalCount = eventCount.exactCount,
@@ -99,7 +100,7 @@ internal class EventRemoteDataSource @Inject constructor(
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
-        Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Start parsing stream")
+        Simber.tag(SYNC.name).d("[EVENT_REMOTE_SOURCE] Start parsing stream")
 
         try {
             while (parser.nextToken() == START_OBJECT) {

@@ -19,13 +19,13 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_M
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -75,7 +75,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
             showProgressNotification()
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
+            Simber.tag(SYNC.name).d("[DOWNLOADER] Started")
 
             val workerId = this@EventDownSyncDownloaderWorker.id.toString()
             var count = syncCache.readProgress(workerId)
@@ -91,7 +91,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 reportCount(count, max)
             }
 
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
+            Simber.tag(SYNC.name).d("[DOWNLOADER] Done $count")
             success(
                 workDataOf(
                     OUTPUT_DOWN_SYNC to count,
@@ -101,7 +101,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
             )
         } catch (t: Throwable) {
             Simber.d("[DOWNLOADER] Unexpected error", t)
-            Simber.tag(SYNC_LOG_TAG).i("[DOWNLOADER] Failed ${t.message}")
+            Simber.tag(SYNC.name).i("[DOWNLOADER] Failed ${t.message}")
             handleSyncException(t)
         }
     }

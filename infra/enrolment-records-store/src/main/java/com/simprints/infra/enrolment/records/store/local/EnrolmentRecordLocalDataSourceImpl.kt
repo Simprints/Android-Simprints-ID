@@ -8,7 +8,7 @@ import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbFaceSample
@@ -108,7 +108,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         // if there is no actions to perform return to avoid useless realm operations
         if (actions.isEmpty()) {
             Simber
-                .tag(CrashReportTag.REALM_DB.name)
+                .tag(REALM_DB.name)
                 .d("[SubjectLocalDataSourceImpl] No realm actions to perform ")
             return
         }

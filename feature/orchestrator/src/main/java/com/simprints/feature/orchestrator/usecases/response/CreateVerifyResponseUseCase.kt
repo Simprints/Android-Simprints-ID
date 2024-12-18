@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MATCHING
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
@@ -24,7 +24,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         ?.let { AppVerifyResponse(it) }
         ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR).also {
             // if subject enrolled with an SDK and the user tries to verify with another SDK
-            Simber.tag(CrashReportTag.MATCHING.name).e("No match results found")
+            Simber.tag(MATCHING.name).e("No match results found")
         }
 
     private fun getFingerprintMatchResults(

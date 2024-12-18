@@ -13,7 +13,7 @@ import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsExc
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.infra.events.session.SessionEventRepository
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -77,7 +77,7 @@ internal class Authenticator @Inject constructor(
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
-        Simber.tag(CrashReportTag.LOGIN.name).i(message)
+        Simber.tag(LOGIN.name).i(message)
     }
 
     private suspend fun addEventAndUpdateProjectIdIfRequired(
