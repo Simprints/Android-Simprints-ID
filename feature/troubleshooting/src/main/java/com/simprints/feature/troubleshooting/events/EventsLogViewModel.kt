@@ -4,17 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.feature.troubleshooting.IsoDateTimeFormatter
 import com.simprints.feature.troubleshooting.adapter.TroubleshootingItemViewData
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @HiltViewModel
 internal class EventsLogViewModel @Inject constructor(
     private val eventRepository: EventRepository,
+    @IsoDateTimeFormatter private val dateFormatter: SimpleDateFormat,
 ) : ViewModel() {
     private val _events = MutableLiveData<List<TroubleshootingItemViewData>>(emptyList())
     val events: LiveData<List<TroubleshootingItemViewData>>
@@ -43,5 +45,6 @@ internal class EventsLogViewModel @Inject constructor(
     private fun formatTimestampSubtitle(
         startMs: Long,
         endMs: Long? = null,
-    ): String = "Started: ${Date(startMs)}" + endMs?.let { "\nEnded: ${Date(it)}" }.orEmpty()
+    ): String = "Started: ${dateFormatter.format(startMs)}" +
+        endMs?.let { "\nEnded: ${dateFormatter.format(it)}" }.orEmpty()
 }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.text.SimpleDateFormat
 import java.util.UUID
 
 class WorkerLogViewModelTest {
@@ -28,14 +29,19 @@ class WorkerLogViewModelTest {
     @MockK
     private lateinit var workManager: WorkManager
 
+    @MockK
+    private lateinit var dateFormatter: SimpleDateFormat
+
     private lateinit var viewModel: WorkerLogViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { dateFormatter.format(any()) } returns "date"
 
         viewModel = WorkerLogViewModel(
             workManager = workManager,
+            dateFormatter = dateFormatter,
         )
     }
 
