@@ -73,7 +73,7 @@ class LoginCheckViewModel @Inject internal constructor(
         rootManager.checkIfDeviceIsRooted()
         true
     } catch (e: RootedDeviceException) {
-        Simber.e(e)
+        Simber.e("Rooted device detected on login check", e)
         _showAlert.send(LoginCheckError.ROOTED_DEVICE)
         false
     }

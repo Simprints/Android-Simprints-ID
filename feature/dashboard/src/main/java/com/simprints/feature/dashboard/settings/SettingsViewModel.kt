@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +39,7 @@ internal class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             configManager.updateDeviceConfiguration { it.apply { it.language = language } }
             _languagePreference.postValue(language)
-            Simber.tag(LoggingConstants.CrashReportTag.SETTINGS.name).i("Language set to $language")
+            Simber.tag(SETTINGS.name).i("Language set to $language")
         }
     }
 

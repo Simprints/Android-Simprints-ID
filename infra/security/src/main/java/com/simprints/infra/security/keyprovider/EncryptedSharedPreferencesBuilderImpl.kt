@@ -29,7 +29,7 @@ internal class EncryptedSharedPreferencesBuilderImpl @Inject constructor(
         // Sometimes the master key has invalid tag (zero), and in such cases the process can be
         // recovered by physically removing the shared preferences file and trying to create
         // it once again
-        Simber.e(e, "Unable to create encrypted shared preferences")
+        Simber.e("Unable to create encrypted shared preferences", e)
         deleteEncryptedSharedPreferences(filename = filename)
         preferencesProvider.provideEncryptedSharedPreferences(
             filename = filename,
@@ -51,7 +51,7 @@ internal class EncryptedSharedPreferencesBuilderImpl @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Simber.e(e, "Unable to delete encrypted shared preferences")
+            Simber.e("Unable to delete encrypted shared preferences", e)
         }
     }
 }

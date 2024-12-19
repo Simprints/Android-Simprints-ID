@@ -30,7 +30,7 @@ internal class QrCodeDetector @Inject constructor() {
             ?.firstOrNull { !it.rawValue.isNullOrEmpty() }
             ?.rawValue
     } catch (t: Throwable) {
-        Simber.e(t)
+        Simber.e("QR code processing failed", t)
         null
     }
 

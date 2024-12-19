@@ -38,10 +38,10 @@ class FirmwareFileUpdateWorker @AssistedInject constructor(
         } catch (e: Throwable) {
             when {
                 e.isCausedFromBadNetworkConnection() ->
-                    Simber.i(NetworkConnectionException(cause = e))
+                    Simber.i("FirmwareFileUpdateWorker failed due to network error", NetworkConnectionException(cause = e))
 
                 else ->
-                    Simber.e(e, "FirmwareFileUpdateWorker failed")
+                    Simber.e("FirmwareFileUpdateWorker failed due to unknown error", e)
             }
             Result.retry()
         }

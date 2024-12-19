@@ -88,7 +88,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
                 .openFileOutput()
                 .use { it.write(licenseData.toByteArray()) }
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to save licence data for ${vendor.value}", t)
         }
     }
 
@@ -100,7 +100,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         try {
             getExpirationFile(vendor, version).writeText(expirationDate)
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to save licence expiration date for ${vendor.value}", t)
         }
     }
 
@@ -116,7 +116,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
             val deleted = File("$licenseDirectoryPath/${vendor.value}").deleteRecursively()
             Simber.d("Deleted cached licenses successfully = $deleted")
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to delete cached licenses for ${vendor.value}", t)
         }
     }
 
@@ -125,7 +125,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
             val deleted = File(licenseDirectoryPath).deleteRecursively()
             Simber.d("Deleted all licenses successfully = $deleted")
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to delete licenses", t)
         }
     }
 

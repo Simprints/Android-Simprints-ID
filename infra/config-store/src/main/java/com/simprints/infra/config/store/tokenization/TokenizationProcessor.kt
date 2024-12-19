@@ -31,7 +31,7 @@ class TokenizationProcessor @Inject constructor(
         return try {
             stringTokenizer.encrypt(decrypted.value, moduleKeyset).asTokenizableEncrypted()
         } catch (e: Exception) {
-            Simber.e(e)
+            Simber.e("Failed to encrypt tokenized value", e)
             decrypted
         }
     }
@@ -55,7 +55,7 @@ class TokenizationProcessor @Inject constructor(
         return try {
             stringTokenizer.decrypt(encrypted.value, moduleKeyset).asTokenizableRaw()
         } catch (e: Exception) {
-            Simber.e(e)
+            Simber.e("Failed to decrypt tokenized value", e)
             encrypted
         }
     }

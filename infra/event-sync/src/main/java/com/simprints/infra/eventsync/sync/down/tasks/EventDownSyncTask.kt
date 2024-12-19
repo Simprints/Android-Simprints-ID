@@ -27,7 +27,7 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.D
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -102,7 +102,7 @@ internal class EventDownSyncTask @Inject constructor(
                 throw t
             }
 
-            Simber.d(t)
+            Simber.d("Down sync error", t)
             errorType = t.javaClass.simpleName
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
@@ -171,7 +171,7 @@ internal class EventDownSyncTask @Inject constructor(
 
         enrolmentRecordRepository.performActions(actions)
 
-        Simber.tag(SYNC_LOG_TAG).d("[DOWN_SYNC_HELPER] batch processed")
+        Simber.tag(SYNC.name).d("[DOWN_SYNC_HELPER] batch processed")
 
         return if (batchOfEventsToProcess.size > 0) {
             lastOperation.copy(

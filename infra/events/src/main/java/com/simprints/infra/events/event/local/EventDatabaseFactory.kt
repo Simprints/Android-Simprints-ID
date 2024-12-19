@@ -23,7 +23,7 @@ internal class EventDatabaseFactory @Inject constructor(
                 DB_NAME,
             )
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to create event database", t)
             throw t
         }
     }

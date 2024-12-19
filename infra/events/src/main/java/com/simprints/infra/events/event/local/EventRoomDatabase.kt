@@ -18,12 +18,12 @@ import com.simprints.infra.events.event.local.migrations.EventMigration2to3
 import com.simprints.infra.events.event.local.migrations.EventMigration3to4
 import com.simprints.infra.events.event.local.migrations.EventMigration4to5
 import com.simprints.infra.events.event.local.migrations.EventMigration5to6
+import com.simprints.infra.events.event.local.migrations.EventMigration6to7
 import com.simprints.infra.events.event.local.migrations.EventMigration7to8
 import com.simprints.infra.events.event.local.migrations.EventMigration8to9
 import com.simprints.infra.events.event.local.migrations.EventMigration9to10
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.DbEventScope
-import com.simprints.infra.events.local.migrations.EventMigration6to7
 import net.sqlcipher.database.SupportFactory
 
 @Database(

@@ -35,7 +35,7 @@ internal class SaveImageUseCase @Inject constructor(
             un20SerialNumber = scannerInfo.un20SerialNumber,
         )
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
-        Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
+        Simber.e("Image save failed", FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
         null
     } else {
         null
@@ -89,7 +89,7 @@ internal class SaveImageUseCase @Inject constructor(
             ),
         )
     } catch (t: Throwable) {
-        Simber.e(t)
+        Simber.e("Failed to determine path for captureId $captureEventId", t)
         null
     }
 

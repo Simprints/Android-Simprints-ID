@@ -11,7 +11,6 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.local.EventRoomDatabase
-import com.simprints.infra.events.local.migrations.EventMigration6to7
 import io.mockk.spyk
 import io.mockk.verify
 import org.json.JSONObject

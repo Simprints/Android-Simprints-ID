@@ -15,10 +15,10 @@ internal class ExtractParametersForAnalyticsUseCase @Inject constructor(
     suspend operator fun invoke(action: ActionRequest) = with(action) {
         ignoreException {
             if (this is ActionRequest.FlowAction) {
-                Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId.toString())
-                Simber.tag(AnalyticsUserProperties.PROJECT_ID).i(projectId)
-                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId.toString())
-                Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
+                Simber.setUserProperty(AnalyticsUserProperties.USER_ID, userId.toString())
+                Simber.setUserProperty(AnalyticsUserProperties.PROJECT_ID, projectId)
+                Simber.setUserProperty(AnalyticsUserProperties.MODULE_ID, moduleId.toString())
+                Simber.setUserProperty(AnalyticsUserProperties.DEVICE_ID, deviceId)
             }
             Simber.i(eventRepository.getCurrentSessionScope().id)
         }

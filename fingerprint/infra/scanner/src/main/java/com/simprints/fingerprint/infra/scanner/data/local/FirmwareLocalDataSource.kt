@@ -39,7 +39,7 @@ internal class FirmwareLocalDataSource(
             try {
                 it.name
             } catch (e: Exception) {
-                Simber.e(e, "Error encountered when parsing firmware file name")
+                Simber.e("Error encountered when parsing firmware file name", e)
                 null
             }
         } ?: emptyList()

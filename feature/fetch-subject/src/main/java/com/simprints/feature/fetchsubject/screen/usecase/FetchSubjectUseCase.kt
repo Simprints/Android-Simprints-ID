@@ -38,7 +38,7 @@ internal class FetchSubjectUseCase @Inject constructor(
 
             return notFoundState()
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("[FETCH_GUID] Error fetching", t)
             return notFoundState()
         }
     }

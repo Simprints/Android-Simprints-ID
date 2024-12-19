@@ -5,7 +5,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
@@ -57,10 +57,10 @@ internal class ModuleRepositoryImpl @Inject constructor(
     }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {
-        Simber.tag(MODULE_IDS, true).i(modules.toString().take(80))
+        Simber.setUserProperty(MODULE_IDS, modules.toString().take(80))
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(LoggingConstants.CrashReportTag.SETTINGS.name).i(message.take(99))
+        Simber.tag(SETTINGS.name).i(message.take(99))
     }
 }

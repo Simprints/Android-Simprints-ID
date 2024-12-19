@@ -91,7 +91,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
             localDataSource.storePrivacyNotice(projectId, language, privacyNotice)
             flowCollector.emit(Succeed(language, privacyNotice))
         } catch (t: Throwable) {
-            Simber.i(t)
+            Simber.i("Failed to download privacy notice", t)
             flowCollector.emit(
                 if (t is BackendMaintenanceException) {
                     FailedBecauseBackendMaintenance(language, t, t.estimatedOutage)

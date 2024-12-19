@@ -31,8 +31,8 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyn
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.FAILED
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncResult
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.currentCoroutineContext
@@ -59,7 +59,7 @@ internal class EventUpSyncTask @Inject constructor(
     ): Flow<EventUpSyncProgress> = flow {
         if (operation.projectId != authStore.signedInProjectId) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
-                Simber.e(it)
+                Simber.e("Failed to upload events due to missing auth", it)
             }
         }
 
@@ -143,7 +143,7 @@ internal class EventUpSyncTask @Inject constructor(
                 throw t
             }
 
-            Simber.e(t)
+            Simber.e("Failed to upload event scopes", t)
             lastOperation = lastOperation.copy(
                 lastState = FAILED,
                 lastSyncTime = timeHelper.now().ms,
@@ -170,7 +170,7 @@ internal class EventUpSyncTask @Inject constructor(
         createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
         Simber
-            .tag(SYNC_LOG_TAG)
+            .tag(SYNC.name)
             .d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
 
         while (eventRepository.getClosedEventScopesCount(eventScopeTypeToUpload) > 0 && currentCoroutineContext().isActive) {
@@ -211,7 +211,7 @@ internal class EventUpSyncTask @Inject constructor(
                 }
             }
 
-            Simber.tag(SYNC_LOG_TAG).d("Deleting ${uploadedScopes.size} session scopes")
+            Simber.tag(SYNC.name).d("Deleting ${uploadedScopes.size} session scopes")
             eventRepository.deleteEventScopes(uploadedScopes)
         }
     }
@@ -241,8 +241,7 @@ internal class EventUpSyncTask @Inject constructor(
                 .also { listOfEvents -> emit(listOfEvents.size) }
         } catch (ex: Exception) {
             if (ex is JsonParseException || ex is JsonMappingException) {
-                Simber.i("Failed to un-marshal events")
-                Simber.i(ex)
+                Simber.i("Failed to un-marshal events", ex)
             } else {
                 throw ex
             }
@@ -279,16 +278,16 @@ internal class EventUpSyncTask @Inject constructor(
     ) {
         var result: EventUpSyncResult? = null
         when (ex) {
-            is NetworkConnectionException -> Simber.i(ex)
+            is NetworkConnectionException -> Simber.i("Network connection error", ex)
             is HttpException -> {
-                Simber.i(ex)
+                Simber.i("Network HTTP request error", ex)
                 result = ex.response()?.let { EventUpSyncResult(it.code()) }
             }
 
             is RemoteDbNotSignedInException -> throw ex
 
             else -> {
-                Simber.e(ex)
+                Simber.e("Unexpected network error", ex)
                 // Propagate other exceptions to report failure to the caller.
                 throw ex
             }
@@ -344,9 +343,9 @@ internal class EventUpSyncTask @Inject constructor(
             } catch (t: Throwable) {
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.
-                    is NetworkConnectionException, is HttpException -> Simber.i(t)
+                    is NetworkConnectionException, is HttpException -> Simber.i("Failed to upload invalid events", t)
                     is RemoteDbNotSignedInException -> throw t
-                    else -> Simber.e(t)
+                    else -> Simber.e("Unexpected error while uploading invalid events", t)
                 }
             }
         }

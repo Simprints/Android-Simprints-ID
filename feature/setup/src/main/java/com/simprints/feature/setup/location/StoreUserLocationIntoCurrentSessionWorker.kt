@@ -40,7 +40,7 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
                     runCatching { saveUserLocation(location) }
                 }
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("StoreUserLocationIntoCurrentSessionWorker failed", t)
             fail(t)
         }
         success()

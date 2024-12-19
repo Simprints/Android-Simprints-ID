@@ -54,7 +54,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 qrCodeAnalyzer.scannedCode
                     .catch { e ->
-                        Simber.e(e)
+                        Simber.e("Camera not available for QR scanning", e)
                         finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
                     }.collectLatest { qrCode ->
                         if (qrCode.isNotEmpty()) {

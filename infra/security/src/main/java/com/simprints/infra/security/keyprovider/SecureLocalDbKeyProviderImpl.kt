@@ -76,7 +76,7 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
     }
 
     private fun logToCrashReport(message: Throwable) {
-        Simber.tag(DB_CORRUPTION.name).i(message)
+        Simber.tag(DB_CORRUPTION.name).i("Failed to recreate local database", message)
     }
 
     /**

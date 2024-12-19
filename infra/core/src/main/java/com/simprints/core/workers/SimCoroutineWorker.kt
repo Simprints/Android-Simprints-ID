@@ -14,7 +14,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.utils.BatteryOptimizationUtils
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.resources.R
@@ -70,9 +70,9 @@ abstract class SimCoroutineWorker(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 setForegroundException is ForegroundServiceStartNotAllowedException
             ) {
-                Simber.i(setForegroundException, "Worker notification service restricted")
+                Simber.i("Worker notification service restricted", setForegroundException)
             } else {
-                Simber.e(setForegroundException)
+                Simber.e("Failed to show notification", setForegroundException)
             }
         }
     }
@@ -110,16 +110,16 @@ abstract class SimCoroutineWorker(
     }
 
     protected fun crashlyticsLog(message: String) {
-        Simber.tag(CrashReportTag.SYNC.name).i("$tag - $message".take(99))
+        Simber.tag(SYNC.name).i("$tag - $message".take(99))
     }
 
     private fun logExceptionIfRequired(t: Throwable?) {
         t?.let {
             when (t) {
-                is CancellationException -> Simber.d(t)
+                is CancellationException -> Simber.d("Worker cancelled", t)
                 // Record network issues only in Analytics
-                is NetworkConnectionException -> Simber.i(t)
-                else -> Simber.e(t)
+                is NetworkConnectionException -> Simber.i("Worker network connection issues", t)
+                else -> Simber.e("Unexpected worker error", t)
             }
         }
     }

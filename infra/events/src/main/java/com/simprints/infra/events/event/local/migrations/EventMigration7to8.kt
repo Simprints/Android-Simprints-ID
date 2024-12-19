@@ -32,10 +32,10 @@ internal class EventMigration7to8 : Migration(7, 8) {
                     migrateFingerprintCaptureEventPayloadType(it, database, id)
                 } catch (t: Throwable) {
                     Simber.e(
-                        t,
                         "Fail to migrate fingerprint capture ${
                             it.getStringWithColumnName(DB_ID_FIELD)
                         } in session ${it.getStringWithColumnName("sessionId")}",
+                        t,
                     )
                 }
             }
@@ -188,12 +188,12 @@ internal class EventMigration7to8 : Migration(7, 8) {
                     migrateFaceCaptureEventPayloadType(it, database, id)
                 } catch (t: Throwable) {
                     Simber.e(
-                        t,
                         "Fail to migrate face capture ${
                             it.getStringWithColumnName(
                                 DB_ID_FIELD,
                             )
                         } in session ${it.getStringWithColumnName("sessionId")}",
+                        t,
                     )
                 }
             }

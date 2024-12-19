@@ -9,7 +9,7 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.license.LicenseRepository
-import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGOUT
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -67,6 +67,6 @@ internal class SignerManager @Inject constructor(
         authStore.cleanCredentials()
         authStore.clearFirebaseToken()
 
-        Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
+        Simber.tag(LOGOUT.name).i("Signed out")
     }
 }

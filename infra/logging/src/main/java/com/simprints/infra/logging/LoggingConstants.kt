@@ -42,5 +42,6 @@ object LoggingConstants {
         REALM_DB,
         DB_CORRUPTION,
         ENROLMENT,
+        APP_SCOPE_ERROR,
     }
 }

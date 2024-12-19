@@ -19,7 +19,7 @@ internal class EventMigration5to6 : Migration(5, 6) {
             migrateConnectivityEvents(database)
             Simber.d("Migration from schema 5 to schema 6 done.")
         } catch (t: Throwable) {
-            Simber.e(t)
+            Simber.e("Failed to migrate room db from schema 5 to schema 6.", t)
         }
     }
 

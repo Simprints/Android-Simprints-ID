@@ -62,7 +62,7 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
     }
 
     @Test
-    fun `check shows alert and logs MissingGooglePlayServices exception for missing google play services`() {
+    fun `check shows alert and logs exception for missing google play services`() {
         // Given
 
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns INTERNAL_ERROR
@@ -81,7 +81,7 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify { launchCallBack(LoginError.MissingPlayServices) }
-        verify { Simber.e(ofType<MissingGooglePlayServices>()) }
+        verify { Simber.e(any(), ofType<MissingGooglePlayServices>()) }
     }
 
     @Test
@@ -111,11 +111,11 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify(exactly = 0) { launchCallBack(any()) }
-        verify(exactly = 0) { Simber.e(ofType<OutdatedGooglePlayServices>()) }
+        verify(exactly = 0) { Simber.e(any(), ofType<OutdatedGooglePlayServices>()) }
     }
 
     @Test
-    fun `check shows alert and logs OutdatedGooglePlayServices exception for outdated google play services and the user cancels the alert dialog`() {
+    fun `check shows alert and logs exception for outdated google play services and the user cancels the alert dialog`() {
         // Given
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns SERVICE_VERSION_UPDATE_REQUIRED
         every { googleApiAvailability.isUserResolvableError(SERVICE_VERSION_UPDATE_REQUIRED) } returns true
@@ -144,6 +144,6 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify { launchCallBack(LoginError.OutdatedPlayServices) }
-        verify { Simber.e(ofType<OutdatedGooglePlayServices>()) }
+        verify { Simber.e(any(), ofType<OutdatedGooglePlayServices>()) }
     }
 }

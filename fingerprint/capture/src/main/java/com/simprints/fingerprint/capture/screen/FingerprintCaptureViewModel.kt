@@ -190,7 +190,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             bioSdkWrapper.initialize()
             bioSdkConfiguration = configuration.getSdkConfiguration(fingerprintSdk)!!
         } catch (e: BioSdkException.BioSdkInitializationException) {
-            Simber.e(e)
+            Simber.e("Failed to initialise bio sdk: ${fingerprintSdk.name}", e)
             _invalidLicense.send()
         }
     }
@@ -529,13 +529,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             }
 
             is NoFingerDetectedException -> {
-                Simber.i(e)
+                Simber.i("No finger detected", e)
                 handleNoFingerDetected()
             }
 
             else -> {
                 updateCaptureState { toNotCollected() }
-                Simber.e(e)
+                Simber.e("Unexpected finger capture exception", e)
                 _launchAlert.send()
             }
         }

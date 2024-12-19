@@ -99,7 +99,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(ofType<MissingLocalDatabaseKeyHashException>())
+            Simber.i(any(), ofType<MissingLocalDatabaseKeyHashException>())
         }
     }
 
@@ -116,7 +116,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(ofType<MatchingLocalDatabaseKeyHashesException>())
+            Simber.i(any(), ofType<MatchingLocalDatabaseKeyHashesException>())
         }
     }
 
@@ -130,7 +130,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(ofType<MismatchingLocalDatabaseKeyHashesException>())
+            Simber.i(any(), ofType<MismatchingLocalDatabaseKeyHashesException>())
         }
     }
 
@@ -143,7 +143,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(ofType<MissingLocalDatabaseKeyException>())
+            Simber.i(any(), ofType<MissingLocalDatabaseKeyException>())
         }
     }
 

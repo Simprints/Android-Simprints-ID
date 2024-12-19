@@ -133,7 +133,7 @@ internal class OtaViewModel @Inject constructor(
         e: Throwable,
         currentRetryAttempt: Int,
     ) {
-        Simber.e(e)
+        Simber.e("OTA update failed", e)
         if (e is BackendMaintenanceException) {
             _otaFailed.send(
                 FetchOtaResult(

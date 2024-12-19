@@ -43,10 +43,10 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         } catch (e: Exception) {
             if (e is JacksonException) {
                 // Return default value
-                Simber.i(e, "Invalid old configuration for project ${authStore.signedInProjectId}")
+                Simber.i("Invalid old configuration for project ${authStore.signedInProjectId}", e)
                 ProtoProjectConfiguration.getDefaultInstance()
             } else {
-                Simber.e(e)
+                Simber.e("Failed to migrate project configuration to Datastore", e)
                 throw e
             }
         }

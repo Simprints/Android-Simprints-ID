@@ -56,10 +56,10 @@ class ExtractCrashKeysUseCaseTest {
         useCase(ActionFactory.getFlowRequest())
 
         verify {
-            Simber.i("projectId")
-            Simber.i("userId")
-            Simber.i("[module1, module2]")
-            Simber.i("PERIODICALLY")
+            Simber.setUserProperty(any(), "projectId")
+            Simber.setUserProperty(any(), "userId")
+            Simber.setUserProperty(any(), "[module1, module2]")
+            Simber.setUserProperty(any(), "PERIODICALLY")
         }
     }
 }

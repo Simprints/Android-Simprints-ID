@@ -33,7 +33,7 @@ internal class QrCodeAnalyzer @Inject constructor(
                         val image = RawImage(mediaImage, rotationDegrees)
                         qrCodeDetector.detectInImage(image)?.let(_scannedCode::tryEmit)
                     } catch (t: Throwable) {
-                        Simber.e(t)
+                        Simber.e("QR code detection failed", t)
                     }
                 }
             }

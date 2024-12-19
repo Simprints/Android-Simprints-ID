@@ -1,6 +1,5 @@
 package com.simprints.infra.logging.trees
 
-import android.os.Bundle
 import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
@@ -27,16 +26,5 @@ internal class AnalyticsTree(
                 analytics.setUserProperty(originalTag, message)
             }
         }
-
-        if (priority == Log.INFO) {
-            val params = Bundle()
-            params.putString(tag ?: DEFAULT_TAG, message)
-            analytics.logEvent(tag ?: DEFAULT_TAG, params)
-        }
-    }
-
-    companion object {
-        // If for some reason there is no tag for the event
-        internal const val DEFAULT_TAG = "DEFAULT"
     }
 }

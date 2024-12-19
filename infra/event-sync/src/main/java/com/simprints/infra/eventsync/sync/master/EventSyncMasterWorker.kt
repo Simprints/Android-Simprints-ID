@@ -19,12 +19,12 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.common.getAllSubjectsSyncWorkersInfo
 import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
 import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.assisted.Assisted
@@ -100,7 +100,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         .buildUpSyncWorkerChain(
                             uniqueSyncId,
                             upSyncWorkerScopeId,
-                        ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers") }
+                        ).also { Simber.tag(SYNC.name).d("Scheduled ${it.size} up workers") }
                 }
 
                 if (configuration.isEventDownSyncAllowed()) {
@@ -113,7 +113,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
-                        ).also { Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers") }
+                        ).also { Simber.tag(SYNC.name).d("Scheduled ${it.size} down workers") }
                 }
 
                 val endSyncReporterWorker =
