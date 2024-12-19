@@ -8,11 +8,13 @@ import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.text.SimpleDateFormat
 
 class EventsLogViewModelTest {
     @get:Rule
@@ -24,14 +26,19 @@ class EventsLogViewModelTest {
     @MockK
     private lateinit var eventRepository: EventRepository
 
+    @MockK
+    private lateinit var dateFormatter: SimpleDateFormat
+
     private lateinit var viewModel: EventsLogViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { dateFormatter.format(any()) } returns "date"
 
         viewModel = EventsLogViewModel(
             eventRepository = eventRepository,
+            dateFormatter = dateFormatter,
         )
     }
 

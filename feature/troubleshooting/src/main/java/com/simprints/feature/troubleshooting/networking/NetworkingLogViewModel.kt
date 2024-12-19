@@ -4,17 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.feature.troubleshooting.IsoDateTimeFormatter
 import com.simprints.feature.troubleshooting.adapter.TroubleshootingItemViewData
 import com.simprints.logging.persistent.LogEntryType
 import com.simprints.logging.persistent.PersistentLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @HiltViewModel
 internal class NetworkingLogViewModel @Inject constructor(
     private val persistentLogger: PersistentLogger,
+    @IsoDateTimeFormatter private val dateFormatter: SimpleDateFormat,
 ) : ViewModel() {
     private val _logs = MutableLiveData<List<TroubleshootingItemViewData>>(emptyList())
     val logs: LiveData<List<TroubleshootingItemViewData>>
@@ -27,7 +29,7 @@ internal class NetworkingLogViewModel @Inject constructor(
                 .map {
                     TroubleshootingItemViewData(
                         title = it.title,
-                        subtitle = Date(it.timestampMs).toString(),
+                        subtitle = dateFormatter.format(it.timestampMs),
                         body = it.body,
                     )
                 }.ifEmpty { listOf(TroubleshootingItemViewData(title = "No data")) }

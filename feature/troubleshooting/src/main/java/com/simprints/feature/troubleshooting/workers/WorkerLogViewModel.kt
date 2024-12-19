@@ -7,15 +7,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
+import com.simprints.feature.troubleshooting.IsoDateTimeFormatter
 import com.simprints.feature.troubleshooting.adapter.TroubleshootingItemViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @HiltViewModel
 internal class WorkerLogViewModel @Inject constructor(
     private val workManager: WorkManager,
+    @IsoDateTimeFormatter private val dateFormatter: SimpleDateFormat,
 ) : ViewModel() {
     private val _workers = MutableLiveData<List<TroubleshootingItemViewData>>(emptyList())
     val workers: LiveData<List<TroubleshootingItemViewData>>
@@ -43,7 +45,7 @@ internal class WorkerLogViewModel @Inject constructor(
             ?: info.id.toString(),
         subtitle = info.state.toString(),
         body = if (info.state == WorkInfo.State.ENQUEUED) {
-            "ID: ${info.id}\nNext run: ${Date(info.nextScheduleTimeMillis)}"
+            "ID: ${info.id}\nNext run: ${dateFormatter.format(info.nextScheduleTimeMillis)}"
         } else {
             "ID: ${info.id}\nOutput: ${info.outputData}"
         },

@@ -9,11 +9,13 @@ import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.text.SimpleDateFormat
 
 class NetworkingLogViewModelTest {
     @get:Rule
@@ -25,14 +27,19 @@ class NetworkingLogViewModelTest {
     @MockK
     private lateinit var persistentLogger: PersistentLogger
 
+    @MockK
+    private lateinit var dateFormatter: SimpleDateFormat
+
     private lateinit var viewModel: NetworkingLogViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        every { dateFormatter.format(any()) } returns "date"
 
         viewModel = NetworkingLogViewModel(
             persistentLogger = persistentLogger,
+            dateFormatter = dateFormatter,
         )
     }
 
