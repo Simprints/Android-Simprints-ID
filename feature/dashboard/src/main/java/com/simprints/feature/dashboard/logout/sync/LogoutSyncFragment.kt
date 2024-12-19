@@ -18,6 +18,7 @@ import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,17 +48,17 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         logoutSyncCard.onOfflineButtonClick =
             { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
         logoutSyncCard.onSelectNoModulesButtonClick =
-            { findNavController().navigate(R.id.action_logoutSyncFragment_to_moduleSelectionFragment) }
+            { findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_moduleSelectionFragment) }
         logoutSyncCard.onLoginButtonClick = { syncViewModel.login() }
         logoutSyncToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
         logoutWithoutSyncButton.setOnClickListener {
-            findNavController().navigate(R.id.action_logoutSyncFragment_to_logoutSyncDeclineFragment)
+            findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_logoutSyncDeclineFragment)
         }
         logoutButton.setOnClickListener {
             logoutSyncViewModel.logout()
-            findNavController().navigate(R.id.action_logoutSyncFragment_to_requestLoginFragment)
+            findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_requestLoginFragment)
         }
     }
 
@@ -72,7 +73,8 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         syncViewModel.loginRequestedEventLiveData.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { loginArgs ->
-                findNavController().navigate(
+                findNavController().navigateSafely(
+                    this@LogoutSyncFragment,
                     R.id.action_logOutSyncFragment_to_login,
                     loginArgs,
                 )

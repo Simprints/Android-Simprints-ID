@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.feature.dashboard.BuildConfig
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentMainBinding
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,9 +41,9 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
 
     private fun menuItemClicked(item: MenuItem): Boolean = with(findNavController()) {
         when (item.itemId) {
-            R.id.menuSettings -> navigate(R.id.action_mainFragment_to_settingsFragment)
-            R.id.debug -> navigate(R.id.action_mainFragment_to_debugFragment)
-            R.id.menuPrivacyNotice -> navigate(R.id.action_mainFragment_to_privacyNoticesFragment)
+            R.id.menuSettings -> navigateSafely(this@MainFragment, R.id.action_mainFragment_to_settingsFragment)
+            R.id.debug -> navigateSafely(this@MainFragment, R.id.action_mainFragment_to_debugFragment)
+            R.id.menuPrivacyNotice -> navigateSafely(this@MainFragment, R.id.action_mainFragment_to_privacyNoticesFragment)
         }
         true
     }
