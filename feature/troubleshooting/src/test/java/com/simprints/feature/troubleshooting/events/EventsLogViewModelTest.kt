@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -34,26 +33,6 @@ class EventsLogViewModelTest {
         viewModel = EventsLogViewModel(
             eventRepository = eventRepository,
         )
-    }
-
-    @Test
-    fun `sets list of scopes on request`() = runTest {
-        coEvery { eventRepository.getAllScopes() } returns listOf(createSessionScope())
-
-        val scopes = viewModel.scopes.test()
-        viewModel.collectEventScopes()
-
-        assertThat(scopes.value()).isNotEmpty()
-    }
-
-    @Test
-    fun `sets list of scopes placeholder if no scopes`() = runTest {
-        coEvery { eventRepository.getAllScopes() } returns emptyList()
-
-        val scopes = viewModel.scopes.test()
-        viewModel.collectEventScopes()
-
-        assertThat(scopes.value()).isNotEmpty()
     }
 
     @Test

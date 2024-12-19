@@ -24,15 +24,15 @@ internal class OverviewViewModel @Inject constructor(
 ) : ViewModel() {
     val projectIds: LiveData<String>
         get() = _projectIds
-    private val _projectIds = MutableLiveData("Collecting data")
+    private val _projectIds = MutableLiveData(PLACEHOLDER_TEXT)
 
     val licenseStates: LiveData<String>
         get() = _licenseStates
-    private val _licenseStates = MutableLiveData("Collecting data")
+    private val _licenseStates = MutableLiveData(PLACEHOLDER_TEXT)
 
     val networkStates: LiveData<String>
         get() = _networkStates
-    private val _networkStates = MutableLiveData("Collecting data")
+    private val _networkStates = MutableLiveData(PLACEHOLDER_TEXT)
 
     val pingResult: LiveData<PingResult>
         get() = _pingResult
@@ -53,5 +53,9 @@ internal class OverviewViewModel @Inject constructor(
         viewModelScope.launch {
             doServerPing().collect { _pingResult.postValue(it) }
         }
+    }
+
+    companion object {
+        private const val PLACEHOLDER_TEXT = "Collecting data"
     }
 }
