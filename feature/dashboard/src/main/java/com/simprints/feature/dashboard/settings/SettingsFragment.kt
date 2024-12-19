@@ -19,6 +19,7 @@ import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -85,12 +86,12 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getFingerSelectionPreference()?.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.action_settingsFragment_to_fingerSelectionFragment)
+            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_fingerSelectionFragment)
             true
         }
 
         getSyncInfoPreference()?.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.action_settingsFragment_to_syncInfoFragment)
+            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_syncInfoFragment)
             true
         }
 
@@ -100,7 +101,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getAboutPreference()?.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.action_settingsFragment_to_aboutFragment)
+            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_aboutFragment)
             true
         }
     }

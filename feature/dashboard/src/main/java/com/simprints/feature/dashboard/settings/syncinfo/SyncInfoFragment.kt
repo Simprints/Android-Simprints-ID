@@ -19,6 +19,7 @@ import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -52,7 +53,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun setupClickListeners() {
         binding.moduleSelectionButton.setOnClickListener {
-            findNavController().navigate(R.id.action_syncInfoFragment_to_moduleSelectionFragment)
+            findNavController().navigateSafely(this, R.id.action_syncInfoFragment_to_moduleSelectionFragment)
         }
         binding.syncInfoToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
@@ -120,7 +121,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         viewModel.loginRequestedEventLiveData.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { loginArgs ->
-                findNavController().navigate(
+                findNavController().navigateSafely(
+                    this,
                     R.id.action_syncInfoFragment_to_login,
                     loginArgs,
                 )
