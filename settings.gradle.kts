@@ -141,3 +141,4 @@ include(
     ":infra:sync",
     ":infra:event-sync",
 )
+include(":fingerprint:infra:image-distortion-config")
