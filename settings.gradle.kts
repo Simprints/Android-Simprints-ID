@@ -10,7 +10,6 @@ pluginManagement {
     }
 }
 
-
 // Utility to get local properties from file
 val properties = File(rootDir, "local.properties").inputStream().use {
     java.util.Properties().apply { load(it) }
@@ -18,7 +17,6 @@ val properties = File(rootDir, "local.properties").inputStream().use {
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-
 
     repositories {
         google()
@@ -66,7 +64,6 @@ dependencyResolutionManagement {
                 password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
             }
         }
-
     }
 }
 
@@ -75,7 +72,7 @@ rootProject.name = "android-simprints-id"
 // Main application module
 include(":id")
 
-//Fingerprint modality modules
+// Fingerprint modality modules
 include(
     ":fingerprint:connect",
     ":fingerprint:capture",
@@ -86,6 +83,7 @@ include(
     ":fingerprint:infra:simprints-bio-sdk",
     ":fingerprint:infra:nec-bio-sdk",
     ":fingerprint:infra:simafis-wrapper",
+    ":fingerprint:infra:image-distortion-config",
 )
 
 // Face modality modules

@@ -14,8 +14,8 @@ internal object SyncConstants {
     const val DEVICE_SYNC_WORK_NAME_ONE_TIME = "device-sync-work-one-time"
     const val DEVICE_SYNC_REPEAT_INTERVAL = BuildConfig.DEVICE_DOWN_SYNC_WORKER_INTERVAL_MINUTES
 
-    const val IMAGE_UP_SYNC_WORK_NAME = "image-upsync-work-v3"
-    const val IMAGE_UP_SYNC_REPEAT_INTERVAL = BuildConfig.IMAGE_UP_SYNC_WORKER_INTERVAL_MINUTES
+    const val FILE_UP_SYNC_WORK_NAME = "file-upsync-work"
+    const val FILE_UP_SYNC_REPEAT_INTERVAL = BuildConfig.FILE_UP_SYNC_WORKER_INTERVAL_MINUTES
 
     const val RECORD_UPLOAD_WORK_NAME = "upload-enrolment-record-work-one-time"
     const val RECORD_UPLOAD_INPUT_ID_NAME = "INPUT_ID_NAME"

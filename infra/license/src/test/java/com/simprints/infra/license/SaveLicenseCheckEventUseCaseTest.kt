@@ -14,7 +14,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.slot
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import kotlin.test.Test
+import org.junit.Test
 
 class SaveLicenseCheckEventUseCaseTest {
     @RelaxedMockK
