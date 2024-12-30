@@ -6,6 +6,7 @@ import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherBG
 import com.simprints.core.DispatcherIO
 import com.simprints.core.ExternalScope
+import com.simprints.core.NonCancellableIO
 import com.simprints.core.PackageVersionName
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.tools.json.JsonHelper
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.StandardTestDispatcher
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 
 @Module
 @TestInstallIn(
@@ -57,6 +59,10 @@ object FakeCoreModule {
     @DispatcherBG
     @Provides
     fun provideCoroutineDispatcherBg(): CoroutineDispatcher = StandardTestDispatcher()
+
+    @NonCancellableIO
+    @Provides
+    fun provideNonCancellableIO(): CoroutineContext = StandardTestDispatcher()
 
     @ExternalScope
     @Provides

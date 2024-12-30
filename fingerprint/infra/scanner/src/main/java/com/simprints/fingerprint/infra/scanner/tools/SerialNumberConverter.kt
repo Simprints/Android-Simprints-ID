@@ -35,7 +35,7 @@ class SerialNumberConverter @Inject constructor() {
     @SuppressLint("DefaultLocale")
     private fun getMacHexFromInt(int: Int): String = Integer
         .toHexString(int)
-        .toUpperCase()
+        .uppercase()
         .padStart(5, '0')
 
     private fun serialHexToMacAddress(hex: String): String = MAC_ADDRESS_PREFIX +

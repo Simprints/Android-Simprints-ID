@@ -2,36 +2,39 @@ package com.simprints.fingerprint.infra.scanner.v2.outgoing
 
 import com.google.common.truth.Truth
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.common.OutputStreamDispatcher
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
+import com.simprints.fingerprint.infra.scanner.v2.tools.asFlow
 import com.simprints.testtools.common.syntax.assertThrows
-import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
-import com.simprints.testtools.unit.reactive.testSubscribe
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class OutputStreamDispatcherTest {
     @Test
-    fun notConnected_callDispatch_throwsException() {
+    fun notConnected_callDispatch_throwsException() = runTest {
         val outputStreamDispatcher = OutputStreamDispatcher()
         assertThrows<IllegalStateException> {
-            outputStreamDispatcher.dispatch(listOf(byteArrayOf(0x01, 0x02, 0x03))).blockingAwait()
+            outputStreamDispatcher.dispatch(listOf(byteArrayOf(0x01, 0x02, 0x03)))
         }
     }
 
     @Test
-    fun connectedThenDisconnected_callDispatch_throwsException() {
+    fun connectedThenDisconnected_callDispatch_throwsException() = runTest {
         val outputStreamDispatcher = OutputStreamDispatcher()
         outputStreamDispatcher.connect(mockk())
         outputStreamDispatcher.disconnect()
         assertThrows<IllegalStateException> {
-            outputStreamDispatcher.dispatch(listOf(byteArrayOf(0x01, 0x02, 0x03))).blockingAwait()
+            outputStreamDispatcher.dispatch(listOf(byteArrayOf(0x01, 0x02, 0x03)))
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun connected_callDispatch_correctlySendsBytes() {
+    fun connected_callDispatch_correctlySendsBytes() = runTest {
         val expectedBytes = listOf(byteArrayOf(0x01, 0x02, 0x03), byteArrayOf(0x04, 0x05), byteArrayOf(0x06))
 
         val outputStream = PipedOutputStream()
@@ -42,15 +45,12 @@ class OutputStreamDispatcherTest {
 
         outputStreamDispatcher.connect(outputStream)
 
-        val testSubscriber = inputStream.toFlowable().testSubscribe()
+        val testFlow = inputStream.asFlow(UnconfinedTestDispatcher())
 
-        outputStreamDispatcher.dispatch(expectedBytes).test().await()
+        outputStreamDispatcher.dispatch(expectedBytes)
         outputStream.close()
-
-        testSubscriber.awaitCompletionWithNoErrors()
-
         Truth
-            .assertThat(testSubscriber.values().reduce { acc, bytes -> acc + bytes })
+            .assertThat(testFlow.toList().reduce { acc, bytes -> acc + bytes })
             .isEqualTo(expectedBytes.reduce { acc, bytes -> acc + bytes })
     }
 }

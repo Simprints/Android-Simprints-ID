@@ -33,8 +33,4 @@ dependencies {
     api(libs.testing.espresso.intents)
     api(libs.testing.espresso.contrib)
     api(libs.testing.espresso.accessibility)
-
-    api(libs.rxJava2.android)
-    api(libs.rxJava2.core)
-    api(libs.rxJava2.kotlin)
 }

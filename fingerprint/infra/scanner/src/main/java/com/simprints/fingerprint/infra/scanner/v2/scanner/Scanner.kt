@@ -4,6 +4,7 @@
 package com.simprints.fingerprint.infra.scanner.v2.scanner
 
 import com.simprints.core.DispatcherIO
+import com.simprints.fingerprint.infra.scanner.v1.ScannerUtils.log
 import com.simprints.fingerprint.infra.scanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.RootMessageChannel
@@ -29,13 +30,13 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedE
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.un20.Un20OtaController
+import com.simprints.fingerprint.infra.scanner.v2.tools.asFlow
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.unsignedToInt
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.*
-import io.reactivex.*
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -61,31 +62,25 @@ class Scanner @Inject constructor(
     private val stmOtaController: StmOtaController,
     private val un20OtaController: Un20OtaController,
     private val scannerInfo: ScannerInfo,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) {
-    private lateinit var flowableDisposable: Disposable
-
     private lateinit var outputStream: OutputStream
-    private lateinit var flowableInputStream: Flowable<ByteArray>
+    private lateinit var inputStreamFlow: Flow<ByteArray>
     var state = disconnectedScannerState()
 
-    val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
-
-    private var scannerTriggerListenerDisposable: Disposable? = null
+    var triggerButtonFlow: Flow<Unit> = emptyFlow()
 
     fun connect(
         inputStream: InputStream,
         outputStream: OutputStream,
     ) {
-        this.flowableInputStream = inputStream
-            .toFlowable()
-            .subscribeOnIoAndPublish(ioDispatcher)
-            .also { this.flowableDisposable = it.connect() }
+        log("Scanner connected")
+        inputStreamFlow = inputStream.asFlow(dispatcher = dispatcherIO)
         this.outputStream = outputStream
         state.connected = true
         state.mode = ROOT
 
-        rootMessageChannel.connect(flowableInputStream, outputStream)
+        rootMessageChannel.connect(inputStreamFlow, outputStream)
     }
 
     fun disconnect() {
@@ -95,7 +90,6 @@ class Scanner @Inject constructor(
                 ROOT -> rootMessageChannel.disconnect()
                 MAIN -> {
                     mainMessageChannel.disconnect()
-                    scannerTriggerListenerDisposable?.dispose()
                 }
 
                 CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
@@ -103,7 +97,7 @@ class Scanner @Inject constructor(
                 null -> { // Do nothing
                 }
             }
-            flowableDisposable.dispose()
+            triggerButtonFlow = emptyFlow()
             state = disconnectedScannerState()
             scannerInfo.clear()
         }
@@ -182,28 +176,25 @@ class Scanner @Inject constructor(
 
     private fun handleMainModeEntered() {
         rootMessageChannel.disconnect()
-        mainMessageChannel.connect(flowableInputStream, outputStream)
-
+        mainMessageChannel.connect(inputStreamFlow, outputStream)
         state.triggerButtonActive = true
         state.mode = MAIN
-        scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
+        triggerButtonFlow = mainMessageChannel.incoming.veroEvents
+            .filterIsInstance<TriggerButtonPressedEvent>()
+            .map {
+                // Trigger button pressed event received
+            }
     }
-
-    private fun subscribeTriggerButtonListeners() = mainMessageChannel.incoming.veroEvents
-        ?.filterCast<TriggerButtonPressedEvent>()
-        ?.subscribeBy(onNext = {
-            triggerButtonListeners.forEach { it.onNext(Unit) }
-        }, onError = { it.printStackTrace() })
 
     private fun handleCypressOtaModeEntered() {
         rootMessageChannel.disconnect()
-        cypressOtaMessageChannel.connect(flowableInputStream, outputStream)
+        cypressOtaMessageChannel.connect(inputStreamFlow, outputStream)
         state.mode = CYPRESS_OTA
     }
 
     private fun handleStmOtaModeEntered() {
         rootMessageChannel.disconnect()
-        stmOtaMessageChannel.connect(flowableInputStream, outputStream)
+        stmOtaMessageChannel.connect(inputStreamFlow, outputStream)
         state.mode = STM_OTA
     }
 

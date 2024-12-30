@@ -7,13 +7,6 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmFirmwareVersion
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.RootCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.RootResponse
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetCypressExtendedVersionCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetCypressVersionCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetExtendedVersionCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetHardwareVersionCommand
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.GetVersionCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressExtendedFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ExtendedHardwareVersion
@@ -24,16 +17,16 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetCypre
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetExtendedVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetHardwareVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.GetVersionResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.SetVersionResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.root.RootMessageInputStream
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.root.RootMessageOutputStream
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.coJustRun
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import io.mockk.spyk
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -41,17 +34,18 @@ import org.junit.Test
 class ScannerExtendedInfoReaderHelperTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val ioDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-    private val mainMessageChannel: MainMessageChannel = mockk()
-    private val rootMessageChannel: RootMessageChannel = getRootMessageChannel()
-
+    val mockRootMessageInputStream = mockk<RootMessageInputStream> {
+        justRun { connect(any()) }
+        justRun { disconnect() }
+    }
     private lateinit var expectedVersionResponse: GetVersionResponse
     private lateinit var expectedHardwareResponse: GetHardwareVersionResponse
     private lateinit var expectedExtendedVersionResponse: GetExtendedVersionResponse
     private lateinit var expectedCypressVersionResponse: GetCypressVersionResponse
     private lateinit var expectedCypressExtendedVersionResponse: GetCypressExtendedVersionResponse
-
+    private lateinit var expectedSetVersionResponse: SetVersionResponse
+    private val mainMessageChannel: MainMessageChannel = mockk()
+    private val rootMessageChannel: RootMessageChannel = getRootMessageChannel()
     private val scannerInfoReader = ScannerExtendedInfoReaderHelper(
         mainMessageChannel,
         rootMessageChannel,
@@ -84,7 +78,7 @@ class ScannerExtendedInfoReaderHelperTest {
             ),
         )
         expectedVersionResponse = GetVersionResponse(expectedUnifiedVersion)
-
+        expectedVersionResponse
         val expectedHardware = "E-1"
         val expectedFirmwareVersions = ExtendedVersionInformation(
             cypressFirmwareVersion = CypressExtendedFirmwareVersion(
@@ -97,11 +91,14 @@ class ScannerExtendedInfoReaderHelperTest {
                 "$un20MajorFirmwareVersion.$expectedHardware.$un20MinorFirmwareVersion",
             ),
         )
+
+        every { mockRootMessageInputStream.rootResponseStream } returns flowOf(
+            expectedCypressVersionResponse,
+            expectedVersionResponse,
+        )
         val scannerInformation = scannerInfoReader.readScannerInfo()
         assertThat(scannerInformation.hardwareVersion).isEqualTo("E-1")
-        assertThat(scannerInformation.firmwareVersions).isEqualTo(
-            expectedFirmwareVersions,
-        )
+        assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
     }
 
     @Test
@@ -120,7 +117,11 @@ class ScannerExtendedInfoReaderHelperTest {
             un20AppVersion = Un20ExtendedAppVersion("1.$expectedHardware.1"),
         )
         expectedExtendedVersionResponse = GetExtendedVersionResponse(expectedFirmwareVersions)
-
+        every { mockRootMessageInputStream.rootResponseStream } returns flowOf(
+            expectedCypressVersionResponse,
+            expectedHardwareResponse,
+            expectedExtendedVersionResponse,
+        )
         val scannerInformation = scannerInfoReader.readScannerInfo()
         assertThat(scannerInformation.hardwareVersion).isEqualTo(expectedHardware)
         assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
@@ -151,6 +152,12 @@ class ScannerExtendedInfoReaderHelperTest {
         )
         expectedVersionResponse = GetVersionResponse(expectedUnifiedVersion)
 
+        every { mockRootMessageInputStream.rootResponseStream } returns flowOf(
+            expectedCypressVersionResponse,
+            expectedHardwareResponse,
+            expectedExtendedVersionResponse,
+            expectedVersionResponse,
+        )
         // merge extended version-info, with old-api's unified version-info
         // for missing version values.
         val expectedFirmwareVersions = firmwareVersions.copy(
@@ -168,31 +175,39 @@ class ScannerExtendedInfoReaderHelperTest {
         assertThat(scannerInformation.firmwareVersions).isEqualTo(expectedFirmwareVersions)
     }
 
+    @Test
+    fun shouldReturn_scannerInformation_containingCypressExtendedVersion() = runTest {
+        val expectedCypressVersion = CypressExtendedFirmwareVersion("3.E-1.4")
+        expectedCypressExtendedVersionResponse =
+            GetCypressExtendedVersionResponse(expectedCypressVersion)
+        every { mockRootMessageInputStream.rootResponseStream } returns flowOf(
+            expectedCypressExtendedVersionResponse,
+        )
+        val scannerInformation = scannerInfoReader.getCypressExtendedVersion()
+
+        assertThat(scannerInformation.versionAsString).isEqualTo(expectedCypressVersion.versionAsString)
+    }
+
+    @Test
+    fun shouldReturn_scannerInformation_containingsetExtendedVersionInformationResponse() = runTest {
+        expectedSetVersionResponse = SetVersionResponse()
+        every { mockRootMessageInputStream.rootResponseStream } returns flowOf(
+            expectedSetVersionResponse,
+        )
+        val scannerInformation = scannerInfoReader.setExtendedVersionInformation(mockk())
+
+        assertThat(scannerInformation).isEqualTo(expectedSetVersionResponse)
+    }
+
     private fun getRootMessageChannel(): RootMessageChannel {
-        val responseSubject = PublishSubject.create<RootResponse>()
-
-        val spyRootMessageInputStream = spyk(RootMessageInputStream(mockk(), mockk())).apply {
-            justRun { connect(any()) }
-            justRun { disconnect() }
-            every { rootResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-        }
         val mockRootMessageOutputStream = mockk<RootMessageOutputStream> {
-            every { sendMessage(any()) } answers {
-                Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(
-                        when (args[0] as RootCommand) {
-                            is GetVersionCommand -> expectedVersionResponse
-                            is GetExtendedVersionCommand -> expectedExtendedVersionResponse
-                            is GetCypressVersionCommand -> expectedCypressVersionResponse
-                            is GetCypressExtendedVersionCommand -> expectedCypressExtendedVersionResponse
-                            is GetHardwareVersionCommand -> expectedHardwareResponse
-                            else -> throw IllegalArgumentException()
-                        },
-                    )
-                }
-            }
+            coJustRun { sendMessage(any()) }
         }
 
-        return RootMessageChannel(spyRootMessageInputStream, mockRootMessageOutputStream, ioDispatcher)
+        return RootMessageChannel(
+            mockRootMessageInputStream,
+            mockRootMessageOutputStream,
+            Dispatchers.IO,
+        )
     }
 }

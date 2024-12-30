@@ -59,7 +59,7 @@ import com.simprints.fingerprint.infra.scanner.v2.outgoing.stmota.StmOtaMessageO
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.un20.Un20OtaController
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
+import com.simprints.fingerprint.infra.scanner.v2.tools.asFlow
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -68,16 +68,10 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.TestObserver
-import io.reactivex.rxkotlin.toFlowable
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -86,13 +80,13 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.InputStream
 import java.io.OutputStream
+import kotlin.coroutines.CoroutineContext
 
 class ScannerTest {
     private lateinit var mockkMessageOutputStream: MainMessageOutputStream
     private lateinit var mockkMessageInputStream: MainMessageInputStream
     private lateinit var scanner: Scanner
-    private lateinit var flowableDisposable: Disposable
-    private lateinit var flowable: Flowable<ByteArray>
+
     private lateinit var mockkInputStream: InputStream
     private val un20OtaController: Un20OtaController = mockk()
     private val mockkOutputStream = mockk<OutputStream>()
@@ -101,8 +95,8 @@ class ScannerTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val dispatcher = Dispatchers.IO
+    private val coroutineContext: CoroutineContext = Dispatchers.Unconfined
+    private val dispatcher = Dispatchers.Unconfined
 
     @Before
     fun setup() {
@@ -110,21 +104,15 @@ class ScannerTest {
         mockkMessageOutputStream = mockk {
             justRun { connect(any()) }
             justRun { disconnect() }
-            every { sendMessage(any()) } returns Completable.complete()
+            justRun { sendMessage(any()) }
         }
-        flowableDisposable = mockk(relaxed = true)
-        flowable = mockk {
-            every { subscribeOn(any()) } returns this
-            every { publish() } returns mockk {
-                every { connect() } returns flowableDisposable
-            }
-        }
-        mockkStatic("com.simprints.fingerprint.infra.scanner.v2.tools.reactive.RxInputStreamKt")
-        mockkInputStream = mockk {
-            every { toFlowable() } returns flowable
+
+        mockkStatic("com.simprints.fingerprint.infra.scanner.v2.tools.InputStreamToFlowKt")
+        mockkInputStream = mockk(relaxed = true) {
+            every { asFlow(dispatcher) } returns emptyFlow<ByteArray>()
         }
         scanner = Scanner(
-            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
+            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, coroutineContext),
             setupRootMessageChannelMock(),
             mockk(),
             mockk(),
@@ -286,7 +274,7 @@ class ScannerTest {
             justRun { connect(any(), any()) }
         }
         scanner = Scanner(
-            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
+            MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, coroutineContext),
             rootMessageChannel,
             mockk(),
             mockk(),
@@ -353,7 +341,7 @@ class ScannerTest {
     @Test()
     fun scanner_connectThenEnterCypressOtaMode_callsConnectOnCypressOtaMessageStreams() = runTest {
         val mockCypressOtaMessageChannel =
-            CypressOtaMessageChannel(mockk(relaxed = true), mockk(relaxed = true), dispatcher)
+            CypressOtaMessageChannel(mockk(relaxed = true), mockk(relaxed = true), coroutineContext)
         scanner = Scanner(
             mockk(),
             setupRootMessageChannelMock(),
@@ -408,7 +396,7 @@ class ScannerTest {
         }
 
         val mockkMessageInputStream = mockk<CypressOtaMessageInputStream>(relaxed = true) {
-            every { cypressOtaResponseStream } returns emptyList<CypressOtaResponse>().toFlowable()
+            every { cypressOtaResponseStream } returns emptyList<CypressOtaResponse>().asFlow()
         }
 
         val scanner = Scanner(
@@ -418,7 +406,7 @@ class ScannerTest {
             CypressOtaMessageChannel(
                 mockkMessageInputStream,
                 mockk(relaxed = true),
-                dispatcher,
+                coroutineContext,
             ),
             mockk(),
             mockkCypressOtaController,
@@ -438,7 +426,7 @@ class ScannerTest {
         val mockkMessageInputStream = mockk<StmOtaMessageInputStream> {
             justRun { connect(any()) }
             justRun { disconnect() }
-            every { stmOtaResponseStream } returns emptyList<StmOtaResponse>().toFlowable()
+            every { stmOtaResponseStream } returns emptyList<StmOtaResponse>().asFlow()
         }
         val mockkMessageOutputStream = mockk<StmOtaMessageOutputStream> {
             justRun { connect(any()) }
@@ -455,7 +443,7 @@ class ScannerTest {
             StmOtaMessageChannel(
                 mockkMessageInputStream,
                 mockkMessageOutputStream,
-                dispatcher,
+                coroutineContext,
             ),
             mockk(),
             mockk(),
@@ -478,7 +466,7 @@ class ScannerTest {
     fun scanner_connectThenEnterStmOtaMode_stateIsInStmOtaMode() = runTest {
         val mockkMessageInputStream = mockk<StmOtaMessageInputStream> {
             justRun { connect(any()) }
-            every { stmOtaResponseStream } returns emptyList<StmOtaResponse>().toFlowable()
+            every { stmOtaResponseStream } returns emptyList<StmOtaResponse>().asFlow()
         }
 
         val scanner = Scanner(
@@ -489,7 +477,7 @@ class ScannerTest {
             StmOtaMessageChannel(
                 mockkMessageInputStream,
                 mockk(relaxed = true),
-                dispatcher,
+                coroutineContext,
             ),
             mockk(),
             mockk(),
@@ -545,24 +533,16 @@ class ScannerTest {
 
     @Test
     fun scannerVeroEvents_differentKindsOfEventsCreated_forwardsOnlyTriggerEventsToObservers() = runTest {
-        val eventsSubject = PublishSubject.create<VeroEvent>()
-        val messageInputStreamMock = setupMainMessageInputStreamMock()
-        every { messageInputStreamMock.veroEvents } returns eventsSubject.toFlowable(
-            BackpressureStrategy.BUFFER,
-        )
-
-        scanner = createScanner(messageInputStreamMock, mockkMessageOutputStream)
-        scanner.connect(mockkInputStream, mockkOutputStream)
+        val numberOfEvents = 3
+        every { mockkMessageInputStream.veroEvents } returns flow {
+            repeat(numberOfEvents) { emit(Un20StateChangeEvent(DigitalValue.TRUE)) }
+            repeat(numberOfEvents) { emit(TriggerButtonPressedEvent()) }
+        }
+        scanner.connect(mockkInputStream, mockk())
         scanner.enterMainMode()
 
-        val testObserver = TestObserver<Unit>()
-        scanner.triggerButtonListeners.add(testObserver)
-
-        val numberOfEvents = 3
-        repeat(numberOfEvents) { eventsSubject.onNext(Un20StateChangeEvent(DigitalValue.TRUE)) }
-        repeat(numberOfEvents) { eventsSubject.onNext(TriggerButtonPressedEvent()) }
-
-        assertThat(testObserver.valueCount()).isEqualTo(numberOfEvents)
+        val eventsCount = scanner.triggerButtonFlow.toList().count()
+        assertThat(eventsCount).isEqualTo(numberOfEvents)
     }
 
     @Test
@@ -747,9 +727,9 @@ class ScannerTest {
     ): MainMessageInputStream = mockk {
         justRun { connect(any()) }
         justRun { disconnect() }
-        every { un20Responses } returns un20Messages.toFlowable()
-        every { veroResponses } returns veroMessages.toFlowable()
-        every { veroEvents } returns veroEventsMessages.toFlowable()
+        every { un20Responses } returns un20Messages.asFlow()
+        every { veroResponses } returns veroMessages.asFlow()
+        every { veroEvents } returns veroEventsMessages.asFlow()
     }
 
     private fun setupRootMessageChannelMock(): RootMessageChannel {
@@ -760,17 +740,17 @@ class ScannerTest {
                 EnterMainModeResponse(),
                 EnterStmOtaModeResponse(),
                 EnterCypressOtaModeResponse(),
-            ).toFlowable()
+            ).asFlow()
         }
         val mockRootMessageOutputStream = mockk<RootMessageOutputStream> {
             justRun { connect(any()) }
             justRun { disconnect() }
-            every { sendMessage(any()) } returns Completable.complete()
+            justRun { sendMessage(any()) }
         }
         return RootMessageChannel(
             mockRootMessageInputStream,
             mockRootMessageOutputStream,
-            dispatcher,
+            coroutineContext,
         )
     }
 
@@ -778,7 +758,7 @@ class ScannerTest {
         messageInputStreamMock: MainMessageInputStream,
         mockkMessageOutputStream: MainMessageOutputStream,
     ) = Scanner(
-        MainMessageChannel(messageInputStreamMock, mockkMessageOutputStream, dispatcher),
+        MainMessageChannel(messageInputStreamMock, mockkMessageOutputStream, coroutineContext),
         setupRootMessageChannelMock(),
         mockk(),
         mockk(),
@@ -791,7 +771,7 @@ class ScannerTest {
     )
 
     private fun createScanner(scannerInfoReaderMockk: ScannerExtendedInfoReaderHelper) = Scanner(
-        MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, dispatcher),
+        MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream, coroutineContext),
         setupRootMessageChannelMock(),
         scannerInfoReaderMockk,
         mockk(),
