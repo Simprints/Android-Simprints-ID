@@ -35,5 +35,4 @@ dependencies {
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
-    implementation(libs.rxJava2.core)
 }

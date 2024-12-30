@@ -6,17 +6,18 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.responses.CommandAcknowledgement
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.stmota.StmOtaMessageInputStream
+import com.simprints.fingerprint.infra.scanner.v2.outgoing.stmota.StmOtaMessageOutputStream
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import io.mockk.spyk
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
@@ -76,32 +77,35 @@ class StmOtaControllerTest {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun configureMessageStreamMock(nackPositions: List<Int> = listOf()): StmOtaMessageChannel {
-        val responseSubject = PublishSubject.create<StmOtaResponse>()
+    private fun TestScope.configureMessageStreamMock(nackPositions: List<Int> = listOf()): StmOtaMessageChannel {
         val messageIndex = AtomicInteger(0)
-
-        return StmOtaMessageChannel(
-            spyk(StmOtaMessageInputStream(mockk(), mockk())).apply {
-                justRun { connect(any()) }
-                every { stmOtaResponseStream } returns responseSubject.toFlowable(
-                    BackpressureStrategy.BUFFER,
-                )
-            },
-            mockk {
-                every { sendMessage(any()) } answers {
-                    Completable.complete().doAfterTerminate {
-                        responseSubject.onNext(
-                            CommandAcknowledgement(
-                                if (nackPositions.contains(messageIndex.getAndIncrement())) {
-                                    CommandAcknowledgement.Kind.NACK
-                                } else {
-                                    CommandAcknowledgement.Kind.ACK
-                                },
-                            ),
-                        )
-                    }
+        var readyToRead = false
+        var response: StmOtaResponse = CommandAcknowledgement(CommandAcknowledgement.Kind.ACK)
+        val incoming = mockk<StmOtaMessageInputStream> {
+            justRun { connect(any()) }
+            every { stmOtaResponseStream } answers {
+                while (!readyToRead) {
+                    advanceTimeBy(SMALL_DELAY)
                 }
-            },
+                readyToRead = false
+                flowOf(response)
+            }
+        }
+        val outgoing = mockk<StmOtaMessageOutputStream> {
+            coEvery { sendMessage(any()) } answers {
+                response = CommandAcknowledgement(
+                    if (nackPositions.contains(messageIndex.getAndIncrement())) {
+                        CommandAcknowledgement.Kind.NACK
+                    } else {
+                        CommandAcknowledgement.Kind.ACK
+                    },
+                )
+                readyToRead = true
+            }
+        }
+        return StmOtaMessageChannel(
+            incoming,
+            outgoing,
             Dispatchers.IO,
         )
     }
@@ -115,5 +119,7 @@ class StmOtaControllerTest {
             val numberOfChunks = expectedNumberOfChunks(binFile)
             return (1..numberOfChunks).map { it.toFloat() / numberOfChunks.toFloat() }
         }
+
+        private const val SMALL_DELAY = 1L
     }
 }

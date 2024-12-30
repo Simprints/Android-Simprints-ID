@@ -13,20 +13,20 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.respo
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.WriteOtaChunkResponse
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.MainMessageInputStream
+import com.simprints.fingerprint.infra.scanner.v2.outgoing.main.MainMessageOutputStream
 import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
@@ -117,44 +117,40 @@ class Un20OtaControllerTest {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun configureMessageStreamMock(errorPositions: List<Int> = listOf()): MainMessageChannel {
-        val responseSubject = PublishSubject.create<Un20Response>()
+    private fun TestScope.configureMessageStreamMock(errorPositions: List<Int> = listOf()): MainMessageChannel {
+        var readyToRead = false
         val messageIndex = AtomicInteger(0)
-
-        return MainMessageChannel(
-            spyk(
-                MainMessageInputStream(
-                    mockk(),
-                    mockk(),
-                    mockk(),
-                    mockk(),
-                    UnconfinedTestDispatcher(),
-                ),
-            ).apply {
-                justRun { connect(any()) }
-                every { un20Responses } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
-            },
-            mockk {
-                every { sendMessage(any()) } answers {
-                    val resultCode =
-                        if (errorPositions.contains(messageIndex.getAndIncrement())) {
-                            OperationResultCode.UNKNOWN_ERROR
-                        } else {
-                            OperationResultCode.OK
-                        }
-                    val response = when (args[0] as Un20Command) {
-                        is StartOtaCommand -> StartOtaResponse(resultCode)
-                        is WriteOtaChunkCommand -> WriteOtaChunkResponse(resultCode)
-                        is VerifyOtaCommand -> VerifyOtaResponse(resultCode)
-                        else -> null
-                    }
-                    response?.let {
-                        Completable.complete().doAfterTerminate {
-                            responseSubject.onNext(it)
-                        }
-                    } ?: Completable.complete()
+        var un20Response: Un20Response = StartOtaResponse(OperationResultCode.OK)
+        val incoming = mockk<MainMessageInputStream> {
+            justRun { connect(any()) }
+            every { un20Responses } answers {
+                while (!readyToRead) {
+                    advanceTimeBy(SMALL_DELAY)
                 }
-            },
+                readyToRead = false
+                flowOf(un20Response)
+            }
+        }
+        val outgoing = mockk<MainMessageOutputStream> {
+            coEvery { sendMessage(any()) } answers {
+                val resultCode =
+                    if (errorPositions.contains(messageIndex.getAndIncrement())) {
+                        OperationResultCode.UNKNOWN_ERROR
+                    } else {
+                        OperationResultCode.OK
+                    }
+                un20Response = when (args[0] as Un20Command) {
+                    is StartOtaCommand -> StartOtaResponse(resultCode)
+                    is WriteOtaChunkCommand -> WriteOtaChunkResponse(resultCode)
+                    is VerifyOtaCommand -> VerifyOtaResponse(resultCode)
+                    else -> VerifyOtaResponse(resultCode)
+                }
+                readyToRead = true
+            }
+        }
+        return MainMessageChannel(
+            incoming,
+            outgoing,
             Dispatchers.IO,
         )
     }
@@ -169,5 +165,7 @@ class Un20OtaControllerTest {
             val numberOfChunks = expectedNumberOfChunks(binFile)
             return (1..numberOfChunks).map { it.toFloat() / numberOfChunks.toFloat() }
         }
+
+        private const val SMALL_DELAY = 1L
     }
 }

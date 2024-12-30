@@ -34,7 +34,6 @@ dependencies {
 
     // Kotlin
     runtimeOnly(libs.kotlin.reflect)
-    implementation(libs.kotlin.coroutine.rx2.adapter)
 
     // Android X
     implementation(libs.androidX.ui.viewpager2)

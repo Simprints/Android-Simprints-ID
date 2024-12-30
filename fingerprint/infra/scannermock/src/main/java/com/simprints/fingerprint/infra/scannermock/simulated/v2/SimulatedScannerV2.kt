@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.scannermock.simulated.v2
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.infra.scanner.v2.domain.IncomingMessage
 import com.simprints.fingerprint.infra.scanner.v2.domain.OutgoingMessage
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprint.infra.scannermock.simulated.SimulatedScannerManager
@@ -12,8 +11,10 @@ import com.simprints.fingerprint.infra.scannermock.simulated.v2.response.Simulat
 import com.simprints.fingerprint.infra.scannermock.simulated.v2.response.SimulatedRootResponseHelper
 import com.simprints.fingerprint.infra.scannermock.simulated.v2.response.SimulatedUn20ResponseHelper
 import com.simprints.fingerprint.infra.scannermock.simulated.v2.response.SimulatedVeroResponseHelper
-import io.reactivex.Flowable
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.io.OutputStream
 
 class SimulatedScannerV2(
@@ -21,6 +22,7 @@ class SimulatedScannerV2(
     val scannerState: SimulatedScannerStateV2 = SimulatedScannerStateV2(),
 ) : SimulatedScanner(simulatedScannerManager) {
     private lateinit var returnStream: OutputStream
+    private val dispatcher = Dispatchers.IO
 
     private val simulatedCommandInputStream = SimulatedCommandInputStream()
     private val simulatedResponseOutputStream = SimulatedResponseOutputStream()
@@ -46,14 +48,16 @@ class SimulatedScannerV2(
     }
 
     @SuppressLint("CheckResult")
-    private fun <T : OutgoingMessage, R : IncomingMessage> SimulatedResponseHelperV2<T, R>.respondToCommands(commands: Flowable<T>) {
-        commands.subscribeBy(onNext = { command ->
-            scannerState.updateStateAccordingToOutgoingMessage(command)
-            val response = this.createResponseToCommand(command)
-            val bytes = simulatedResponseOutputStream.serialize(response)
-            bytes.forEach { writeResponseToStream(it, returnStream) }
-            resolveEventQueue()
-        }, onError = { it.printStackTrace() })
+    private fun <T : OutgoingMessage, R : IncomingMessage> SimulatedResponseHelperV2<T, R>.respondToCommands(commands: Flow<T>) {
+        CoroutineScope(dispatcher).launch {
+            commands.collect { command ->
+                scannerState.updateStateAccordingToOutgoingMessage(command)
+                val response = createResponseToCommand(command)
+                val bytes = simulatedResponseOutputStream.serialize(response)
+                bytes.forEach { writeResponseToStream(it, returnStream) }
+                resolveEventQueue()
+            }
+        }
     }
 
     private fun resolveEventQueue() {
@@ -63,12 +67,6 @@ class SimulatedScannerV2(
 
     fun triggerUn20StateChangeEvent(digitalValue: DigitalValue) {
         val event = Un20StateChangeEvent(digitalValue)
-        val bytes = simulatedResponseOutputStream.serialize(event)
-        bytes.forEach { writeResponseToStream(it, returnStream) }
-    }
-
-    fun triggerButtonPressedEvent() {
-        val event = TriggerButtonPressedEvent()
         val bytes = simulatedResponseOutputStream.serialize(event)
         bytes.forEach { writeResponseToStream(it, returnStream) }
     }
