@@ -1,8 +1,4 @@
 package com.simprints.testtools.common.syntax
-
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.TestObserver
-import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert
 
 inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
@@ -24,17 +20,6 @@ inline fun <reified T : Throwable> assertThrows(
     val thrown = assertThrows<T>(executable)
     Assert.assertEquals(throwable, thrown)
     return thrown
-}
-
-fun <T> TestObserver<T>.awaitAndAssertSuccess(): Disposable = this
-    .await()
-    .assertComplete()
-    .assertNoErrors()
-
-fun <T> TestSubscriber<T>.awaitCompletionWithNoErrors() {
-    awaitTerminalEvent()
-    assertComplete()
-    assertNoErrors()
 }
 
 fun failTest(message: String?): Nothing {

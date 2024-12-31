@@ -1,32 +1,25 @@
 package com.simprints.fingerprint.infra.scanner.v2.tools.accumulator
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
-import com.simprints.testtools.unit.reactive.testSubscribe
-import io.reactivex.rxkotlin.toFlowable
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class AccumulatorTest {
     @Test
-    fun accumulator_usedInRxStream_producesCorrectElements() {
+    fun accumulator_usedInRxStream_producesCorrectElements() = runTest {
         val fragmentSize = 4
         val strings = listOf("28abcdefghijklmnopqrstuvwxyz", "10DEADBEEF", "05xyz")
         val stringFragments = strings.reduce { acc, s -> acc + s }.chunked(fragmentSize)
 
-        val testSubscriber = stringFragments
-            .toFlowable()
-            .accumulateAndTakeElements(StringAccumulator())
-            .testSubscribe()
+        val result = stringFragments.asFlow().accumulateAndTakeElements(StringAccumulator())
 
-        testSubscriber.awaitCompletionWithNoErrors()
-
-        assertThat(testSubscriber.values())
-            .containsExactlyElementsIn(strings)
-            .inOrder()
+        assertThat(result.toList()).containsExactlyElementsIn(strings).inOrder()
     }
 
     @Test
-    fun accumulator_fragmentsAddedDirectly_producesCorrectElements() {
+    fun accumulator_fragmentsAddedDirectly_producesCorrectElements() = runTest {
         val fragmentSize = 4
         val strings = listOf("28abcdefghijklmnopqrstuvwxyz", "10DEADBEEF", "05xyz")
         val stringFragments = strings.reduce { acc, s -> acc + s }.chunked(fragmentSize)
@@ -35,13 +28,9 @@ class AccumulatorTest {
 
         stringFragments.forEach { accumulator.updateWithNewFragment(it) }
 
-        val testSubscriber = accumulator.takeElements().testSubscribe()
+        val result = accumulator.takeElements()
 
-        testSubscriber.awaitCompletionWithNoErrors()
-
-        assertThat(testSubscriber.values())
-            .containsExactlyElementsIn(strings)
-            .inOrder()
+        assertThat(result.toList()).containsExactlyElementsIn(strings).inOrder()
     }
 
     class StringAccumulator :

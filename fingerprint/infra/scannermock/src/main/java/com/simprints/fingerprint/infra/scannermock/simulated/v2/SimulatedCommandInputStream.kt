@@ -80,51 +80,44 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.main.packet.PacketPar
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.packet.PacketRouter
 import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.ByteArrayAccumulator
 import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.accumulateAndTakeElements
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
-import io.reactivex.Flowable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import com.simprints.fingerprint.infra.scanner.v2.tools.asFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class SimulatedCommandInputStream {
-    private val streamDisposables = mutableListOf<Disposable>()
-
     private val rootOutputStream = PipedOutputStream()
     private val rootInputStream = PipedInputStream().also { it.connect(rootOutputStream) }
 
     private val mainOutputStream = PipedOutputStream()
     private val mainInputStream = PipedInputStream().also { it.connect(mainOutputStream) }
+    private val dispatcher = Dispatchers.IO
 
     private val router =
         PacketRouter(
             listOf(Route.Remote.VeroServer, Route.Remote.Un20Server),
             { destination },
             ByteArrayToPacketAccumulator(PacketParser()),
-            Dispatchers.IO,
-        ).also { it.connect(mainInputStream.toFlowable()) }
+            dispatcher,
+        ).also { it.connect(mainInputStream.asFlow(dispatcher)) }
 
-    val rootCommands: Flowable<RootCommand> =
+    val rootCommands: Flow<RootCommand> =
         rootInputStream
-            .toFlowable()
+            .asFlow(dispatcher)
             .accumulateAndTakeElements(RootCommandAccumulator(RootCommandParser()))
-            .subscribeOn(Schedulers.io())
-            .publish()
-            .also { streamDisposables.add(it.connect()) }
 
-    val veroCommands: Flowable<VeroCommand> = router.incomingPacketRoutes
+    val veroCommands: Flow<VeroCommand> = router.incomingPacketRoutes
         .getValue(
             Route.Remote.VeroServer,
         ).toMainMessageStream(VeroCommandAccumulator(VeroCommandParser()))
-    val un20Commands: Flowable<Un20Command> = router.incomingPacketRoutes
+    val un20Commands: Flow<Un20Command> = router.incomingPacketRoutes
         .getValue(
             Route.Remote.Un20Server,
         ).toMainMessageStream(Un20CommandAccumulator(Un20CommandParser()))
 
     fun disconnect() {
         router.disconnect()
-        streamDisposables.forEach { it.dispose() }
     }
 
     fun updateWithNewBytes(

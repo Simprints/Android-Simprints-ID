@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v2.incoming
 
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 import java.io.InputStream
 
 /**
@@ -9,7 +9,7 @@ import java.io.InputStream
  * are to be used for setting-up and releasing resources appropriately.
  */
 interface IncomingConnectable {
-    fun connect(flowableInputStream: Flowable<ByteArray>)
+    fun connect(inputStreamFlow: Flow<ByteArray>)
 
     fun disconnect()
 }

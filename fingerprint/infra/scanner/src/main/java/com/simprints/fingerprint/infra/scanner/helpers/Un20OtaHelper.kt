@@ -6,7 +6,6 @@ import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
-import io.reactivex.Completable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -135,7 +134,7 @@ internal class Un20OtaHelper @Inject constructor(
             val newVersion = oldVersion.updatedWithUn20Version(newFirmwareVersion)
             scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
         }
-            ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
+            ?: throw OtaFailedException("Was not able to determine the appropriate new unified version")
     }
 
     private fun ScannerVersion.updatedWithUn20Version(un20Firmware: Un20ExtendedAppVersion) =

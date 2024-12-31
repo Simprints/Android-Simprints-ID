@@ -2,7 +2,6 @@ package com.simprints.fingerprint.infra.scanner.v2.incoming.main.packet
 
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.accumulateAndTakeElements
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 
-fun Flowable<out ByteArray>.toPacketStream(accumulator: ByteArrayToPacketAccumulator): Flowable<Packet> = this
-    .accumulateAndTakeElements(accumulator)
+fun Flow<ByteArray>.toPacketStream(accumulator: ByteArrayToPacketAccumulator): Flow<Packet> = accumulateAndTakeElements(accumulator)

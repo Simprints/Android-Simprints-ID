@@ -2,7 +2,7 @@ package com.simprints.fingerprint.infra.scanner.v2.channel
 
 import com.simprints.fingerprint.infra.scanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.OutgoingConnectable
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 import java.io.OutputStream
 
 /**
@@ -10,7 +10,7 @@ import java.io.OutputStream
  */
 interface Connectable {
     fun connect(
-        flowableInputStream: Flowable<ByteArray>,
+        inputStreamFlow: Flow<ByteArray>,
         outputStream: OutputStream,
     )
 

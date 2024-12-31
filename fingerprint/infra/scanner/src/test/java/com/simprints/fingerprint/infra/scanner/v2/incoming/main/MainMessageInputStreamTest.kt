@@ -9,6 +9,9 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.model
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetUn20OnResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route.Remote.Un20Server
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route.Remote.VeroEvent
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route.Remote.VeroServer
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.accumulators.VeroResponseAccumulator
@@ -16,328 +19,145 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.parsers.
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.parsers.VeroEventParser
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.parsers.VeroResponseParser
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.packet.PacketRouter
-import com.simprints.fingerprint.infra.scanner.v2.tools.helpers.SchedulerHelper.INTERVAL
-import com.simprints.fingerprint.infra.scanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.hexToByteArray
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import io.reactivex.Flowable
-import io.reactivex.rxkotlin.toFlowable
-import io.reactivex.schedulers.TestScheduler
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainMessageInputStreamTest {
-    private val packetRouter = mockk<PacketRouter> {
+    private val packetRouter: PacketRouter = mockk {
         justRun { connect(any()) }
+        justRun { disconnect() }
     }
+    private val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
+    private val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
+    private val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
+    private lateinit var messageInputStream: MainMessageInputStream
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val dispatcher = UnconfinedTestDispatcher()
-
-    @Suppress(
-        "Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
-            " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
-            "re-written when the RxJava is finally removed from the scanners SDK.",
-    )
-    fun messageInputStream_receiveVeroResponse_correctlyForwardsResponse() {
-        val testScheduler = TestScheduler()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(
+    @Before
+    fun setup() {
+        messageInputStream = MainMessageInputStream(
             packetRouter,
             veroResponseAccumulator,
             veroEventAccumulator,
             un20ResponseAccumulator,
-            dispatcher,
         )
+    }
 
+    @Test
+    fun messageInputStream_receiveVeroResponse_correctlyForwardsResponse() = runTest {
         val messageBytes = "20 10 01 00 FF".hexToByteArray()
-        val packets =
-            messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
+        val packetsFlow = MutableSharedFlow<Packet>()
+
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
-
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to packets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.VeroEvent as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.Un20Server as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
+            VeroServer as Route to packetsFlow,
+            VeroEvent as Route to emptyFlow(),
+            Un20Server as Route to emptyFlow(),
         )
-
         every { packetRouter.incomingPacketRoutes } returns routes
-
         messageInputStream.connect(mockk())
-
-        val testSubscriber = messageInputStream
-            .receiveResponse<GetUn20OnResponse>()
-            .observeOn(testScheduler)
-            .timeout(TIMEOUT, TimeUnit.SECONDS)
-            .test()
-
-        routes[Route.Remote.VeroServer]?.connect()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!testSubscriber.isTerminated)
-
-        testSubscriber.awaitAndAssertSuccess()
-        testSubscriber.assertValue { expectedResponse.value == it.value }
+        launch { packetsFlow.emitAll(VeroServer, messageBytes) }
+        val res = messageInputStream.receiveResponse<GetUn20OnResponse>()
+        assertThat(res.value).isEqualTo(expectedResponse.value)
     }
 
-    @Suppress(
-        "Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
-            " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
-            "re-written when the RxJava is finally removed from the scanners SDK.",
-    )
-    fun messageInputStream_receiveUn20Response_correctlyForwardsResponse() {
-        val testScheduler = TestScheduler()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(
-            packetRouter,
-            veroResponseAccumulator,
-            veroEventAccumulator,
-            un20ResponseAccumulator,
-            dispatcher,
-        )
-
+    @Test
+    fun messageInputStream_receiveUn20Response_correctlyForwardsResponse() = runTest {
         val messageBytes = "30 00 01 00 00 00 10".hexToByteArray()
-        val packets =
-            messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.Un20Server, it) }
+        val packetsFlow = MutableSharedFlow<Packet>()
+
         val expectedResponse =
             GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.VeroEvent as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.Un20Server as Route to packets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
+            VeroServer as Route to emptyFlow(),
+            VeroEvent as Route to emptyFlow(),
+            Un20Server as Route to packetsFlow,
         )
-
         every { packetRouter.incomingPacketRoutes } returns routes
 
         messageInputStream.connect(mockk())
-
-        val testSubscriber = messageInputStream
-            .receiveResponse<GetSupportedTemplateTypesResponse>()
-            .observeOn(testScheduler)
-            .timeout(TIMEOUT, TimeUnit.SECONDS)
-            .test()
-
-        routes[Route.Remote.Un20Server]?.connect()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!testSubscriber.isTerminated)
-
-        testSubscriber.awaitAndAssertSuccess()
-        testSubscriber.assertValue { expectedResponse.supportedTemplateTypes == it.supportedTemplateTypes }
+        launch { packetsFlow.emitAll(Un20Server, messageBytes) }
+        val response = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>()
+        assertThat(response.supportedTemplateTypes).isEqualTo(
+            expectedResponse.supportedTemplateTypes,
+        )
     }
 
     @Test
-    fun messageInputStream_subscribeToVeroEvents_correctlyForwardsEvents() {
-        val testScheduler = TestScheduler()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(
-            packetRouter,
-            veroResponseAccumulator,
-            veroEventAccumulator,
-            un20ResponseAccumulator,
-            dispatcher,
-        )
-
+    fun messageInputStream_subscribeToVeroEvents_correctlyForwardsEvents() = runTest {
         val numberOfEvents = 5
         val messageBytes = "3A 00 00 00".repeat(numberOfEvents).hexToByteArray()
-        val packets =
-            messageBytes.chunked(3).map { packetWithSourceAndPayload(Route.Remote.VeroEvent, it) }
+        val packetsFlow = MutableSharedFlow<Packet>()
         val expectedEvent = TriggerButtonPressedEvent()
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.VeroEvent as Route to packets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.Un20Server as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
+            VeroServer as Route to emptyFlow(),
+            VeroEvent as Route to packetsFlow,
+            Un20Server as Route to emptyFlow(),
         )
 
         every { packetRouter.incomingPacketRoutes } returns routes
 
         messageInputStream.connect(mockk())
-
-        val testSubscriber = messageInputStream.veroEvents!!
-            .observeOn(testScheduler)
-            .timeout(TIMEOUT, TimeUnit.SECONDS)
-            .test()
-
-        routes[Route.Remote.VeroEvent]?.connect()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!testSubscriber.isTerminated)
-
-        testSubscriber.awaitCount(numberOfEvents)
-        testSubscriber.values().forEach { assertThat(it).isInstanceOf(expectedEvent::class.java) }
+        launch { packetsFlow.emitAll(VeroEvent, messageBytes, 3) }
+        val response = messageInputStream.veroEvents
+        assertThat(response.first()).isInstanceOf(expectedEvent::class.java)
     }
 
     @Test
-    fun messageInputStream_receiveMultipleOfSameResponses_forwardsOnlyFirstAsResponse() {
-        val testScheduler = TestScheduler()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(
-            packetRouter,
-            veroResponseAccumulator,
-            veroEventAccumulator,
-            un20ResponseAccumulator,
-            dispatcher,
-        )
-
+    fun messageInputStream_receiveMultipleOfSameResponses_forwardsOnlyFirstAsResponse() = runTest {
         val messageBytes = "20 10 01 00 FF 20 10 01 00 00".hexToByteArray()
-        val packets =
-            messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
+        val packetsFlow = MutableSharedFlow<Packet>()
         val firstExpectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to packets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.VeroEvent as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.Un20Server as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
+            VeroServer as Route to packetsFlow,
+            VeroEvent as Route to emptyFlow(),
+            Un20Server as Route to emptyFlow(),
         )
 
         every { packetRouter.incomingPacketRoutes } returns routes
 
         messageInputStream.connect(mockk())
-
-        val responseSubscriber = messageInputStream
-            .receiveResponse<GetUn20OnResponse>()
-            .observeOn(testScheduler)
-            .timeout(TIMEOUT, TimeUnit.SECONDS)
-            .test()
-
-        routes[Route.Remote.VeroServer]?.connect()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!responseSubscriber.isTerminated)
-
-        responseSubscriber.awaitAndAssertSuccess()
-        responseSubscriber.assertValue { firstExpectedResponse.value == it.value }
+        launch { packetsFlow.emitAll(VeroServer, messageBytes) }
+        val response = messageInputStream.receiveResponse<GetUn20OnResponse>()
+        assertThat(response.value).isEqualTo(firstExpectedResponse.value)
     }
 
     @Test
-    fun messageInputStream_receiveDifferentResponses_forwardsOnlyCorrectResponse() {
-        val testScheduler = TestScheduler()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(
-            packetRouter,
-            veroResponseAccumulator,
-            veroEventAccumulator,
-            un20ResponseAccumulator,
-            dispatcher,
-        )
-
+    fun messageInputStream_receiveDifferentResponses_forwardsOnlyCorrectResponse() = runTest {
         val messageBytes = "20 20 01 00 00 30 10 01 00 FF 20 10 01 00 FF".hexToByteArray()
-        val packets =
-            messageBytes.chunked(2).map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
+        val packetsFlow = MutableSharedFlow<Packet>()
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val routes = mapOf(
-            Route.Remote.VeroServer as Route to packets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.VeroEvent as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.Un20Server as Route to Flowable
-                .empty<Packet>()
-                .observeOn(testScheduler)
-                .publish(),
+            VeroServer as Route to packetsFlow,
+            VeroEvent as Route to emptyFlow(),
+            Un20Server as Route to emptyFlow(),
         )
-
         every { packetRouter.incomingPacketRoutes } returns routes
-
         messageInputStream.connect(mockk())
-
-        val testSubscriber =
-            messageInputStream
-                .receiveResponse<GetUn20OnResponse>()
-                .observeOn(testScheduler)
-                .timeout(TIMEOUT, TimeUnit.SECONDS)
-                .test()
-
-        routes[Route.Remote.VeroServer]?.connect()
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!testSubscriber.isTerminated)
-
-        testSubscriber.awaitAndAssertSuccess()
-        testSubscriber.assertValue { expectedResponse.value == it.value }
+        launch { packetsFlow.emitAll(VeroServer, messageBytes) }
+        val response = messageInputStream.receiveResponse<GetUn20OnResponse>()
+        assertThat(response.value).isEqualTo(expectedResponse.value)
     }
 
-    @Suppress(
-        "Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
-            " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
-            "re-written when the RxJava is finally removed from the scanners SDK.",
-    )
-    fun messageInputStream_receiveResponsesAndEventsFromMultipleRoutesSimultaneously_correctlyForwardsResponsesAndEvents() {
-        val testScheduler = TestScheduler()
-        val veroResponseAccumulator = VeroResponseAccumulator(VeroResponseParser())
-        val veroEventAccumulator = VeroEventAccumulator(VeroEventParser())
-        val un20ResponseAccumulator = Un20ResponseAccumulator(Un20ResponseParser())
-        val messageInputStream = MainMessageInputStream(
-            packetRouter,
-            veroResponseAccumulator,
-            veroEventAccumulator,
-            un20ResponseAccumulator,
-            dispatcher,
-        )
-
+    @Test
+    fun messageInputStream_receiveResponsesFromMultipleRoutes_correctlyForwardIt() = runTest {
         val veroResponseBytes = "20 10 01 00 FF".hexToByteArray()
         val expectedVeroResponse = GetUn20OnResponse(DigitalValue.TRUE)
         val numberOfEvents = 5
@@ -347,70 +167,53 @@ class MainMessageInputStreamTest {
         val expectedUn20Response =
             GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
 
-        val veroResponsePackets = veroResponseBytes
-            .chunked(2)
-            .map { packetWithSourceAndPayload(Route.Remote.VeroServer, it) }
-        val veroEventPackets =
-            veroEventBytes.chunked(3).map { packetWithSourceAndPayload(Route.Remote.VeroEvent, it) }
-        val un20ResponsePackets = un20ResponseBytes
-            .chunked(2)
-            .map { packetWithSourceAndPayload(Route.Remote.Un20Server, it) }
+        val veroResponsePackets = MutableSharedFlow<Packet>()
+        val veroEventPackets = MutableSharedFlow<Packet>()
+        val un20ResponsePackets = MutableSharedFlow<Packet>()
 
-        val routes = mapOf(
-            Route.Remote.VeroServer as Route to veroResponsePackets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.VeroEvent as Route to veroEventPackets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
-            Route.Remote.Un20Server as Route to un20ResponsePackets
-                .toFlowable()
-                .observeOn(testScheduler)
-                .publish(),
+        val routes = mapOf<Route, Flow<Packet>>(
+            VeroServer to veroResponsePackets,
+            VeroEvent to veroEventPackets,
+            Un20Server to un20ResponsePackets,
         )
 
         every { packetRouter.incomingPacketRoutes } returns routes
 
         messageInputStream.connect(mockk())
+        launch { veroResponsePackets.emitAll(VeroServer, veroResponseBytes) }
+        val veroResponse = messageInputStream.receiveResponse<GetUn20OnResponse>()
+        launch { veroEventPackets.emitAll(VeroEvent, veroEventBytes, 3) }
+        val veroEvent = messageInputStream.receiveResponse<TriggerButtonPressedEvent>()
+        launch { un20ResponsePackets.emitAll(Un20Server, un20ResponseBytes) }
+        val un20Response = messageInputStream.receiveResponse<GetSupportedTemplateTypesResponse>()
 
-        val veroResponseTestSubscriber =
-            messageInputStream
-                .receiveResponse<GetUn20OnResponse>()
-                .observeOn(testScheduler)
-                .timeout(TIMEOUT, TimeUnit.SECONDS)
-                .test()
-        val veroEventTestSubscriber = messageInputStream.veroEvents!!
-            .observeOn(testScheduler)
-            .timeout(TIMEOUT, TimeUnit.SECONDS)
-            .test()
-        val un20ResponseTestSubscriber =
-            messageInputStream
-                .receiveResponse<GetSupportedTemplateTypesResponse>()
-                .observeOn(testScheduler)
-                .timeout(TIMEOUT, TimeUnit.SECONDS)
-                .test()
+        assertThat(veroResponse.value).isEqualTo(expectedVeroResponse.value)
+        assertThat(veroEvent.veroMessageType).isEqualTo(expectedVeroEvent.veroMessageType)
+        assertThat(un20Response.supportedTemplateTypes).isEqualTo(expectedUn20Response.supportedTemplateTypes)
+    }
 
-        routes.values.forEach { it.connect() }
-
-        do {
-            testScheduler.advanceTimeBy(INTERVAL, TimeUnit.MILLISECONDS)
-        } while (!veroResponseTestSubscriber.isTerminated &&
-            !veroEventTestSubscriber.isTerminated &&
-            un20ResponseTestSubscriber.isTerminated
+    @Test
+    fun messageInputStream_disconnect_disconnectsPacketRouter() = runTest {
+        val routes = mapOf(
+            VeroServer as Route to emptyFlow<Packet>(),
+            VeroEvent as Route to emptyFlow(),
+            Un20Server as Route to emptyFlow(),
         )
 
-        veroResponseTestSubscriber.awaitAndAssertSuccess()
-        veroResponseTestSubscriber.assertValue { expectedVeroResponse.value == it.value }
+        every { packetRouter.incomingPacketRoutes } returns routes
+        justRun { packetRouter.disconnect() }
+        messageInputStream.connect(mockk())
+        messageInputStream.disconnect()
+        verify {
+            packetRouter.disconnect()
+        }
+    }
 
-        veroEventTestSubscriber.awaitCount(numberOfEvents)
-        assertThat(veroEventTestSubscriber.values().size).isEqualTo(numberOfEvents)
-        veroEventTestSubscriber
-            .values()
-            .forEach { assertThat(it).isInstanceOf(expectedVeroEvent::class.java) }
-
-        un20ResponseTestSubscriber.awaitAndAssertSuccess()
-        un20ResponseTestSubscriber.assertValue { expectedUn20Response.supportedTemplateTypes == it.supportedTemplateTypes }
+    private suspend fun MutableSharedFlow<Packet>.emitAll(
+        route: Route,
+        bytes: ByteArray,
+        chunkSize: Int = 2,
+    ) {
+        bytes.chunked(chunkSize).forEach { emit(packetWithSourceAndPayload(route, it)) }
     }
 }

@@ -18,16 +18,16 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoRea
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
 import com.simprints.fingerprint.infra.scanner.v2.tools.runWithErrorWrapping
-import com.simprints.fingerprint.infra.scanner.v2.tools.wrapErrorFromScanner
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import io.reactivex.Observer
-import io.reactivex.observers.DisposableObserver
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Collections
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
 internal class ScannerWrapperV2(
@@ -81,6 +81,7 @@ internal class ScannerWrapperV2(
     }
 
     override suspend fun disconnect() = runWithErrorWrapping {
+        triggerEventJob?.cancel()
         connectionHelper.disconnectScanner(scannerV2)
     }
 
@@ -97,6 +98,8 @@ internal class ScannerWrapperV2(
      */
     override suspend fun sensorWakeUp() = runWithErrorWrapping {
         scannerV2.ensureUn20State(true)
+        // Now that the scanner is active, start observing trigger button events.
+        observeTriggerButtonEvents()
     }
 
     /**
@@ -161,24 +164,23 @@ internal class ScannerWrapperV2(
         runCatching { scannerV2.setSmileLedState(scannerUiHelper.turnedOffState()) }
     }
 
-    private val triggerListenerToObserverMap =
-        mutableMapOf<ScannerTriggerListener, Observer<Unit>>()
+    private val activeTriggerListeners = Collections.synchronizedSet(mutableSetOf<ScannerTriggerListener>())
+    private var triggerEventJob: Job? = null
 
-    override fun registerTriggerListener(triggerListener: ScannerTriggerListener) {
-        triggerListenerToObserverMap[triggerListener] = object : DisposableObserver<Unit>() {
-            override fun onComplete() {}
-
-            override fun onNext(t: Unit) {
-                triggerListener.onTrigger()
-            }
-
-            override fun onError(e: Throwable): Unit = throw wrapErrorFromScanner(e)
-        }.also { scannerV2.triggerButtonListeners.add(it) }
+    override fun registerTriggerListener(listener: ScannerTriggerListener) {
+        activeTriggerListeners.add(listener)
     }
 
-    override fun unregisterTriggerListener(triggerListener: ScannerTriggerListener) {
-        triggerListenerToObserverMap[triggerListener]?.let {
-            scannerV2.triggerButtonListeners.remove(it)
+    override fun unregisterTriggerListener(listener: ScannerTriggerListener) {
+        activeTriggerListeners.remove(listener)
+    }
+
+    private fun observeTriggerButtonEvents() {
+        triggerEventJob?.cancel()
+        triggerEventJob = CoroutineScope(ioDispatcher).launch {
+            scannerV2.triggerButtonFlow.collect {
+                activeTriggerListeners.forEach { listener -> listener.onTrigger() }
+            }
         }
     }
 
