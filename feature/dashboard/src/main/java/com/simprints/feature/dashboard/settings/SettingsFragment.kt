@@ -86,12 +86,18 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getFingerSelectionPreference()?.setOnPreferenceClickListener {
-            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_fingerSelectionFragment)
+            findNavController().navigateSafely(
+                this@SettingsFragment,
+                SettingsFragmentDirections.actionSettingsFragmentToFingerSelectionFragment(),
+            )
             true
         }
 
         getSyncInfoPreference()?.setOnPreferenceClickListener {
-            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_syncInfoFragment)
+            findNavController().navigateSafely(
+                this@SettingsFragment,
+                SettingsFragmentDirections.actionSettingsFragmentToSyncInfoFragment(),
+            )
             true
         }
 
@@ -101,7 +107,10 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getAboutPreference()?.setOnPreferenceClickListener {
-            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_aboutFragment)
+            findNavController().navigateSafely(
+                this@SettingsFragment,
+                SettingsFragmentDirections.actionSettingsFragmentToAboutFragment(),
+            )
             true
         }
     }

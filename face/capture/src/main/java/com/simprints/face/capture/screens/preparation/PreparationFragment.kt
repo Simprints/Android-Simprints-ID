@@ -36,7 +36,10 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
 
         binding.detectionOnboardingFrame.setOnClickListener {
             mainVm.addOnboardingComplete(startTime)
-            findNavController().navigateSafely(this, R.id.action_facePreparationFragment_to_faceLiveFeedbackFragment)
+            findNavController().navigateSafely(
+                this,
+                PreparationFragmentDirections.actionFacePreparationFragmentToFaceLiveFeedbackFragment(),
+            )
         }
     }
 }

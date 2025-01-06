@@ -41,9 +41,9 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
 
     private fun menuItemClicked(item: MenuItem): Boolean = with(findNavController()) {
         when (item.itemId) {
-            R.id.menuSettings -> navigateSafely(this@MainFragment, R.id.action_mainFragment_to_settingsFragment)
-            R.id.debug -> navigateSafely(this@MainFragment, R.id.action_mainFragment_to_debugFragment)
-            R.id.menuPrivacyNotice -> navigateSafely(this@MainFragment, R.id.action_mainFragment_to_privacyNoticesFragment)
+            R.id.menuSettings -> navigateSafely(this@MainFragment, MainFragmentDirections.actionMainFragmentToSettingsFragment())
+            R.id.debug -> navigateSafely(this@MainFragment, MainFragmentDirections.actionMainFragmentToDebugFragment())
+            R.id.menuPrivacyNotice -> navigateSafely(this@MainFragment, MainFragmentDirections.actionMainFragmentToPrivacyNoticesFragment())
         }
         true
     }

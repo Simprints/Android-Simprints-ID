@@ -55,6 +55,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private val binding by viewBinding(FragmentLoginFormBinding::bind)
     private val viewModel by viewModels<LoginFormViewModel>()
 
+    @Suppress("UNNECESSARY_LATEINIT")
     private lateinit var checkForPlayServicesResultLauncher: ActivityResultLauncher<IntentSenderRequest>
 
     init {
@@ -104,7 +105,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
         binding.loginButtonScanQr.setOnClickListener {
             Simber.tag(LOGIN.name).i("Scan QR button clicked")
-            findNavController().navigateSafely(this, R.id.action_loginFormFragment_to_loginQrScanner)
+            findNavController().navigateSafely(this, LoginFormFragmentDirections.actionLoginFormFragmentToLoginQrScanner())
         }
         binding.loginButtonSignIn.setOnClickListener {
             Simber.tag(LOGIN.name).i("Login button clicked")

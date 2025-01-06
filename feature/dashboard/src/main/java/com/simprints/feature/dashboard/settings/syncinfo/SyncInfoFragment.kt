@@ -53,7 +53,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun setupClickListeners() {
         binding.moduleSelectionButton.setOnClickListener {
-            findNavController().navigateSafely(this, R.id.action_syncInfoFragment_to_moduleSelectionFragment)
+            findNavController().navigateSafely(this, SyncInfoFragmentDirections.actionSyncInfoFragmentToModuleSelectionFragment())
         }
         binding.syncInfoToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()

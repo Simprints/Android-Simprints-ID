@@ -53,7 +53,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
         binding.loginImageViewLogo.setOnClickListener {
             if (clickCounter.handleClick(lifecycleScope)) {
-                findNavController().navigateSafely(this, R.id.action_requestLoginFragment_to_troubleshooting)
+                findNavController().navigateSafely(this, RequestLoginFragmentDirections.actionRequestLoginFragmentToTroubleshooting())
             }
         }
     }
@@ -66,7 +66,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
     override fun onResume() {
         super.onResume()
         if (authStore.signedInProjectId.isNotEmpty()) {
-            findNavController().navigateSafely(this, R.id.action_requestLoginFragment_to_mainFragment)
+            findNavController().navigateSafely(this, RequestLoginFragmentDirections.actionRequestLoginFragmentToMainFragment())
         }
     }
 
