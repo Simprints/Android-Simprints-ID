@@ -92,7 +92,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
     }
 
     override fun startProjectSync() {
-        workManager.startWorker<ProjectConfigDownSyncWorker>(SyncConstants.PROJECT_SYNC_WORK_NAME)
+        workManager.startWorker<ProjectConfigDownSyncWorker>(SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME)
     }
 
     override fun startDeviceSync() {
