@@ -1,0 +1,33 @@
+name: "Deploy: Release Workflow"
+
+on:
+    workflow_dispatch:
+
+concurrency:
+    group: release-internal-workflow
+    cancel-in-progress: true
+
+jobs:
+
+    run-core-tests:
+        name: Run Core Tests
+        uses: ./.github/workflows/pr-checks.yml
+        secrets: inherit
+
+    deploy-to-dev:
+        uses: ./.github/workflows/pipeline-deploy-to-dev.yml
+        secrets: inherit
+        needs:
+            - run-core-tests
+
+    deploy-to-staging:
+        uses: ./.github/workflows/pipeline-deploy-to-staging.yml
+        secrets: inherit
+        needs:
+            - run-core-tests
+
+    deploy-to-internal:
+        uses: ./.github/workflows/pipeline-deploy-to-internal.yml
+        secrets: inherit
+        needs:
+            - run-core-tests

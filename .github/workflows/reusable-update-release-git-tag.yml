@@ -1,0 +1,16 @@
+name: "[Reusable] Update Release Git Tag"
+
+on:
+    workflow_call:
+
+permissions:
+    contents: write # A write permission For Auto tagging the releases
+
+jobs:
+    set-release-tag:
+        name: Set Release tag
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Set release tag
+                uses: ./.github/actions/set-release-git-tag

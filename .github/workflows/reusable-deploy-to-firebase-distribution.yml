@@ -1,0 +1,55 @@
+# Deploy APKs to Firebase App Distribution
+name: "[Reusable] Deploy to Firebase"
+
+on:
+    workflow_call:
+        inputs:
+            build-environment:
+                type: string
+                required: true
+            upload-artifact:
+                type: string
+                required: true
+
+jobs:
+    deploy-to-firebase:
+        runs-on: ubuntu-latest
+
+        concurrency:
+            group: firebase-${{ inputs.build-environment }}-workflow
+            cancel-in-progress: true
+
+        environment: ${{ inputs.build-environment }}
+
+        env:
+            GOOGLE_APPLICATION_CREDENTIALS: "set later"
+
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
+
+            -   name: Set up Node.js
+                uses: actions/setup-node@v4
+                with:
+                    node-version: 'latest'
+
+            -   name: Install Firebase Tools
+                run: npm install -g firebase-tools
+
+            -   name: Authenticate to Firebase
+                env:
+                    FIREBASE_CRED_FILE: ${{ secrets.FIREBASE_DIST_CREDENTIALS }}
+                run: |
+                    echo $FIREBASE_CRED_FILE > $HOME/firebase-service-account.json
+                    echo GOOGLE_APPLICATION_CREDENTIALS=$HOME/firebase-service-account.json >> $GITHUB_ENV
+
+            -   name: Download APK artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: ${{ inputs.upload-artifact }}
+
+            -   name: Distribution Summary
+                run: echo "### Deployed ${{ inputs.upload-artifact}} to Firebase Simprints ID ${{ inputs.build-environment }} :rocket:" >> $GITHUB_STEP_SUMMARY
+
+            -   name: Deploy to Firebase App Distribution
+                run: firebase appdistribution:distribute ${{ inputs.upload-artifact }} --app ${{ vars.FIREBASE_DISTRIBUTION_APP_ID}} --groups "pre-release-testers"

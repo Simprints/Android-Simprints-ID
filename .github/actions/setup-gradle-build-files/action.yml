@@ -1,0 +1,82 @@
+name: "Setup: Gradle Build Files"
+description: This composite action sets up the Gradle build files for the project.
+
+inputs:
+    gh-package-name:
+        description: "The GitHub username to use for the Gradle properties."
+        required: false
+    gh-package-token:
+        description: "The GitHub token to use for the Gradle properties."
+        required: false
+    google-services-file:
+        description: "The Google Services file to use for the project."
+        required: false
+    signing-jks-file:
+        description: "The signing JKS file to use for the project."
+        required: false
+    jks-store-password:
+        description: "REQUIRED IF JKS FILE IS INPUT"
+        required: false
+    jks-key-alias:
+        description: "REQUIRED IF JKS FILE IS INPUT"
+        required: false
+    jks-key-password:
+        description: "REQUIRED IF JKS FILE IS INPUT"
+        required: false
+
+runs:
+    using: "composite"
+
+    steps:
+        -   name: Set up gradle properties
+            shell: bash
+            run: |
+                chmod +x gradlew
+                echo "org.gradle.caching=true" >>gradle.properties
+                echo "org.gradle.jvmargs=-Xmx7g"
+
+        -   name: Set up local.properties files
+            if: ${{ inputs.gh-package-name != '' && inputs.gh-package-token != '' }}
+            shell: bash
+            run: |
+                touch local.properties
+                echo "GITHUB_USERNAME=${{ inputs.gh-package-name }}" >>  local.properties
+                echo "GITHUB_TOKEN=${{ inputs.gh-package-token }}" >>  local.properties
+
+        -   name: Set up signing info
+            if: ${{ inputs.signing-jks-file != '' }}
+            shell: bash
+            env:
+                SIGNING_JKS_FILE: ${{ inputs.signing-jks-file }}
+            run: |
+                echo "$SIGNING_JKS_FILE" | base64 -di >android-signing-keystore.jks
+                touch build-logic/signing_info.gradle.kts
+                cat << EOF >> build-logic/signing_info.gradle.kts
+                extra.apply {
+                    set("store_file", "\$rootDir/android-signing-keystore.jks")
+                    set("store_password", "${{ inputs.jks-store-password }}")
+                    set("key_alias", "${{ inputs.jks-key-alias}}")
+                    set("key_password", "${{ inputs.jks-key-password}}")
+                }
+                EOF
+
+        -   name: Set up dummy signing info
+            if: ${{ inputs.signing-jks-file == '' }}
+            shell: bash
+            run: |
+                touch build-logic/signing_info.gradle.kts
+                # Add dummy signing info to build-logic/signing_info.gradle.kts
+                cat << EOF >> build-logic/signing_info.gradle.kts
+                extra.apply {
+                    set("store_file", "dummy")
+                    set("store_password", "dummy")
+                    set("key_alias", "dummy")
+                    set("key_password", "dummy")
+                }
+
+        -   name: Write Google Services file
+            if: ${{ inputs.google-services-file != '' }}
+            shell: bash
+            env:
+                GOOGLE_SERVICES_FILE: ${{ inputs.google-services-file }}
+            run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json

@@ -15,7 +15,6 @@ plugins {
     alias(libs.plugins.gms) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.firebase.perf) apply false
-    alias(libs.plugins.firebase.distribution) apply false
     alias(libs.plugins.play.publisher) apply false
 
     alias(libs.plugins.retry) apply false
