@@ -112,9 +112,10 @@ private fun <T : Serializable> handleResultFromChild(
 /**
  * Executes the [NavController] navigation request in a safely manner. Executes the navigation
  * request only if no other transaction is scheduled for the [currentFragment]
+ * Make sure that current fragment is part of the same graph as the action.
  *
- *  @param currentFragment - currently displayed fragment in the [NavController]
- *  @param directions - [directions that describe this navigation operation
+ *  @param currentFragment - currently displayed fragment in the [NavController].
+ *  @param directions - directions that describe this navigation operation.
  *  @param navOptions - special options for this navigation operation
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
@@ -130,6 +131,9 @@ fun NavController.navigateSafely(
 /**
  * Executes the [NavController] navigation request in a safely manner. Executes the navigation
  * request only if no other transaction is scheduled for the [currentFragment]
+ * Make sure that current fragment is part of the same graph as the action.
+ *
+ * **NOTE:** Use [navigateSafely(Fragment?, NavDirections, NavOptions?)] where possible.
  *
  *  @param currentFragment - currently displayed fragment in the [NavController]
  *  @param actionId - an action id or a destination id to navigate to

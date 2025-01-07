@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.face.capture.GraphFaceCaptureInternalDirections
 import com.simprints.face.capture.R
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.feature.alert.AlertContract
@@ -55,7 +56,10 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             if (option != null) {
                 findNavController().finishWithResult(this, it)
             } else {
-                internalNavController?.navigateSafely(currentlyDisplayedInternalFragment, R.id.action_global_faceLiveFeedback)
+                internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    GraphFaceCaptureInternalDirections.actionGlobalFaceLiveFeedback(),
+                )
             }
         }
 
@@ -72,7 +76,10 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
         viewModel.recaptureEvent.observe(
             viewLifecycleOwner,
             LiveDataEventObserver {
-                internalNavController?.navigateSafely(currentlyDisplayedInternalFragment, R.id.action_global_faceLiveFeedback)
+                internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    GraphFaceCaptureInternalDirections.actionGlobalFaceLiveFeedback(),
+                )
             },
         )
 

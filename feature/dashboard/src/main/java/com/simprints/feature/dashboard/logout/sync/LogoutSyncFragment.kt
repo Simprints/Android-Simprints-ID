@@ -47,18 +47,28 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         logoutSyncCard.onSyncButtonClick = { syncViewModel.sync() }
         logoutSyncCard.onOfflineButtonClick =
             { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
-        logoutSyncCard.onSelectNoModulesButtonClick =
-            { findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_moduleSelectionFragment) }
+        logoutSyncCard.onSelectNoModulesButtonClick = {
+            findNavController().navigateSafely(
+                this@LogoutSyncFragment,
+                LogoutSyncFragmentDirections.actionLogoutSyncFragmentToModuleSelectionFragment(),
+            )
+        }
         logoutSyncCard.onLoginButtonClick = { syncViewModel.login() }
         logoutSyncToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
         logoutWithoutSyncButton.setOnClickListener {
-            findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_logoutSyncDeclineFragment)
+            findNavController().navigateSafely(
+                this@LogoutSyncFragment,
+                LogoutSyncFragmentDirections.actionLogoutSyncFragmentToLogoutSyncDeclineFragment(),
+            )
         }
         logoutButton.setOnClickListener {
             logoutSyncViewModel.logout()
-            findNavController().navigateSafely(this@LogoutSyncFragment, R.id.action_logoutSyncFragment_to_requestLoginFragment)
+            findNavController().navigateSafely(
+                this@LogoutSyncFragment,
+                LogoutSyncFragmentDirections.actionLogoutSyncFragmentToRequestLoginFragment(),
+            )
         }
     }
 

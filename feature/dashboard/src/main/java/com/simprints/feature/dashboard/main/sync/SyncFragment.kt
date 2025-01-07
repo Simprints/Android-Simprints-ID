@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDashboardCardSyncBinding
+import com.simprints.feature.dashboard.main.MainFragmentDirections
 import com.simprints.feature.dashboard.requestlogin.LogoutReason
 import com.simprints.feature.dashboard.requestlogin.RequestLoginFragmentArgs
 import com.simprints.feature.login.LoginContract
@@ -44,7 +45,10 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         onSyncButtonClick = { viewModel.sync() }
         onOfflineButtonClick = { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
         onSelectNoModulesButtonClick = {
-            findNavController().navigateSafely(this@SyncFragment, R.id.action_mainFragment_to_moduleSelectionFragment)
+            findNavController().navigateSafely(
+                parentFragment,
+                MainFragmentDirections.actionMainFragmentToModuleSelectionFragment(),
+            )
         }
         onLoginButtonClick = { viewModel.login() }
     }
@@ -66,7 +70,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
                 body = getString(IDR.string.dashboard_sync_project_ending_message),
             )
             findNavController().navigateSafely(
-                this,
+                parentFragment,
                 R.id.action_mainFragment_to_requestLoginFragment,
                 RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle(),
             )
@@ -74,7 +78,11 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         viewModel.loginRequestedEventLiveData.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { loginArgs ->
-                findNavController().navigateSafely(this@SyncFragment, R.id.action_mainFragment_to_login, loginArgs)
+                findNavController().navigateSafely(
+                    parentFragment,
+                    R.id.action_mainFragment_to_login,
+                    loginArgs,
+                )
             },
         )
     }

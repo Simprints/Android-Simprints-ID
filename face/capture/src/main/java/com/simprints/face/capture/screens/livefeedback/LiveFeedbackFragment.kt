@@ -171,7 +171,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
                         currentFragment = this,
-                        actionId = R.id.action_faceLiveFeedbackFragment_to_faceConfirmationFragment,
+                        directions = LiveFeedbackFragmentDirections.actionFaceLiveFeedbackFragmentToFaceConfirmationFragment(),
                     )
                 }
             }

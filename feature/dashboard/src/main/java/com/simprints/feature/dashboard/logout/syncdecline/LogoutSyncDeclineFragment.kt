@@ -75,6 +75,9 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
 
     private fun processLogoutConfirmation() {
         viewModel.logout()
-        findNavController().navigateSafely(this, R.id.action_logoutSyncDeclineFragment_to_requestLoginFragment)
+        findNavController().navigateSafely(
+            this,
+            LogoutSyncDeclineFragmentDirections.actionLogoutSyncDeclineFragmentToRequestLoginFragment(),
+        )
     }
 }

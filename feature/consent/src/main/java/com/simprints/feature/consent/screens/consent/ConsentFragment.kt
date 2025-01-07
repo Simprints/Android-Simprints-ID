@@ -93,7 +93,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
     private fun openPrivacyNotice() {
         findNavController().navigateSafely(
             this,
-            R.id.action_consentFragment_to_privacyNoticeFragment,
+            ConsentFragmentDirections.actionConsentFragmentToPrivacyNoticeFragment(),
         )
     }
 
