@@ -53,10 +53,12 @@ internal class MatchViewModel @Inject constructor(
 
         val matcherResult = matcherUseCase(
             params,
-            onLoadingCandidates = { tag ->
+            onLoadingStarted = { tag ->
                 Simber.tag(tag).i("Loading candidates")
-                _matchState.postValue(MatchState.LoadingCandidates)
             },
+            onCandidateLoaded = { total, loaded ->
+                _matchState.postValue(MatchState.LoadingCandidates(total, loaded))
+            }
         )
 
         val endTime = timeHelper.now()
@@ -111,7 +113,10 @@ internal class MatchViewModel @Inject constructor(
     sealed class MatchState {
         data object NotStarted : MatchState()
 
-        data object LoadingCandidates : MatchState()
+        data class LoadingCandidates(
+            val total: Int,
+            val loaded: Int,
+        ) : MatchState()
 
         data object Matching : MatchState()
 

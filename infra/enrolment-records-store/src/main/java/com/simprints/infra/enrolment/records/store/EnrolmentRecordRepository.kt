@@ -23,11 +23,13 @@ interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity>
 
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity>
 }

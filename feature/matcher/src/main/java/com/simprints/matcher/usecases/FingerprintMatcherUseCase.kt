@@ -35,7 +35,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingCandidates: (tag: String) -> Unit,
+        onLoadingStarted: (tag: String) -> Unit,
+        onCandidateLoaded: (totalCandidates: Int, loaded: Int) -> Unit,
     ): MatcherResult = coroutineScope {
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK!!)
 
@@ -53,11 +54,16 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, bioSdkWrapper.matcherName)
         }
 
-        onLoadingCandidates(crashReportTag)
+        onLoadingStarted(crashReportTag)
+        var candidatesLoaded = 0
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
-                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource)
+                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource) {
+                        // When a candidate is loaded
+                        candidatesLoaded ++
+                        onCandidateLoaded(totalCandidates, candidatesLoaded)
+                    }
                     match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK)
                         .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
                             acc.add(FingerprintMatchResult.Item(item.id, item.score))
@@ -76,8 +82,9 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        onCandidateLoaded: () -> Unit,
     ) = enrolmentRecordRepository
-        .loadFingerprintIdentities(query, range, dataSource)
+        .loadFingerprintIdentities(query, range, dataSource, onCandidateLoaded)
         .map {
             FingerprintIdentity(
                 it.subjectId,

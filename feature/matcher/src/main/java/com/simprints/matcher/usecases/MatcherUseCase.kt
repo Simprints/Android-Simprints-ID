@@ -12,7 +12,8 @@ internal interface MatcherUseCase {
      */
     suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingCandidates: (tag: String) -> Unit = {},
+        onLoadingStarted: (tag: String) -> Unit = {},
+        onCandidateLoaded: (totalCandidates: Int, loaded: Int) -> Unit = {_,_->},
     ): MatcherResult
 
     data class MatcherResult(

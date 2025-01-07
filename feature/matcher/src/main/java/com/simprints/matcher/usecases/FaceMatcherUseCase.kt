@@ -29,7 +29,8 @@ internal class FaceMatcherUseCase @Inject constructor(
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingCandidates: (tag: String) -> Unit,
+        onLoadingStarted: (tag: String) -> Unit,
+        onCandidateLoaded: (totalCandidates: Int, loaded: Int) -> Unit,
     ): MatcherResult = coroutineScope {
         faceMatcher = resolveFaceBioSdk().matcher
         if (matchParams.probeFaceSamples.isEmpty()) {
@@ -47,7 +48,8 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
 
-        onLoadingCandidates(crashReportTag)
+        onLoadingStarted(crashReportTag)
+        var candidatesLoaded = 0
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
@@ -55,7 +57,11 @@ internal class FaceMatcherUseCase @Inject constructor(
                         queryWithSupportedFormat,
                         range,
                         dataSource = matchParams.biometricDataSource,
-                    )
+                    ){
+                        // When a candidate is loaded
+                        candidatesLoaded++
+                        onCandidateLoaded(totalCandidates, candidatesLoaded)
+                    }
                     match(batchCandidates, samples)
                 }
             }.awaitAll()
@@ -70,8 +76,9 @@ internal class FaceMatcherUseCase @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        onCandidateLoaded: () -> Unit,
     ) = enrolmentRecordRepository
-        .loadFaceIdentities(query, range, dataSource)
+        .loadFaceIdentities(query, range, dataSource, onCandidateLoaded)
         .map {
             FaceIdentity(
                 it.subjectId,

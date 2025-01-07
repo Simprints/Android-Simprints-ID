@@ -127,13 +127,15 @@ internal class EnrolmentRecordRepositoryImpl(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FingerprintIdentity> = fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range, dataSource)
+        onCandidateLoaded: () -> Unit,
+    ): List<FingerprintIdentity> = fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range, dataSource, onCandidateLoaded)
 
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FaceIdentity> = fromIdentityDataSource(dataSource).loadFaceIdentities(query, range, dataSource)
+        onCandidateLoaded: () -> Unit,
+    ): List<FaceIdentity> = fromIdentityDataSource(dataSource).loadFaceIdentities(query, range, dataSource, onCandidateLoaded)
 
     private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
         is BiometricDataSource.Simprints -> localDataSource

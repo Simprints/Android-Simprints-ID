@@ -48,12 +48,14 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .find { it.subList(range.first, range.last) }
             .map { subject ->
+                onCandidateLoaded()
                 FingerprintIdentity(
                     subject.subjectId.toString(),
                     subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
@@ -65,12 +67,14 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .find { it.subList(range.first, range.last) }
             .map { subject ->
+                onCandidateLoaded()
                 FaceIdentity(
                     subject.subjectId.toString(),
                     subject.faceSamples.map(DbFaceSample::fromDbToDomain),
