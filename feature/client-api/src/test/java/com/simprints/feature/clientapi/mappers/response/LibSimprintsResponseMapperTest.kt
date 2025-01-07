@@ -110,7 +110,7 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
             """
-            [{"guid":"guid-1","tier":"TIER_2","confidence":100}]
+            [{"guid":"guid-1","confidenceBand":"MEDIUM","confidence":100}]
             """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
@@ -229,7 +229,7 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
             """
-            {"guid":"guid","tier":"TIER_1","confidence":50,"isSuccess":true}
+            {"guid":"guid","confidenceBand":"HIGH","confidence":50,"isSuccess":true}
             """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
