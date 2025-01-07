@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
@@ -72,13 +71,11 @@ class LibSimprintsResponseMapperTest {
                     AppMatchResult(
                         guid = "guid-1",
                         confidenceScore = 100,
-                        tier = AppResponseTier.TIER_5,
                         matchConfidence = AppMatchConfidence.MEDIUM,
                     ),
                     AppMatchResult(
                         guid = "guid-2",
                         confidenceScore = 75,
-                        tier = AppResponseTier.TIER_3,
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
@@ -87,7 +84,7 @@ class LibSimprintsResponseMapperTest {
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getParcelableArrayList<LegacyIdentification>(Constants.SIMPRINTS_IDENTIFICATIONS)).containsExactly(
-            LegacyIdentification("guid-1", 100, LegacyTier.TIER_5),
+            LegacyIdentification("guid-1", 100, LegacyTier.TIER_2),
             LegacyIdentification("guid-2", 75, LegacyTier.TIER_3),
         )
     }
@@ -104,7 +101,6 @@ class LibSimprintsResponseMapperTest {
                     AppMatchResult(
                         guid = "guid-1",
                         confidenceScore = 100,
-                        tier = AppResponseTier.TIER_5,
                         matchConfidence = AppMatchConfidence.MEDIUM,
                     ),
                 ),
@@ -114,7 +110,7 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
             """
-            [{"guid":"guid-1","tier":"TIER_5","confidence":100}]
+            [{"guid":"guid-1","tier":"TIER_2","confidence":100}]
             """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
@@ -143,7 +139,6 @@ class LibSimprintsResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = null,
                 ),
@@ -155,7 +150,7 @@ class LibSimprintsResponseMapperTest {
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extraVerification?.guid).isEqualTo("guid")
-        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_2)
+        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isFalse() // Default value
@@ -170,7 +165,6 @@ class LibSimprintsResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = false,
                 ),
@@ -182,7 +176,7 @@ class LibSimprintsResponseMapperTest {
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extraVerification?.guid).isEqualTo("guid")
-        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_2)
+        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isEqualTo(false)
@@ -197,7 +191,6 @@ class LibSimprintsResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = true,
                 ),
@@ -209,7 +202,7 @@ class LibSimprintsResponseMapperTest {
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extraVerification?.guid).isEqualTo("guid")
-        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_2)
+        assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
         // assertThat(extraVerification?.isSuccess).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
@@ -227,7 +220,6 @@ class LibSimprintsResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = true,
                 ),
@@ -237,7 +229,7 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
             """
-            {"guid":"guid","tier":"TIER_2","confidence":50,"isSuccess":true}
+            {"guid":"guid","tier":"TIER_1","confidence":50,"isSuccess":true}
             """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()

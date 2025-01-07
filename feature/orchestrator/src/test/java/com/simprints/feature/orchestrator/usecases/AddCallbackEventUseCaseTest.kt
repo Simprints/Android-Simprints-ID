@@ -3,7 +3,6 @@ package com.simprints.feature.orchestrator.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
@@ -73,7 +72,7 @@ class AddCallbackEventUseCaseTest {
     fun `adds event for identification response`() {
         useCase(
             AppIdentifyResponse(
-                listOf(AppMatchResult("guid", 0, AppResponseTier.TIER_1, AppMatchConfidence.HIGH)),
+                listOf(AppMatchResult("guid", 0, AppMatchConfidence.HIGH)),
                 "sessionId",
             ),
         )
@@ -89,7 +88,7 @@ class AddCallbackEventUseCaseTest {
 
     @Test
     fun `adds event for verification response`() {
-        useCase(AppVerifyResponse(AppMatchResult("guid", 0, AppResponseTier.TIER_1, AppMatchConfidence.HIGH)))
+        useCase(AppVerifyResponse(AppMatchResult("guid", 0, AppMatchConfidence.HIGH)))
 
         coVerify {
             eventRepository.addOrUpdateEvent(

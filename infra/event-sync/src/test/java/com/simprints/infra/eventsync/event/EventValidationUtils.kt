@@ -84,8 +84,12 @@ fun verifyCallbackIdentificationApiModel(
         val score = jsonArray.getJSONObject(0)
 
         assertThat(score.getString("guid")).isNotNull()
-        assertThat(score.getString("tier")).isNotNull()
         assertThat(score.getString("confidence")).isNotNull()
+
+        when (version) {
+            1 -> assertThat(score.getString("tier")).isNotNull()
+            else -> {}
+        }
 
         when (version) {
             2 -> assertThat(score.has("confidenceMatch")).isFalse()
@@ -104,7 +108,11 @@ fun verifyCallbackVerificationApiModel(
     json.getJSONObject("score").let { score ->
         assertThat(score.getString("guid")).isNotNull()
         assertThat(score.getString("confidence")).isNotNull()
-        assertThat(score.getString("tier")).isNotNull()
+
+        when (version) {
+            1 -> assertThat(score.getString("tier")).isNotNull()
+            else -> {}
+        }
 
         when (version) {
             2 -> assertThat(score.has("confidenceMatch")).isFalse()
