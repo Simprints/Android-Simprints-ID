@@ -1,12 +1,5 @@
 package com.simprints.fingerprint.infra.scanner.v2.incoming.main.packet
 
-/**
- * The PacketRouter takes an InputStream of bytes, converting it into a single stream of
- * Flow <Packet> containing all incoming packets. It reads the [Route] of each incoming packet,
- * and forwards them to a separate Flow <Packet> dedicated to that route, which is exposed
- * in the map [PacketRouter.incomingPacketRoutes].
- */
-
 import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
@@ -19,6 +12,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * The PacketRouter takes an InputStream of bytes, converting it into a single stream of
+ * Flow <Packet> containing all incoming packets. It reads the [Route] of each incoming packet,
+ * and forwards them to a separate Flow <Packet> dedicated to that route, which is exposed
+ * in the map [PacketRouter.incomingPacketRoutes].
+ */
 
 class PacketRouter @Inject constructor(
     routes: List<Route>,
@@ -38,10 +38,7 @@ class PacketRouter @Inject constructor(
             inputStream
                 .toPacketStream(byteArrayToPacketAccumulator)
                 .collect { packet ->
-                    val routeDesignator = packet.packetRouteDesignator()
-                    val routeId = routeIdMap[routeDesignator]
-                    val packetRoute = routeId?.let { internalPacketRoutes[it] }
-                    packetRoute?.emit(packet)
+                    routeIdMap[packet.packetRouteDesignator()]?.let { internalPacketRoutes[it] }?.emit(packet)
                 }
         }
     }

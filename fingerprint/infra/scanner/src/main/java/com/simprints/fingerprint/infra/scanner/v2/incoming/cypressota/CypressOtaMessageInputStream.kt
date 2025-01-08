@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.scanner.v2.incoming.cypressota
 import com.simprints.fingerprint.infra.scanner.v2.domain.cypressota.CypressOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageInputStream
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -23,7 +22,7 @@ class CypressOtaMessageInputStream @Inject constructor(
     }
 
     override fun disconnect() {
-        cypressOtaResponseStream = emptyFlow()
+        // No action needed as this stream is not usable anymore
     }
 
     suspend inline fun <reified R : CypressOtaResponse> receiveResponse(): R = cypressOtaResponseStream.filterIsInstance<R>().first()

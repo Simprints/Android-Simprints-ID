@@ -44,13 +44,11 @@ class MainMessageInputStream @Inject constructor(
         }
     }
 
-    override fun disconnect() {
-        packetRouter.disconnect()
-    }
+    // only disconnecting the packet router as the other three streams are derived from it as shared flows and will be disconnected automatically
+    override fun disconnect() = packetRouter.disconnect()
 
     @ExcludedFromGeneratedTestCoverageReports(
-        "This function is already tested in MainMessageInputStreamTest. " +
-            "but it is not appearing in the test coverage report. as it is inline functions.",
+        "This function is already tested in MainMessageInputStreamTest, but it does not appear in the test coverage report because it is an inline function.",
     )
     suspend inline fun <reified R : IncomingMainMessage> receiveResponse(): R = when {
         isSubclass<R, VeroResponse>() -> veroResponses.filterIsInstance<R>().first()

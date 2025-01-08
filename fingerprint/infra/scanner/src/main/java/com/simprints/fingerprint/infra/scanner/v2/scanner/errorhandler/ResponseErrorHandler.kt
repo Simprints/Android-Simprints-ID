@@ -42,8 +42,7 @@ class ResponseErrorHandler @Inject constructor(
     }
 
     @ExcludedFromGeneratedTestCoverageReports(
-        "This fun is already tested in ResponseErrorHandlerTest. " +
-            "but it is not covered in the test coverage report as it is inline functions.",
+        "This function is already tested in ResponseErrorHandlerTest, but it does not appear in the test coverage report because it is an inline function",
     )
     suspend inline fun <reified T> handle(
         crossinline block: suspend () -> T,

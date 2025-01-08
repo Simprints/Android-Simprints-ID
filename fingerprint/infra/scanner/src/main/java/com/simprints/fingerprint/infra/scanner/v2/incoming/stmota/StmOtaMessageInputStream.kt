@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.scanner.v2.incoming.stmota
 import com.simprints.fingerprint.infra.scanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageInputStream
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -23,7 +22,7 @@ class StmOtaMessageInputStream @Inject constructor(
     }
 
     override fun disconnect() {
-        stmOtaResponseStream = emptyFlow()
+        // No action needed as this stream is not usable anymore
     }
 
     suspend inline fun <reified R : StmOtaResponse> receiveResponse(): R = stmOtaResponseStream.filterIsInstance<R>().first()
