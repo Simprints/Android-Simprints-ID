@@ -44,7 +44,7 @@ class ImageDistortionConfigRemoteRepoTest {
     fun `uploadConfig returns false when firebase project name is null`() = runTest {
         every { authStore.getCoreApp().options.projectId } returns null
 
-        val result = repo.uploadConfig(SERIAL_NUMBER, byteArrayOf())
+        val result = repo.uploadConfig(UN20_SERIAL_NUMBER, byteArrayOf())
 
         Truth.assertThat(result).isFalse()
     }
@@ -54,7 +54,7 @@ class ImageDistortionConfigRemoteRepoTest {
         every { authStore.getCoreApp().options.projectId } returns "firebaseProject"
         every { authStore.signedInProjectId } returns ""
 
-        val result = repo.uploadConfig(SERIAL_NUMBER, byteArrayOf())
+        val result = repo.uploadConfig(UN20_SERIAL_NUMBER, byteArrayOf())
 
         Truth.assertThat(result).isFalse()
     }
@@ -69,7 +69,7 @@ class ImageDistortionConfigRemoteRepoTest {
         setupMockFirebase(mockFolderRef)
         coEvery { mockFolderRef.listAll().await() } returns mockListResult
 
-        val result = repo.uploadConfig(SERIAL_NUMBER, byteArrayOf())
+        val result = repo.uploadConfig(UN20_SERIAL_NUMBER, byteArrayOf())
 
         Truth.assertThat(result).isTrue()
     }
@@ -90,7 +90,7 @@ class ImageDistortionConfigRemoteRepoTest {
         every { mockFolderRef.child(FILE_NAME) } returns mockFileRef
         coEvery { mockFileRef.putBytes(any()).await() } returns mockUploadTask
 
-        val result = repo.uploadConfig(SERIAL_NUMBER, byteArrayOf(1, 2, 3))
+        val result = repo.uploadConfig(UN20_SERIAL_NUMBER, byteArrayOf(1, 2, 3))
 
         Truth.assertThat(result).isTrue()
     }
@@ -111,7 +111,7 @@ class ImageDistortionConfigRemoteRepoTest {
         every { mockFolderRef.child(FILE_NAME) } returns mockFileRef
         coEvery { mockFileRef.putBytes(any()).await() } returns mockUploadTask
 
-        val result = repo.uploadConfig(SERIAL_NUMBER, byteArrayOf(1, 2, 3))
+        val result = repo.uploadConfig(UN20_SERIAL_NUMBER, byteArrayOf(1, 2, 3))
 
         Truth.assertThat(result).isFalse()
     }
@@ -128,13 +128,13 @@ class ImageDistortionConfigRemoteRepoTest {
         every {
             FirebaseStorage.getInstance(any(), bucketUrl).reference
         } returns mockRootRef
-        every { mockRootRef.child("$PROJECTS_FOLDER/$PROJECT_ID/$UN20_MODULES_FOLDER/$SERIAL_NUMBER/") } returns folderRef
+        every { mockRootRef.child("$PROJECTS_FOLDER/$PROJECT_ID/$UN20_MODULES_FOLDER/$UN20_SERIAL_NUMBER/") } returns folderRef
     }
 
     companion object {
         private const val PROJECTS_FOLDER = "projects"
         private const val UN20_MODULES_FOLDER = "un20modules"
-        private const val SERIAL_NUMBER = "serial123"
+        private const val UN20_SERIAL_NUMBER = "serial123"
         private const val PROJECT_ID = "project123"
         private const val FILE_NAME = "calibration.dat"
     }

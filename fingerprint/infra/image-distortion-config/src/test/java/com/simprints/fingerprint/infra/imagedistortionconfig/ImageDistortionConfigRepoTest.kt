@@ -27,21 +27,19 @@ class ImageDistortionConfigRepoTest {
     }
 
     @Test
-    fun `saveConfig should save to localRepo and upload pending configs`() = runBlocking {
+    fun `saveConfig should save to localRepo`() = runBlocking {
         // Given
         val scannerId = "scanner123"
         val un20SerialNumber = "serial456"
         val configFile = byteArrayOf(1, 2, 3, 4)
 
         coJustRun { localRepo.saveConfig(scannerId, un20SerialNumber, configFile) }
-        coEvery { localRepo.getPendingUploads() } returns emptyList()
 
         // When
         repo.saveConfig(scannerId, un20SerialNumber, configFile)
 
         // Then
         coVerify(exactly = 1) { localRepo.saveConfig(scannerId, un20SerialNumber, configFile) }
-        coVerify(exactly = 1) { localRepo.getPendingUploads() }
     }
 
     @Test
