@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,15 +25,17 @@ internal class EventSyncCache @Inject constructor(
     private val sharedForLastSyncTime =
         securityManager.buildEncryptedSharedPreferences(FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)
 
-    suspend fun readLastSuccessfulSyncTime(): Date? = withContext(dispatcher) {
-        val dateLong = sharedForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
-        if (dateLong > -1) Date(dateLong) else null
+    suspend fun readLastSuccessfulSyncTime(): Timestamp? = withContext(dispatcher) {
+        sharedForLastSyncTime
+            .getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
+            .takeIf { it >= 0 }
+            ?.let { Timestamp(it) }
     }
 
-    suspend fun storeLastSuccessfulSyncTime(lastSyncTime: Date?): Unit = withContext(dispatcher) {
+    suspend fun storeLastSuccessfulSyncTime(lastSyncTime: Timestamp?): Unit = withContext(dispatcher) {
         sharedForLastSyncTime
             .edit()
-            .putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.time ?: -1)
+            .putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.ms ?: -1)
             .apply()
     }
 

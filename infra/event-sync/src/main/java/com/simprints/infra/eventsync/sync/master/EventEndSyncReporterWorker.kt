@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
@@ -12,7 +13,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.util.Date
 
 /**
  * It's executed at the end of the sync, when all workers succeed (downloaders and uploaders).
@@ -24,6 +24,7 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val syncCache: EventSyncCache,
     private val eventRepository: EventRepository,
+    private val timeHelper: TimeHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
     override val tag: String = EventEndSyncReporterWorker::class.java.simpleName
@@ -43,7 +44,7 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
             }
 
             if (!syncId.isNullOrEmpty()) {
-                syncCache.storeLastSuccessfulSyncTime(Date())
+                syncCache.storeLastSuccessfulSyncTime(timeHelper.now())
                 success()
             } else {
                 throw IllegalArgumentException("SyncId missed")
