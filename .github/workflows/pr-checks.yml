@@ -119,6 +119,7 @@ jobs:
                 fingerprint:infra:simafis-wrapper
                 fingerprint:infra:simprints-bio-sdk
                 fingerprint:infra:nec-bio-sdk
+                fingerprint:infra:image-distortion-config
             reportsId: fingerprint
 
     sonarqube:

@@ -3,7 +3,7 @@ package com.simprints.infra.config.store.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ENABLE_ID_POOL_VALIDATION
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED
-import kotlin.test.Test
+import org.junit.Test
 
 internal class ExperimentalProjectConfigurationTest {
     @Test

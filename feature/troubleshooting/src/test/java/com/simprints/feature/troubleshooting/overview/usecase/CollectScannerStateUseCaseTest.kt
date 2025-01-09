@@ -14,7 +14,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import kotlin.test.Test
+import org.junit.Test
 
 class CollectScannerStateUseCaseTest {
     @MockK
