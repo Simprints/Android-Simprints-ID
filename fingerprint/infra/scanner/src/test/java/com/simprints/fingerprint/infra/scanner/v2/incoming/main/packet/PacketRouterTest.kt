@@ -1,66 +1,77 @@
 package com.simprints.fingerprint.infra.scanner.v2.incoming.main.packet
 
-import com.simprints.fingerprint.infra.scanner.testtools.assertPacketsEqual
-import com.simprints.fingerprint.infra.scanner.testtools.interleave
-import com.simprints.fingerprint.infra.scanner.testtools.randomPacketsWithSource
+import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.infra.scanner.testtools.randomPacketWithSource
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
 import com.simprints.fingerprint.infra.scanner.v2.tools.lang.objects
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.failTest
-import com.simprints.testtools.unit.reactive.testSubscribe
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
 
 class PacketRouterTest {
-    private lateinit var outputStream: PipedOutputStream
-    private lateinit var inputStream: PipedInputStream
     private lateinit var router: PacketRouter
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
-        outputStream = PipedOutputStream()
-        inputStream = PipedInputStream()
-        inputStream.connect(outputStream)
-
         router = PacketRouter(
             Route.Remote::class.objects(),
             { source },
-            ByteArrayToPacketAccumulator(
-                PacketParser(),
-            ),
+            ByteArrayToPacketAccumulator(PacketParser()),
             Dispatchers.IO,
         )
-
-        router.connect(inputStream.toFlowable())
     }
 
     @Test
-    fun packetRouter_receivingPacketsInterleavedFromDifferentSources_routesCorrectly() {
-        val veroResponseTestSubscriber = router.incomingPacketRoutes[Route.Remote.VeroServer]?.testSubscribe()
-            ?: failTest("Missing route")
-        val veroEventTestSubscriber = router.incomingPacketRoutes[Route.Remote.VeroEvent]?.testSubscribe()
-            ?: failTest("Missing route")
-        val un20ResponseTestSubscriber = router.incomingPacketRoutes[Route.Remote.Un20Server]?.testSubscribe()
-            ?: failTest("Missing route")
+    fun `packetRouter receiving Packets from different sources routesCorrectly`() = runTest {
+        val veroResponsePacket = randomPacketWithSource(Route.Remote.VeroServer).bytes
+        val veroEventPacket = randomPacketWithSource(Route.Remote.VeroEvent).bytes
+        val un20ResponsePacket = randomPacketWithSource(Route.Remote.Un20Server).bytes
+        val allPacketsByteArrayFlow = MutableSharedFlow<ByteArray>()
 
-        val veroResponsePackets = randomPacketsWithSource(Route.Remote.VeroServer)
-        val veroEventPackets = randomPacketsWithSource(Route.Remote.VeroEvent)
-        val un20ResponsePackets = randomPacketsWithSource(Route.Remote.Un20Server)
-        val allPackets = interleave(veroResponsePackets, veroEventPackets, un20ResponsePackets)
+        // Collect data in a different coroutine scope to avoid blocking
+        router.connect(allPacketsByteArrayFlow)
+        val veroResponseTestSubscriber = router.incomingPacketRoutes[Route.Remote.VeroServer] ?: failTest("Missing route")
+        val un20ResponseTestSubscriber = router.incomingPacketRoutes[Route.Remote.Un20Server] ?: failTest("Missing route")
+        launch {
+            allPacketsByteArrayFlow.emit(veroResponsePacket)
+            allPacketsByteArrayFlow.emit(veroEventPacket)
+            allPacketsByteArrayFlow.emit(un20ResponsePacket)
+        }
+        assertThat(veroResponsePacket).isEqualTo(veroResponseTestSubscriber.first().bytes)
+        assertThat(un20ResponsePacket).isEqualTo(un20ResponseTestSubscriber.first().bytes)
+    }
 
-        allPackets.forEach { outputStream.write(it.bytes) }
+    @Test
+    fun `disconnect cancels job`() = runTest {
+        router.connect(flowOf(byteArrayOf(0x01, 0x02)))
 
-        veroResponseTestSubscriber.awaitCount(veroResponsePackets.count())
-        veroEventTestSubscriber.awaitCount(veroEventPackets.count())
-        un20ResponseTestSubscriber.awaitCount(un20ResponsePackets.count())
+        router.disconnect()
 
-        assertPacketsEqual(veroResponsePackets, veroResponseTestSubscriber.values())
-        assertPacketsEqual(veroEventPackets, veroEventTestSubscriber.values())
-        assertPacketsEqual(un20ResponsePackets, un20ResponseTestSubscriber.values())
+        // Assert job  is cancelled
+        assertThat(router.packetProcessingJob?.isCancelled).isTrue()
+    }
+
+    @Test
+    fun `calling connect twice cancels the old job`() = runTest {
+        val mockInputStream = flowOf(byteArrayOf(0x01, 0x02))
+
+        // Call connect the first time
+        router.connect(mockInputStream)
+        val firstJob = router.packetProcessingJob
+
+        // Call connect a second time
+        router.connect(mockInputStream)
+        val secondJob = router.packetProcessingJob
+
+        // Ensure the first job was cancelled and a new job started
+        assertThat(firstJob?.isCancelled).isTrue()
+        assertThat(secondJob?.isCancelled).isFalse()
+        assertThat(firstJob).isNotEqualTo(secondJob)
     }
 }

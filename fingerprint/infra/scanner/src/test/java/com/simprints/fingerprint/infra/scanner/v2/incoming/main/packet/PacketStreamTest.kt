@@ -7,11 +7,11 @@ import com.simprints.fingerprint.infra.scanner.testtools.stripWhiteSpaceToLowerc
 import com.simprints.fingerprint.infra.scanner.testtools.toHexStrings
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.hexToByteArray
-import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
-import com.simprints.testtools.unit.reactive.testSubscribe
 import io.mockk.every
 import io.mockk.mockk
-import io.reactivex.rxkotlin.toFlowable
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class PacketStreamTest {
@@ -22,22 +22,19 @@ class PacketStreamTest {
     }
 
     @Test
-    fun packetStream_accumulatesAndCreatesPacketsCorrectly() {
+    fun packetStream_accumulatesAndCreatesPacketsCorrectly() = runTest {
         val packetStrings = listOf("10 A0 01 00 F0", "10 A0 03 00 F0 F1 F2", "10 A0 02 00 F0 F1")
 
-        val testSubscriber = packetStrings
+        val testFlow = packetStrings
             .reduceString()
             .hexToByteArray()
             .chunked(4)
-            .toFlowable()
+            .asFlow()
             .toPacketStream(ByteArrayToPacketAccumulator(packetParserMock))
-            .testSubscribe()
-
-        testSubscriber.awaitCompletionWithNoErrors()
 
         assertThat(
-            testSubscriber
-                .values()
+            testFlow
+                .toList()
                 .map { it.bytes }
                 .toHexStrings()
                 .stripWhiteSpaceToLowercase(),

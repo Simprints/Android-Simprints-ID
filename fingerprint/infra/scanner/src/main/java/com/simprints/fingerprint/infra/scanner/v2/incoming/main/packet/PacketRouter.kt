@@ -4,48 +4,48 @@ import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
 import com.simprints.fingerprint.infra.scanner.v2.incoming.IncomingConnectable
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.subscribeOnIoAndPublish
-import io.reactivex.Flowable
-import io.reactivex.disposables.Disposable
-import io.reactivex.flowables.ConnectableFlowable
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * The PacketRouter takes an InputStream of bytes, converting it into a single stream of
- * Flowable<Packet> containing all incoming packets. It reads the [Route] of each incoming packet,
- * and forwards them to a separate Flowable<Packet> dedicated to that route, which is exposed
- * in the map [incomingPacketRoutes].
+ * Flow <Packet> containing all incoming packets. It reads the [Route] of each incoming packet,
+ * and forwards them to a separate Flow <Packet> dedicated to that route, which is exposed
+ * in the map [PacketRouter.incomingPacketRoutes].
  */
+
 class PacketRouter @Inject constructor(
-    private val routes: List<Route>,
+    routes: List<Route>,
     private val packetRouteDesignator: Packet.() -> Byte,
     private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : IncomingConnectable {
-    lateinit var incomingPacketRoutes: Map<Route, ConnectableFlowable<Packet>>
+    private val routeIdMap = routes.associateBy { it.id.value }
+    private val internalPacketRoutes = routes.associateWith { MutableSharedFlow<Packet>() }
+    val incomingPacketRoutes: Map<Route, Flow<Packet>> = internalPacketRoutes.mapValues { it.value.asSharedFlow() }
 
-    private lateinit var incomingPacketsDisposable: Disposable
-    private lateinit var incomingPacketRoutesDisposable: Map<Route, Disposable>
+    var packetProcessingJob: Job? = null
+        private set // Expose for testing but restrict external modification
 
-    override fun connect(flowableInputStream: Flowable<ByteArray>) {
-        val rawPacketStream = transformToPacketStream(flowableInputStream)
-        val incomingPackets = rawPacketStream.subscribeOnIoAndPublish(ioDispatcher)
-        incomingPacketRoutes = routes.associateWith {
-            incomingPackets.filterRoute(it).subscribeOnIoAndPublish(ioDispatcher)
+    override fun connect(inputStream: Flow<ByteArray>) {
+        packetProcessingJob?.cancel()
+        packetProcessingJob = CoroutineScope(dispatcher).launch {
+            inputStream
+                .toPacketStream(byteArrayToPacketAccumulator)
+                .collect { packet ->
+                    routeIdMap[packet.packetRouteDesignator()]?.let { internalPacketRoutes[it] }?.emit(packet)
+                }
         }
-        incomingPacketsDisposable = incomingPackets.connect()
-        incomingPacketRoutesDisposable = incomingPacketRoutes.mapValues { it.value.connect() }
     }
-
-    private fun transformToPacketStream(flowableInputStream: Flowable<ByteArray>): Flowable<Packet> =
-        flowableInputStream.toPacketStream(byteArrayToPacketAccumulator)
 
     override fun disconnect() {
-        incomingPacketsDisposable.dispose()
-        incomingPacketRoutesDisposable.forEach { it.value.dispose() }
+        packetProcessingJob?.cancel()
+        internalPacketRoutes.values.forEach { it.resetReplayCache() }
     }
-
-    private fun ConnectableFlowable<Packet>.filterRoute(route: Route) =
-        filter { packet -> packet.packetRouteDesignator() == route.id.value }
 }

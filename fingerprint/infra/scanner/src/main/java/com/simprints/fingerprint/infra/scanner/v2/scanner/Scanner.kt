@@ -1,4 +1,3 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
 // This class uses entire vero API so import list would be extremely long without wildcards
 
 package com.simprints.fingerprint.infra.scanner.v2.scanner
@@ -9,19 +8,59 @@ import com.simprints.fingerprint.infra.scanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.RootMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.channel.StmOtaMessageChannel
 import com.simprints.fingerprint.infra.scanner.v2.domain.Mode
-import com.simprints.fingerprint.infra.scanner.v2.domain.Mode.*
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.*
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.*
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.*
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.*
+import com.simprints.fingerprint.infra.scanner.v2.domain.Mode.CYPRESS_OTA
+import com.simprints.fingerprint.infra.scanner.v2.domain.Mode.MAIN
+import com.simprints.fingerprint.infra.scanner.v2.domain.Mode.ROOT
+import com.simprints.fingerprint.infra.scanner.v2.domain.Mode.STM_OTA
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.CaptureFingerprintCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageDistortionConfigurationMatrixCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageQualityCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageQualityPreviewCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetTemplateCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetUnprocessedImageCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.SetScanLedStateCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageData
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormatData
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.TemplateData
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.TemplateType
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageDistortionConfigurationMatrixResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageQualityPreviewResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageQualityResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetTemplateResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.SetScanLedStateResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.GetBatteryCurrentCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.GetBatteryPercentChargeCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.GetBatteryTemperatureCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.GetBatteryVoltageCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.GetUn20OnCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.SetSmileLedStateCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.commands.SetUn20OnCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.SmileLedState
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.*
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.*
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.*
-import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.*
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryCurrentResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryPercentChargeResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryTemperatureResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetBatteryVoltageResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.GetUn20OnResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.responses.SetUn20OnResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.EnterCypressOtaModeCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.EnterMainModeCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.EnterStmOtaModeCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressExtendedFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ExtendedVersionInformation
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.EnterCypressOtaModeResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.EnterMainModeResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.responses.EnterStmOtaModeResponse
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.IllegalUn20StateException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.IncorrectModeException
@@ -29,13 +68,12 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedE
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ota.un20.Un20OtaController
+import com.simprints.fingerprint.infra.scanner.v2.tools.asFlow
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.unsignedToInt
-import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.*
-import io.reactivex.*
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -61,31 +99,24 @@ class Scanner @Inject constructor(
     private val stmOtaController: StmOtaController,
     private val un20OtaController: Un20OtaController,
     private val scannerInfo: ScannerInfo,
-    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) {
-    private lateinit var flowableDisposable: Disposable
-
     private lateinit var outputStream: OutputStream
-    private lateinit var flowableInputStream: Flowable<ByteArray>
+    private lateinit var inputStreamFlow: Flow<ByteArray>
     var state = disconnectedScannerState()
 
-    val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
-
-    private var scannerTriggerListenerDisposable: Disposable? = null
+    lateinit var triggerButtonFlow: Flow<Unit>
 
     fun connect(
         inputStream: InputStream,
         outputStream: OutputStream,
     ) {
-        this.flowableInputStream = inputStream
-            .toFlowable()
-            .subscribeOnIoAndPublish(ioDispatcher)
-            .also { this.flowableDisposable = it.connect() }
+        inputStreamFlow = inputStream.asFlow(dispatcher = dispatcherIO)
         this.outputStream = outputStream
         state.connected = true
         state.mode = ROOT
 
-        rootMessageChannel.connect(flowableInputStream, outputStream)
+        rootMessageChannel.connect(inputStreamFlow, outputStream)
     }
 
     fun disconnect() {
@@ -95,7 +126,6 @@ class Scanner @Inject constructor(
                 ROOT -> rootMessageChannel.disconnect()
                 MAIN -> {
                     mainMessageChannel.disconnect()
-                    scannerTriggerListenerDisposable?.dispose()
                 }
 
                 CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
@@ -103,7 +133,6 @@ class Scanner @Inject constructor(
                 null -> { // Do nothing
                 }
             }
-            flowableDisposable.dispose()
             state = disconnectedScannerState()
             scannerInfo.clear()
         }
@@ -182,28 +211,25 @@ class Scanner @Inject constructor(
 
     private fun handleMainModeEntered() {
         rootMessageChannel.disconnect()
-        mainMessageChannel.connect(flowableInputStream, outputStream)
-
+        mainMessageChannel.connect(inputStreamFlow, outputStream)
         state.triggerButtonActive = true
         state.mode = MAIN
-        scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
+        triggerButtonFlow = mainMessageChannel.incoming.veroEvents
+            .filterIsInstance<TriggerButtonPressedEvent>()
+            .map {
+                // Trigger button pressed event received
+            }
     }
-
-    private fun subscribeTriggerButtonListeners() = mainMessageChannel.incoming.veroEvents
-        ?.filterCast<TriggerButtonPressedEvent>()
-        ?.subscribeBy(onNext = {
-            triggerButtonListeners.forEach { it.onNext(Unit) }
-        }, onError = { it.printStackTrace() })
 
     private fun handleCypressOtaModeEntered() {
         rootMessageChannel.disconnect()
-        cypressOtaMessageChannel.connect(flowableInputStream, outputStream)
+        cypressOtaMessageChannel.connect(inputStreamFlow, outputStream)
         state.mode = CYPRESS_OTA
     }
 
     private fun handleStmOtaModeEntered() {
         rootMessageChannel.disconnect()
-        stmOtaMessageChannel.connect(flowableInputStream, outputStream)
+        stmOtaMessageChannel.connect(inputStreamFlow, outputStream)
         state.mode = STM_OTA
     }
 

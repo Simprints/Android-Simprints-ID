@@ -26,24 +26,7 @@ fun randomPacketWithSource(source: Route): Packet = PacketProtocol
         PacketParser().parse(it)
     }
 
-fun randomHollowPacketWithRawBytes(maxSize: Int = 20) = hollowPacketWithRawBytes(Random.nextBytes(Random.nextInt(1, maxSize)))
-
-fun randomPacketsWithSource(
-    source: Route,
-    maxSize: Int = 20,
-): List<Packet> = List(Random.nextInt(1, maxSize)) { randomPacketWithSource(source) }
-
 fun randomPayload(maxSize: Int = 20) = Random.nextBytes(Random.nextInt(maxSize))
-
-fun assertPacketsEqual(
-    expected: List<Packet>,
-    actual: List<Packet>,
-) {
-    assertThat(actual.size).isEqualTo(expected.size)
-    expected.zip(actual).forEach { (expected, actual) ->
-        assertPacketsEqual(expected, actual)
-    }
-}
 
 fun assertPacketsEqual(
     expected: Packet,

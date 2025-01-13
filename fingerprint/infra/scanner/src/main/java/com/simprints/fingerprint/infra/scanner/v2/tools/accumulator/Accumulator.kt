@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.infra.scanner.v2.tools.accumulator
 
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 /**
  * An [Accumulator] is used to transform a stream of [Fragment]s into [Element]s.
@@ -43,15 +44,9 @@ abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
         updateCurrentElementLength()
     }
 
-    fun takeElements(): Flowable<Element> = Flowable.generate { emitter ->
-        try {
-            if (containsCompleteElement()) {
-                emitter.onNext(takeElement()!!)
-            } else {
-                emitter.onComplete()
-            }
-        } catch (e: Throwable) {
-            emitter.onError(e)
+    fun takeElements(): Flow<Element> = flow {
+        while (containsCompleteElement()) {
+            emit(takeElement())
         }
     }
 

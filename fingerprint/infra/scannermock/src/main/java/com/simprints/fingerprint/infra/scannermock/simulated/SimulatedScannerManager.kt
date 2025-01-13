@@ -11,8 +11,6 @@ import com.simprints.fingerprint.infra.scannermock.simulated.v1.SimulatedScanner
 import com.simprints.fingerprint.infra.scannermock.simulated.v1.SimulatedScannerV1
 import com.simprints.fingerprint.infra.scannermock.simulated.v2.SimulatedScannerStateV2
 import com.simprints.fingerprint.infra.scannermock.simulated.v2.SimulatedScannerV2
-import io.reactivex.Observer
-import io.reactivex.observers.DisposableObserver
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.util.concurrent.atomic.AtomicInteger
@@ -27,7 +25,7 @@ class SimulatedScannerManager(
     var isAdapterEnabled: Boolean = true,
     var isDeviceBonded: Boolean = true,
     var deviceName: String = "",
-    var outgoingStreamObservers: Set<Observer<ByteArray>> = setOf(),
+    var outgoingStreamObservers: Set<(message: ByteArray) -> Unit> = setOf(),
     var context: Context?,
 ) {
     private var simulatedScanner: SimulatedScanner? = null
@@ -82,16 +80,8 @@ class SimulatedScannerManager(
         }
     }
 
-    private val appToScannerObserver = object : DisposableObserver<ByteArray>() {
-        override fun onComplete() {}
-
-        override fun onNext(bytes: ByteArray) {
-            handleAppToScannerEvent(bytes)
-        }
-
-        override fun onError(e: Throwable) {
-            e.printStackTrace()
-        }
+    private val appToScannerObserver: (message: ByteArray) -> Unit = { bytes ->
+        handleAppToScannerEvent(bytes)
     }
 
     private fun handleAppToScannerEvent(bytes: ByteArray) {
