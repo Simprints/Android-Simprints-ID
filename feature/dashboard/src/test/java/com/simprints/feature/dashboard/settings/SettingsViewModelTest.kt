@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.settings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
@@ -13,6 +14,7 @@ import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -84,11 +86,13 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `trigger device sync when called`() {
+    fun `trigger config refresh when called`() {
+        coEvery { syncOrchestrator.refreshConfiguration() } returns flowOf(Unit)
+
         viewModel.scheduleConfigUpdate()
 
-        verify { syncOrchestrator.startProjectSync() }
-        verify { syncOrchestrator.startDeviceSync() }
+        verify { syncOrchestrator.refreshConfiguration() }
+        viewModel.configUpdated.test().assertHasValue()
     }
 
     companion object {

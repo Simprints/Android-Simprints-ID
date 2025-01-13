@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
@@ -61,6 +62,17 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         viewModel.languagePreference.observe(viewLifecycleOwner) {
             loadSelectedLanguage(it)
         }
+        viewModel.configUpdated.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                Toast
+                    .makeText(
+                        requireContext(),
+                        IDR.string.dashboard_preference_update_config_finished,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+            },
+        )
         bindClickListeners()
     }
 

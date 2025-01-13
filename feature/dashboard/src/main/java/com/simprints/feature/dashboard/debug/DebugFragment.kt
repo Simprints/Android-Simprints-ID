@@ -109,10 +109,6 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             }
         }
 
-        binding.syncDevice.setOnClickListener {
-            syncOrchestrator.startDeviceSync()
-        }
-
         binding.printRoomDb.setOnClickListener {
             binding.logs.text = ""
             runBlocking {

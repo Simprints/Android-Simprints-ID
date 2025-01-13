@@ -1,13 +1,17 @@
 package com.simprints.infra.sync
 
+import kotlinx.coroutines.flow.Flow
+
 interface SyncOrchestrator {
     suspend fun scheduleBackgroundWork()
 
     suspend fun cancelBackgroundWork()
 
-    fun startProjectSync()
-
-    fun startDeviceSync()
+    /**
+     * Trigger project and device configuration sync workers.
+     * Emits value when both sync workers are done.
+     */
+    fun refreshConfiguration(): Flow<Unit>
 
     fun rescheduleEventSync()
 

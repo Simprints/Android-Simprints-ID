@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.send
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
@@ -31,6 +33,10 @@ internal class SettingsViewModel @Inject constructor(
         get() = _settingsLocked
     private val _settingsLocked = MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
 
+    val configUpdated: LiveData<LiveDataEvent>
+        get() = _configUpdated
+    private val _configUpdated = MutableLiveData<LiveDataEvent>()
+
     init {
         load()
     }
@@ -56,7 +62,10 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun scheduleConfigUpdate() {
-        syncOrchestrator.startProjectSync()
-        syncOrchestrator.startDeviceSync()
+        viewModelScope.launch {
+            syncOrchestrator
+                .refreshConfiguration()
+                .collect { _configUpdated.send() }
+        }
     }
 }

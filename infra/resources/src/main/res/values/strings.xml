@@ -378,6 +378,7 @@
     <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Audio alerts for scan completion, prompting the user to remove the subject’s finger from the scanner.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
     <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
+    <string name="dashboard_preference_update_config_finished">Configuration updated</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">Audio Alert</string>
 
     <!-- Dashboard - Sync info -->
