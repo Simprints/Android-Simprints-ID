@@ -5,10 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.ConfigSyncCache
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncOrchestrator
@@ -20,6 +22,7 @@ import javax.inject.Inject
 internal class SettingsViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val syncOrchestrator: SyncOrchestrator,
+    private val configSyncCache: ConfigSyncCache,
 ) : ViewModel() {
     val generalConfiguration: LiveData<GeneralConfiguration>
         get() = _generalConfiguration
@@ -32,6 +35,10 @@ internal class SettingsViewModel @Inject constructor(
     val settingsLocked: LiveData<SettingsPasswordConfig>
         get() = _settingsLocked
     private val _settingsLocked = MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
+
+    val sinceConfigLastUpdated: LiveData<LiveDataEventWithContent<String>>
+        get() = _sinceConfigLastUpdated
+    private val _sinceConfigLastUpdated = MutableLiveData<LiveDataEventWithContent<String>>()
 
     val configUpdated: LiveData<LiveDataEvent>
         get() = _configUpdated
@@ -52,6 +59,7 @@ internal class SettingsViewModel @Inject constructor(
     private fun load() = viewModelScope.launch {
         val configuration = configManager.getProjectConfiguration().general
 
+        _sinceConfigLastUpdated.send(configSyncCache.sinceLastUpdateTime())
         _languagePreference.postValue(configManager.getDeviceConfiguration().language)
         _generalConfiguration.postValue(configuration)
         _settingsLocked.postValue(configuration.settingsPassword)
@@ -65,7 +73,10 @@ internal class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             syncOrchestrator
                 .refreshConfiguration()
-                .collect { _configUpdated.send() }
+                .collect {
+                    _configUpdated.send()
+                    _sinceConfigLastUpdated.send(configSyncCache.sinceLastUpdateTime())
+                }
         }
     }
 }

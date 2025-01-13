@@ -7,6 +7,7 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.ConfigSyncCache
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -43,6 +44,9 @@ class SettingsViewModelTest {
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
 
+    @MockK
+    private lateinit var configSyncCache: ConfigSyncCache
+
     private lateinit var viewModel: SettingsViewModel
 
     @Before
@@ -52,7 +56,12 @@ class SettingsViewModelTest {
         coEvery { configManager.getProjectConfiguration().general } returns generalConfiguration
         coEvery { configManager.getDeviceConfiguration().language } returns LANGUAGE
 
-        viewModel = SettingsViewModel(configManager, syncOrchestrator)
+        coEvery { configSyncCache.sinceLastUpdateTime() } returnsMany listOf(
+            LAST_UPDATED,
+            OTHER_LAST_UPDATED,
+        )
+
+        viewModel = SettingsViewModel(configManager, syncOrchestrator, configSyncCache)
     }
 
     @Test
@@ -60,6 +69,7 @@ class SettingsViewModelTest {
         assertThat(viewModel.generalConfiguration.value).isEqualTo(generalConfiguration)
         assertThat(viewModel.languagePreference.value).isEqualTo(LANGUAGE)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
+        assertThat(viewModel.sinceConfigLastUpdated.value?.peekContent()).isEqualTo(LAST_UPDATED)
     }
 
     @Test
@@ -88,14 +98,21 @@ class SettingsViewModelTest {
     @Test
     fun `trigger config refresh when called`() {
         coEvery { syncOrchestrator.refreshConfiguration() } returns flowOf(Unit)
+        val updateTest = viewModel.sinceConfigLastUpdated.test() // to capture full update history
 
         viewModel.scheduleConfigUpdate()
 
         verify { syncOrchestrator.refreshConfiguration() }
         viewModel.configUpdated.test().assertHasValue()
+        updateTest
+            .valueHistory()
+            .map { it.peekContent() }
+            .let { assertThat(it).containsExactly(LAST_UPDATED, OTHER_LAST_UPDATED) }
     }
 
     companion object {
         private const val LANGUAGE = "fr"
+        private const val LAST_UPDATED = "5 minutes ago"
+        private const val OTHER_LAST_UPDATED = "0 minutes ago"
     }
 }

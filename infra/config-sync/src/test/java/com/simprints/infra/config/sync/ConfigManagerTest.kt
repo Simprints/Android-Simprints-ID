@@ -31,6 +31,9 @@ class ConfigManagerTest {
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
+    private lateinit var configSyncCache: ConfigSyncCache
+
+    @MockK
     private lateinit var projectWithConfig: ProjectWithConfig
 
     @MockK
@@ -48,6 +51,7 @@ class ConfigManagerTest {
         configManager = ConfigManager(
             configRepository = configRepository,
             enrolmentRecordRepository = enrolmentRecordRepository,
+            configSyncCache = configSyncCache,
         )
     }
 
@@ -57,6 +61,8 @@ class ConfigManagerTest {
 
         val refreshedProject = configManager.refreshProject(PROJECT_ID)
         assertThat(refreshedProject).isEqualTo(projectWithConfig)
+
+        coVerify { configSyncCache.saveUpdateTime() }
     }
 
     @Test

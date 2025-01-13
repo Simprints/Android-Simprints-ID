@@ -14,6 +14,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.livedata.LiveDataEventObserver
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
@@ -71,6 +72,15 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
                         IDR.string.dashboard_preference_update_config_finished,
                         Toast.LENGTH_SHORT,
                     ).show()
+            },
+        )
+        viewModel.sinceConfigLastUpdated.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver<String> { lastUpdated ->
+                getUpdateConfig()?.summary = getString(
+                    IDR.string.dashboard_preference_summary_update_config_last_updated,
+                    lastUpdated,
+                )
             },
         )
         bindClickListeners()
@@ -188,12 +198,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun updateConfiguration() {
         viewModel.scheduleConfigUpdate()
-        Toast
-            .makeText(
-                requireContext(),
-                IDR.string.dashboard_preference_update_config_scheduled,
-                Toast.LENGTH_SHORT,
-            ).show()
+        getUpdateConfig()?.setSummary(IDR.string.dashboard_preference_update_config_scheduled)
     }
 
     private fun getLanguagePreference(): Preference? = findPreference(getString(R.string.preference_select_language_key))
