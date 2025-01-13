@@ -8,6 +8,7 @@ import com.simprints.testtools.common.syntax.failTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -27,7 +28,7 @@ class PacketRouterTest {
     }
 
     @Test
-    fun packetRouter_receivingPacketsFromDifferentSources_routesCorrectly() = runTest {
+    fun `packetRouter receiving Packets from different sources routesCorrectly`() = runTest {
         val veroResponsePacket = randomPacketWithSource(Route.Remote.VeroServer).bytes
         val veroEventPacket = randomPacketWithSource(Route.Remote.VeroEvent).bytes
         val un20ResponsePacket = randomPacketWithSource(Route.Remote.Un20Server).bytes
@@ -44,5 +45,33 @@ class PacketRouterTest {
         }
         assertThat(veroResponsePacket).isEqualTo(veroResponseTestSubscriber.first().bytes)
         assertThat(un20ResponsePacket).isEqualTo(un20ResponseTestSubscriber.first().bytes)
+    }
+
+    @Test
+    fun `disconnect cancels job`() = runTest {
+        router.connect(flowOf(byteArrayOf(0x01, 0x02)))
+
+        router.disconnect()
+
+        // Assert job  is cancelled
+        assertThat(router.packetProcessingJob?.isCancelled).isTrue()
+    }
+
+    @Test
+    fun `calling connect twice cancels the old job`() = runTest {
+        val mockInputStream = flowOf(byteArrayOf(0x01, 0x02))
+
+        // Call connect the first time
+        router.connect(mockInputStream)
+        val firstJob = router.packetProcessingJob
+
+        // Call connect a second time
+        router.connect(mockInputStream)
+        val secondJob = router.packetProcessingJob
+
+        // Ensure the first job was cancelled and a new job started
+        assertThat(firstJob?.isCancelled).isTrue()
+        assertThat(secondJob?.isCancelled).isFalse()
+        assertThat(firstJob).isNotEqualTo(secondJob)
     }
 }

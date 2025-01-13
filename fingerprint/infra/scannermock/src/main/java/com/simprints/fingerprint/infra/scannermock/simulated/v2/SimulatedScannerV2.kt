@@ -61,8 +61,8 @@ class SimulatedScannerV2(
 
     private suspend fun resolveEventQueue() {
         scannerState.eventQueue.forEach {
-            // add delay to let the previous event to be processed
-            delay(100)
+            // add 300 ms delay to let the previous event to be processed before the next one
+            delay(300)
             it.invoke(this)
         }
         scannerState.eventQueue.clear()

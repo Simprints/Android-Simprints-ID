@@ -30,7 +30,8 @@ class PacketRouter @Inject constructor(
     private val internalPacketRoutes = routes.associateWith { MutableSharedFlow<Packet>() }
     val incomingPacketRoutes: Map<Route, Flow<Packet>> = internalPacketRoutes.mapValues { it.value.asSharedFlow() }
 
-    private var packetProcessingJob: Job? = null
+    var packetProcessingJob: Job? = null
+        private set // Expose for testing but restrict external modification
 
     override fun connect(inputStream: Flow<ByteArray>) {
         packetProcessingJob?.cancel()
