@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
@@ -28,7 +29,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
-import java.util.Date
 import javax.inject.Inject
 
 internal class EventSyncManagerImpl @Inject constructor(
@@ -43,7 +43,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val configRepository: ConfigRepository,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
-    override suspend fun getLastSyncTime(): Date? = eventSyncCache.readLastSuccessfulSyncTime()
+    override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
 
     override fun getLastSyncState(): LiveData<EventSyncState> = eventSyncStateProcessor.getLastSyncState()
 

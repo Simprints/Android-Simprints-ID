@@ -4,6 +4,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,7 +22,7 @@ internal class ExecutionTracker @Inject constructor(
      *
      * Limit for execution is set by the [executionTimeLimitSec] (in seconds).
      */
-    private var timestamp: Long = 0
+    private var timestamp: Timestamp = Timestamp(0)
 
     /**
      * ID of the [LifecycleOwner] that is considered the main executor.
@@ -36,7 +37,7 @@ internal class ExecutionTracker @Inject constructor(
         if (event == Lifecycle.Event.ON_CREATE) {
             if (currentLifecycleOwnerId == null || enoughTimePassedSinceLastLock()) {
                 currentLifecycleOwnerId = ownerId
-                timestamp = timeHelper.now().ms
+                timestamp = timeHelper.now()
                 Simber.i("Lifecycle owner [$ownerId] is set as main executor")
             } else {
                 Simber.i("Main executor already set, ignoring Lifecycle owner [$ownerId]")
@@ -44,7 +45,7 @@ internal class ExecutionTracker @Inject constructor(
         } else if (event == Lifecycle.Event.ON_DESTROY) {
             if (currentLifecycleOwnerId == ownerId) {
                 currentLifecycleOwnerId = null
-                timestamp = 0
+                timestamp = Timestamp(0)
                 Simber.i("Lifecycle owner [$ownerId] removed from main executor")
             }
         }
