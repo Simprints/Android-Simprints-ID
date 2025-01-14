@@ -1,9 +1,7 @@
 name: "Deploy: Main Workflow"
 
 on:
-    push:
-        branches:
-            - main
+    workflow_dispatch:
 
 concurrency:
     group: deploy-main-workflow
@@ -14,4 +12,4 @@ jobs:
     deploy-to-dev:
         uses: ./.github/workflows/pipeline-deploy-to-dev.yml
         secrets: inherit
-       
+        
