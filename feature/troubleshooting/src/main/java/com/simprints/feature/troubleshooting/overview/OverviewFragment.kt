@@ -24,6 +24,9 @@ internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_ove
         viewModel.projectIds.observe(viewLifecycleOwner) {
             binding.troubleshootOverviewIds.text = it.orEmpty()
         }
+        viewModel.configurationDetails.observe(viewLifecycleOwner) {
+            binding.troubleshootOverviewConfiguration.text = it.orEmpty()
+        }
         viewModel.licenseStates.observe(viewLifecycleOwner) {
             binding.troubleshootOverviewLicences.text = it.ifBlank { "No licenses found" }
         }

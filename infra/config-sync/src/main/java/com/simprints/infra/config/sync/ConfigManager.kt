@@ -14,9 +14,11 @@ import javax.inject.Inject
 class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val configSyncCache: ConfigSyncCache,
 ) {
     suspend fun refreshProject(projectId: String): ProjectWithConfig = configRepository.refreshProject(projectId).also {
         enrolmentRecordRepository.tokenizeExistingRecords(it.project)
+        configSyncCache.saveUpdateTime()
     }
 
     suspend fun getProject(projectId: String): Project = try {

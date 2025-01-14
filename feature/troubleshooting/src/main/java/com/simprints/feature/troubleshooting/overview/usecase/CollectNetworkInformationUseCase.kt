@@ -28,7 +28,7 @@ internal class CollectNetworkInformationUseCase @Inject constructor(
         return """ 
             $connectionType
             Strength: ${getSignalStrength(networkCapabilities)}
-            Internet access: $connectionValidated)}
+            Internet access: $connectionValidated
             Bandwidth up (kbps): ${networkCapabilities.linkUpstreamBandwidthKbps}
             Bandwidth down (kbps): ${networkCapabilities.linkDownstreamBandwidthKbps}
             """.trimIndent()

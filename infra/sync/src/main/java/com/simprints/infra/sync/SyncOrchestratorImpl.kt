@@ -3,6 +3,7 @@ package com.simprints.infra.sync
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import androidx.work.workDataOf
@@ -24,6 +25,9 @@ import com.simprints.infra.sync.firmware.FirmwareFileUpdateWorker
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
 import com.simprints.infra.sync.usecase.CleanupDeprecatedWorkersUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -91,12 +95,19 @@ internal class SyncOrchestratorImpl @Inject constructor(
         stopEventSync()
     }
 
-    override fun startProjectSync() {
+    override fun refreshConfiguration(): Flow<Unit> {
         workManager.startWorker<ProjectConfigDownSyncWorker>(SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME)
-    }
-
-    override fun startDeviceSync() {
         workManager.startWorker<DeviceConfigDownSyncWorker>(SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME)
+
+        return workManager
+            .getWorkInfosFlow(
+                WorkQuery.fromUniqueWorkNames(
+                    SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME,
+                    SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME,
+                ),
+            ).filter { workInfoList ->
+                workInfoList.none { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
+            }.map { } // Converts flow emissions to Unit value as we only care about when it happens, not the value
     }
 
     override fun rescheduleEventSync() {

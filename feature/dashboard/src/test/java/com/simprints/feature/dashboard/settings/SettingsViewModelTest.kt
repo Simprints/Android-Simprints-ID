@@ -2,10 +2,12 @@ package com.simprints.feature.dashboard.settings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.ConfigSyncCache
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -13,6 +15,7 @@ import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -41,6 +44,9 @@ class SettingsViewModelTest {
     @MockK
     private lateinit var syncOrchestrator: SyncOrchestrator
 
+    @MockK
+    private lateinit var configSyncCache: ConfigSyncCache
+
     private lateinit var viewModel: SettingsViewModel
 
     @Before
@@ -50,7 +56,12 @@ class SettingsViewModelTest {
         coEvery { configManager.getProjectConfiguration().general } returns generalConfiguration
         coEvery { configManager.getDeviceConfiguration().language } returns LANGUAGE
 
-        viewModel = SettingsViewModel(configManager, syncOrchestrator)
+        coEvery { configSyncCache.sinceLastUpdateTime() } returnsMany listOf(
+            LAST_UPDATED,
+            OTHER_LAST_UPDATED,
+        )
+
+        viewModel = SettingsViewModel(configManager, syncOrchestrator, configSyncCache)
     }
 
     @Test
@@ -58,6 +69,7 @@ class SettingsViewModelTest {
         assertThat(viewModel.generalConfiguration.value).isEqualTo(generalConfiguration)
         assertThat(viewModel.languagePreference.value).isEqualTo(LANGUAGE)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
+        assertThat(viewModel.sinceConfigLastUpdated.value?.peekContent()).isEqualTo(LAST_UPDATED)
     }
 
     @Test
@@ -84,14 +96,23 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `trigger device sync when called`() {
+    fun `trigger config refresh when called`() {
+        coEvery { syncOrchestrator.refreshConfiguration() } returns flowOf(Unit)
+        val updateTest = viewModel.sinceConfigLastUpdated.test() // to capture full update history
+
         viewModel.scheduleConfigUpdate()
 
-        verify { syncOrchestrator.startProjectSync() }
-        verify { syncOrchestrator.startDeviceSync() }
+        verify { syncOrchestrator.refreshConfiguration() }
+        viewModel.configUpdated.test().assertHasValue()
+        updateTest
+            .valueHistory()
+            .map { it.peekContent() }
+            .let { assertThat(it).containsExactly(LAST_UPDATED, OTHER_LAST_UPDATED) }
     }
 
     companion object {
         private const val LANGUAGE = "fr"
+        private const val LAST_UPDATED = "5 minutes ago"
+        private const val OTHER_LAST_UPDATED = "0 minutes ago"
     }
 }

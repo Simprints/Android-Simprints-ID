@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.feature.troubleshooting.overview.usecase.CollectConfigurationDetailsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class OverviewViewModel @Inject constructor(
     private val collectIds: CollectIdsUseCase,
+    private val collectConfigurationDetails: CollectConfigurationDetailsUseCase,
     private val collectLicenseStates: CollectLicenceStatesUseCase,
     private val collectNetworkInformation: CollectNetworkInformationUseCase,
     private val doServerPing: PingServerUseCase,
@@ -25,6 +27,10 @@ internal class OverviewViewModel @Inject constructor(
     val projectIds: LiveData<String>
         get() = _projectIds
     private val _projectIds = MutableLiveData(PLACEHOLDER_TEXT)
+
+    val configurationDetails: LiveData<String>
+        get() = _configurationDetails
+    private val _configurationDetails = MutableLiveData(PLACEHOLDER_TEXT)
 
     val licenseStates: LiveData<String>
         get() = _licenseStates
@@ -44,6 +50,7 @@ internal class OverviewViewModel @Inject constructor(
 
     fun collectData() {
         _projectIds.postValue(collectIds())
+        viewModelScope.launch { _configurationDetails.postValue(collectConfigurationDetails()) }
         viewModelScope.launch { _licenseStates.postValue(collectLicenseStates()) }
         _networkStates.postValue(collectNetworkInformation())
         viewModelScope.launch { _scannerState.postValue(collectScannerState()) }

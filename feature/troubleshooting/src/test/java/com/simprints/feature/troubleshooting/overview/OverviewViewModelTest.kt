@@ -3,6 +3,7 @@ package com.simprints.feature.troubleshooting.overview
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.feature.troubleshooting.overview.usecase.CollectConfigurationDetailsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
@@ -31,6 +32,9 @@ class OverviewViewModelTest {
     private lateinit var collectIdsUseCase: CollectIdsUseCase
 
     @MockK
+    private lateinit var collectConfigurationDetails: CollectConfigurationDetailsUseCase
+
+    @MockK
     private lateinit var collectLicencesUseCase: CollectLicenceStatesUseCase
 
     @MockK
@@ -50,6 +54,7 @@ class OverviewViewModelTest {
 
         viewModel = OverviewViewModel(
             collectIds = collectIdsUseCase,
+            collectConfigurationDetails = collectConfigurationDetails,
             collectLicenseStates = collectLicencesUseCase,
             collectNetworkInformation = collectNetworkInformationUseCase,
             doServerPing = pingServerUseCase,
@@ -60,10 +65,12 @@ class OverviewViewModelTest {
     @Test
     fun `sets when data collected`() = runTest {
         every { collectIdsUseCase() } returns "ids"
+        coEvery { collectConfigurationDetails() } returns "details"
         coEvery { collectLicencesUseCase() } returns "licences"
         every { collectNetworkInformationUseCase() } returns "network"
 
         val idsText = viewModel.projectIds.test()
+        val configText = viewModel.configurationDetails.test()
         val licenceText = viewModel.licenseStates.test()
         val networkText = viewModel.networkStates.test()
         val pingResult = viewModel.pingResult.test()
@@ -71,6 +78,7 @@ class OverviewViewModelTest {
         viewModel.collectData()
 
         assertThat(idsText.value()).isNotEmpty()
+        assertThat(configText.value()).isNotEmpty()
         assertThat(licenceText.value()).isNotEmpty()
         assertThat(networkText.value()).isNotEmpty()
         assertThat(pingResult.value()).isInstanceOf(PingResult.NotDone::class.java)
