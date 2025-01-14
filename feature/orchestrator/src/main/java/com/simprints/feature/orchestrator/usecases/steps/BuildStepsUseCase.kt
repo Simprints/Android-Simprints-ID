@@ -305,7 +305,7 @@ internal class BuildStepsUseCase @Inject constructor(
     /**
      * Builds the capture steps for the given flow type and age group.
      *
-     * If the preferred modalities are not available for the age group,
+     * If none of the capturing modalities are available for the age group,
      * the function will fall back to all configured modalities.
      */
     private fun buildCaptureSteps(
@@ -316,12 +316,25 @@ internal class BuildStepsUseCase @Inject constructor(
         // Cache the age group used for capture in case it's needed for Enrol Last followup
         cache.ageGroup = ageGroup
 
-        return preferredModalitiesForFlowType(projectConfiguration, flowType)
+        return capturingModalitiesForFlowType(projectConfiguration, flowType)
             .flatMap { modality ->
                 buildCaptureStepsForModality(modality, projectConfiguration, ageGroup, flowType)
             }.takeIf { it.isNotEmpty() } ?: projectConfiguration.general.modalities.flatMap { modality ->
             buildCaptureStepsForModality(modality, projectConfiguration, ageGroup, flowType)
         }
+    }
+
+    /**
+     * When enrolling capture all configured modalities.
+     * When identifying or verifying, capture only the modalities that will be used for matching.
+     */
+    private fun capturingModalitiesForFlowType(
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowType,
+    ): List<Modality> = when (flowType) {
+        FlowType.ENROL -> projectConfiguration.general.modalities
+        FlowType.IDENTIFY -> projectConfiguration.general.matchingModalities
+        FlowType.VERIFY -> projectConfiguration.general.matchingModalities
     }
 
     private fun buildCaptureStepsForModality(
@@ -368,7 +381,7 @@ internal class BuildStepsUseCase @Inject constructor(
     /**
      * Builds the matcher steps for the given flow type, age group, subject query and biometric data source.
      *
-     * If the preferred modalities are not available for the age group,
+     * If none of the matching modalities are available for the age group,
      * the function will fall back to all configured modalities.
      */
     private fun buildMatcherSteps(
@@ -377,7 +390,7 @@ internal class BuildStepsUseCase @Inject constructor(
         ageGroup: AgeGroup?,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
-    ): List<Step> = preferredModalitiesForFlowType(projectConfiguration, flowType)
+    ): List<Step> = projectConfiguration.general.matchingModalities
         .flatMap { modality ->
             buildMatcherStepsForModality(modality, projectConfiguration, ageGroup, flowType, subjectQuery, biometricDataSource)
         }.takeIf { it.isNotEmpty() } ?: projectConfiguration.general.modalities.flatMap { modality ->
@@ -528,14 +541,5 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
     ): AgeGroup? = action.getSubjectAgeIfAvailable()?.let { subjectAge ->
         projectConfiguration.sortedUniqueAgeGroups().firstOrNull { it.includes(subjectAge) }
-    }
-
-    private fun preferredModalitiesForFlowType(
-        projectConfiguration: ProjectConfiguration,
-        flowType: FlowType,
-    ): List<Modality> = when (flowType) {
-        FlowType.ENROL -> projectConfiguration.general.modalities
-        FlowType.IDENTIFY -> projectConfiguration.general.matchingModalities
-        FlowType.VERIFY -> projectConfiguration.general.matchingModalities
     }
 }
