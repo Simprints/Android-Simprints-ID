@@ -98,7 +98,6 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
                 viewModel.unlockSettings()
                 when (action) {
                     ACTION_LANGUAGE -> createLanguageSelectionDialog().show()
-                    ACTION_CONFIG_UPDATE -> updateConfiguration()
                 }
             },
         )
@@ -124,7 +123,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getUpdateConfig()?.setOnPreferenceClickListener {
-            showPasswordIfRequired(ACTION_CONFIG_UPDATE) { updateConfiguration() }
+            updateConfiguration()
             true
         }
 
@@ -213,6 +212,5 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
 
     companion object {
         private const val ACTION_LANGUAGE = "language"
-        private const val ACTION_CONFIG_UPDATE = "configUpdate"
     }
 }
