@@ -128,7 +128,7 @@ internal class FirebaseAuthManager @Inject constructor(
         try {
             getCoreApp().delete()
         } catch (ex: IllegalStateException) {
-            Simber.d("Failed to delete core app", ex)
+            Simber.e("Failed to delete core app", ex)
         }
     }
 

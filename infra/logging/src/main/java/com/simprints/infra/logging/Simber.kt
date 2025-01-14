@@ -27,11 +27,7 @@ object Simber {
      * STAGING: Is sent to Log.d
      * RELEASE: Is ignored
      */
-    @JvmStatic
-    fun d(
-        message: String,
-        t: Throwable? = null,
-    ) = Timber.d(t, message)
+    fun d(message: String) = Timber.d(message)
 
     /**
      * Use this to post useful information to the log. For example: that you have successfully
@@ -41,6 +37,7 @@ object Simber {
      * STAGING: Is sent to Log.i and Crashlytics as a breadcrumb
      * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
+    @JvmStatic
     fun i(
         message: String,
         t: Throwable? = null,

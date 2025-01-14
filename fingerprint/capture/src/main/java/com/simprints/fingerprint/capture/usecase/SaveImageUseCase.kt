@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.capture.usecase
 
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
-import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedException
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.extensions.toInt
 import com.simprints.fingerprint.capture.state.CaptureState
@@ -35,7 +34,7 @@ internal class SaveImageUseCase @Inject constructor(
             un20SerialNumber = scannerInfo.un20SerialNumber,
         )
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
-        Simber.e("Image save failed", FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))
+        Simber.i("Could not save fingerprint image because of null capture ID")
         null
     } else {
         null
@@ -70,7 +69,7 @@ internal class SaveImageUseCase @Inject constructor(
         if (securedImageRef != null) {
             SecuredImageRef(Path(securedImageRef.relativePath.parts))
         } else {
-            Simber.e("Saving image failed for captureId $captureEventId")
+            Simber.i("Saving image failed for captureId $captureEventId")
             null
         }
     }

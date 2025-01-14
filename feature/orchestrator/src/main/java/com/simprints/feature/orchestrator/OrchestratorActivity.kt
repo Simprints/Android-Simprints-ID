@@ -70,7 +70,7 @@ internal class OrchestratorActivity : BaseActivity() {
                 isGraphInitialized = true
             }
         } else {
-            Simber.e("Orchestrator already executing, finishing with RESULT_CANCELED")
+            Simber.i("Orchestrator already executing, finishing with RESULT_CANCELED")
             finish()
         }
     }

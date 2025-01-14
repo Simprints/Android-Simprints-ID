@@ -24,7 +24,7 @@ internal class SaveFaceImageUseCase @Inject constructor(
         if (securedImageRef != null) {
             SecuredImageRef(securedImageRef.relativePath)
         } else {
-            Simber.e("Saving image failed for captureId $captureEventId")
+            Simber.i("Saving image failed for captureId $captureEventId")
             null
         }
     }

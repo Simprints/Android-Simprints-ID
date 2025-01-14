@@ -26,7 +26,7 @@ internal class ShouldCreatePersonUseCase @Inject constructor(
         }
 
         if (modalities.isEmpty()) {
-            Simber.e("Modalities are empty")
+            Simber.i("Modalities are empty")
             return false
         }
 

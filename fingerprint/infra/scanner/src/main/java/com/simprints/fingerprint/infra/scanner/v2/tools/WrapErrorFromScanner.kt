@@ -13,10 +13,7 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     is NotConnectedException,
     is IOException,
     -> { // Disconnected or timed-out communications with Scanner
-        Simber.d(
-            "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException",
-            e,
-        )
+        Simber.i("IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException", e)
         ScannerDisconnectedException()
     }
 

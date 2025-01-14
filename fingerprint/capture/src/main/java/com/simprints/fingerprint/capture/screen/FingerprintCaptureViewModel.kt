@@ -330,7 +330,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             is CaptureState.ScanProcess.TransferringImage -> { // do nothing
             }
 
-            is CaptureState.NotCollected, is CaptureState.Skipped, is CaptureState.ScanProcess.NotDetected, is CaptureState.ScanProcess.Collected -> startScanning()
+            is CaptureState.NotCollected,
+            is CaptureState.Skipped,
+            is CaptureState.ScanProcess.NotDetected,
+            is CaptureState.ScanProcess.Collected,
+            -> startScanning()
         }
     }
 
@@ -360,7 +364,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 handleCaptureSuccess(capturedFingerprint)
             } catch (_: CancellationException) {
                 // ignore cancellation exception, but log behaviour
-                Simber.d("Fingerprint scanning was cancelled")
+                Simber.i("Fingerprint scanning was cancelled")
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
@@ -529,7 +533,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             }
 
             is NoFingerDetectedException -> {
-                Simber.i("No finger detected", e)
+                Simber.i("No finger detected")
                 handleNoFingerDetected()
             }
 

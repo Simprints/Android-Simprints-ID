@@ -116,7 +116,7 @@ abstract class SimCoroutineWorker(
     private fun logExceptionIfRequired(t: Throwable?) {
         t?.let {
             when (t) {
-                is CancellationException -> Simber.d("Worker cancelled", t)
+                is CancellationException -> Simber.i("Worker cancelled", t)
                 // Record network issues only in Analytics
                 is NetworkConnectionException -> Simber.i("Worker network connection issues", t)
                 else -> Simber.e("Unexpected worker error", t)
