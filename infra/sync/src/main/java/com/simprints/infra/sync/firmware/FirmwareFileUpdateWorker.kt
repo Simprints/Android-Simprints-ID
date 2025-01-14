@@ -28,22 +28,17 @@ class FirmwareFileUpdateWorker @AssistedInject constructor(
     override val tag: String = "FirmwareFileUpdateWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("FirmwareFileUpdateWorker started")
+        crashlyticsLog("Started")
         try {
             firmwareRepository.updateStoredFirmwareFilesWithLatest()
             firmwareRepository.cleanUpOldFirmwareFiles()
 
-            crashlyticsLog("FirmwareFileUpdateWorker succeeded")
-            Result.success()
+            success()
         } catch (e: Throwable) {
-            when {
-                e.isCausedFromBadNetworkConnection() ->
-                    Simber.i("FirmwareFileUpdateWorker failed due to network error", NetworkConnectionException(cause = e))
-
-                else ->
-                    Simber.e("FirmwareFileUpdateWorker failed due to unknown error", e)
+            if (e.isCausedFromBadNetworkConnection()) {
+                Simber.tag(tag).i("Failed due to network error", NetworkConnectionException(cause = e))
             }
-            Result.retry()
+            retry(e)
         }
     }
 }

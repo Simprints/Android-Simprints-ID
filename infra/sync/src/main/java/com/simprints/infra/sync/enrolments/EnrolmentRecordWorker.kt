@@ -24,7 +24,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     override val tag: String = "EnrolmentRecordWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("Enrolment record upload start")
+        crashlyticsLog("Started")
         try {
             val instructionId =
                 inputData.getString(SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME)
@@ -39,9 +39,9 @@ class EnrolmentRecordWorker @AssistedInject constructor(
                 it.apply { it.lastInstructionId = instructionId }
             }
 
-            Result.success()
+            success()
         } catch (e: Exception) {
-            Result.retry()
+            retry(e)
         }
     }
 }

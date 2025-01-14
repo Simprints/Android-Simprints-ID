@@ -26,7 +26,6 @@ import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.C
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_MAX_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -48,13 +47,13 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params),
     WorkerProgressCountReporter {
-    override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
+    override val tag: String = "EventUpSyncUploader"
 
     private val upSyncScope by lazy {
         try {
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
-            Simber.d("Received $jsonInput")
+            Simber.tag(tag).d("Received $jsonInput")
 
             jsonHelper.fromJson(jsonInput)
         } catch (t: Throwable) {
@@ -72,26 +71,23 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
         ?: throw IllegalArgumentException("input required")
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("Started")
+        showProgressNotification()
         try {
-            showProgressNotification()
-            Simber.tag(SYNC.name).d("[UPLOADER] Started")
-
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
             val max = eventRepository
                 .observeEventCount(null)
                 .firstOrNull() ?: 0
 
-            crashlyticsLog("Start")
             upSyncTask.upSync(upSyncScope.operation, getEventScope()).collect {
                 count += it.progress
                 eventSyncCache.saveProgress(workerId, count)
-                Simber.tag(SYNC.name).d("[UPLOADER] Uploaded $count for batch : $it")
+                Simber.tag(tag).d("Uploaded $count for batch : $it")
 
                 reportCount(count, max)
             }
 
-            Simber.tag(SYNC.name).d("[UPLOADER] Done")
             success(
                 workDataOf(
                     OUTPUT_UP_SYNC to count,
@@ -100,7 +96,6 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                 "Total uploaded: $count / $max",
             )
         } catch (t: Throwable) {
-            Simber.tag(SYNC.name).i("[UPLOADER] Failed ${t.message}")
             retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
         }
     }

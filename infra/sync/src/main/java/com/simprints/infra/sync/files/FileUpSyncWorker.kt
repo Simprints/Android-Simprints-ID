@@ -28,7 +28,7 @@ internal class FileUpSyncWorker @AssistedInject constructor(
     override val tag: String = "FileUpSyncWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
-        crashlyticsLog("file upload start")
+        crashlyticsLog("Started")
         try {
             when {
                 !imageDistortionConfigRepo.uploadPendingConfigs() -> retry()
@@ -36,8 +36,7 @@ internal class FileUpSyncWorker @AssistedInject constructor(
                 else -> retry()
             }
         } catch (ex: Exception) {
-            ex.printStackTrace()
-            retry(t = ex)
+            retry(ex)
         }
     }
 }
