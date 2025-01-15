@@ -42,7 +42,11 @@ object Simber {
     fun i(
         message: String,
         t: Throwable? = null,
-    ) = Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+    ) = if (t == null) {
+        Timber.i(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+    } else {
+        Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+    }
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -62,10 +66,10 @@ object Simber {
         message: String,
         t: Throwable? = null,
     ) {
-        if (t != null && shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
-        } else {
-            Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+        when {
+            t == null -> Timber.w(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+            shouldSkipThrowableReporting(t) -> Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+            else -> Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
         }
     }
 
@@ -85,9 +89,9 @@ object Simber {
      */
     fun e(
         message: String,
-        t: Throwable? = null,
+        t: Throwable,
     ) {
-        if (t != null && shouldSkipThrowableReporting(t)) {
+        if (shouldSkipThrowableReporting(t)) {
             Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
         } else {
             Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
@@ -108,7 +112,7 @@ object Simber {
      * Adds a custom tag to the log.
      * @param tag One of the predefined crash report tags
      */
-    fun tag(tag: CrashReportTag): Simber = tag(tag.name)
+    fun tag(tag: CrashReportTag) = tag(tag.name)
 
     /**
      * Adds a custom user property to analytics services.
