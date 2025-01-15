@@ -2,13 +2,14 @@ package com.simprints.infra.events.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration11to12 : Migration(11, 12) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.d("Migrating room db from schema 11 to schema 12.")
+        Simber.tag(MIGRATION).i("Migrating room db from schema 11 to schema 12.")
         updateTimestampsInSessionScope(database)
-        Simber.d("Migration from schema 11 to schema 12 done.")
+        Simber.tag(MIGRATION).i("Migration from schema 11 to schema 12 done.")
     }
 
     private fun updateTimestampsInSessionScope(database: SupportSQLiteDatabase) {

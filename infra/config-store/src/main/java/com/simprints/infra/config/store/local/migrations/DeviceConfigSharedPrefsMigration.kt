@@ -6,6 +6,7 @@ import androidx.datastore.core.DataMigration
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -29,11 +30,11 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
             .remove(SELECTED_MODULES_KEY)
             .remove(LAST_INSTRUCTION_ID_KEY)
             .apply()
-        Simber.i("Migration of device configuration to Datastore done")
+        Simber.tag(MIGRATION).i("Migration of device configuration to Datastore done")
     }
 
     override suspend fun migrate(currentData: ProtoDeviceConfiguration): ProtoDeviceConfiguration {
-        Simber.i("Start migration of device configuration to Datastore")
+        Simber.tag(MIGRATION).i("Start migration of device configuration to Datastore")
         return currentData.let {
             val proto = it.toBuilder()
 

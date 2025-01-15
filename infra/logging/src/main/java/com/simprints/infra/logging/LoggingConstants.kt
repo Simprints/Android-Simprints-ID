@@ -43,5 +43,6 @@ object LoggingConstants {
         ENROLMENT,
         APP_SCOPE_ERROR,
         ORCHESTRATION,
+        MIGRATION,
     }
 }
