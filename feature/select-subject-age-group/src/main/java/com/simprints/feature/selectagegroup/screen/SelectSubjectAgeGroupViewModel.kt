@@ -60,7 +60,7 @@ internal class SelectSubjectAgeGroupViewModel @Inject constructor(
             AgeGroupSelectionEvent.AgeGroup(ageRange.startInclusive, ageRange.endExclusive),
         )
         eventRepository.addOrUpdateEvent(event)
-        Simber.tag(SESSION.name).i("Added Age Group Selection Event")
+        Simber.tag(SESSION).i("Added Age Group Selection Event")
         _finish.send(ageRange)
     }
 

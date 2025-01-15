@@ -67,6 +67,6 @@ internal class SignerManager @Inject constructor(
         authStore.cleanCredentials()
         authStore.clearFirebaseToken()
 
-        Simber.tag(LOGOUT.name).i("Signed out")
+        Simber.tag(LOGOUT).i("Signed out")
     }
 }

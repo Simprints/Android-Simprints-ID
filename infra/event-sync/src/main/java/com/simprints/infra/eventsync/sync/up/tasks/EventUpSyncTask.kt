@@ -170,7 +170,7 @@ internal class EventUpSyncTask @Inject constructor(
         createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
         Simber
-            .tag(SYNC.name)
+            .tag(SYNC)
             .d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
 
         while (eventRepository.getClosedEventScopesCount(eventScopeTypeToUpload) > 0 && currentCoroutineContext().isActive) {
@@ -211,7 +211,7 @@ internal class EventUpSyncTask @Inject constructor(
                 }
             }
 
-            Simber.tag(SYNC.name).d("Deleting ${uploadedScopes.size} session scopes")
+            Simber.tag(SYNC).d("Deleting ${uploadedScopes.size} session scopes")
             eventRepository.deleteEventScopes(uploadedScopes)
         }
     }

@@ -24,7 +24,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         ?.let { AppVerifyResponse(it) }
         ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR).also {
             // if subject enrolled with an SDK and the user tries to verify with another SDK
-            Simber.tag(MATCHING.name).i("No match results found")
+            Simber.tag(MATCHING).i("No match results found")
         }
 
     private fun getFingerprintMatchResults(

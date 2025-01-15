@@ -154,10 +154,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val scannerTriggerListener = ScannerTriggerListener {
         viewModelScope.launch {
             if (state.isShowingConfirmDialog) {
-                Simber.tag(FINGER_CAPTURE.name).i("Scanner trigger clicked for confirm dialog")
+                Simber.tag(FINGER_CAPTURE).i("Scanner trigger clicked for confirm dialog")
                 handleConfirmFingerprintsAndContinue()
             } else {
-                Simber.tag(FINGER_CAPTURE.name).i("Scanner trigger clicked for scanning")
+                Simber.tag(FINGER_CAPTURE).i("Scanner trigger clicked for scanning")
                 handleScanButtonPressed()
             }
         }
@@ -237,7 +237,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun startLiveFeedback(scanner: ScannerWrapper) {
         if (liveFeedbackState != LiveFeedbackState.START && shouldWeDoLiveFeedback(scanner)) {
-            Simber.tag(FINGER_CAPTURE.name).i("startLiveFeedback")
+            Simber.tag(FINGER_CAPTURE).i("startLiveFeedback")
             liveFeedbackState = LiveFeedbackState.START
             stopLiveFeedbackTask?.cancel()
             liveFeedbackTask = viewModelScope.launch {
@@ -254,14 +254,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         // if live feedback is not supported, or if it is already paused, do nothing
         if (liveFeedbackState == null || liveFeedbackState == LiveFeedbackState.PAUSE) return
 
-        Simber.tag(FINGER_CAPTURE.name).i("pauseLiveFeedback")
+        Simber.tag(FINGER_CAPTURE).i("pauseLiveFeedback")
         liveFeedbackState = LiveFeedbackState.PAUSE
         liveFeedbackTask?.cancel()
     }
 
     private fun stopLiveFeedback() {
         if (liveFeedbackState != null && liveFeedbackState != LiveFeedbackState.STOP) {
-            Simber.tag(FINGER_CAPTURE.name).i("stopLiveFeedback")
+            Simber.tag(FINGER_CAPTURE).i("stopLiveFeedback")
             liveFeedbackState = LiveFeedbackState.STOP
             liveFeedbackTask?.cancel()
             stopLiveFeedbackTask = viewModelScope.launch {
@@ -486,7 +486,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun resolveFingerTerminalConditionTriggered() = with(state) {
         if (isScanningEndStateAchieved()) {
-            Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints dialog shown")
+            Simber.tag(FINGER_CAPTURE).i("Confirm fingerprints dialog shown")
             updateState { it.copy(isShowingConfirmDialog = true) }
         } else if (currentCaptureState().let { it is CaptureState.ScanProcess.Collected && it.scanResult.isGoodScan() }) {
             nudgeToNextFinger()

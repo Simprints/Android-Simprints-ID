@@ -44,11 +44,11 @@ internal class SelectSubjectViewModel @Inject constructor(
             val event = GuidSelectionEvent(timeHelper.now(), subjectId)
             eventRepository.addOrUpdateEvent(event)
 
-            Simber.tag(SESSION.name).i("Added Guid Selection Event")
+            Simber.tag(SESSION).i("Added Guid Selection Event")
             _finish.send(true)
         } catch (t: Throwable) {
             // It doesn't matter if it was an error, we always return a result
-            Simber.tag(SESSION.name).e("Failed to save Guid Selection Event", t)
+            Simber.tag(SESSION).e("Failed to save Guid Selection Event", t)
             _finish.send(false)
         }
     }

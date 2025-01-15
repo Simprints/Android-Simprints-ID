@@ -171,7 +171,7 @@ internal class EventDownSyncTask @Inject constructor(
 
         enrolmentRecordRepository.performActions(actions)
 
-        Simber.tag(SYNC.name).d("[DOWN_SYNC_HELPER] batch processed")
+        Simber.tag(SYNC).d("[DOWN_SYNC_HELPER] batch processed")
 
         return if (batchOfEventsToProcess.size > 0) {
             lastOperation.copy(

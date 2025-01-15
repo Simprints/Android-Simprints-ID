@@ -70,15 +70,15 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         try {
             val subject = buildSubject(params)
 
-            Simber.tag(ENROLMENT.name).d("Enrolment in progress")
+            Simber.tag(ENROLMENT).d("Enrolment in progress")
             registerEvent(subject)
-            Simber.tag(ENROLMENT.name).d("Create a subject record")
+            Simber.tag(ENROLMENT).d("Create a subject record")
             enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)))
-            Simber.tag(ENROLMENT.name).d("Done!")
+            Simber.tag(ENROLMENT).d("Done!")
 
             _finish.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
-            Simber.tag(ENROLMENT.name).e("Enrolment failed", t)
+            Simber.tag(ENROLMENT).e("Enrolment failed", t)
             _finish.send(EnrolLastState.Failed(GENERAL_ERROR, modalities))
         }
     }
@@ -87,7 +87,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         steps.filterIsInstance<EnrolLastBiometricStepResult.EnrolLastBiometricsResult>().firstOrNull()
 
     private suspend fun registerEvent(subject: Subject) {
-        Simber.tag(ENROLMENT.name).d("Register events for enrolments")
+        Simber.tag(ENROLMENT).d("Register events for enrolments")
 
         val personCreationEvent = eventRepository
             .getEventsInCurrentSession()

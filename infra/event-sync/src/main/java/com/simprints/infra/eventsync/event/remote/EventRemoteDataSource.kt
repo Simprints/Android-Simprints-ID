@@ -75,7 +75,7 @@ internal class EventRemoteDataSource @Inject constructor(
         val eventCount = getEventCountFromHeader(response)
 
         val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
-        Simber.tag(SYNC.name).d("[EVENT_REMOTE_SOURCE] Stream taken")
+        Simber.tag(SYNC).d("[EVENT_REMOTE_SOURCE] Stream taken")
 
         EventDownSyncResult(
             totalCount = eventCount.exactCount,
@@ -100,7 +100,7 @@ internal class EventRemoteDataSource @Inject constructor(
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
-        Simber.tag(SYNC.name).d("[EVENT_REMOTE_SOURCE] Start parsing stream")
+        Simber.tag(SYNC).d("[EVENT_REMOTE_SOURCE] Start parsing stream")
 
         try {
             while (parser.nextToken() == START_OBJECT) {

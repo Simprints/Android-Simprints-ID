@@ -77,7 +77,7 @@ internal class Authenticator @Inject constructor(
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
-        Simber.tag(LOGIN.name).i(message)
+        Simber.tag(LOGIN).i(message)
     }
 
     private suspend fun addEventAndUpdateProjectIdIfRequired(

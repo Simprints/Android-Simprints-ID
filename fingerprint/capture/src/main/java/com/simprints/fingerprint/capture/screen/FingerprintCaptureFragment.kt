@@ -234,14 +234,14 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private fun initMissingFingerButton() {
         binding.fingerprintMissingFinger.setOnClickListener {
-            Simber.tag(FINGER_CAPTURE.name).i("Missing finger text clicked")
+            Simber.tag(FINGER_CAPTURE).i("Missing finger text clicked")
             vm.handleMissingFingerButtonPressed()
         }
     }
 
     private fun initScanButton() {
         binding.fingerprintScanButton.setOnClickListener {
-            Simber.tag(FINGER_CAPTURE.name).i("Scan button clicked")
+            Simber.tag(FINGER_CAPTURE).i("Scan button clicked")
             vm.handleScanButtonPressed()
         }
     }
@@ -311,7 +311,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 FingerprintConnectContract.getArgs(args.params.fingerprintSDK),
             )
         } catch (e: Exception) {
-            Simber.tag(FINGER_CAPTURE.name).i("Error launching scanner connection screen", e)
+            Simber.tag(FINGER_CAPTURE).i("Error launching scanner connection screen", e)
         }
     }
 
@@ -363,11 +363,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 requireContext(),
                 dialogItems,
                 onConfirm = {
-                    Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints clicked")
+                    Simber.tag(FINGER_CAPTURE).i("Confirm fingerprints clicked")
                     vm.handleConfirmFingerprintsAndContinue()
                 },
                 onRestart = {
-                    Simber.tag(FINGER_CAPTURE.name).i("Restart clicked")
+                    Simber.tag(FINGER_CAPTURE).i("Restart clicked")
                     vm.handleRestart()
                 },
             ).create()

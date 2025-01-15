@@ -253,7 +253,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(SCANNER_SETUP.name).i(message)
+        Simber.tag(SCANNER_SETUP).i(message)
     }
 
     fun handleScannerDisconnectedYesClick() {

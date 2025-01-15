@@ -108,7 +108,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         // if there is no actions to perform return to avoid useless realm operations
         if (actions.isEmpty()) {
             Simber
-                .tag(REALM_DB.name)
+                .tag(REALM_DB)
                 .d("[SubjectLocalDataSourceImpl] No realm actions to perform ")
             return
         }

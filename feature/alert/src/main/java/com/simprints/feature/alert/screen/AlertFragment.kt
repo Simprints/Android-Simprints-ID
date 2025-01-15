@@ -68,7 +68,7 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            Simber.tag(ALERT.name).i("Alert back button clicked")
+            Simber.tag(ALERT).i("Alert back button clicked")
             setPressedButtonResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, config.appErrorReason)
             findNavController().popBackStack()
         }
@@ -79,7 +79,7 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
             Toast.makeText(requireContext(), IDR.string.alert_export_copied, Toast.LENGTH_SHORT).show()
         }
 
-        Simber.tag(ALERT.name).i("${binding.alertTitle.text}")
+        Simber.tag(ALERT).i("${binding.alertTitle.text}")
     }
 
     private fun TextView.setupButton(
@@ -89,7 +89,7 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         setTextWithFallbacks(config.text, config.textRes)
         setOnClickListener {
             config.resultKey?.let {
-                Simber.tag(ALERT.name).i("Alert button clicked: $it")
+                Simber.tag(ALERT).i("Alert button clicked: $it")
                 setPressedButtonResult(it, appErrorReason)
             }
 

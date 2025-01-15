@@ -1,6 +1,7 @@
 package com.simprints.infra.logging
 
 import com.google.firebase.FirebaseNetworkException
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import timber.log.Timber
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -102,6 +103,12 @@ object Simber {
         Timber.tag(conformingTag)
         return Simber
     }
+
+    /**
+     * Adds a custom tag to the log.
+     * @param tag One of the predefined crash report tags
+     */
+    fun tag(tag: CrashReportTag): Simber = tag(tag.name)
 
     /**
      * Adds a custom user property to analytics services.

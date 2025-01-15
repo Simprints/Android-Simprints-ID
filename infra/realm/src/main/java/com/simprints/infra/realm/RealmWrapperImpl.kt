@@ -40,7 +40,7 @@ class RealmWrapperImpl @Inject constructor(
     }
 
     private fun createRealm(): Realm {
-        Simber.tag(REALM_DB.name).d("[RealmWrapperImpl] getting new realm instance")
+        Simber.tag(REALM_DB).d("[RealmWrapperImpl] getting new realm instance")
         return try {
             try {
                 Realm.open(config)
@@ -63,7 +63,7 @@ class RealmWrapperImpl @Inject constructor(
                 // 2. Recreate the DB key
                 recreateLocalDbKey()
                 // 3. Log exception after recreating the key so we get extra info
-                Simber.tag(DB_CORRUPTION.name).e("Realm DB recreated due to corruption", ex)
+                Simber.tag(DB_CORRUPTION).e("Realm DB recreated due to corruption", ex)
                 // 4. Update Realm config with the new key
                 config = createAndSaveRealmConfig()
                 // 5. Delete "last sync" info and start new sync
