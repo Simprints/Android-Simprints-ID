@@ -3,7 +3,6 @@ package com.simprints.infra.events.sampledata
 import android.os.Build
 import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.core.domain.response.AppMatchConfidence.MEDIUM
-import com.simprints.core.domain.response.AppResponseTier.TIER_1
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
@@ -161,7 +160,7 @@ fun createErrorCallbackEvent() = ErrorCallbackEvent(
 fun createIdentificationCallbackEvent() = IdentificationCallbackEvent(
     CREATED_AT,
     GUID1,
-    listOf(CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)),
+    listOf(CallbackComparisonScore(GUID1, 1, MEDIUM)),
 )
 
 fun createRefusalCallbackEvent() = RefusalCallbackEvent(
@@ -172,12 +171,12 @@ fun createRefusalCallbackEvent() = RefusalCallbackEvent(
 
 fun createVerificationCallbackEventV1() = VerificationCallbackEvent(
     CREATED_AT,
-    CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM),
+    CallbackComparisonScore(GUID1, 1, MEDIUM),
 )
 
 fun createVerificationCallbackEventV2() = VerificationCallbackEvent(
     CREATED_AT,
-    CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM),
+    CallbackComparisonScore(GUID1, 1, MEDIUM),
 )
 
 fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(

@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
@@ -50,13 +49,11 @@ class CommCareResponseMapperTest {
                     AppMatchResult(
                         guid = "guid-1",
                         confidenceScore = 100,
-                        tier = AppResponseTier.TIER_5,
                         matchConfidence = AppMatchConfidence.MEDIUM,
                     ),
                     AppMatchResult(
                         guid = "guid-2",
                         confidenceScore = 75,
-                        tier = AppResponseTier.TIER_3,
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
@@ -70,7 +67,7 @@ class CommCareResponseMapperTest {
             .isEqualTo(
                 ArrayList<LegacyIdentification>(
                     listOf(
-                        LegacyIdentification("guid-1", 100, LegacyTier.TIER_5),
+                        LegacyIdentification("guid-1", 100, LegacyTier.TIER_2),
                         LegacyIdentification("guid-2", 75, LegacyTier.TIER_3),
                     ),
                 ),
@@ -100,7 +97,6 @@ class CommCareResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = null,
                 ),
@@ -110,7 +106,7 @@ class CommCareResponseMapperTest {
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
-        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_1")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_SUCCESS_KEY)).isNull()
     }
@@ -124,7 +120,6 @@ class CommCareResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = false,
                 ),
@@ -134,7 +129,7 @@ class CommCareResponseMapperTest {
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
-        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_1")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_SUCCESS_KEY)).isEqualTo("false")
     }
@@ -148,7 +143,6 @@ class CommCareResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = true,
                 ),
@@ -158,7 +152,7 @@ class CommCareResponseMapperTest {
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_CONFIDENCE_KEY)).isEqualTo("50")
-        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(CommCareConstants.VERIFICATION_TIER_KEY)).isEqualTo("TIER_1")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
         assertThat(extras.getString(CommCareConstants.VERIFICATION_SUCCESS_KEY)).isEqualTo("true")
     }

@@ -2,7 +2,6 @@ package com.simprints.infra.events.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier.TIER_1
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -12,7 +11,7 @@ import org.junit.Test
 class VerificationCallbackEventTest {
     @Test
     fun create_VerificationCallbackEvent() {
-        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE)
+        val comparisonScore = CallbackComparisonScore(GUID1, 1, AppMatchConfidence.NONE)
 
         val event = VerificationCallbackEvent(CREATED_AT, comparisonScore)
         assertThat(event.id).isNotNull()

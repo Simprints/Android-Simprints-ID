@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
@@ -46,13 +45,11 @@ class OdkResponseMapperTest {
                     AppMatchResult(
                         guid = "guid-1",
                         confidenceScore = 100,
-                        tier = AppResponseTier.TIER_5,
                         matchConfidence = AppMatchConfidence.MEDIUM,
                     ),
                     AppMatchResult(
                         guid = "guid-2",
                         confidenceScore = 75,
-                        tier = AppResponseTier.TIER_3,
                         matchConfidence = AppMatchConfidence.LOW,
                     ),
                 ),
@@ -62,7 +59,7 @@ class OdkResponseMapperTest {
         assertThat(extras.getString(OdkConstants.ODK_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(OdkConstants.ODK_GUIDS_KEY)).isEqualTo("guid-1 guid-2")
         assertThat(extras.getString(OdkConstants.ODK_CONFIDENCES_KEY)).isEqualTo("100 75")
-        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_5 TIER_3")
+        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_2 TIER_3")
         assertThat(extras.getString(OdkConstants.ODK_MATCH_CONFIDENCE_FLAGS_KEY)).isEqualTo("MEDIUM LOW")
         assertThat(extras.getString(OdkConstants.ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY)).isEqualTo("MEDIUM")
         assertThat(extras.getBoolean(OdkConstants.ODK_IDENTIFY_BIOMETRICS_COMPLETE)).isEqualTo(true)
@@ -104,7 +101,6 @@ class OdkResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = null,
                 ),
@@ -114,7 +110,7 @@ class OdkResponseMapperTest {
         assertThat(extras.getString(OdkConstants.ODK_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(OdkConstants.ODK_GUIDS_KEY)).isEqualTo("guid")
         assertThat(extras.getString(OdkConstants.ODK_CONFIDENCES_KEY)).isEqualTo("50")
-        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_1")
         assertThat(extras.getBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(true)
         assertThat(extras.getBoolean(OdkConstants.ODK_VERIFICATION_SUCCESS_KEY)).isEqualTo(false) // default value
     }
@@ -128,7 +124,6 @@ class OdkResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = false,
                 ),
@@ -138,7 +133,7 @@ class OdkResponseMapperTest {
         assertThat(extras.getString(OdkConstants.ODK_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(OdkConstants.ODK_GUIDS_KEY)).isEqualTo("guid")
         assertThat(extras.getString(OdkConstants.ODK_CONFIDENCES_KEY)).isEqualTo("50")
-        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_1")
         assertThat(extras.getBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(true)
         assertThat(extras.getBoolean(OdkConstants.ODK_VERIFICATION_SUCCESS_KEY)).isEqualTo(false)
     }
@@ -152,7 +147,6 @@ class OdkResponseMapperTest {
                 matchResult = AppMatchResult(
                     guid = "guid",
                     confidenceScore = 50,
-                    tier = AppResponseTier.TIER_2,
                     matchConfidence = AppMatchConfidence.HIGH,
                     verificationSuccess = true,
                 ),
@@ -162,7 +156,7 @@ class OdkResponseMapperTest {
         assertThat(extras.getString(OdkConstants.ODK_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getString(OdkConstants.ODK_GUIDS_KEY)).isEqualTo("guid")
         assertThat(extras.getString(OdkConstants.ODK_CONFIDENCES_KEY)).isEqualTo("50")
-        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_2")
+        assertThat(extras.getString(OdkConstants.ODK_TIERS_KEY)).isEqualTo("TIER_1")
         assertThat(extras.getBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE)).isEqualTo(true)
         assertThat(extras.getBoolean(OdkConstants.ODK_VERIFICATION_SUCCESS_KEY)).isEqualTo(true)
     }

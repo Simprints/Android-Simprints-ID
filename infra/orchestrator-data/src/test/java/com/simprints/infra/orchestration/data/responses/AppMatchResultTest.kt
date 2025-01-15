@@ -19,7 +19,6 @@ class AppMatchResultTest {
             AppMatchResult(
                 guid = "guid",
                 confidenceScore = 25,
-                tier = AppResponseTier.TIER_4,
                 matchConfidence = AppMatchConfidence.MEDIUM,
             ),
         )
@@ -28,20 +27,25 @@ class AppMatchResultTest {
     @Test
     fun testComputeTier() {
         mapOf(
-            0.0f to AppResponseTier.TIER_5,
-            10.0f to AppResponseTier.TIER_5,
-            20.0f to AppResponseTier.TIER_4,
-            30.0f to AppResponseTier.TIER_4,
-            35.0f to AppResponseTier.TIER_3,
-            40.0f to AppResponseTier.TIER_3,
+            0.0f to AppResponseTier.TIER_4,
+            10.0f to AppResponseTier.TIER_4,
+            // low
+            20.0f to AppResponseTier.TIER_3,
+            30.0f to AppResponseTier.TIER_3,
+            // medium
+            40.0f to AppResponseTier.TIER_2,
             50.0f to AppResponseTier.TIER_2,
-            60.0f to AppResponseTier.TIER_2,
-            70.0f to AppResponseTier.TIER_2,
-            75.0f to AppResponseTier.TIER_1,
-            80.0f to AppResponseTier.TIER_1,
-            90.0f to AppResponseTier.TIER_1,
+            // high
+            60.0f to AppResponseTier.TIER_1,
+            70.0f to AppResponseTier.TIER_1,
         ).forEach { (score, expected) ->
-            assertThat(AppMatchResult.computeTier(score)).isEqualTo(expected)
+            assertThat(
+                AppMatchResult(
+                    guid = "guid",
+                    confidenceScore = score,
+                    decisionPolicy = DecisionPolicy(low = 20, medium = 40, high = 60),
+                ).tier,
+            ).isEqualTo(expected)
         }
     }
 
