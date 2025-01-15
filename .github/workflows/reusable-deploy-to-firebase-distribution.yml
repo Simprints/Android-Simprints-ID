@@ -48,8 +48,23 @@ jobs:
                 with:
                     name: ${{ inputs.upload-artifact }}
 
-            -   name: Distribution Summary
-                run: echo "### Deployed ${{ inputs.upload-artifact}} to Firebase Simprints ID ${{ inputs.build-environment }} :rocket:" >> $GITHUB_STEP_SUMMARY
-
             -   name: Deploy to Firebase App Distribution
-                run: firebase appdistribution:distribute ${{ inputs.upload-artifact }} --app ${{ vars.FIREBASE_DISTRIBUTION_APP_ID}} --groups "pre-release-testers"
+                id: firebase-deploy
+                run: |
+                    # Capture the entire output of the firebase command in a variable
+                    output="$(firebase appdistribution:distribute ${{ inputs.upload-artifact }} --app ${{ vars.FIREBASE_DISTRIBUTION_APP_ID}} --groups "pre-release-testers")"
+
+                    echo "$output"
+
+                    # The CLI prints a line like:
+                    #   "✔  View this release in the Firebase console: https://console.firebase.google.com/...."
+                    console_url="$(echo "$output" | grep -o 'https://console\.firebase\.google\.com[^[:space:]]*')"
+
+                    # Expose console_url as a step output using $GITHUB_OUTPUT
+                    echo "console_url=$console_url" >> "$GITHUB_OUTPUT"
+
+            -   name: Distribution Summary
+                run: |
+                    echo "### Deployed ${{ inputs.upload-artifact}} to Firebase Simprints ID ${{ inputs.build-environment }} :rocket:" >> $GITHUB_STEP_SUMMARY
+                    echo "✔ [View this release in the Firebase console](${{ steps.firebase-deploy.outputs.console_url }})" >> "$GITHUB_STEP_SUMMARY"
+
