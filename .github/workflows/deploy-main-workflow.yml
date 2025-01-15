@@ -12,4 +12,3 @@ jobs:
     deploy-to-dev:
         uses: ./.github/workflows/pipeline-deploy-to-dev.yml
         secrets: inherit
-        
