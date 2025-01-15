@@ -147,7 +147,7 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
                 viewModel.scannerNumber.orEmpty(),
             )
             viewModel.startPairing(serialNumber)
-        } catch (e: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             context?.showToast(IDR.string.fingerprint_connect_serial_entry_pair_toast_invalid)
         }
     }
@@ -168,17 +168,19 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
 
     private fun handlePairingAttemptFailed(pairingRejected: Boolean) {
         determineWhetherPairingWasSuccessfulJob?.cancel()
-        viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
-            binding.serialEntryPairProgressBar.visibility = View.INVISIBLE
-            binding.serialEntryOkButton.visibility = View.VISIBLE
-            binding.serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
-            binding.serialEntryPairInstructionsTextView.text = if (pairingRejected) {
-                getString(IDR.string.fingerprint_connect_serial_entry_pair_rejected)
-            } else {
-                getString(
-                    IDR.string.fingerprint_connect_serial_entry_pair_failed,
-                    serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()),
-                )
+        if (isAdded && view != null) {
+            viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
+                binding.serialEntryPairProgressBar.visibility = View.INVISIBLE
+                binding.serialEntryOkButton.visibility = View.VISIBLE
+                binding.serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
+                binding.serialEntryPairInstructionsTextView.text = if (pairingRejected) {
+                    getString(IDR.string.fingerprint_connect_serial_entry_pair_rejected)
+                } else {
+                    getString(
+                        IDR.string.fingerprint_connect_serial_entry_pair_failed,
+                        serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()),
+                    )
+                }
             }
         }
     }
