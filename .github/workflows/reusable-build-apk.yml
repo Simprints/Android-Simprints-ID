@@ -57,7 +57,6 @@ jobs:
                     exit 1
 
             -   name: Check base version code
-                if: ${{ github.run_number * 100 >= env.BASE_VERSION_CODE }}
                 run: |
                     if [ $(( ${{ github.run_number }} * 100 )) -ge $BASE_VERSION_CODE ]; then
                       echo "Github workflows now exceeds the base version code..."
