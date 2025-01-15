@@ -44,6 +44,7 @@ import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.navigation.finishWithResult
@@ -81,6 +82,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("FingerprintCaptureFragment started")
 
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,

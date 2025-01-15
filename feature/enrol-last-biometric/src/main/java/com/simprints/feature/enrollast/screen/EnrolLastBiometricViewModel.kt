@@ -69,13 +69,8 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         try {
             val subject = buildSubject(params)
-
-            Simber.tag(ENROLMENT).d("Enrolment in progress")
             registerEvent(subject)
-            Simber.tag(ENROLMENT).d("Create a subject record")
             enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)))
-            Simber.tag(ENROLMENT).d("Done!")
-
             _finish.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
             Simber.tag(ENROLMENT).e("Enrolment failed", t)

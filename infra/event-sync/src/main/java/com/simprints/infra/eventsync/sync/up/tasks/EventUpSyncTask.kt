@@ -59,7 +59,7 @@ internal class EventUpSyncTask @Inject constructor(
     ): Flow<EventUpSyncProgress> = flow {
         if (operation.projectId != authStore.signedInProjectId) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
-                Simber.e("Failed to upload events due to missing auth", it)
+                Simber.tag(SYNC).e("Failed to upload events due to missing auth", it)
             }
         }
 
@@ -143,7 +143,7 @@ internal class EventUpSyncTask @Inject constructor(
                 throw t
             }
 
-            Simber.e("Failed to upload event scopes", t)
+            Simber.tag(SYNC).e("Failed to upload event scopes", t)
             lastOperation = lastOperation.copy(
                 lastState = FAILED,
                 lastSyncTime = timeHelper.now().ms,
@@ -241,7 +241,7 @@ internal class EventUpSyncTask @Inject constructor(
                 .also { listOfEvents -> emit(listOfEvents.size) }
         } catch (ex: Exception) {
             if (ex is JsonParseException || ex is JsonMappingException) {
-                Simber.i("Failed to un-marshal events", ex)
+                Simber.tag(SYNC).i("Failed to un-marshal events", ex)
             } else {
                 throw ex
             }
@@ -280,14 +280,14 @@ internal class EventUpSyncTask @Inject constructor(
         when (ex) {
             is NetworkConnectionException -> Simber.i("Network connection error", ex)
             is HttpException -> {
-                Simber.i("Network HTTP request error", ex)
+                Simber.tag(SYNC).i("Network HTTP request error", ex)
                 result = ex.response()?.let { EventUpSyncResult(it.code()) }
             }
 
             is RemoteDbNotSignedInException -> throw ex
 
             else -> {
-                Simber.e("Unexpected network error", ex)
+                Simber.tag(SYNC).e("Unexpected network error", ex)
                 // Propagate other exceptions to report failure to the caller.
                 throw ex
             }
@@ -330,7 +330,7 @@ internal class EventUpSyncTask @Inject constructor(
     ) = flow {
         corruptedScopes.forEach { scope ->
             try {
-                Simber.i("Uploading invalid events for session ${scope.id}")
+                Simber.tag(SYNC).i("Uploading invalid events for session ${scope.id}")
                 val scopeString = jsonHelper.toJson(scope)
                 val eventJsons = eventRepository.getEventsJsonFromScope(scope.id)
                 emit(eventJsons.size)
@@ -343,9 +343,9 @@ internal class EventUpSyncTask @Inject constructor(
             } catch (t: Throwable) {
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.
-                    is NetworkConnectionException, is HttpException -> Simber.i("Failed to upload invalid events", t)
+                    is NetworkConnectionException, is HttpException -> Simber.tag(SYNC).i("Failed to upload invalid events", t)
                     is RemoteDbNotSignedInException -> throw t
-                    else -> Simber.e("Unexpected error while uploading invalid events", t)
+                    else -> Simber.tag(SYNC).e("Unexpected error while uploading invalid events", t)
                 }
             }
         }

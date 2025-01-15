@@ -17,6 +17,8 @@ import com.simprints.feature.exitform.toArgs
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.fetchsubject.R
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -33,6 +35,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("FetchSubjectFragment started")
 
         with(findNavController()) {
             handleResult(viewLifecycleOwner, R.id.fetchSubjectFragment, AlertContract.DESTINATION, ::handleAlertResult)

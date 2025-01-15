@@ -15,6 +15,7 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
@@ -31,12 +32,13 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
-    override val crashReportTag = LoggingConstants.CrashReportTag.MATCHING.name
+    override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING.name
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingCandidates: (tag: String) -> Unit,
+        onLoadingCandidates: () -> Unit,
     ): MatcherResult = coroutineScope {
+        Simber.tag(crashReportTag).i("Initialising matcher")
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK!!)
 
         if (matchParams.probeFingerprintSamples.isEmpty()) {
@@ -53,7 +55,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, bioSdkWrapper.matcherName)
         }
 
-        onLoadingCandidates(crashReportTag)
+        Simber.tag(crashReportTag).i("Matching candidates")
+        onLoadingCandidates()
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
@@ -66,6 +69,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             }.awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
+
+        Simber.tag(crashReportTag).i("Matched $totalCandidates candidates")
         MatcherResult(resultItems, totalCandidates, bioSdkWrapper.matcherName)
     }
 

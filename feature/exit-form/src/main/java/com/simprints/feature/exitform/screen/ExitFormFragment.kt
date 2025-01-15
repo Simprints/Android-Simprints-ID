@@ -14,6 +14,8 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.R
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.databinding.FragmentExitFormBinding
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.listeners.TextWatcherOnChangeListener
 import com.simprints.infra.uibase.navigation.finishWithResult
@@ -37,6 +39,8 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("ExitFormFragment started")
+
         val config = args.exitFormConfiguration
 
         binding.exitFormTitle.setTextWithFallbacks(

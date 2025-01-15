@@ -19,6 +19,7 @@ import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.databinding.FragmentAlertBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ALERT
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.setResult
 import com.simprints.infra.uibase.system.Clipboard
@@ -38,8 +39,10 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("AlertFragment started")
 
         val config = args.alertConfiguration
+        Simber.tag(ALERT).i("Alert reason: ${config.appErrorReason}")
 
         binding.root.setBackgroundColor(
             ResourcesCompat.getColor(
@@ -75,11 +78,10 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         config.eventType?.let { vm.saveAlertEvent(it) }
 
         binding.alertExportButton.setOnClickListener {
+            Simber.tag(ALERT).i("Alert export button clicked")
             Clipboard.copyToClipboard(requireContext(), vm.collectExportData())
             Toast.makeText(requireContext(), IDR.string.alert_export_copied, Toast.LENGTH_SHORT).show()
         }
-
-        Simber.tag(ALERT).i("${binding.alertTitle.text}")
     }
 
     private fun TextView.setupButton(

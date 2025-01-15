@@ -40,6 +40,7 @@ import com.simprints.feature.login.screens.form.SignInState.Unknown
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -76,6 +77,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("LoginFormFragment started")
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             finishWithError(LoginError.LoginNotCompleted)

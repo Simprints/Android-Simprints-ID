@@ -101,7 +101,7 @@ class RealmWrapperImpl @Inject constructor(
             try {
                 securityManager.getLocalDbKeyOrThrow(it)
             } catch (ex: Exception) {
-                Simber.e("Failed to fetch local DB key", ex)
+                Simber.tag(REALM_DB).e("Failed to fetch local DB key", ex)
                 securityManager.recreateLocalDatabaseKey(it)
                 securityManager.getLocalDbKeyOrThrow(it)
             }
@@ -132,7 +132,7 @@ class RealmWrapperImpl @Inject constructor(
                 appContext.startService(intent)
             }
         } catch (ex: Exception) {
-            Simber.e("Unable to start sync reset service", ex)
+            Simber.tag(REALM_DB).e("Unable to start sync reset service", ex)
         }
     }
 }

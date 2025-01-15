@@ -54,7 +54,7 @@ internal class MatchViewModelTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
-    private lateinit var cb1: CapturingSlot<(String) -> Unit>
+    private lateinit var cb1: CapturingSlot<() -> Unit>
 
     private lateinit var viewModel: MatchViewModel
 
@@ -81,7 +81,7 @@ internal class MatchViewModelTest {
         )
 
         coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
-            cb1.captured.invoke("tag1")
+            cb1.captured.invoke()
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
@@ -125,7 +125,7 @@ internal class MatchViewModelTest {
         )
 
         coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
-            cb1.captured.invoke("tag1")
+            cb1.captured.invoke()
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
@@ -173,7 +173,7 @@ internal class MatchViewModelTest {
         )
 
         coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1)) } answers {
-            cb1.captured.invoke("tag1")
+            cb1.captured.invoke()
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,

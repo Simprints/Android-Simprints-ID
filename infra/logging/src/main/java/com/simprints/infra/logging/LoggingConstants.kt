@@ -34,7 +34,7 @@ object LoggingConstants {
         SESSION,
         FINGER_CAPTURE,
         FACE_CAPTURE,
-        MATCHING,
+        FINGER_MATCHING,
         FACE_MATCHING,
         LICENSE,
         SETTINGS,
@@ -43,5 +43,6 @@ object LoggingConstants {
         DB_CORRUPTION,
         ENROLMENT,
         APP_SCOPE_ERROR,
+        ORCHESTRATION,
     }
 }

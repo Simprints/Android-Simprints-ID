@@ -19,6 +19,8 @@ import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.toArgs
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -46,6 +48,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("FaceCaptureControllerFragment started")
 
         findNavController().handleResult<ExitFormResult>(
             this,

@@ -13,6 +13,7 @@ import com.simprints.infra.authstore.domain.JwtTokenHelper.Companion.extractToke
 import com.simprints.infra.authstore.domain.LoginInfoStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -71,7 +72,7 @@ internal class FirebaseAuthManager @Inject constructor(
                 ?.getIdToken(false)
                 ?.await()
         } catch (ex: Exception) {
-            Simber.e("Failed to get access token", ex)
+            Simber.tag(LOGIN).e("Failed to get access token", ex)
             throw transformFirebaseExceptionIfNeeded(ex)
         }
 
@@ -128,7 +129,7 @@ internal class FirebaseAuthManager @Inject constructor(
         try {
             getCoreApp().delete()
         } catch (ex: IllegalStateException) {
-            Simber.e("Failed to delete core app", ex)
+            Simber.tag(LOGIN).e("Failed to delete core app", ex)
         }
     }
 

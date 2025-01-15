@@ -9,6 +9,7 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
@@ -29,8 +30,9 @@ internal class FaceMatcherUseCase @Inject constructor(
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingCandidates: (tag: String) -> Unit,
+        onLoadingCandidates: () -> Unit,
     ): MatcherResult = coroutineScope {
+        Simber.tag(crashReportTag).i("Initialising matcher")
         faceMatcher = resolveFaceBioSdk().matcher
         if (matchParams.probeFaceSamples.isEmpty()) {
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
@@ -47,7 +49,8 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
 
-        onLoadingCandidates(crashReportTag)
+        Simber.tag(crashReportTag).i("Matching candidates")
+        onLoadingCandidates()
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
@@ -61,6 +64,8 @@ internal class FaceMatcherUseCase @Inject constructor(
             }.awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
+        Simber.tag(crashReportTag).i("Matched $totalCandidates candidates")
+
         MatcherResult(resultItems, totalCandidates, faceMatcher.matcherName)
     }
 

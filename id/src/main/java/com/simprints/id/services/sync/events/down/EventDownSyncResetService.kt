@@ -43,7 +43,7 @@ class EventDownSyncResetService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
-        Simber.tag(SYNC).i("Reset downSync")
+        Simber.tag(SYNC).i("Reset down sync service started")
         resetJob = externalScope.launch {
             startForegroundIfNeeded()
             // Reset current downsync state

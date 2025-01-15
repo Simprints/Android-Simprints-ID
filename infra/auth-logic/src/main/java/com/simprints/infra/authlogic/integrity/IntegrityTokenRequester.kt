@@ -18,6 +18,7 @@ import com.simprints.infra.authlogic.BuildConfig
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
 import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -48,7 +49,7 @@ internal class IntegrityTokenRequester @Inject constructor(
                     ),
                 ).token()
         } catch (integrityServiceException: IntegrityServiceException) {
-            Simber.e("Integrity token request failed", integrityServiceException)
+            Simber.tag(LOGIN).e("Integrity token request failed", integrityServiceException)
             throw mapException(
                 integrityServiceException,
             )

@@ -8,6 +8,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.core.tools.extentions.resumeWithExceptionSafely
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
@@ -30,7 +31,7 @@ internal class QrCodeDetector @Inject constructor() {
             ?.firstOrNull { !it.rawValue.isNullOrEmpty() }
             ?.rawValue
     } catch (t: Throwable) {
-        Simber.e("QR code processing failed", t)
+        Simber.tag(LOGIN).e("QR code processing failed", t)
         null
     }
 

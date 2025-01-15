@@ -36,25 +36,25 @@ internal class Authenticator @Inject constructor(
         deviceId: String,
     ): AuthenticateDataResult {
         val result = try {
-            logMessageForCrashReportWithNetworkTrigger("Making authentication request")
+            log("Making authentication request")
             authStore.cleanCredentials()
 
             loginStartTime = timeHelper.now()
             val nonceScope = NonceScope(projectId, deviceId)
             projectAuthenticator.authenticate(nonceScope, projectSecret)
 
-            logMessageForCrashReportWithNetworkTrigger("Sign in success")
+            log("Sign in success")
             authStore.signedInUserId = userId
 
             AuthenticateDataResult.Authenticated
         } catch (t: Throwable) {
             when (t) {
-                is NetworkConnectionException -> Simber.i("Authentication failed due to network error", t)
-                else -> Simber.e("Authentication failed due to unknown error", t)
+                is NetworkConnectionException -> Simber.tag(LOGIN).i("Authentication failed due to network error", t)
+                else -> Simber.tag(LOGIN).e("Authentication failed due to unknown error", t)
             }
 
             extractResultFromException(t).also { signInResult ->
-                logMessageForCrashReportWithNetworkTrigger("Sign in reason - ${signInResult.javaClass.simpleName}")
+                log("Sign in reason - ${signInResult.javaClass.simpleName}")
             }
         }
 
@@ -76,7 +76,7 @@ internal class Authenticator @Inject constructor(
         else -> AuthenticateDataResult.Unknown
     }
 
-    private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
+    private fun log(message: String) {
         Simber.tag(LOGIN).i(message)
     }
 

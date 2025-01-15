@@ -4,6 +4,7 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.simprints.core.DispatcherBG
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
@@ -33,7 +34,7 @@ internal class QrCodeAnalyzer @Inject constructor(
                         val image = RawImage(mediaImage, rotationDegrees)
                         qrCodeDetector.detectInImage(image)?.let(_scannedCode::tryEmit)
                     } catch (t: Throwable) {
-                        Simber.e("QR code detection failed", t)
+                        Simber.tag(LOGIN).e("QR code detection failed", t)
                     }
                 }
             }
