@@ -10,6 +10,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentPreparationBinding
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +34,9 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
         view: View,
         savedInstanceState: Bundle?,
     ) {
+        super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("PreparationFragment started")
+
         startTime = faceTimeHelper.now()
 
         binding.detectionOnboardingFrame.setOnClickListener {

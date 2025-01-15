@@ -273,6 +273,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         vm.noFingersScannedToast.observe(
             viewLifecycleOwner,
             LiveDataEventObserver {
+                Simber.tag(FINGER_CAPTURE).i("No finger scanned")
                 requireContext().showToast(IDR.string.fingerprint_capture_no_fingers_scanned)
             },
         )

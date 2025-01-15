@@ -29,7 +29,6 @@ object LoggingConstants {
     enum class CrashReportTag {
         LOGIN,
         LOGOUT,
-        SCANNER_SETUP,
         SYNC,
         SESSION,
         FINGER_CAPTURE,

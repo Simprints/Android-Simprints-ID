@@ -10,6 +10,7 @@ import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -34,7 +35,7 @@ internal class SaveImageUseCase @Inject constructor(
             un20SerialNumber = scannerInfo.un20SerialNumber,
         )
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
-        Simber.i("Could not save fingerprint image because of null capture ID")
+        Simber.tag(FACE_CAPTURE).i("Could not save fingerprint image because of null capture ID")
         null
     } else {
         null
@@ -49,7 +50,7 @@ internal class SaveImageUseCase @Inject constructor(
         scannerId: String?,
         un20SerialNumber: String?,
     ): SecuredImageRef? = determinePath(captureEventId, fileExtension)?.let { path ->
-        Simber.d("Saving fingerprint image $path")
+        Simber.tag(FACE_CAPTURE).d("Saving fingerprint image $path")
         val currentSession = coreEventRepository.getCurrentSessionScope()
         val projectId = currentSession.projectId
 
@@ -69,7 +70,7 @@ internal class SaveImageUseCase @Inject constructor(
         if (securedImageRef != null) {
             SecuredImageRef(Path(securedImageRef.relativePath.parts))
         } else {
-            Simber.i("Saving image failed for captureId $captureEventId")
+            Simber.tag(FACE_CAPTURE).i("Saving image failed for captureId $captureEventId")
             null
         }
     }
@@ -88,7 +89,7 @@ internal class SaveImageUseCase @Inject constructor(
             ),
         )
     } catch (t: Throwable) {
-        Simber.e("Failed to determine path for captureId $captureEventId", t)
+        Simber.tag(FACE_CAPTURE).e("Failed to determine path for captureId $captureEventId", t)
         null
     }
 

@@ -10,6 +10,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentConfirmationBinding
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -33,8 +35,9 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
         view: View,
         savedInstanceState: Bundle?,
     ) {
-        startTime = faceTimeHelper.now()
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("ConfirmationFragment started")
+        startTime = faceTimeHelper.now()
 
         binding.apply(::setImageBitmapAndButtonClickListener)
 

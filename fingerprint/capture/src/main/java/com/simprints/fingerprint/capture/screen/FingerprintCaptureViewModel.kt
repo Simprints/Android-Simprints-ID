@@ -190,12 +190,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             bioSdkWrapper.initialize()
             bioSdkConfiguration = configuration.getSdkConfiguration(fingerprintSdk)!!
         } catch (e: BioSdkException.BioSdkInitializationException) {
-            Simber.e("Failed to initialise bio sdk: ${fingerprintSdk.name}", e)
+            Simber.tag(FINGER_CAPTURE).e("Failed to initialise bio sdk: ${fingerprintSdk.name}", e)
             _invalidLicense.send()
         }
     }
 
     private fun launchReconnect() {
+        Simber.tag(FINGER_CAPTURE).i("Reconnecting to scanner")
         tracker.resetToIdle()
         if (!state.isShowingConnectionScreen) {
             updateState {
@@ -285,7 +286,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun progressBarTimeout() = bioSdkWrapper.scanningTimeoutMs +
         if (isImageTransferRequired()) bioSdkWrapper.imageTransferTimeoutMs else 0
 
-    private fun isImageTransferRequired(): Boolean = bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
+    private fun isImageTransferRequired(): Boolean = bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() == true &&
         scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
@@ -364,7 +365,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 handleCaptureSuccess(capturedFingerprint)
             } catch (_: CancellationException) {
                 // ignore cancellation exception, but log behaviour
-                Simber.i("Fingerprint scanning was cancelled")
+                Simber.tag(FINGER_CAPTURE).i("Fingerprint scanning was cancelled")
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
@@ -432,9 +433,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun handleCaptureFinished() = with(state) {
-        Simber
-            .tag(FINGER_CAPTURE.name)
-            .i("Finger scanned - ${currentFingerState().id}")
+        Simber.tag(FINGER_CAPTURE).i("Finger scanned - ${currentFingerState().id}")
         tracker.resetToIdle()
         addCaptureAndBiometricEventsInSession()
         saveCurrentImageIfEager()
@@ -533,13 +532,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             }
 
             is NoFingerDetectedException -> {
-                Simber.i("No finger detected")
+                Simber.tag(FINGER_CAPTURE).i("No finger detected")
                 handleNoFingerDetected()
             }
 
             else -> {
                 updateCaptureState { toNotCollected() }
-                Simber.e("Unexpected finger capture exception", e)
+                Simber.tag(FINGER_CAPTURE).e("Unexpected finger capture exception", e)
                 _launchAlert.send()
             }
         }
@@ -649,15 +648,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun saveImages(collectedFingers: List<Pair<CaptureId, CaptureState.ScanProcess.Collected>>) {
-        runBlocking {
-            collectedFingers.map { (id, collectedFinger) ->
-                saveImageIfExists(id, collectedFinger)
-            }
-        }
+    private fun saveImages(collectedFingers: List<Pair<CaptureId, CaptureState.ScanProcess.Collected>>) = runBlocking {
+        Simber.tag(FINGER_CAPTURE).i("Saving fingerprint images")
+        collectedFingers.map { (id, collectedFinger) -> saveImageIfExists(id, collectedFinger) }
     }
 
     private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.ScanProcess.Collected>>) {
+        Simber.tag(FINGER_CAPTURE).i("Finishing fingerprint capture")
         val resultItems = collectedFingers.map { (captureId, collectedFinger) ->
             FingerprintCaptureResult.Item(
                 identifier = captureId.finger,
@@ -689,6 +686,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     fun handleRestart() {
+        Simber.tag(FINGER_CAPTURE).i("Restarting state")
         setStartingState(originalFingerprintsToCapture)
         tracker.resetToIdle()
     }
@@ -698,9 +696,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         fingerprintSdk: FingerprintConfiguration.BioSdk,
     ) {
         updateState {
-            it.copy(
-                isShowingConnectionScreen = false,
-            )
+            it.copy(isShowingConnectionScreen = false)
         }
         start(fingerprintsToCapture, fingerprintSdk)
     }
@@ -708,9 +704,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleOnResume() {
         updateState {
             // refresh
-            it.copy(
-                isShowingSplashScreen = false,
-            )
+            it.copy(isShowingSplashScreen = false)
         }
         runOnScannerOrReconnectScanner { registerTriggerListener(scannerTriggerListener) }
     }
@@ -732,6 +726,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        Simber.tag(FINGER_CAPTURE).i("Disconnecting scanner")
         cancelScanning()
         externalScope.launch {
             scannerManager.scanner.disconnect()

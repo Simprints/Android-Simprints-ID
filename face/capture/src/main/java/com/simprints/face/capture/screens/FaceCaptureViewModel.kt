@@ -78,15 +78,13 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
-    init {
-        Simber.tag(FACE_CAPTURE).i("Starting face capture flow")
-    }
-
     fun setupCapture(samplesToCapture: Int) {
         this.samplesToCapture = samplesToCapture
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
+        Simber.tag(FACE_CAPTURE).i("Starting face capture flow")
+
         val licenseVendor = Vendor.RankOne
         val license = licenseRepository.getCachedLicense(licenseVendor)
         var licenseStatus = license.determineLicenseStatus()
@@ -150,6 +148,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun getSampleDetection() = faceDetections.firstOrNull()
 
     fun flowFinished() {
+        Simber.tag(FACE_CAPTURE).i("Finishing capture flow")
         viewModelScope.launch {
             val projectConfiguration = configManager.getProjectConfiguration()
             if (projectConfiguration.face?.imageSavingStrategy?.shouldSaveImage() == true) {
@@ -202,11 +201,12 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun submitError(throwable: Throwable) {
-        Simber.e("Face capture failed", throwable)
+        Simber.tag(FACE_CAPTURE).e("Face capture failed", throwable)
         _unexpectedErrorEvent.send()
     }
 
     fun addOnboardingComplete(startTime: Timestamp) {
+        Simber.tag(FACE_CAPTURE).i("Face capture onboarding complete")
         eventReporter.addOnboardingCompleteEvent(startTime)
     }
 
