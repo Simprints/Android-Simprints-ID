@@ -167,6 +167,21 @@ class SimpleCaptureEventReporterTest {
         }
     }
 
+    @Test
+    fun `Adds capture event with correct auto-capture flag`() = runTest {
+        listOf(true, false).forEach { isAutoCapture ->
+            reporter.addCaptureEvents(getDetection(FaceDetection.Status.VALID), 1, 0.5f, isAutoCapture)
+            coVerify {
+                eventRepository.addOrUpdateEvent(
+                    withArg {
+                        assertThat(it).isInstanceOf(FaceCaptureEvent::class.java)
+                        assertThat((it.payload as FaceCaptureEvent.FaceCapturePayload).isAutoCapture).isEqualTo(isAutoCapture)
+                    },
+                )
+            }
+        }
+    }
+
     private fun getDetection(status: FaceDetection.Status) =
         FaceDetection(mockk(), getFace(), status, mockk(), Timestamp(1L), false, "id", Timestamp(1L))
 

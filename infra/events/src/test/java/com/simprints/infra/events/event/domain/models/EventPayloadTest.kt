@@ -140,6 +140,7 @@ class EventPayloadTest {
             attemptNb = 0,
             qualityThreshold = 1F,
             result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
+            isAutoCapture = false,
             isFallback = true,
             face = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT),
         ),

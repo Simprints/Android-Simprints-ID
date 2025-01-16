@@ -25,6 +25,7 @@ data class FaceCaptureEvent(
         attemptNb: Int,
         qualityThreshold: Float,
         result: FaceCapturePayload.Result,
+        isAutoCapture: Boolean,
         isFallback: Boolean,
         face: Face?,
         id: String = randomUUID(),
@@ -38,6 +39,7 @@ data class FaceCaptureEvent(
             attemptNb = attemptNb,
             qualityThreshold = qualityThreshold,
             result = result,
+            isAutoCapture = isAutoCapture,
             isFallback = isFallback,
             face = face,
             id = payloadId,
@@ -58,11 +60,12 @@ data class FaceCaptureEvent(
         val attemptNb: Int,
         val qualityThreshold: Float,
         val result: Result,
+        val isAutoCapture: Boolean,
         val isFallback: Boolean,
         val face: Face?,
         override val type: EventType = FACE_CAPTURE,
     ) : EventPayload() {
-        override fun toSafeString(): String = "result: $result, attempt nr: $attemptNb, fallback: $isFallback, " +
+        override fun toSafeString(): String = "result: $result, attempt nr: $attemptNb, auto-capture: $isAutoCapture, fallback: $isFallback, " +
             "quality: ${face?.quality},  format: ${face?.format}"
 
         @Keep

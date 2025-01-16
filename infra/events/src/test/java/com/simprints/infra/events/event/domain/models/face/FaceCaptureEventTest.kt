@@ -18,6 +18,7 @@ class FaceCaptureEventTest {
             0,
             1F,
             FaceCaptureEvent.FaceCapturePayload.Result.VALID,
+            false,
             true,
             faceArg,
         )

@@ -83,7 +83,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
         if (autoCaptureInitialDelayJob.isCompleted) {
             currentDetection.postValue(faceDetection)
             if (faceDetection.status == FaceDetection.Status.VALID
-                    && capturingState.value == CapturingState.NOT_STARTED) {
+                && capturingState.value == CapturingState.NOT_STARTED) {
                 capturingState.postValue(CapturingState.CAPTURING)
             }
         }
@@ -246,7 +246,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
         attemptNumber: Int,
     ) {
         if (faceDetection == null) return
-        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
+        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold, isAutoCapture = true)
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
