@@ -43,9 +43,9 @@ object Simber {
         message: String,
         t: Throwable? = null,
     ) = if (t == null) {
-        Timber.i(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+        Timber.i(message)
     } else {
-        Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+        Timber.i(t, message)
     }
 
     /**
@@ -67,9 +67,9 @@ object Simber {
         t: Throwable? = null,
     ) {
         when {
-            t == null -> Timber.w(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
-            shouldSkipThrowableReporting(t) -> Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
-            else -> Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+            t == null -> Timber.w(message)
+            shouldSkipThrowableReporting(t) -> Timber.i(t, message)
+            else -> Timber.w(t, message)
         }
     }
 
@@ -92,9 +92,9 @@ object Simber {
         t: Throwable,
     ) {
         if (shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+            Timber.i(t, message)
         } else {
-            Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+            Timber.e(t, message)
         }
     }
 
