@@ -19,8 +19,16 @@ data class ExperimentalProjectConfiguration(
             ?.let { it as? Boolean }
             .let { it == true }
 
+    val faceAutoCaptureConfig: Map<String, *>
+        get() = customConfig
+            ?.get(FACE_AUTO_CAPTURE)
+            ?.let { it as? Map<*, *> }
+            ?.let { map -> map.mapKeys { it.key.toString() } }
+            ?: emptyMap<String, String>()
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
+        internal const val FACE_AUTO_CAPTURE = "faceAutoCapture"
     }
 }
