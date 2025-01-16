@@ -11,6 +11,9 @@
         <argument
             android:name="samplesToCapture"
             app:argType="integer" />
+        <argument
+            android:name="isAutoCapture"
+            app:argType="boolean" />
     </fragment>
 
     <include app:graph="@navigation/graph_alert" />

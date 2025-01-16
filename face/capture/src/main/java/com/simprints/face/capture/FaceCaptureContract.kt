@@ -6,5 +6,8 @@ import com.simprints.face.capture.screens.controller.FaceCaptureControllerFragme
 object FaceCaptureContract {
     val DESTINATION = R.id.faceCaptureControllerFragment
 
-    fun getArgs(samplesToCapture: Int): Bundle = FaceCaptureControllerFragmentArgs(samplesToCapture).toBundle()
+    fun getArgs(
+        samplesToCapture: Int,
+        isAutoCapture: Boolean,
+    ): Bundle = FaceCaptureControllerFragmentArgs(samplesToCapture, isAutoCapture).toBundle()
 }
