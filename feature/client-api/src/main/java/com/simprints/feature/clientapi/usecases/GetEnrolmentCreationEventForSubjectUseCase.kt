@@ -1,5 +1,9 @@
 package com.simprints.feature.clientapi.usecases
 
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.models.canCoSyncAllData
@@ -34,7 +38,7 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
             ?.fromSubjectToEnrolmentCreationEvent()
             ?: return null
 
-        return jsonHelper.toJson(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)))
+        return jsonHelper.toJson(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)), dbSerializationModule)
     }
 
     private fun Subject.fromSubjectToEnrolmentCreationEvent() = EnrolmentRecordCreationEvent(
@@ -44,4 +48,11 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         attendantId,
         EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
     )
+
+    companion object {
+        val dbSerializationModule = SimpleModule().apply {
+            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
+            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
+        }
+    }
 }
