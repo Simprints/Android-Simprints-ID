@@ -81,7 +81,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         try {
             val caseId = attemptExtractingCaseId(query.metadata)
             if (caseId != null) {
-                return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query)
+                return loadEnrolmentRecordCreationEvents(caseId, callerPackageName)
             }
 
             context.contentResolver
@@ -95,7 +95,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     if (caseMetadataCursor.moveToPosition(range.first)) {
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query))
+                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName))
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
                     }
@@ -145,7 +145,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
     private fun loadEnrolmentRecordCreationEvents(
         caseId: String,
         callerPackageName: String,
-        query: SubjectQuery,
     ): List<EnrolmentRecordCreationEvent> {
         // Access Case Data Listing for the caseId
         val caseDataUri = getCaseDataUri(callerPackageName).buildUpon().appendPath(caseId).build()
@@ -153,18 +152,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         return context.contentResolver
             .query(caseDataUri, null, null, null, null)
             ?.use { caseDataCursor ->
-                var subjectActions = getSubjectActionsValue(caseDataCursor)
+                val subjectActions = getSubjectActionsValue(caseDataCursor)
                 Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
                 coSyncEnrolmentRecordEvents
                     ?.events
                     ?.filterIsInstance<EnrolmentRecordCreationEvent>()
-                    ?.filterNot { event ->
-                        (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
-                            (query.attendantId != null && query.attendantId != event.payload.attendantId.value) ||
-                            (query.moduleId != null && query.moduleId != event.payload.moduleId.value)
-                    }
             }.orEmpty()
     }
 
