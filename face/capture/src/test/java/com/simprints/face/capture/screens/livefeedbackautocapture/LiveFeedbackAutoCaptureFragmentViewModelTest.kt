@@ -84,6 +84,129 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         )
     }
 
+
+    @Test
+    fun `Do not start capture if valid quality face detected but before preparation delay elapses`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returns getFace()
+        val currentDetection = viewModel.currentDetection.testObserver()
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        viewModel.process(frame)
+
+        assertThat(currentDetection.observedValues)
+            .isEmpty()
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
+    }
+
+    @Test
+    fun `Do not start capture if valid quality face detected but preparation delay is reset`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returns getFace()
+        val currentDetection = viewModel.currentDetection.testObserver()
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startPreparationDelay()
+        viewModel.process(frame)
+
+        assertThat(currentDetection.observedValues)
+            .isEmpty()
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
+    }
+
+    @Test
+    fun `Do not start capture if no valid quality face detected after preparation delay elapses`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returns getFace(quality = -2f)
+        val currentDetection = viewModel.currentDetection.testObserver()
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.process(frame)
+
+        assertThat(currentDetection.observedValues.last()?.status)
+            .isEqualTo(FaceDetection.Status.BAD_QUALITY)
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
+    }
+
+    @Test
+    fun `Start capture if valid quality face detected when preparation delay elapses`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returns getFace()
+        val currentDetection = viewModel.currentDetection.testObserver()
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.process(frame)
+
+        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+    }
+
+    @Test
+    fun `Proceed with capture if preparation delay uis reset after capture started`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returns getFace()
+        val currentDetection = viewModel.currentDetection.testObserver()
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.process(frame)
+        viewModel.startPreparationDelay()
+        viewModel.process(frame)
+
+        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+    }
+
+    @Test
+    fun `Start capture if valid quality face detected later than preparation delay had elapsed`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returnsMany listOf(
+            getFace(quality = -2f),
+            getFace(),
+        )
+        val currentDetection = viewModel.currentDetection.testObserver()
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.process(frame)
+        viewModel.process(frame)
+
+        assertThat(currentDetection.observedValues.first()?.status)
+            .isEqualTo(FaceDetection.Status.BAD_QUALITY)
+        assertThat(capturingState.observedValues.first())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
+        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+    }
+
+    @Test
+    fun `Respect frame pacing to avoid capturing excessive frames within the capture duration`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returns getFace()
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        // imaging frame pacing
+        (1..AUTO_CAPTURE_SAMPLE_COUNT).forEach {
+            viewModel.process(frame)
+            viewModel.process(frame)
+            advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS / AUTO_CAPTURE_SAMPLE_COUNT)
+        }
+
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
+        assertThat(viewModel.userCaptures.size).isEqualTo(AUTO_CAPTURE_SAMPLE_COUNT)
+    }
+
     @Test
     fun `Process fallback image when valid face correctly but not started capture`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
