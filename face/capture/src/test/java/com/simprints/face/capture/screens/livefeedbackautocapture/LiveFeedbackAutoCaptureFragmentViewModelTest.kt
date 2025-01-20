@@ -67,8 +67,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
         coEvery { configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns false
-        every { timeHelper.now() } returnsMany (0..100L)
-            .map { Timestamp(it * AUTO_CAPTURE_IMAGING_DURATION_MS / AUTO_CAPTURE_SAMPLE_COUNT) }
+        every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
             coEvery { this@mockk.invoke() } returns mockk {
@@ -189,25 +188,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
-    fun `Respect frame pacing to avoid capturing excessive frames within the capture duration`() = runTest {
-        coEvery { faceDetector.analyze(frame) } returns getFace()
-        val capturingState = viewModel.capturingState.testObserver()
-
-        viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
-        // imaging frame pacing
-        (1..AUTO_CAPTURE_SAMPLE_COUNT).forEach {
-            viewModel.process(frame)
-            viewModel.process(frame)
-            advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS / AUTO_CAPTURE_SAMPLE_COUNT)
-        }
-
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
-        assertThat(viewModel.userCaptures.size).isEqualTo(AUTO_CAPTURE_SAMPLE_COUNT)
-    }
-
-    @Test
     fun `Process fallback image when valid face correctly but not started capture`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
@@ -229,11 +209,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initCapture(1, 0)
         advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
         viewModel.process(frame)
-        // imaging frame pacing
-        (1..AUTO_CAPTURE_SAMPLE_COUNT).forEach {
-            viewModel.process(frame)
-            advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS / AUTO_CAPTURE_SAMPLE_COUNT)
-        }
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
 
         val currentDetection = viewModel.currentDetection.testObserver()
         assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
@@ -319,14 +295,14 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
-        viewModel.initCapture(2, 0)
+        val samplesToKeep = 2
+        viewModel.initCapture(samplesToKeep, 0)
         viewModel.process(frame) // won't be observed during the preparation phase
         advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
-        // imaging frame pacing
-        (1..AUTO_CAPTURE_SAMPLE_COUNT).forEach {
+        (1..100).forEach {
             viewModel.process(frame)
-            advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS / AUTO_CAPTURE_SAMPLE_COUNT)
         }
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
 
         currentDetectionObserver.observedValues.let {
             // 1st frame wasn't observed during preparation delay
@@ -340,7 +316,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
             assertThat(it[2]).isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
         }
 
-        assertThat(viewModel.userCaptures.size).isEqualTo(AUTO_CAPTURE_SAMPLE_COUNT)
+        assertThat(viewModel.userCaptures.size).isEqualTo(samplesToKeep)
         viewModel.userCaptures.let {
             with(it[0]) {
                 assertThat(hasValidStatus()).isEqualTo(true)
@@ -352,7 +328,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         }
 
         with(viewModel.sortedQualifyingCaptures) {
-            assertThat(size).isEqualTo(2)
+            assertThat(size).isEqualTo(samplesToKeep)
             assertThat(get(0).face).isEqualTo(validFace)
             assertThat(get(0).isFallback).isEqualTo(false)
             assertThat(get(1).face).isEqualTo(validFace)
@@ -374,6 +350,5 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         private const val QUALITY_THRESHOLD = -1f
         private const val AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS = 2000L
         private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 2000L
-        private const val AUTO_CAPTURE_SAMPLE_COUNT = 25
     }
 }

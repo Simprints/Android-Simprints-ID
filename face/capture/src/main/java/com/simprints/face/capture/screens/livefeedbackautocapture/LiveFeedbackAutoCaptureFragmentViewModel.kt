@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.extentions.area
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
@@ -54,6 +53,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     private var autoCaptureInitialDelayJob: Job = viewModelScope.launch {
         delay(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS)
     }
+    private var autoCaptureImagingTimeoutJob: Job? = null
     private lateinit var faceDetector: FaceDetector
 
     fun startPreparationDelay() {
@@ -85,17 +85,18 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
             if (faceDetection.status == FaceDetection.Status.VALID
                 && capturingState.value == CapturingState.NOT_STARTED) {
                 capturingState.postValue(CapturingState.CAPTURING)
+                autoCaptureImagingTimeoutJob = viewModelScope.launch {
+                    delay(AUTO_CAPTURE_IMAGING_DURATION_MS)
+                    finishCapture(attemptNumber)
+                }
             }
         }
 
         when (capturingState.value) {
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             CapturingState.CAPTURING -> {
-                if (isEligibleForImagingSample(currentTimestamp = captureStartTime)) {
-                    userCaptures += faceDetection
-                    if (userCaptures.size == AUTO_CAPTURE_SAMPLE_COUNT) {
-                        finishCapture(attemptNumber)
-                    }
+                if (isQualifying(faceDetection)) {
+                    updateUserCapturesWith(faceDetection)
                 }
             }
 
@@ -124,16 +125,29 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
             (timeHelper.now().ms - detectionStartTime).toFloat() / AUTO_CAPTURE_IMAGING_DURATION_MS
         } ?: 0f
 
-    private fun isEligibleForImagingSample(currentTimestamp: Timestamp): Boolean {
-        if (userCaptures.isEmpty()) {
-            return true
-        }
-        if (userCaptures.size >= AUTO_CAPTURE_SAMPLE_COUNT) {
+    private fun isQualifying(faceDetection: FaceDetection): Boolean {
+        if (autoCaptureImagingTimeoutJob?.isActive != true) {
             return false
         }
-        val samplingStepMillis = AUTO_CAPTURE_IMAGING_DURATION_MS.toDouble() / AUTO_CAPTURE_SAMPLE_COUNT
-        val minNextSampleTimeMillis = userCaptures.first().detectionStartTime.ms + samplingStepMillis * userCaptures.size
-        return currentTimestamp.ms >= minNextSampleTimeMillis
+        if (!faceDetection.hasValidStatus()) {
+            return false
+        }
+        val betterPreviousCaptureCount = userCaptures.count { previousCapture ->
+            (previousCapture.face?.quality ?: -1f) > (faceDetection.face?.quality ?: -1f)
+        }
+        return betterPreviousCaptureCount < samplesToKeep
+    }
+
+    private fun updateUserCapturesWith(faceDetection: FaceDetection) {
+        if (userCaptures.count() == samplesToKeep) {
+            userCaptures.indices.minByOrNull { index ->
+                userCaptures[index].face?.quality ?: -1f
+            }?.takeIf { it >= 0 }?.let { worseQualityCaptureIndex ->
+                userCaptures[worseQualityCaptureIndex] = faceDetection
+            }
+        } else {
+            userCaptures.add(faceDetection)
+        }
     }
 
     /**
@@ -142,9 +156,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     private fun finishCapture(attemptNumber: Int) {
         viewModelScope.launch {
             sortedQualifyingCaptures = userCaptures
-                .filter { it.hasValidStatus() }
                 .sortedByDescending { it.face?.quality }
-                .take(samplesToKeep)
                 .ifEmpty { listOfNotNull(fallbackCapture) }
 
             sendQualifyingAndFallbackCaptureEvents(attemptNumber)
@@ -230,14 +242,8 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
      */
     private fun sendQualifyingAndFallbackCaptureEvents(attemptNumber: Int) = runBlocking {
         userCaptures
-            .asSequence()
-            .filter { it.hasValidStatus() }
-            .sortedByDescending { it.face?.quality }
-            .take(samplesToKeep)
-            .sortedBy { it.detectionStartTime }
             .map { async { sendCaptureEvent(it, attemptNumber) } }
             .plus(async { sendCaptureEvent(fallbackCapture, attemptNumber) })
-            .toList()
             .awaitAll()
     }
 
@@ -256,6 +262,5 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
         private const val VALID_YAW_DELTA = 30f
         private const val AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS = 2000L
         private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 2000L
-        private const val AUTO_CAPTURE_SAMPLE_COUNT = 25
     }
 }
