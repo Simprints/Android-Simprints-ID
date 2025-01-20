@@ -6,7 +6,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import javax.inject.Inject
 import com.simprints.infra.events.event.domain.models.Event
 
-class TokenizeEventPayloadFieldsUseCase @Inject constructor(
+internal class TokenizeEventPayloadFieldsUseCase @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor
 ) {
     operator fun invoke(event: Event, project: Project): Event {
