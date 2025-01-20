@@ -44,6 +44,10 @@ class SecureLocalDbKeyProviderImplTest {
     @MockK
     private lateinit var keyHashEditor: SharedPreferences.Editor
 
+    val simber = mockk<Simber>(relaxed = true) {
+        every { tag(any()) } returns this
+    }
+
     private lateinit var dbKeyProvider: SecureLocalDbKeyProviderImpl
 
     @Before
@@ -61,6 +65,7 @@ class SecureLocalDbKeyProviderImplTest {
         every { hashSharedPrefs.edit() } returns keyHashEditor
 
         mockkObject(Simber)
+        every { Simber.INSTANCE } returns simber
 
         dbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPreferencesBuilder, randomGenerator)
     }
@@ -121,7 +126,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.e(any(), ofType<MissingLocalDatabaseKeyHashException>())
+            simber.e(any(), ofType<MissingLocalDatabaseKeyHashException>())
         }
     }
 
@@ -138,7 +143,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.e(any(), ofType<MatchingLocalDatabaseKeyHashesException>())
+            simber.e(any(), ofType<MatchingLocalDatabaseKeyHashesException>())
         }
     }
 
@@ -152,7 +157,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.e(any(), ofType<MismatchingLocalDatabaseKeyHashesException>())
+            simber.e(any(), ofType<MismatchingLocalDatabaseKeyHashesException>())
         }
     }
 
@@ -165,7 +170,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.e(any(), ofType<MissingLocalDatabaseKeyException>())
+            simber.e(any(), ofType<MissingLocalDatabaseKeyException>())
         }
     }
 

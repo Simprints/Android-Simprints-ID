@@ -13,6 +13,7 @@ import com.simprints.feature.login.LoginError
 import com.simprints.infra.logging.Simber
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,15 +32,25 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
     @MockK
     private lateinit var launchCallBack: (LoginError) -> Unit
 
+    val simber = mockk<Simber>(relaxed = true) {
+        every { tag(any()) } returns this
+    }
+
     private lateinit var googlePlayServicesAvailabilityChecker: GooglePlayServicesAvailabilityChecker
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         mockkObject(Simber)
+        every { Simber.INSTANCE } returns simber
 
         every { launchCallBack.invoke(any()) } returns Unit
         googlePlayServicesAvailabilityChecker = GooglePlayServicesAvailabilityChecker(googleApiAvailability)
+    }
+
+    @After
+    fun cleanUp() {
+        unmockkObject(Simber)
     }
 
     @Test
@@ -81,7 +92,7 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify { launchCallBack(LoginError.MissingPlayServices) }
-        verify { Simber.e(any(), ofType<MissingGooglePlayServices>()) }
+        verify { simber.e(any(), ofType<MissingGooglePlayServices>()) }
     }
 
     @Test
@@ -144,6 +155,6 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify { launchCallBack(LoginError.OutdatedPlayServices) }
-        verify { Simber.e(any(), ofType<OutdatedGooglePlayServices>()) }
+        verify { simber.e(any(), ofType<OutdatedGooglePlayServices>()) }
     }
 }
