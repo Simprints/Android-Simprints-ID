@@ -36,6 +36,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     private var samplesToKeep: Int = 1
     private var qualityThreshold: Float = 0f
     private var singleQualityFallbackCaptureRequired: Boolean = false
+    private var captureImagingStartTime: Long = 0
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -85,6 +86,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
             if (faceDetection.status == FaceDetection.Status.VALID
                 && capturingState.value == CapturingState.NOT_STARTED) {
                 capturingState.postValue(CapturingState.CAPTURING)
+                captureImagingStartTime = captureStartTime.ms
                 autoCaptureImagingTimeoutJob = viewModelScope.launch {
                     delay(AUTO_CAPTURE_IMAGING_DURATION_MS)
                     finishCapture(attemptNumber)
@@ -121,9 +123,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     }
 
     fun getAutoCaptureImagingProgressNormalized(): Float =
-        userCaptures.firstOrNull()?.detectionStartTime?.ms?.let { detectionStartTime ->
-            (timeHelper.now().ms - detectionStartTime).toFloat() / AUTO_CAPTURE_IMAGING_DURATION_MS
-        } ?: 0f
+        ((timeHelper.now().ms - captureImagingStartTime).toFloat() / AUTO_CAPTURE_IMAGING_DURATION_MS).coerceIn(0f, 1f)
 
     private fun isQualifying(faceDetection: FaceDetection): Boolean {
         if (autoCaptureImagingTimeoutJob?.isActive != true) {
