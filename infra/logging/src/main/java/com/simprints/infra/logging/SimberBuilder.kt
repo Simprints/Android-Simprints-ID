@@ -8,6 +8,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.simprints.infra.logging.writers.AnalyticsPropertyLogWriter
 import com.simprints.infra.logging.writers.CrashlyticsLogWriter
+import com.simprints.infra.logging.writers.FileLogWriter
 
 object SimberBuilder {
     /**
@@ -23,6 +24,7 @@ object SimberBuilder {
             Logger.setLogWriters(
                 AnalyticsPropertyLogWriter(FirebaseAnalytics.getInstance(context)),
                 CrashlyticsLogWriter(FirebaseCrashlytics.getInstance()),
+                FileLogWriter(context),
             )
             Logger.setMinSeverity(Severity.Info)
         }

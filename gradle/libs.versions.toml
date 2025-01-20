@@ -184,6 +184,7 @@ commonsIO-commons_io = { module = "commons-io:commons-io", version.ref = "common
 
 #Logging
 kermit = { module = "co.touchlab:kermit-android", version.ref = "kermit_version" }
+kermit-io = { module = "co.touchlab:kermit-io", version.ref = "kermit_version" }
 
 #Kronos
 kronos-kronos = { module = "com.lyft.kronos:kronos-android", version.ref = "kronos_version" }

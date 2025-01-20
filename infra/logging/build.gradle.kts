@@ -38,6 +38,7 @@ dependencies {
     api(libs.firebase.analytics)
     implementation(libs.firebase.perf)
     implementation(libs.kermit)
+    implementation(libs.kermit.io)
 
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)
