@@ -4,7 +4,6 @@ import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
-import com.simprints.feature.orchestrator.usecases.FaceAutoCaptureEligibilityUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -33,9 +32,6 @@ class BuildStepsUseCaseTest {
     private lateinit var mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase
 
     @RelaxedMockK
-    private lateinit var faceAutoCaptureEligibility: FaceAutoCaptureEligibilityUseCase
-
-    @RelaxedMockK
     private lateinit var secugenSimMatcher: FingerprintConfiguration.FingerprintSdkConfiguration
 
     @RelaxedMockK
@@ -46,7 +42,7 @@ class BuildStepsUseCaseTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        useCase = BuildStepsUseCase(buildMatcherSubjectQuery, cache, mapStepsForLastBiometrics, faceAutoCaptureEligibility)
+        useCase = BuildStepsUseCase(buildMatcherSubjectQuery, cache, mapStepsForLastBiometrics)
     }
 
     private fun mockCommonProjectConfiguration(): ProjectConfiguration {

@@ -13,7 +13,6 @@ import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedExcep
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
-import com.simprints.feature.orchestrator.usecases.FaceAutoCaptureEligibilityUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupContract
 import com.simprints.feature.selectsubject.SelectSubjectContract
@@ -40,7 +39,6 @@ internal class BuildStepsUseCase @Inject constructor(
     private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase,
     private val cache: OrchestratorCache,
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
-    private val faceAutoCaptureEligibility: FaceAutoCaptureEligibilityUseCase,
 ) {
     fun build(
         action: ActionRequest,
@@ -370,7 +368,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 // Face bio SDK is currently ignored until we add a second one
                 // TODO: samplesToCapture can be read directly from FaceCapture
                 val samplesToCapture = projectConfiguration.face?.nbOfImagesToCapture ?: 0
-                val isAutoCapture = faceAutoCaptureEligibility(projectConfiguration.experimental().faceAutoCaptureConfig)
+                val isAutoCapture = projectConfiguration.experimental().faceAutoCaptureEnabled
                 Step(
                     id = StepId.FACE_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
