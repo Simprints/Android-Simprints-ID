@@ -5,30 +5,18 @@ on:
 
 jobs:
 
-    extract-version-name:
-        runs-on: ubuntu-latest
-
-        outputs:
-            version-name: ${{ steps.extract-version-name.outputs.version-name }}
-
-        steps:
-            -   name: Checkout repository
-                uses: actions/checkout@v4
-
-            -   name: Extract VERSION_NAME from build_properties.gradle.kts
-                id: extract-version-name
-                run: |
-                    VERSION_NAME=$(grep 'set("VERSION_NAME"' build-logic/build_properties.gradle.kts \
-                    | sed -E 's/.*set\("VERSION_NAME",[[:space:]]*"([^"]+)".*/\1/')                   
-                    echo "version-name=$VERSION_NAME" >> $GITHUB_OUTPUT
+    get-version:
+        uses: ./.github/workflows/reusable-get-version-name.yml
+        with:
+            version-source: "internal"
 
     build-dev-apk:
         uses: ./.github/workflows/reusable-build-apk.yml
         secrets: inherit
-        needs: extract-version-name
+        needs: get-version
         with:
             build-environment: dev
-            version-name: ${{ needs.extract-version-name.outputs.version-name }}
+            version-name: ${{ needs.get-version.outputs.version-name }}
 
     deploy-to-firebase:
         uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml

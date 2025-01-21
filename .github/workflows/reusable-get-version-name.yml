@@ -1,0 +1,37 @@
+# Parse out the version name based on the release type
+name: "[Reusable] Get Version Name"
+
+on:
+    workflow_call:
+        inputs:
+            version-source:
+                type: string
+                description: "Where to get the version from: 'branch' or 'internal'"
+                default: "internal"
+
+jobs:
+    extract-version:
+        runs-on: ubuntu-latest
+
+        outputs:
+            version-name: ${{ steps.extract.outputs.version-name }}
+
+        steps:
+            -   name: Checkout if using internal version
+                if: ${{ inputs.version-source == 'internal' }}
+                uses: actions/checkout@v4
+
+            -   name: Extract version (branch)
+                id: extract
+                if: ${{ inputs.version-source == 'branch' }}
+                run: |
+                    last_part="${GITHUB_REF_NAME##*/}"
+                    echo "version-name=$last_part" >> "$GITHUB_OUTPUT"
+
+            -   name: Extract version (internal file)
+                id: extract
+                if: ${{ inputs.version-source == 'internal' }}
+                run: |
+                    version_name=$(grep 'set("VERSION_NAME",' build-logic/build_properties.gradle.kts \
+                      | sed -E 's/.*set\("VERSION_NAME",[[:space:]]*"([^"]+)".*/\1/')
+                    echo "version-name=$version_name" >> "$GITHUB_OUTPUT"
