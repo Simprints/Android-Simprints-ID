@@ -7,6 +7,10 @@ jobs:
 
     extract-version-name:
         runs-on: ubuntu-latest
+
+        outputs:
+            version-name: ${{ steps.extract-version-name.outputs.version-name }}
+
         steps:
             -   name: Checkout repository
                 uses: actions/checkout@v4
@@ -15,7 +19,7 @@ jobs:
                 id: extract-version-name
                 run: |
                     VERSION_NAME=$(grep 'VERSION_NAME' build-logic/build_properties.gradle.kts | awk -F'"' '{print $2}')
-                    echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+                    echo "version-name=$VERSION_NAME" >> $GITHUB_OUTPUT
 
     build-dev-apk:
         uses: ./.github/workflows/reusable-build-apk.yml
@@ -23,7 +27,7 @@ jobs:
         needs: extract-version-name
         with:
             build-environment: dev
-            version-name: ${{ env.VERSION_NAME }}
+            version-name: ${{ needs.extract-version-name.outputs.version-name }}
 
     deploy-to-firebase:
         uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
