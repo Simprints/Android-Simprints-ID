@@ -12,7 +12,7 @@ import com.simprints.infra.orchestration.data.responses.AppResponse
 import java.io.Serializable
 import javax.inject.Inject
 
-internal class CreateEnrolResponseUseCase @Inject constructor(
+class CreateEnrolResponseUseCase @Inject constructor(
     private val subjectFactory: SubjectFactory,
     private val enrolSubject: EnrolSubjectUseCase,
 ) {
@@ -20,8 +20,8 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         request: ActionRequest.EnrolActionRequest,
         results: List<Serializable>,
     ): AppResponse {
-        val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
-        val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
+        val fingerprintCapture = results.filterIsInstance<FingerprintCaptureResult>().lastOrNull()
+        val faceCapture = results.filterIsInstance<FaceCaptureResult>().lastOrNull()
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(
@@ -37,6 +37,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         } catch (e: Exception) {
             Simber.e("Error creating enrol response", e)
             AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
+            throw e
         }
     }
 }

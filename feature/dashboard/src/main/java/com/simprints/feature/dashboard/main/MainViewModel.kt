@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.send
+import com.simprints.feature.debugdatagenerator.enrollmentrecords.BiometricSdk
+import com.simprints.feature.debugdatagenerator.enrollmentrecords.GenerateEnrollmentRecordsUseCase
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -18,6 +21,7 @@ import javax.inject.Inject
 internal class MainViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val securityManager: SecurityManager,
+    private val generateEnrollmentRecords: GenerateEnrollmentRecordsUseCase,
 ) : ViewModel() {
     val consentRequired: LiveData<Boolean>
         get() = _consentRequired
@@ -34,6 +38,14 @@ internal class MainViewModel @Inject constructor(
     private fun load() = viewModelScope.launch {
         _consentRequired.postValue(configManager.getProjectConfiguration().consent.collectConsent)
         checkIfDeviceIsSafe()
+        val projectId = configManager.getProjectConfiguration().projectId
+        generateEnrollmentRecords(
+            projectId = projectId,
+            userId = "userId".asTokenizableRaw(),
+            moduleId = "moduleId".asTokenizableRaw(),
+            numberOfRecords = 1,
+            biometricSdks = listOf(BiometricSdk.Roc1),
+        )
     }
 
     private fun checkIfDeviceIsSafe() = try {

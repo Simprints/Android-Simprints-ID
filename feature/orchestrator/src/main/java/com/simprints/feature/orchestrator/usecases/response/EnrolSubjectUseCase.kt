@@ -8,12 +8,14 @@ import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
+import kotlin.uuid.ExperimentalUuidApi
 
-internal class EnrolSubjectUseCase @Inject constructor(
+class EnrolSubjectUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {
+    @OptIn(ExperimentalUuidApi::class)
     suspend operator fun invoke(subject: Subject) {
         val personCreationEvent = eventRepository
             .getEventsInCurrentSession()

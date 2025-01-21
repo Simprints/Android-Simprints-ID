@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":feature:consent"))
     implementation(project(":feature:login"))
     implementation(project(":feature:troubleshooting"))
+    implementation(project(":feature:debugdatagenerator"))
 
     implementation(libs.fuzzywuzzy.core)
 

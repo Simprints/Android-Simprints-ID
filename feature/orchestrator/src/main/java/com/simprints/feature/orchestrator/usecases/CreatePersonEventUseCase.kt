@@ -12,7 +12,7 @@ import com.simprints.infra.events.session.SessionEventRepository
 import java.io.Serializable
 import javax.inject.Inject
 
-internal class CreatePersonEventUseCase @Inject constructor(
+class CreatePersonEventUseCase @Inject constructor(
     private val eventRepository: SessionEventRepository,
     private val timeHelper: TimeHelper,
 ) {
