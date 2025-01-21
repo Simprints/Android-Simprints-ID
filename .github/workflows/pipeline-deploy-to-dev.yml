@@ -18,7 +18,7 @@ jobs:
             -   name: Extract VERSION_NAME from build_properties.gradle.kts
                 id: extract-version-name
                 run: |
-                    VERSION_NAME=$(grep 'VERSION_NAME' build-logic/build_properties.gradle.kts | awk -F'"' '{print $2}')
+                    VERSION_NAME=$(grep 'VERSION_NAME =' build-logic/build_properties.gradle.kts | awk -F' = ' '{print $2}' | tr -d '"')
                     echo "version-name=$VERSION_NAME" >> $GITHUB_OUTPUT
 
     build-dev-apk:
