@@ -22,6 +22,8 @@ dependencies {
     implementation(project(":feature:consent"))
     implementation(project(":feature:login"))
     implementation(project(":feature:troubleshooting"))
+    // Data Generator is a test-only feature, only included in debug builds
+    debugImplementation(project(":testing:data-generator"))
 
     implementation(libs.fuzzywuzzy.core)
 

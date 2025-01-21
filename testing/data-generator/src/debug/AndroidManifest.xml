@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.simprints.feature.datagenerator">
+
+    <application>
+
+        <activity
+            android:name=".DataGeneratorActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <!-- Action to trigger the generation of enrollment records -->
+                <action android:name="com.simprints.test.GENERATE_ENROLLMENT_RECORDS" />
+
+                <!-- Action to trigger the generation of session events -->
+                <action android:name="com.simprints.test.GENERATE_SESSION_EVENTS" />
+
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
