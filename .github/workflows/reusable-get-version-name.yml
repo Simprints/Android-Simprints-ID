@@ -9,6 +9,11 @@ on:
                 description: "Where to get the version from: 'branch' or 'internal'"
                 default: "internal"
 
+        outputs:
+            version-name:
+                description: "The version name extracted from the source"
+                value: ${{ jobs.extract-version.outputs.version-name }}
+
 jobs:
     extract-version:
         runs-on: ubuntu-latest
