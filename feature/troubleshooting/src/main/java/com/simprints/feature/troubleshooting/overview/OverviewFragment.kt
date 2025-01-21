@@ -60,7 +60,7 @@ internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_ove
             }
 
             if (it is LogsExportResult.Success) {
-                launchFileExportIntent(it.file)
+                launchFileExportIntent(it.deviceId, it.file)
             }
         }
 
@@ -72,19 +72,23 @@ internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_ove
         }
     }
 
-    private fun launchFileExportIntent(file: File) {
-        val fileProvider = FileProvider.getUriForFile(
-            requireContext(),
-            "com.simprints.id",
-            file,
-        )
+    private fun launchFileExportIntent(
+        deviceId: String,
+        file: File,
+    ) {
+        val fileProvider = FileProvider.getUriForFile(requireContext(), "com.simprints.id", file)
 
-        val intent = Intent(Intent.ACTION_SEND).also { intent ->
-            intent.type = "application/zip"
-            intent.putExtra(Intent.EXTRA_STREAM, fileProvider)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/zip"
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(LOG_EMAIL_RECIPIENT))
+            putExtra(Intent.EXTRA_SUBJECT, "Reporting logs from $deviceId")
+            putExtra(Intent.EXTRA_STREAM, fileProvider)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
+        requireActivity().startActivity(Intent.createChooser(intent, "Share with"))
+    }
 
-        requireActivity().startActivity(intent)
+    companion object {
+        private const val LOG_EMAIL_RECIPIENT = "sid-error-logs@simprints.atlassian.net"
     }
 }

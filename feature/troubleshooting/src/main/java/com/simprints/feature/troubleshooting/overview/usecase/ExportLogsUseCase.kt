@@ -1,6 +1,7 @@
 package com.simprints.feature.troubleshooting.overview.usecase
 
 import android.content.Context
+import com.simprints.core.DeviceID
 import com.simprints.feature.troubleshooting.FileNameDateTimeFormatter
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LogDirectoryProvider
@@ -17,6 +18,7 @@ import java.util.Date
 import javax.inject.Inject
 
 internal class ExportLogsUseCase @Inject constructor(
+    @DeviceID private val deviceId: String,
     @ApplicationContext private val context: Context,
     private val logDirectoryProvider: LogDirectoryProvider,
     private val configManager: ConfigManager,
@@ -28,12 +30,12 @@ internal class ExportLogsUseCase @Inject constructor(
         val files = directory.listFiles().orEmpty()
 
         if (files.isNotEmpty()) {
-            val archiveFile = createArchiveFile(dateFormatter.format(Date()))
+            val archiveFile = createArchiveFile(dateFormatter.format(Date()) + "_$deviceId")
             val password = getPassword()
             createZipArchiveWithPassword(archiveFile, files.toList(), password)
 
             delay(2000L) // To look like it does something
-            emit(LogsExportResult.Success(archiveFile))
+            emit(LogsExportResult.Success(deviceId, archiveFile))
         } else {
             emit(LogsExportResult.NotStarted)
         }
@@ -68,6 +70,7 @@ internal class ExportLogsUseCase @Inject constructor(
 
     sealed class LogsExportResult {
         data class Success(
+            val deviceId: String,
             val file: File,
         ) : LogsExportResult()
 

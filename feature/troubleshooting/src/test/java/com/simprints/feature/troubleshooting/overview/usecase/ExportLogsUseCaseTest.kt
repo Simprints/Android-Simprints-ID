@@ -51,6 +51,7 @@ class ExportLogsUseCaseTest {
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
         exportLogsUseCase = ExportLogsUseCase(
+            deviceId = "deviceId",
             context = context,
             logDirectoryProvider = logDirectoryProvider,
             configManager = configManager,
@@ -88,7 +89,7 @@ class ExportLogsUseCaseTest {
         val results = exportLogsUseCase.invoke().toList()
         assertThat(results).containsExactly(
             ExportLogsUseCase.LogsExportResult.InProgress,
-            ExportLogsUseCase.LogsExportResult.Success(File("cache/log_archives/fileName.zip")),
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", File("cache/log_archives/fileName_deviceId.zip")),
         )
 
         coVerify(exactly = 0) { projectConfiguration.projectId }
@@ -112,7 +113,7 @@ class ExportLogsUseCaseTest {
         val results = exportLogsUseCase.invoke().toList()
         assertThat(results).containsExactly(
             ExportLogsUseCase.LogsExportResult.InProgress,
-            ExportLogsUseCase.LogsExportResult.Success(File("cache/log_archives/fileName.zip")),
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", File("cache/log_archives/fileName_deviceId.zip")),
         )
 
         assertThat(cacheFileRoot.listFiles()?.none { it.name == "oldArchive.zip" }).isTrue()
@@ -132,7 +133,7 @@ class ExportLogsUseCaseTest {
         val results = exportLogsUseCase.invoke().toList()
         assertThat(results).containsExactly(
             ExportLogsUseCase.LogsExportResult.InProgress,
-            ExportLogsUseCase.LogsExportResult.Success(File("cache/log_archives/fileName.zip")),
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", File("cache/log_archives/fileName_deviceId.zip")),
         )
 
         coVerify(exactly = 1) { projectConfiguration.projectId }

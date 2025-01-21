@@ -119,7 +119,7 @@ class OverviewViewModelTest {
 
         every { exportLogsUseCase.invoke() } returns flowOf(
             ExportLogsUseCase.LogsExportResult.InProgress,
-            ExportLogsUseCase.LogsExportResult.Success(file),
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", file),
         )
 
         viewModel.exportLogs()
@@ -129,7 +129,7 @@ class OverviewViewModelTest {
         assertThat(logsExport.valueHistory()).containsExactly(
             ExportLogsUseCase.LogsExportResult.NotStarted, // Initial value
             ExportLogsUseCase.LogsExportResult.InProgress,
-            ExportLogsUseCase.LogsExportResult.Success(file),
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", file),
             ExportLogsUseCase.LogsExportResult.NotStarted, // Reset after delay
         )
     }
