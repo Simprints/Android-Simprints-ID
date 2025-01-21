@@ -6,6 +6,7 @@ import com.simprints.core.domain.tokenization.serialization.FIELD_CLASS_NAME
 import com.simprints.core.domain.tokenization.serialization.FIELD_VALUE
 import com.simprints.core.domain.tokenization.serialization.RAW
 import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 
 /**
@@ -30,9 +31,9 @@ import com.simprints.infra.logging.Simber
  */
 internal class EventMigration9to10 : Migration(9, 10) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.d("Migrating room db from schema 9 to schema 10.")
+        Simber.tag(MIGRATION).i("Migrating room db from schema 9 to schema 10.")
         migrateEventJson(database)
-        Simber.d("Migration from schema 9 to schema 10 done.")
+        Simber.tag(MIGRATION).i("Migration from schema 9 to schema 10 done.")
     }
 
     private fun migrateEventJson(database: SupportSQLiteDatabase) {
@@ -62,26 +63,26 @@ internal class EventMigration9to10 : Migration(9, 10) {
         private const val USER_ID = "userId"
         private const val MODULE_ID = "moduleId"
     }
-}
 
-internal fun String.migrateJsonStringToTokenizableString(vararg fieldsToMigrate: String): String =
-    fieldsToMigrate.fold(this) { json, field ->
-        val modifiedJson = StringBuilder(json)
-        val searchField = "\"$field\":\""
-        val classNameValue = RAW
+    internal fun String.migrateJsonStringToTokenizableString(vararg fieldsToMigrate: String): String =
+        fieldsToMigrate.fold(this) { json, field ->
+            val modifiedJson = StringBuilder(json)
+            val searchField = "\"$field\":\""
+            val classNameValue = RAW
 
-        val startIndex = modifiedJson.indexOf(searchField)
+            val startIndex = modifiedJson.indexOf(searchField)
 
-        if (startIndex != -1) {
-            val endIndex = modifiedJson.indexOf("\"", startIndex + searchField.length)
-            if (endIndex != -1) {
-                val userIdValue =
-                    modifiedJson.substring(startIndex + searchField.length, endIndex)
-                val replacement =
-                    "\"$field\":{\"$FIELD_CLASS_NAME\":\"$classNameValue\",\"$FIELD_VALUE\":\"$userIdValue\"}"
-                modifiedJson.replace(startIndex, endIndex + 1, replacement)
+            if (startIndex != -1) {
+                val endIndex = modifiedJson.indexOf("\"", startIndex + searchField.length)
+                if (endIndex != -1) {
+                    val userIdValue =
+                        modifiedJson.substring(startIndex + searchField.length, endIndex)
+                    val replacement =
+                        "\"$field\":{\"$FIELD_CLASS_NAME\":\"$classNameValue\",\"$FIELD_VALUE\":\"$userIdValue\"}"
+                    modifiedJson.replace(startIndex, endIndex + 1, replacement)
+                }
             }
-        }
 
-        return@fold modifiedJson.toString()
-    }
+            return@fold modifiedJson.toString()
+        }
+}

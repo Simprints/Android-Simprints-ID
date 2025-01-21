@@ -9,6 +9,7 @@ import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,13 +28,14 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     private val timeHelper: TimeHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
-    override val tag: String = EventEndSyncReporterWorker::class.java.simpleName
+    override val tag: String = "EventEndSyncReporter"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("Started")
+        showProgressNotification()
         try {
-            showProgressNotification()
             val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
-            crashlyticsLog("Start - Params: $syncId")
+            Simber.tag(tag).d("Params: $syncId")
 
             inputData.getString(EVENT_DOWN_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
                 eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)

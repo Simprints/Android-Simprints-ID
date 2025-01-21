@@ -4,6 +4,7 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnect
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
@@ -13,17 +14,14 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     is NotConnectedException,
     is IOException,
     -> { // Disconnected or timed-out communications with Scanner
-        Simber.d(
-            "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException",
-            e,
-        )
+        Simber.tag(FINGER_CAPTURE).i("IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException", e)
         ScannerDisconnectedException()
     }
 
     is IllegalStateException, // We're calling scanner methods out of order somehow
     is IllegalArgumentException,
     -> {
-        Simber.e("Received unexpected/invalid bytes from the scanner", e)
+        Simber.tag(FINGER_CAPTURE).e("Received unexpected/invalid bytes from the scanner", e)
         UnexpectedScannerException(throwable = e)
     }
 

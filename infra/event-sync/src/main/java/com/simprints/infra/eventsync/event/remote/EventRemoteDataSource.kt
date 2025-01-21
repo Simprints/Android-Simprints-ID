@@ -53,7 +53,7 @@ internal class EventRemoteDataSource @Inject constructor(
         val totalCount = response.headers()[COUNT_HEADER]?.toIntOrNull() ?: 0
         val isTotalLowerBound = response
             .headers()[IS_COUNT_HEADER_LOWER_BOUND]
-            ?.toBoolean() ?: false // If not present, assume it's not lower bound
+            ?.toBoolean() == true // If not present, assume it's not lower bound
         return EventCount(totalCount, isTotalLowerBound)
     }
 
@@ -73,9 +73,7 @@ internal class EventRemoteDataSource @Inject constructor(
     ): EventDownSyncResult = try {
         val response = takeStreaming(requestId, query)
         val eventCount = getEventCountFromHeader(response)
-
         val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
-        Simber.tag(SYNC.name).d("[EVENT_REMOTE_SOURCE] Stream taken")
 
         EventDownSyncResult(
             totalCount = eventCount.exactCount,
@@ -100,8 +98,6 @@ internal class EventRemoteDataSource @Inject constructor(
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
-        Simber.tag(SYNC.name).d("[EVENT_REMOTE_SOURCE] Start parsing stream")
-
         try {
             while (parser.nextToken() == START_OBJECT) {
                 val event =
@@ -112,7 +108,7 @@ internal class EventRemoteDataSource @Inject constructor(
             parser.close()
             channel.close()
         } catch (t: Throwable) {
-            Simber.d("Event parsing stream failed", t)
+            Simber.tag(SYNC).i("Event parsing stream failed", t)
             parser.close()
             channel.close(t)
         }

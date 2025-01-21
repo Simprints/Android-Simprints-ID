@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.local.models.ProtoFingerprintConfigurati
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.VeroGeneration.VERO_2
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -13,11 +14,11 @@ import javax.inject.Inject
  */
 internal class ProjectConfigQualityThresholdMigration @Inject constructor() : DataMigration<ProtoProjectConfiguration> {
     override suspend fun cleanUp() {
-        Simber.i("Migration of project configuration quality threshold is done")
+        Simber.tag(MIGRATION).i("Migration of project configuration quality threshold is done")
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.i("Start migration of project configuration to Datastore")
+        Simber.tag(MIGRATION).i("Start migration of project configuration to Datastore")
         val qualityThreshold = currentData.fingerprint.qualityThreshold
         val fingerprintProto = currentData.fingerprint.toBuilder()
         if (currentData.fingerprint.allowedVeroGenerationsList.contains(VERO_1)) {

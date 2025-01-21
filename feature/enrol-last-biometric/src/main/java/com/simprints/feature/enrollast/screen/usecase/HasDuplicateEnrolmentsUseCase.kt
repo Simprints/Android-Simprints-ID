@@ -19,14 +19,14 @@ internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
         return when {
             fingerprintResponse == null && faceResponse == null -> {
                 Simber
-                    .tag(ENROLMENT.name)
+                    .tag(ENROLMENT)
                     .i("No capture response. Must be either fingerprint, face or both")
                 true
             }
 
             isAnyResponseWithHighConfidence(projectConfig, fingerprintResponse, faceResponse) -> {
                 Simber
-                    .tag(ENROLMENT.name)
+                    .tag(ENROLMENT)
                     .i("There is a subject with confidence score above the high confidence level")
                 true
             }

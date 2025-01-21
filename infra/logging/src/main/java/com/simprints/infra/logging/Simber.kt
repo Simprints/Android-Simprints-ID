@@ -1,6 +1,7 @@
 package com.simprints.infra.logging
 
 import com.google.firebase.FirebaseNetworkException
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import timber.log.Timber
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -27,11 +28,7 @@ object Simber {
      * STAGING: Is sent to Log.d
      * RELEASE: Is ignored
      */
-    @JvmStatic
-    fun d(
-        message: String,
-        t: Throwable? = null,
-    ) = Timber.d(t, message)
+    fun d(message: String) = Timber.d(message)
 
     /**
      * Use this to post useful information to the log. For example: that you have successfully
@@ -41,10 +38,15 @@ object Simber {
      * STAGING: Is sent to Log.i and Crashlytics as a breadcrumb
      * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
+    @JvmStatic
     fun i(
         message: String,
         t: Throwable? = null,
-    ) = Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+    ) = if (t == null) {
+        Timber.i(message)
+    } else {
+        Timber.i(t, message)
+    }
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -64,10 +66,10 @@ object Simber {
         message: String,
         t: Throwable? = null,
     ) {
-        if (t != null && shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
-        } else {
-            Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+        when {
+            t == null -> Timber.w(message)
+            shouldSkipThrowableReporting(t) -> Timber.i(t, message)
+            else -> Timber.w(t, message)
         }
     }
 
@@ -87,12 +89,12 @@ object Simber {
      */
     fun e(
         message: String,
-        t: Throwable? = null,
+        t: Throwable,
     ) {
-        if (t != null && shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+        if (shouldSkipThrowableReporting(t)) {
+            Timber.i(t, message)
         } else {
-            Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+            Timber.e(t, message)
         }
     }
 
@@ -105,6 +107,12 @@ object Simber {
         Timber.tag(conformingTag)
         return Simber
     }
+
+    /**
+     * Adds a custom tag to the log.
+     * @param tag One of the predefined crash report tags
+     */
+    fun tag(tag: CrashReportTag) = tag(tag.name)
 
     /**
      * Adds a custom user property to analytics services.

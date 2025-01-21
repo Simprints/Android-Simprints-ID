@@ -8,6 +8,7 @@ import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBinding
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -30,7 +31,7 @@ internal class OrchestratorActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Simber.i("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized")
+        Simber.tag(ORCHESTRATION).d("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized")
 
         isGraphInitialized = savedInstanceState?.getBoolean(KEY_IS_GRAPH_INITIALIZED) ?: false
         lifecycle.addObserver(activityTracker)
@@ -41,7 +42,7 @@ internal class OrchestratorActivity : BaseActivity() {
             this,
             R.id.orchestratorRootFragment,
         ) { result ->
-            Simber.i("OrchestratorActivity on result ${result.resultCode}")
+            Simber.tag(ORCHESTRATION).d("OrchestratorActivity result code ${result.resultCode}")
 
             setResult(result.resultCode, Intent().putExtras(result.extras))
             finish()
@@ -50,14 +51,14 @@ internal class OrchestratorActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        Simber.i("OrchestratorActivity.onStart isGraphInitialized=$isGraphInitialized")
+        Simber.tag(ORCHESTRATION).d("OrchestratorActivity.onStart isGraphInitialized=$isGraphInitialized")
 
         if (activityTracker.isMain(activity = this)) {
             if (!isGraphInitialized) {
                 val action = intent.action.orEmpty()
                 val extras = intent.extras ?: bundleOf()
-                Simber.i("Intent received: $action")
-                Simber.i("Intent from: $callingPackage")
+                Simber.setUserProperty("Intent_received", action)
+                Simber.setUserProperty("Caller", callingPackage.orEmpty())
 
                 // Some co-sync functionality depends on the exact package name of the caller app,
                 // e.g. to switch content providers of debug and release variants of the caller app
@@ -70,7 +71,7 @@ internal class OrchestratorActivity : BaseActivity() {
                 isGraphInitialized = true
             }
         } else {
-            Simber.e("Orchestrator already executing, finishing with RESULT_CANCELED")
+            Simber.tag(ORCHESTRATION).i("Orchestrator already executing, finishing with RESULT_CANCELED")
             finish()
         }
     }

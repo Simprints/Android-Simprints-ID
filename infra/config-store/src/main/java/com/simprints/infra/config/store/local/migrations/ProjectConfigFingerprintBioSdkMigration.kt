@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.local.migrations
 import androidx.datastore.core.DataMigration
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -11,7 +12,7 @@ import javax.inject.Inject
  */
 class ProjectConfigFingerprintBioSdkMigration @Inject constructor() : DataMigration<ProtoProjectConfiguration> {
     override suspend fun cleanUp() {
-        Simber.i("Migration of project configuration fingerprint bio sdk is done")
+        Simber.tag(MIGRATION).i("Migration of project configuration fingerprint bio sdk is done")
     }
 
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData.fingerprint) {
@@ -19,7 +20,7 @@ class ProjectConfigFingerprintBioSdkMigration @Inject constructor() : DataMigrat
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.i("Start migration of project configuration fingerprint bio sdk to Datastore")
+        Simber.tag(MIGRATION).i("Start migration of project configuration fingerprint bio sdk to Datastore")
 
         val fingerprintProto = currentData.fingerprint.toBuilder()
 

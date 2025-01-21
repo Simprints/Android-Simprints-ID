@@ -3,6 +3,7 @@ package com.simprints.feature.clientapi.mappers.request.validators
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.models.ClientApiError
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SESSION
 import com.simprints.infra.logging.Simber
 
 internal class ConfirmIdentityValidator(
@@ -32,7 +33,7 @@ internal class ConfirmIdentityValidator(
         }
         if (currentSessionId != sessionId) {
             // TODO Remove in 2024.2.1 or when root cause of "Invalid Session ID" error is found
-            Simber.i("Mismatched IDs: '$currentSessionId' != '$sessionId'")
+            Simber.tag(SESSION).i("Mismatched IDs: '$currentSessionId' != '$sessionId'")
             throw InvalidRequestException("Invalid Session ID", ClientApiError.INVALID_SESSION_ID)
         }
     }

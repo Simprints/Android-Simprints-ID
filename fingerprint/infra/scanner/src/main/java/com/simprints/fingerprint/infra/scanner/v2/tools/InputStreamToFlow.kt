@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.v2.tools
 
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,6 @@ fun InputStream.asFlow(
     } catch (e: IOException) {
         // IOExceptions should be ignored because they are thrown when disconnecting the scanner
         // and closing the input stream at the end of the fingerprint collection process
-        Simber.i("Scanner disconnected", e)
+        Simber.tag(FINGER_CAPTURE).i("Scanner disconnected", e)
     }
 }.flowOn(dispatcher)

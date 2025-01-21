@@ -13,6 +13,8 @@ import com.simprints.infra.security.exceptions.MissingLocalDatabaseKeyHashExcept
 import com.simprints.infra.security.random.RandomGenerator
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,19 +26,31 @@ class SecureLocalDbKeyProviderImplTest {
         private const val KEY_NAME = "REALM_KEY_$DB_NAME"
     }
 
-    private val sharedPreferencesBuilder = mockk<EncryptedSharedPreferencesBuilder>()
-    private val dbKeySharedPrefs = mockk<SharedPreferences>()
-    private val hashSharedPrefs = mockk<SharedPreferences>()
-    private val randomGenerator = mockk<RandomGenerator> {
-        every { generateByteArray() } returns byteArrayOf(1, 2, 3)
-    }
-    private val dbKeyEditor = mockk<SharedPreferences.Editor>(relaxed = true)
-    private val keyHashEditor = mockk<SharedPreferences.Editor>(relaxed = true)
-    private val dbKeyProvider =
-        SecureLocalDbKeyProviderImpl(sharedPreferencesBuilder, randomGenerator)
+    @MockK
+    private lateinit var sharedPreferencesBuilder: EncryptedSharedPreferencesBuilder
+
+    @MockK
+    private lateinit var dbKeySharedPrefs: SharedPreferences
+
+    @MockK
+    private lateinit var hashSharedPrefs: SharedPreferences
+
+    @MockK
+    private lateinit var randomGenerator: RandomGenerator
+
+    @MockK
+    private lateinit var dbKeyEditor: SharedPreferences.Editor
+
+    @MockK
+    private lateinit var keyHashEditor: SharedPreferences.Editor
+
+    private lateinit var dbKeyProvider: SecureLocalDbKeyProviderImpl
 
     @Before
     fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { randomGenerator.generateByteArray() } returns byteArrayOf(1, 2, 3)
         every {
             sharedPreferencesBuilder.buildEncryptedSharedPreferences(SecureLocalDbKeyProvider.FILENAME_FOR_REALM_KEY_SHARED_PREFS)
         } returns dbKeySharedPrefs
@@ -45,7 +59,15 @@ class SecureLocalDbKeyProviderImplTest {
             sharedPreferencesBuilder.buildEncryptedSharedPreferences(SecureLocalDbKeyProvider.FILENAME_FOR_KEY_HASHES_SHARED_PREFS)
         } returns hashSharedPrefs
         every { hashSharedPrefs.edit() } returns keyHashEditor
+
         mockkObject(Simber)
+
+        dbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPreferencesBuilder, randomGenerator)
+    }
+
+    @After
+    fun cleanUp() {
+        unmockkObject(Simber)
     }
 
     @Test
@@ -99,7 +121,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any(), ofType<MissingLocalDatabaseKeyHashException>())
+            Simber.e(any(), ofType<MissingLocalDatabaseKeyHashException>())
         }
     }
 
@@ -116,7 +138,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any(), ofType<MatchingLocalDatabaseKeyHashesException>())
+            Simber.e(any(), ofType<MatchingLocalDatabaseKeyHashesException>())
         }
     }
 
@@ -130,7 +152,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any(), ofType<MismatchingLocalDatabaseKeyHashesException>())
+            Simber.e(any(), ofType<MismatchingLocalDatabaseKeyHashesException>())
         }
     }
 
@@ -143,7 +165,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any(), ofType<MissingLocalDatabaseKeyException>())
+            Simber.e(any(), ofType<MissingLocalDatabaseKeyException>())
         }
     }
 

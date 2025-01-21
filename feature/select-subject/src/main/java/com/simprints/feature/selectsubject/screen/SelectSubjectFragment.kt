@@ -8,6 +8,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.feature.selectsubject.R
 import com.simprints.feature.selectsubject.SelectSubjectResult
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,6 +23,7 @@ internal class SelectSubjectFragment : Fragment(R.layout.fragment_select_subject
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("SelectSubjectFragment started")
 
         viewModel.finish.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let(::finishWithResult)

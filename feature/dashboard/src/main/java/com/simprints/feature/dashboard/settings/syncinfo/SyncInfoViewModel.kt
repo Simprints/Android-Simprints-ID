@@ -27,6 +27,7 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -221,7 +222,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts = try {
         eventSyncManager.countEventsToDownload()
     } catch (t: Throwable) {
-        Simber.d("Could not count events for download", t)
+        Simber.tag(SYNC).i("Could not count events for download", t)
         DownSyncCounts(0, isLowerBound = false)
     }
 

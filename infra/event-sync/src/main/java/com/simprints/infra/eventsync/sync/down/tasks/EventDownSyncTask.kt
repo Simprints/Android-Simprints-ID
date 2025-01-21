@@ -102,7 +102,7 @@ internal class EventDownSyncTask @Inject constructor(
                 throw t
             }
 
-            Simber.d("Down sync error", t)
+            Simber.tag(SYNC).i("Down sync error", t)
             errorType = t.javaClass.simpleName
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
@@ -170,8 +170,6 @@ internal class EventDownSyncTask @Inject constructor(
             }.flatten()
 
         enrolmentRecordRepository.performActions(actions)
-
-        Simber.tag(SYNC.name).d("[DOWN_SYNC_HELPER] batch processed")
 
         return if (batchOfEventsToProcess.size > 0) {
             lastOperation.copy(

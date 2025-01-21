@@ -5,6 +5,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -80,7 +81,7 @@ internal class EventSyncCache @Inject constructor(
             sharedForProgresses.edit().clear().commit()
             sharedForCounts.edit().clear().commit()
         } catch (ex: SecurityException) {
-            Simber.e("Crashed during event sync cleanup", ex)
+            Simber.tag(SYNC).e("Crashed during event sync cleanup", ex)
         }
     }
 

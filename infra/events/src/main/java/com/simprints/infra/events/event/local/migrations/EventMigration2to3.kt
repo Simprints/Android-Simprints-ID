@@ -3,6 +3,7 @@ package com.simprints.infra.events.event.local.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 
 /**
@@ -16,6 +17,7 @@ internal class EventMigration2to3 : Migration(2, 3) {
     private val idColumn = "id"
 
     override fun migrate(database: SupportSQLiteDatabase) {
+        Simber.tag(MIGRATION).i("Migrating room db from schema 2 to schema 3.")
         try {
             /**
              * Update the table to include a sessionIsClosed column and set it's default to false.
@@ -28,8 +30,9 @@ internal class EventMigration2to3 : Migration(2, 3) {
              * only be 1) will be closed the first time the user opens the app after the migration.
              */
             updateTableToCloseClosedSessions(database)
+            Simber.tag(MIGRATION).i("Migration from schema 2 to schema 3 done.")
         } catch (ex: Exception) {
-            Simber.e("Failed to migrate room db from schema 2 to schema 3.", ex)
+            Simber.tag(MIGRATION).e("Failed to migrate room db from schema 2 to schema 3.", ex)
         }
     }
 

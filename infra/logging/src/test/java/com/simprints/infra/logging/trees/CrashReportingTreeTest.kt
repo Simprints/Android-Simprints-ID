@@ -67,23 +67,6 @@ class CrashReportingTreeTest {
     }
 
     @Test
-    fun `should log and record error on ERROR priority`() {
-        val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
-        val spyCrashReportingTree = spyk(CrashReportingTree(crashMock))
-
-        Timber.plant(spyCrashReportingTree)
-        Simber.e("Test Message")
-
-        verify {
-            crashMock.recordException(
-                withArg {
-                    it is Exception && it.message.contentEquals("Test Message")
-                },
-            )
-        }
-    }
-
-    @Test
     fun `with custom exception should log and record error on ERROR priority`() {
         val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
         val spyCrashReportingTree = spyk(CrashReportingTree(crashMock))

@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.local.migrations
 import androidx.datastore.core.DataMigration
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.models.ProtoProject
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbProject
@@ -20,14 +21,14 @@ internal class ProjectRealmMigration @Inject constructor(
     }
 
     override suspend fun cleanUp() {
-        Simber.i("Migration of project to Datastore done")
+        Simber.tag(MIGRATION).i("Migration of project to Datastore done")
         realmWrapper.writeRealm { realm ->
             realm.delete(DbProject::class)
         }
     }
 
     override suspend fun migrate(currentData: ProtoProject): ProtoProject {
-        Simber.i("Start migration of project to Datastore")
+        Simber.tag(MIGRATION).i("Start migration of project to Datastore")
         val dbProject = realmWrapper.readRealm {
             it
                 .query(DbProject::class, "$PROJECT_ID_FIELD == $0", authStore.signedInProjectId)

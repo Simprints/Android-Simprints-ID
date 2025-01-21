@@ -16,6 +16,8 @@ import com.simprints.feature.consent.databinding.FragmentConsentBinding
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.toArgs
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.listeners.OnTabSelectedListener
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -35,9 +37,9 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("ConsentFragment started")
 
-        binding.consentPrivacyNotice.paintFlags =
-            binding.consentPrivacyNotice.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        binding.consentPrivacyNotice.paintFlags = binding.consentPrivacyNotice.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         binding.consentTextHolderView.movementMethod = ScrollingMovementMethod()
 
         handleClicks()
@@ -58,14 +60,10 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         }
 
         binding.consentAcceptButton.setOnClickListener {
-            viewModel.acceptClicked(
-                getCurrentConsentTab(),
-            )
+            viewModel.acceptClicked(getCurrentConsentTab())
         }
         binding.consentDeclineButton.setOnClickListener {
-            viewModel.declineClicked(
-                getCurrentConsentTab(),
-            )
+            viewModel.declineClicked(getCurrentConsentTab())
         }
         binding.consentPrivacyNotice.setOnClickListener { openPrivacyNotice() }
     }
