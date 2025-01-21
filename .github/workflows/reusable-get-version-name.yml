@@ -28,9 +28,9 @@ jobs:
                       last_part="${GITHUB_REF_NAME##*/}"
                       echo "version-name=$last_part" >> "$GITHUB_OUTPUT"                
                     elif [ "${{ inputs.version-source }}" = "internal" ]; then
-                      version_name=$(grep 'set("VERSION_NAME",' build-logic/build_properties.gradle.kts \
-                        | sed -E 's/.*set\("VERSION_NAME",[[:space:]]*"([^"]+)".*/\1/')
-                      echo "version-name=$version_name" >> "$GITHUB_OUTPUT"
+                        VERSION_NAME=$(grep 'set("VERSION_NAME"' build-logic/build_properties.gradle.kts \
+                        | sed -E 's/.*set\("VERSION_NAME",[[:space:]]*"([^"]+)".*/\1/')                   
+                        echo "version-name=$VERSION_NAME" >> $GITHUB_OUTPUT
                     else
                       echo "Error: Unknown version-source '${{ inputs.version-source }}'"
                       exit 1
