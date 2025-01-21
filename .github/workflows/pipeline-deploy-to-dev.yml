@@ -4,12 +4,26 @@ on:
     workflow_call:
 
 jobs:
+
+    extract-version-name:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
+
+            -   name: Extract VERSION_NAME from build_properties.gradle.kts
+                id: extract-version-name
+                run: |
+                    VERSION_NAME=$(grep 'VERSION_NAME' build-logic/build_properties.gradle.kts | awk -F'"' '{print $2}')
+                    echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+
     build-dev-apk:
         uses: ./.github/workflows/reusable-build-apk.yml
         secrets: inherit
+        needs: extract-version-name
         with:
             build-environment: dev
-
+            version-name: ${{ env.VERSION_NAME }}
 
     deploy-to-firebase:
         uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml

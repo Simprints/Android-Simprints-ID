@@ -9,6 +9,7 @@ jobs:
         secrets: inherit
         with:
             build-environment: staging
+            version-name: ${{ github.ref_name.split('/').last }}
 
     deploy-to-firebase:
         uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml

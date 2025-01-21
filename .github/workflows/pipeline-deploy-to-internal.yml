@@ -10,6 +10,7 @@ jobs:
         secrets: inherit
         with:
             build-environment: internal
+            version-name: ${{ github.ref_name.split('/').last }}
 
     run-app-sweep:
         uses: ./.github/workflows/reusable-app-sweep.yml
