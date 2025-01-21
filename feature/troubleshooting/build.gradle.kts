@@ -19,4 +19,5 @@ dependencies {
     implementation(project(":fingerprint:infra:scanner"))
 
     implementation(libs.workManager.work)
+    implementation(libs.zip4j)
 }

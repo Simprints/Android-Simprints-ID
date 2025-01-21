@@ -9,9 +9,13 @@ import com.simprints.feature.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectScannerStateUseCase
+import com.simprints.feature.troubleshooting.overview.usecase.ExportLogsUseCase
+import com.simprints.feature.troubleshooting.overview.usecase.ExportLogsUseCase.LogsExportResult
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase.PingResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,6 +26,7 @@ internal class OverviewViewModel @Inject constructor(
     private val collectLicenseStates: CollectLicenceStatesUseCase,
     private val collectNetworkInformation: CollectNetworkInformationUseCase,
     private val doServerPing: PingServerUseCase,
+    private val doExportLogs: ExportLogsUseCase,
     private val collectScannerState: CollectScannerStateUseCase,
 ) : ViewModel() {
     val projectIds: LiveData<String>
@@ -48,6 +53,10 @@ internal class OverviewViewModel @Inject constructor(
         get() = _scannerState
     private val _scannerState = MutableLiveData("Connecting to scanner...")
 
+    val logsExport: LiveData<LogsExportResult>
+        get() = _logsExport
+    private val _logsExport = MutableLiveData<LogsExportResult>(LogsExportResult.NotStarted)
+
     fun collectData() {
         _projectIds.postValue(collectIds())
         viewModelScope.launch { _configurationDetails.postValue(collectConfigurationDetails()) }
@@ -62,7 +71,19 @@ internal class OverviewViewModel @Inject constructor(
         }
     }
 
+    fun exportLogs() {
+        viewModelScope.launch {
+            doExportLogs()
+                .onCompletion {
+                    // Just enough time for success to register and then reset the view
+                    delay(EXPORT_BUTTON_RESET_DELAY)
+                    emit(LogsExportResult.NotStarted)
+                }.collect { _logsExport.postValue(it) }
+        }
+    }
+
     companion object {
         private const val PLACEHOLDER_TEXT = "Collecting data"
+        private const val EXPORT_BUTTON_RESET_DELAY = 200L
     }
 }

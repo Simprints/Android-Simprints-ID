@@ -116,6 +116,21 @@
             tools:text="Connecting to scanner..."
             android:textIsSelectable="true" />
 
+        <TextView
+            style="@style/Text.Headline6.Accented"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:lineSpacingMultiplier="1.5"
+            android:text="Exports"
+            android:textIsSelectable="true" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/troubleshootOverviewExportLogs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export logs" />
     </LinearLayout>
 
 </ScrollView>
