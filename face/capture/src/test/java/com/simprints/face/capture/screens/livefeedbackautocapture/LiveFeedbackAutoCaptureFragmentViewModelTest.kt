@@ -349,6 +349,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     companion object {
         private const val QUALITY_THRESHOLD = -1f
         private const val AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS = 2000L
-        private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 2000L
+        private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 3000L
     }
 }

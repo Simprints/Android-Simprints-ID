@@ -261,6 +261,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
         private const val AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS = 2000L
-        private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 2000L
+        private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 3000L
     }
 }
