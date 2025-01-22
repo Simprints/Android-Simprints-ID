@@ -5,11 +5,17 @@ on:
 
 jobs:
 
+    get-version:
+        uses: ./.github/workflows/reusable-get-version-name.yml
+        with:
+            version-source: "branch"
+
     build-internal-aab:
         uses: ./.github/workflows/reusable-build-apk.yml
         secrets: inherit
         with:
             build-environment: internal
+            version-name: ${{ needs.get-version.outputs.version-name }}
 
     run-app-sweep:
         uses: ./.github/workflows/reusable-app-sweep.yml

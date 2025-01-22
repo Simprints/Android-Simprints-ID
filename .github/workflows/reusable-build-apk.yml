@@ -6,6 +6,9 @@ on:
             build-environment:
                 type: string
                 required: true
+            version-name:
+                type: string
+                required: true
 
         outputs:
             build-artifact:
@@ -30,7 +33,7 @@ jobs:
             # VERSION_CODE: Unique version code using the sum of the current timestamp and run number.
             VERSION_CODE: "set in lower step"
             # VERSION_NAME: Version name derived from the GitHub ref name after the final /.
-            VERSION_NAME: "set in lower step"
+            VERSION_NAME: ${{ inputs.version-name }}
             # VERSION_SUFFIX: The build environment (e.g., dev, staging, internal).
             VERSION_SUFFIX: ${{ inputs.build-environment }}
             # VERSION_BUILD: A unique build identifier combining the run number and attempt.
@@ -66,11 +69,10 @@ jobs:
             -   name: Compute version variables
                 run: |
                     echo "VERSION_CODE=$(($BASE_VERSION_CODE + ${{ github.run_number }} * 100 + ${{ github.run_attempt }}))" >> $GITHUB_ENV
-                    echo "VERSION_NAME=$(echo '${{ github.ref_name }}' | awk -F'/' '{print $NF}')" >> $GITHUB_ENV
 
             -   name: Compute file name
                 run: |
-                    echo "FILE_NAME=${{ env.VERSION_NAME }}-${{ env.VERSION_SUFFIX }}+${{ env.VERSION_BUILD }}" >> $GITHUB_ENV
+                    echo "FILE_NAME=${{ env.VERSION_NAME }}+${{ env.VERSION_SUFFIX }}.${{ env.VERSION_BUILD }}" >> $GITHUB_ENV
 
             -   name: Set up build files
                 uses: ./.github/actions/setup-gradle-build-files
