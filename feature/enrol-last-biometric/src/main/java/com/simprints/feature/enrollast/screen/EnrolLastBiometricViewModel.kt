@@ -73,7 +73,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)))
             _finish.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
-            Simber.tag(ENROLMENT).e("Enrolment failed", t)
+            Simber.e("Enrolment failed", t, tag = ENROLMENT)
             _finish.send(EnrolLastState.Failed(GENERAL_ERROR, modalities))
         }
     }
@@ -82,7 +82,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         steps.filterIsInstance<EnrolLastBiometricStepResult.EnrolLastBiometricsResult>().firstOrNull()
 
     private suspend fun registerEvent(subject: Subject) {
-        Simber.tag(ENROLMENT).d("Register events for enrolments")
+        Simber.d("Register events for enrolments", tag = ENROLMENT)
 
         val personCreationEvent = eventRepository
             .getEventsInCurrentSession()

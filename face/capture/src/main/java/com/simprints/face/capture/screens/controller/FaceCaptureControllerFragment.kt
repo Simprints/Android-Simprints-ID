@@ -48,7 +48,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("FaceCaptureControllerFragment started")
+        Simber.i("FaceCaptureControllerFragment started", tag = ORCHESTRATION)
 
         findNavController().handleResult<ExitFormResult>(
             this,

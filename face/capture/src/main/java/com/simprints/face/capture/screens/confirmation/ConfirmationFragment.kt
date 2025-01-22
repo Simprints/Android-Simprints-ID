@@ -36,7 +36,7 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("ConfirmationFragment started")
+        Simber.i("ConfirmationFragment started", tag = ORCHESTRATION)
         startTime = faceTimeHelper.now()
 
         binding.apply(::setImageBitmapAndButtonClickListener)

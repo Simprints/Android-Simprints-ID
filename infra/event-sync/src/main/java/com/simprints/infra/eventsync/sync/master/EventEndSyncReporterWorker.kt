@@ -35,7 +35,7 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
         showProgressNotification()
         try {
             val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
-            Simber.tag(tag).d("Params: $syncId")
+            Simber.d("Params: $syncId", tag = tag)
 
             inputData.getString(EVENT_DOWN_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
                 eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)

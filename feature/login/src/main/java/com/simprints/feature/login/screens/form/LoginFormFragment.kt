@@ -77,7 +77,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("LoginFormFragment started")
+        Simber.i("LoginFormFragment started", tag = ORCHESTRATION)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             finishWithError(LoginError.LoginNotCompleted)
@@ -101,16 +101,16 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         binding.loginProjectId.setText(args.loginParams.projectId)
 
         binding.loginChangeUrlButton.setOnClickListener {
-            Simber.tag(LOGIN).i("Change URL button clicked")
+            Simber.i("Change URL button clicked", tag = LOGIN)
             viewModel.changeUrlClicked()
         }
 
         binding.loginButtonScanQr.setOnClickListener {
-            Simber.tag(LOGIN).i("Scan QR button clicked")
+            Simber.i("Scan QR button clicked", tag = LOGIN)
             findNavController().navigateSafely(this, LoginFormFragmentDirections.actionLoginFormFragmentToLoginQrScanner())
         }
         binding.loginButtonSignIn.setOnClickListener {
-            Simber.tag(LOGIN).i("Login button clicked")
+            Simber.i("Login button clicked", tag = LOGIN)
             viewModel.signInClicked(
                 args.loginParams,
                 binding.loginProjectId.text.toString(),

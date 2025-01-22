@@ -52,7 +52,7 @@ internal class CameraFocusManager @Inject constructor() {
                 try {
                     cameraControl.startFocusAndMetering(focusAction)
                 } catch (e: CameraInfoUnavailableException) {
-                    Simber.tag(LOGIN).e("Cannot access camera", e)
+                    Simber.e("Cannot access camera", e, tag = LOGIN)
                 }
                 true
             }
@@ -78,7 +78,7 @@ internal class CameraFocusManager @Inject constructor() {
             try {
                 camera.cameraControl.startFocusAndMetering(focusAction)
             } catch (e: CameraInfoUnavailableException) {
-                Simber.tag(LOGIN).e("Cannot access camera", e)
+                Simber.e("Cannot access camera", e, tag = LOGIN)
             }
         }
     }

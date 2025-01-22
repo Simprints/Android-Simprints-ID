@@ -56,7 +56,7 @@ internal class CameraHelper @Inject constructor(
                             }
                         }
                 } catch (e: Exception) {
-                    Simber.tag(LOGIN).i("Camera is already in use by another process", e)
+                    Simber.i("Camera is already in use by another process", e, tag = LOGIN)
                     initializationErrorListener.onCameraError()
                 }
             },

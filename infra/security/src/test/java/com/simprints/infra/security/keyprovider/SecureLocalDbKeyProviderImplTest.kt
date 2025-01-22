@@ -5,6 +5,7 @@ import android.util.Base64.DEFAULT
 import android.util.Base64.encodeToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MatchingLocalDatabaseKeyHashesException
 import com.simprints.infra.security.exceptions.MismatchingLocalDatabaseKeyHashesException
@@ -44,10 +45,6 @@ class SecureLocalDbKeyProviderImplTest {
     @MockK
     private lateinit var keyHashEditor: SharedPreferences.Editor
 
-    val simber = mockk<Simber>(relaxed = true) {
-        every { tag(any()) } returns this
-    }
-
     private lateinit var dbKeyProvider: SecureLocalDbKeyProviderImpl
 
     @Before
@@ -65,7 +62,6 @@ class SecureLocalDbKeyProviderImplTest {
         every { hashSharedPrefs.edit() } returns keyHashEditor
 
         mockkObject(Simber)
-        every { Simber.INSTANCE } returns simber
 
         dbKeyProvider = SecureLocalDbKeyProviderImpl(sharedPreferencesBuilder, randomGenerator)
     }
@@ -126,7 +122,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            simber.e(any(), ofType<MissingLocalDatabaseKeyHashException>())
+            Simber.e(any(), ofType<MissingLocalDatabaseKeyHashException>(), any<CrashReportTag>())
         }
     }
 
@@ -143,7 +139,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            simber.e(any(), ofType<MatchingLocalDatabaseKeyHashesException>())
+            Simber.e(any(), ofType<MatchingLocalDatabaseKeyHashesException>(), any<CrashReportTag>())
         }
     }
 
@@ -157,7 +153,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            simber.e(any(), ofType<MismatchingLocalDatabaseKeyHashesException>())
+            Simber.e(any(), ofType<MismatchingLocalDatabaseKeyHashesException>(), any<CrashReportTag>())
         }
     }
 
@@ -170,7 +166,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            simber.e(any(), ofType<MissingLocalDatabaseKeyException>())
+            Simber.e(any(), ofType<MissingLocalDatabaseKeyException>(), any<CrashReportTag>())
         }
     }
 

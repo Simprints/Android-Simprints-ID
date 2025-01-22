@@ -37,7 +37,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("ConsentFragment started")
+        Simber.i("ConsentFragment started", tag = ORCHESTRATION)
 
         binding.consentPrivacyNotice.paintFlags = binding.consentPrivacyNotice.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         binding.consentTextHolderView.movementMethod = ScrollingMovementMethod()

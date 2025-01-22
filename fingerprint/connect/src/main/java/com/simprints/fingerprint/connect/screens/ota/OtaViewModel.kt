@@ -134,7 +134,7 @@ internal class OtaViewModel @Inject constructor(
         e: Throwable,
         currentRetryAttempt: Int,
     ) {
-        Simber.tag(FINGER_CAPTURE).e("OTA update failed", e)
+        Simber.e("OTA update failed", e, tag = FINGER_CAPTURE)
         if (e is BackendMaintenanceException) {
             _otaFailed.send(
                 FetchOtaResult(

@@ -51,7 +51,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("MatchFragment started (isFace=${args.params.isFaceMatch()})")
+        Simber.i("MatchFragment started (isFace=${args.params.isFaceMatch()})", tag = ORCHESTRATION)
 
         observeViewModel()
     }

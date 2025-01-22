@@ -14,11 +14,11 @@ import javax.inject.Inject
  */
 internal class ProjectConfigQualityThresholdMigration @Inject constructor() : DataMigration<ProtoProjectConfiguration> {
     override suspend fun cleanUp() {
-        Simber.tag(MIGRATION).i("Migration of project configuration quality threshold is done")
+        Simber.i("Migration of project configuration quality threshold is done", tag = MIGRATION)
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.tag(MIGRATION).i("Start migration of project configuration to Datastore")
+        Simber.i("Start migration of project configuration to Datastore", tag = MIGRATION)
         val qualityThreshold = currentData.fingerprint.qualityThreshold
         val fingerprintProto = currentData.fingerprint.toBuilder()
         if (currentData.fingerprint.allowedVeroGenerationsList.contains(VERO_1)) {

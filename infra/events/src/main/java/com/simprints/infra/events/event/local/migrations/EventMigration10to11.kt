@@ -20,14 +20,14 @@ import com.simprints.infra.logging.Simber
 
 internal class EventMigration10to11 : Migration(10, 11) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        Simber.tag(MIGRATION).i("Migrating room db from schema 10 to schema 11.")
+        Simber.i("Migrating room db from schema 10 to schema 11.", tag = MIGRATION)
 
         createSessionScopeTable(db)
         convertAllSessionCaptureEventsToScopes(db)
         deleteSessionCaptureEvents(db)
         deleteArtificialTerminationEvents(db)
 
-        Simber.tag(MIGRATION).i("Migration from schema 10 to schema 11 done.")
+        Simber.i("Migration from schema 10 to schema 11 done.", tag = MIGRATION)
     }
 
     private fun createSessionScopeTable(database: SupportSQLiteDatabase) {
@@ -55,7 +55,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
                 val id = it.getStringWithColumnName("id")
                 val scope = getScopeFromCursor(it)
                 if (scope == null) {
-                    Simber.tag(MIGRATION).d("Could not parse session scope from event with id $id")
+                    Simber.d("Could not parse session scope from event with id $id", tag = MIGRATION)
                     continue
                 }
                 database.insert(SCOPE_TABLE_NAME, SQLiteDatabase.CONFLICT_NONE, scope)

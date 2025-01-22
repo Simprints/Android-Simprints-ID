@@ -12,7 +12,7 @@ import javax.inject.Inject
  */
 class ProjectConfigFingerprintBioSdkMigration @Inject constructor() : DataMigration<ProtoProjectConfiguration> {
     override suspend fun cleanUp() {
-        Simber.tag(MIGRATION).i("Migration of project configuration fingerprint bio sdk is done")
+        Simber.i("Migration of project configuration fingerprint bio sdk is done", tag = MIGRATION)
     }
 
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData.fingerprint) {
@@ -20,7 +20,7 @@ class ProjectConfigFingerprintBioSdkMigration @Inject constructor() : DataMigrat
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.tag(MIGRATION).i("Start migration of project configuration fingerprint bio sdk to Datastore")
+        Simber.i("Start migration of project configuration fingerprint bio sdk to Datastore", tag = MIGRATION)
 
         val fingerprintProto = currentData.fingerprint.toBuilder()
 

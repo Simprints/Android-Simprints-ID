@@ -39,7 +39,7 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("ExitFormFragment started")
+        Simber.i("ExitFormFragment started", tag = ORCHESTRATION)
 
         val config = args.exitFormConfiguration
 

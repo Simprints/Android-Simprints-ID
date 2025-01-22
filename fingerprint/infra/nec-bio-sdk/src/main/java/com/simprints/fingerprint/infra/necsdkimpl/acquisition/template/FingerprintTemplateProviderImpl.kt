@@ -72,7 +72,7 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
     }
 
     private fun log(message: String) {
-        Simber.tag("NEC_SDK").d(message)
+        Simber.d(message, tag = "NEC_SDK")
     }
 
     companion object {

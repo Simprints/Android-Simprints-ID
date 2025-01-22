@@ -39,15 +39,15 @@ internal class ExecutionTracker @Inject constructor(
             if (currentLifecycleOwnerId == null || enoughTimePassedSinceLastLock()) {
                 currentLifecycleOwnerId = ownerId
                 timestamp = timeHelper.now()
-                Simber.tag(ORCHESTRATION).i("Lifecycle owner [$ownerId] is set as main executor")
+                Simber.i("Lifecycle owner [$ownerId] is set as main executor", tag = ORCHESTRATION)
             } else {
-                Simber.tag(ORCHESTRATION).i("Main executor already set, ignoring Lifecycle owner [$ownerId]")
+                Simber.i("Main executor already set, ignoring Lifecycle owner [$ownerId]", tag = ORCHESTRATION)
             }
         } else if (event == Lifecycle.Event.ON_DESTROY) {
             if (currentLifecycleOwnerId == ownerId) {
                 currentLifecycleOwnerId = null
                 timestamp = Timestamp(0)
-                Simber.tag(ORCHESTRATION).i("Lifecycle owner [$ownerId] removed from main executor")
+                Simber.i("Lifecycle owner [$ownerId] removed from main executor", tag = ORCHESTRATION)
             }
         }
     }

@@ -28,11 +28,11 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         ALL_KEYS.forEach { editor.remove(it) }
         editor.remove(PROJECT_SETTINGS_JSON_STRING_KEY)
         editor.apply()
-        Simber.i("Migration of project configuration to Datastore done")
+        Simber.i("Migration of project configuration to Datastore done", tag = MIGRATION)
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.tag(MIGRATION).i("Start migration of project configuration to Datastore")
+        Simber.i("Start migration of project configuration to Datastore", tag = MIGRATION)
         val projectSettingsJson = prefs.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
@@ -44,10 +44,10 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         } catch (e: Exception) {
             if (e is JacksonException) {
                 // Return default value
-                Simber.tag(MIGRATION).i("Invalid old configuration for project ${authStore.signedInProjectId}", e)
+                Simber.i("Invalid old configuration for project ${authStore.signedInProjectId}", e, tag = MIGRATION)
                 ProtoProjectConfiguration.getDefaultInstance()
             } else {
-                Simber.tag(MIGRATION).e("Failed to migrate project configuration to Datastore", e)
+                Simber.e("Failed to migrate project configuration to Datastore", e, tag = MIGRATION)
                 throw e
             }
         }

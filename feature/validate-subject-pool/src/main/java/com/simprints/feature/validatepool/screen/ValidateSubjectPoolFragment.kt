@@ -30,7 +30,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("ValidateSubjectPoolFragment started")
+        Simber.i("ValidateSubjectPoolFragment started", tag = ORCHESTRATION)
 
         viewModel.state.observe(viewLifecycleOwner, LiveDataEventWithContentObserver(::renderState))
 

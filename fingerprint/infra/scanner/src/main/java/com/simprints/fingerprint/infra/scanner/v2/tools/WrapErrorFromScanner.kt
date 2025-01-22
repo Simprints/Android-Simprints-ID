@@ -14,14 +14,14 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     is NotConnectedException,
     is IOException,
     -> { // Disconnected or timed-out communications with Scanner
-        Simber.tag(FINGER_CAPTURE).i("IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException", e)
+        Simber.i("IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException", e, tag = FINGER_CAPTURE)
         ScannerDisconnectedException()
     }
 
     is IllegalStateException, // We're calling scanner methods out of order somehow
     is IllegalArgumentException,
     -> {
-        Simber.tag(FINGER_CAPTURE).e("Received unexpected/invalid bytes from the scanner", e)
+        Simber.e("Received unexpected/invalid bytes from the scanner", e, tag = FINGER_CAPTURE)
         UnexpectedScannerException(throwable = e)
     }
 

@@ -32,7 +32,7 @@ internal class EventStartSyncReporterWorker @AssistedInject constructor(
         showProgressNotification()
         try {
             val syncId = inputData.getString(SYNC_ID_STARTED)
-            Simber.tag(tag).d("Params: $syncId")
+            Simber.d("Params: $syncId", tag = tag)
             success(inputData)
         } catch (t: Throwable) {
             fail(t)

@@ -4,11 +4,25 @@ import co.touchlab.kermit.Logger
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.simprints.infra.logging.Simber
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.spyk
+import io.mockk.unmockkObject
 import io.mockk.verify
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class CrashlyticsLogWriterTest {
+    @Before
+    fun setUp() {
+        mockkObject(Logger)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkObject(Logger)
+    }
+
     @Test
     fun `should return on DEBUG priority`() {
         val crashMock = mockk<FirebaseCrashlytics>(relaxed = true)
@@ -26,7 +40,7 @@ class CrashlyticsLogWriterTest {
         val spyCrashReportingTree = spyk(CrashlyticsLogWriter(crashMock))
 
         Logger.setLogWriters(spyCrashReportingTree)
-        Simber.i("Test Message")
+        Simber.i("Test Message", null)
 
         verify { crashMock.log("[${Simber.DEFAULT_TAG}] Test Message") }
     }
@@ -37,7 +51,7 @@ class CrashlyticsLogWriterTest {
         val spyCrashReportingTree = spyk(CrashlyticsLogWriter(crashMock))
 
         Logger.setLogWriters(spyCrashReportingTree)
-        Simber.tag("TAG").i("Test Message")
+        Simber.i("Test Message", tag = "TAG")
 
         verify { crashMock.log("[TAG] Test Message") }
     }
@@ -48,7 +62,7 @@ class CrashlyticsLogWriterTest {
         val spyCrashReportingTree = spyk(CrashlyticsLogWriter(crashMock))
 
         Logger.setLogWriters(spyCrashReportingTree)
-        Simber.w("Test Message")
+        Simber.w("Test Message", null)
 
         verify {
             crashMock.recordException(

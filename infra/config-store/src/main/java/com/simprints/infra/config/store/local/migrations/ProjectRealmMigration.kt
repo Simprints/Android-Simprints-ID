@@ -21,14 +21,14 @@ internal class ProjectRealmMigration @Inject constructor(
     }
 
     override suspend fun cleanUp() {
-        Simber.tag(MIGRATION).i("Migration of project to Datastore done")
+        Simber.i("Migration of project to Datastore done", tag = MIGRATION)
         realmWrapper.writeRealm { realm ->
             realm.delete(DbProject::class)
         }
     }
 
     override suspend fun migrate(currentData: ProtoProject): ProtoProject {
-        Simber.tag(MIGRATION).i("Start migration of project to Datastore")
+        Simber.i("Start migration of project to Datastore", tag = MIGRATION)
         val dbProject = realmWrapper.readRealm {
             it
                 .query(DbProject::class, "$PROJECT_ID_FIELD == $0", authStore.signedInProjectId)

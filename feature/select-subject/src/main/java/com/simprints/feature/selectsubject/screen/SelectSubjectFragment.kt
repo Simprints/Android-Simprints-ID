@@ -23,7 +23,7 @@ internal class SelectSubjectFragment : Fragment(R.layout.fragment_select_subject
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("SelectSubjectFragment started")
+        Simber.i("SelectSubjectFragment started", tag = ORCHESTRATION)
 
         viewModel.finish.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let(::finishWithResult)

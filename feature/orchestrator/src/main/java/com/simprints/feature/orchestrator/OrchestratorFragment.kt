@@ -84,7 +84,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             savedInstanceState
                 .getString(KEY_ACTION_REQUEST)
                 ?.run(orchestratorVm::setActionRequestFromJson)
-            Simber.tag(ORCHESTRATION).i("Attempting to restore OrchestratorFragment state")
+            Simber.i("Attempting to restore OrchestratorFragment state", tag = ORCHESTRATION)
             orchestratorVm.restoreStepsIfNeeded()
             orchestratorVm.restoreModalitiesIfNeeded()
         }
@@ -101,14 +101,14 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         observeOrchestratorVm()
 
         handleResult<AlertResult>(AlertContract.DESTINATION) { alertResult ->
-            Simber.tag(ORCHESTRATION).i("Alert result: $alertResult")
+            Simber.i("Alert result: $alertResult", tag = ORCHESTRATION)
             orchestratorVm.handleErrorResponse(
                 AppErrorResponse(alertResult.appErrorReason ?: AppErrorReason.UNEXPECTED_ERROR),
             )
         }
 
         handleResult<LoginResult>(LoginContract.DESTINATION) { result ->
-            Simber.tag(ORCHESTRATION).i("Sign-in result: $result")
+            Simber.i("Sign-in result: $result", tag = ORCHESTRATION)
             loginCheckVm.handleLoginResult(result)
         }
 
@@ -174,7 +174,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         loginCheckVm.proceedWithAction.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { action ->
-                Simber.tag(ORCHESTRATION).i("Login check complete, starting orchestrator")
+                Simber.i("Login check complete, starting orchestrator", tag = ORCHESTRATION)
                 orchestratorVm.handleAction(action)
             },
         )
@@ -184,7 +184,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         clientApiVm.newSessionCreated.observe(
             viewLifecycleOwner,
             LiveDataEventObserver {
-                Simber.tag(ORCHESTRATION).i("New session created, caches cleared")
+                Simber.i("New session created, caches cleared", tag = ORCHESTRATION)
                 orchestratorCache.clearCache()
             },
         )
@@ -212,7 +212,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { step ->
                 if (step != null) {
-                    Simber.tag(ORCHESTRATION).i("Executing step: ${step.id}")
+                    Simber.i("Executing step: ${step.id}", tag = ORCHESTRATION)
                     findNavController().navigateSafely(this, step.navigationActionId, step.payload)
                 }
             },
@@ -220,8 +220,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         orchestratorVm.appResponse.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { response ->
-                Simber.tag(ORCHESTRATION).i("Responding to ${response.request?.actionIdentifier?.actionName}")
-                Simber.tag(ORCHESTRATION).i("Responding with ${response.response.javaClass.simpleName}")
+                Simber.i("Responding to ${response.request?.actionIdentifier?.actionName}", tag = ORCHESTRATION)
+                Simber.i("Responding with ${response.response.javaClass.simpleName}", tag = ORCHESTRATION)
 
                 if (response.request == null) {
                     clientApiVm.handleErrorResponse(
@@ -261,7 +261,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Simber.tag(ORCHESTRATION).i("Saving OrchestratorFragment state")
+        Simber.i("Saving OrchestratorFragment state", tag = ORCHESTRATION)
         outState.putBoolean(KEY_REQUEST_PROCESSED, orchestratorVm.isRequestProcessed)
         // [MS-405] Saving the action request in the bundle, since ViewModels don't survive the
         // process death. ActionRequest is important in mapping the correct SID response, hence it
@@ -273,13 +273,13 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         super.onResume()
 
         if (!orchestratorVm.isRequestProcessed) {
-            Simber.tag(ORCHESTRATION).i("Start processing action request")
+            Simber.i("Start processing action request", tag = ORCHESTRATION)
             if (loginCheckVm.isDeviceSafe()) {
                 lifecycleScope.launch {
                     val actionRequest =
                         clientApiVm.handleIntent(args.requestAction, args.requestParams)
                     if (actionRequest != null) {
-                        Simber.tag(ORCHESTRATION).i("Action request parsed successfully")
+                        Simber.i("Action request parsed successfully", tag = ORCHESTRATION)
                         loginCheckVm.validateSignInAndProceed(actionRequest)
                     }
                     orchestratorVm.isRequestProcessed = true

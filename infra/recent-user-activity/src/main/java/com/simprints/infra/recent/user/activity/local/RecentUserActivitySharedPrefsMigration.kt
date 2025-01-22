@@ -3,6 +3,7 @@ package com.simprints.infra.recent.user.activity.local
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.ProtoRecentUserActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,11 +28,11 @@ internal class RecentUserActivitySharedPrefsMigration @Inject constructor(
             .remove(LAST_SCANNER_USED_KEY)
             .remove(LAST_MAC_ADDRESS_KEY)
             .apply()
-        Simber.i("Migration of recent user activity to Datastore done")
+        Simber.i("Migration of recent user activity to Datastore done", tag = MIGRATION)
     }
 
     override suspend fun migrate(currentData: ProtoRecentUserActivity): ProtoRecentUserActivity {
-        Simber.i("Start migration of recent user activity to Datastore")
+        Simber.i("Start migration of recent user activity to Datastore", tag = MIGRATION)
         return currentData
             .toBuilder()
             .setEnrolmentsToday(prefs.getInt(ENROLMENTS_KEY, 0))

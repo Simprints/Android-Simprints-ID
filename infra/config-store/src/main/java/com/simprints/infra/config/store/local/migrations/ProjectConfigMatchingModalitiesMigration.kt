@@ -14,7 +14,7 @@ internal class ProjectConfigMatchingModalitiesMigration @Inject constructor() : 
         currentData.general.matchingModalitiesList.isEmpty()
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.tag(MIGRATION).i("Start migration of matching modalities")
+        Simber.i("Start migration of matching modalities", tag = MIGRATION)
 
         return currentData
             .toBuilder()
@@ -27,6 +27,6 @@ internal class ProjectConfigMatchingModalitiesMigration @Inject constructor() : 
     }
 
     override suspend fun cleanUp() {
-        Simber.tag(MIGRATION).i("Migration of matching modalities done")
+        Simber.i("Migration of matching modalities done", tag = MIGRATION)
     }
 }

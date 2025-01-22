@@ -70,9 +70,9 @@ abstract class SimCoroutineWorker(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 setForegroundException is ForegroundServiceStartNotAllowedException
             ) {
-                Simber.tag(tag).i("Worker notification service restricted", setForegroundException)
+                Simber.i("Worker notification service restricted", setForegroundException, tag = tag)
             } else {
-                Simber.tag(tag).e("Failed to show notification", setForegroundException)
+                Simber.e("Failed to show notification", setForegroundException, tag = tag)
             }
         }
     }
@@ -110,15 +110,15 @@ abstract class SimCoroutineWorker(
     }
 
     protected fun crashlyticsLog(message: String) {
-        Simber.tag(tag).i(message.take(99))
+        Simber.i(message, tag = tag)
     }
 
     private fun logExceptionIfRequired(t: Throwable?) = t?.let {
         when (t) {
-            is CancellationException -> Simber.tag(tag).i("Worker cancelled", t)
+            is CancellationException -> Simber.i("Worker cancelled", t, tag = tag)
             // Record network issues only in Analytics
-            is NetworkConnectionException -> Simber.tag(tag).i("Worker network connection issues", t)
-            else -> Simber.tag(tag).e("Unexpected worker error", t)
+            is NetworkConnectionException -> Simber.i("Worker network connection issues", t, tag = tag)
+            else -> Simber.e("Unexpected worker error", t, tag = tag)
         }
     }
 

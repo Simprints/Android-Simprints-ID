@@ -93,7 +93,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         .buildUpSyncWorkerChain(
                             uniqueSyncId,
                             upSyncWorkerScopeId,
-                        ).also { Simber.tag(tag).d("Scheduled ${it.size} up workers") }
+                        ).also { Simber.d("Scheduled ${it.size} up workers", tag = tag) }
                 }
 
                 if (configuration.isEventDownSyncAllowed()) {
@@ -106,7 +106,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
-                        ).also { Simber.tag(tag).d("Scheduled ${it.size} down workers") }
+                        ).also { Simber.d("Scheduled ${it.size} down workers", tag = tag) }
                 }
 
                 val endSyncReporterWorker =

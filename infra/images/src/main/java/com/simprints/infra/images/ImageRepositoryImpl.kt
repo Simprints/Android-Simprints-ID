@@ -40,12 +40,12 @@ internal class ImageRepositoryImpl @Inject internal constructor(
                         metadataStore.deleteMetadata(imageRef.relativePath)
                     } else {
                         allImagesUploaded = false
-                        Simber.tag(SYNC).i("Failed to upload image without exception")
+                        Simber.i("Failed to upload image without exception", tag = SYNC)
                     }
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
-                Simber.tag(SYNC).e("Failed to upload images", t)
+                Simber.e("Failed to upload images", t, tag = SYNC)
             }
         }
 

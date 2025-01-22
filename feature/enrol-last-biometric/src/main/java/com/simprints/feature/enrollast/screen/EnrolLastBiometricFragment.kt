@@ -40,7 +40,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("EnrolLastBiometricFragment started")
+        Simber.i("EnrolLastBiometricFragment started", tag = ORCHESTRATION)
 
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,

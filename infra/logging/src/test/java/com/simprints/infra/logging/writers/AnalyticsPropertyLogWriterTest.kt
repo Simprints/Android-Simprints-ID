@@ -5,11 +5,25 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.USER_ID
 import com.simprints.infra.logging.Simber
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.spyk
+import io.mockk.unmockkObject
 import io.mockk.verify
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class AnalyticsPropertyLogWriterTest {
+    @Before
+    fun setUp() {
+        mockkObject(Logger)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkObject(Logger)
+    }
+
     @Test
     fun `should return on DEBUG priority`() {
         val faMock = mockk<FirebaseAnalytics>(relaxed = true)

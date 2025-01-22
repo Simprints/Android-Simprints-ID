@@ -61,6 +61,6 @@ internal class ModuleRepositoryImpl @Inject constructor(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(SETTINGS).i(message)
+        Simber.i(message, tag = SETTINGS)
     }
 }
