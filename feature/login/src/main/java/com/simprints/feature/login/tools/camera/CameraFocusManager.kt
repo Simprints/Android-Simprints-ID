@@ -14,6 +14,7 @@ import androidx.camera.core.MeteringPointFactory
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.view.PreviewView
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -51,7 +52,7 @@ internal class CameraFocusManager @Inject constructor() {
                 try {
                     cameraControl.startFocusAndMetering(focusAction)
                 } catch (e: CameraInfoUnavailableException) {
-                    Simber.e("Cannot access camera", e)
+                    Simber.tag(LOGIN).e("Cannot access camera", e)
                 }
                 true
             }
@@ -77,7 +78,7 @@ internal class CameraFocusManager @Inject constructor() {
             try {
                 camera.cameraControl.startFocusAndMetering(focusAction)
             } catch (e: CameraInfoUnavailableException) {
-                Simber.e("Cannot access camera", e)
+                Simber.tag(LOGIN).e("Cannot access camera", e)
             }
         }
     }

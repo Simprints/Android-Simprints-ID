@@ -22,6 +22,8 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -38,6 +40,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("EnrolLastBiometricFragment started")
 
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,

@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.local.migrations
 
 import androidx.datastore.core.DataMigration
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -13,7 +14,7 @@ internal class ProjectConfigMatchingModalitiesMigration @Inject constructor() : 
         currentData.general.matchingModalitiesList.isEmpty()
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.i("Start migration of matching modalities")
+        Simber.tag(MIGRATION).i("Start migration of matching modalities")
 
         return currentData
             .toBuilder()
@@ -26,6 +27,6 @@ internal class ProjectConfigMatchingModalitiesMigration @Inject constructor() : 
     }
 
     override suspend fun cleanUp() {
-        Simber.i("Migration of matching modalities done")
+        Simber.tag(MIGRATION).i("Migration of matching modalities done")
     }
 }

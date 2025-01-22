@@ -2,13 +2,14 @@ package com.simprints.infra.events.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration8to9 : Migration(8, 9) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.d("Migrating room db from schema 8 to schema 9.")
+        Simber.tag(MIGRATION).i("Migrating room db from schema 8 to schema 9.")
         removeColumns(database)
-        Simber.d("Migration from schema 8 to schema 9 done.")
+        Simber.tag(MIGRATION).i("Migration from schema 8 to schema 9 done.")
     }
 
     private fun removeColumns(database: SupportSQLiteDatabase) {

@@ -88,7 +88,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         isShrinkResources = true
                         isDebuggable = propDebuggable
                         lint.fatal += "StopShip"
-                        versionNameSuffix = "-$propVersionSuffix+$propVersionBuild"
+                        versionNameSuffix = "+$propVersionSuffix.$propVersionBuild"
                         buildConfigField("Boolean", "DEBUG_MODE", "true")
                     }
 
@@ -96,7 +96,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         isMinifyEnabled = false
                         isShrinkResources = false
                         isDebuggable = propDebuggable
-                        versionNameSuffix = "-$propVersionSuffix+$propVersionBuild"
+                        versionNameSuffix = "+$propVersionSuffix.$propVersionBuild"
                         buildConfigField("Boolean", "DEBUG_MODE", "true")
 
                         withGroovyBuilder {

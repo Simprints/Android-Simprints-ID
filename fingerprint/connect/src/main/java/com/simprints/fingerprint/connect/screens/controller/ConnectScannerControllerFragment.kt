@@ -37,6 +37,8 @@ import com.simprints.fingerprint.connect.screens.alert.AlertError
 import com.simprints.fingerprint.connect.screens.issues.scanneroff.ScannerOffFragmentArgs
 import com.simprints.fingerprint.connect.screens.ota.OtaFragmentArgs
 import com.simprints.fingerprint.connect.screens.ota.OtaFragmentParams
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -73,7 +75,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                 requireActivity().permissionFromResult(permission, isGranted)
             }.worstPermissionStatus()
 
-        Simber.i("Bluetooth permission: $permission")
+        Simber.tag(FINGER_CAPTURE).i("Bluetooth permission: $permission")
 
         when (permission) {
             PermissionStatus.Granted -> activityViewModel.connect()
@@ -96,6 +98,8 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("ConnectScannerControllerFragment started")
+
         shouldRequestPermissions = savedInstanceState?.getBoolean(KEY_SHOULD_REQUEST_PERMISSIONS)
             ?: shouldRequestPermissions
 

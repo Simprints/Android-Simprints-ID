@@ -20,6 +20,7 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.SO
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaStep
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -133,7 +134,7 @@ internal class OtaViewModel @Inject constructor(
         e: Throwable,
         currentRetryAttempt: Int,
     ) {
-        Simber.e("OTA update failed", e)
+        Simber.tag(FINGER_CAPTURE).e("OTA update failed", e)
         if (e is BackendMaintenanceException) {
             _otaFailed.send(
                 FetchOtaResult(

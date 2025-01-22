@@ -14,7 +14,6 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.utils.BatteryOptimizationUtils
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.resources.R
@@ -25,6 +24,9 @@ abstract class SimCoroutineWorker(
     private val context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
+    /**
+     * Must be less than 24 characters.
+     */
     abstract val tag: String
     private var resultSetter = WorkerResultSetter()
 
@@ -33,7 +35,6 @@ abstract class SimCoroutineWorker(
         message: String = t?.message ?: "",
     ): Result {
         crashlyticsLog("[Retry] $message")
-
         logExceptionIfRequired(t)
         return resultSetter.retry()
     }
@@ -53,7 +54,6 @@ abstract class SimCoroutineWorker(
         message: String = "",
     ): Result {
         crashlyticsLog("[Success] $message")
-
         return resultSetter.success(outputData)
     }
 
@@ -70,9 +70,9 @@ abstract class SimCoroutineWorker(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 setForegroundException is ForegroundServiceStartNotAllowedException
             ) {
-                Simber.i("Worker notification service restricted", setForegroundException)
+                Simber.tag(tag).i("Worker notification service restricted", setForegroundException)
             } else {
-                Simber.e("Failed to show notification", setForegroundException)
+                Simber.tag(tag).e("Failed to show notification", setForegroundException)
             }
         }
     }
@@ -110,17 +110,15 @@ abstract class SimCoroutineWorker(
     }
 
     protected fun crashlyticsLog(message: String) {
-        Simber.tag(SYNC.name).i("$tag - $message".take(99))
+        Simber.tag(tag).i(message.take(99))
     }
 
-    private fun logExceptionIfRequired(t: Throwable?) {
-        t?.let {
-            when (t) {
-                is CancellationException -> Simber.d("Worker cancelled", t)
-                // Record network issues only in Analytics
-                is NetworkConnectionException -> Simber.i("Worker network connection issues", t)
-                else -> Simber.e("Unexpected worker error", t)
-            }
+    private fun logExceptionIfRequired(t: Throwable?) = t?.let {
+        when (t) {
+            is CancellationException -> Simber.tag(tag).i("Worker cancelled", t)
+            // Record network issues only in Analytics
+            is NetworkConnectionException -> Simber.tag(tag).i("Worker network connection issues", t)
+            else -> Simber.tag(tag).e("Unexpected worker error", t)
         }
     }
 

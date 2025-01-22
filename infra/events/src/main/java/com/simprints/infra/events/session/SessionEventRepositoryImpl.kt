@@ -99,11 +99,11 @@ internal class SessionEventRepositoryImpl @Inject constructor(
 
         val restoredScope = localSessionScope()
         if (restoredScope != null) {
-            Simber.w("Restored session from DB")
+            Simber.i("Restored session from DB")
             return restoredScope
         }
 
-        Simber.w("Creating new session DB")
+        Simber.i("Creating new session DB")
         return createSessionInternal()
     }
 

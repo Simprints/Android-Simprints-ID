@@ -12,7 +12,7 @@ internal interface MatcherUseCase {
      */
     suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingCandidates: (tag: String) -> Unit = {},
+        onLoadingCandidates: () -> Unit = {},
     ): MatcherResult
 
     data class MatcherResult(

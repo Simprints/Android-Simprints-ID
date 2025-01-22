@@ -24,11 +24,11 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     private val rescheduleWorkersIfConfigChanged: RescheduleWorkersIfConfigChangedUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
-    override val tag = "ProjectConfigWorker"
+    override val tag = "ProjectConfigDownSync"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("Started")
         showProgressNotification()
-
         try {
             val projectId = authStore.signedInProjectId
             val oldConfig = configManager.getProjectConfiguration()
@@ -41,7 +41,6 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
                 handleProjectState(project.state)
                 rescheduleWorkersIfConfigChanged(oldConfig, config)
 
-                crashlyticsLog("Successfully refresh the project configuration")
                 success()
             }
         } catch (t: Throwable) {

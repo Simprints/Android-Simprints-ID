@@ -67,6 +67,7 @@ internal class ImageDistortionConfigRemoteRepo @Inject constructor(
         private const val PROJECTS_FOLDER = "projects"
         private const val UN20_MODULES_FOLDER = "un20modules"
         private const val FILE_NAME = "calibration.dat"
-        private const val TAG = "distortionConfigRepo"
+
+        private const val TAG = "DISTORTION_FILE_UPLOAD"
     }
 }

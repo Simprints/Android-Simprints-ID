@@ -12,6 +12,6 @@ class AppCoroutineExceptionHandler : CoroutineExceptionHandler {
         context: CoroutineContext,
         exception: Throwable,
     ) {
-        Simber.tag(APP_SCOPE_ERROR.name).e("Coroutine exception", exception)
+        Simber.tag(APP_SCOPE_ERROR).e("Coroutine exception", exception)
     }
 }

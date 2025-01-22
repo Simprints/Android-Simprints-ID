@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.utils.FileUtil
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion.Chip
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -39,7 +40,7 @@ internal class FirmwareLocalDataSource(
             try {
                 it.name
             } catch (e: Exception) {
-                Simber.e("Error encountered when parsing firmware file name", e)
+                Simber.tag(FINGER_CAPTURE).e("Error encountered when parsing firmware file name", e)
                 null
             }
         } ?: emptyList()

@@ -15,6 +15,8 @@ import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -53,7 +55,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     /**
      * Processes the image
      *
-     * @param image is the camera frame
+     * @param croppedBitmap is the camera frame
      */
     fun process(croppedBitmap: Bitmap) {
         val captureStartTime = timeHelper.now()
@@ -83,6 +85,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         samplesToCapture: Int,
         attemptNumber: Int,
     ) {
+        Simber.tag(FACE_CAPTURE).i("Initialise face detection")
+
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
@@ -102,6 +106,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
     private fun finishCapture(attemptNumber: Int) {
+        Simber.tag(FACE_CAPTURE).i("Finish capture")
         viewModelScope.launch {
             sortedQualifyingCaptures = userCaptures
                 .filter { it.hasValidStatus() }
@@ -165,6 +170,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         val detectionQuality = faceDetection.face?.quality ?: 0f
 
         if (faceDetection.hasValidStatus() && detectionQuality >= fallbackQuality) {
+            Simber.tag(FACE_CAPTURE).i("Fallback capture updated")
             fallbackCapture = faceDetection.apply { isFallback = true }
             createFirstFallbackCaptureEvent(faceDetection)
         }

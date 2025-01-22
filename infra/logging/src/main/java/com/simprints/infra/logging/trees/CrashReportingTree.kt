@@ -19,19 +19,32 @@ internal class CrashReportingTree(
         if (tag != null && tag.contains(USER_PROPERTY_TAG)) {
             val originalTag = tag.removePrefix(USER_PROPERTY_TAG)
             crashlytics.setCustomKey(originalTag, message)
+            return
         }
 
         if (priority == Log.INFO) {
-            crashlytics.log(message)
+            logMessageWithTag(tag, message)
         }
 
         if (priority == Log.WARN || priority == Log.ERROR) {
             if (t != null) {
-                crashlytics.log(message)
+                logMessageWithTag(tag, message)
                 crashlytics.recordException(t)
             } else {
                 crashlytics.recordException(Exception(message))
             }
+        }
+    }
+
+    private fun logMessageWithTag(
+        tag: String?,
+        message: String,
+    ) {
+        // Custom crashlytics logs do not have the tag field
+        if (tag.isNullOrBlank()) {
+            crashlytics.log(message)
+        } else {
+            crashlytics.log("[$tag] $message")
         }
     }
 }

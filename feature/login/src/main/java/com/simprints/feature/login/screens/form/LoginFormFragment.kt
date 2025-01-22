@@ -40,6 +40,7 @@ import com.simprints.feature.login.screens.form.SignInState.Unknown
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -76,6 +77,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.tag(ORCHESTRATION).i("LoginFormFragment started")
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             finishWithError(LoginError.LoginNotCompleted)
@@ -99,16 +101,16 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         binding.loginProjectId.setText(args.loginParams.projectId)
 
         binding.loginChangeUrlButton.setOnClickListener {
-            Simber.tag(LOGIN.name).i("Change URL button clicked")
+            Simber.tag(LOGIN).i("Change URL button clicked")
             viewModel.changeUrlClicked()
         }
 
         binding.loginButtonScanQr.setOnClickListener {
-            Simber.tag(LOGIN.name).i("Scan QR button clicked")
+            Simber.tag(LOGIN).i("Scan QR button clicked")
             findNavController().navigateSafely(this, LoginFormFragmentDirections.actionLoginFormFragmentToLoginQrScanner())
         }
         binding.loginButtonSignIn.setOnClickListener {
-            Simber.tag(LOGIN.name).i("Login button clicked")
+            Simber.tag(LOGIN).i("Login button clicked")
             viewModel.signInClicked(
                 args.loginParams,
                 binding.loginProjectId.text.toString(),

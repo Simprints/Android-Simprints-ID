@@ -111,7 +111,7 @@ class MessageDispatcher extends Thread {
             try {
                 pendingRequest.lock.wait(timeOutMs);
             } catch (InterruptedException e) {
-                Simber.d("Message response timed out", e);
+                Simber.i("Message response timed out", e);
                 throw new RuntimeException();
             }
 
@@ -146,7 +146,7 @@ class MessageDispatcher extends Thread {
             try {
                 pendingRequest.lock.wait(timeOutMs);
             } catch (InterruptedException e) {
-                Simber.d("Message response timed out", e);
+                Simber.i("Message response timed out", e);
                 return MESSAGE_STATUS.ERROR;
             }
 

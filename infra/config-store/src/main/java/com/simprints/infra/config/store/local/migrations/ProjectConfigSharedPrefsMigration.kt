@@ -9,6 +9,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.models.OldProjectConfig
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.toProto
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -31,7 +32,7 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.i("Start migration of project configuration to Datastore")
+        Simber.tag(MIGRATION).i("Start migration of project configuration to Datastore")
         val projectSettingsJson = prefs.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
@@ -43,10 +44,10 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         } catch (e: Exception) {
             if (e is JacksonException) {
                 // Return default value
-                Simber.i("Invalid old configuration for project ${authStore.signedInProjectId}", e)
+                Simber.tag(MIGRATION).i("Invalid old configuration for project ${authStore.signedInProjectId}", e)
                 ProtoProjectConfiguration.getDefaultInstance()
             } else {
-                Simber.e("Failed to migrate project configuration to Datastore", e)
+                Simber.tag(MIGRATION).e("Failed to migrate project configuration to Datastore", e)
                 throw e
             }
         }

@@ -17,28 +17,28 @@ internal class FetchSubjectUseCase @Inject constructor(
         projectId: String,
         subjectId: String,
     ): FetchSubjectState {
-        Simber.d("[FETCH_GUID] Fetching $subjectId")
+        Simber.tag(TAG).d("Fetching $subjectId")
         try {
             val localSubject = loadFromDatabase(projectId, subjectId)
             if (localSubject != null) {
-                Simber.d("[FETCH_GUID] Guid found in Local")
+                Simber.tag(TAG).d("Guid found in Local")
                 return FetchSubjectState.FoundLocal
             }
 
             eventSyncManager.downSyncSubject(projectId, subjectId)
-            Simber.d("[FETCH_GUID] Network request done")
+            Simber.tag(TAG).d("Network request done")
 
             val remoteSubject = loadFromDatabase(projectId, subjectId)
             if (remoteSubject != null) {
-                Simber.d("[FETCH_GUID] Guid found in Remote")
+                Simber.tag(TAG).d("Guid found in Remote")
                 return FetchSubjectState.FoundRemote
             }
 
-            Simber.d("[FETCH_GUID] Guid found not")
+            Simber.tag(TAG).d("Guid found not")
 
             return notFoundState()
         } catch (t: Throwable) {
-            Simber.e("[FETCH_GUID] Error fetching", t)
+            Simber.tag(TAG).e("Error fetching", t)
             return notFoundState()
         }
     }
@@ -52,5 +52,9 @@ internal class FetchSubjectUseCase @Inject constructor(
         FetchSubjectState.NotFound
     } else {
         FetchSubjectState.ConnectionError
+    }
+
+    companion object {
+        private const val TAG = "FETCH_GUID"
     }
 }
