@@ -14,8 +14,6 @@ import com.simprints.feature.troubleshooting.overview.usecase.ExportLogsUseCase.
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase.PingResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,9 +51,9 @@ internal class OverviewViewModel @Inject constructor(
         get() = _scannerState
     private val _scannerState = MutableLiveData("Connecting to scanner...")
 
-    val logsExport: LiveData<LogsExportResult>
-        get() = _logsExport
-    private val _logsExport = MutableLiveData<LogsExportResult>(LogsExportResult.NotStarted)
+    val logsExportResult: LiveData<LogsExportResult>
+        get() = _logsExportResult
+    private val _logsExportResult = MutableLiveData<LogsExportResult>(LogsExportResult.NotStarted)
 
     fun collectData() {
         _projectIds.postValue(collectIds())
@@ -73,17 +71,11 @@ internal class OverviewViewModel @Inject constructor(
 
     fun exportLogs() {
         viewModelScope.launch {
-            doExportLogs()
-                .onCompletion {
-                    // Just enough time for success to register and then reset the view
-                    delay(EXPORT_BUTTON_RESET_DELAY)
-                    emit(LogsExportResult.NotStarted)
-                }.collect { _logsExport.postValue(it) }
+            doExportLogs().collect { _logsExportResult.postValue(it) }
         }
     }
 
     companion object {
         private const val PLACEHOLDER_TEXT = "Collecting data"
-        private const val EXPORT_BUTTON_RESET_DELAY = 200L
     }
 }

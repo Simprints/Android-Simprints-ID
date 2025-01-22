@@ -6,7 +6,6 @@ import com.simprints.feature.troubleshooting.FileNameDateTimeFormatter
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LogDirectoryProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import net.lingala.zip4j.ZipFile
@@ -26,6 +25,7 @@ internal class ExportLogsUseCase @Inject constructor(
 ) {
     operator fun invoke(): Flow<LogsExportResult> = flow {
         emit(LogsExportResult.InProgress)
+
         val directory = logDirectoryProvider(context)
         val files = directory.listFiles().orEmpty()
 
@@ -34,14 +34,13 @@ internal class ExportLogsUseCase @Inject constructor(
             val password = getPassword()
             createZipArchiveWithPassword(archiveFile, files.toList(), password)
 
-            delay(2000L) // To look like it does something
             emit(LogsExportResult.Success(deviceId, archiveFile))
         } else {
-            emit(LogsExportResult.NotStarted)
+            emit(LogsExportResult.Failed)
         }
     }
 
-    private fun createArchiveFile(name: String): File = File(context.cacheDir, ARCHIVE_NAME)
+    private fun createArchiveFile(name: String): File = File(context.cacheDir, ARCHIVE_DIRECTORY)
         .also {
             if (it.exists()) {
                 // Keep the archive cache slim
@@ -77,9 +76,11 @@ internal class ExportLogsUseCase @Inject constructor(
         data object InProgress : LogsExportResult()
 
         data object NotStarted : LogsExportResult()
+
+        data object Failed : LogsExportResult()
     }
 
     companion object {
-        private const val ARCHIVE_NAME = "log_archives/"
+        private const val ARCHIVE_DIRECTORY = "log_archives/"
     }
 }

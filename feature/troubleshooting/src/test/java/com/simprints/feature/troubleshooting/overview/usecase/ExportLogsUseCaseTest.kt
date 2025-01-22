@@ -72,7 +72,7 @@ class ExportLogsUseCaseTest {
         val results = exportLogsUseCase.invoke().toList()
         assertThat(results).containsExactly(
             ExportLogsUseCase.LogsExportResult.InProgress,
-            ExportLogsUseCase.LogsExportResult.NotStarted,
+            ExportLogsUseCase.LogsExportResult.Failed,
         )
     }
 

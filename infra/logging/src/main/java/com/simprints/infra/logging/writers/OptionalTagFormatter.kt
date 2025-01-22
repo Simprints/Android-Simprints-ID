@@ -6,7 +6,7 @@ import co.touchlab.kermit.Severity
 import co.touchlab.kermit.Tag
 
 internal class OptionalTagFormatter : MessageStringFormatter {
-    override fun formatTag(tag: Tag): String = "(${tag.tag})"
+    override fun formatTag(tag: Tag): String = "[${tag.tag}]"
 
     override fun formatMessage(
         severity: Severity?,

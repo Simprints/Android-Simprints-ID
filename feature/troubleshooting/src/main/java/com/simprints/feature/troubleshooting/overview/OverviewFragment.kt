@@ -52,11 +52,12 @@ internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_ove
             }
             binding.troubleshootOverviewPing.isEnabled = it != PingResult.InProgress
         }
-        viewModel.logsExport.observe(viewLifecycleOwner) {
+        viewModel.logsExportResult.observe(viewLifecycleOwner) {
             binding.troubleshootOverviewExportLogs.isEnabled = it !is LogsExportResult.InProgress
-            binding.troubleshootOverviewExportLogs.text = when (it) {
+            binding.troubleshootOverviewExportLogsResult.text = when (it) {
                 LogsExportResult.InProgress -> "Preparing logs..."
-                else -> "Export logs"
+                LogsExportResult.Failed -> "Nothing to export"
+                else -> ""
             }
 
             if (it is LogsExportResult.Success) {

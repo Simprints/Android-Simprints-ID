@@ -112,8 +112,8 @@ class OverviewViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `propagates server log export result`() = runTest {
-        val logsExport = viewModel.logsExport.test()
+    fun `propagates log export result`() = runTest {
+        val logsExport = viewModel.logsExportResult.test()
 
         val file = File("tmp")
 
@@ -130,7 +130,6 @@ class OverviewViewModelTest {
             ExportLogsUseCase.LogsExportResult.NotStarted, // Initial value
             ExportLogsUseCase.LogsExportResult.InProgress,
             ExportLogsUseCase.LogsExportResult.Success("deviceId", file),
-            ExportLogsUseCase.LogsExportResult.NotStarted, // Reset after delay
         )
     }
 }

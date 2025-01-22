@@ -28,7 +28,7 @@ class CrashlyticsLogWriterTest {
         Logger.setLogWriters(spyCrashReportingTree)
         Simber.i("Test Message")
 
-        verify { crashMock.log("(${Simber.DEFAULT_TAG}) Test Message") }
+        verify { crashMock.log("[${Simber.DEFAULT_TAG}] Test Message") }
     }
 
     @Test
@@ -39,7 +39,7 @@ class CrashlyticsLogWriterTest {
         Logger.setLogWriters(spyCrashReportingTree)
         Simber.tag("TAG").i("Test Message")
 
-        verify { crashMock.log("(TAG) Test Message") }
+        verify { crashMock.log("[TAG] Test Message") }
     }
 
     @Test
