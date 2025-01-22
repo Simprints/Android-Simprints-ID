@@ -143,7 +143,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
             userCaptures.indices.minByOrNull { index ->
                 userCaptures[index].face?.quality ?: -1f
             }?.takeIf { it >= 0 }?.let { worseQualityCaptureIndex ->
-                userCaptures[worseQualityCaptureIndex].bitmap.recycle()
                 userCaptures[worseQualityCaptureIndex] = faceDetection
             }
         } else {
