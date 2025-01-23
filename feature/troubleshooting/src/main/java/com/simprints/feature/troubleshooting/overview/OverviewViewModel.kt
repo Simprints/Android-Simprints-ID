@@ -9,6 +9,8 @@ import com.simprints.feature.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectScannerStateUseCase
+import com.simprints.feature.troubleshooting.overview.usecase.ExportLogsUseCase
+import com.simprints.feature.troubleshooting.overview.usecase.ExportLogsUseCase.LogsExportResult
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase.PingResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +24,7 @@ internal class OverviewViewModel @Inject constructor(
     private val collectLicenseStates: CollectLicenceStatesUseCase,
     private val collectNetworkInformation: CollectNetworkInformationUseCase,
     private val doServerPing: PingServerUseCase,
+    private val doExportLogs: ExportLogsUseCase,
     private val collectScannerState: CollectScannerStateUseCase,
 ) : ViewModel() {
     val projectIds: LiveData<String>
@@ -48,6 +51,10 @@ internal class OverviewViewModel @Inject constructor(
         get() = _scannerState
     private val _scannerState = MutableLiveData("Connecting to scanner...")
 
+    val logsExportResult: LiveData<LogsExportResult>
+        get() = _logsExportResult
+    private val _logsExportResult = MutableLiveData<LogsExportResult>(LogsExportResult.NotStarted)
+
     fun collectData() {
         _projectIds.postValue(collectIds())
         viewModelScope.launch { _configurationDetails.postValue(collectConfigurationDetails()) }
@@ -59,6 +66,12 @@ internal class OverviewViewModel @Inject constructor(
     fun pingServer() {
         viewModelScope.launch {
             doServerPing().collect { _pingResult.postValue(it) }
+        }
+    }
+
+    fun exportLogs() {
+        viewModelScope.launch {
+            doExportLogs().collect { _logsExportResult.postValue(it) }
         }
     }
 

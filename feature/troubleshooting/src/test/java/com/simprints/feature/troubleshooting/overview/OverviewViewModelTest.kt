@@ -8,6 +8,7 @@ import com.simprints.feature.troubleshooting.overview.usecase.CollectIdsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectLicenceStatesUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectNetworkInformationUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.CollectScannerStateUseCase
+import com.simprints.feature.troubleshooting.overview.usecase.ExportLogsUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase
 import com.simprints.feature.troubleshooting.overview.usecase.PingServerUseCase.PingResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -15,11 +16,14 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
 
 class OverviewViewModelTest {
     @get:Rule
@@ -46,6 +50,9 @@ class OverviewViewModelTest {
     @MockK
     private lateinit var pingServerUseCase: PingServerUseCase
 
+    @MockK
+    private lateinit var exportLogsUseCase: ExportLogsUseCase
+
     private lateinit var viewModel: OverviewViewModel
 
     @Before
@@ -58,6 +65,7 @@ class OverviewViewModelTest {
             collectLicenseStates = collectLicencesUseCase,
             collectNetworkInformation = collectNetworkInformationUseCase,
             doServerPing = pingServerUseCase,
+            doExportLogs = exportLogsUseCase,
             collectScannerState = collectScannerState,
         )
     }
@@ -99,6 +107,29 @@ class OverviewViewModelTest {
             PingResult.NotDone,
             PingResult.InProgress,
             PingResult.Success("message"),
+        )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `propagates log export result`() = runTest {
+        val logsExport = viewModel.logsExportResult.test()
+
+        val file = File("tmp")
+
+        every { exportLogsUseCase.invoke() } returns flowOf(
+            ExportLogsUseCase.LogsExportResult.InProgress,
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", file),
+        )
+
+        viewModel.exportLogs()
+
+        advanceUntilIdle()
+
+        assertThat(logsExport.valueHistory()).containsExactly(
+            ExportLogsUseCase.LogsExportResult.NotStarted, // Initial value
+            ExportLogsUseCase.LogsExportResult.InProgress,
+            ExportLogsUseCase.LogsExportResult.Success("deviceId", file),
         )
     }
 }

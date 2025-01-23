@@ -60,7 +60,8 @@ kronos_version = "0.0.1-alpha11"
 # Protobuf version is tied to Firebase dependencies and must be checked for compatibility on each update
 protobuf_version = "4.26.1"
 circleImageView_version = "3.1.0"
-timber_version = "5.0.1"
+kermit_version = "2.0.5"
+zip4j_version = "2.11.5"
 
 libsimprints_version = "2025.1.2-SNAPSHOT"
 simmatcher_version = "1.2.0"
@@ -182,8 +183,10 @@ circleImageView = { module = "de.hdodenhof:circleimageview", version.ref = "circ
 #CommonsIO
 commonsIO-commons_io = { module = "commons-io:commons-io", version.ref = "commons_io_version" }
 
-#Timber
-timber = { module = "com.jakewharton.timber:timber", version.ref = "timber_version" }
+#Logging
+kermit = { module = "co.touchlab:kermit-android", version.ref = "kermit_version" }
+kermit-io = { module = "co.touchlab:kermit-io", version.ref = "kermit_version" }
+zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j_version" }
 
 #Kronos
 kronos-kronos = { module = "com.lyft.kronos:kronos-android", version.ref = "kronos_version" }
