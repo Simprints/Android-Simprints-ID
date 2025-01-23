@@ -81,7 +81,7 @@ internal class EventSyncCache @Inject constructor(
             sharedForProgresses.edit().clear().commit()
             sharedForCounts.edit().clear().commit()
         } catch (ex: SecurityException) {
-            Simber.tag(SYNC).e("Crashed during event sync cleanup", ex)
+            Simber.e("Crashed during event sync cleanup", ex, tag = SYNC)
         }
     }
 

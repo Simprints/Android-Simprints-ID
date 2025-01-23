@@ -23,12 +23,12 @@ import org.json.JSONObject
 internal class EventMigration1to2 : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
-            Simber.tag(MIGRATION).i("Migrating room db from schema 1 to schema 2.")
+            Simber.i("Migrating room db from schema 1 to schema 2.", tag = MIGRATION)
             migrateEnrolments(database)
             migrateSessionClosedInformation(database)
-            Simber.tag(MIGRATION).i("Migration from schema 1 to schema 2 done.")
+            Simber.i("Migration from schema 1 to schema 2 done.", tag = MIGRATION)
         } catch (t: Throwable) {
-            Simber.tag(MIGRATION).e("Failed to migrate room db from schema 1 to schema 2.", t)
+            Simber.e("Failed to migrate room db from schema 1 to schema 2.", t, tag = MIGRATION)
         }
     }
 

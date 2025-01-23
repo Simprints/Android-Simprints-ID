@@ -17,7 +17,7 @@ internal class EventMigration2to3 : Migration(2, 3) {
     private val idColumn = "id"
 
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.tag(MIGRATION).i("Migrating room db from schema 2 to schema 3.")
+        Simber.i("Migrating room db from schema 2 to schema 3.", tag = MIGRATION)
         try {
             /**
              * Update the table to include a sessionIsClosed column and set it's default to false.
@@ -30,9 +30,9 @@ internal class EventMigration2to3 : Migration(2, 3) {
              * only be 1) will be closed the first time the user opens the app after the migration.
              */
             updateTableToCloseClosedSessions(database)
-            Simber.tag(MIGRATION).i("Migration from schema 2 to schema 3 done.")
+            Simber.i("Migration from schema 2 to schema 3 done.", tag = MIGRATION)
         } catch (ex: Exception) {
-            Simber.tag(MIGRATION).e("Failed to migrate room db from schema 2 to schema 3.", ex)
+            Simber.e("Failed to migrate room db from schema 2 to schema 3.", ex, tag = MIGRATION)
         }
     }
 

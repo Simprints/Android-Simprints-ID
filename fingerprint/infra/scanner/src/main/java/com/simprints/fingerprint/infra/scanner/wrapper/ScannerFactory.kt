@@ -53,7 +53,7 @@ class ScannerFactory @Inject internal constructor(
                 scannerId,
             )
         }.also {
-            Simber.tag(FINGER_CAPTURE).i("Using scanner generation $it")
+            Simber.i("Using scanner generation $it", tag = FINGER_CAPTURE)
         }
 
         when (scannerGenerationToUse) {

@@ -35,7 +35,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("FetchSubjectFragment started")
+        Simber.i("FetchSubjectFragment started", tag = ORCHESTRATION)
 
         with(findNavController()) {
             handleResult(viewLifecycleOwner, R.id.fetchSubjectFragment, AlertContract.DESTINATION, ::handleAlertResult)
@@ -54,6 +54,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
             FetchSubjectAlerts.ACTION_CLOSE -> {
                 findNavController().finishWithResult(this, alertResult)
             }
+
             FetchSubjectAlerts.ACTION_RETRY -> tryFetchSubject()
             AlertContract.ALERT_BUTTON_PRESSED_BACK -> viewModel.startExitForm()
         }

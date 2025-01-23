@@ -62,7 +62,7 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
                 ),
             )
             eventRepository.saveSessionScope(updatesSessionScope)
-            Simber.tag(tag).d("Saving user's location into the current session")
+            Simber.d("Saving user's location into the current session", tag = tag)
         }
     }
 

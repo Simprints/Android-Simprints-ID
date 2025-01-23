@@ -222,7 +222,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts = try {
         eventSyncManager.countEventsToDownload()
     } catch (t: Throwable) {
-        Simber.tag(SYNC).i("Could not count events for download", t)
+        Simber.i("Could not count events for download", t, tag = SYNC)
         DownSyncCounts(0, isLowerBound = false)
     }
 

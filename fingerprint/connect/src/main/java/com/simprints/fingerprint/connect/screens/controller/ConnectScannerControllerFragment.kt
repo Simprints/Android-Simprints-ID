@@ -75,7 +75,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                 requireActivity().permissionFromResult(permission, isGranted)
             }.worstPermissionStatus()
 
-        Simber.tag(FINGER_CAPTURE).i("Bluetooth permission: $permission")
+        Simber.i("Bluetooth permission: $permission", tag = FINGER_CAPTURE)
 
         when (permission) {
             PermissionStatus.Granted -> activityViewModel.connect()
@@ -98,7 +98,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("ConnectScannerControllerFragment started")
+        Simber.i("ConnectScannerControllerFragment started", tag = ORCHESTRATION)
 
         shouldRequestPermissions = savedInstanceState?.getBoolean(KEY_SHOULD_REQUEST_PERMISSIONS)
             ?: shouldRequestPermissions

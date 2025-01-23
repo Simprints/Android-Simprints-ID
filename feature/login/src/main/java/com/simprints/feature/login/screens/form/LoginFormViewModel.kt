@@ -89,7 +89,7 @@ internal class LoginFormViewModel @Inject constructor(
         } else if (!result.content.isNullOrEmpty()) {
             try {
                 val qrContent = jsonHelper.fromJson<QrCodeContent>(result.content)
-                Simber.tag(LOGIN).i("QR scanning successful")
+                Simber.i("QR scanning successful", tag = LOGIN)
 
                 if (projectId != qrContent.projectId) {
                     _signInState.send(SignInState.ProjectIdMismatch)
@@ -103,11 +103,11 @@ internal class LoginFormViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Simber.tag(LOGIN).i("QR scanning unsuccessful")
+                Simber.i("QR scanning unsuccessful", tag = LOGIN)
                 _signInState.send(SignInState.QrInvalidCode)
             }
         } else {
-            Simber.tag(LOGIN).i("QR code missing")
+            Simber.i("QR code missing", tag = LOGIN)
             _signInState.send(SignInState.QrInvalidCode)
         }
     }

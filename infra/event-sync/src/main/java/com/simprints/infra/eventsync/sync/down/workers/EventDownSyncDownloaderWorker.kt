@@ -78,7 +78,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 reportCount(count, max)
             }
 
-            Simber.tag(tag).d("Downloaded events: $count")
+            Simber.d("Downloaded events: $count", tag = tag)
             success(
                 workDataOf(
                     OUTPUT_DOWN_SYNC to count,

@@ -26,7 +26,7 @@ internal class PrivacyNoticeFragment : Fragment(R.layout.fragment_privacy) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("PrivacyNoticeFragment started")
+        Simber.i("PrivacyNoticeFragment started", tag = ORCHESTRATION)
 
         binding.privacyText.movementMethod = ScrollingMovementMethod()
         binding.privacyToolbar.setNavigationOnClickListener { findNavController().popBackStack() }

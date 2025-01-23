@@ -33,7 +33,7 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("SelectSubjectAgeGroupFragment started")
+        Simber.i("SelectSubjectAgeGroupFragment started", tag = ORCHESTRATION)
 
         viewModel.ageGroups.observe(viewLifecycleOwner) { ageGroupsList ->
             fillRecyclerView(ageGroupsList)

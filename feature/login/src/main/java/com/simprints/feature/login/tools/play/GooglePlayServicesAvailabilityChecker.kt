@@ -65,7 +65,6 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
     /**
      * Handle non resolvable errors, then throw exception
      *
-     * @param activity
      * @param statusCode
      */
     private inline fun handleMissingGooglePlayServices(
@@ -73,11 +72,10 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
         crossinline errorCallback: (LoginError) -> Unit,
     ) {
         errorCallback(LoginError.MissingPlayServices)
-        Simber.tag(LOGIN).e(
+        Simber.e(
             "Missing GooglePlay services",
-            MissingGooglePlayServices(
-                "Error with GooglePlayServices version. Error code=$statusCode",
-            ),
+            MissingGooglePlayServices("Error with GooglePlayServices version. Error code=$statusCode"),
+            tag = LOGIN,
         )
     }
 
@@ -86,11 +84,10 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
         crossinline errorCallback: (LoginError) -> Unit,
     ) {
         errorCallback(LoginError.OutdatedPlayServices)
-        Simber.tag(LOGIN).e(
+        Simber.e(
             "Outdated GooglePlay services",
-            OutdatedGooglePlayServices(
-                "Error with GooglePlayServices version. Error code=$statusCode",
-            ),
+            OutdatedGooglePlayServices("Error with GooglePlayServices version. Error code=$statusCode"),
+            tag = LOGIN,
         )
     }
 }

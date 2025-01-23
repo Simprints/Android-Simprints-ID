@@ -89,7 +89,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
                 .openFileOutput()
                 .use { it.write(licenseData.toByteArray()) }
         } catch (t: Throwable) {
-            Simber.tag(LICENSE).e("Failed to save licence data for ${vendor.value}", t)
+            Simber.e("Failed to save licence data for ${vendor.value}", t, tag = LICENSE)
         }
     }
 
@@ -101,7 +101,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         try {
             getExpirationFile(vendor, version).writeText(expirationDate)
         } catch (t: Throwable) {
-            Simber.tag(LICENSE).e("Failed to save licence expiration date for ${vendor.value}", t)
+            Simber.e("Failed to save licence expiration date for ${vendor.value}", t, tag = LICENSE)
         }
     }
 
@@ -115,18 +115,18 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     override suspend fun deleteCachedLicense(vendor: Vendor): Unit = withContext(dispatcherIo) {
         try {
             val deleted = File("$licenseDirectoryPath/${vendor.value}").deleteRecursively()
-            Simber.tag(LICENSE).d("Deleted cached licenses successfully = $deleted")
+            Simber.d("Deleted cached licenses successfully = $deleted", tag = LICENSE)
         } catch (t: Throwable) {
-            Simber.tag(LICENSE).e("Failed to delete cached licenses for ${vendor.value}", t)
+            Simber.e("Failed to delete cached licenses for ${vendor.value}", t, tag = LICENSE)
         }
     }
 
     override suspend fun deleteCachedLicenses(): Unit = withContext(dispatcherIo) {
         try {
             val deleted = File(licenseDirectoryPath).deleteRecursively()
-            Simber.tag(LICENSE).d("Deleted all licenses successfully = $deleted")
+            Simber.d("Deleted all licenses successfully = $deleted", tag = LICENSE)
         } catch (t: Throwable) {
-            Simber.tag(LICENSE).e("Failed to delete licenses", t)
+            Simber.e("Failed to delete licenses", t, tag = LICENSE)
         }
     }
 

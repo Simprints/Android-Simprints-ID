@@ -102,7 +102,7 @@ internal class EventDownSyncTask @Inject constructor(
                 throw t
             }
 
-            Simber.tag(SYNC).i("Down sync error", t)
+            Simber.i("Down sync error", t, tag = SYNC)
             errorType = t.javaClass.simpleName
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)

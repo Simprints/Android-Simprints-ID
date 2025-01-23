@@ -26,6 +26,6 @@ fun InputStream.asFlow(
     } catch (e: IOException) {
         // IOExceptions should be ignored because they are thrown when disconnecting the scanner
         // and closing the input stream at the end of the fingerprint collection process
-        Simber.tag(FINGER_CAPTURE).i("Scanner disconnected", e)
+        Simber.i("Scanner disconnected", e, tag = FINGER_CAPTURE)
     }
 }.flowOn(dispatcher)

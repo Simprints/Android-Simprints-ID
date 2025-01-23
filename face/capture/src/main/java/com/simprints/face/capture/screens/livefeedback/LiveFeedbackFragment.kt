@@ -76,7 +76,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("LiveFeedbackFragment started")
+        Simber.i("LiveFeedbackFragment started", tag = ORCHESTRATION)
         initFragment()
     }
 
@@ -130,7 +130,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         )
         // Attach the view's surface provider to preview use case
         preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
-        Simber.tag(FACE_CAPTURE).i("Camera setup finished")
+        Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
 
     override fun onResume() {
@@ -186,7 +186,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         try {
             vm.process(croppedBitmap = image)
         } catch (t: Throwable) {
-            Simber.tag(FACE_CAPTURE).e("Image analysis crashed", t)
+            Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
             // Image analysis is running in bg thread
             lifecycleScope.launch {
                 mainVm.submitError(t)

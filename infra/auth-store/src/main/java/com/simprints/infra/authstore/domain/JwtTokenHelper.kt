@@ -20,7 +20,7 @@ internal class JwtTokenHelper {
                 throw Throwable("Impossible to parse jwt")
             }
         } catch (t: Throwable) {
-            Simber.tag(LOGIN).e("Failed to parse JWT", t)
+            Simber.e("Failed to parse JWT", t, tag = LOGIN)
             null
         }
 

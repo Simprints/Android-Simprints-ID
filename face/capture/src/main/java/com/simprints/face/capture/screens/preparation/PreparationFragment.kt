@@ -35,7 +35,7 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("PreparationFragment started")
+        Simber.i("PreparationFragment started", tag = ORCHESTRATION)
 
         startTime = faceTimeHelper.now()
 

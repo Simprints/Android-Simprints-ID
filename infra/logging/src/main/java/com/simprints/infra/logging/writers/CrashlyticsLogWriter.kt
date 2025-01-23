@@ -6,7 +6,7 @@ import co.touchlab.kermit.MessageStringFormatter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.Tag
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.simprints.infra.logging.Simber.Companion.USER_PROPERTY_TAG
+import com.simprints.infra.logging.Simber.USER_PROPERTY_TAG
 
 internal class CrashlyticsLogWriter(
     private val crashlytics: FirebaseCrashlytics,

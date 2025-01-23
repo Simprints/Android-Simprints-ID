@@ -1,10 +1,8 @@
 package com.simprints.core.tools.exceptions
 
 import com.simprints.infra.logging.Simber
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkObject
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -12,19 +10,15 @@ import org.junit.Before
 import org.junit.Test
 
 class ErrorHandlerHelperTest {
-    val simber = mockk<Simber>(relaxed = true) {
-        every { tag(any()) } returns this
-    }
-
     @Before
     fun setUp() {
-        mockkObject(Simber)
-        every { Simber.INSTANCE } returns simber
+        // Not using mockObject since the verified method is annotated with JvmStatic and it confuses the mockk library
+        mockkStatic(Simber::class)
     }
 
     @After
     fun cleanUp() {
-        unmockkObject(Simber)
+        unmockkStatic(Simber::class)
     }
 
     @Test
@@ -43,7 +37,7 @@ class ErrorHandlerHelperTest {
             throw exception
         }
 
-        verify(exactly = 1) { simber.i(any(), exception) }
+        verify(exactly = 1) { Simber.i(any<String>(), eq(exception), any<String>()) }
     }
 
     @Test

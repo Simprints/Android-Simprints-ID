@@ -49,8 +49,8 @@ internal class Authenticator @Inject constructor(
             AuthenticateDataResult.Authenticated
         } catch (t: Throwable) {
             when (t) {
-                is NetworkConnectionException -> Simber.tag(LOGIN).i("Authentication failed due to network error", t)
-                else -> Simber.tag(LOGIN).e("Authentication failed due to unknown error", t)
+                is NetworkConnectionException -> Simber.i("Authentication failed due to network error", t, tag = LOGIN)
+                else -> Simber.e("Authentication failed due to unknown error", t, tag = LOGIN)
             }
 
             extractResultFromException(t).also { signInResult ->
@@ -77,7 +77,7 @@ internal class Authenticator @Inject constructor(
     }
 
     private fun log(message: String) {
-        Simber.tag(LOGIN).i(message)
+        Simber.i(message, tag = LOGIN)
     }
 
     private suspend fun addEventAndUpdateProjectIdIfRequired(

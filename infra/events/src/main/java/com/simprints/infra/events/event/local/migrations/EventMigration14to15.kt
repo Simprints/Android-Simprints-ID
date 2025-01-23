@@ -13,9 +13,9 @@ import org.json.JSONObject
 
 internal class EventMigration14to15 : Migration(14, 15) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.tag(MIGRATION).i("Migrating room db from schema 14 to schema 15.")
+        Simber.i("Migrating room db from schema 14 to schema 15.", tag = MIGRATION)
         updateSessionIdtoScopeIdColumn(database)
-        Simber.tag(MIGRATION).i("Migration from schema 14 to schema 15 done.")
+        Simber.i("Migration from schema 14 to schema 15 done.", tag = MIGRATION)
     }
 
     private fun updateSessionIdtoScopeIdColumn(database: SupportSQLiteDatabase) {

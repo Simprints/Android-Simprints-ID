@@ -108,7 +108,7 @@ internal class EventRemoteDataSource @Inject constructor(
             parser.close()
             channel.close()
         } catch (t: Throwable) {
-            Simber.tag(SYNC).i("Event parsing stream failed", t)
+            Simber.i("Event parsing stream failed", t, tag = SYNC)
             parser.close()
             channel.close(t)
         }

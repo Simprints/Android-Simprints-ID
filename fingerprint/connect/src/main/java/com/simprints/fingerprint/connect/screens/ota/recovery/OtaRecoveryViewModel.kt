@@ -28,7 +28,7 @@ internal class OtaRecoveryViewModel @Inject constructor(
 
             _isConnectionSuccess.send(true)
         } catch (ex: Throwable) {
-            Simber.tag(FINGER_CAPTURE).e("OTA recovery failed", ex)
+            Simber.e("OTA recovery failed", ex, FINGER_CAPTURE)
             _isConnectionSuccess.send(false)
         }
     }

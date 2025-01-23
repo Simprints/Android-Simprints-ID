@@ -85,7 +85,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         samplesToCapture: Int,
         attemptNumber: Int,
     ) {
-        Simber.tag(FACE_CAPTURE).i("Initialise face detection")
+        Simber.i("Initialise face detection", tag = FACE_CAPTURE)
 
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
@@ -106,7 +106,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
     private fun finishCapture(attemptNumber: Int) {
-        Simber.tag(FACE_CAPTURE).i("Finish capture")
+        Simber.i("Finish capture", tag = FACE_CAPTURE)
         viewModelScope.launch {
             sortedQualifyingCaptures = userCaptures
                 .filter { it.hasValidStatus() }
@@ -170,7 +170,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         val detectionQuality = faceDetection.face?.quality ?: 0f
 
         if (faceDetection.hasValidStatus() && detectionQuality >= fallbackQuality) {
-            Simber.tag(FACE_CAPTURE).i("Fallback capture updated")
+            Simber.i("Fallback capture updated", tag = FACE_CAPTURE)
             fallbackCapture = faceDetection.apply { isFallback = true }
             createFirstFallbackCaptureEvent(faceDetection)
         }

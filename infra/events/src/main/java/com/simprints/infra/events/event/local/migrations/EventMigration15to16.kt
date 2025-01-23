@@ -8,9 +8,9 @@ import com.simprints.infra.logging.Simber
 
 internal class EventMigration15to16 : Migration(15, 16) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        Simber.tag(MIGRATION).i("Migrating room db from schema 15 to schema 16.")
+        Simber.i("Migrating room db from schema 15 to schema 16.", tag = MIGRATION)
         renameFaceLicenseErrors(db)
-        Simber.tag(MIGRATION).i("Migration from schema 15 to schema 16 done.")
+        Simber.i("Migration from schema 15 to schema 16 done.", tag = MIGRATION)
     }
 
     // rename FACE_LICENSE_MISSING and FACE_LICENSE_INVALID to LICENSE_MISSING and LICENSE_INVALID

@@ -60,7 +60,7 @@ internal class ImageDistortionConfigRemoteRepo @Inject constructor(
     }
 
     private fun log(message: String) {
-        Simber.tag(TAG).i(message)
+        Simber.i(message, tag = TAG)
     }
 
     companion object {

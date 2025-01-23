@@ -30,11 +30,11 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
             .remove(SELECTED_MODULES_KEY)
             .remove(LAST_INSTRUCTION_ID_KEY)
             .apply()
-        Simber.tag(MIGRATION).i("Migration of device configuration to Datastore done")
+        Simber.i("Migration of device configuration to Datastore done", tag = MIGRATION)
     }
 
     override suspend fun migrate(currentData: ProtoDeviceConfiguration): ProtoDeviceConfiguration {
-        Simber.tag(MIGRATION).i("Start migration of device configuration to Datastore")
+        Simber.i("Start migration of device configuration to Datastore", tag = MIGRATION)
         return currentData.let {
             val proto = it.toBuilder()
 

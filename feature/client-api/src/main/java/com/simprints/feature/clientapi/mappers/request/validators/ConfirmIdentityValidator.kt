@@ -33,7 +33,7 @@ internal class ConfirmIdentityValidator(
         }
         if (currentSessionId != sessionId) {
             // TODO Remove in 2024.2.1 or when root cause of "Invalid Session ID" error is found
-            Simber.tag(SESSION).i("Mismatched IDs: '$currentSessionId' != '$sessionId'")
+            Simber.i("Mismatched IDs: '$currentSessionId' != '$sessionId'", tag = SESSION)
             throw InvalidRequestException("Invalid Session ID", ClientApiError.INVALID_SESSION_ID)
         }
     }

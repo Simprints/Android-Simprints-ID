@@ -26,13 +26,13 @@ internal class FaceMatcherUseCase @Inject constructor(
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
     private lateinit var faceMatcher: FaceMatcher
-    override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING.name
+    override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
         onLoadingCandidates: () -> Unit,
     ): MatcherResult = coroutineScope {
-        Simber.tag(crashReportTag).i("Initialising matcher")
+        Simber.i("Initialising matcher", tag = crashReportTag)
         faceMatcher = resolveFaceBioSdk().matcher
         if (matchParams.probeFaceSamples.isEmpty()) {
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
@@ -49,7 +49,7 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
 
-        Simber.tag(crashReportTag).i("Matching candidates")
+        Simber.i("Matching candidates", tag = crashReportTag)
         onLoadingCandidates()
         val resultItems = createRanges(totalCandidates)
             .map { range ->
@@ -64,7 +64,7 @@ internal class FaceMatcherUseCase @Inject constructor(
             }.awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
-        Simber.tag(crashReportTag).i("Matched $totalCandidates candidates")
+        Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
 
         MatcherResult(resultItems, totalCandidates, faceMatcher.matcherName)
     }

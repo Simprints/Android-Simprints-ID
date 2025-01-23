@@ -61,7 +61,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("SetupFragment started")
+        Simber.i("SetupFragment started", tag = ORCHESTRATION)
 
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,
@@ -123,7 +123,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     }
 
     private fun renderFinishedWithError(errorCode: String) {
-        Simber.tag(LICENSE).i("Error with licence download. Error code = $errorCode")
+        Simber.i("Error with licence download. Error code = $errorCode", tag = LICENSE)
         val errorTitle = getString(IDR.string.configuration_generic_error_title, errorCode)
         findNavController().navigateSafely(
             this,
@@ -133,7 +133,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     }
 
     private fun renderFinishedWithBackendMaintenanceError(estimatedOutage: Long?) {
-        Simber.tag(LICENSE).i("Error with licence download. The backend is under maintenance")
+        Simber.i("Error with licence download. The backend is under maintenance", tag = LICENSE)
         val errorMessage = if (estimatedOutage != null && estimatedOutage != 0L) {
             getString(
                 IDR.string.error_backend_maintenance_with_time_message,

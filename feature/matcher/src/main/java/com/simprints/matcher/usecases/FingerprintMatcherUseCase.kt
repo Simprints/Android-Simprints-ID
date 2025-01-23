@@ -32,13 +32,13 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
-    override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING.name
+    override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
         onLoadingCandidates: () -> Unit,
     ): MatcherResult = coroutineScope {
-        Simber.tag(crashReportTag).i("Initialising matcher")
+        Simber.i("Initialising matcher", tag = crashReportTag)
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK!!)
 
         if (matchParams.probeFingerprintSamples.isEmpty()) {
@@ -55,7 +55,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, bioSdkWrapper.matcherName)
         }
 
-        Simber.tag(crashReportTag).i("Matching candidates")
+        Simber.i("Matching candidates", tag = crashReportTag)
         onLoadingCandidates()
         val resultItems = createRanges(totalCandidates)
             .map { range ->
@@ -70,7 +70,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
 
-        Simber.tag(crashReportTag).i("Matched $totalCandidates candidates")
+        Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
         MatcherResult(resultItems, totalCandidates, bioSdkWrapper.matcherName)
     }
 

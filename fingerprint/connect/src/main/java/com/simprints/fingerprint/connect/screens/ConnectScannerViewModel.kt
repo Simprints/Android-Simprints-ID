@@ -209,7 +209,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     }
 
     private suspend fun manageVeroErrors(e: Throwable) {
-        Simber.tag(FINGER_CAPTURE).i("Vero connection issue", e)
+        Simber.i("Vero connection issue", e, tag = FINGER_CAPTURE)
         _scannerConnected.send(false)
 
         launchAlertOrScannerIssueOrShowDialog(e)
@@ -253,7 +253,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     }
 
     private fun logMessageForCrashReport(message: String) {
-        Simber.tag(FINGER_CAPTURE).i(message)
+        Simber.i(message, tag = FINGER_CAPTURE)
     }
 
     fun handleScannerDisconnectedYesClick() {

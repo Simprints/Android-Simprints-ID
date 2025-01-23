@@ -31,7 +31,7 @@ internal class OrchestratorActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Simber.tag(ORCHESTRATION).d("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized")
+        Simber.d("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized", tag = ORCHESTRATION)
 
         isGraphInitialized = savedInstanceState?.getBoolean(KEY_IS_GRAPH_INITIALIZED) ?: false
         lifecycle.addObserver(activityTracker)
@@ -42,7 +42,7 @@ internal class OrchestratorActivity : BaseActivity() {
             this,
             R.id.orchestratorRootFragment,
         ) { result ->
-            Simber.tag(ORCHESTRATION).d("OrchestratorActivity result code ${result.resultCode}")
+            Simber.d("OrchestratorActivity result code ${result.resultCode}", tag = ORCHESTRATION)
 
             setResult(result.resultCode, Intent().putExtras(result.extras))
             finish()
@@ -51,7 +51,7 @@ internal class OrchestratorActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        Simber.tag(ORCHESTRATION).d("OrchestratorActivity.onStart isGraphInitialized=$isGraphInitialized")
+        Simber.d("OrchestratorActivity.onStart isGraphInitialized=$isGraphInitialized", tag = ORCHESTRATION)
 
         if (activityTracker.isMain(activity = this)) {
             if (!isGraphInitialized) {
@@ -71,7 +71,7 @@ internal class OrchestratorActivity : BaseActivity() {
                 isGraphInitialized = true
             }
         } else {
-            Simber.tag(ORCHESTRATION).i("Orchestrator already executing, finishing with RESULT_CANCELED")
+            Simber.i("Orchestrator already executing, finishing with RESULT_CANCELED", tag = ORCHESTRATION)
             finish()
         }
     }

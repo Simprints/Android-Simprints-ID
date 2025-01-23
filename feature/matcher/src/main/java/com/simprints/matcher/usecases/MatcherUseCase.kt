@@ -1,10 +1,11 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 
 internal interface MatcherUseCase {
-    val crashReportTag: String
+    val crashReportTag: LoggingConstants.CrashReportTag
 
     /**
      * Returns a MatcherResult which contains a list of [MatchResultItem]s sorted by confidence score in descending order,

@@ -39,10 +39,10 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Simber.tag(ORCHESTRATION).i("AlertFragment started")
+        Simber.i("AlertFragment started", tag = ORCHESTRATION)
 
         val config = args.alertConfiguration
-        Simber.tag(ALERT).i("Alert reason: ${config.appErrorReason}")
+        Simber.i("Alert reason: ${config.appErrorReason}", tag = ALERT)
 
         binding.root.setBackgroundColor(
             ResourcesCompat.getColor(
@@ -71,14 +71,14 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            Simber.tag(ALERT).i("Alert back button clicked")
+            Simber.i("Alert back button clicked", tag = ALERT)
             setPressedButtonResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, config.appErrorReason)
             findNavController().popBackStack()
         }
         config.eventType?.let { vm.saveAlertEvent(it) }
 
         binding.alertExportButton.setOnClickListener {
-            Simber.tag(ALERT).i("Alert export button clicked")
+            Simber.i("Alert export button clicked", tag = ALERT)
             Clipboard.copyToClipboard(requireContext(), vm.collectExportData())
             Toast.makeText(requireContext(), IDR.string.alert_export_copied, Toast.LENGTH_SHORT).show()
         }
@@ -91,7 +91,7 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         setTextWithFallbacks(config.text, config.textRes)
         setOnClickListener {
             config.resultKey?.let {
-                Simber.tag(ALERT).i("Alert button clicked: $it")
+                Simber.i("Alert button clicked: $it", tag = ALERT)
                 setPressedButtonResult(it, appErrorReason)
             }
 

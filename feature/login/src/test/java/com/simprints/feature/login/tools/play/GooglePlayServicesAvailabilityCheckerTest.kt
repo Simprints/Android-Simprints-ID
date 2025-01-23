@@ -10,6 +10,7 @@ import com.google.android.gms.common.ConnectionResult.SERVICE_VERSION_UPDATE_REQ
 import com.google.android.gms.common.ConnectionResult.SUCCESS
 import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.feature.login.LoginError
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -32,17 +33,12 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
     @MockK
     private lateinit var launchCallBack: (LoginError) -> Unit
 
-    val simber = mockk<Simber>(relaxed = true) {
-        every { tag(any()) } returns this
-    }
-
     private lateinit var googlePlayServicesAvailabilityChecker: GooglePlayServicesAvailabilityChecker
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         mockkObject(Simber)
-        every { Simber.INSTANCE } returns simber
 
         every { launchCallBack.invoke(any()) } returns Unit
         googlePlayServicesAvailabilityChecker = GooglePlayServicesAvailabilityChecker(googleApiAvailability)
@@ -92,7 +88,7 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify { launchCallBack(LoginError.MissingPlayServices) }
-        verify { simber.e(any(), ofType<MissingGooglePlayServices>()) }
+        verify { Simber.e(any(), ofType<MissingGooglePlayServices>(), any<CrashReportTag>()) }
     }
 
     @Test
@@ -122,7 +118,7 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify(exactly = 0) { launchCallBack(any()) }
-        verify(exactly = 0) { Simber.e(any(), ofType<OutdatedGooglePlayServices>()) }
+        verify(exactly = 0) { Simber.e(any(), ofType<OutdatedGooglePlayServices>(), any<CrashReportTag>()) }
     }
 
     @Test
@@ -155,6 +151,6 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             )
         }
         verify { launchCallBack(LoginError.OutdatedPlayServices) }
-        verify { simber.e(any(), ofType<OutdatedGooglePlayServices>()) }
+        verify { Simber.e(any(), ofType<OutdatedGooglePlayServices>(), any<CrashReportTag>()) }
     }
 }

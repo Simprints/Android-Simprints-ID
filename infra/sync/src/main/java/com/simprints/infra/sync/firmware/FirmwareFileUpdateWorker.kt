@@ -36,7 +36,7 @@ class FirmwareFileUpdateWorker @AssistedInject constructor(
             success()
         } catch (e: Throwable) {
             if (e.isCausedFromBadNetworkConnection()) {
-                Simber.tag(tag).i("Failed due to network error", NetworkConnectionException(cause = e))
+                Simber.i("Failed due to network error", NetworkConnectionException(cause = e), tag = tag)
             }
             retry(e)
         }

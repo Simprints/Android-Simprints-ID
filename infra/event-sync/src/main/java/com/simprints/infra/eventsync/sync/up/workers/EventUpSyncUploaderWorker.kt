@@ -53,7 +53,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
         try {
             val jsonInput = inputData.getString(INPUT_UP_SYNC)
                 ?: throw IllegalArgumentException("input required")
-            Simber.tag(tag).d("Received $jsonInput")
+            Simber.d("Received $jsonInput", tag = tag)
 
             jsonHelper.fromJson(jsonInput)
         } catch (t: Throwable) {
@@ -83,7 +83,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             upSyncTask.upSync(upSyncScope.operation, getEventScope()).collect {
                 count += it.progress
                 eventSyncCache.saveProgress(workerId, count)
-                Simber.tag(tag).d("Uploaded $count for batch : $it")
+                Simber.d("Uploaded $count for batch : $it", tag = tag)
 
                 reportCount(count, max)
             }

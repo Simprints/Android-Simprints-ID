@@ -52,7 +52,7 @@ internal class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             configManager.updateDeviceConfiguration { it.apply { it.language = language } }
             _languagePreference.postValue(language)
-            Simber.tag(SETTINGS).i("Language set to $language")
+            Simber.i("Language set to $language", tag = SETTINGS)
         }
     }
 

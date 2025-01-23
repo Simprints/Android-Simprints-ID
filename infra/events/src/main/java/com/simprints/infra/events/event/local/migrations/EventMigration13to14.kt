@@ -7,9 +7,9 @@ import com.simprints.infra.logging.Simber
 
 internal class EventMigration13to14 : Migration(13, 14) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.tag(MIGRATION).i("Migrating room db from schema 13 to schema 14.")
+        Simber.i("Migrating room db from schema 13 to schema 14.", tag = MIGRATION)
         updateSessionScopesToEventScopes(database)
-        Simber.tag(MIGRATION).i("Migration from schema 13 to schema 14 done.")
+        Simber.i("Migration from schema 13 to schema 14 done.", tag = MIGRATION)
     }
 
     private fun updateSessionScopesToEventScopes(database: SupportSQLiteDatabase) {

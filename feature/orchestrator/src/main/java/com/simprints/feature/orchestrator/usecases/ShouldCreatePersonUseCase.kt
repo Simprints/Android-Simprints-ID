@@ -27,7 +27,7 @@ internal class ShouldCreatePersonUseCase @Inject constructor(
         }
 
         if (modalities.isEmpty()) {
-            Simber.tag(ORCHESTRATION).i("Could not create person event - modalities are empty")
+            Simber.i("Could not create person event - modalities are empty", tag = ORCHESTRATION)
             return false
         }
 
