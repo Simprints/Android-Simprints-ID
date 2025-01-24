@@ -6,7 +6,6 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
-import com.simprints.feature.clientapi.usecases.IsCurrentSessionAnIdentificationOrEnrolmentUseCase
 import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -37,9 +36,6 @@ class IntentToActionMapperTest {
     private lateinit var getCurrentSessionIdUseCase: GetCurrentSessionIdUseCase
 
     @MockK
-    private lateinit var isCurrentSessionAnIdentificationOrEnrolment: IsCurrentSessionAnIdentificationOrEnrolmentUseCase
-
-    @MockK
     private lateinit var sessionHasIdentificationCallback: SessionHasIdentificationCallbackUseCase
 
     @MockK
@@ -56,12 +52,10 @@ class IntentToActionMapperTest {
 
         coEvery { getCurrentSessionIdUseCase.invoke() } returns SESSION_ID
         coEvery { sessionHasIdentificationCallback.invoke(any()) } returns true
-        coEvery { isCurrentSessionAnIdentificationOrEnrolment.invoke() } returns true
         every { timeHelper.now() } returns Timestamp(0L)
 
         mapper = IntentToActionMapper(
             getCurrentSessionIdUseCase,
-            isCurrentSessionAnIdentificationOrEnrolment,
             sessionHasIdentificationCallback,
             tokenizationProcessor,
             timeHelper,

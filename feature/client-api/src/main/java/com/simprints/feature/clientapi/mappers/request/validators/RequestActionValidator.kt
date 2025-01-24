@@ -48,7 +48,7 @@ internal abstract class RequestActionValidator(
     private fun hasValidMetadata(): Boolean = try {
         JsonHelper.validateJsonOrThrow(extractor.getMetadata())
         true
-    } catch (ex: Throwable) {
+    } catch (_: Throwable) {
         false
     }
 

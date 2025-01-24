@@ -26,7 +26,6 @@ import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
-import com.simprints.feature.clientapi.usecases.IsCurrentSessionAnIdentificationOrEnrolmentUseCase
 import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -38,7 +37,6 @@ import javax.inject.Inject
 
 internal class IntentToActionMapper @Inject constructor(
     private val getCurrentSessionId: GetCurrentSessionIdUseCase,
-    private val isCurrentSessionAnIdentificationOrEnrolment: IsCurrentSessionAnIdentificationOrEnrolmentUseCase,
     private val sessionHasIdentificationCallback: SessionHasIdentificationCallbackUseCase,
     private val tokenizationProcessor: TokenizationProcessor,
     private val timeHelper: TimeHelper,
@@ -132,21 +130,17 @@ internal class IntentToActionMapper @Inject constructor(
             extractor = IdentifyRequestExtractor(extras),
             project = project,
         )
-        ActionConstants.ACTION_ENROL_LAST_BIOMETRICS -> ensureExtrasHaveSessionId(extras).let {
-            enrolLastBiometricsBuilder(
-                actionIdentifier = actionIdentifier,
-                extractor = EnrolLastBiometricsRequestExtractor(it),
-                project = project,
-            )
-        }
+        ActionConstants.ACTION_ENROL_LAST_BIOMETRICS -> enrolLastBiometricsBuilder(
+            actionIdentifier = actionIdentifier,
+            extractor = EnrolLastBiometricsRequestExtractor(ensureExtrasHaveSessionId(extras)),
+            project = project,
+        )
 
-        ActionConstants.ACTION_CONFIRM_IDENTITY -> ensureExtrasHaveSessionId(extras).let {
-            confirmIdentifyBuilder(
-                actionIdentifier = actionIdentifier,
-                extractor = ConfirmIdentityRequestExtractor(it),
-                project = project,
-            )
-        }
+        ActionConstants.ACTION_CONFIRM_IDENTITY -> confirmIdentifyBuilder(
+            actionIdentifier = actionIdentifier,
+            extractor = ConfirmIdentityRequestExtractor(ensureExtrasHaveSessionId(extras)),
+            project = project,
+        )
 
         else -> throw InvalidRequestException(
             "Invalid CommCare action",
@@ -250,8 +244,8 @@ internal class IntentToActionMapper @Inject constructor(
         tokenizationProcessor = tokenizationProcessor,
         validator = EnrolLastBiometricsValidator(
             extractor = extractor,
-            currentSession = getCurrentSessionId(),
-            isCurrentSessionAnEnrolmentOrIdentification = isCurrentSessionAnIdentificationOrEnrolment(),
+            currentSessionId = getCurrentSessionId(),
+            sessionHasIdentificationCallback = sessionHasIdentificationCallback(extractor.getSessionId()),
         ),
     )
 
@@ -267,7 +261,7 @@ internal class IntentToActionMapper @Inject constructor(
         validator = ConfirmIdentityValidator(
             extractor = extractor,
             currentSessionId = getCurrentSessionId(),
-            isSessionHasIdentificationCallback = sessionHasIdentificationCallback(extractor.getSessionId()),
+            sessionHasIdentificationCallback = sessionHasIdentificationCallback(extractor.getSessionId()),
         ),
     )
 }
