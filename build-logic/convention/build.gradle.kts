@@ -25,7 +25,6 @@ dependencies {
     // CI Scanning & Retry
     compileOnly(libs.plugin.sonar)
     compileOnly(libs.plugin.jacoco)
-    compileOnly(libs.plugin.retry)
 }
 
 gradlePlugin {
