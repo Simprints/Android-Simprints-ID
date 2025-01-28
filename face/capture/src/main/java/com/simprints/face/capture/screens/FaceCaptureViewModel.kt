@@ -17,6 +17,7 @@ import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -78,6 +79,10 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
+    val isAutoCaptureEnabled: LiveData<Boolean>
+        get() = _isAutoCaptureEnabled
+    private val _isAutoCaptureEnabled = MutableLiveData<Boolean>()
+
     fun setupCapture(samplesToCapture: Int) {
         this.samplesToCapture = samplesToCapture
     }
@@ -116,6 +121,12 @@ internal class FaceCaptureViewModel @Inject constructor(
         }
         saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
+
+    fun setupAutoCapture() =
+        viewModelScope.launch {
+            val experimentalConfiguration = configManager.getProjectConfiguration().experimental()
+            _isAutoCaptureEnabled.postValue(experimentalConfiguration.faceAutoCaptureEnabled)
+        }
 
     private suspend fun initialize(
         activity: Activity,

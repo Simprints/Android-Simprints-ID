@@ -124,13 +124,16 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             }
         }
 
-        internalNavController?.setGraph(
-            if (args.isAutoCapture) {
-                R.navigation.graph_face_capture_auto_internal
-            } else {
-                R.navigation.graph_face_capture_internal
-            }
-        )
+        viewModel.setupAutoCapture()
+        viewModel.isAutoCaptureEnabled.observe(viewLifecycleOwner) { isAutoCaptureEnabled ->
+            internalNavController?.setGraph(
+                if (isAutoCaptureEnabled) {
+                    R.navigation.graph_face_capture_auto_internal
+                } else {
+                    R.navigation.graph_face_capture_internal
+                }
+            )
+        }
     }
 
     private fun initFaceBioSdk() {

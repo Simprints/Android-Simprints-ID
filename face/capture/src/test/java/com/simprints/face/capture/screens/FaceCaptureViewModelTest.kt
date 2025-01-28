@@ -10,6 +10,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -259,6 +260,30 @@ class FaceCaptureViewModelTest {
         coVerify { licenseRepository.redownloadLicence(any(), any(), Vendor.RankOne, any()) }
         coVerify(exactly = 2) { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.VALID)
+    }
+
+    @Test
+    fun `setupAutoCapture should post true when face auto capture is enabled in experimental config`() {
+        // Given
+        coEvery { configManager.getProjectConfiguration().experimental().faceAutoCaptureEnabled } returns true
+
+        // When
+        viewModel.setupAutoCapture()
+
+        // Then
+        assertThat(viewModel.isAutoCaptureEnabled.getOrAwaitValue()).isTrue()
+    }
+
+    @Test
+    fun `setupAutoCapture should post false when face auto capture is disabled in experimental config`() {
+        // Given
+        coEvery { configManager.getProjectConfiguration().experimental().faceAutoCaptureEnabled } returns false
+
+        // When
+        viewModel.setupAutoCapture()
+
+        // Then
+        assertThat(viewModel.isAutoCaptureEnabled.getOrAwaitValue()).isFalse()
     }
 
     @Test

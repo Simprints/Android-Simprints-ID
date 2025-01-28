@@ -368,12 +368,11 @@ internal class BuildStepsUseCase @Inject constructor(
                 // Face bio SDK is currently ignored until we add a second one
                 // TODO: samplesToCapture can be read directly from FaceCapture
                 val samplesToCapture = projectConfiguration.face?.nbOfImagesToCapture ?: 0
-                val isAutoCapture = projectConfiguration.experimental().faceAutoCaptureEnabled
                 Step(
                     id = StepId.FACE_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
                     destinationId = FaceCaptureContract.DESTINATION,
-                    payload = FaceCaptureContract.getArgs(samplesToCapture, isAutoCapture),
+                    payload = FaceCaptureContract.getArgs(samplesToCapture),
                 )
             }
         }
