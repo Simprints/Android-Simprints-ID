@@ -25,9 +25,22 @@ data class ExperimentalProjectConfiguration(
             ?.let { it as? Boolean }
             .let { it == true }
 
+    val faceAutoCaptureImagingDurationMillis: Long
+        get() = customConfig
+            ?.get(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS)
+            ?.let { it as? Int }
+            ?.toLong()
+            ?.coerceIn(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN, FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX)
+            ?: FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
         internal const val FACE_AUTO_CAPTURE_ENABLED = "faceAutoCaptureEnabled"
+        internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS = "faceAutoCaptureImagingDurationMillis"
+
+        const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN = 1L
+        const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT = 3_000L
+        const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX = 10_000L
     }
 }

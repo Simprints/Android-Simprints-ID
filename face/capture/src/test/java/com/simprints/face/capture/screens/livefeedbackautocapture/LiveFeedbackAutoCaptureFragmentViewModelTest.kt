@@ -289,6 +289,43 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
+    fun `Use default imaging duration when not configured`() = runTest {
+        coEvery { faceDetector.analyze(frame) } returns getFace()
+        coEvery { configManager.getProjectConfiguration().experimental().faceAutoCaptureImagingDurationMillis } returns AUTO_CAPTURE_IMAGING_DURATION_MS
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.process(frame)
+        advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS)
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+
+        advanceTimeBy(1)
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
+    }
+
+    @Test
+    fun `Use custom imaging duration when provided in config`() = runTest {
+        val configDuration = 5000
+        coEvery { faceDetector.analyze(frame) } returns getFace()
+        coEvery { configManager.getProjectConfiguration().custom } returns mapOf("faceAutoCaptureImagingDurationMillis" to configDuration)
+        val capturingState = viewModel.capturingState.testObserver()
+
+        viewModel.initCapture(1, 0)
+        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.process(frame)
+        advanceTimeBy(configDuration.toLong())
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+
+        advanceTimeBy(1)
+        assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
+    }
+
+    @Test
     fun `Save all valid captures without fallback image`() = runTest {
         val validFace: Face = getFace()
         every { faceDetector.analyze(frame) } returns validFace
