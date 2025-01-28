@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
+import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
@@ -69,6 +70,9 @@ class FaceCaptureViewModelTest {
     @MockK
     private lateinit var saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
 
+    @MockK
+    private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
+
     private lateinit var viewModel: FaceCaptureViewModel
 
     private val faceDetections = listOf<FaceDetection>(
@@ -96,6 +100,7 @@ class FaceCaptureViewModelTest {
                 coEvery { this@mockk().initializer } returns faceBioSdkInitializer
             },
             saveLicenseCheckEvent,
+            isUsingAutoCapture,
             "deviceId",
         )
     }
@@ -263,9 +268,9 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `setupAutoCapture should post true when face auto capture is enabled in experimental config`() {
+    fun `auto-capture should be enabled if it is used according to its use case`() {
         // Given
-        coEvery { configManager.getProjectConfiguration().experimental().faceAutoCaptureEnabled } returns true
+        coEvery { isUsingAutoCapture() } returns true
 
         // When
         viewModel.setupAutoCapture()
@@ -275,9 +280,9 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `setupAutoCapture should post false when face auto capture is disabled in experimental config`() {
+    fun `auto-capture should be disabled if it is not used according to its use case`() {
         // Given
-        coEvery { configManager.getProjectConfiguration().experimental().faceAutoCaptureEnabled } returns false
+        coEvery { isUsingAutoCapture() } returns false
 
         // When
         viewModel.setupAutoCapture()

@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
@@ -38,6 +39,8 @@ class SettingsViewModelTest {
         settingsPassword = SettingsPasswordConfig.Locked("1234"),
     )
 
+    private val experimentalConfiguration = mapOf("faceAutoCaptureEnabled" to true)
+
     @MockK
     private lateinit var configManager: ConfigManager
 
@@ -54,6 +57,7 @@ class SettingsViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { configManager.getProjectConfiguration().general } returns generalConfiguration
+        coEvery { configManager.getProjectConfiguration().custom } returns experimentalConfiguration
         coEvery { configManager.getDeviceConfiguration().language } returns LANGUAGE
 
         coEvery { configSyncCache.sinceLastUpdateTime() } returnsMany listOf(
@@ -66,6 +70,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `should initialize the live data correctly`() {
+        assertThat(viewModel.experimentalConfiguration.value).isEqualTo(ExperimentalProjectConfiguration(experimentalConfiguration))
         assertThat(viewModel.generalConfiguration.value).isEqualTo(generalConfiguration)
         assertThat(viewModel.languagePreference.value).isEqualTo(LANGUAGE)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
