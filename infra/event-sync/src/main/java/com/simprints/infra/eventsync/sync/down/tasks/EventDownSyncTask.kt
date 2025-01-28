@@ -47,7 +47,7 @@ internal class EventDownSyncTask @Inject constructor(
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val eventRepository: EventRepository,
 ) {
-    suspend fun downSync(
+    fun downSync(
         scope: CoroutineScope,
         operation: EventDownSyncOperation,
         eventScope: EventScope,
@@ -171,7 +171,7 @@ internal class EventDownSyncTask @Inject constructor(
 
         enrolmentRecordRepository.performActions(actions)
 
-        return if (batchOfEventsToProcess.size > 0) {
+        return if (batchOfEventsToProcess.isNotEmpty()) {
             lastOperation.copy(
                 state = RUNNING,
                 lastEventId = batchOfEventsToProcess.last().id,
@@ -196,14 +196,14 @@ internal class EventDownSyncTask @Inject constructor(
         operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent,
     ): List<SubjectAction> {
-        val modulesIdsUnderSyncing = operation.queryEvent.moduleId
+        val modulesIdUnderSyncing = operation.queryEvent.moduleId
         val attendantUnderSyncing = operation.queryEvent.attendantId
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
         val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
 
         val actions = mutableListOf<SubjectAction>()
         when {
-            !modulesIdsUnderSyncing.isNullOrEmpty() -> {
+            !modulesIdUnderSyncing.isNullOrEmpty() -> {
                 /**
                  * handleSubjectMoveEvent is executed by each worker to process a new moveEvent.
                  * The deletion part of a move is executed if:
@@ -227,9 +227,7 @@ internal class EventDownSyncTask @Inject constructor(
 
                 if (enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                        actions.add(
-                            it,
-                        )
+                        actions.add(it)
                     }
                 }
             }
@@ -241,9 +239,7 @@ internal class EventDownSyncTask @Inject constructor(
 
                 if (attendantUnderSyncing == enrolmentRecordCreation.attendantId.value) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                        actions.add(
-                            it,
-                        )
+                        actions.add(it)
                     }
                 }
             }
@@ -251,9 +247,7 @@ internal class EventDownSyncTask @Inject constructor(
             else -> {
                 actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                    actions.add(
-                        it,
-                    )
+                    actions.add(it)
                 }
             }
         }
