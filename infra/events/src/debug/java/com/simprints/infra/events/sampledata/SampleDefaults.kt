@@ -12,6 +12,7 @@ object SampleDefaults {
     val DEFAULT_MODULES = listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2.value)
 
     val DEFAULT_USER_ID = "user_id".asTokenizableRaw()
+    val DEFAULT_USER_ID_2 = "user_id_2".asTokenizableRaw()
     const val DEFAULT_METADATA = "DEFAULT_METADATA"
 
     val CREATED_AT: Timestamp = Timestamp(1234L)

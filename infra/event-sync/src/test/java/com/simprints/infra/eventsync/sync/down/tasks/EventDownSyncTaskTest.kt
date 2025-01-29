@@ -20,6 +20,8 @@ import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID_2
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -58,7 +60,7 @@ class EventDownSyncTaskTest {
             "attendantId".asTokenizableRaw(),
             listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
         )
-        val ENROLMENT_RECORD_MOVE = EnrolmentRecordMoveEvent(
+        val ENROLMENT_RECORD_MOVE_MODULE = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
                 "subjectId",
                 "projectId",
@@ -73,10 +75,41 @@ class EventDownSyncTaskTest {
                 "attendantId".asTokenizableRaw(),
             ),
         )
+        val ENROLMENT_RECORD_MOVE_ATTENDANT = EnrolmentRecordMoveEvent(
+            EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
+                "subjectId",
+                "projectId",
+                "moduleId".asTokenizableRaw(),
+                DEFAULT_USER_ID,
+                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            ),
+            EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
+                "subjectId",
+                "projectId",
+                "moduleId".asTokenizableRaw(),
+                DEFAULT_USER_ID_2,
+            ),
+        )
+        val ENROLMENT_RECORD_MOVE_ATTENDANT2 = EnrolmentRecordMoveEvent(
+            EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
+                "subjectId",
+                "projectId",
+                "moduleId".asTokenizableRaw(),
+                DEFAULT_USER_ID_2,
+                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            ),
+            EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
+                "subjectId",
+                "projectId",
+                "moduleId".asTokenizableRaw(),
+                DEFAULT_USER_ID,
+            ),
+        )
     }
 
     private val projectOp = SampleSyncScopes.projectDownSyncScope.operations.first()
     private val moduleOp = SampleSyncScopes.modulesDownSyncScope.operations.first()
+    private val userOp = SampleSyncScopes.userDownSyncScope.operations.first()
 
     private lateinit var downloadEventsChannel: Channel<EnrolmentRecordEvent>
 
@@ -284,7 +317,7 @@ class EventDownSyncTaskTest {
 
     @Test
     fun moveSubjectFromModulesUnderSyncing_theOriginalModuleSyncShouldDoNothing() = runTest {
-        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
@@ -295,13 +328,18 @@ class EventDownSyncTaskTest {
         eventDownSyncTask.downSync(this, moduleOp, eventScope).toList()
 
         coVerify {
-            enrolmentRecordRepository.performActions(emptyList())
+            enrolmentRecordRepository.performActions(
+                listOf(
+                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
+                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                ),
+            )
         }
     }
 
     @Test
     fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() = runTest {
-        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
@@ -319,6 +357,7 @@ class EventDownSyncTaskTest {
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
+                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
             )
@@ -327,7 +366,7 @@ class EventDownSyncTaskTest {
 
     @Test
     fun moveSubjectToAModuleNotUnderSyncing_shouldPerformDeletionOnly() = runTest {
-        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             language = "",
@@ -347,8 +386,8 @@ class EventDownSyncTaskTest {
     }
 
     @Test
-    fun moveSubjectToAModuleUnderSyncing_shouldPerformCreationOnly() = runTest {
-        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+    fun moveSubjectToAModuleUnderSyncing_shouldPerformCreation() = runTest {
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
@@ -366,6 +405,7 @@ class EventDownSyncTaskTest {
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
+                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
             )
@@ -374,7 +414,7 @@ class EventDownSyncTaskTest {
 
     @Test
     fun moveSubjectToModule2_syncModule1_shouldPerformCreationInModule2() = runTest {
-        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
@@ -392,6 +432,57 @@ class EventDownSyncTaskTest {
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
+                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
+                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun moveSubjectFromAttendantUnderSyncingToAnotherOne_ShouldDPerformDeleteOnly() = runTest {
+        val eventToMoveToAttendant2 = ENROLMENT_RECORD_MOVE_ATTENDANT2
+        mockProgressEmission(listOf(eventToMoveToAttendant2))
+
+        eventDownSyncTask.downSync(this, userOp, eventScope).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                listOf(
+                    Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun moveSubjectFromAnotherAttendantToAttendantUnderSyncing_ShouldDPerformDeleteAndCreate() = runTest {
+        val eventToMoveToAttendant2 = ENROLMENT_RECORD_MOVE_ATTENDANT
+        mockProgressEmission(listOf(eventToMoveToAttendant2))
+
+        eventDownSyncTask.downSync(this, userOp, eventScope).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                listOf(
+                    Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
+                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToAttendant2.payload.enrolmentRecordCreation)),
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun moveSubjectUnderProjectSync_ShouldPerformDeleteAndCreate() = runTest {
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
+        mockProgressEmission(listOf(eventToMoveToModule2))
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                listOf(
+                    Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
             )
