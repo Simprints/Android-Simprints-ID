@@ -502,7 +502,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         updateState { it.copy(isShowingSplashScreen = true) }
         viewModelScope.launch {
             delay(TRY_DIFFERENT_FINGER_SPLASH_DELAY)
-            if (addNewFinger) handleAutoAddFinger()
+            val isEligibleForFingerAddition = bioSdkWrapper.addNewFingerOnBadScan && addNewFinger
+            if (isEligibleForFingerAddition) handleAutoAddFinger()
             nudgeToNextFinger()
         }
     }
@@ -597,7 +598,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         .filter {
             val currentCapture = it.currentCapture()
             currentCapture is CaptureState.ScanProcess.Collected && currentCapture.scanResult.isGoodScan()
-        }.size >= min(TARGET_NUMBER_OF_GOOD_SCANS, numberOfOriginalFingers())
+        }.size >= min(bioSdkWrapper.minGoodScans, numberOfOriginalFingers())
 
     private fun CollectFingerprintsState.weHaveTheMinimumNumberOfAnyQualityScans() = fingerStates
         .filter {
@@ -748,7 +749,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     companion object {
-        const val TARGET_NUMBER_OF_GOOD_SCANS = 2
         const val MAXIMUM_TOTAL_NUMBER_OF_FINGERS_FOR_AUTO_ADDING = 4
         const val NUMBER_OF_BAD_SCANS_REQUIRED_TO_AUTO_ADD_NEW_FINGER = 3
         const val AUTO_SWIPE_DELAY: Long = 500

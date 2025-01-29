@@ -12,6 +12,12 @@ interface BioSdkWrapper {
     // Maximum time to wait for the bio sdk to transfer the fingerprint image
     val imageTransferTimeoutMs: Long
 
+    // Minimum Number of required good scans
+    val minGoodScans: Int
+
+    // Determines whether to suggest adding a new finger after multiple bad scans
+    val addNewFingerOnBadScan: Boolean
+
     val matcherName: String
 
     val supportedTemplateFormat: String

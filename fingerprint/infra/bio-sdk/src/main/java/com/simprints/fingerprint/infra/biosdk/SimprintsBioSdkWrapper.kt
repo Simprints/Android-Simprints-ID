@@ -20,6 +20,11 @@ class SimprintsBioSdkWrapper @Inject constructor(
     override val imageTransferTimeoutMs
         get() = 3000L
 
+    override val minGoodScans: Int
+        get() = 2
+    override val addNewFingerOnBadScan: Boolean
+        get() = true
+
     override val matcherName: String
         get() = bioSdk.matcherName
     override val supportedTemplateFormat: String

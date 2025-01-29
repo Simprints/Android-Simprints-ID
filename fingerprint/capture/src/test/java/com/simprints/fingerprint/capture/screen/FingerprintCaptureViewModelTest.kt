@@ -136,10 +136,13 @@ class FingerprintCaptureViewModelTest {
         every { scanner.versionInformation().generation } returns ScannerGeneration.VERO_1
         every { scannerManager.scanner } returns scanner
         every { scannerManager.isScannerConnected } returns true
-
-        coJustRun { bioSdkWrapper.initialize() }
-        every { bioSdkWrapper.scanningTimeoutMs } returns 1000
-        every { bioSdkWrapper.imageTransferTimeoutMs } returns 1000
+        with(bioSdkWrapper) {
+            coJustRun { initialize() }
+            every { scanningTimeoutMs } returns 1000
+            every { imageTransferTimeoutMs } returns 1000
+            every { minGoodScans } returns 2
+            every { addNewFingerOnBadScan } returns true
+        }
 
         vm = FingerprintCaptureViewModel(
             scannerManager = scannerManager,
