@@ -225,7 +225,7 @@ internal class EventDownSyncTask @Inject constructor(
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
 
-                if (enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
+                if (enrolmentRecordCreation.isUnderOverallSyncing()) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
                         actions.add(it)
                     }
@@ -266,9 +266,6 @@ internal class EventDownSyncTask @Inject constructor(
         }
 
     private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleId == moduleId.value
-
-    private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
         op.queryEvent.moduleId == moduleId.value
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =

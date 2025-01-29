@@ -372,6 +372,32 @@ class EventDownSyncTaskTest {
         }
     }
 
+    @Test
+    fun moveSubjectToModule2_syncModule1_shouldPerformCreationInModule2() = runTest {
+        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+        mockProgressEmission(listOf(eventToMoveToModule2))
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+            "",
+        )
+
+        val syncByModule = moduleOp.copy(
+            queryEvent = moduleOp.queryEvent.copy(
+                moduleId = DEFAULT_MODULE_ID.value,
+            ),
+        )
+        eventDownSyncTask.downSync(this, syncByModule, eventScope).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                listOf(
+                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                ),
+            )
+        }
+    }
+
     private suspend fun mockProgressEmission(progressEvents: List<EnrolmentRecordEvent>) {
         downloadEventsChannel = Channel(capacity = Channel.UNLIMITED)
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } returns EventDownSyncResult(
