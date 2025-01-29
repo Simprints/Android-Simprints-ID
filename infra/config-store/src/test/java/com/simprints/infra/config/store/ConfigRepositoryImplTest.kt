@@ -228,4 +228,22 @@ class ConfigRepositoryImplTest {
         coVerify(exactly = 1) { localDataSource.clearDeviceConfiguration() }
         verify(exactly = 1) { localDataSource.deletePrivacyNotices() }
     }
+
+    @Test
+    fun `watchProjectConfiguration should emit values from the local data source`() = runTest {
+        val config1 = projectConfiguration.copy(projectId = "project1")
+        val config2 = projectConfiguration.copy(projectId = "project2")
+
+        coEvery { localDataSource.watchProjectConfiguration() } returns kotlinx.coroutines.flow.flow {
+            emit(config1)
+            emit(config2)
+        }
+
+        val emittedConfigs = configServiceImpl.watchProjectConfiguration().toList()
+
+        assertThat(emittedConfigs).hasSize(2)
+        assertThat(emittedConfigs[0]).isEqualTo(config1)
+        assertThat(emittedConfigs[1]).isEqualTo(config2)
+        coVerify(exactly = 0) { remoteDataSource.getProject(any()) }
+    }
 }

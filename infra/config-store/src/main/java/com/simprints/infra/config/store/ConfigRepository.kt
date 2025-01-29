@@ -15,6 +15,8 @@ interface ConfigRepository {
 
     suspend fun getProjectConfiguration(): ProjectConfiguration
 
+    fun watchProjectConfiguration(): Flow<ProjectConfiguration>
+
     suspend fun getDeviceState(): DeviceState
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration

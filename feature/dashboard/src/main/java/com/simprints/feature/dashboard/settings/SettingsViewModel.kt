@@ -3,12 +3,13 @@ package com.simprints.feature.dashboard.settings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
@@ -17,6 +18,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SETTINGS
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,9 +32,9 @@ internal class SettingsViewModel @Inject constructor(
         get() = _generalConfiguration
     private val _generalConfiguration = MutableLiveData<GeneralConfiguration>()
 
-    val experimentalConfiguration: LiveData<ExperimentalProjectConfiguration>
-        get() = _experimentalConfiguration
-    private val _experimentalConfiguration = MutableLiveData<ExperimentalProjectConfiguration>()
+    val experimentalConfiguration = configManager.watchProjectConfiguration()
+        .map(ProjectConfiguration::experimental)
+        .asLiveData(viewModelScope.coroutineContext)
 
     val languagePreference: LiveData<String>
         get() = _languagePreference
@@ -64,12 +66,10 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun load() = viewModelScope.launch {
         val configuration = configManager.getProjectConfiguration().general
-        val experimentalConfiguration = configManager.getProjectConfiguration().experimental()
 
         _sinceConfigLastUpdated.send(configSyncCache.sinceLastUpdateTime())
         _languagePreference.postValue(configManager.getDeviceConfiguration().language)
         _generalConfiguration.postValue(configuration)
-        _experimentalConfiguration.postValue(experimentalConfiguration)
         _settingsLocked.postValue(configuration.settingsPassword)
     }
 

@@ -23,7 +23,9 @@ import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Vero1Configuration
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import java.io.File
 import javax.inject.Inject
 
@@ -66,6 +68,9 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
+
+    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> =
+        configDataStore.data.map(ProtoProjectConfiguration::toDomain)
 
     override suspend fun clearProjectConfiguration() {
         configDataStore.updateData { it.toBuilder().clear().build() }

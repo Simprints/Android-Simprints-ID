@@ -45,6 +45,9 @@ class ConfigManager @Inject constructor(
         }
     }
 
+    // Watches the local state of the project configuration without attempting to download if empty
+    fun watchProjectConfiguration(): Flow<ProjectConfiguration> = configRepository.watchProjectConfiguration()
+
     suspend fun getDeviceConfiguration(): DeviceConfiguration = configRepository.getDeviceConfiguration()
 
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =

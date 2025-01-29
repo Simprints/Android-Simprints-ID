@@ -6,16 +6,14 @@ import com.jraska.livedata.test
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.sync.ConfigSyncCache
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.slot
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -39,8 +37,6 @@ class SettingsViewModelTest {
         settingsPassword = SettingsPasswordConfig.Locked("1234"),
     )
 
-    private val experimentalConfiguration = mapOf("faceAutoCaptureEnabled" to true)
-
     @MockK
     private lateinit var configManager: ConfigManager
 
@@ -57,7 +53,6 @@ class SettingsViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { configManager.getProjectConfiguration().general } returns generalConfiguration
-        coEvery { configManager.getProjectConfiguration().custom } returns experimentalConfiguration
         coEvery { configManager.getDeviceConfiguration().language } returns LANGUAGE
 
         coEvery { configSyncCache.sinceLastUpdateTime() } returnsMany listOf(
@@ -69,8 +64,31 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `experimentalConfiguration live data should follow the project experimental configuration`() = runTest {
+        val experimentalConfig1 = mapOf("key1" to "value1")
+        val experimentalConfig2 = mapOf("key2" to "value2")
+
+        coEvery { configManager.watchProjectConfiguration() } returns flowOf(
+            mockk<ProjectConfiguration>(relaxed = true) {
+                every { custom } returns experimentalConfig1
+            },
+            mockk<ProjectConfiguration>(relaxed = true) {
+                every { custom } returns experimentalConfig2
+            },
+        )
+        viewModel = SettingsViewModel(configManager, syncOrchestrator, configSyncCache)
+
+        assertThat(viewModel.experimentalConfiguration.test().valueHistory())
+            .isEqualTo(
+                listOf(
+                    ExperimentalProjectConfiguration(experimentalConfig1),
+                    ExperimentalProjectConfiguration(experimentalConfig2),
+                )
+            )
+    }
+
+    @Test
     fun `should initialize the live data correctly`() {
-        assertThat(viewModel.experimentalConfiguration.value).isEqualTo(ExperimentalProjectConfiguration(experimentalConfiguration))
         assertThat(viewModel.generalConfiguration.value).isEqualTo(generalConfiguration)
         assertThat(viewModel.languagePreference.value).isEqualTo(LANGUAGE)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
