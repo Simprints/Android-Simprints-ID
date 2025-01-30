@@ -69,7 +69,7 @@ internal class ExperimentalProjectConfigurationTest {
             // Value present and lesser than min
             mapOf(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS to 0) to FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MIN,
             // Value present and greater than max
-            mapOf(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS to 10_001) to FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX,
+            mapOf(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS to 60_001) to FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX,
             // Value present and within the range
             mapOf(FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS to 1_000) to 1_000L,
         ).forEach { (config, result) ->
