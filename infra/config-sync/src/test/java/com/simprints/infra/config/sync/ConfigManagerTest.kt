@@ -137,4 +137,18 @@ class ConfigManagerTest {
         assertThat(emittedConfigs[0]).isEqualTo(config1)
         assertThat(emittedConfigs[1]).isEqualTo(config2)
     }
+
+    @Test
+    fun `watchProjectConfiguration should call getProjectConfiguration on start to invoke download if config empty`() = runTest {
+        coEvery { configRepository.watchProjectConfiguration() } returns kotlinx.coroutines.flow.flow {
+            emit(projectConfiguration)
+        }
+
+        val emittedConfigs = configManager.watchProjectConfiguration().toList()
+
+        coVerify(exactly = 1) { configRepository.getProjectConfiguration() }
+
+        assertThat(emittedConfigs).hasSize(1)
+        assertThat(emittedConfigs[0]).isEqualTo(projectConfiguration)
+    }
 }
