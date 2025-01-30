@@ -155,6 +155,28 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
+    fun `build - enrol action - no age restriction - duplicate check - matching modalities - returns expected steps`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        val action = mockk<ActionRequest.EnrolActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration)
+
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.FACE_MATCHER,
+        )
+    }
+
+    @Test
     fun `build - identify action - no age restriction - returns expected steps`() {
         val projectConfiguration = mockCommonProjectConfiguration()
 
@@ -172,6 +194,25 @@ class BuildStepsUseCaseTest {
             StepId.FACE_CAPTURE,
             StepId.FINGERPRINT_MATCHER,
             StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER,
+        )
+    }
+
+    @Test
+    fun `build - identify action - no age restriction - matching modalities - returns expected steps`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
+
+        val action = mockk<ActionRequest.IdentifyActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration)
+
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.CONSENT,
+            StepId.FACE_CAPTURE,
             StepId.FACE_MATCHER,
         )
     }
@@ -224,6 +265,26 @@ class BuildStepsUseCaseTest {
     }
 
     @Test
+    fun `build - verify action - no age restriction - matching modalities - returns expected steps`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
+
+        val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+
+        val steps = useCase.build(action, projectConfiguration)
+
+        assertStepOrder(
+            steps,
+            StepId.SETUP,
+            StepId.FETCH_GUID,
+            StepId.CONSENT,
+            StepId.FACE_CAPTURE,
+            StepId.FACE_MATCHER,
+        )
+    }
+
+    @Test
     fun `build - confirm identity action - returns expected steps`() {
         val projectConfiguration = mockCommonProjectConfiguration()
 
@@ -253,6 +314,27 @@ class BuildStepsUseCaseTest {
 
         assertStepOrder(
             steps,
+            StepId.ENROL_LAST_BIOMETRIC,
+        )
+    }
+
+    @Test
+    fun `build - enrol last biometric action - missing modality capture - returns expected steps`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        every { projectConfiguration.general.matchingModalities } returns listOf(Modality.FACE)
+
+        val action = mockk<ActionRequest.EnrolLastBiometricActionRequest>(relaxed = true)
+        every { action.getSubjectAgeIfAvailable() } returns null
+        every { cache.steps } returns listOf(
+            Step(StepId.FACE_CAPTURE, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)),
+        )
+
+        val steps = useCase.build(action, projectConfiguration)
+
+        assertStepOrder(
+            steps,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
             StepId.ENROL_LAST_BIOMETRIC,
         )
     }
