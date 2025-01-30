@@ -1,7 +1,6 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,8 +16,8 @@ class ResolveFaceBioSdkUseCase @Inject constructor(
             .face
             ?.rankOne
             ?.version
-        Simber.d("FaceBioSDK version: $version")
-        // if the version is null, return rocV1BioSdk
+            ?.takeIf { it.isNotBlank() } // Ensures version is not null or empty
+        requireNotNull(version) { "FaceBioSDK version is null or empty" }
         return if (version == rocV3BioSdk.version) rocV3BioSdk else rocV1BioSdk
     }
 }
