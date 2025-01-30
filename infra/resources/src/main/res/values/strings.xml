@@ -244,7 +244,7 @@
     <string name="fingerprint_connect_ota_start_update">Start update</string>
     <string name="fingerprint_connect_ota_recovery_title">Scanner update failed</string>
     <string name="fingerprint_connect_ota_recovery_soft_reset">Turn scanner off and on again</string>
-    <string name="fingerprint_connect_ota_recovery_hard_reset">1. Press and hold the power button until the scanner turns off \n 2. Press and hold power button for 7 seconds</string>
+    <string name="fingerprint_connect_ota_recovery_hard_reset">1. Press and hold the power button until the scanner turns off \n2. Press and hold the power button again for 7 seconds</string>
     <string name="fingerprint_connect_ota_failed_title">Scanner update failed</string>
     <string name="fingerprint_connect_ota_failed_instructions">Please contact your supervisor for help</string>
     <string name="fingerprint_connect_ota_continue_button">Continue</string>
