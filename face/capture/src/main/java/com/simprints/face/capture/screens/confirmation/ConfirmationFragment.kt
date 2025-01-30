@@ -51,6 +51,7 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
         mainVm.getSampleDetection()?.bitmap?.let { binding.confirmationImg.setImageBitmap(it) }
 
         binding.confirmationBtn.setOnClickListener {
+            binding.confirmationBtn.setOnClickListener(null)
             mainVm.addCaptureConfirmationAction(startTime, true)
             mainVm.flowFinished()
         }
