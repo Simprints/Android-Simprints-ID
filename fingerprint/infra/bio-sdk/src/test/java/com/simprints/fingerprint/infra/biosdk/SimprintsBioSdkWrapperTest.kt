@@ -33,18 +33,24 @@ class SimprintsBioSdkWrapperTest {
     }
 
     @Test
-    fun `test scanningTimeoutMs and imageTransferTimeoutMs`() {
+    fun `test Fixed Properties`() {
         // Given
         val expectedScanningTimeoutMs = 3000L
         val expectedImageTransferTimeoutMs = 3000L
+        val expectedMinGoodScans = 2
+        val expectedAddNewFingerOnBadScan = true
 
         // When
         val actualScanningTimeoutMs = simprintsBioSdkWrapper.scanningTimeoutMs
         val actualImageTransferTimeoutMs = simprintsBioSdkWrapper.imageTransferTimeoutMs
+        val actualMinGoodScans = simprintsBioSdkWrapper.minGoodScans
+        val actualAddNewFingerOnBadScan = simprintsBioSdkWrapper.addNewFingerOnBadScan
 
         // Then
         assertThat(actualScanningTimeoutMs).isEqualTo(expectedScanningTimeoutMs)
         assertThat(actualImageTransferTimeoutMs).isEqualTo(expectedImageTransferTimeoutMs)
+        assertThat(actualMinGoodScans).isEqualTo(expectedMinGoodScans)
+        assertThat(actualAddNewFingerOnBadScan).isEqualTo(expectedAddNewFingerOnBadScan)
     }
 
     @Test

@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.biosdk
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -39,18 +39,24 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
-    fun `test scanningTimeoutMs and imageTransferTimeoutMs`() {
+    fun `test Fixed Properties`() {
         // Given
         val expectedScanningTimeoutMs = 8000L
         val expectedImageTransferTimeoutMs = 0L
+        val expectedMinGoodScans = 0
+        val expectedAddNewFingerOnBadScan = false
 
         // When
         val actualScanningTimeoutMs = necBioSdkWrapper.scanningTimeoutMs
         val actualImageTransferTimeoutMs = necBioSdkWrapper.imageTransferTimeoutMs
+        val actualMinGoodScans = necBioSdkWrapper.minGoodScans
+        val actualAddNewFingerOnBadScan = necBioSdkWrapper.addNewFingerOnBadScan
 
         // Then
-        Truth.assertThat(actualScanningTimeoutMs).isEqualTo(expectedScanningTimeoutMs)
-        Truth.assertThat(actualImageTransferTimeoutMs).isEqualTo(expectedImageTransferTimeoutMs)
+        assertThat(actualScanningTimeoutMs).isEqualTo(expectedScanningTimeoutMs)
+        assertThat(actualImageTransferTimeoutMs).isEqualTo(expectedImageTransferTimeoutMs)
+        assertThat(actualMinGoodScans).isEqualTo(expectedMinGoodScans)
+        assertThat(actualAddNewFingerOnBadScan).isEqualTo(expectedAddNewFingerOnBadScan)
     }
 
     @Test
@@ -106,19 +112,18 @@ class NECBioSdkWrapperTest {
         // Then
         coVerify { bioSdk.acquireFingerprintTemplate(any()) }
         with(settingsSlot.captured) {
-            Truth
-                .assertThat(processingResolution?.value)
+            assertThat(processingResolution?.value)
                 .isEqualTo(captureFingerprintStrategy.toShort())
-            Truth.assertThat(timeOutMs).isEqualTo(captureTimeOutMs)
-            Truth.assertThat(qualityThreshold).isEqualTo(captureQualityThreshold)
-            Truth.assertThat(allowLowQualityExtraction).isEqualTo(captureAllowLowQualityExtraction)
+            assertThat(timeOutMs).isEqualTo(captureTimeOutMs)
+            assertThat(qualityThreshold).isEqualTo(captureQualityThreshold)
+            assertThat(allowLowQualityExtraction).isEqualTo(captureAllowLowQualityExtraction)
         }
-        Truth.assertThat(bioSdkResponse.template).isEqualTo(response.template)
-        Truth
-            .assertThat(bioSdkResponse.templateMetadata?.templateFormat)
+        assertThat(bioSdkResponse.template).isEqualTo(response.template)
+
+        assertThat(bioSdkResponse.templateMetadata?.templateFormat)
             .isEqualTo(response.templateFormat)
-        Truth
-            .assertThat(bioSdkResponse.templateMetadata?.imageQualityScore)
+
+        assertThat(bioSdkResponse.templateMetadata?.imageQualityScore)
             .isEqualTo(response.imageQualityScore)
     }
 
@@ -149,6 +154,6 @@ class NECBioSdkWrapperTest {
         val response = necBioSdkWrapper.acquireFingerprintImage()
         // Then
         coVerify { bioSdk.acquireFingerprintImage() }
-        Truth.assertThat(bioSdkResponse.imageBytes).isEqualTo(response.imageBytes)
+        assertThat(bioSdkResponse.imageBytes).isEqualTo(response.imageBytes)
     }
 }
