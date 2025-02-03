@@ -105,6 +105,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
     private fun updateFingerDirectionText(state: CollectFingerprintsState) = withFingerState {
         binding.fingerResultText.isVisible = currentCapture() !is CaptureState.ScanProcess.Scanning
+        binding.transferProgress.isVisible = currentCapture() is CaptureState.ScanProcess.TransferringImage
         binding.fingerDirectionText.text = getString(directionTextId(state.isOnLastFinger()))
         binding.fingerDirectionText.setTextColor(
             resources.getColor(
