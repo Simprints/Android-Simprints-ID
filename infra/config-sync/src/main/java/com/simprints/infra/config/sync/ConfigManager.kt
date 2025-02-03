@@ -9,6 +9,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class ConfigManager @Inject constructor(
@@ -44,6 +45,10 @@ class ConfigManager @Inject constructor(
             localConfig
         }
     }
+
+    fun watchProjectConfiguration(): Flow<ProjectConfiguration> =
+        configRepository.watchProjectConfiguration()
+            .onStart { getProjectConfiguration() } // to invoke download if empty
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration = configRepository.getDeviceConfiguration()
 

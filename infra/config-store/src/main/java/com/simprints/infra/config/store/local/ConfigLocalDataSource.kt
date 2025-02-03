@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.local
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import kotlinx.coroutines.flow.Flow
 
 internal interface ConfigLocalDataSource {
     suspend fun saveProject(project: Project)
@@ -14,6 +15,8 @@ internal interface ConfigLocalDataSource {
     suspend fun saveProjectConfiguration(config: ProjectConfiguration)
 
     suspend fun getProjectConfiguration(): ProjectConfiguration
+
+    fun watchProjectConfiguration(): Flow<ProjectConfiguration>
 
     suspend fun clearProjectConfiguration()
 

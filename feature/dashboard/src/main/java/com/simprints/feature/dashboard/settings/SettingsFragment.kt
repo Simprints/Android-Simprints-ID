@@ -60,6 +60,9 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         viewModel.generalConfiguration.observe(viewLifecycleOwner) {
             enableFingerprintSettings(it.modalities)
         }
+        viewModel.experimentalConfiguration.observe(viewLifecycleOwner) {
+            showFaceAutoCaptureSetting(isVisible = it.faceAutoCaptureEnabled)
+        }
         viewModel.languagePreference.observe(viewLifecycleOwner) {
             loadSelectedLanguage(it)
         }
@@ -209,6 +212,12 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
     private fun getUpdateConfig(): Preference? = findPreference(getString(R.string.preference_update_config_key))
 
     private fun getAboutPreference(): Preference? = findPreference(getString(R.string.preference_app_details_key))
+
+    private fun getFaceAutoCapturePreference(): Preference? = findPreference(getString(R.string.preference_enable_face_auto_capture))
+
+    private fun showFaceAutoCaptureSetting(isVisible: Boolean) {
+        getFaceAutoCapturePreference()?.isVisible = isVisible
+    }
 
     companion object {
         private const val ACTION_LANGUAGE = "language"

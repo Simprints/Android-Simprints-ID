@@ -4,17 +4,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.sync.ConfigSyncCache
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.slot
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -62,6 +61,30 @@ class SettingsViewModelTest {
         )
 
         viewModel = SettingsViewModel(configManager, syncOrchestrator, configSyncCache)
+    }
+
+    @Test
+    fun `experimentalConfiguration live data should follow the project experimental configuration`() = runTest {
+        val experimentalConfig1 = mapOf("key1" to "value1")
+        val experimentalConfig2 = mapOf("key2" to "value2")
+
+        coEvery { configManager.watchProjectConfiguration() } returns flowOf(
+            mockk<ProjectConfiguration>(relaxed = true) {
+                every { custom } returns experimentalConfig1
+            },
+            mockk<ProjectConfiguration>(relaxed = true) {
+                every { custom } returns experimentalConfig2
+            },
+        )
+        viewModel = SettingsViewModel(configManager, syncOrchestrator, configSyncCache)
+
+        assertThat(viewModel.experimentalConfiguration.test().valueHistory())
+            .isEqualTo(
+                listOf(
+                    ExperimentalProjectConfiguration(experimentalConfig1),
+                    ExperimentalProjectConfiguration(experimentalConfig2),
+                )
+            )
     }
 
     @Test

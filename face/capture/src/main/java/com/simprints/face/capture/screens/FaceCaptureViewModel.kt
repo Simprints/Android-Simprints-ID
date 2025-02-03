@@ -13,10 +13,12 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
+import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -48,6 +50,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
+    private val isUsingAutoCapture: IsUsingAutoCaptureUseCase,
     @DeviceID private val deviceID: String,
 ) : ViewModel() {
     // Updated in live feedback screen
@@ -77,6 +80,10 @@ internal class FaceCaptureViewModel @Inject constructor(
     val invalidLicense: LiveData<LiveDataEvent>
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
+
+    val isAutoCaptureEnabled: LiveData<Boolean>
+        get() = _isAutoCaptureEnabled
+    private val _isAutoCaptureEnabled = MutableLiveData<Boolean>()
 
     fun setupCapture(samplesToCapture: Int) {
         this.samplesToCapture = samplesToCapture
@@ -116,6 +123,11 @@ internal class FaceCaptureViewModel @Inject constructor(
         }
         saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
+
+    fun setupAutoCapture() =
+        viewModelScope.launch {
+            _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
+        }
 
     private suspend fun initialize(
         activity: Activity,

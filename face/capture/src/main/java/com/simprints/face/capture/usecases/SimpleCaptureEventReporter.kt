@@ -51,6 +51,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
         faceDetection: FaceDetection,
         attempt: Int,
         qualityThreshold: Float,
+        isAutoCapture: Boolean = false,
     ) {
         val faceCaptureEvent = FaceCaptureEvent(
             faceDetection.detectionStartTime,
@@ -58,6 +59,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
             attempt,
             qualityThreshold,
             mapDetectionStatusToPayloadResult(faceDetection),
+            isAutoCapture = isAutoCapture,
             faceDetection.isFallback,
             mapDetectionToCapturePayloadFace(faceDetection),
             payloadId = faceDetection.id,

@@ -377,10 +377,12 @@
     <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
     <string name="dashboard_preference_summary_update_config_last_updated">Refresh device and project configuration\nLast updated: %s</string>
     <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Audio alerts for scan completion, prompting the user to remove the subject’s finger from the scanner.</string>
+    <string name="dashboard_preference_summary_enable_auto_capture">Automatically start taking pictures when a face is well positioned in the viewfinder.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
     <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
     <string name="dashboard_preference_update_config_finished">Configuration updated</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">Audio Alert</string>
+    <string name="dashboard_preference_enable_auto_capture">Auto-capture</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Sync Information</string>
