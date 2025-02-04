@@ -29,8 +29,8 @@ class SubjectFactory @Inject constructor(
             projectId = projectId,
             attendantId = attendantId,
             moduleId = moduleId,
-            fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
-            faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
+            fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(subjectId, this.biometricReferences),
+            faceSamples = extractFaceSamplesFromBiometricReferences(subjectId, this.biometricReferences),
         )
     }
 
@@ -40,8 +40,8 @@ class SubjectFactory @Inject constructor(
             projectId = projectId,
             attendantId = attendantId,
             moduleId = moduleId,
-            fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
-            faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
+            fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(subjectId, this.biometricReferences),
+            faceSamples = extractFaceSamplesFromBiometricReferences(subjectId, this.biometricReferences),
         )
     }
 
@@ -59,8 +59,8 @@ class SubjectFactory @Inject constructor(
             attendantId = attendantId,
             moduleId = moduleId,
             createdAt = Date(timeHelper.now().ms),
-            fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
-            faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
+            fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(subjectId, it) }.orEmpty(),
+            faceSamples = faceResponse?.let { extractFaceSamples(subjectId, it) }.orEmpty(),
         )
     }
 
@@ -84,28 +84,38 @@ class SubjectFactory @Inject constructor(
         faceSamples = faceSamples,
     )
 
-    private fun extractFingerprintSamples(fingerprintResponse: FingerprintCaptureResult) =
-        fingerprintResponse.results.mapNotNull { captureResult ->
-            captureResult.sample?.let { sample ->
-                FingerprintSample(
-                    captureResult.identifier,
-                    sample.template,
-                    sample.templateQualityScore,
-                    sample.format,
-                )
-            }
+    private fun extractFingerprintSamples(
+        subjectId: String,
+        fingerprintResponse: FingerprintCaptureResult,
+    ) = fingerprintResponse.results.mapNotNull { captureResult ->
+        captureResult.sample?.let { sample ->
+            FingerprintSample(
+                captureResult.identifier,
+                sample.template,
+                sample.templateQualityScore,
+                sample.format,
+                subjectId = subjectId,
+            )
         }
+    }
 
-    private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
+    private fun extractFaceSamples(
+        subjectId: String,
+        faceResponse: FaceCaptureResult,
+    ) = faceResponse.results
         .mapNotNull { it.sample }
-        .map { FaceSample(it.template, it.format) }
+        .map { FaceSample(it.template, it.format, subjectId = subjectId) }
 
-    private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
+    private fun extractFingerprintSamplesFromBiometricReferences(
+        subjectId: String,
+        biometricReferences: List<BiometricReference>?,
+    ) = biometricReferences
         ?.filterIsInstance<FingerprintReference>()
         ?.firstOrNull()
         ?.let { reference ->
             reference.templates.map {
                 buildFingerprintSample(
+                    subjectId = subjectId,
                     it,
                     reference.format,
                 )
@@ -114,6 +124,7 @@ class SubjectFactory @Inject constructor(
         ?: emptyList()
 
     private fun buildFingerprintSample(
+        subjectId: String,
         template: FingerprintTemplate,
         format: String,
     ): FingerprintSample = FingerprintSample(
@@ -121,16 +132,29 @@ class SubjectFactory @Inject constructor(
         template = encodingUtils.base64ToBytes(template.template),
         templateQualityScore = template.quality,
         format = format,
+        subjectId = subjectId,
     )
 
-    private fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
+    private fun extractFaceSamplesFromBiometricReferences(
+        subjectId: String,
+        biometricReferences: List<BiometricReference>?,
+    ) = biometricReferences
         ?.filterIsInstance<FaceReference>()
         ?.firstOrNull()
-        ?.let { reference -> reference.templates.map { buildFaceSample(it, reference.format) } }
+        ?.let { reference ->
+            reference.templates.map {
+                buildFaceSample(
+                    subjectId,
+                    it,
+                    reference.format,
+                )
+            }
+        }
         ?: emptyList()
 
     private fun buildFaceSample(
+        subjectId: String,
         template: FaceTemplate,
         format: String,
-    ) = FaceSample(encodingUtils.base64ToBytes(template.template), format)
+    ) = FaceSample(encodingUtils.base64ToBytes(template.template), format, subjectId = subjectId)
 }

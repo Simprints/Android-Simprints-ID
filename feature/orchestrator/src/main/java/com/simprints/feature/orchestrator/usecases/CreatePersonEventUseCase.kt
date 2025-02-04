@@ -51,15 +51,22 @@ internal class CreatePersonEventUseCase @Inject constructor(
             .ifEmpty { null }
         val fingerprintReferenceId = fingerprintSamplesForPersonCreation
             .mapNotNull { it.sample }
-            .map { FingerprintSample(it.fingerIdentifier, it.template, it.templateQualityScore, it.format) }
-            .uniqueId()
+            .map {
+                FingerprintSample(
+                    it.fingerIdentifier,
+                    it.template,
+                    it.templateQualityScore,
+                    it.format,
+                    subjectId = "",
+                )
+            }.uniqueId()
 
         val faceCaptureIds = faceSamplesForPersonCreation
             .mapNotNull { it.captureEventId }
             .ifEmpty { null }
         val faceReferenceId = faceSamplesForPersonCreation
             .mapNotNull { it.sample }
-            .map { FaceSample(it.template, it.format) }
+            .map { FaceSample(it.template, it.format, subjectId = "") }
             .uniqueId()
 
         // If the step results of the current callout do not contain a modality but we have a PersonCreationEvent from the

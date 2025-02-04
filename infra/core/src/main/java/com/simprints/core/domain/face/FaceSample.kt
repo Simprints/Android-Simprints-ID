@@ -11,6 +11,7 @@ data class FaceSample(
     val template: ByteArray,
     val format: String,
     val id: String = UUID.randomUUID().toString(),
+    val subjectId: String,
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

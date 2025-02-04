@@ -19,17 +19,20 @@ internal class BuildSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val subjectFactory: SubjectFactory,
 ) {
-    operator fun invoke(params: EnrolLastBiometricParams): Subject = subjectFactory.buildSubject(
-        UUID.randomUUID().toString(),
-        params.projectId,
-        params.userId,
-        params.moduleId,
-        createdAt = Date(timeHelper.now().ms),
-        fingerprintSamples = getFingerprintCaptureResult(params.steps)
-            ?.map(::fingerprintSample)
-            .orEmpty(),
-        faceSamples = getFaceCaptureResult(params.steps)?.map(::faceSample).orEmpty(),
-    )
+    operator fun invoke(params: EnrolLastBiometricParams): Subject {
+        val subjectId = UUID.randomUUID().toString()
+        return subjectFactory.buildSubject(
+            subjectId = subjectId,
+            params.projectId,
+            params.userId,
+            params.moduleId,
+            createdAt = Date(timeHelper.now().ms),
+            fingerprintSamples = getFingerprintCaptureResult(params.steps)
+                ?.map { fingerprintSample(subjectId, it) }
+                .orEmpty(),
+            faceSamples = getFaceCaptureResult(params.steps)?.map { faceSample(subjectId, it) }.orEmpty(),
+        )
+    }
 
     private fun getFingerprintCaptureResult(steps: List<EnrolLastBiometricStepResult>) = steps
         .filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>()
@@ -41,11 +44,15 @@ internal class BuildSubjectUseCase @Inject constructor(
         .firstOrNull()
         ?.results
 
-    private fun fingerprintSample(it: FingerTemplateCaptureResult) = FingerprintSample(
+    private fun fingerprintSample(
+        subjectId: String,
+        it: FingerTemplateCaptureResult,
+    ) = FingerprintSample(
         fromDomainToModuleApi(it.finger),
         it.template,
         it.templateQualityScore,
         it.format,
+        subjectId = subjectId,
     )
 
     private fun fromDomainToModuleApi(finger: Finger) = when (finger) {
@@ -61,5 +68,8 @@ internal class BuildSubjectUseCase @Inject constructor(
         Finger.LEFT_5TH_FINGER -> IFingerIdentifier.LEFT_5TH_FINGER
     }
 
-    private fun faceSample(it: FaceTemplateCaptureResult) = FaceSample(it.template, it.format)
+    private fun faceSample(
+        subjectId: String,
+        it: FaceTemplateCaptureResult,
+    ) = FaceSample(it.template, it.format, subjectId = subjectId)
 }
