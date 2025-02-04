@@ -14,7 +14,6 @@ import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -99,7 +98,7 @@ internal class EnrolmentRecordRepositoryImpl(
             localDataSource.performActions(tokenizedSubjectsCreateAction)
         } catch (e: Exception) {
             when (e) {
-                is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
+                // is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
                 else -> Simber.e("Failed to tokenize existing records", e)
             }
         }

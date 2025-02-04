@@ -1,49 +1,68 @@
 package com.simprints.infra.enrolment.records.store.local.models
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.Relation
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.core.domain.tokenization.isTokenized
-import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.infra.realm.models.DbFaceSample
-import com.simprints.infra.realm.models.DbFingerprintSample
-import com.simprints.infra.realm.models.DbSubject
-import com.simprints.infra.realm.models.toDate
-import com.simprints.infra.realm.models.toRealmInstant
-import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.types.RealmUUID
+import java.util.Date
+import java.util.UUID
+import com.simprints.infra.enrolment.records.store.domain.models.Subject as SubjectDomain
 
-internal fun DbSubject.fromDbToDomain(): Subject {
+@Entity(
+    tableName = "subjects",
+    indices = [
+        Index(value = ["projectId"]),
+        Index(value = ["attendantId"]),
+        Index(value = ["moduleId"]),
+    ],
+)
+data class DbSubject(
+    @PrimaryKey
+    val subjectId: String = UUID.randomUUID().toString(),
+    val projectId: String? = "",
+    val attendantId: String? = "",
+    val moduleId: String? = "",
+    val createdAt: Long? = 0,
+    val updatedAt: Long? = 0,
+    val toSync: Boolean = false,
+    val isAttendantIdTokenized: Boolean = false,
+    val isModuleIdTokenized: Boolean = false,
+)
+
+data class Subject(
+    @Embedded val subject: DbSubject,
+    @Relation(
+        parentColumn = "subjectId",
+        entityColumn = "subjectId",
+    )
+    val fingerprintSamples: List<DbFingerprintSample>,
+    @Relation(
+        parentColumn = "subjectId",
+        entityColumn = "subjectId",
+    )
+    val faceSamples: List<DbFaceSample>,
+)
+
+fun Subject.toDomain(): SubjectDomain {
     val attendantId =
-        if (isAttendantIdTokenized) attendantId.asTokenizableEncrypted() else attendantId.asTokenizableRaw()
+        if (subject.isAttendantIdTokenized) subject.attendantId?.asTokenizableEncrypted() else subject.attendantId?.asTokenizableRaw()
     val moduleId =
-        if (isModuleIdTokenized) moduleId.asTokenizableEncrypted() else moduleId.asTokenizableRaw()
+        if (subject.isModuleIdTokenized) subject.moduleId?.asTokenizableEncrypted() else subject.moduleId?.asTokenizableRaw()
 
-    return Subject(
-        subjectId = subjectId.toString(),
-        projectId = projectId,
-        attendantId = attendantId,
-        moduleId = moduleId,
-        createdAt = createdAt?.toDate(),
-        updatedAt = updatedAt?.toDate(),
-        toSync = toSync,
-        fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
-        faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain),
+    return SubjectDomain(
+        subjectId = subject.subjectId.toString(),
+        projectId = subject.projectId!!,
+        attendantId = attendantId!!,
+        moduleId = moduleId!!,
+        createdAt = subject.createdAt?.toDate(),
+        updatedAt = subject.updatedAt?.toDate(),
+        fingerprintSamples = fingerprintSamples.map { it.fromDbToDomain() },
+        faceSamples = faceSamples.map { it.fromDbToDomain() },
+        toSync = subject.toSync,
     )
 }
 
-internal fun Subject.fromDomainToDb(): DbSubject = DbSubject().also { subject ->
-    subject.subjectId = RealmUUID.from(subjectId)
-    subject.projectId = projectId
-    subject.attendantId = attendantId.value
-    subject.moduleId = moduleId.value
-    subject.createdAt = createdAt?.toRealmInstant()
-    subject.updatedAt = updatedAt?.toRealmInstant()
-    subject.toSync = toSync
-    subject.fingerprintSamples =
-        fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList()
-    subject.faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
-    subject.isModuleIdTokenized = moduleId.isTokenized()
-    subject.isAttendantIdTokenized = attendantId.isTokenized()
-}
+fun Long.toDate() = Date(this)

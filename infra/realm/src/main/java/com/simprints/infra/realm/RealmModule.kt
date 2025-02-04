@@ -7,7 +7,8 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RealmModule {
+abstract class
+RealmModule {
     @Binds
     internal abstract fun bindRealmWrapper(impl: RealmWrapperImpl): RealmWrapper
 }

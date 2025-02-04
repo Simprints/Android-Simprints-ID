@@ -1,6 +1,7 @@
 plugins {
     id("simprints.infra")
     id("kotlin-parcelize")
+    id("simprints.library.room")
 }
 
 android {
@@ -10,7 +11,7 @@ android {
 dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":infra:auth-store"))
-    implementation(project(":infra:realm"))
+    //  implementation(project(":infra:realm"))
     implementation(project(":infra:events"))
 
     implementation(libs.libsimprints)
