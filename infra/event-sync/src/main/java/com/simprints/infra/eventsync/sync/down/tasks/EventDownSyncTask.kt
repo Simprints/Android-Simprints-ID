@@ -19,7 +19,6 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -47,7 +46,7 @@ internal class EventDownSyncTask @Inject constructor(
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val eventRepository: EventRepository,
 ) {
-    suspend fun downSync(
+    fun downSync(
         scope: CoroutineScope,
         operation: EventDownSyncOperation,
         eventScope: EventScope,
@@ -171,7 +170,7 @@ internal class EventDownSyncTask @Inject constructor(
 
         enrolmentRecordRepository.performActions(actions)
 
-        return if (batchOfEventsToProcess.size > 0) {
+        return if (batchOfEventsToProcess.isNotEmpty()) {
             lastOperation.copy(
                 state = RUNNING,
                 lastEventId = batchOfEventsToProcess.last().id,
@@ -196,70 +195,48 @@ internal class EventDownSyncTask @Inject constructor(
         operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent,
     ): List<SubjectAction> {
-        val modulesIdsUnderSyncing = operation.queryEvent.moduleId
-        val attendantUnderSyncing = operation.queryEvent.attendantId
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
         val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
 
         val actions = mutableListOf<SubjectAction>()
-        when {
-            !modulesIdsUnderSyncing.isNullOrEmpty() -> {
-                /**
-                 * handleSubjectMoveEvent is executed by each worker to process a new moveEvent.
-                 * The deletion part of a move is executed if:
-                 * 1) the deletion is part of the EventDownSyncOperation (deletion.moduleId == op.moduleId)
-                 * AND
-                 * 2) the creation is not synced by other workers.
-                 * Required to avoid a race condition:
-                 * Let's assume that SID is syncing by module1 (by worker1) and module2 (by worker2) and a subjectA
-                 * is moved from module1 to module2.
-                 * Both workers will receive a move event (worker1 to delete subjectA and worker2 to create subjectA), but
-                 * because workers run in parallel, the worker1 may execute the deletion after worker2 has done the
-                 * creation. So finally the subject is not moved, but actually deleted.
-                 * So if another worker is going to create (insertOrUpdate) the subject for a different module,
-                 * then the deletion will be ignored and a the update is executed.)
-                 */
-                if (enrolmentRecordDeletion.isUnderSyncingByCurrentDownSyncOperation(operation) &&
-                    (!enrolmentRecordCreation.isUnderOverallSyncing())
-                ) {
-                    actions.add(Deletion(enrolmentRecordDeletion.subjectId))
-                }
 
-                if (enrolmentRecordCreation.isUnderSyncingByCurrentDownSyncOperation(operation)) {
-                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                        actions.add(
-                            it,
-                        )
-                    }
-                }
-            }
-
-            attendantUnderSyncing != null -> {
-                if (attendantUnderSyncing == enrolmentRecordDeletion.attendantId.value) {
-                    actions.add(Deletion(enrolmentRecordDeletion.subjectId))
-                }
-
-                if (attendantUnderSyncing == enrolmentRecordCreation.attendantId.value) {
-                    createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                        actions.add(
-                            it,
-                        )
-                    }
-                }
-            }
-
-            else -> {
-                actions.add(Deletion(enrolmentRecordDeletion.subjectId))
-                createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
-                    actions.add(
-                        it,
-                    )
-                }
+        actions.add(Deletion(enrolmentRecordDeletion.subjectId))
+        if (shouldBeSynced(enrolmentRecordCreation, operation)) {
+            createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
+                actions.add(it)
             }
         }
 
         return actions
     }
+
+    private suspend fun shouldBeSynced(
+        enrolmentRecordCreation: EnrolmentRecordCreationInMove,
+        operation: EventDownSyncOperation,
+    ): Boolean = when {
+        // When syncing by module, check whether record was moved in a module selected for syncing
+        operation.isSyncingByModule() -> {
+            configManager
+                .getDeviceConfiguration()
+                .selectedModules
+                .values()
+                .contains(enrolmentRecordCreation.moduleId.value)
+        }
+
+        // When syncing by attendant, check whether record was moved to the attendant we are  syncing by
+        operation.isSyncingByAttendant() -> {
+            enrolmentRecordCreation.attendantId.value == operation.queryEvent.attendantId
+        }
+
+        // When syncing by project - record should always be synced
+        else -> {
+            true
+        }
+    }
+
+    private fun EventDownSyncOperation.isSyncingByModule(): Boolean = !queryEvent.moduleId.isNullOrEmpty()
+
+    private fun EventDownSyncOperation.isSyncingByAttendant(): Boolean = !queryEvent.attendantId.isNullOrEmpty()
 
     private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
         enrolmentRecordCreation?.let {
@@ -270,17 +247,6 @@ internal class EventDownSyncTask @Inject constructor(
                 null
             }
         }
-
-    private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleId == moduleId.value
-
-    private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleId == moduleId.value
-
-    private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
-        moduleId.value.partOf(configManager.getDeviceConfiguration().selectedModules.values())
-
-    private fun String.partOf(modules: List<String>) = modules.contains(this)
 
     private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
         listOf(Deletion(event.payload.subjectId))
