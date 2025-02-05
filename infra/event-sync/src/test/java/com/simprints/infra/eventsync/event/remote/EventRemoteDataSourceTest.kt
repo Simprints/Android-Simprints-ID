@@ -129,7 +129,7 @@ class EventRemoteDataSourceTest {
     @Test
     fun downloadEvents_shouldParseStreamAndEmitBatches() = runTest {
         val responseStreamWith6Events =
-            this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_7events.json")!!
+            this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_8events.json")!!
         val channel = mockk<ProducerScope<EnrolmentRecordEvent>>(relaxed = true)
         excludeRecords { channel.isClosedForSend }
 
@@ -148,6 +148,7 @@ class EventRemoteDataSourceTest {
                 EnrolmentRecordEventType.EnrolmentRecordDeletion,
                 EnrolmentRecordEventType.EnrolmentRecordMove,
                 EnrolmentRecordEventType.EnrolmentRecordMove,
+                EnrolmentRecordEventType.EnrolmentRecordUpdate,
             ),
         )
     }

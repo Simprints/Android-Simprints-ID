@@ -32,10 +32,6 @@ internal data class ApiEnrolmentRecordMovePayload(
         val attendantId: String,
         val biometricReferences: List<ApiBiometricReference>?,
     )
-
-    companion object {
-        const val ENROLMENT_RECORD_MOVE = "EnrolmentRecordMove"
-    }
 }
 
 internal fun ApiEnrolmentRecordMovePayload.fromApiToDomain() = EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload(
