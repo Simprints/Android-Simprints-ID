@@ -9,6 +9,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.AGE_GR
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHORIZATION_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.BIOMETRIC_REFERENCE_CREATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_CONFIRMATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_ENROLMENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_ERROR_KEY
@@ -138,6 +139,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = EventUpSyncRequestEvent::class, name = EVENT_UP_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = LicenseCheckEvent::class, name = LICENSE_CHECK_KEY),
     JsonSubTypes.Type(value = AgeGroupSelectionEvent::class, name = AGE_GROUP_SELECTION_KEY),
+    JsonSubTypes.Type(value = BiometricReferenceCreationEvent::class, name = BIOMETRIC_REFERENCE_CREATION_KEY),
 )
 abstract class Event {
     abstract val id: String

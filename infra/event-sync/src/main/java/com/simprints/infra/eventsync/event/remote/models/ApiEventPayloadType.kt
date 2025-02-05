@@ -6,6 +6,7 @@ import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECT
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
 import com.simprints.infra.events.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.infra.events.event.domain.models.EventType.BIOMETRIC_REFERENCE_CREATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
@@ -147,6 +148,9 @@ internal enum class ApiEventPayloadType {
     // key added: AGE_GROUP_SELECTION_KEY
     AgeGroupSelection,
 
+    // key added: BIOMETRIC_REFERENCE_CREATION_KEY
+    BiometricReferenceCreation,
+
     ;
 
     companion object {
@@ -180,6 +184,7 @@ internal enum class ApiEventPayloadType {
         const val FINGERPRINT_CAPTURE_BIOMETRICS_KEY = "FingerprintCaptureBiometrics"
         const val EVENT_DOWN_SYNC_REQUEST_KEY = "EventDownSyncRequest"
         const val EVENT_UP_SYNC_REQUEST_KEY = "EventUpSyncRequest"
+        const val BIOMETRIC_REFERENCE_CREATION_KEY = "BiometricReferenceCreation"
     }
 }
 
@@ -229,6 +234,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
     LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
     AGE_GROUP_SELECTION -> ApiEventPayloadType.AgeGroupSelection
+    BIOMETRIC_REFERENCE_CREATION -> ApiEventPayloadType.BiometricReferenceCreation
 }
 
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
@@ -262,6 +268,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
     ApiEventPayloadType.LicenseCheck -> LICENSE_CHECK
     ApiEventPayloadType.AgeGroupSelection -> AGE_GROUP_SELECTION
+    ApiEventPayloadType.BiometricReferenceCreation -> BIOMETRIC_REFERENCE_CREATION
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }
