@@ -20,6 +20,7 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -168,6 +169,10 @@ internal class EventDownSyncTask @Inject constructor(
                     EnrolmentRecordEventType.EnrolmentRecordMove -> {
                         handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
                     }
+
+                    EnrolmentRecordEventType.EnrolmentRecordUpdate -> {
+                        handleSubjectUpdateEvent(event as EnrolmentRecordUpdateEvent)
+                    }
                 }
             }.flatten()
 
@@ -253,6 +258,10 @@ internal class EventDownSyncTask @Inject constructor(
 
     private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
         listOf(Deletion(event.payload.subjectId))
+
+    private fun EventDownSyncTask.handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<SubjectAction> {
+        TODO("Not yet implemented")
+    }
 
     companion object {
         const val EVENTS_BATCH_SIZE = 200
