@@ -16,6 +16,7 @@ import com.simprints.infra.events.event.domain.models.AuthenticationEvent.Authen
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult.FOUND
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
@@ -452,4 +453,11 @@ fun createAgeGroupSelectionEvent() = AgeGroupSelectionEvent(
     createdAt = CREATED_AT,
     endedAt = ENDED_AT,
     subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2),
+)
+
+fun createBiometricReferenceCreationEvent() = BiometricReferenceCreationEvent(
+    startTime = CREATED_AT,
+    referenceId = GUID1,
+    modality = BiometricReferenceCreationEvent.BiometricReferenceModality.FACE,
+    captureIds = listOf(GUID1, GUID2),
 )
