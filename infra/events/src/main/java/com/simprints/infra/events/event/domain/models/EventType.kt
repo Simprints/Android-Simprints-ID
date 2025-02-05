@@ -133,6 +133,9 @@ enum class EventType {
 
     // key added: AGE_GROUP_SELECTION_KEY
     AGE_GROUP_SELECTION,
+
+    // key added: BIOMETRIC_REFERENCE_CREATION_KEY
+    BIOMETRIC_REFERENCE_CREATION,
     ;
 
     companion object {
@@ -178,5 +181,6 @@ enum class EventType {
         const val EVENT_UP_SYNC_REQUEST_KEY = "EVENT_UP_SYNC_REQUEST"
         const val LICENSE_CHECK_KEY = "LICENSE_CHECK"
         const val AGE_GROUP_SELECTION_KEY = "AGE_GROUP_SELECTION"
+        const val BIOMETRIC_REFERENCE_CREATION_KEY = "BIOMETRIC_REFERENCE_CREATION"
     }
 }

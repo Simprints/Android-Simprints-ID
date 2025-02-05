@@ -631,4 +631,14 @@ fun validateAgeGroupSelectionEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateBiometricReferenceCreationEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "BiometricReferenceCreation", 1)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("id")).isNotNull()
+        assertThat(getString("modality")).isNotNull()
+        assertThat(getString("captureIds")).isNotNull()
+    }
+}
+
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

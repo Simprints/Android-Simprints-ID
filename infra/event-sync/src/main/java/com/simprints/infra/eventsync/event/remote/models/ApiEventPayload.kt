@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
@@ -19,6 +20,7 @@ import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECT
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
 import com.simprints.infra.events.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.infra.events.event.domain.models.EventType.BIOMETRIC_REFERENCE_CREATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
@@ -86,7 +88,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmati
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Companion
@@ -132,6 +134,7 @@ import com.simprints.infra.eventsync.event.remote.models.upsync.ApiEventUpSyncRe
     JsonSubTypes.Type(value = ApiCalloutPayload::class, name = Companion.CALLBACK_KEY),
     JsonSubTypes.Type(value = ApiEventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = ApiEventUpSyncRequestPayload::class, name = Companion.EVENT_UP_SYNC_REQUEST_KEY),
+    JsonSubTypes.Type(value = ApiBiometricReferenceCreationPayload::class, name = Companion.BIOMETRIC_REFERENCE_CREATION_KEY),
 )
 @Keep
 internal abstract class ApiEventPayload(
@@ -177,12 +180,11 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     CALLBACK_VERIFICATION -> ApiCallbackPayload(this as VerificationCallbackPayload)
     CALLBACK_ERROR -> ApiCallbackPayload(this as ErrorCallbackPayload)
     CALLBACK_CONFIRMATION -> ApiCallbackPayload(this as ConfirmationCallbackPayload)
-    FINGERPRINT_CAPTURE_BIOMETRICS -> ApiFingerprintCaptureBiometricsPayload(
-        this as FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload,
-    )
+    FINGERPRINT_CAPTURE_BIOMETRICS -> ApiFingerprintCaptureBiometricsPayload(this as FingerprintCaptureBiometricsPayload)
     FACE_CAPTURE_BIOMETRICS -> ApiFaceCaptureBiometricsPayload(this as FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload)
     EVENT_DOWN_SYNC_REQUEST -> ApiEventDownSyncRequestPayload(this as EventDownSyncRequestEvent.EventDownSyncRequestPayload)
     EVENT_UP_SYNC_REQUEST -> ApiEventUpSyncRequestPayload(this as EventUpSyncRequestEvent.EventUpSyncRequestPayload)
     LICENSE_CHECK -> ApiLicenseCheckEventPayload(this as LicenseCheckEvent.LicenseCheckEventPayload)
     AGE_GROUP_SELECTION -> ApiAgeGroupSelectionPayload(this as AgeGroupSelectionEvent.AgeGroupSelectionPayload)
+    BIOMETRIC_REFERENCE_CREATION -> ApiBiometricReferenceCreationPayload(this as BiometricReferenceCreationPayload)
 }
