@@ -7,4 +7,5 @@ enum class EnrolmentRecordEventType {
     EnrolmentRecordCreation,
     EnrolmentRecordDeletion,
     EnrolmentRecordMove,
+    EnrolmentRecordUpdate,
 }
