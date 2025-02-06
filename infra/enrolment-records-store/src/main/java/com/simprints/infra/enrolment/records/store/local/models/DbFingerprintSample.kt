@@ -5,7 +5,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.realm.models.DbFingerprintSample
 
 internal fun DbFingerprintSample.fromDbToDomain(): FingerprintSample = FingerprintSample(
-    id = id,
+    id = uuid,
     fingerIdentifier = IFingerIdentifier.values()[fingerIdentifier],
     template = template,
     templateQualityScore = templateQualityScore,
@@ -13,7 +13,7 @@ internal fun DbFingerprintSample.fromDbToDomain(): FingerprintSample = Fingerpri
 )
 
 internal fun FingerprintSample.fromDomainToDb(): DbFingerprintSample = DbFingerprintSample().also { sample ->
-    sample.id = id
+    sample.uuid = id
     sample.fingerIdentifier = fingerIdentifier.ordinal
     sample.template = template
     sample.templateQualityScore = templateQualityScore

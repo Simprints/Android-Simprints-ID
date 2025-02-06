@@ -9,14 +9,14 @@ class LibraryRealmConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("io.realm.kotlin")
+                apply("io.objectbox")
             }
 
             configureDbEncryptionBuild()
 
             val libs = getLibs()
             dependencies {
-                api(libs, "realm.base")
+                api(libs, "objectbox.base")
             }
         }
     }

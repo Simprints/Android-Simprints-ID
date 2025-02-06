@@ -87,6 +87,7 @@ realm_version = "3.0.0"
 protobuf_plugin_version = "0.9.4"
 deps_graph_version = "0.8.0"
 tink_version = "1.16.0"
+objectboxVersion = "4.1.0"
 
 [libraries]
 
@@ -132,6 +133,7 @@ androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", ver
 androidX-annotation-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx_annotation_version" }
 
 #Support
+objectbox-gradle-plugin = { module = "io.objectbox:objectbox-gradle-plugin", version.ref = "objectboxVersion" }
 support-material = { module = "com.google.android.material:material", version.ref = "matertial_version" }
 
 #WorkManager
@@ -154,7 +156,7 @@ firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "f
 sqlCipher-core = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlCipher_version" }
 
 #Realm
-realm_base = { module = "io.realm.kotlin:library-base", version.ref = "realm_version" }
+objectbox-base = { module = "io.objectbox:objectbox-kotlin", version.ref = "objectboxVersion" }
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
@@ -276,7 +278,7 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp_version" }
 gms = { id = "com.google.gms.google-services", version.ref = "gsm_plugin_version" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebase_perfPlugin_version" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase_crashlyticsPlugin_version" }
-realm = { id = "io.realm.kotlin", version.ref = "realm_version" }
+objectbox = { id = "io.objectbox", version.ref = "objectboxVersion" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf_plugin_version" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt_version" }
 navigation-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx_navigation_version" }

@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":infra:realm"))
     implementation(project(":infra:events"))
 
+    implementation(libs.objectbox.base)
     implementation(libs.libsimprints)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)

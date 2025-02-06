@@ -62,5 +62,6 @@ open class Application :
             syncOrchestrator.cleanupWorkers()
             syncOrchestrator.scheduleBackgroundWork()
         }
+        // ObjectBoxLiveData.init(this)
     }
 }
