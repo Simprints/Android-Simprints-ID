@@ -83,8 +83,11 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         bindViewModel()
         binding.captureProgress.max = 1 // normalized progress
 
-        binding.captureFeedbackBtn.setOnClickListener { vm.startCapture() }
-        
+        binding.captureFeedbackBtn.setOnClickListener {
+            vm.startCapture()
+            binding.captureFeedbackBtn.isClickable = false
+        }
+
         // Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
             if (view != null) {
@@ -99,6 +102,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
             return@launch
         }
         vm.holdOffCapture()
+        binding.captureFeedbackBtn.isClickable = true
 
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
