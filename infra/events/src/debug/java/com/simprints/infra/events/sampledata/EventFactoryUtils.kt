@@ -26,6 +26,7 @@ import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
@@ -314,6 +315,15 @@ fun createEnrolmentEventV2() = EnrolmentEventV2(
     DEFAULT_MODULE_ID,
     DEFAULT_USER_ID,
     GUID2,
+)
+
+fun createEnrolmentEventV4() = EnrolmentEventV4(
+    CREATED_AT,
+    GUID1,
+    DEFAULT_PROJECT_ID,
+    DEFAULT_MODULE_ID,
+    DEFAULT_USER_ID,
+    listOf(GUID1, GUID2),
 )
 
 fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(

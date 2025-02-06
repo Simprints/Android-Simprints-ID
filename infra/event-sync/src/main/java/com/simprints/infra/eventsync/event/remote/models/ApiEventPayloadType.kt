@@ -23,6 +23,7 @@ import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
@@ -190,7 +191,7 @@ internal enum class ApiEventPayloadType {
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     AUTHENTICATION -> ApiEventPayloadType.Authentication
     CONSENT -> ApiEventPayloadType.Consent
-    ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
+    ENROLMENT_V2, ENROLMENT_V4 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
     FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
     ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToOneMatch
@@ -239,7 +240,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.Authentication -> AUTHENTICATION
     ApiEventPayloadType.Consent -> CONSENT
-    ApiEventPayloadType.Enrolment -> ENROLMENT_V2
+    ApiEventPayloadType.Enrolment -> ENROLMENT_V4
     ApiEventPayloadType.Authorization -> AUTHORIZATION
     ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE
     ApiEventPayloadType.OneToOneMatch -> ONE_TO_MANY_MATCH

@@ -4,12 +4,11 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
 import java.util.UUID
 
 @Keep
-@Deprecated("Replaced by v4 in 2025.1.0")
-data class EnrolmentEventV2(
+data class EnrolmentEventV4(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: EnrolmentPayload,
     override val type: EventType,
@@ -22,7 +21,7 @@ data class EnrolmentEventV2(
         projectId: String,
         moduleId: TokenizableString,
         attendantId: TokenizableString,
-        personCreationEventId: String,
+        biometricReferenceIds: List<String>,
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentPayload(
@@ -32,9 +31,9 @@ data class EnrolmentEventV2(
             projectId = projectId,
             moduleId = moduleId,
             attendantId = attendantId,
-            personCreationEventId = personCreationEventId,
+            biometricReferenceIds = biometricReferenceIds,
         ),
-        ENROLMENT_V2,
+        ENROLMENT_V4,
     )
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(
@@ -57,14 +56,14 @@ data class EnrolmentEventV2(
         val projectId: String,
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
-        val personCreationEventId: String,
+        val biometricReferenceIds: List<String>,
         override val endedAt: Timestamp? = null,
-        override val type: EventType = ENROLMENT_V2,
+        override val type: EventType = ENROLMENT_V4,
     ) : EventPayload() {
         override fun toSafeString(): String = "subject ID: $subjectId, module ID: $moduleId"
     }
 
     companion object {
-        const val EVENT_VERSION = 3
+        const val EVENT_VERSION = 4
     }
 }
