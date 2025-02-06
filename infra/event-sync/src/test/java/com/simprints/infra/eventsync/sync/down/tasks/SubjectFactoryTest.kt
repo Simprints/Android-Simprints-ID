@@ -150,6 +150,7 @@ class SubjectFactoryTest {
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
             fingerprintResponse = FingerprintCaptureResult(
+                GUID1,
                 listOf(
                     FingerprintCaptureResult.Item(
                         captureEventId = GUID1,
@@ -165,6 +166,7 @@ class SubjectFactoryTest {
                 ),
             ),
             faceResponse = FaceCaptureResult(
+                GUID1,
                 listOf(
                     FaceCaptureResult.Item(
                         captureEventId = GUID1,

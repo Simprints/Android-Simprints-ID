@@ -51,6 +51,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         val result = useCase(
             listOf(
                 FaceCaptureResult(
+                    "",
                     results = listOf(
                         FaceCaptureResult.Item(captureEventId = null, index = 0, sample = null),
                         FaceCaptureResult.Item(
@@ -98,6 +99,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         val result = useCase(
             listOf(
                 FingerprintCaptureResult(
+                    "",
                     results = listOf(
                         FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_THUMB, null),
                         FingerprintCaptureResult.Item(
