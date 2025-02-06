@@ -14,9 +14,6 @@ enum class EventType {
     // key added: CONSENT_KEY
     CONSENT,
 
-    // key added: ENROLMENT_V1_KEY
-    ENROLMENT_V1,
-
     // key added: ENROLMENT_V1_KE2
     ENROLMENT_V2,
 
@@ -157,7 +154,6 @@ enum class EventType {
         const val FACE_CAPTURE_CONFIRMATION_KEY = "FACE_CAPTURE_CONFIRMATION"
         const val AUTHENTICATION_KEY = "AUTHENTICATION"
         const val CONSENT_KEY = "CONSENT"
-        const val ENROLMENT_V1_KEY = "ENROLMENT_V1"
         const val ENROLMENT_V2_KEY = "ENROLMENT_V2"
         const val AUTHORIZATION_KEY = "AUTHORIZATION"
         const val FINGERPRINT_CAPTURE_KEY = "FINGERPRINT_CAPTURE"

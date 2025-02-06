@@ -25,7 +25,6 @@ import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
@@ -315,11 +314,6 @@ fun createEnrolmentEventV2() = EnrolmentEventV2(
     DEFAULT_MODULE_ID,
     DEFAULT_USER_ID,
     GUID2,
-)
-
-fun createEnrolmentEventV1() = EnrolmentEventV1(
-    CREATED_AT,
-    GUID1,
 )
 
 fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(

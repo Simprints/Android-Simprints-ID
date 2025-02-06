@@ -303,16 +303,6 @@ fun validateConsentEventApiModel(json: JSONObject) {
     }
 }
 
-fun validateEnrolmentEventV1ApiModel(json: JSONObject) {
-    validateCommonParams(json, "Enrolment", 2)
-
-    with(json.getJSONObject("payload")) {
-        validateTimestamp(getJSONObject("startTime"))
-        assertThat(getString("personId").isValidGuid()).isTrue()
-        assertThat(length()).isEqualTo(2)
-    }
-}
-
 fun validateEnrolmentEventV2ApiModel(json: JSONObject) {
     validateCommonParams(json, "Enrolment", 3)
 
