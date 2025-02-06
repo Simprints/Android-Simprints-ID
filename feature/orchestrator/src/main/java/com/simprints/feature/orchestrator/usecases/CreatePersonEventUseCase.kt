@@ -1,9 +1,7 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.face.uniqueId
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.uniqueId
+import com.simprints.core.domain.common.faceReferenceId
+import com.simprints.core.domain.common.fingerprintReferenceId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
@@ -51,16 +49,15 @@ internal class CreatePersonEventUseCase @Inject constructor(
             .ifEmpty { null }
         val fingerprintReferenceId = fingerprintSamplesForPersonCreation
             .mapNotNull { it.sample }
-            .map { FingerprintSample(it.fingerIdentifier, it.template, it.templateQualityScore, it.format) }
-            .uniqueId()
+            .map { it.templateQualityScore to it.template }
+            .fingerprintReferenceId()
 
         val faceCaptureIds = faceSamplesForPersonCreation
             .mapNotNull { it.captureEventId }
             .ifEmpty { null }
         val faceReferenceId = faceSamplesForPersonCreation
-            .mapNotNull { it.sample }
-            .map { FaceSample(it.template, it.format) }
-            .uniqueId()
+            .mapNotNull { it.sample?.template }
+            .faceReferenceId()
 
         // If the step results of the current callout do not contain a modality but we have a PersonCreationEvent from the
         // previous callout (of the same session), we use the modality from the previous callout. This happens when the

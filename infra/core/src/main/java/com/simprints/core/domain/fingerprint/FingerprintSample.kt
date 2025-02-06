@@ -34,15 +34,3 @@ data class FingerprintSample(
         return result
     }
 }
-
-// Generates a unique id for a list of samples.
-// It concats the templates (sorted by quality score) and creates a UUID from that.
-fun List<FingerprintSample>.uniqueId(): String? = if (this.isNotEmpty()) {
-    UUID.nameUUIDFromBytes(concatTemplates()).toString()
-} else {
-    null
-}
-
-fun List<FingerprintSample>.concatTemplates(): ByteArray = this.sortedBy { it.templateQualityScore }.fold(byteArrayOf()) { acc, sample ->
-    acc + sample.template
-}
