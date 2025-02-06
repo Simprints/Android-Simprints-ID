@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
+import com.simprints.core.domain.common.fingerprintReferenceId
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -24,6 +25,7 @@ import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.LiveFeedbackState
 import com.simprints.fingerprint.capture.state.ScanResult
+import com.simprints.fingerprint.capture.usecase.AddBiometricReferenceCreationEventsUseCase
 import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
@@ -74,6 +76,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
     private val addCaptureEvents: AddCaptureEventsUseCase,
+    private val addBiometricReferenceCreatedEvents: AddBiometricReferenceCreationEventsUseCase,
     private val tracker: FingerprintScanningStatusTracker,
     private val isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase,
     @ExternalScope private val externalScope: CoroutineScope,
@@ -669,6 +672,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 ),
             )
         }
+        val biometricReferenceId = resultItems
+            .mapNotNull { it.sample }
+            .map { it.templateQualityScore to it.template }
+            .fingerprintReferenceId()
+            .orEmpty()
+        addBiometricReferenceCreatedEvents(biometricReferenceId, resultItems.mapNotNull { it.captureEventId })
+
         _finishWithFingerprints.send(FingerprintCaptureResult(resultItems))
     }
 

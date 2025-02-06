@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
+import com.simprints.core.domain.common.faceReferenceId
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -184,6 +185,8 @@ internal class FaceCaptureViewModel @Inject constructor(
                     ),
                 )
             }
+            val referenceId = items.mapNotNull { it.sample?.template }.faceReferenceId().orEmpty()
+            eventReporter.addBiometricReferenceCreationEvents(referenceId, items.mapNotNull { it.captureEventId })
 
             _finishFlowEvent.send(FaceCaptureResult(items))
         }

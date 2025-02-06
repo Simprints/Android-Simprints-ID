@@ -15,6 +15,7 @@ import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
@@ -315,6 +316,7 @@ internal class EventUpSyncTask @Inject constructor(
 
         config.canSyncBiometricDataToSimprints() -> events.filter {
             it is EnrolmentEventV2 ||
+                it is EnrolmentEventV4 ||
                 it is PersonCreationEvent ||
                 it is FingerprintCaptureBiometricsEvent ||
                 it is FaceCaptureBiometricsEvent
