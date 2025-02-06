@@ -60,6 +60,7 @@ class OrchestratorCacheIntegrationTest {
                 payload = bundleOf("key" to "value"),
                 status = StepStatus.COMPLETED,
                 result = FingerprintCaptureResult(
+                    "",
                     results = listOf(
                         FingerprintCaptureResult.Item(
                             captureEventId = GUID1,

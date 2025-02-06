@@ -67,6 +67,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
@@ -91,6 +92,7 @@ class SaveMatchEventUseCaseTest {
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
                     assertThat(it.payload.result?.score).isEqualTo(0.5f)
+                    // TODO verify reference id
                 },
             )
         }
@@ -102,6 +104,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFingerprintSamples = listOf(
@@ -133,6 +136,7 @@ class SaveMatchEventUseCaseTest {
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
                     assertThat(it.payload.result?.score).isEqualTo(0.5f)
+                    // TODO verify reference id
                 },
             )
         }
@@ -144,6 +148,7 @@ class SaveMatchEventUseCaseTest {
             startTime = Timestamp(1L),
             endTime = Timestamp(2L),
             matchParams = MatchParams(
+                probeReferenceId = "referenceId",
                 probeFaceSamples = emptyList(),
                 probeFingerprintSamples = emptyList(),
                 fingerprintSDK = null,
@@ -177,6 +182,7 @@ class SaveMatchEventUseCaseTest {
                             ?.last()
                             ?.candidateId,
                     ).isEqualTo("guid2")
+                    // TODO verify reference id
                 },
             )
         }
@@ -188,6 +194,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(attendantId = "userId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -213,6 +220,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -238,6 +246,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 emptyList(),
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(),

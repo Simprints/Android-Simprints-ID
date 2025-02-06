@@ -256,7 +256,7 @@ internal class OrchestratorViewModelTest {
         coEvery { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FaceCaptureResult(emptyList()))
+        viewModel.handleResult(FaceCaptureResult("", emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FACE_MATCHER)
@@ -280,7 +280,7 @@ internal class OrchestratorViewModelTest {
         coEvery { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FingerprintCaptureResult(emptyList()))
+        viewModel.handleResult(FingerprintCaptureResult("", emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
@@ -348,7 +348,7 @@ internal class OrchestratorViewModelTest {
         )
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FingerprintCaptureResult(captureResults))
+        viewModel.handleResult(FingerprintCaptureResult("", captureResults))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
@@ -456,7 +456,7 @@ internal class OrchestratorViewModelTest {
         )
 
         viewModel.handleAction(mockk())
-        viewModel.handleResult(FingerprintCaptureResult(emptyList()))
+        viewModel.handleResult(FingerprintCaptureResult("", emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.payload.getParcelable<EnrolLastBiometricParams>("params")?.steps)

@@ -679,7 +679,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             .orEmpty()
         addBiometricReferenceCreatedEvents(biometricReferenceId, resultItems.mapNotNull { it.captureEventId })
 
-        _finishWithFingerprints.send(FingerprintCaptureResult(resultItems))
+        _finishWithFingerprints.send(FingerprintCaptureResult(biometricReferenceId, resultItems))
     }
 
     private suspend fun saveImageIfExists(

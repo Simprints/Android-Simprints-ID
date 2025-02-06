@@ -59,7 +59,7 @@ internal class CreatePersonEventUseCaseTest {
     fun `Create event if there is face biometric data`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf()
 
-        useCase(listOf(FaceCaptureResult(listOf(createFaceCaptureResultItem()))))
+        useCase(listOf(FaceCaptureResult("", listOf(createFaceCaptureResultItem()))))
 
         coVerify {
             eventRepository.addOrUpdateEvent(
@@ -79,7 +79,7 @@ internal class CreatePersonEventUseCaseTest {
             },
         )
 
-        useCase(listOf(FingerprintCaptureResult(listOf(createFingerprintCaptureResultItem()))))
+        useCase(listOf(FingerprintCaptureResult("", listOf(createFingerprintCaptureResultItem()))))
 
         coVerify {
             eventRepository.addOrUpdateEvent(
@@ -99,7 +99,7 @@ internal class CreatePersonEventUseCaseTest {
             },
         )
 
-        useCase(listOf(FaceCaptureResult(listOf(createFaceCaptureResultItem()))))
+        useCase(listOf(FaceCaptureResult("", listOf(createFaceCaptureResultItem()))))
 
         coVerify {
             eventRepository.addOrUpdateEvent(
@@ -121,7 +121,7 @@ internal class CreatePersonEventUseCaseTest {
             },
         )
 
-        useCase(listOf(FingerprintCaptureResult(listOf(createFingerprintCaptureResultItem()))))
+        useCase(listOf(FingerprintCaptureResult("", listOf(createFingerprintCaptureResultItem()))))
 
         coVerify {
             eventRepository.addOrUpdateEvent(
@@ -149,7 +149,7 @@ internal class CreatePersonEventUseCaseTest {
             },
         )
 
-        useCase(listOf(FingerprintCaptureResult(listOf(createFingerprintCaptureResultItem()))))
+        useCase(listOf(FingerprintCaptureResult("", listOf(createFingerprintCaptureResultItem()))))
 
         coVerify {
             eventRepository.addOrUpdateEvent(
