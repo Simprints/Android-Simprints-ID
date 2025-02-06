@@ -85,7 +85,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
 
     @Test
-    fun `Do not start capture if valid quality face detected but before preparation delay elapses`() = runTest {
+    fun `Do not start capture if valid quality face detected but before start capture clicked`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
@@ -100,14 +100,14 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
-    fun `Do not start capture if valid quality face detected but preparation delay is reset`() = runTest {
+    fun `Do not start capture if valid quality face detected but capture held off`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
-        viewModel.startPreparationDelay()
+        viewModel.startCapture()
+        viewModel.holdOffCapture()
         viewModel.process(frame)
 
         assertThat(currentDetection.observedValues)
@@ -117,13 +117,13 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
-    fun `Do not start capture if no valid quality face detected after preparation delay elapses`() = runTest {
+    fun `Do not start capture if no valid quality face detected after start capture clicked`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace(quality = -2f)
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
 
         assertThat(currentDetection.observedValues.last()?.status)
@@ -133,13 +133,13 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
-    fun `Start capture if valid quality face detected when preparation delay elapses`() = runTest {
+    fun `Start capture if valid quality face detected when start capture clicked`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
 
         assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
@@ -148,15 +148,15 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
-    fun `Proceed with capture if preparation delay uis reset after capture started`() = runTest {
+    fun `Proceed with capture if capture attempted to be held off after it started`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         val currentDetection = viewModel.currentDetection.testObserver()
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
-        viewModel.startPreparationDelay()
+        viewModel.holdOffCapture()
         viewModel.process(frame)
 
         assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
@@ -165,7 +165,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     }
 
     @Test
-    fun `Start capture if valid quality face detected later than preparation delay had elapsed`() = runTest {
+    fun `Start capture if valid quality face detected later than start capture clicked`() = runTest {
         coEvery { faceDetector.analyze(frame) } returnsMany listOf(
             getFace(quality = -2f),
             getFace(),
@@ -174,7 +174,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
         viewModel.process(frame)
 
@@ -193,7 +193,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         viewModel.initCapture(1, 0)
         viewModel.process(frame) // a fallback image frame before the preparation delay elapses
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
@@ -207,7 +207,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
 
@@ -237,7 +237,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         val detections = viewModel.currentDetection.testObserver()
         viewModel.initCapture(2, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
 
         viewModel.process(frame)
         viewModel.process(frame)
@@ -277,7 +277,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         // fallback image frames before the preparation delay elapses
         viewModel.process(frame)
         viewModel.process(frame)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
         viewModel.process(frame)
 
@@ -295,7 +295,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS)
         assertThat(capturingState.observedValues.last())
@@ -314,7 +314,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(1, 0)
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         viewModel.process(frame)
         advanceTimeBy(configDuration.toLong())
         assertThat(capturingState.observedValues.last())
@@ -335,7 +335,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val samplesToKeep = 2
         viewModel.initCapture(samplesToKeep, 0)
         viewModel.process(frame) // won't be observed during the preparation phase
-        advanceTimeBy(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS + 1)
+        viewModel.startCapture()
         (1..100).forEach {
             viewModel.process(frame)
         }
@@ -385,7 +385,6 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
     companion object {
         private const val QUALITY_THRESHOLD = -1f
-        private const val AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS = 2000L
         private const val AUTO_CAPTURE_IMAGING_DURATION_MS = 3000L
     }
 }

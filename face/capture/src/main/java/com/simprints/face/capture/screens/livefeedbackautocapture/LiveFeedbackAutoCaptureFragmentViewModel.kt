@@ -52,22 +52,21 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
-    private var autoCaptureInitialDelayJob: Job = viewModelScope.launch {
-        delay(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS)
-    }
+    private var isAutoCaptureHeldOff = true
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
 
-    fun startPreparationDelay() {
+    fun holdOffCapture() {
         if (capturingState.value != CapturingState.NOT_STARTED) {
             return // too late - imaging has already started
         }
         capturingState.value = CapturingState.NOT_STARTED // reset view
-        autoCaptureInitialDelayJob.cancel()
-        autoCaptureInitialDelayJob = viewModelScope.launch {
-            delay(AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS)
-        }
+        isAutoCaptureHeldOff = true
+    }
+    
+    fun startCapture() {
+        isAutoCaptureHeldOff = false
     }
 
     /**
@@ -83,7 +82,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = timeHelper.now()
 
-        if (autoCaptureInitialDelayJob.isCompleted) {
+        if (!isAutoCaptureHeldOff) {
             currentDetection.postValue(faceDetection)
             if (faceDetection.status == FaceDetection.Status.VALID
                 && capturingState.value == CapturingState.NOT_STARTED) {
@@ -263,6 +262,5 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     companion object {
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
-        private const val AUTO_CAPTURE_VIEWFINDER_RESUME_DELAY_MS = 2000L
     }
 }
