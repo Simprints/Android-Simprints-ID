@@ -14,6 +14,7 @@ import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.Compl
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECTION
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
@@ -36,6 +37,7 @@ import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
@@ -114,7 +116,7 @@ import com.simprints.infra.eventsync.event.remote.models.upsync.ApiEventUpSyncRe
     JsonSubTypes.Type(value = ApiCompletionCheckPayload::class, name = Companion.COMPLETION_CHECK_KEY),
     JsonSubTypes.Type(value = ApiConnectivitySnapshotPayload::class, name = Companion.CONNECTIVITY_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ApiConsentPayload::class, name = Companion.CONSENT_KEY),
-    JsonSubTypes.Type(value = ApiEnrolmentPayloadV2::class, name = Companion.ENROLMENT_KEY),
+    JsonSubTypes.Type(value = ApiEnrolmentPayloadV4::class, name = Companion.ENROLMENT_KEY),
     JsonSubTypes.Type(value = ApiFingerprintCapturePayload::class, name = Companion.FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFingerprintCaptureBiometricsPayload::class, name = Companion.FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = ApiGuidSelectionPayload::class, name = Companion.GUID_SELECTION_KEY),
@@ -145,6 +147,7 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)
     CONSENT -> ApiConsentPayload(this as ConsentPayload)
     ENROLMENT_V2 -> ApiEnrolmentPayloadV2(this as EnrolmentEventV2.EnrolmentPayload)
+    ENROLMENT_V4 -> ApiEnrolmentPayloadV4(this as EnrolmentEventV4.EnrolmentPayload)
     AUTHORIZATION -> ApiAuthorizationPayload(this as AuthorizationPayload)
     FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCaptureEvent.FingerprintCapturePayload)
     ONE_TO_ONE_MATCH -> ApiOneToOneMatchPayload(this as OneToOneMatchPayload)
