@@ -26,6 +26,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.COMPLE
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONSENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V4_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_DOWN_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
@@ -114,6 +115,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = ConnectivitySnapshotEvent::class, name = CONNECTIVITY_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ConsentEvent::class, name = CONSENT_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
+    JsonSubTypes.Type(value = EnrolmentEventV4::class, name = ENROLMENT_V4_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FingerprintCaptureBiometricsEvent::class,

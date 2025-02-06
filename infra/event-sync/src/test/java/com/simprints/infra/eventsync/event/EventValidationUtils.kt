@@ -317,6 +317,20 @@ fun validateEnrolmentEventV2ApiModel(json: JSONObject) {
     }
 }
 
+fun validateEnrolmentEventV4ApiModel(json: JSONObject) {
+    validateCommonParams(json, "Enrolment", 4)
+
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("subjectId")).isNotNull()
+        assertThat(getString("projectId")).isNotNull()
+        assertThat(getString("moduleId")).isNotNull()
+        assertThat(getString("attendantId")).isNotNull()
+        assertThat(getJSONArray("biometricReferenceIds")).isNotNull()
+        assertThat(length()).isEqualTo(6)
+    }
+}
+
 fun validateIntentParsingEventApiModel(json: JSONObject) {
     validateCommonParams(json, "IntentParsing", 2)
     with(json.getJSONObject("payload")) {
