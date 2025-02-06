@@ -226,7 +226,7 @@ internal class OrchestratorViewModel @Inject constructor(
                     .map { MatchParams.FaceSample(it.faceId, it.template) }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
-                    ?.toFaceStepArgs(faceSamples)
+                    ?.toFaceStepArgs(result.referenceId, faceSamples)
 
                 if (newPayload != null) {
                     matchingStep.payload = newPayload
@@ -257,7 +257,7 @@ internal class OrchestratorViewModel @Inject constructor(
                     }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
-                    ?.toFingerprintStepArgs(fingerprintSamples)
+                    ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
 
                 if (newPayload != null) {
                     matchingStep.payload = newPayload

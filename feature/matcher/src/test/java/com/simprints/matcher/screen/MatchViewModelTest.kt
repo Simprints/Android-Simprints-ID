@@ -109,6 +109,7 @@ internal class MatchViewModelTest {
         viewModel.matchState.test()
         viewModel.setupMatch(
             MatchParams(
+                probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(getFaceSample()),
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -153,6 +154,7 @@ internal class MatchViewModelTest {
         val states = viewModel.matchState.test()
         viewModel.setupMatch(
             MatchParams(
+                probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(getFaceSample()),
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
@@ -207,6 +209,7 @@ internal class MatchViewModelTest {
 
         viewModel.setupMatch(
             MatchParams(
+                probeReferenceId = "referenceId",
                 probeFingerprintSamples = listOf(getFingerprintSample()),
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.ENROL,

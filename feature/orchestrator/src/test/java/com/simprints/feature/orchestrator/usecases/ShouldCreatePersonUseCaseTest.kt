@@ -42,7 +42,7 @@ class ShouldCreatePersonUseCaseTest {
                 actionRequest = null,
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isFalse()
@@ -63,7 +63,7 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isTrue()
@@ -84,7 +84,7 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isTrue()
@@ -106,7 +106,7 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isTrue()
@@ -127,7 +127,7 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isFalse()
@@ -148,7 +148,7 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isTrue()
@@ -161,7 +161,7 @@ class ShouldCreatePersonUseCaseTest {
                 actionRequest = flowAction,
                 modalities = emptySet(),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isFalse()
@@ -210,7 +210,7 @@ class ShouldCreatePersonUseCaseTest {
                 actionRequest = flowAction,
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
                 results = listOf(
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isTrue()
@@ -227,7 +227,7 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 results = listOf(
                     createStep(StepId.FACE_CAPTURE, null),
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isFalse()
@@ -243,7 +243,7 @@ class ShouldCreatePersonUseCaseTest {
                     GeneralConfiguration.Modality.FINGERPRINT,
                 ),
                 results = listOf(
-                    createStep(StepId.FACE_CAPTURE, FaceCaptureResult(emptyList())),
+                    createStep(StepId.FACE_CAPTURE, FaceCaptureResult("", emptyList())),
                     createStep(StepId.FINGERPRINT_CAPTURE, null),
                 ),
             ),
@@ -256,7 +256,7 @@ class ShouldCreatePersonUseCaseTest {
             useCase(
                 actionRequest = flowAction,
                 modalities = setOf(GeneralConfiguration.Modality.FACE),
-                results = listOf(createStep(StepId.FACE_CAPTURE, FaceCaptureResult(emptyList()))),
+                results = listOf(createStep(StepId.FACE_CAPTURE, FaceCaptureResult("", emptyList()))),
             ),
         ).isTrue()
     }
@@ -271,8 +271,8 @@ class ShouldCreatePersonUseCaseTest {
                     GeneralConfiguration.Modality.FINGERPRINT,
                 ),
                 results = listOf(
-                    createStep(StepId.FACE_CAPTURE, FaceCaptureResult(emptyList())),
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FACE_CAPTURE, FaceCaptureResult("", emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isTrue()
@@ -280,7 +280,7 @@ class ShouldCreatePersonUseCaseTest {
 
     @Test
     fun `Returns true when there is a PersonCreationEvent but it's missing a face reference that was scheduled for capture`() = runTest {
-        val faceCaptureResults = listOf(createStep(StepId.FACE_CAPTURE, FaceCaptureResult(emptyList())))
+        val faceCaptureResults = listOf(createStep(StepId.FACE_CAPTURE, FaceCaptureResult("", emptyList())))
 
         val sessionEvents = listOf(
             PersonCreationEvent(
@@ -308,7 +308,7 @@ class ShouldCreatePersonUseCaseTest {
     @Test
     fun `Returns true when there is a PersonCreationEvent but it's missing a fingerprint reference that was scheduled for capture`() =
         runTest {
-            val fingerprintCaptureResults = listOf(createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())))
+            val fingerprintCaptureResults = listOf(createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())))
 
             val sessionEvents = listOf(
                 PersonCreationEvent(
@@ -361,8 +361,8 @@ class ShouldCreatePersonUseCaseTest {
                     GeneralConfiguration.Modality.FINGERPRINT,
                 ),
                 results = listOf(
-                    createStep(StepId.FACE_CAPTURE, FaceCaptureResult(emptyList())),
-                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
+                    createStep(StepId.FACE_CAPTURE, FaceCaptureResult("", emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult("", emptyList())),
                 ),
             ),
         ).isFalse()

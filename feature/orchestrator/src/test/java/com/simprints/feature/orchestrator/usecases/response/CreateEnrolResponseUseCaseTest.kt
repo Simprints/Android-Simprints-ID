@@ -56,8 +56,8 @@ internal class CreateEnrolResponseUseCaseTest {
             useCase(
                 action,
                 listOf(
-                    FingerprintCaptureResult(emptyList()),
-                    FaceCaptureResult(emptyList()),
+                    FingerprintCaptureResult("", emptyList()),
+                    FaceCaptureResult("", emptyList()),
                     mockk(),
                 ),
                 project

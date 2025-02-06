@@ -41,6 +41,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
                     if (matchParams.isFaceMatch()) null else getFingerprintComparisonStrategy(matchParams.fingerprintSDK!!),
+                    matchParams.probeReferenceId,
                 )
             } else {
                 getOneToManyEvent(
@@ -50,6 +51,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     matchParams.queryForCandidates,
                     candidatesCount,
                     matchEntries,
+                    matchParams.probeReferenceId,
                 )
             }
             eventRepository.addOrUpdateEvent(event)
@@ -75,6 +77,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         queryForCandidates: SubjectQuery,
         matchEntry: MatchEntry?,
         fingerComparisonStrategy: FingerComparisonStrategy?,
+        biometricReferenceId: String, // TODO add field to event
     ) = OneToOneMatchEvent(
         startTime,
         endTime,
@@ -91,6 +94,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         queryForCandidates: SubjectQuery,
         candidatesCount: Int,
         matchEntries: List<MatchEntry>,
+        biometricReferenceId: String, // TODO add field to event
     ) = OneToManyMatchEvent(
         startTime,
         endTime,

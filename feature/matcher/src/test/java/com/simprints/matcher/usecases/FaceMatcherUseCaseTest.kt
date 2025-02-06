@@ -65,6 +65,7 @@ internal class FaceMatcherUseCaseTest {
 
         val results = useCase.invoke(
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -89,6 +90,7 @@ internal class FaceMatcherUseCaseTest {
 
         val results = useCase.invoke(
             MatchParams(
+                probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                 ),
@@ -127,6 +129,7 @@ internal class FaceMatcherUseCaseTest {
 
         val results = useCase.invoke(
             matchParams = MatchParams(
+                probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                 ),
