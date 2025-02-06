@@ -7,6 +7,8 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.infra.basebiosdk.detection.Face
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
@@ -73,8 +75,9 @@ class SimpleCaptureEventReporterTest {
             eventRepository.addOrUpdateEvent(
                 withArg {
                     assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
-                    assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result)
-                        .isEqualTo(FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE)
+                    assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result).isEqualTo(
+                        FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE,
+                    )
                 },
             )
         }
@@ -87,8 +90,9 @@ class SimpleCaptureEventReporterTest {
             eventRepository.addOrUpdateEvent(
                 withArg {
                     assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
-                    assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result)
-                        .isEqualTo(FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE)
+                    assertThat((it.payload as FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload).result).isEqualTo(
+                        FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE,
+                    )
                 },
             )
         }
@@ -179,6 +183,20 @@ class SimpleCaptureEventReporterTest {
                     },
                 )
             }
+        }
+    }
+
+    @Test
+    fun `Adds reference creation event`() = runTest {
+        reporter.addBiometricReferenceCreationEvents("id", listOf("id1", "id2", "id3"))
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(it).isInstanceOf(BiometricReferenceCreationEvent::class.java)
+                    assertThat((it.payload as BiometricReferenceCreationPayload).modality)
+                        .isEqualTo(BiometricReferenceCreationEvent.BiometricReferenceModality.FACE)
+                },
+            )
         }
     }
 

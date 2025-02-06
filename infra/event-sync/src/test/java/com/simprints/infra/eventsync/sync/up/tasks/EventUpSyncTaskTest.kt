@@ -23,6 +23,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID3
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createAuthenticationEvent
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
+import com.simprints.infra.events.sampledata.createEnrolmentEventV4
 import com.simprints.infra.events.sampledata.createEventWithSessionId
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
@@ -260,6 +261,7 @@ internal class EventUpSyncTaskTest {
             createAlertScreenEvent(),
             // only following should be uploaded
             createEnrolmentEventV2(),
+            createEnrolmentEventV4(),
             createPersonCreationEvent(),
             createFingerprintCaptureBiometricsEvent(),
             createFaceCaptureBiometricsEvent(),
@@ -273,7 +275,7 @@ internal class EventUpSyncTaskTest {
                 any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
-                    assertThat(it.sessions.first().events).hasSize(4)
+                    assertThat(it.sessions.first().events).hasSize(5)
                 },
                 any(),
             )
@@ -295,6 +297,7 @@ internal class EventUpSyncTaskTest {
             // only following should be uploaded
             createPersonCreationEvent(),
             createEnrolmentEventV2(),
+            createEnrolmentEventV4(),
             createAlertScreenEvent(),
         )
 
@@ -306,7 +309,7 @@ internal class EventUpSyncTaskTest {
                 any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
-                    assertThat(it.sessions.first().events).hasSize(3)
+                    assertThat(it.sessions.first().events).hasSize(4)
                 },
                 any(),
             )
@@ -358,6 +361,7 @@ internal class EventUpSyncTaskTest {
         )
         coEvery { eventRepo.getEventsFromScope(GUID2) } returns listOf(
             createEnrolmentEventV2(),
+            createEnrolmentEventV4(),
             createAlertScreenEvent(),
         )
 

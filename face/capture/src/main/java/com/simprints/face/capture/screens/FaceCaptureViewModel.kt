@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
+import com.simprints.core.domain.common.faceReferenceId
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -18,7 +19,6 @@ import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -124,10 +124,9 @@ internal class FaceCaptureViewModel @Inject constructor(
         saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
 
-    fun setupAutoCapture() =
-        viewModelScope.launch {
-            _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
-        }
+    fun setupAutoCapture() = viewModelScope.launch {
+        _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
+    }
 
     private suspend fun initialize(
         activity: Activity,
@@ -179,6 +178,8 @@ internal class FaceCaptureViewModel @Inject constructor(
                     ),
                 )
             }
+            val referenceId = items.mapNotNull { it.sample?.template }.faceReferenceId().orEmpty()
+            eventReporter.addBiometricReferenceCreationEvents(referenceId, items.mapNotNull { it.captureEventId })
 
             _finishFlowEvent.send(FaceCaptureResult(items))
         }
