@@ -192,7 +192,6 @@ class EventPayloadTest {
             ),
         ),
         ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED),
-        EnrolmentEventV1(CREATED_AT, GUID2),
         EnrolmentEventV2(
             createdAt = CREATED_AT,
             subjectId = GUID1,

@@ -13,7 +13,6 @@ import com.simprints.infra.events.event.domain.models.CandidateReadEvent.Candida
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECTION
@@ -36,7 +35,6 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
-import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
@@ -146,7 +144,6 @@ internal abstract class ApiEventPayload(
 internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) {
     AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)
     CONSENT -> ApiConsentPayload(this as ConsentPayload)
-    ENROLMENT_V1 -> ApiEnrolmentPayloadV1(this as EnrolmentEventV1.EnrolmentPayload)
     ENROLMENT_V2 -> ApiEnrolmentPayloadV2(this as EnrolmentEventV2.EnrolmentPayload)
     AUTHORIZATION -> ApiAuthorizationPayload(this as AuthorizationPayload)
     FINGERPRINT_CAPTURE -> ApiFingerprintCapturePayload(this as FingerprintCaptureEvent.FingerprintCapturePayload)
