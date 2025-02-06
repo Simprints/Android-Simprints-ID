@@ -25,19 +25,3 @@ data class FaceSample(
 
     override fun hashCode(): Int = template.contentHashCode()
 }
-
-// Generates a unique id for a list of samples.
-// It concats the templates (sorted by quality score) and creates a UUID from that. Or null if there
-// are not templates
-fun List<FaceSample>.uniqueId(): String? = if (this.isNotEmpty()) {
-    UUID
-        .nameUUIDFromBytes(
-            concatTemplates(),
-        ).toString()
-} else {
-    null
-}
-
-fun List<FaceSample>.concatTemplates(): ByteArray = this.sortedBy { it.template.contentHashCode() }.fold(byteArrayOf()) { acc, sample ->
-    acc + sample.template
-}
