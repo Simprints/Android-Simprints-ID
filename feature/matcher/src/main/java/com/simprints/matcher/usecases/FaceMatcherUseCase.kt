@@ -14,8 +14,6 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
@@ -53,16 +51,14 @@ internal class FaceMatcherUseCase @Inject constructor(
         onLoadingCandidates()
         val resultItems = createRanges(totalCandidates)
             .map { range ->
-                async(dispatcher) {
-                    val batchCandidates = getCandidates(
-                        queryWithSupportedFormat,
-                        range,
-                        dataSource = matchParams.biometricDataSource,
-                    )
-                    match(batchCandidates, samples)
-                }
-            }.awaitAll()
-            .reduce { acc, subSet -> acc.addAll(subSet) }
+
+                val batchCandidates = getCandidates(
+                    queryWithSupportedFormat,
+                    range,
+                    dataSource = matchParams.biometricDataSource,
+                )
+                match(batchCandidates, samples)
+            }.reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
         Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
 

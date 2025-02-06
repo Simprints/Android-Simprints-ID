@@ -1,17 +1,9 @@
 package com.simprints.infra.realm
 
-import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.Realm
+import io.objectbox.BoxStore
 
 interface RealmWrapper {
-    /**
-     * Returns read-only Realm instance for data fetching.
-     */
-    suspend fun <R> readRealm(block: (Realm) -> R): R
+    suspend fun <R> readObjectBox(block: (BoxStore) -> R): R
 
-    /**
-     * Executes provided block with a writable Realm instance ensuring
-     * that modifications are handled in a transaction.
-     */
-    suspend fun <R> writeRealm(block: (MutableRealm) -> R)
+    suspend fun <R> writeObjectBox(block: (BoxStore) -> R)
 }
