@@ -220,6 +220,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
             captureOverlay.drawSemiTransparentTarget()
             captureFeedbackBtn.setText(IDR.string.face_capture_start_capture)
             captureFeedbackBtn.isVisible = true
+            captureFeedbackBtn.isChecked = true
             captureFeedbackPermissionButton.isGone = true
         }
     }
