@@ -20,7 +20,6 @@ import com.simprints.infra.events.sampledata.createConnectivitySnapshotEvent
 import com.simprints.infra.events.sampledata.createConsentEvent
 import com.simprints.infra.events.sampledata.createEnrolmentCallbackEvent
 import com.simprints.infra.events.sampledata.createEnrolmentCalloutEvent
-import com.simprints.infra.events.sampledata.createEnrolmentEventV1
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
 import com.simprints.infra.events.sampledata.createEventDownSyncRequestEvent
 import com.simprints.infra.events.sampledata.createEventUpSyncRequestEvent
@@ -99,7 +98,6 @@ import com.simprints.infra.eventsync.event.validateCompletionCheckEventApiModel
 import com.simprints.infra.eventsync.event.validateConnectivitySnapshotEventApiModel
 import com.simprints.infra.eventsync.event.validateConsentEventApiModel
 import com.simprints.infra.eventsync.event.validateDownSyncRequestEventApiModel
-import com.simprints.infra.eventsync.event.validateEnrolmentEventV1ApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV2ApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureBiometricsEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureConfirmationEventApiModel
@@ -298,15 +296,6 @@ class ApiEventTest {
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateConsentEventApiModel(json)
-    }
-
-    @Test
-    fun validateEnrolmentV1_enrolmentEventApiModel() {
-        val event = createEnrolmentEventV1()
-        val apiEvent = event.fromDomainToApi()
-        val json = JSONObject(jackson.writeValueAsString(apiEvent))
-
-        validateEnrolmentEventV1ApiModel(json)
     }
 
     @Test
