@@ -12,5 +12,5 @@ internal fun DbFaceSample.fromDbToDomain(): FaceSample = FaceSample(
 internal fun FaceSample.fromDomainToDb(): DbFaceSample = DbFaceSample().also { sample ->
     sample.id = id
     sample.template = template
-    sample.format = format
+    sample.format = "RANK_ONE_3_1"
 }

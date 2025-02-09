@@ -2,7 +2,6 @@ package com.simprints.infra.realm.config
 
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.infra.realm.BuildConfig
 import com.simprints.infra.realm.migration.RealmMigrations
 import com.simprints.infra.realm.models.DbFaceSample
 import com.simprints.infra.realm.models.DbFingerprintSample
@@ -32,7 +31,7 @@ class RealmConfig @Inject constructor() {
         .migration(
             migration = RealmMigrations(),
             resolveEmbeddedObjectConstraints = true, // Delete embedded objects if they are not in the schema anymore
-        ).let { if (BuildConfig.DB_ENCRYPTION) it.encryptionKey(key) else it }
+        ).encryptionKey(key)
         .build()
 
     companion object {

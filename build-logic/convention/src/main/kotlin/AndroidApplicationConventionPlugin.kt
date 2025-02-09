@@ -93,8 +93,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     }
 
                     getByName(BuildTypes.DEBUG) {
-                        isMinifyEnabled = false
-                        isShrinkResources = false
+                        isMinifyEnabled = true
+                        isShrinkResources = true
                         isDebuggable = propDebuggable
                         versionNameSuffix = "+$propVersionSuffix.$propVersionBuild"
                         buildConfigField("Boolean", "DEBUG_MODE", "true")

@@ -20,6 +20,8 @@ import io.realm.kotlin.query.Sort
 import io.realm.kotlin.query.find
 import io.realm.kotlin.types.RealmUUID
 import javax.inject.Inject
+import kotlin.system.measureTimeMillis
+import kotlin.time.measureTimedValue
 
 internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     private val realmWrapper: RealmWrapper,
@@ -36,12 +38,21 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         const val FORMAT_FIELD = "format"
     }
 
+    fun log(message: String) {
+        Simber.d(message, tag = REALM_DB)
+    }
+
     override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
-        it
-            .query(DbSubject::class)
-            .buildRealmQueryForSubject(query)
-            .find()
-            .map { dbSubject -> dbSubject.fromDbToDomain() }
+        var res = emptyList<Subject>()
+        val timeTaken = measureTimeMillis {
+            res = it
+                .query(DbSubject::class)
+                .buildRealmQueryForSubject(query)
+                .find()
+                .map { dbSubject -> dbSubject.fromDbToDomain() }
+        }
+        log("load: ${res.size} in $timeTaken ms")
+        res
     }
 
     override suspend fun loadFingerprintIdentities(
@@ -49,16 +60,21 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         range: IntRange,
         dataSource: BiometricDataSource,
     ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
-        realm
-            .query(DbSubject::class)
-            .buildRealmQueryForSubject(query)
-            .find { it.subList(range.first, range.last) }
-            .map { subject ->
-                FingerprintIdentity(
-                    subject.subjectId.toString(),
-                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
-                )
-            }
+
+        var result = measureTimedValue {
+            realm
+                .query(DbSubject::class)
+                .buildRealmQueryForSubject(query)
+                .find { it.subList(range.first, range.last) }
+                .map { subject ->
+                    FingerprintIdentity(
+                        subject.subjectId.toString(),
+                        subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
+                    )
+                }
+        }
+        log("loadFingerprintIdentities: ${result.value.size} in ${result.duration.inWholeMilliseconds} ms")
+        result.value
     }
 
     override suspend fun loadFaceIdentities(
@@ -66,16 +82,20 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         range: IntRange,
         dataSource: BiometricDataSource,
     ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
-        realm
-            .query(DbSubject::class)
-            .buildRealmQueryForSubject(query)
-            .find { it.subList(range.first, range.last) }
-            .map { subject ->
-                FaceIdentity(
-                    subject.subjectId.toString(),
-                    subject.faceSamples.map(DbFaceSample::fromDbToDomain),
-                )
-            }
+        val result = measureTimedValue {
+            realm
+                .query(DbSubject::class)
+                .buildRealmQueryForSubject(query)
+                .find { it.subList(range.first, range.last) }
+                .map { subject ->
+                    FaceIdentity(
+                        subject.subjectId.toString(),
+                        subject.faceSamples.map(DbFaceSample::fromDbToDomain),
+                    )
+                }
+        }
+        log("loadFaceIdentities: ${result.value.size} in ${result.duration.inWholeMilliseconds} ms")
+        result.value
     }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
@@ -112,25 +132,28 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         }
 
         realmWrapper.writeRealm { realm ->
-            actions.forEach { action ->
-                when (action) {
-                    is SubjectAction.Creation -> realm.copyToRealm(
-                        action.subject.fromDomainToDb(),
-                        updatePolicy = UpdatePolicy.ALL,
-                    )
+            val timeTaker = measureTimeMillis {
+                actions.forEach { action ->
+                    when (action) {
+                        is SubjectAction.Creation -> realm.copyToRealm(
+                            action.subject.fromDomainToDb(),
+                            updatePolicy = UpdatePolicy.ALL,
+                        )
 
-                    is SubjectAction.Deletion -> realm.delete(
-                        realm
-                            .query(DbSubject::class)
-                            .buildRealmQueryForSubject(
-                                query = SubjectQuery(
-                                    subjectId =
-                                        action.subjectId,
-                                ),
-                            ).find(),
-                    )
+                        is SubjectAction.Deletion -> realm.delete(
+                            realm
+                                .query(DbSubject::class)
+                                .buildRealmQueryForSubject(
+                                    query = SubjectQuery(
+                                        subjectId =
+                                            action.subjectId,
+                                    ),
+                                ).find(),
+                        )
+                    }
                 }
             }
+            log("performActions: ${actions.size} in $timeTaker ms")
         }
     }
 
