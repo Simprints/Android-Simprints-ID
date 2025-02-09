@@ -1,6 +1,6 @@
 package com.simprints.matcher.usecases
 
-import com.simprints.core.DispatcherBG
+import com.simprints.core.DispatcherIO
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
@@ -14,14 +14,14 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
     private lateinit var faceMatcher: FaceMatcher
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
@@ -29,11 +29,11 @@ internal class FaceMatcherUseCase @Inject constructor(
     override suspend operator fun invoke(
         matchParams: MatchParams,
         onLoadingCandidates: () -> Unit,
-    ): MatcherResult = coroutineScope {
+    ): MatcherResult = withContext(dispatcher) {
         Simber.i("Initialising matcher", tag = crashReportTag)
         faceMatcher = resolveFaceBioSdk().matcher
         if (matchParams.probeFaceSamples.isEmpty()) {
-            return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
+            return@withContext MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
@@ -44,7 +44,7 @@ internal class FaceMatcherUseCase @Inject constructor(
             dataSource = matchParams.biometricDataSource,
         )
         if (totalCandidates == 0) {
-            return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
+            return@withContext MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
 
         Simber.i("Matching candidates", tag = crashReportTag)

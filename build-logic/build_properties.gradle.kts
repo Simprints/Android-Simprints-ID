@@ -38,5 +38,5 @@ extra.apply {
      * CD WILL OVERWRITE TO FALSE AS THE PLAYSTORE DOES NOT ACCEPT DEBUGGABLE TRUE APPS
      */
     set("DEBUGGABLE", true)
-    set("DB_ENCRYPTION", false)
+    set("DB_ENCRYPTION", true)
 }
