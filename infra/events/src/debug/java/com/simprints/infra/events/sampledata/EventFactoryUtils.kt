@@ -367,6 +367,7 @@ fun createOneToManyMatchEvent() = OneToManyMatchEvent(
     MatchPool(PROJECT, 100),
     "RANK_ONE",
     listOf(MatchEntry(GUID1, 0F)),
+    GUID2,
 )
 
 fun createOneToOneMatchEvent() = OneToOneMatchEvent(
@@ -376,6 +377,7 @@ fun createOneToOneMatchEvent() = OneToOneMatchEvent(
     "SIM_AFIS",
     MatchEntry(GUID1, 10F),
     FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
+    GUID2,
 )
 
 fun createPersonCreationEvent() = PersonCreationEvent(

@@ -382,7 +382,7 @@ fun validateMatchEntryApiModel(json: JSONObject) {
 }
 
 fun validateOneToManyMatchEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "OneToManyMatch", 2)
+    validateCommonParams(json, "OneToManyMatch", 3)
 
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
@@ -397,12 +397,13 @@ fun validateOneToManyMatchEventApiModel(json: JSONObject) {
         for (i in 0 until matchEntries.length()) {
             validateMatchEntryApiModel(matchEntries.getJSONObject(i))
         }
-        assertThat(length()).isEqualTo(5)
+        assertThat(getString("probeBiometricReferenceId").isValidGuid()).isTrue()
+        assertThat(length()).isEqualTo(6)
     }
 }
 
 fun validateOneToOneMatchEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "OneToOneMatch", 3)
+    validateCommonParams(json, "OneToOneMatch", 4)
 
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
@@ -417,7 +418,8 @@ fun validateOneToOneMatchEventApiModel(json: JSONObject) {
         with(getJSONObject("result")) {
             validateMatchEntryApiModel(this)
         }
-        assertThat(length()).isEqualTo(6)
+        assertThat(getString("probeBiometricReferenceId").isValidGuid()).isTrue()
+        assertThat(length()).isEqualTo(7)
     }
 }
 
