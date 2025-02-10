@@ -217,6 +217,7 @@ class EventPayloadTest {
             pool = MatchPool(PROJECT, 100),
             matcher = "MATCHER_NAME",
             result = listOf(MatchEntry(GUID1, 0F)),
+            probeBiometricReferenceId = GUID1,
         ),
         OneToOneMatchEvent(
             createdAt = CREATED_AT,
@@ -225,6 +226,7 @@ class EventPayloadTest {
             matcher = "MATCHER_NAME",
             result = MatchEntry(GUID1, 0F),
             fingerComparisonStrategy = FingerComparisonStrategy.SAME_FINGER,
+            probeBiometricReferenceId = GUID1,
         ),
         PersonCreationEvent(
             startTime = CREATED_AT,
