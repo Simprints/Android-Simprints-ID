@@ -20,10 +20,8 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
-import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
-import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
@@ -82,12 +80,6 @@ internal class OrchestratorViewModelTest {
     private lateinit var mapRefusalOrErrorResult: MapRefusalOrErrorResultUseCase
 
     @MockK
-    private lateinit var shouldCreatePerson: ShouldCreatePersonUseCase
-
-    @MockK
-    private lateinit var createPersonEvent: CreatePersonEventUseCase
-
-    @MockK
     private lateinit var appResponseBuilder: AppResponseBuilderUseCase
 
     @MockK
@@ -111,8 +103,6 @@ internal class OrchestratorViewModelTest {
             locationStore,
             stepsBuilder,
             mapRefusalOrErrorResult,
-            shouldCreatePerson,
-            createPersonEvent,
             appResponseBuilder,
             addCallbackEvent,
             dailyActivityUseCase,
@@ -140,7 +130,6 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.CONSENT),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-        coEvery { shouldCreatePerson(any(), any(), any()) } returns false
 
         val stepsObserver = viewModel.currentStep.test()
 
@@ -152,26 +141,12 @@ internal class OrchestratorViewModelTest {
     }
 
     @Test
-    fun `Creates person if required after step result`() = runTest {
-        every { stepsBuilder.build(any(), any()) } returns emptyList()
-        coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-
-        coEvery { shouldCreatePerson(any(), any(), any()) } returns true
-        coJustRun { createPersonEvent(any()) }
-
-        viewModel.handleResult(SetupResult(true))
-
-        coVerify { createPersonEvent(any()) }
-    }
-
-    @Test
     fun `Returns response when all steps executed`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-        coEvery { shouldCreatePerson(any(), any(), any()) } returns false
         coEvery { appResponseBuilder(any(), any(), any(), any()) } returns mockk()
         coJustRun { dailyActivityUseCase(any()) }
         justRun { addCallbackEvent(any()) }
@@ -216,7 +191,6 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SELECT_SUBJECT_AGE),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-        coEvery { shouldCreatePerson(any(), any(), any()) } returns false
         val captureAndMatchSteps = listOf(
             createMockStep(StepId.FACE_CAPTURE),
             createMockStep(
@@ -253,7 +227,6 @@ internal class OrchestratorViewModelTest {
             ),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-        coEvery { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(FaceCaptureResult("", emptyList()))
@@ -277,7 +250,6 @@ internal class OrchestratorViewModelTest {
             ),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-        coEvery { shouldCreatePerson(any(), any(), any()) } returns false
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(FingerprintCaptureResult("", emptyList()))
@@ -326,7 +298,6 @@ internal class OrchestratorViewModelTest {
             ),
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
-        coEvery { shouldCreatePerson(any(), any(), any()) } returns false
         val format = "SimMatcher"
         val sample1 = FingerprintCaptureResult.Sample(
             IFingerIdentifier.LEFT_INDEX_FINGER,
