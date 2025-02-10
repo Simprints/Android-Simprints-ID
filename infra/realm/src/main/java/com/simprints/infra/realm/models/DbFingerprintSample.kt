@@ -10,6 +10,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 class DbFingerprintSample : RealmObject {
     @PrimaryKey
     var id: String = ""
+    var referenceId = ""
     var fingerIdentifier: Int = -1
     var template: ByteArray = byteArrayOf()
     var templateQualityScore: Int = -1

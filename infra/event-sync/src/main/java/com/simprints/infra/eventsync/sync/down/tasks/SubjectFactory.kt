@@ -92,45 +92,46 @@ class SubjectFactory @Inject constructor(
                     sample.template,
                     sample.templateQualityScore,
                     sample.format,
+                    fingerprintResponse.referenceId,
                 )
             }
         }
 
     private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
         .mapNotNull { it.sample }
-        .map { FaceSample(it.template, it.format) }
+        .map { FaceSample(it.template, it.format, faceResponse.referenceId) }
 
     private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
         ?.filterIsInstance<FingerprintReference>()
         ?.firstOrNull()
-        ?.let { reference ->
-            reference.templates.map {
-                buildFingerprintSample(
-                    it,
-                    reference.format,
-                )
-            }
-        }
+        ?.let { reference -> reference.templates.map { buildFingerprintSample(it, reference.format, reference.id) } }
         ?: emptyList()
 
     private fun buildFingerprintSample(
         template: FingerprintTemplate,
         format: String,
+        referenceId: String,
     ): FingerprintSample = FingerprintSample(
         fingerIdentifier = template.finger,
         template = encodingUtils.base64ToBytes(template.template),
         templateQualityScore = template.quality,
         format = format,
+        referenceId = referenceId,
     )
 
     private fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
         ?.filterIsInstance<FaceReference>()
         ?.firstOrNull()
-        ?.let { reference -> reference.templates.map { buildFaceSample(it, reference.format) } }
+        ?.let { reference -> reference.templates.map { buildFaceSample(it, reference.format, reference.id) } }
         ?: emptyList()
 
     private fun buildFaceSample(
         template: FaceTemplate,
         format: String,
-    ) = FaceSample(encodingUtils.base64ToBytes(template.template), format)
+        referenceId: String,
+    ) = FaceSample(
+        template = encodingUtils.base64ToBytes(template.template),
+        format = format,
+        referenceId = referenceId,
+    )
 }

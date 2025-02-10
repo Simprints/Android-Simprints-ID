@@ -73,12 +73,14 @@ class SubjectFactoryTest {
                     template = BASE_64_BYTES,
                     templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
             faceSamples = listOf(
                 FaceSample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
         )
@@ -107,12 +109,14 @@ class SubjectFactoryTest {
                     template = BASE_64_BYTES,
                     templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
             faceSamples = listOf(
                 FaceSample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
         )
@@ -135,12 +139,14 @@ class SubjectFactoryTest {
                     template = BASE_64_BYTES,
                     templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
             faceSamples = listOf(
                 FaceSample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
         )
@@ -197,12 +203,14 @@ class SubjectFactoryTest {
                     template = BASE_64_BYTES,
                     templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
             faceSamples = listOf(
                 FaceSample(
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
+                    referenceId = REFERENCE_ID,
                 ),
             ),
         )

@@ -27,7 +27,6 @@ internal fun DbSubject.fromDbToDomain(): Subject {
         moduleId = moduleId,
         createdAt = createdAt?.toDate(),
         updatedAt = updatedAt?.toDate(),
-        toSync = toSync,
         fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
         faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain),
     )
@@ -40,7 +39,6 @@ internal fun Subject.fromDomainToDb(): DbSubject = DbSubject().also { subject ->
     subject.moduleId = moduleId.value
     subject.createdAt = createdAt?.toRealmInstant()
     subject.updatedAt = updatedAt?.toRealmInstant()
-    subject.toSync = toSync
     subject.fingerprintSamples =
         fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList()
     subject.faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()

@@ -10,6 +10,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 class DbFaceSample : RealmObject {
     @PrimaryKey
     var id: String = ""
+    var referenceId = ""
     var template: ByteArray = byteArrayOf()
     var format: String = ""
 }

@@ -7,10 +7,12 @@ internal fun DbFaceSample.fromDbToDomain(): FaceSample = FaceSample(
     id = id,
     template = template,
     format = format,
+    referenceId = referenceId,
 )
 
 internal fun FaceSample.fromDomainToDb(): DbFaceSample = DbFaceSample().also { sample ->
     sample.id = id
+    sample.referenceId = referenceId
     sample.template = template
     sample.format = format
 }
