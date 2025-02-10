@@ -12,6 +12,7 @@ internal data class ApiOneToManyMatchPayload(
     val pool: ApiMatchPool,
     val matcher: String,
     val result: List<ApiMatchEntry>?,
+    val probeBiometricReferenceId: String? = null,
 ) : ApiEventPayload(startTime) {
     @Keep
     data class ApiMatchPool(
@@ -30,11 +31,15 @@ internal data class ApiOneToManyMatchPayload(
     }
 
     constructor(domainPayload: OneToManyMatchPayload) : this(
-        domainPayload.createdAt.fromDomainToApi(),
-        domainPayload.endedAt?.fromDomainToApi(),
-        ApiMatchPool(domainPayload.pool),
-        domainPayload.matcher,
-        domainPayload.result?.map { ApiMatchEntry(it) },
+        startTime = domainPayload.createdAt.fromDomainToApi(),
+        endTime = domainPayload.endedAt?.fromDomainToApi(),
+        pool = ApiMatchPool(domainPayload.pool),
+        matcher = domainPayload.matcher,
+        result = domainPayload.result?.map { ApiMatchEntry(it) },
+        probeBiometricReferenceId = when (domainPayload) {
+            is OneToManyMatchPayload.OneToManyMatchPayloadV2 -> null
+            is OneToManyMatchPayload.OneToManyMatchPayloadV3 -> domainPayload.probeBiometricReferenceId
+        },
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null // this payload doesn't have tokenizable fields

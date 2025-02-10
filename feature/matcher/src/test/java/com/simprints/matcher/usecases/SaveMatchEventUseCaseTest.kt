@@ -11,7 +11,9 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.OneToManyMatchPayloadV3
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload.OneToOneMatchPayloadV4
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
@@ -92,7 +94,7 @@ class SaveMatchEventUseCaseTest {
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
                     assertThat(it.payload.result?.score).isEqualTo(0.5f)
-                    // TODO verify reference id
+                    assertThat((it.payload as OneToOneMatchPayloadV4).probeBiometricReferenceId).isEqualTo("referenceId")
                 },
             )
         }
@@ -136,7 +138,7 @@ class SaveMatchEventUseCaseTest {
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
                     assertThat(it.payload.result?.score).isEqualTo(0.5f)
-                    // TODO verify reference id
+                    assertThat((it.payload as OneToOneMatchPayloadV4).probeBiometricReferenceId).isEqualTo("referenceId")
                 },
             )
         }
@@ -182,7 +184,7 @@ class SaveMatchEventUseCaseTest {
                             ?.last()
                             ?.candidateId,
                     ).isEqualTo("guid2")
-                    // TODO verify reference id
+                    assertThat((it.payload as OneToManyMatchPayloadV3).probeBiometricReferenceId).isEqualTo("referenceId")
                 },
             )
         }
