@@ -30,6 +30,8 @@ import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
@@ -74,6 +76,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.i("LiveFeedbackFragment started", tag = ORCHESTRATION)
         initFragment()
     }
 
@@ -127,6 +130,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         )
         // Attach the view's surface provider to preview use case
         preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
+        Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
 
     override fun onResume() {
@@ -171,7 +175,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
                         currentFragment = this,
-                        actionId = R.id.action_faceLiveFeedbackFragment_to_faceConfirmationFragment,
+                        directions = LiveFeedbackFragmentDirections.actionFaceLiveFeedbackFragmentToFaceConfirmationFragment(),
                     )
                 }
             }
@@ -182,7 +186,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         try {
             vm.process(croppedBitmap = image)
         } catch (t: Throwable) {
-            Simber.e("Image analysis crashed", t)
+            Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
             // Image analysis is running in bg thread
             lifecycleScope.launch {
                 mainVm.submitError(t)

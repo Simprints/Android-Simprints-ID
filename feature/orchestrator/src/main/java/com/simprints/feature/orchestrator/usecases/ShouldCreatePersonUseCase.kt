@@ -7,6 +7,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
@@ -26,7 +27,7 @@ internal class ShouldCreatePersonUseCase @Inject constructor(
         }
 
         if (modalities.isEmpty()) {
-            Simber.e("Modalities are empty")
+            Simber.i("Could not create person event - modalities are empty", tag = ORCHESTRATION)
             return false
         }
 

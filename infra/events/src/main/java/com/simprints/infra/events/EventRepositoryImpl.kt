@@ -198,7 +198,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     } catch (t: Throwable) {
         // prevent crashlytics logging of duplicate guid-selection
         if (t is DuplicateGuidSelectEventValidatorException) {
-            Simber.d("Duplicate guid exception", t)
+            Simber.i("Duplicate guid exception", t)
         } else {
             Simber.e("Failed to save the event", t)
         }

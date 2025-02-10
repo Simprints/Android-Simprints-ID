@@ -12,6 +12,8 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.validatepool.R
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.feature.validatepool.databinding.FragmentValidateSubjectPoolBinding
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +30,7 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.i("ValidateSubjectPoolFragment started", tag = ORCHESTRATION)
 
         viewModel.state.observe(viewLifecycleOwner, LiveDataEventWithContentObserver(::renderState))
 

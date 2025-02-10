@@ -13,6 +13,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.simprints.core.livedata.LiveDataEventObserver
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
@@ -58,9 +60,32 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         viewModel.generalConfiguration.observe(viewLifecycleOwner) {
             enableFingerprintSettings(it.modalities)
         }
+        viewModel.experimentalConfiguration.observe(viewLifecycleOwner) {
+            showFaceAutoCaptureSetting(isVisible = it.faceAutoCaptureEnabled)
+        }
         viewModel.languagePreference.observe(viewLifecycleOwner) {
             loadSelectedLanguage(it)
         }
+        viewModel.configUpdated.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                Toast
+                    .makeText(
+                        requireContext(),
+                        IDR.string.dashboard_preference_update_config_finished,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+            },
+        )
+        viewModel.sinceConfigLastUpdated.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver<String> { lastUpdated ->
+                getUpdateConfig()?.summary = getString(
+                    IDR.string.dashboard_preference_summary_update_config_last_updated,
+                    lastUpdated,
+                )
+            },
+        )
         bindClickListeners()
     }
 
@@ -76,7 +101,6 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
                 viewModel.unlockSettings()
                 when (action) {
                     ACTION_LANGUAGE -> createLanguageSelectionDialog().show()
-                    ACTION_CONFIG_UPDATE -> updateConfiguration()
                 }
             },
         )
@@ -86,22 +110,31 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         getFingerSelectionPreference()?.setOnPreferenceClickListener {
-            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_fingerSelectionFragment)
+            findNavController().navigateSafely(
+                this@SettingsFragment,
+                SettingsFragmentDirections.actionSettingsFragmentToFingerSelectionFragment(),
+            )
             true
         }
 
         getSyncInfoPreference()?.setOnPreferenceClickListener {
-            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_syncInfoFragment)
+            findNavController().navigateSafely(
+                this@SettingsFragment,
+                SettingsFragmentDirections.actionSettingsFragmentToSyncInfoFragment(),
+            )
             true
         }
 
         getUpdateConfig()?.setOnPreferenceClickListener {
-            showPasswordIfRequired(ACTION_CONFIG_UPDATE) { updateConfiguration() }
+            updateConfiguration()
             true
         }
 
         getAboutPreference()?.setOnPreferenceClickListener {
-            findNavController().navigateSafely(this@SettingsFragment, R.id.action_settingsFragment_to_aboutFragment)
+            findNavController().navigateSafely(
+                this@SettingsFragment,
+                SettingsFragmentDirections.actionSettingsFragmentToAboutFragment(),
+            )
             true
         }
     }
@@ -167,12 +200,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun updateConfiguration() {
         viewModel.scheduleConfigUpdate()
-        Toast
-            .makeText(
-                requireContext(),
-                IDR.string.dashboard_preference_update_config_scheduled,
-                Toast.LENGTH_SHORT,
-            ).show()
+        getUpdateConfig()?.setSummary(IDR.string.dashboard_preference_update_config_scheduled)
     }
 
     private fun getLanguagePreference(): Preference? = findPreference(getString(R.string.preference_select_language_key))
@@ -185,8 +213,13 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun getAboutPreference(): Preference? = findPreference(getString(R.string.preference_app_details_key))
 
+    private fun getFaceAutoCapturePreference(): Preference? = findPreference(getString(R.string.preference_enable_face_auto_capture))
+
+    private fun showFaceAutoCaptureSetting(isVisible: Boolean) {
+        getFaceAutoCapturePreference()?.isVisible = isVisible
+    }
+
     companion object {
         private const val ACTION_LANGUAGE = "language"
-        private const val ACTION_CONFIG_UPDATE = "configUpdate"
     }
 }

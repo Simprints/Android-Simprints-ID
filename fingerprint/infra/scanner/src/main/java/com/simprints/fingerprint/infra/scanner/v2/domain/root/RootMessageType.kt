@@ -20,7 +20,7 @@ enum class RootMessageType(
     ;
 
     companion object {
-        fun fromByte(byte: Byte) = values().find { it.byte == byte }
+        fun fromByte(byte: Byte) = RootMessageType.entries.find { it.byte == byte }
             ?: throw InvalidMessageException("Invalid RootMessageType received with bytes: $byte")
     }
 }

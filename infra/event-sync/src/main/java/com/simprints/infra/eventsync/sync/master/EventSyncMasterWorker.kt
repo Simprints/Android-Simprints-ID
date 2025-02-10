@@ -24,7 +24,6 @@ import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
 import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.assisted.Assisted
@@ -47,11 +46,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
     private val securityManager: SecurityManager,
 ) : SimCoroutineWorker(appContext, params) {
-    companion object {
-        const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
-    }
-
-    override val tag: String = EventSyncMasterWorker::class.java.simpleName
+    override val tag: String = "EventSyncMasterWorker"
 
     private val wm = WorkManager.getInstance(appContext)
 
@@ -67,17 +62,15 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     }
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("Started")
+        showProgressNotification()
         try {
-            showProgressNotification()
             // check if device is rooted before starting the sync
             securityManager.checkIfDeviceIsRooted()
-            crashlyticsLog("Start")
             val configuration = configManager.getProjectConfiguration()
 
             if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed(configuration)) {
-                return@withContext success(
-                    message = "Can't sync to SimprintsID, skip",
-                )
+                return@withContext success(message = "Can't sync to SimprintsID, skip")
             }
 
             // Requests NTP sync now as device is surely ONLINE,
@@ -100,7 +93,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         .buildUpSyncWorkerChain(
                             uniqueSyncId,
                             upSyncWorkerScopeId,
-                        ).also { Simber.tag(SYNC.name).d("Scheduled ${it.size} up workers") }
+                        ).also { Simber.d("Scheduled ${it.size} up workers", tag = tag) }
                 }
 
                 if (configuration.isEventDownSyncAllowed()) {
@@ -113,7 +106,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
-                        ).also { Simber.tag(SYNC.name).d("Scheduled ${it.size} down workers") }
+                        ).also { Simber.d("Scheduled ${it.size} down workers", tag = tag) }
                 }
 
                 val endSyncReporterWorker =
@@ -164,5 +157,9 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
 
     private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? = syncWorkers?.filter {
         it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED
+    }
+
+    companion object {
+        const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
     }
 }

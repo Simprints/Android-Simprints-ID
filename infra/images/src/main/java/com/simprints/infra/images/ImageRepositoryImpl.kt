@@ -5,6 +5,7 @@ import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.ImageRemoteDataSource
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -39,12 +40,12 @@ internal class ImageRepositoryImpl @Inject internal constructor(
                         metadataStore.deleteMetadata(imageRef.relativePath)
                     } else {
                         allImagesUploaded = false
-                        Simber.e("Failed to upload image without exception")
+                        Simber.i("Failed to upload image without exception", tag = SYNC)
                     }
                 }
             } catch (t: Throwable) {
                 allImagesUploaded = false
-                Simber.e("Failed to upload images", t)
+                Simber.e("Failed to upload images", t, tag = SYNC)
             }
         }
 

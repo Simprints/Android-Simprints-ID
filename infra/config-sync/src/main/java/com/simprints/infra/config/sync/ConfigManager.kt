@@ -9,14 +9,17 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val configSyncCache: ConfigSyncCache,
 ) {
     suspend fun refreshProject(projectId: String): ProjectWithConfig = configRepository.refreshProject(projectId).also {
         enrolmentRecordRepository.tokenizeExistingRecords(it.project)
+        configSyncCache.saveUpdateTime()
     }
 
     suspend fun getProject(projectId: String): Project = try {
@@ -42,6 +45,10 @@ class ConfigManager @Inject constructor(
             localConfig
         }
     }
+
+    fun watchProjectConfiguration(): Flow<ProjectConfiguration> =
+        configRepository.watchProjectConfiguration()
+            .onStart { getProjectConfiguration() } // to invoke download if empty
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration = configRepository.getDeviceConfiguration()
 

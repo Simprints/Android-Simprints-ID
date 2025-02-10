@@ -1,0 +1,27 @@
+name: "[Pipeline] Deploy to Staging"
+
+on:
+    workflow_call:
+
+jobs:
+
+    get-version:
+        uses: ./.github/workflows/reusable-get-version-name.yml
+        with:
+            version-source: "branch"
+
+    build-staging-apk:
+        uses: ./.github/workflows/reusable-build-apk.yml
+        secrets: inherit
+        with:
+            build-environment: staging
+            version-name: ${{ needs.get-version.outputs.version-name }}
+
+    deploy-to-firebase:
+        uses: ./.github/workflows/reusable-deploy-to-firebase-distribution.yml
+        secrets: inherit
+        needs:
+            - build-staging-apk
+        with:
+            build-environment: staging
+            upload-artifact: ${{ needs.build-staging-apk.outputs.build-artifact }}

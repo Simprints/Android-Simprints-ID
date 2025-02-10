@@ -15,6 +15,7 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
@@ -31,13 +32,14 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
-    override val crashReportTag = LoggingConstants.CrashReportTag.MATCHING.name
+    override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingStarted: (tag: String) -> Unit,
-        onCandidateLoaded: (totalCandidates: Int, loaded: Int) -> Unit,
+        onLoadingStarted: (totalCandidates: Int) -> Unit,
+        onCandidateLoaded: () -> Unit,
     ): MatcherResult = coroutineScope {
+        Simber.i("Initialising matcher", tag = crashReportTag)
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK!!)
 
         if (matchParams.probeFingerprintSamples.isEmpty()) {
@@ -54,15 +56,14 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, bioSdkWrapper.matcherName)
         }
 
-        onLoadingStarted(crashReportTag)
-        var candidatesLoaded = 0
+        Simber.i("Matching candidates", tag = crashReportTag)
+        onLoadingStarted(totalCandidates)
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
                     val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource) {
                         // When a candidate is loaded
-                        candidatesLoaded ++
-                        onCandidateLoaded(totalCandidates, candidatesLoaded)
+                        onCandidateLoaded()
                     }
                     match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK)
                         .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
@@ -72,6 +73,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             }.awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
+
+        Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
         MatcherResult(resultItems, totalCandidates, bioSdkWrapper.matcherName)
     }
 

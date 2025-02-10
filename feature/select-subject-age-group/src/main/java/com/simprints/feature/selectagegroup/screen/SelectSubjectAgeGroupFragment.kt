@@ -15,6 +15,8 @@ import com.simprints.feature.selectagegroup.R
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
 import com.simprints.feature.selectagegroup.databinding.FragmentAgeGroupSelectionBinding
 import com.simprints.infra.config.store.models.AgeGroup
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -31,6 +33,7 @@ internal class SelectSubjectAgeGroupFragment : Fragment(R.layout.fragment_age_gr
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.i("SelectSubjectAgeGroupFragment started", tag = ORCHESTRATION)
 
         viewModel.ageGroups.observe(viewLifecycleOwner) { ageGroupsList ->
             fillRecyclerView(ageGroupsList)

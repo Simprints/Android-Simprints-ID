@@ -3,7 +3,6 @@ package com.simprints.infra.events.event.domain.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier.TIER_1
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
@@ -77,12 +76,12 @@ class EventPayloadTest {
         IdentificationCallbackEvent(
             createdAt = CREATED_AT,
             sessionId = GUID1,
-            scores = listOf(CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE)),
+            scores = listOf(CallbackComparisonScore(GUID1, 1, AppMatchConfidence.NONE)),
         ),
         RefusalCallbackEvent(CREATED_AT, "some_reason", "some_extra"),
         VerificationCallbackEvent(
             createdAt = CREATED_AT,
-            score = CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE),
+            score = CallbackComparisonScore(GUID1, 1, AppMatchConfidence.NONE),
         ),
         ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2),
         EnrolmentCalloutEvent(
@@ -141,6 +140,7 @@ class EventPayloadTest {
             attemptNb = 0,
             qualityThreshold = 1F,
             result = FaceCaptureEvent.FaceCapturePayload.Result.VALID,
+            isAutoCapture = false,
             isFallback = true,
             face = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT),
         ),

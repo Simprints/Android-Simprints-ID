@@ -1,0 +1,81 @@
+#This is a reusable workflow that receives a list of modules as input and runs the unit tests for each module.
+name: "[Reusable] Android Module Unit Tests"
+
+on:
+    workflow_call:
+        inputs:
+            modules:
+                type: string
+                required: true
+                description: |
+                    A comma separated list of modules to test. For example: "id,feature:orchestrator"
+            reportsId:
+                type: string
+                required: true
+                description: |
+                    The id of the reports artifact. For example: "face reports"
+jobs:
+    test-modules:
+
+        runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v4
+                with:
+                    java-version: 17
+                    distribution: 'temurin'
+
+            -   name: Restore gradle global directory
+                uses: actions/cache/restore@v4
+                id: cache
+                with:
+                    path: |
+                        ~/.gradle/
+                        .gradle/
+
+                    key: global-gradle-
+                    restore-keys: global-gradle-
+
+            -   name: Set up build files
+                uses: ./.github/actions/setup-gradle-build-files
+                with:
+                    gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
+                    gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
+
+            -   name: Create modules array
+                id: create-modules-array
+                run: |
+                    modules=$(echo "${{ inputs.modules }}" |  tr '\n' ',')
+                    # Convert modules to an array
+                    modules_array=(${modules//,/ })
+                    # output the array in the step output so that it can be used in the next step
+                    echo "modules_array=${modules_array[@]}">> $GITHUB_OUTPUT
+
+            -   name: Run tests
+                run: |
+                    # Get the modules array from the previous step
+                    modules_array=("${{ steps.create-modules-array.outputs.modules_array}}")
+                    modules_array=(${modules_array// / })
+                    # Iterate over the array
+                    for module in "${modules_array[@]}"; do
+                        echo -e "\n\n"
+                        echo "=========================================="
+                        echo "=========================================="
+                        echo "              Test $module"
+                        echo "=========================================="
+                        echo "=========================================="
+                        echo -e "\n\n"
+                        ./gradlew $module:jacocoTestReport
+                    done
+
+            -   name: Upload Folders
+                uses: actions/upload-artifact@v4
+                with:
+                    name: "${{ inputs.reportsId }}"
+                    path: "*/**/build/reports/jacoco/jacocoTestReport"

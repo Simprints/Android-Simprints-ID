@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -27,7 +28,7 @@ internal class OtaRecoveryViewModel @Inject constructor(
 
             _isConnectionSuccess.send(true)
         } catch (ex: Throwable) {
-            Simber.e("OTA recovery failed", ex)
+            Simber.e("OTA recovery failed", ex, FINGER_CAPTURE)
             _isConnectionSuccess.send(false)
         }
     }

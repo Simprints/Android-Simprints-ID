@@ -4,6 +4,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -17,11 +18,6 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     private val authStore: AuthStore,
     private val jsonHelper: JsonHelper,
 ) : LicenseRemoteDataSource {
-    companion object {
-        private const val AUTHORIZATION_ERROR = 403
-        private const val UNKNOWN_ERROR_CODE = "000"
-    }
-
     override suspend fun getLicense(
         projectId: String,
         deviceId: String,
@@ -38,22 +34,22 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     } catch (t: Throwable) {
         when (t) {
             is NetworkConnectionException -> {
-                Simber.i("Licence download failed due to network error", t)
+                Simber.i("Licence download failed due to network error", t, tag = LICENSE)
                 ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
             }
 
             is BackendMaintenanceException -> {
-                Simber.i("Licence download failed due to backend maintenance", t)
+                Simber.i("Licence download failed due to backend maintenance", t, tag = LICENSE)
                 ApiLicenseResult.BackendMaintenanceError(t.estimatedOutage)
             }
 
             is SyncCloudIntegrationException -> {
-                Simber.e("Licence download failed due to cloud integration error", t)
+                Simber.e("Licence download failed due to cloud integration error", t, tag = LICENSE)
                 handleCloudException(t)
             }
 
             else -> {
-                Simber.e("Licence download failed due to unknown error", t)
+                Simber.e("Licence download failed due to unknown error", t, tag = LICENSE)
                 ApiLicenseResult.Error(UNKNOWN_ERROR_CODE)
             }
         }
@@ -83,4 +79,9 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
 
     private suspend fun getProjectApiClient(): SimNetwork.SimApiClient<LicenseRemoteInterface> =
         authStore.buildClient(LicenseRemoteInterface::class)
+
+    companion object {
+        private const val AUTHORIZATION_ERROR = 403
+        private const val UNKNOWN_ERROR_CODE = "000"
+    }
 }

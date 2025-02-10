@@ -6,6 +6,7 @@ import com.simprints.infra.license.local.LicenseLocalDataSource.Companion.LICENS
 import com.simprints.infra.license.models.License
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -88,7 +89,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
                 .openFileOutput()
                 .use { it.write(licenseData.toByteArray()) }
         } catch (t: Throwable) {
-            Simber.e("Failed to save licence data for ${vendor.value}", t)
+            Simber.e("Failed to save licence data for ${vendor.value}", t, tag = LICENSE)
         }
     }
 
@@ -100,7 +101,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         try {
             getExpirationFile(vendor, version).writeText(expirationDate)
         } catch (t: Throwable) {
-            Simber.e("Failed to save licence expiration date for ${vendor.value}", t)
+            Simber.e("Failed to save licence expiration date for ${vendor.value}", t, tag = LICENSE)
         }
     }
 
@@ -114,18 +115,18 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     override suspend fun deleteCachedLicense(vendor: Vendor): Unit = withContext(dispatcherIo) {
         try {
             val deleted = File("$licenseDirectoryPath/${vendor.value}").deleteRecursively()
-            Simber.d("Deleted cached licenses successfully = $deleted")
+            Simber.d("Deleted cached licenses successfully = $deleted", tag = LICENSE)
         } catch (t: Throwable) {
-            Simber.e("Failed to delete cached licenses for ${vendor.value}", t)
+            Simber.e("Failed to delete cached licenses for ${vendor.value}", t, tag = LICENSE)
         }
     }
 
     override suspend fun deleteCachedLicenses(): Unit = withContext(dispatcherIo) {
         try {
             val deleted = File(licenseDirectoryPath).deleteRecursively()
-            Simber.d("Deleted all licenses successfully = $deleted")
+            Simber.d("Deleted all licenses successfully = $deleted", tag = LICENSE)
         } catch (t: Throwable) {
-            Simber.e("Failed to delete licenses", t)
+            Simber.e("Failed to delete licenses", t, tag = LICENSE)
         }
     }
 

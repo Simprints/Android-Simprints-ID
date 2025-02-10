@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.simprints.fingerprint.infra.scanner.v1.enums.MESSAGE_STATUS;
 import com.simprints.fingerprint.infra.scanner.v1.enums.MESSAGE_TYPE;
+import com.simprints.infra.logging.LoggingConstants;
 import com.simprints.infra.logging.Simber;
 
 import java.io.IOException;
@@ -111,7 +112,7 @@ class MessageDispatcher extends Thread {
             try {
                 pendingRequest.lock.wait(timeOutMs);
             } catch (InterruptedException e) {
-                Simber.d("Message response timed out", e);
+                Simber.i("Message response timed out", e, LoggingConstants.CrashReportTag.FINGER_CAPTURE);
                 throw new RuntimeException();
             }
 
@@ -146,7 +147,7 @@ class MessageDispatcher extends Thread {
             try {
                 pendingRequest.lock.wait(timeOutMs);
             } catch (InterruptedException e) {
-                Simber.d("Message response timed out", e);
+                Simber.i("Message response timed out", e, LoggingConstants.CrashReportTag.FINGER_CAPTURE);
                 return MESSAGE_STATUS.ERROR;
             }
 

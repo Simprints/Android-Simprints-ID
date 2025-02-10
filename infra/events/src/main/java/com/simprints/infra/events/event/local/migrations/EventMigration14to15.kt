@@ -6,15 +6,16 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getIntWithColumnName
 import com.simprints.core.tools.extentions.getLongWithColumnName
 import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import net.sqlcipher.database.SQLiteDatabase
 import org.json.JSONObject
 
 internal class EventMigration14to15 : Migration(14, 15) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.d("Migrating room db from schema 14 to schema 15.")
+        Simber.i("Migrating room db from schema 14 to schema 15.", tag = MIGRATION)
         updateSessionIdtoScopeIdColumn(database)
-        Simber.d("Migration from schema 14 to schema 15 done.")
+        Simber.i("Migration from schema 14 to schema 15 done.", tag = MIGRATION)
     }
 
     private fun updateSessionIdtoScopeIdColumn(database: SupportSQLiteDatabase) {

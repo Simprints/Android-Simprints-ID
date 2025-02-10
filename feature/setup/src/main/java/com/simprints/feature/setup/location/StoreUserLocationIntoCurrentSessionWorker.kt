@@ -29,18 +29,18 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     private val locationManager: LocationManager,
     @DispatcherMain private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
-    override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
+    override val tag: String = "StoreUserLocationWorker"
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("Started")
+        showProgressNotification()
         try {
-            showProgressNotification()
             createLocationFlow()
                 .filterNotNull()
                 .collect { location ->
                     runCatching { saveUserLocation(location) }
                 }
         } catch (t: Throwable) {
-            Simber.e("StoreUserLocationIntoCurrentSessionWorker failed", t)
             fail(t)
         }
         success()
@@ -62,7 +62,7 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
                 ),
             )
             eventRepository.saveSessionScope(updatesSessionScope)
-            Simber.d("Saving user's location into the current session")
+            Simber.d("Saving user's location into the current session", tag = tag)
         }
     }
 

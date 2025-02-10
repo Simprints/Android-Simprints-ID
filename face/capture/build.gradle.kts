@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)
+    implementation(libs.androidX.ui.preference)
     implementation(libs.workManager.work)
 
     implementation(libs.circleImageView)

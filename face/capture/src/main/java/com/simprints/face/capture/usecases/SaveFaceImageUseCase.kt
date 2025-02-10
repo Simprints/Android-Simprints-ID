@@ -4,6 +4,7 @@ import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ internal class SaveFaceImageUseCase @Inject constructor(
         imageBytes: ByteArray,
         captureEventId: String,
     ): SecuredImageRef? = determinePath(captureEventId)?.let { path ->
-        Simber.d("Saving face image ${path.compose()}")
+        Simber.d("Saving face image ${path.compose()}", tag = FACE_CAPTURE)
         val sessionScope = sessionEventRepository.getCurrentSessionScope()
         val projectId = sessionScope.projectId
         val securedImageRef =
@@ -24,7 +25,7 @@ internal class SaveFaceImageUseCase @Inject constructor(
         if (securedImageRef != null) {
             SecuredImageRef(securedImageRef.relativePath)
         } else {
-            Simber.e("Saving image failed for captureId $captureEventId")
+            Simber.i("Saving image failed for captureId $captureEventId", tag = FACE_CAPTURE)
             null
         }
     }
@@ -41,7 +42,7 @@ internal class SaveFaceImageUseCase @Inject constructor(
             ),
         )
     } catch (t: Throwable) {
-        Simber.e("Error determining path for captureId=$captureEventId", t)
+        Simber.e("Error determining path for captureId=$captureEventId", t, tag = FACE_CAPTURE)
         null
     }
 

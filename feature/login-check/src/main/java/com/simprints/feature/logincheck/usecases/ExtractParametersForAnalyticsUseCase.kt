@@ -2,7 +2,6 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.core.DeviceID
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -10,7 +9,6 @@ import javax.inject.Inject
 
 internal class ExtractParametersForAnalyticsUseCase @Inject constructor(
     @DeviceID private val deviceId: String,
-    private val eventRepository: SessionEventRepository,
 ) {
     suspend operator fun invoke(action: ActionRequest) = with(action) {
         ignoreException {
@@ -20,7 +18,6 @@ internal class ExtractParametersForAnalyticsUseCase @Inject constructor(
                 Simber.setUserProperty(AnalyticsUserProperties.MODULE_ID, moduleId.toString())
                 Simber.setUserProperty(AnalyticsUserProperties.DEVICE_ID, deviceId)
             }
-            Simber.i(eventRepository.getCurrentSessionScope().id)
         }
     }
 }

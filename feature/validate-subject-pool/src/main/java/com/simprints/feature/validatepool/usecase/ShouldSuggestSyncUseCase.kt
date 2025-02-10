@@ -22,7 +22,7 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
                 .let(Duration.Companion::parse)
                 .inWholeMilliseconds
 
-            timeHelper.msBetweenNowAndTime(it.time) > thresholdMs
+            timeHelper.msBetweenNowAndTime(it) > thresholdMs
         }
         ?: true
 }

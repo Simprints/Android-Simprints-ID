@@ -48,6 +48,8 @@ internal class ConfigRepositoryImpl @Inject constructor(
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration = localDataSource.getProjectConfiguration()
 
+    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> = localDataSource.watchProjectConfiguration()
+
     override suspend fun getDeviceState(): DeviceState {
         val projectId = localDataSource.getProject().id
         val lastInstructionId = localDataSource.getDeviceConfiguration().lastInstructionId

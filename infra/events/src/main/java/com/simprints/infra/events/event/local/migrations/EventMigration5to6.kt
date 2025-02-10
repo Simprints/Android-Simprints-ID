@@ -4,6 +4,7 @@ import android.database.Cursor
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import org.json.JSONArray
 import org.json.JSONObject
@@ -15,11 +16,11 @@ import org.json.JSONObject
 internal class EventMigration5to6 : Migration(5, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
-            Simber.d("Migrating room db from schema 5 to schema 6.")
+            Simber.i("Migrating room db from schema 5 to schema 6.", tag = MIGRATION)
             migrateConnectivityEvents(database)
-            Simber.d("Migration from schema 5 to schema 6 done.")
+            Simber.i("Migration from schema 5 to schema 6 done.", tag = MIGRATION)
         } catch (t: Throwable) {
-            Simber.e("Failed to migrate room db from schema 5 to schema 6.", t)
+            Simber.e("Failed to migrate room db from schema 5 to schema 6.", t, tag = MIGRATION)
         }
     }
 

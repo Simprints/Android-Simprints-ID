@@ -44,6 +44,7 @@ import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.navigation.finishWithResult
@@ -81,6 +82,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.i("FingerprintCaptureFragment started", tag = ORCHESTRATION)
 
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,
@@ -234,14 +236,14 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private fun initMissingFingerButton() {
         binding.fingerprintMissingFinger.setOnClickListener {
-            Simber.tag(FINGER_CAPTURE.name).i("Missing finger text clicked")
+            Simber.i("Missing finger text clicked", tag = FINGER_CAPTURE)
             vm.handleMissingFingerButtonPressed()
         }
     }
 
     private fun initScanButton() {
         binding.fingerprintScanButton.setOnClickListener {
-            Simber.tag(FINGER_CAPTURE.name).i("Scan button clicked")
+            Simber.i("Scan button clicked", tag = FINGER_CAPTURE)
             vm.handleScanButtonPressed()
         }
     }
@@ -271,6 +273,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         vm.noFingersScannedToast.observe(
             viewLifecycleOwner,
             LiveDataEventObserver {
+                Simber.i("No finger scanned", tag = FINGER_CAPTURE)
                 requireContext().showToast(IDR.string.fingerprint_capture_no_fingers_scanned)
             },
         )
@@ -311,7 +314,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 FingerprintConnectContract.getArgs(args.params.fingerprintSDK),
             )
         } catch (e: Exception) {
-            Simber.tag(FINGER_CAPTURE.name).i("Error launching scanner connection screen", e)
+            Simber.i("Error launching scanner connection screen", e, tag = FINGER_CAPTURE)
         }
     }
 
@@ -363,11 +366,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 requireContext(),
                 dialogItems,
                 onConfirm = {
-                    Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints clicked")
+                    Simber.i("Confirm fingerprints clicked", tag = FINGER_CAPTURE)
                     vm.handleConfirmFingerprintsAndContinue()
                 },
                 onRestart = {
-                    Simber.tag(FINGER_CAPTURE.name).i("Restart clicked")
+                    Simber.i("Restart clicked", tag = FINGER_CAPTURE)
                     vm.handleRestart()
                 },
             ).create()

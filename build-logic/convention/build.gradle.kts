@@ -21,12 +21,10 @@ dependencies {
     compileOnly(libs.plugin.navigation)
     // Deployment
     compileOnly(libs.plugin.play.publisher)
-    compileOnly(libs.plugin.firebase.distribution)
 
     // CI Scanning & Retry
     compileOnly(libs.plugin.sonar)
     compileOnly(libs.plugin.jacoco)
-    compileOnly(libs.plugin.retry)
 }
 
 gradlePlugin {

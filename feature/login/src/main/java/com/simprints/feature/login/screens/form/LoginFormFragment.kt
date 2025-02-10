@@ -40,6 +40,7 @@ import com.simprints.feature.login.screens.form.SignInState.Unknown
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -55,6 +56,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private val binding by viewBinding(FragmentLoginFormBinding::bind)
     private val viewModel by viewModels<LoginFormViewModel>()
 
+    @Suppress("UNNECESSARY_LATEINIT")
     private lateinit var checkForPlayServicesResultLauncher: ActivityResultLauncher<IntentSenderRequest>
 
     init {
@@ -75,6 +77,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.i("LoginFormFragment started", tag = ORCHESTRATION)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             finishWithError(LoginError.LoginNotCompleted)
@@ -98,16 +101,16 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         binding.loginProjectId.setText(args.loginParams.projectId)
 
         binding.loginChangeUrlButton.setOnClickListener {
-            Simber.tag(LOGIN.name).i("Change URL button clicked")
+            Simber.i("Change URL button clicked", tag = LOGIN)
             viewModel.changeUrlClicked()
         }
 
         binding.loginButtonScanQr.setOnClickListener {
-            Simber.tag(LOGIN.name).i("Scan QR button clicked")
-            findNavController().navigateSafely(this, R.id.action_loginFormFragment_to_loginQrScanner)
+            Simber.i("Scan QR button clicked", tag = LOGIN)
+            findNavController().navigateSafely(this, LoginFormFragmentDirections.actionLoginFormFragmentToLoginQrScanner())
         }
         binding.loginButtonSignIn.setOnClickListener {
-            Simber.tag(LOGIN.name).i("Login button clicked")
+            Simber.i("Login button clicked", tag = LOGIN)
             viewModel.signInClicked(
                 args.loginParams,
                 binding.loginProjectId.text.toString(),

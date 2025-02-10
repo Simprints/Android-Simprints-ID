@@ -10,6 +10,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
@@ -55,7 +56,7 @@ internal class CameraHelper @Inject constructor(
                             }
                         }
                 } catch (e: Exception) {
-                    Simber.i("Camera is already in use by another process", e)
+                    Simber.i("Camera is already in use by another process", e, tag = LOGIN)
                     initializationErrorListener.onCameraError()
                 }
             },

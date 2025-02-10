@@ -95,7 +95,7 @@ fun ByteArray.toHexString() = StringBuilder()
                 0 -> "00"
                 1 -> "0$str"
                 else -> str
-            }.toUpperCase() + " "
+            }.uppercase() + " "
             append(str)
         }
     }.toString()

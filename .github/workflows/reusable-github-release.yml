@@ -1,0 +1,20 @@
+name: "[Reusable] Create GitHub Release"
+on:
+    push:
+        tags:
+            - 'v*'
+jobs:
+    create-release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write # A write permission For auto release creation
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            tag: ${{ github.ref_name }}
+        steps:
+            -   name: Create Release
+                run: |
+                    gh release create "$tag" \
+                        --repo="$GITHUB_REPOSITORY" \
+                        --title="$tag" \
+                        --generate-notes

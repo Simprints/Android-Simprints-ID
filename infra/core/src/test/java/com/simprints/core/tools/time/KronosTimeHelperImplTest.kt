@@ -52,7 +52,7 @@ class KronosTimeHelperImplTest {
         every { kronosClock.getCurrentTime() } returns KronosTime(3000L, 0L)
         every { kronosClock.getElapsedTimeMs() } returns 3L
 
-        val result = timeHelperImpl.msBetweenNowAndTime(1000L)
+        val result = timeHelperImpl.msBetweenNowAndTime(Timestamp(1000L))
 
         assertThat(result).isEqualTo(2000L)
     }

@@ -4,7 +4,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.MainMessag
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.accumulators.PacketToMainMessageAccumulator
 import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.accumulateAndTakeElements
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 
-fun <R : MainMessage> Flowable<out Packet>.toMainMessageStream(accumulator: PacketToMainMessageAccumulator<R>): Flowable<R> =
+fun <R : MainMessage> Flow<Packet>.toMainMessageStream(accumulator: PacketToMainMessageAccumulator<R>): Flow<R> =
     accumulateAndTakeElements(accumulator)

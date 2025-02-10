@@ -7,15 +7,16 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import org.json.JSONObject
 
 internal class EventMigration7to8 : Migration(7, 8) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        Simber.d("Migrating room db from schema 7 to schema 8.")
+        Simber.i("Migrating room db from schema 7 to schema 8.", tag = MIGRATION)
         removeTemplateDataFromOldFingerprintCaptureAndSaveFingerBiometricsEvent(database)
         removeTemplateDataFromOldFaceCaptureAndSaveFaceBiometricsEvent(database)
-        Simber.d("Migration from schema 7 to schema 8 done.")
+        Simber.i("Migration from schema 7 to schema 8 done.", tag = MIGRATION)
     }
 
     private fun removeTemplateDataFromOldFingerprintCaptureAndSaveFingerBiometricsEvent(database: SupportSQLiteDatabase) {
@@ -36,6 +37,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
                             it.getStringWithColumnName(DB_ID_FIELD)
                         } in session ${it.getStringWithColumnName("sessionId")}",
                         t,
+                        tag = MIGRATION,
                     )
                 }
             }

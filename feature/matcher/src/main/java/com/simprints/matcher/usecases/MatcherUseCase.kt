@@ -1,10 +1,11 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 
 internal interface MatcherUseCase {
-    val crashReportTag: String
+    val crashReportTag: LoggingConstants.CrashReportTag
 
     /**
      * Returns a MatcherResult which contains a list of [MatchResultItem]s sorted by confidence score in descending order,
@@ -12,8 +13,8 @@ internal interface MatcherUseCase {
      */
     suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingStarted: (tag: String) -> Unit = {},
-        onCandidateLoaded: (totalCandidates: Int, loaded: Int) -> Unit = {_,_->},
+        onLoadingStarted: (totalCandidates: Int) -> Unit = {},
+        onCandidateLoaded: () -> Unit = {},
     ): MatcherResult
 
     data class MatcherResult(

@@ -26,6 +26,25 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
             android:lineSpacingMultiplier="1.5"
+            android:text="Configuration"
+            android:textIsSelectable="true" />
+
+        <TextView
+            android:id="@+id/troubleshootOverviewConfiguration"
+            style="@style/Text.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.1"
+            android:textIsSelectable="true"
+            tools:text="@tools:sample/lorem" />
+
+        <TextView
+            style="@style/Text.Headline6.Accented"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:lineSpacingMultiplier="1.5"
             android:text="Licenses"
             android:textIsSelectable="true" />
 
@@ -94,8 +113,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lineSpacingMultiplier="1.1"
-            tools:text="Connecting to scanner..."
+            android:textIsSelectable="true"
+            tools:text="Connecting to scanner..." />
+
+        <TextView
+            style="@style/Text.Headline6.Accented"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:lineSpacingMultiplier="1.5"
+            android:text="Exports"
             android:textIsSelectable="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/troubleshootOverviewExportLogs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Export logs" />
+
+            <TextView
+                android:id="@+id/troubleshootOverviewExportLogsResult"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                android:text="" />
+        </LinearLayout>
 
     </LinearLayout>
 

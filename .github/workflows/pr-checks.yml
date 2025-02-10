@@ -1,5 +1,6 @@
 # This action is used to run the PR checks workflow
-name: PR Checks
+name: "PR: Checks"
+
 on: # this checks should be triggered on pull request, before deployments, and manually
     pull_request:
         paths-ignore:
@@ -10,7 +11,7 @@ on: # this checks should be triggered on pull request, before deployments, and m
 jobs:
     core-unit-tests:
         name: Core Unit Tests
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: |
@@ -24,7 +25,7 @@ jobs:
 
     infra-unit-tests-1:
         name: Infra Unit Tests 1
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: |
@@ -40,7 +41,7 @@ jobs:
 
     infra-unit-tests-2:
         name: Infra Unit Tests 2
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: |
@@ -53,7 +54,7 @@ jobs:
 
     feature-unit-tests1:
         name: Feature Unit Tests 1
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: |
@@ -67,7 +68,7 @@ jobs:
 
     feature-unit-tests2:
         name: Feature Unit Tests 2
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: |
@@ -83,7 +84,7 @@ jobs:
 
     feature-dashboard-unit-tests:
         name: Feature Dashboard Unit Tests
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: | 
@@ -93,7 +94,7 @@ jobs:
 
     face-unit-tests:
         name: Face Unit Tests
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: |
@@ -106,7 +107,7 @@ jobs:
 
     fingerprint-unit-tests:
         name: Fingerprint Unit Tests
-        uses: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
         secrets: inherit
         with:
             modules: |
@@ -118,6 +119,7 @@ jobs:
                 fingerprint:infra:simafis-wrapper
                 fingerprint:infra:simprints-bio-sdk
                 fingerprint:infra:nec-bio-sdk
+                fingerprint:infra:image-distortion-config
             reportsId: fingerprint
 
     sonarqube:
@@ -131,4 +133,4 @@ jobs:
                  feature-dashboard-unit-tests,
                  face-unit-tests,
                  fingerprint-unit-tests ]
-        uses: ./.github/workflows/sonar-scan.yml
+        uses: ./.github/workflows/reusable-sonar-scan.yml

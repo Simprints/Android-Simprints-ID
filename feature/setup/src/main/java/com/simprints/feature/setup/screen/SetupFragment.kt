@@ -22,6 +22,7 @@ import com.simprints.infra.license.models.LicenseState.FinishedWithError
 import com.simprints.infra.license.models.LicenseState.FinishedWithSuccess
 import com.simprints.infra.license.models.LicenseState.Started
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -60,6 +61,8 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.i("SetupFragment started", tag = ORCHESTRATION)
+
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,
             R.id.setupFragment,
@@ -120,11 +123,8 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     }
 
     private fun renderFinishedWithError(errorCode: String) {
-        val errorTitle =
-            getString(IDR.string.configuration_generic_error_title, errorCode)
-        Simber
-            .tag(LICENSE.name)
-            .i("Error with configuration download. Error = $errorTitle")
+        Simber.i("Error with licence download. Error code = $errorCode", tag = LICENSE)
+        val errorTitle = getString(IDR.string.configuration_generic_error_title, errorCode)
         findNavController().navigateSafely(
             this,
             R.id.action_global_errorFragment,
@@ -133,6 +133,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     }
 
     private fun renderFinishedWithBackendMaintenanceError(estimatedOutage: Long?) {
+        Simber.i("Error with licence download. The backend is under maintenance", tag = LICENSE)
         val errorMessage = if (estimatedOutage != null && estimatedOutage != 0L) {
             getString(
                 IDR.string.error_backend_maintenance_with_time_message,
@@ -141,10 +142,6 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         } else {
             getString(IDR.string.error_backend_maintenance_message)
         }
-
-        Simber
-            .tag(LICENSE.name)
-            .i("Error with configuration download. The backend is under maintenance")
         findNavController().navigateSafely(
             this,
             R.id.action_global_errorFragment,

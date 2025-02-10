@@ -57,7 +57,7 @@ internal class EventSyncStateProcessor @Inject constructor(
                 )
 
                 emit(syncState)
-                Simber.tag(SYNC.name).d("[PROCESSOR] Emitting for UI $syncState")
+                Simber.d("Emitting for sync state: $syncState", tag = SYNC)
             }
         }
     }
@@ -65,7 +65,7 @@ internal class EventSyncStateProcessor @Inject constructor(
     private fun observerForLastSyncId(): LiveData<String> = syncWorkersLiveDataProvider
         .getStartSyncReportersLiveData()
         .switchMap { startSyncReporters ->
-            Simber.tag(SYNC.name).d("[PROCESSOR] Received updated from Master Scheduler")
+            Simber.d("Received updated from Master Scheduler", tag = SYNC)
 
             val completedSyncMaster = completedWorkers(startSyncReporters)
             val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
@@ -74,7 +74,7 @@ internal class EventSyncStateProcessor @Inject constructor(
                 if (mostRecentSyncMaster != null) {
                     val lastSyncId = mostRecentSyncMaster.outputData.getString(SYNC_ID_STARTED)
                     if (!lastSyncId.isNullOrBlank()) {
-                        Simber.tag(SYNC.name).d("[PROCESSOR] Received sync id: $lastSyncId")
+                        Simber.d("Received sync id: $lastSyncId", tag = SYNC)
                         this.postValue(lastSyncId)
                     }
                 }

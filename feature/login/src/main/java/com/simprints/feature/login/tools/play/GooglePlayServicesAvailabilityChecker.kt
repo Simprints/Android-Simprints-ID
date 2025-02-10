@@ -6,6 +6,7 @@ import androidx.activity.result.IntentSenderRequest
 import com.google.android.gms.common.ConnectionResult.SUCCESS
 import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.feature.login.LoginError
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -64,7 +65,6 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
     /**
      * Handle non resolvable errors, then throw exception
      *
-     * @param activity
      * @param statusCode
      */
     private inline fun handleMissingGooglePlayServices(
@@ -74,9 +74,8 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
         errorCallback(LoginError.MissingPlayServices)
         Simber.e(
             "Missing GooglePlay services",
-            MissingGooglePlayServices(
-                "Error with GooglePlayServices version. Error code=$statusCode",
-            ),
+            MissingGooglePlayServices("Error with GooglePlayServices version. Error code=$statusCode"),
+            tag = LOGIN,
         )
     }
 
@@ -87,9 +86,8 @@ internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
         errorCallback(LoginError.OutdatedPlayServices)
         Simber.e(
             "Outdated GooglePlay services",
-            OutdatedGooglePlayServices(
-                "Error with GooglePlayServices version. Error code=$statusCode",
-            ),
+            OutdatedGooglePlayServices("Error with GooglePlayServices version. Error code=$statusCode"),
+            tag = LOGIN,
         )
     }
 }

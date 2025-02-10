@@ -22,6 +22,7 @@ import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -290,5 +291,30 @@ class ConfigLocalDataSourceImplTest {
 
         exist = configLocalDataSourceImpl.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE)
         assertThat(exist).isEqualTo(false)
+    }
+
+    @Test
+    fun `watchProjectConfiguration should emit updated values when configuration changes`() = runTest {
+        val config1 = projectConfiguration.copy(projectId = "project1")
+        val config2 = projectConfiguration.copy(projectId = "project2")
+        val config3 = projectConfiguration.copy(projectId = "project3")
+        val config4 = projectConfiguration.copy(projectId = "project4")
+        val emittedConfigs = mutableListOf<ProjectConfiguration>()
+
+        configLocalDataSourceImpl.saveProjectConfiguration(config1)
+        configLocalDataSourceImpl.saveProjectConfiguration(config2) // will replay when collection starts below
+
+        val job = launch {
+            configLocalDataSourceImpl.watchProjectConfiguration().collect { emittedConfigs.add(it) }
+        }
+
+        configLocalDataSourceImpl.saveProjectConfiguration(config3)
+        configLocalDataSourceImpl.saveProjectConfiguration(config4)
+
+        assertThat(emittedConfigs).hasSize(3)
+        assertThat(emittedConfigs[0]).isEqualTo(config2)
+        assertThat(emittedConfigs[1]).isEqualTo(config3)
+        assertThat(emittedConfigs[2]).isEqualTo(config4)
+        job.cancel()
     }
 }

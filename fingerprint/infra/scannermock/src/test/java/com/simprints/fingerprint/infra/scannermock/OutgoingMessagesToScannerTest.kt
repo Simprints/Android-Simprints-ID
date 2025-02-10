@@ -9,10 +9,6 @@ import com.simprints.fingerprint.infra.scannermock.simulated.SimulationMode
 import com.simprints.fingerprint.infra.scannermock.simulated.component.SimulatedBluetoothAdapter
 import com.simprints.fingerprint.infra.scannermock.simulated.tools.byteArrayFromHexString
 import io.mockk.mockk
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.observers.TestObserver
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -23,20 +19,19 @@ import java.util.concurrent.LinkedBlockingQueue
 @RunWith(AndroidJUnit4::class)
 class OutgoingMessagesToScannerTest {
     private lateinit var testScanner: Scanner
-    private lateinit var testObserver: TestObserver<ByteArray>
+    private lateinit var receivedValues: MutableList<ByteArray>
+    private var testObserver: (message: ByteArray) -> Unit = { bytes ->
+        receivedValues.add(bytes)
+    }
 
     @Before
     fun setup() {
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
-        RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
-
-        testObserver = TestObserver()
-
         val simulatedScannerManager = SimulatedScannerManager(
             SimulationMode.V1,
             outgoingStreamObservers = setOf(testObserver),
-            context = mockk(relaxed = true),
+            context = mockk(),
         )
+        receivedValues = mutableListOf()
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(simulatedScannerManager)
         testScanner = Scanner("F0:AC:D7:C0:00:00", simulatedBluetoothAdapter)
 
@@ -47,15 +42,15 @@ class OutgoingMessagesToScannerTest {
     fun outgoing_message_un20wakeup() {
         assertOnSuccessCallback { testScanner.un20Wakeup(it) }
 
-        assertOutgoingMessageIs(UN_20_WAKE_UP)
-        assertOutgoingMessageIs(GET_SENSOR_INFO, 1)
+        assertOutgoingMessageIs(WAKE_UP_MESSAGE)
+        assertOutgoingMessageIs(SENSOR_INFO_REQUEST, 1)
     }
 
     @Test
     fun outgoing_message_resetUI() {
         assertOnSuccessCallback { testScanner.resetUI(it) }
 
-        assertOutgoingMessageIs(RESET_UI)
+        assertOutgoingMessageIs(RESET_UI_COMMAND)
     }
 
     @Test
@@ -69,7 +64,7 @@ class OutgoingMessagesToScannerTest {
     fun outgoing_message_internal_getTemplate() {
         invokePrivateMethod(testScanner, "internal_getTemplate")
 
-        assertOutgoingMessageIs(GENERATE_TEMPLATE_REQUEST)
+        assertOutgoingMessageIs(GET_TEMPLATE_REQUEST)
         assertOutgoingMessageIs(GET_TEMPLATE_FRAGMENT_0, 1)
         assertOutgoingMessageIs(GET_TEMPLATE_FRAGMENT_1, 2)
         assertOutgoingMessageIs(GET_TEMPLATE_FRAGMENT_2, 3)
@@ -90,12 +85,12 @@ class OutgoingMessagesToScannerTest {
     @Test
     fun outgoing_message_connection_sendOtaMeta() {
         testScanner.connection_sendOtaMeta(mockMeta[0], mockMeta[1].toShort())
-        assertOutgoingMessageIs(SET_META_DATA)
+        assertOutgoingMessageIs(META_DATA_COMMAND)
     }
 
     @Test
     fun outgoing_message_connection_sendOtaPacket() {
-        testScanner.connection_sendOtaPacket(0, MOCK_OTA_PACKET_0.length, MOCK_OTA_PACKET_0)
+        testScanner.connection_sendOtaPacket(0, OTA_PACKET_0.length, OTA_PACKET_0)
         assertOutgoingMessageIs(SET_OTA_PACKET_0)
     }
 
@@ -108,7 +103,6 @@ class OutgoingMessagesToScannerTest {
     private fun callBlocking(
         function: (ScannerCallback) -> Unit,
         scannerCallback: ScannerCallback? = null,
-        wakeUpLooper: Boolean = false,
     ): Boolean {
         val result = LinkedBlockingQueue<Boolean>()
 
@@ -123,10 +117,8 @@ class OutgoingMessagesToScannerTest {
         )
 
         // TODO loopers in Scanner.wrapCallback mean we have to wakeUpLooper.
-        if (wakeUpLooper) {
-            Thread.sleep(100)
-            ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-        }
+        Thread.sleep(100)
+        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
         return result.take()
     }
@@ -139,7 +131,6 @@ class OutgoingMessagesToScannerTest {
                 onSuccess = { x = 1 },
                 onFailure = {},
             ),
-            true,
         )
         Assert.assertEquals(1, x)
     }
@@ -148,10 +139,7 @@ class OutgoingMessagesToScannerTest {
         msgToScanner: String,
         position: Int = 0,
     ) {
-        assert(
-            testObserver.values()[position]?.contentEquals(byteArrayFromHexString(msgToScanner))
-                ?: false,
-        )
+        assert(receivedValues[position].contentEquals(byteArrayFromHexString(msgToScanner)))
     }
 
     private fun invokePrivateMethod(
@@ -165,11 +153,11 @@ class OutgoingMessagesToScannerTest {
 
     companion object {
         // Expected outgoing messages to the scanner
-        private const val UN_20_WAKE_UP = "fafafafa0c001000f5f5f5f5"
-        private const val GET_SENSOR_INFO = "fafafafa0c000000f5f5f5f5"
-        private const val RESET_UI = "fafafafa1600020001010000000000000000f5f5f5f5"
+        private const val WAKE_UP_MESSAGE = "fafafafa0c001000f5f5f5f5"
+        private const val SENSOR_INFO_REQUEST = "fafafafa0c000000f5f5f5f5"
+        private const val RESET_UI_COMMAND = "fafafafa1600020001010000000000000000f5f5f5f5"
         private const val GET_IMAGE_QUALITY = "fafafafa0c000b00f5f5f5f5"
-        private const val GENERATE_TEMPLATE_REQUEST = "fafafafa0c000c00f5f5f5f5"
+        private const val GET_TEMPLATE_REQUEST = "fafafafa0c000c00f5f5f5f5"
         private const val GET_TEMPLATE_FRAGMENT_0 = "fafafafa0e0016000000f5f5f5f5"
         private const val GET_TEMPLATE_FRAGMENT_1 = "fafafafa0e0016000100f5f5f5f5"
         private const val GET_TEMPLATE_FRAGMENT_2 = "fafafafa0e0016000200f5f5f5f5"
@@ -177,12 +165,12 @@ class OutgoingMessagesToScannerTest {
         private const val SET_RUNNING_BANK = "fafafafa0f001f00010100f5f5f5f5"
         private const val CRASH_VERO_0 = "fafafafa0d00200000f5f5f5f5"
 
-        private const val MOCK_META_FILE_SIZE = 108848
-        private const val MOCK_META_CRC = 64851
-        private val mockMeta = arrayListOf(MOCK_META_FILE_SIZE, MOCK_META_CRC)
-        private const val SET_META_DATA = "fafafafa12001d0030a9010053fdf5f5f5f5"
+        private const val META_FILE_SIZE = 108848
+        private const val META_CRC = 64851
+        private val mockMeta = arrayListOf(META_FILE_SIZE, META_CRC)
+        private const val META_DATA_COMMAND = "fafafafa12001d0030a9010053fdf5f5f5f5"
 
-        private const val MOCK_OTA_PACKET_0 = ":020000040000FA\n" +
+        private const val OTA_PACKET_0 = ":020000040000FA\n" +
             ":10000000B45100208D03001BB902001BE54A001B00\n" +
             ":10001000C102001BC502001BC902001BD254FF3DD8\n" +
             ":10002000000000000000000000000000191B001B81\n" +

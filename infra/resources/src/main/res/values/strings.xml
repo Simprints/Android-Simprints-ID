@@ -175,6 +175,7 @@
     <string name="face_capture_onboarding_continue_button">Tap anywhere to continue</string>
     <string name="face_capture_capturing_title">Live Capture</string>
     <string name="face_capture_preparation_title">Preparation</string>
+    <string name="face_capture_start_capture">Start capture</string>
     <string name="face_capture_title_previewing">Preparing to scan</string>
     <string name="face_capture_title_no_face">No face detected</string>
     <string name="face_capture_error_no_face">Make sure the face fills the circle</string>
@@ -244,7 +245,7 @@
     <string name="fingerprint_connect_ota_start_update">Start update</string>
     <string name="fingerprint_connect_ota_recovery_title">Scanner update failed</string>
     <string name="fingerprint_connect_ota_recovery_soft_reset">Turn scanner off and on again</string>
-    <string name="fingerprint_connect_ota_recovery_hard_reset">Press and hold power button for 5 seconds</string>
+    <string name="fingerprint_connect_ota_recovery_hard_reset">1. Press and hold the power button until the scanner turns off \n2. Press and hold the power button again for 7 seconds</string>
     <string name="fingerprint_connect_ota_failed_title">Scanner update failed</string>
     <string name="fingerprint_connect_ota_failed_instructions">Please contact your supervisor for help</string>
     <string name="fingerprint_connect_ota_continue_button">Continue</string>
@@ -375,10 +376,14 @@
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
     <string name="dashboard_preference_summary_update_config">Refresh device and project configuration</string>
+    <string name="dashboard_preference_summary_update_config_last_updated">Refresh device and project configuration\nLast updated: %s</string>
     <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Audio alerts for scan completion, prompting the user to remove the subject’s finger from the scanner.</string>
+    <string name="dashboard_preference_summary_enable_auto_capture">Automatically start taking pictures when a face is well positioned in the viewfinder.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
     <string name="dashboard_preference_update_config_scheduled">Configuration update started</string>
+    <string name="dashboard_preference_update_config_finished">Configuration updated</string>
     <string name="dashboard_preference_enable_audio_on_scan_complete">Audio Alert</string>
+    <string name="dashboard_preference_enable_auto_capture">Auto-capture</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Sync Information</string>

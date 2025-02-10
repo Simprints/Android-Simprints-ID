@@ -22,6 +22,7 @@ import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
@@ -79,7 +80,7 @@ class ClientApiViewModel @Inject internal constructor(
             }
             intentMapper(action = action, extras = extrasMap, project = getProject())
         } catch (validationException: InvalidRequestException) {
-            Simber.e("Cannot parse intent data", validationException)
+            Simber.e("Cannot parse intent data", validationException, tag = ORCHESTRATION)
             simpleEventReporter.addInvalidIntentEvent(action, extrasMap)
             _showAlert.send(validationException.error)
             null

@@ -21,6 +21,12 @@ class NECBioSdkWrapper @Inject constructor(
     override val imageTransferTimeoutMs: Long
         get() = 0 // 0 seconds as the image is already captured and stored in the memory from the scanning step
 
+    override val minGoodScans: Int
+        get() = 0 // NEC SDK has a high rate of bad scans, so we don't need to enforce a minimum number of good scans
+
+    override val addNewFingerOnBadScan: Boolean
+        get() = false // NEC SDK has a high rate of bad scans, so we don't need to add a new finger on bad scan
+
     override val matcherName: String = bioSdk.matcherName
 
     override val supportedTemplateFormat: String = bioSdk.supportedTemplateFormat

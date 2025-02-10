@@ -59,7 +59,7 @@ internal class EventUpSyncTask @Inject constructor(
     ): Flow<EventUpSyncProgress> = flow {
         if (operation.projectId != authStore.signedInProjectId) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
-                Simber.e("Failed to upload events due to missing auth", it)
+                Simber.e("Failed to upload events due to missing auth", it, tag = SYNC)
             }
         }
 
@@ -143,7 +143,7 @@ internal class EventUpSyncTask @Inject constructor(
                 throw t
             }
 
-            Simber.e("Failed to upload event scopes", t)
+            Simber.e("Failed to upload event scopes", t, tag = SYNC)
             lastOperation = lastOperation.copy(
                 lastState = FAILED,
                 lastSyncTime = timeHelper.now().ms,
@@ -169,9 +169,7 @@ internal class EventUpSyncTask @Inject constructor(
         eventFilter: (Map<EventScope, List<Event>?>) -> Map<EventScope, List<Event>?> = { it },
         createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
-        Simber
-            .tag(SYNC.name)
-            .d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize")
+        Simber.d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize", tag = SYNC)
 
         while (eventRepository.getClosedEventScopesCount(eventScopeTypeToUpload) > 0 && currentCoroutineContext().isActive) {
             val sessionScopes = getClosedScopesForType(eventScopeTypeToUpload, batchSize)
@@ -211,7 +209,7 @@ internal class EventUpSyncTask @Inject constructor(
                 }
             }
 
-            Simber.tag(SYNC.name).d("Deleting ${uploadedScopes.size} session scopes")
+            Simber.d("Deleting ${uploadedScopes.size} session scopes", tag = SYNC)
             eventRepository.deleteEventScopes(uploadedScopes)
         }
     }
@@ -241,7 +239,7 @@ internal class EventUpSyncTask @Inject constructor(
                 .also { listOfEvents -> emit(listOfEvents.size) }
         } catch (ex: Exception) {
             if (ex is JsonParseException || ex is JsonMappingException) {
-                Simber.i("Failed to un-marshal events", ex)
+                Simber.i("Failed to un-marshal events", ex, tag = SYNC)
             } else {
                 throw ex
             }
@@ -278,16 +276,16 @@ internal class EventUpSyncTask @Inject constructor(
     ) {
         var result: EventUpSyncResult? = null
         when (ex) {
-            is NetworkConnectionException -> Simber.i("Network connection error", ex)
+            is NetworkConnectionException -> Simber.i("Network connection error", ex, tag = SYNC)
             is HttpException -> {
-                Simber.i("Network HTTP request error", ex)
+                Simber.i("Network HTTP request error", ex, tag = SYNC)
                 result = ex.response()?.let { EventUpSyncResult(it.code()) }
             }
 
             is RemoteDbNotSignedInException -> throw ex
 
             else -> {
-                Simber.e("Unexpected network error", ex)
+                Simber.e("Unexpected network error", ex, tag = SYNC)
                 // Propagate other exceptions to report failure to the caller.
                 throw ex
             }
@@ -330,7 +328,7 @@ internal class EventUpSyncTask @Inject constructor(
     ) = flow {
         corruptedScopes.forEach { scope ->
             try {
-                Simber.i("Uploading invalid events for session ${scope.id}")
+                Simber.i("Uploading invalid events for session ${scope.id}", tag = SYNC)
                 val scopeString = jsonHelper.toJson(scope)
                 val eventJsons = eventRepository.getEventsJsonFromScope(scope.id)
                 emit(eventJsons.size)
@@ -343,9 +341,9 @@ internal class EventUpSyncTask @Inject constructor(
             } catch (t: Throwable) {
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.
-                    is NetworkConnectionException, is HttpException -> Simber.i("Failed to upload invalid events", t)
+                    is NetworkConnectionException, is HttpException -> Simber.i("Failed to upload invalid events", t, tag = SYNC)
                     is RemoteDbNotSignedInException -> throw t
-                    else -> Simber.e("Unexpected error while uploading invalid events", t)
+                    else -> Simber.e("Unexpected error while uploading invalid events", t, tag = SYNC)
                 }
             }
         }

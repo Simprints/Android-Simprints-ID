@@ -12,10 +12,18 @@ import kotlinx.parcelize.Parcelize
 data class AppMatchResult(
     val guid: String,
     val confidenceScore: Int,
-    val tier: AppResponseTier,
     val matchConfidence: AppMatchConfidence,
     val verificationSuccess: Boolean? = null,
 ) : Parcelable {
+    // Temporarily using match confidence as a proxy for tiers.
+    val tier: AppResponseTier
+        get() = when (matchConfidence) {
+            AppMatchConfidence.NONE -> AppResponseTier.TIER_4
+            AppMatchConfidence.LOW -> AppResponseTier.TIER_3
+            AppMatchConfidence.MEDIUM -> AppResponseTier.TIER_2
+            AppMatchConfidence.HIGH -> AppResponseTier.TIER_1
+        }
+
     constructor(
         guid: String,
         confidenceScore: Float,
@@ -24,20 +32,11 @@ data class AppMatchResult(
     ) : this(
         guid = guid,
         confidenceScore = confidenceScore.toInt(),
-        tier = computeTier(confidenceScore),
         matchConfidence = computeMatchConfidence(confidenceScore.toInt(), decisionPolicy),
         verificationSuccess = computeVerificationSuccess(confidenceScore.toInt(), verificationMatchThreshold),
     )
 
     companion object {
-        fun computeTier(score: Float) = when {
-            score < 20f -> AppResponseTier.TIER_5
-            score < 35f -> AppResponseTier.TIER_4
-            score < 50f -> AppResponseTier.TIER_3
-            score < 75f -> AppResponseTier.TIER_2
-            else -> AppResponseTier.TIER_1
-        }
-
         fun computeMatchConfidence(
             confidenceScore: Int,
             policy: DecisionPolicy,

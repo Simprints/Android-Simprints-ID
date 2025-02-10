@@ -6,11 +6,11 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.contracts.VersionsList
+import com.simprints.libsimprints.contracts.data.ConfidenceBand
 import com.simprints.libsimprints.contracts.data.Enrolment
 import com.simprints.libsimprints.contracts.data.Identification
 import com.simprints.libsimprints.contracts.data.Identification.Companion.toJson
 import com.simprints.libsimprints.contracts.data.RefusalForm
-import com.simprints.libsimprints.contracts.data.Tier
 import com.simprints.libsimprints.contracts.data.Verification
 import javax.inject.Inject
 import com.simprints.libsimprints.Identification as LegacyIdentification
@@ -49,7 +49,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                 else -> putString(
                     Constants.SIMPRINTS_IDENTIFICATIONS,
                     response.identifications
-                        .map { Identification(it.guid, it.confidenceScore.toFloat(), Tier.valueOf(it.tier.name)) }
+                        .map { Identification(it.guid, it.confidenceScore.toFloat(), ConfidenceBand.valueOf(it.matchConfidence.name)) }
                         .toJson(),
                 )
             }
@@ -82,7 +82,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                     Verification(
                         guid = response.matchResult.guid,
                         confidence = response.matchResult.confidenceScore.toFloat(),
-                        tier = Tier.valueOf(response.matchResult.tier.name),
+                        confidenceBand = ConfidenceBand.valueOf(response.matchResult.matchConfidence.name),
                         isSuccess = response.matchResult.verificationSuccess == true,
                     ).toJson(),
                 )

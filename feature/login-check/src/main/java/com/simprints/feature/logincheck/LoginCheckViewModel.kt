@@ -23,6 +23,7 @@ import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCas
 import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.security.SecurityManager
@@ -73,7 +74,7 @@ class LoginCheckViewModel @Inject internal constructor(
         rootManager.checkIfDeviceIsRooted()
         true
     } catch (e: RootedDeviceException) {
-        Simber.e("Rooted device detected on login check", e)
+        Simber.e("Rooted device detected on login check", e, tag = LOGIN)
         _showAlert.send(LoginCheckError.ROOTED_DEVICE)
         false
     }
@@ -95,6 +96,7 @@ class LoginCheckViewModel @Inject internal constructor(
             _returnLoginNotComplete.send()
             return
         }
+        Simber.i("Start log-in attempt", tag = LOGIN)
         addAuthorizationEvent(actionRequest, false)
         cachedRequest = actionRequest
         loginAlreadyTried.set(true)
@@ -105,6 +107,7 @@ class LoginCheckViewModel @Inject internal constructor(
     }
 
     fun handleLoginResult(result: LoginResult) = viewModelScope.launch {
+        Simber.i("Log-in result: $result", tag = LOGIN)
         val requestAction = cachedRequest?.takeIf { result.isSuccess }
         if (requestAction != null) {
             validateProjectAndProceed(requestAction)

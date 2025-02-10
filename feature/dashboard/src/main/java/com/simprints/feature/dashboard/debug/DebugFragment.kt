@@ -14,7 +14,6 @@ import com.simprints.core.DispatcherIO
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
@@ -32,9 +31,6 @@ import javax.inject.Inject
 internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     @Inject
     lateinit var eventSyncManager: EventSyncManager
-
-    @Inject
-    lateinit var configManager: ConfigManager
 
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
@@ -95,22 +91,6 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         binding.clearFirebaseToken.setOnClickListener {
             authStore.clearFirebaseToken()
             binding.logs.append("\nFirebase token deleted")
-        }
-
-        binding.syncConfig.setOnClickListener {
-            binding.logs.append("\nGetting Configs from BFSID")
-            lifecycleScope.launch {
-                try {
-                    configManager.refreshProject(authStore.signedInProjectId)
-                    binding.logs.append("\nGot Configs from BFSID")
-                } catch (e: Exception) {
-                    binding.logs.append("\nFailed to refresh the project configuration")
-                }
-            }
-        }
-
-        binding.syncDevice.setOnClickListener {
-            syncOrchestrator.startDeviceSync()
         }
 
         binding.printRoomDb.setOnClickListener {

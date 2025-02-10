@@ -25,7 +25,6 @@ import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWo
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -46,16 +45,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params),
     WorkerProgressCountReporter {
-    companion object {
-        const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
-        const val INPUT_EVENT_DOWN_SYNC_SCOPE_ID = "INPUT_EVENT_DOWN_SYNC_SCOPE_ID"
-        const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
-        const val PROGRESS_DOWN_MAX_SYNC = "PROGRESS_DOWN_MAX_SYNC"
-        const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
-        const val OUTPUT_DOWN_MAX_SYNC = "OUTPUT_DOWN_MAX_SYNC"
-    }
-
-    override val tag: String = EventDownSyncDownloaderWorker::class.java.simpleName
+    override val tag: String = "EventDownSyncDownloader"
 
     private val downSyncOperationInput by lazy {
         val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
@@ -73,15 +63,12 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private suspend fun getDownSyncOperation() = eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        crashlyticsLog("Started")
+        showProgressNotification()
         try {
-            showProgressNotification()
-            Simber.tag(SYNC.name).d("[DOWNLOADER] Started")
-
-            val workerId = this@EventDownSyncDownloaderWorker.id.toString()
+            val workerId = id.toString()
             var count = syncCache.readProgress(workerId)
             var max: Int? = syncCache.readMax(workerId)
-
-            crashlyticsLog("Start")
 
             downSyncTask.downSync(this, getDownSyncOperation(), getEventScope()).collect {
                 count = it.progress
@@ -91,7 +78,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 reportCount(count, max)
             }
 
-            Simber.tag(SYNC.name).d("[DOWNLOADER] Done $count")
+            Simber.d("Downloaded events: $count", tag = tag)
             success(
                 workDataOf(
                     OUTPUT_DOWN_SYNC to count,
@@ -100,8 +87,6 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 "Total downloaded: $count / $max",
             )
         } catch (t: Throwable) {
-            Simber.d("[DOWNLOADER] Unexpected error", t)
-            Simber.tag(SYNC.name).i("[DOWNLOADER] Failed ${t.message}")
             handleSyncException(t)
         }
     }
@@ -118,20 +103,9 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
             ),
         )
 
-        is SyncCloudIntegrationException -> fail(
-            t,
-            t.message,
-            workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true),
-        )
-
-        is TooManyRequestsException -> fail(
-            t,
-            t.message,
-            workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true),
-        )
-        is RemoteDbNotSignedInException -> {
-            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
-        }
+        is SyncCloudIntegrationException -> fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
+        is TooManyRequestsException -> fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true))
+        is RemoteDbNotSignedInException -> fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
         else -> retry(t)
     }
 
@@ -145,6 +119,15 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 PROGRESS_DOWN_MAX_SYNC to maxCount,
             ),
         )
+    }
+
+    companion object {
+        const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
+        const val INPUT_EVENT_DOWN_SYNC_SCOPE_ID = "INPUT_EVENT_DOWN_SYNC_SCOPE_ID"
+        const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
+        const val PROGRESS_DOWN_MAX_SYNC = "PROGRESS_DOWN_MAX_SYNC"
+        const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
+        const val OUTPUT_DOWN_MAX_SYNC = "OUTPUT_DOWN_MAX_SYNC"
     }
 }
 

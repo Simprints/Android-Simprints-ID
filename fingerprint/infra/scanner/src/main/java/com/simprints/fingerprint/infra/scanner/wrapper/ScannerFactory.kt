@@ -14,6 +14,7 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -52,7 +53,7 @@ class ScannerFactory @Inject internal constructor(
                 scannerId,
             )
         }.also {
-            Simber.i("Using scanner generation $it")
+            Simber.i("Using scanner generation $it", tag = FINGER_CAPTURE)
         }
 
         when (scannerGenerationToUse) {

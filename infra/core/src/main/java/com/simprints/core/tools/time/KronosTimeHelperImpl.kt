@@ -29,10 +29,10 @@ class KronosTimeHelperImpl @Inject constructor(
         )
     }
 
-    override fun msBetweenNowAndTime(time: Long): Long = now().ms - time
+    override fun msBetweenNowAndTime(time: Timestamp): Long = now().ms - time.ms
 
-    override fun readableBetweenNowAndTime(date: Date): String =
-        getRelativeTimeSpanString(date.time, now().ms, MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
+    override fun readableBetweenNowAndTime(date: Timestamp): String =
+        getRelativeTimeSpanString(date.ms, now().ms, MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
 
     override fun getCurrentDateAsString(): String {
         val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())

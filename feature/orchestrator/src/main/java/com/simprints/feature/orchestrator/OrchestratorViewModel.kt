@@ -37,6 +37,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -85,6 +86,7 @@ internal class OrchestratorViewModel @Inject constructor(
             // and add new ones to the list. This way all session steps are available throughout
             // the app for reference (i.e. have we already captured face in this session?)
             steps = cache.steps + stepsBuilder.build(action, projectConfiguration)
+            Simber.i("Steps to execute: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
             return@launch
@@ -94,7 +96,8 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     fun handleResult(result: Serializable) = viewModelScope.launch {
-        Simber.d(result.toString())
+        Simber.i("Handling step result: ${result.javaClass.simpleName}", tag = ORCHESTRATION)
+        Simber.d(result.toString(), tag = ORCHESTRATION)
 
         val projectConfiguration = configManager.getProjectConfiguration()
         val errorResponse = mapRefusalOrErrorResult(result, projectConfiguration)
@@ -107,11 +110,13 @@ internal class OrchestratorViewModel @Inject constructor(
         steps.firstOrNull { it.status == StepStatus.IN_PROGRESS }?.let { step ->
             step.status = StepStatus.COMPLETED
             step.result = result
+            Simber.i("Completed step: ${step.id}", tag = ORCHESTRATION)
 
             updateMatcherStepPayload(step, result)
         }
 
         if (shouldCreatePerson(actionRequest, modalities, steps)) {
+            Simber.i("Creating person event", tag = ORCHESTRATION)
             createPersonEvent(steps.mapNotNull { it.result })
         }
 
@@ -136,6 +141,7 @@ internal class OrchestratorViewModel @Inject constructor(
         if (steps.isEmpty()) {
             // Restore the steps from cache
             steps = cache.steps
+            Simber.i("Restored steps: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         }
     }
 
@@ -157,11 +163,13 @@ internal class OrchestratorViewModel @Inject constructor(
         if (steps.all { it.status != StepStatus.IN_PROGRESS }) {
             val nextStep = steps.firstOrNull { it.status == StepStatus.NOT_STARTED }
             if (nextStep != null) {
+                Simber.i("Next step: ${nextStep.id}", tag = ORCHESTRATION)
                 updateEnrolLastBiometricParamsIfNeeded(nextStep)
                 nextStep.status = StepStatus.IN_PROGRESS
                 cache.steps = steps
                 _currentStep.send(nextStep)
             } else {
+                Simber.i("All steps complete", tag = ORCHESTRATION)
                 // Acquiring location info could take long time, so we should stop location tracker
                 // before returning to the caller app to avoid creating empty sessions.
                 locationStore.cancelLocationCollection()
@@ -264,7 +272,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 type = object : TypeReference<ActionRequest>() {},
             )
         } catch (e: Exception) {
-            Simber.e("Action request deserialization failed", e)
+            Simber.e("Action request deserialization failed", e, tag = ORCHESTRATION)
         }
     }
 
@@ -273,7 +281,7 @@ internal class OrchestratorViewModel @Inject constructor(
             JsonHelper.toJson(it, dbSerializationModule)
         }
     } catch (e: Exception) {
-        Simber.e("Action request serialization failed", e)
+        Simber.e("Action request serialization failed", e, tag = ORCHESTRATION)
         null
     }
 

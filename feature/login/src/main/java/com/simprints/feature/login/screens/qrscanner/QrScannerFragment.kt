@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.analytics.FirebaseAnalytics.Event.LOGIN
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentQrScannerBinding
@@ -54,7 +55,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 qrCodeAnalyzer.scannedCode
                     .catch { e ->
-                        Simber.e("Camera not available for QR scanning", e)
+                        Simber.e("Camera not available for QR scanning", e, tag = LOGIN)
                         finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
                     }.collectLatest { qrCode ->
                         if (qrCode.isNotEmpty()) {

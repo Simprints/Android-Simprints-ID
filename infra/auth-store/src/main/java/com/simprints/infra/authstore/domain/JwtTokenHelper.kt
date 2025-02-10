@@ -1,6 +1,7 @@
 package com.simprints.infra.authstore.domain
 
 import android.util.Base64
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import org.json.JSONObject
 
@@ -19,7 +20,7 @@ internal class JwtTokenHelper {
                 throw Throwable("Impossible to parse jwt")
             }
         } catch (t: Throwable) {
-            Simber.e("Failed to parse JWT", t)
+            Simber.e("Failed to parse JWT", t, tag = LOGIN)
             null
         }
 

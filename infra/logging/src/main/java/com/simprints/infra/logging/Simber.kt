@@ -1,7 +1,8 @@
 package com.simprints.infra.logging
 
+import co.touchlab.kermit.Logger
 import com.google.firebase.FirebaseNetworkException
-import timber.log.Timber
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLHandshakeException
@@ -13,12 +14,6 @@ import javax.net.ssl.SSLProtocolException
  * @see <a href="URL#https://github.com/JakeWharton/timber">Timber</a>
  */
 object Simber {
-    internal const val USER_PROPERTY_TAG = "zzUserPropertyTag"
-    private const val FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH = 100
-    private const val FIREBASE_ANALYTICS_MAX_TAG_LENGTH = 24
-    private const val FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH = 40
-    private val firebaseInvalidCharactersRegex = Regex("[^a-zA-Z0-9_]")
-
     /**
      * Use this for debugging purposes. If you want to print out a bunch of messages so you can log
      * the exact flow of your program, use this. If you want to keep a log of variable values,
@@ -27,11 +22,15 @@ object Simber {
      * STAGING: Is sent to Log.d
      * RELEASE: Is ignored
      */
-    @JvmStatic
     fun d(
         message: String,
-        t: Throwable? = null,
-    ) = Timber.d(t, message)
+        tag: CrashReportTag,
+    ) = d(message, tag.name)
+
+    fun d(
+        message: String,
+        tag: String = DEFAULT_TAG,
+    ) = Logger.d(message, null, ensureCharactersAreValid(tag))
 
     /**
      * Use this to post useful information to the log. For example: that you have successfully
@@ -41,10 +40,23 @@ object Simber {
      * STAGING: Is sent to Log.i and Crashlytics as a breadcrumb
      * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
+    @JvmStatic
     fun i(
         message: String,
         t: Throwable? = null,
-    ) = Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+        tag: CrashReportTag,
+    ) = i(message, t, tag.name)
+
+    @JvmStatic
+    fun i(
+        message: String,
+        t: Throwable? = null,
+        tag: String = DEFAULT_TAG,
+    ) = if (t == null) {
+        Logger.i(message, null, ensureCharactersAreValid(tag))
+    } else {
+        Logger.i(message, t, ensureCharactersAreValid(tag))
+    }
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -63,11 +75,18 @@ object Simber {
     fun w(
         message: String,
         t: Throwable? = null,
+        tag: CrashReportTag,
+    ) = w(message, t, tag.name)
+
+    fun w(
+        message: String,
+        t: Throwable? = null,
+        tag: String = DEFAULT_TAG,
     ) {
-        if (t != null && shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
-        } else {
-            Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
+        when {
+            t == null -> Logger.w(message, null, ensureCharactersAreValid(tag))
+            shouldSkipThrowableReporting(t) -> Logger.i(message, t, ensureCharactersAreValid(tag))
+            else -> Logger.w(message, t, ensureCharactersAreValid(tag))
         }
     }
 
@@ -87,23 +106,20 @@ object Simber {
      */
     fun e(
         message: String,
-        t: Throwable? = null,
-    ) {
-        if (t != null && shouldSkipThrowableReporting(t)) {
-            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
-        } else {
-            Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
-        }
-    }
+        t: Throwable,
+        tag: CrashReportTag,
+    ) = e(message, t, tag.name)
 
-    /**
-     * Adds a custom tag to the log.
-     * @param tag Custom tag to add to log
-     */
-    fun tag(tag: String): Simber {
-        val conformingTag = limitLength(ensureCharactersAreValid(tag), FIREBASE_ANALYTICS_MAX_TAG_LENGTH)
-        Timber.tag(conformingTag)
-        return Simber
+    fun e(
+        message: String,
+        t: Throwable,
+        tag: String = DEFAULT_TAG,
+    ) {
+        if (shouldSkipThrowableReporting(t)) {
+            Logger.i(message, t, ensureCharactersAreValid(tag))
+        } else {
+            Logger.e(message, t, ensureCharactersAreValid(tag))
+        }
     }
 
     /**
@@ -122,11 +138,14 @@ object Simber {
         key: String,
         value: String,
     ) {
-        var conformingTag = limitLength(
-            USER_PROPERTY_TAG + ensureCharactersAreValid(key),
-            FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH,
+        Logger.i(
+            messageString = limitLength(value, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH),
+            throwable = null,
+            tag = limitLength(
+                USER_PROPERTY_TAG + ensureCharactersAreValid(key),
+                FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH,
+            ),
         )
-        Timber.tag(conformingTag).i(limitLength(value, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH))
     }
 
     /*
@@ -168,4 +187,11 @@ object Simber {
         it is SSLProtocolException ||
         it is SSLHandshakeException ||
         it is FirebaseNetworkException
+
+    // companion object {
+    const val DEFAULT_TAG = "Simber"
+    const val USER_PROPERTY_TAG = "zzUserPropertyTag"
+    private const val FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH = 100
+    private const val FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH = 40
+    private val firebaseInvalidCharactersRegex = Regex("[^a-zA-Z0-9_]")
 }

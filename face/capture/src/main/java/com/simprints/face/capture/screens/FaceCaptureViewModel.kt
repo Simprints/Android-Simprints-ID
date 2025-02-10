@@ -13,10 +13,12 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
+import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -48,6 +50,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
+    private val isUsingAutoCapture: IsUsingAutoCaptureUseCase,
     @DeviceID private val deviceID: String,
 ) : ViewModel() {
     // Updated in live feedback screen
@@ -78,15 +81,17 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
-    init {
-        Simber.tag(FACE_CAPTURE.name).i("Starting face capture flow")
-    }
+    val isAutoCaptureEnabled: LiveData<Boolean>
+        get() = _isAutoCaptureEnabled
+    private val _isAutoCaptureEnabled = MutableLiveData<Boolean>()
 
     fun setupCapture(samplesToCapture: Int) {
         this.samplesToCapture = samplesToCapture
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
+        Simber.i("Starting face capture flow", tag = FACE_CAPTURE)
+
         val licenseVendor = Vendor.RankOne
         val license = licenseRepository.getCachedLicense(licenseVendor)
         var licenseStatus = license.determineLicenseStatus()
@@ -96,7 +101,7 @@ internal class FaceCaptureViewModel @Inject constructor(
 
         // In some cases license is invalidated on initialisation attempt
         if (licenseStatus != LicenseStatus.VALID) {
-            Simber.tag(LICENSE.name).i("Face license is $licenseStatus - attempting download")
+            Simber.i("Face license is $licenseStatus - attempting download", tag = LICENSE)
             licenseStatus = refreshLicenceAndRetry(
                 activity,
                 licenseVendor,
@@ -112,12 +117,17 @@ internal class FaceCaptureViewModel @Inject constructor(
         }
         // Still invalid after attempted refresh
         if (licenseStatus != LicenseStatus.VALID) {
-            Simber.tag(LICENSE.name).i("Face license is $licenseStatus")
+            Simber.i("Face license is $licenseStatus", tag = LICENSE)
             licenseRepository.deleteCachedLicense(Vendor.RankOne)
             _invalidLicense.send()
         }
         saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
+
+    fun setupAutoCapture() =
+        viewModelScope.launch {
+            _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
+        }
 
     private suspend fun initialize(
         activity: Activity,
@@ -150,6 +160,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun getSampleDetection() = faceDetections.firstOrNull()
 
     fun flowFinished() {
+        Simber.i("Finishing capture flow", tag = FACE_CAPTURE)
         viewModelScope.launch {
             val projectConfiguration = configManager.getProjectConfiguration()
             if (projectConfiguration.face?.imageSavingStrategy?.shouldSaveImage() == true) {
@@ -182,13 +193,13 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun recapture() {
-        Simber.tag(FACE_CAPTURE.name).i("Starting face recapture flow")
+        Simber.i("Starting face recapture flow", tag = FACE_CAPTURE)
         faceDetections = listOf()
         _recaptureEvent.send()
     }
 
     private fun saveFaceDetections() {
-        Simber.tag(FACE_CAPTURE.name).i("Saving captures to disk")
+        Simber.i("Saving captures to disk", tag = FACE_CAPTURE)
         faceDetections.forEach { saveImage(it, it.id) }
     }
 
@@ -202,11 +213,12 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun submitError(throwable: Throwable) {
-        Simber.e("Face capture failed", throwable)
+        Simber.e("Face capture failed", throwable, FACE_CAPTURE)
         _unexpectedErrorEvent.send()
     }
 
     fun addOnboardingComplete(startTime: Timestamp) {
+        Simber.i("Face capture onboarding complete", tag = FACE_CAPTURE)
         eventReporter.addOnboardingCompleteEvent(startTime)
     }
 

@@ -1,7 +1,6 @@
 package com.simprints.core.tools.time
 
 import androidx.annotation.Keep
-import java.util.Date
 
 @Keep
 interface TimeHelper {
@@ -9,9 +8,9 @@ interface TimeHelper {
 
     fun now(): Timestamp
 
-    fun msBetweenNowAndTime(time: Long): Long
+    fun msBetweenNowAndTime(time: Timestamp): Long
 
-    fun readableBetweenNowAndTime(date: Date): String
+    fun readableBetweenNowAndTime(date: Timestamp): String
 
     fun getCurrentDateAsString(): String
 

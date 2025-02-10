@@ -20,6 +20,7 @@ internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
     }
 
     private fun namesForDeprecatedWorkers() = listOf(
+        "image-upsync-work-v3", // renamed to "file-upsync-work" in 2025.1.0
         "remote-config-work", // 2022.4.0
         "security-status-check-work", // 2023.2.0
         "image-upsync-work", // 2023.2.0

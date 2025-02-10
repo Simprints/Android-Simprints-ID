@@ -21,7 +21,6 @@ android {
             manifestPlaceholders["firebase_performance_logcat_enabled"] = false
             manifestPlaceholders["firebase_analytics_collection_enabled"] = true
         }
-
     }
 
     defaultConfig {
@@ -38,9 +37,8 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     api(libs.firebase.analytics)
     implementation(libs.firebase.perf)
-    implementation(libs.timber) {
-        exclude("org.jetbrains", "annotations")
-    }
+    implementation(libs.kermit)
+    implementation(libs.kermit.io)
 
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)

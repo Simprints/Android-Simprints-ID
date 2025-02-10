@@ -93,8 +93,8 @@ internal class AboutFragment : PreferenceFragmentCompat() {
             viewLifecycleOwner,
             LiveDataEventWithContentObserver {
                 val destination = when (it) {
-                    LogoutDestination.LogoutDataSyncScreen -> R.id.action_aboutFragment_to_logout_navigation
-                    LogoutDestination.LoginScreen -> R.id.action_aboutFragment_to_requestLoginFragment
+                    LogoutDestination.LogoutDataSyncScreen -> AboutFragmentDirections.actionAboutFragmentToLogoutNavigation()
+                    LogoutDestination.LoginScreen -> AboutFragmentDirections.actionAboutFragmentToRequestLoginFragment()
                 }
                 findNavController().navigateSafely(this, destination)
             },
@@ -153,7 +153,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
     }
 
     private fun openTroubleshooting() {
-        findNavController().navigateSafely(this, R.id.action_aboutFragment_to_troubleshooting)
+        findNavController().navigateSafely(this, AboutFragmentDirections.actionAboutFragmentToTroubleshooting())
     }
 
     private fun getAppVersionPreference(): Preference? = findPreference(getString(R.string.preference_app_version_key))

@@ -9,7 +9,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.common.truth.Truth
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
@@ -298,12 +297,6 @@ class SyncFragmentTest {
 
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.sync_card_select_no_modules_button))
-            .check(matches(isDisplayed()))
-            .perform(click())
-        Truth
-            .assertThat(navController.currentDestination?.id)
-            .isEqualTo(R.id.moduleSelectionFragment)
     }
 
     @Test

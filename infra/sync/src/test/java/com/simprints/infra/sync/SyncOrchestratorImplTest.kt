@@ -5,6 +5,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
@@ -13,9 +14,10 @@ import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME
+import com.simprints.infra.sync.SyncConstants.FILE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.FIRMWARE_UPDATE_WORK_NAME
-import com.simprints.infra.sync.SyncConstants.IMAGE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
+import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
@@ -30,6 +32,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -89,7 +93,7 @@ class SyncOrchestratorImplTest {
         verify {
             workManager.enqueueUniquePeriodicWork(PROJECT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(DEVICE_SYNC_WORK_NAME, any(), any())
-            workManager.enqueueUniquePeriodicWork(IMAGE_UP_SYNC_WORK_NAME, any(), any())
+            workManager.enqueueUniquePeriodicWork(FILE_UP_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(EVENT_SYNC_WORK_NAME, any(), any())
             workManager.enqueueUniquePeriodicWork(FIRMWARE_UPDATE_WORK_NAME, any(), any())
         }
@@ -108,7 +112,7 @@ class SyncOrchestratorImplTest {
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                IMAGE_UP_SYNC_WORK_NAME,
+                FILE_UP_SYNC_WORK_NAME,
                 any(),
                 match { it.workSpec.constraints.requiredNetworkType == NetworkType.CONNECTED },
             )
@@ -129,7 +133,7 @@ class SyncOrchestratorImplTest {
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                IMAGE_UP_SYNC_WORK_NAME,
+                FILE_UP_SYNC_WORK_NAME,
                 any(),
                 match { it.workSpec.constraints.requiredNetworkType == NetworkType.UNMETERED },
             )
@@ -157,7 +161,7 @@ class SyncOrchestratorImplTest {
         verify {
             workManager.cancelUniqueWork(PROJECT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(DEVICE_SYNC_WORK_NAME)
-            workManager.cancelUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
+            workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(FIRMWARE_UPDATE_WORK_NAME)
 
@@ -167,8 +171,8 @@ class SyncOrchestratorImplTest {
     }
 
     @Test
-    fun `schedules device worker when requested`() = runTest {
-        syncOrchestrator.startDeviceSync()
+    fun `schedules device worker when refresh requested`() = runTest {
+        syncOrchestrator.refreshConfiguration()
 
         verify {
             workManager.enqueueUniqueWork(
@@ -177,6 +181,26 @@ class SyncOrchestratorImplTest {
                 any<OneTimeWorkRequest>(),
             )
         }
+        verify {
+            workManager.enqueueUniqueWork(
+                PROJECT_SYNC_WORK_NAME_ONE_TIME,
+                any(),
+                any<OneTimeWorkRequest>(),
+            )
+        }
+    }
+
+    @Test
+    fun `configuration refresh emits when workers are complete`() = runTest {
+        val eventStartFlow = flowOf(
+            createWorkInfo(WorkInfo.State.ENQUEUED),
+            createWorkInfo(WorkInfo.State.RUNNING),
+            createWorkInfo(WorkInfo.State.SUCCEEDED),
+        )
+        every { workManager.getWorkInfosFlow(any()) } returns eventStartFlow
+
+        // Should only emit the success
+        assertThat(syncOrchestrator.refreshConfiguration().count()).isEqualTo(1)
     }
 
     @Test
@@ -240,7 +264,7 @@ class SyncOrchestratorImplTest {
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                IMAGE_UP_SYNC_WORK_NAME,
+                FILE_UP_SYNC_WORK_NAME,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 any(),
             )
@@ -286,7 +310,7 @@ class SyncOrchestratorImplTest {
         val eventStartFlow = MutableSharedFlow<List<WorkInfo>>()
         every { workManager.getWorkInfosFlow(any()) } returns eventStartFlow
         every {
-            workManager.getWorkInfosForUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
+            workManager.getWorkInfosForUniqueWork(FILE_UP_SYNC_WORK_NAME)
         } returns mockFuture(createWorkInfo(WorkInfo.State.RUNNING))
 
         // Recreating orchestrator with new mocks since the subscription is done in init
@@ -295,7 +319,7 @@ class SyncOrchestratorImplTest {
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                IMAGE_UP_SYNC_WORK_NAME,
+                FILE_UP_SYNC_WORK_NAME,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 any(),
             )
@@ -312,7 +336,7 @@ class SyncOrchestratorImplTest {
         eventStartFlow.emit(createWorkInfo(WorkInfo.State.CANCELLED))
 
         verify(exactly = 0) {
-            workManager.getWorkInfosForUniqueWork(IMAGE_UP_SYNC_WORK_NAME)
+            workManager.getWorkInfosForUniqueWork(FILE_UP_SYNC_WORK_NAME)
             workManager.cancelWorkById(any())
         }
     }

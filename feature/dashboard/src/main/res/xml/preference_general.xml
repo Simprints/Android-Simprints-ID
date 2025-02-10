@@ -25,7 +25,15 @@
             android:summary="@string/dashboard_preference_summary_enable_audio_on_scan_complete"
             android:title="@string/dashboard_preference_enable_audio_on_scan_complete" />
 
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            app:isPreferenceVisible="false"
+            android:key="@string/preference_enable_face_auto_capture"
+            android:summary="@string/dashboard_preference_summary_enable_auto_capture"
+            android:title="@string/dashboard_preference_enable_auto_capture" />
+
         <Preference
+            android:widgetLayout="@layout/view_settings_update_config_item"
             android:key="@string/preference_update_config_key"
             android:summary="@string/dashboard_preference_summary_update_config"
             android:title="@string/dashboard_preference_update_config_title" />

@@ -1,0 +1,143 @@
+name: "[Reusable] Build APK"
+
+on:
+    workflow_call:
+        inputs:
+            build-environment:
+                type: string
+                required: true
+            version-name:
+                type: string
+                required: true
+
+        outputs:
+            build-artifact:
+                description: "The artifact file name of the built APK"
+                value: ${{ jobs.build-apk.outputs.build-artifact }}
+            optional-mapping-file:
+                description: "The mapping file for the built APK"
+                value: ${{ jobs.build-apk.outputs.mapping-text }}
+
+jobs:
+    build-apk:
+
+        outputs:
+            build-artifact: ${{ steps.set-build-artifact.outputs.artifact }}
+            mapping-text: ${{ steps.build-internal-apk.outputs.mapping }}
+
+        runs-on: ubuntu-latest
+
+        environment: ${{ inputs.build-environment }}
+
+        env:
+            # VERSION_CODE: Unique version code using the sum of the current timestamp and run number.
+            VERSION_CODE: "set in lower step"
+            # VERSION_NAME: Version name derived from the GitHub ref name after the final /.
+            VERSION_NAME: ${{ inputs.version-name }}
+            # VERSION_SUFFIX: The build environment (e.g., dev, staging, internal).
+            VERSION_SUFFIX: ${{ inputs.build-environment }}
+            # VERSION_BUILD: A unique build identifier combining the run number and attempt.
+            VERSION_BUILD: ${{ github.run_number }}.${{ github.run_attempt }}
+            # The final output file name.
+            FILE_NAME: "set in lower step"
+            # The base floor version code. Please check the README for more information.
+            BASE_VERSION_CODE: 10000000
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v4
+                with:
+                    java-version: 17
+                    distribution: 'temurin'
+
+            -   name: Check workflow validity
+                if: ${{ github.run_attempt > 99 }}
+                run: |
+                    echo "Run attempts exceeded 99. Please start a new workflow."
+                    exit 1
+
+            -   name: Check base version code
+                run: |
+                    if [ $(( ${{ github.run_number }} * 100 )) -ge $BASE_VERSION_CODE ]; then
+                      echo "Github workflows now exceeds the base version code..."
+                      echo "BASE_VERSION_CODE=0" >> $GITHUB_ENV
+                    fi
+
+            -   name: Compute version variables
+                run: |
+                    echo "VERSION_CODE=$(($BASE_VERSION_CODE + ${{ github.run_number }} * 100 + ${{ github.run_attempt }}))" >> $GITHUB_ENV
+
+            -   name: Compute file name
+                run: |
+                    echo "FILE_NAME=${{ env.VERSION_NAME }}+${{ env.VERSION_SUFFIX }}.${{ env.VERSION_BUILD }}" >> $GITHUB_ENV
+
+            -   name: Set up build files
+                uses: ./.github/actions/setup-gradle-build-files
+                with:
+                    gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
+                    gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
+                    signing-jks-file: ${{ secrets.SIGNING_JKS_FILE }}
+                    jks-store-password: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+                    jks-key-alias: ${{ vars.SIGNING_KEY_ALIAS }}
+                    jks-key-password: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+            -   name: Create build properties
+                run: |
+                    #overwrite the existing file with an empty file
+                    truncate -s 0 build-logic/build_properties.gradle.kts
+                    #Write the build properties
+                    cat <<EOF >>build-logic/build_properties.gradle.kts
+                    extra.apply {
+                        set("VERSION_CODE", $VERSION_CODE)
+                        set("VERSION_NAME", "$VERSION_NAME")
+                        set("VERSION_SUFFIX", "$VERSION_SUFFIX")
+                        set("VERSION_BUILD", "$VERSION_BUILD")
+                        set("DEBUGGABLE", ${{ vars.BUILD_IS_DEBUGGABLE }})
+                        set("DB_ENCRYPTION", ${{ vars.DB_IS_ENCRYPTED }})
+                    }
+                    EOF
+
+            -   name: build dev apk
+                if: ${{ inputs.build-environment == 'dev' }}
+                run: |
+                    ./gradlew id:packageDebugUniversalApk
+                    mv id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk $FILE_NAME.apk
+                    echo "FILE_NAME=$FILE_NAME.apk" >> $GITHUB_ENV
+
+            -   name: build staging apk
+                if: ${{ inputs.build-environment == 'staging' }}
+                run: |
+                    ./gradlew id:packageStagingUniversalApk
+                    mv id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk $FILE_NAME.apk
+                    echo "FILE_NAME=$FILE_NAME.apk" >> $GITHUB_ENV
+
+            -   name: build internal apk
+                id: build-internal-apk
+                if: ${{ inputs.build-environment == 'internal' }}
+                run: |
+                    ./gradlew id:bundleRelease
+                    mv id/build/outputs/bundle/release/id-release.aab $FILE_NAME.aab
+                    echo "FILE_NAME=$FILE_NAME.aab" >> $GITHUB_ENV
+                    mv id/build/outputs/mapping/release/mapping.txt $FILE_NAME-mapping.txt
+                    echo "mapping=$FILE_NAME-mapping.txt" >> $GITHUB_OUTPUT
+
+            -   name: Upload artifact
+                uses: actions/upload-artifact@v4
+                with:
+                    name: ${{ env.FILE_NAME }}
+                    path: ${{ env.FILE_NAME }}
+
+            -   name: Upload mapping if available
+                if: steps.build-internal-apk.outputs.mapping
+                uses: actions/upload-artifact@v4
+                with:
+                    name: ${{ steps.build-internal-apk.outputs.mapping }}
+                    path: ${{ steps.build-internal-apk.outputs.mapping }}
+
+            -   name: Set build-artifact output
+                id: set-build-artifact
+                run: echo "artifact=${{ env.FILE_NAME }}" >> $GITHUB_OUTPUT

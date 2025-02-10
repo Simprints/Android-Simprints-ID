@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -53,11 +52,10 @@ internal class MatchViewModel @Inject constructor(
 
         val matcherResult = matcherUseCase(
             params,
-            onLoadingStarted = { tag ->
-                Simber.tag(tag).i("Loading candidates")
-            },
-            onCandidateLoaded = { total, loaded ->
-                _matchState.postValue(MatchState.LoadingCandidates(total, loaded))
+            onLoadingStarted = { totalCandidates -> _matchState.postValue(MatchState.LoadingCandidates(totalCandidates, loaded = 0)) },
+            onCandidateLoaded = {
+                val currentState = _matchState.value as? MatchState.LoadingCandidates ?: return@matcherUseCase
+                _matchState.postValue(currentState.copy(loaded = currentState.loaded + 1))
             }
         )
 

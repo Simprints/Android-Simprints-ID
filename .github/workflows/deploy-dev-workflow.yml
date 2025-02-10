@@ -1,0 +1,14 @@
+name: "Deploy: Dev Workflow"
+
+on:
+    workflow_dispatch:
+
+concurrency:
+    group: deploy-main-workflow
+    cancel-in-progress: true
+
+jobs:
+
+    deploy-to-dev:
+        uses: ./.github/workflows/pipeline-deploy-to-dev.yml
+        secrets: inherit

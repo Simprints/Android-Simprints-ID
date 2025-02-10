@@ -9,6 +9,7 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
@@ -25,13 +26,14 @@ internal class FaceMatcherUseCase @Inject constructor(
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
     private lateinit var faceMatcher: FaceMatcher
-    override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING.name
+    override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingStarted: (tag: String) -> Unit,
-        onCandidateLoaded: (totalCandidates: Int, loaded: Int) -> Unit,
+        onLoadingStarted: (totalCandidates: Int) -> Unit,
+        onCandidateLoaded: () -> Unit,
     ): MatcherResult = coroutineScope {
+        Simber.i("Initialising matcher", tag = crashReportTag)
         faceMatcher = resolveFaceBioSdk().matcher
         if (matchParams.probeFaceSamples.isEmpty()) {
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
@@ -48,8 +50,8 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
 
-        onLoadingStarted(crashReportTag)
-        var candidatesLoaded = 0
+        Simber.i("Matching candidates", tag = crashReportTag)
+        onLoadingStarted(totalCandidates)
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
@@ -59,14 +61,15 @@ internal class FaceMatcherUseCase @Inject constructor(
                         dataSource = matchParams.biometricDataSource,
                     ){
                         // When a candidate is loaded
-                        candidatesLoaded++
-                        onCandidateLoaded(totalCandidates, candidatesLoaded)
+                        onCandidateLoaded()
                     }
                     match(batchCandidates, samples)
                 }
             }.awaitAll()
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
+        Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
+
         MatcherResult(resultItems, totalCandidates, faceMatcher.matcherName)
     }
 

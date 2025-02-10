@@ -15,10 +15,8 @@ plugins {
     alias(libs.plugins.gms) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.firebase.perf) apply false
-    alias(libs.plugins.firebase.distribution) apply false
     alias(libs.plugins.play.publisher) apply false
 
-    alias(libs.plugins.retry) apply false
     alias(libs.plugins.sonar) apply false
     alias(libs.plugins.depsGraph) apply false
 }
@@ -36,5 +34,4 @@ https://docs.gradle.org/nightly/userguide/performance.html#suggestions_for_java_
 */
 tasks.withType(Test::class).configureEach {
     maxParallelForks = Runtime.getRuntime().availableProcessors().div(2)
-    retry.maxRetries.set(5)
 }

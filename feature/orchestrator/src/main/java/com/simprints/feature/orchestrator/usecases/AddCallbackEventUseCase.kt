@@ -2,7 +2,6 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.simprints.core.SessionCoroutineScope
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
@@ -61,7 +60,6 @@ internal class AddCallbackEventUseCase @Inject constructor(
     private fun buildComparisonScore(matchResult: AppMatchResult) = CallbackComparisonScore(
         matchResult.guid,
         matchResult.confidenceScore,
-        AppResponseTier.valueOf(matchResult.tier.name),
         AppMatchConfidence.valueOf(matchResult.matchConfidence.name),
     )
 

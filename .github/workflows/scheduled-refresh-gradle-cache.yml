@@ -1,0 +1,44 @@
+# This workflow refresh all the gradle cached folders.
+# it should be triggered automatically every 5 days, and manually
+name: "[Manual][Scheduled] Refresh Gradle cache"
+
+on:
+    workflow_dispatch:
+    schedule:
+        -   cron: '0 0 */5 * *'
+
+jobs:
+    refresh-caches:
+        runs-on: ubuntu-latest
+        timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Cache Gradle global directory
+                uses: actions/cache@v4
+                with:
+                    path: |
+                        ~/.gradle/
+                        .gradle/
+                    key: global-gradle-${{ github.run_id }}
+
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v4
+                with:
+                    java-version: 17
+                    distribution: 'temurin'
+
+            -   name: Set up local.properties
+                uses: ./.github/actions/setup-gradle-build-files
+                with:
+                    gh-package-name: ${{ secrets.GH_PACKAGE_NAME }}
+                    gh-package-token: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    google-services-file: ${{ secrets.GOOGLE_SERVICES_FILE }}
+
+            -   name: Run all unit tests # To make sure all gradle folders are generated
+                run: ./gradlew testDebugUnitTest --test-dry-run
+
+
+

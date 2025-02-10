@@ -10,6 +10,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
@@ -43,8 +44,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -81,13 +80,11 @@ internal class SyncViewModel @Inject constructor(
     private val upSyncCountLiveData = MutableLiveData(0)
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
 
-    private suspend fun lastTimeSyncSucceed() = runBlocking {
-        eventSyncManager
-            .getLastSyncTime()
-            ?.let { timeHelper.readableBetweenNowAndTime(it) }
-    }
+    private suspend fun lastTimeSyncSucceed(): String? = eventSyncManager
+        .getLastSyncTime()
+        ?.let { timeHelper.readableBetweenNowAndTime(it) }
 
-    private var lastTimeSyncRun: Date? = null
+    private var lastTimeSyncRun: Timestamp? = null
 
     init {
         viewModelScope.launch {
@@ -149,7 +146,7 @@ internal class SyncViewModel @Inject constructor(
 
             val isRunning = syncStateLiveData.value?.isSyncRunning() ?: false
 
-            if (!isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)) {
+            if (!isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate) > MAX_TIME_BEFORE_SYNC_AGAIN)) {
                 sync()
             }
         }
@@ -215,7 +212,7 @@ internal class SyncViewModel @Inject constructor(
         }.let {
             _syncCardLiveData.postValue(it)
             if (syncState != null && syncState.isSyncRunning()) {
-                lastTimeSyncRun = Date()
+                lastTimeSyncRun = timeHelper.now()
             }
         }
     }

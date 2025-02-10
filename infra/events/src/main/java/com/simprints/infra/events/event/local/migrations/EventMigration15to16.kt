@@ -3,13 +3,14 @@ package com.simprints.infra.events.event.local.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration15to16 : Migration(15, 16) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        Simber.d("Migrating room db from schema 15 to schema 16.")
+        Simber.i("Migrating room db from schema 15 to schema 16.", tag = MIGRATION)
         renameFaceLicenseErrors(db)
-        Simber.d("Migration from schema 15 to schema 16 done.")
+        Simber.i("Migration from schema 15 to schema 16 done.", tag = MIGRATION)
     }
 
     // rename FACE_LICENSE_MISSING and FACE_LICENSE_INVALID to LICENSE_MISSING and LICENSE_INVALID

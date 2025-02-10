@@ -2,7 +2,7 @@ package com.simprints.fingerprint.infra.scanner
 
 import android.content.Context
 import android.nfc.NfcAdapter
-import com.simprints.core.CoreModule.provideDispatcherIo
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.infra.scanner.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Route
@@ -15,7 +15,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 
+@Suppress("unused")
 @Module(
     includes = [
         FingerprintDependenciesModule::class,
@@ -36,10 +38,12 @@ object FingerprintDependenciesModule {
     ): ComponentNfcAdapter = AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(context))
 
     @Provides
-    fun providePacketRouter(): PacketRouter = PacketRouter(
+    fun providePacketRouter(
+        @DispatcherIO ioDispatcher: CoroutineDispatcher,
+    ): PacketRouter = PacketRouter(
         listOf(Route.Remote.VeroServer, Route.Remote.VeroEvent, Route.Remote.Un20Server),
         { source },
         ByteArrayToPacketAccumulator(PacketParser()),
-        provideDispatcherIo(),
+        ioDispatcher,
     )
 }
