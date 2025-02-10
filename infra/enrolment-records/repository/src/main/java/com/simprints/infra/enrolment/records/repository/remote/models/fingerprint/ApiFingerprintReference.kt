@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.remote.models.fingerprint
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.common.fingerprintReferenceIdFromSamples
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiBiometricReference
@@ -16,7 +15,7 @@ internal data class ApiFingerprintReference(
 
 internal fun List<FingerprintSample>.toApi(encoder: EncodingUtils): ApiFingerprintReference? = if (isNotEmpty()) {
     ApiFingerprintReference(
-        fingerprintReferenceIdFromSamples() ?: "",
+        first().referenceId,
         map {
             ApiFingerprintTemplate(
                 it.templateQualityScore,

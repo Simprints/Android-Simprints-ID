@@ -17,6 +17,4 @@ data class Subject(
     val updatedAt: Date? = null,
     var fingerprintSamples: List<FingerprintSample> = emptyList(),
     var faceSamples: List<FaceSample> = emptyList(),
-    @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
-    val toSync: Boolean = false,
 ) : Parcelable

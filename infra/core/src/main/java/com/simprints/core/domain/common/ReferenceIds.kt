@@ -1,7 +1,5 @@
 package com.simprints.core.domain.common
 
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
 import java.util.UUID
 
 /**
@@ -16,11 +14,6 @@ fun List<ByteArray>.faceReferenceId(): String? = if (isNotEmpty()) {
 }
 
 /**
- * Generate UUID based on the provided face samples.
- */
-fun List<FaceSample>.faceReferenceIdFromSamples(): String? = map { it.template }.faceReferenceId()
-
-/**
  * Generate UUID based on the provided fingerprint templates and template quality scores.
  */
 fun List<Pair<Int, ByteArray>>.fingerprintReferenceId(): String? = if (isNotEmpty()) {
@@ -30,9 +23,3 @@ fun List<Pair<Int, ByteArray>>.fingerprintReferenceId(): String? = if (isNotEmpt
 } else {
     null
 }
-
-/**
- * Generate UUID based on the provided fingerprint templates.
- */
-fun List<FingerprintSample>.fingerprintReferenceIdFromSamples(): String? =
-    map { it.templateQualityScore to it.template }.fingerprintReferenceId()

@@ -308,8 +308,8 @@ class EnrolmentRecordLocalDataSourceImplTest {
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
         faceSamples: Array<FaceSample> = arrayOf(
-            FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
-            FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
+            FaceSample(Random.nextBytes(64), "faceTemplateFormat", "referenceId"),
+            FaceSample(Random.nextBytes(64), "faceTemplateFormat", "referenceId"),
         ),
     ): Subject = Subject(
         subjectId = patientId,

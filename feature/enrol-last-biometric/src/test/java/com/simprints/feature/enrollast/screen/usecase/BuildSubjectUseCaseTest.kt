@@ -68,8 +68,14 @@ class BuildSubjectUseCaseTest {
             createParams(
                 listOf(
                     EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
-                    EnrolLastBiometricStepResult.FingerprintCaptureResult(listOf(mockFingerprintResults(Finger.RIGHT_THUMB))),
-                    EnrolLastBiometricStepResult.FingerprintCaptureResult(listOf(mockFingerprintResults(Finger.LEFT_THUMB))),
+                    EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                        REFERENCE_ID,
+                        listOf(mockFingerprintResults(Finger.RIGHT_THUMB)),
+                    ),
+                    EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                        REFERENCE_ID,
+                        listOf(mockFingerprintResults(Finger.LEFT_THUMB)),
+                    ),
                 ),
             ),
         )
@@ -84,6 +90,7 @@ class BuildSubjectUseCaseTest {
             createParams(
                 listOf(
                     EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                        REFERENCE_ID,
                         listOf(
                             mockFingerprintResults(Finger.RIGHT_5TH_FINGER),
                             mockFingerprintResults(Finger.RIGHT_4TH_FINGER),
@@ -111,8 +118,8 @@ class BuildSubjectUseCaseTest {
             createParams(
                 listOf(
                     EnrolLastBiometricStepResult.FaceMatchResult(emptyList()),
-                    EnrolLastBiometricStepResult.FaceCaptureResult(mockFaceResultsList("first")),
-                    EnrolLastBiometricStepResult.FaceCaptureResult(mockFaceResultsList("second")),
+                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("first")),
+                    EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("second")),
                 ),
             ),
         )
@@ -133,6 +140,8 @@ class BuildSubjectUseCaseTest {
     private fun mockFaceResultsList(format: String) = listOf(FaceTemplateCaptureResult(byteArrayOf(), format))
 
     companion object {
+        private const val REFERENCE_ID = "referenceId"
+
         private const val PROJECT_ID = "projectId"
         private val USER_ID = "userId".asTokenizableRaw()
         private val MODULE_ID = "moduleId".asTokenizableRaw()

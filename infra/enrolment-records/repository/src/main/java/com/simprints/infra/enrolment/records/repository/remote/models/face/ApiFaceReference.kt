@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.remote.models.face
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.common.faceReferenceIdFromSamples
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiBiometricReference
@@ -16,10 +15,8 @@ internal data class ApiFaceReference(
 
 internal fun List<FaceSample>.toApi(encoder: EncodingUtils): ApiFaceReference? = if (isNotEmpty()) {
     ApiFaceReference(
-        faceReferenceIdFromSamples().orEmpty(),
-        map {
-            ApiFaceTemplate(encoder.byteArrayToBase64(it.template))
-        },
+        first().referenceId,
+        map { ApiFaceTemplate(encoder.byteArrayToBase64(it.template)) },
         first().format,
     )
 } else {

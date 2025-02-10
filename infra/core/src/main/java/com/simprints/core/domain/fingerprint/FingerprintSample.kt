@@ -12,6 +12,7 @@ data class FingerprintSample(
     val template: ByteArray,
     val templateQualityScore: Int,
     val format: String,
+    val referenceId: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {

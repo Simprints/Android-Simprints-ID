@@ -10,6 +10,7 @@ import java.util.UUID
 data class FaceSample(
     val template: ByteArray,
     val format: String,
+    val referenceId: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {

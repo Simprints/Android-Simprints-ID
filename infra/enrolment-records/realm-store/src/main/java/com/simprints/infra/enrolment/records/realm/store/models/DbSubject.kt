@@ -23,8 +23,6 @@ class DbSubject : RealmObject {
     var fingerprintSamples: RealmList<DbFingerprintSample> = realmListOf()
     var faceSamples: RealmList<DbFaceSample> = realmListOf()
 
-    @Deprecated("See SubjectToEventDbMigrationManagerImpl doc")
-    var toSync: Boolean = false
     var isAttendantIdTokenized: Boolean = false
     var isModuleIdTokenized: Boolean = false
 }
