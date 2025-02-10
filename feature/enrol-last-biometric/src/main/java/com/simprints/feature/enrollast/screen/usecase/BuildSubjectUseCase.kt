@@ -26,26 +26,30 @@ internal class BuildSubjectUseCase @Inject constructor(
         params.moduleId,
         createdAt = Date(timeHelper.now().ms),
         fingerprintSamples = getFingerprintCaptureResult(params.steps)
-            ?.map(::fingerprintSample)
+            ?.let { result -> result.results.map { fingerprintSample(result.referenceId, it) } }
             .orEmpty(),
-        faceSamples = getFaceCaptureResult(params.steps)?.map(::faceSample).orEmpty(),
+        faceSamples = getFaceCaptureResult(params.steps)
+            ?.let { result -> result.results.map { faceSample(result.referenceId, it) } }
+            .orEmpty(),
     )
 
     private fun getFingerprintCaptureResult(steps: List<EnrolLastBiometricStepResult>) = steps
         .filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>()
         .firstOrNull()
-        ?.results
 
     private fun getFaceCaptureResult(steps: List<EnrolLastBiometricStepResult>) = steps
         .filterIsInstance<EnrolLastBiometricStepResult.FaceCaptureResult>()
         .firstOrNull()
-        ?.results
 
-    private fun fingerprintSample(it: FingerTemplateCaptureResult) = FingerprintSample(
-        fromDomainToModuleApi(it.finger),
-        it.template,
-        it.templateQualityScore,
-        it.format,
+    private fun fingerprintSample(
+        referenceId: String,
+        result: FingerTemplateCaptureResult,
+    ) = FingerprintSample(
+        fromDomainToModuleApi(result.finger),
+        result.template,
+        result.templateQualityScore,
+        result.format,
+        referenceId,
     )
 
     private fun fromDomainToModuleApi(finger: Finger) = when (finger) {
@@ -61,5 +65,8 @@ internal class BuildSubjectUseCase @Inject constructor(
         Finger.LEFT_5TH_FINGER -> IFingerIdentifier.LEFT_5TH_FINGER
     }
 
-    private fun faceSample(it: FaceTemplateCaptureResult) = FaceSample(it.template, it.format)
+    private fun faceSample(
+        referenceId: String,
+        result: FaceTemplateCaptureResult,
+    ) = FaceSample(result.template, result.format, referenceId)
 }

@@ -1,8 +1,6 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.common.faceReferenceIdFromSamples
-import com.simprints.core.domain.common.fingerprintReferenceIdFromSamples
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -64,7 +62,7 @@ data class EnrolmentRecordCreationEvent(
             encoder: EncodingUtils,
         ) = if (fingerprintSamples.isNotEmpty()) {
             FingerprintReference(
-                fingerprintSamples.fingerprintReferenceIdFromSamples() ?: "",
+                fingerprintSamples.first().referenceId,
                 fingerprintSamples.map {
                     FingerprintTemplate(
                         it.templateQualityScore,
@@ -83,7 +81,7 @@ data class EnrolmentRecordCreationEvent(
             encoder: EncodingUtils,
         ) = if (faceSamples.isNotEmpty()) {
             FaceReference(
-                faceSamples.faceReferenceIdFromSamples() ?: "",
+                faceSamples.first().referenceId,
                 faceSamples.map {
                     FaceTemplate(
                         encoder.byteArrayToBase64(it.template),

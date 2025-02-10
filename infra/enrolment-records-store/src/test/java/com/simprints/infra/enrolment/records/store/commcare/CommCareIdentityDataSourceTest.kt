@@ -50,12 +50,14 @@ class CommCareIdentityDataSourceTest {
                         templateQualityScore = 99,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
+                        referenceId = "referenceId",
                     ),
                     FingerprintSample(
                         fingerIdentifier = LEFT_INDEX_FINGER,
                         templateQualityScore = 88,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
+                        referenceId = "referenceId",
                     ),
                 ),
             ),
@@ -67,12 +69,14 @@ class CommCareIdentityDataSourceTest {
                         templateQualityScore = 77,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
+                        referenceId = "referenceId",
                     ),
                     FingerprintSample(
                         fingerIdentifier = LEFT_INDEX_FINGER,
                         templateQualityScore = 66,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
+                        referenceId = "referenceId",
                     ),
                 ),
             ),
@@ -80,11 +84,23 @@ class CommCareIdentityDataSourceTest {
         val expectedFaceIdentities = listOf(
             FaceIdentity(
                 subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
-                faces = listOf(FaceSample(template = byteArrayOf(), format = "ROC_1_23")),
+                faces = listOf(
+                    FaceSample(
+                        template = byteArrayOf(),
+                        format = "ROC_1_23",
+                        referenceId = "referenceId",
+                    ),
+                ),
             ),
             FaceIdentity(
                 subjectId = "a961fcb4-8573-4270-a1b2-088e88275b00",
-                faces = listOf(FaceSample(template = byteArrayOf(), format = "ROC_3")),
+                faces = listOf(
+                    FaceSample(
+                        template = byteArrayOf(),
+                        format = "ROC_3",
+                        referenceId = "referenceId",
+                    ),
+                ),
             ),
         )
 
