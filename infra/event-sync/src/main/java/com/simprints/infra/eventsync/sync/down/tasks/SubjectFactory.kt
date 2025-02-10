@@ -11,6 +11,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
@@ -42,6 +43,24 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
+        )
+    }
+
+    fun buildSubjectFromUpdatePayload(
+        existingSubject: Subject,
+        payload: EnrolmentRecordUpdatePayload,
+    ): Subject {
+        val removedBiometricReferences = payload.biometricReferencesRemoved.toSet() // to make lookup O(1)
+        val addedFaceSamples = extractFaceSamplesFromBiometricReferences(payload.biometricReferencesAdded)
+        val addedFingerprintSamples = extractFingerprintSamplesFromBiometricReferences(payload.biometricReferencesAdded)
+
+        return existingSubject.copy(
+            faceSamples = existingSubject.faceSamples
+                .filterNot { it.referenceId in removedBiometricReferences }
+                .plus(addedFaceSamples),
+            fingerprintSamples = existingSubject.fingerprintSamples
+                .filterNot { it.referenceId in removedBiometricReferences }
+                .plus(addedFingerprintSamples),
         )
     }
 

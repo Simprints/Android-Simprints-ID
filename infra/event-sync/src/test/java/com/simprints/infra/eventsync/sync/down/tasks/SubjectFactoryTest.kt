@@ -12,6 +12,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
@@ -117,6 +118,104 @@ class SubjectFactoryTest {
                     template = BASE_64_BYTES,
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
+                ),
+            ),
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `when buildSubjectFromUpdatePayload is called, correct samples list is created`() {
+        val subject = Subject(
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            fingerprintSamples = listOf(
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-1",
+                ),
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-2",
+                ),
+            ),
+            faceSamples = listOf(
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-3",
+                ),
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-4",
+                ),
+            ),
+        )
+
+        val payload = EnrolmentRecordUpdatePayload(
+            subjectId = SUBJECT_ID,
+            biometricReferencesRemoved = listOf("referenceId-finger-3", "referenceId-finger-2"),
+            biometricReferencesAdded = listOf(
+                FingerprintReference(
+                    id = "referenceId-finger-5",
+                    format = REFERENCE_FORMAT,
+                    templates = listOf(
+                        FingerprintTemplate(
+                            quality = QUALITY,
+                            template = BASE_64_BYTES.toString(),
+                            finger = IFingerIdentifier.LEFT_THUMB,
+                        ),
+                    ),
+                ),
+                FaceReference(
+                    id = "referenceId-finger-6",
+                    format = REFERENCE_FORMAT,
+                    templates = listOf(FaceTemplate(template = BASE_64_BYTES.toString())),
+                ),
+            ),
+        )
+        val result = factory.buildSubjectFromUpdatePayload(subject, payload)
+
+        val expected = Subject(
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            fingerprintSamples = listOf(
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-1",
+                ),
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-5",
+                ),
+            ),
+            faceSamples = listOf(
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-4",
+                ),
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT,
+                    referenceId = "referenceId-finger-6",
                 ),
             ),
         )

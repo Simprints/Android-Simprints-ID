@@ -11,6 +11,7 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -52,7 +53,7 @@ internal class EventDownSyncTask @Inject constructor(
         scope: CoroutineScope,
         operation: EventDownSyncOperation,
         eventScope: EventScope,
-        project: Project
+        project: Project,
     ): Flow<EventDownSyncProgress> = flow {
         var lastOperation = operation.copy()
         var count = 0
@@ -153,7 +154,7 @@ internal class EventDownSyncTask @Inject constructor(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
         lastOperation: EventDownSyncOperation,
-        project: Project
+        project: Project,
     ): EventDownSyncOperation {
         val actions = batchOfEventsToProcess
             .map { event ->
@@ -259,8 +260,16 @@ internal class EventDownSyncTask @Inject constructor(
     private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
         listOf(Deletion(event.payload.subjectId))
 
-    private fun EventDownSyncTask.handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<SubjectAction> {
-        TODO("Not yet implemented")
+    private suspend fun handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<SubjectAction> {
+        val existingSubject = enrolmentRecordRepository.load(SubjectQuery(subjectId = event.payload.subjectId)).first()
+        val subject = subjectFactory.buildSubjectFromUpdatePayload(existingSubject, event.payload)
+
+        return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
+            listOf(Creation(subject))
+        } else {
+            // Having no samples after update is equal to deletion
+            listOf(Deletion(event.payload.subjectId))
+        }
     }
 
     companion object {

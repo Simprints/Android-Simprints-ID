@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
@@ -8,6 +9,7 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
 import com.simprints.infra.events.EventRepository
@@ -17,6 +19,7 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCre
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -105,6 +108,11 @@ class EventDownSyncTaskTest {
                 "moduleId".asTokenizableRaw(),
                 DEFAULT_USER_ID,
             ),
+        )
+        val ENROLMENT_RECORD_UPDATE = EnrolmentRecordUpdateEvent(
+            "subjectId",
+            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            listOf("referenceIdToDelete"),
         )
     }
 
@@ -497,6 +505,60 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
+                project,
+            )
+        }
+    }
+
+    @Test
+    fun downSync_shouldProcessRecordUpdateEvent_withCreations() = runTest {
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(
+            Subject(
+                subjectId = "subjectId",
+                projectId = "projectId",
+                attendantId = "moduleId".asTokenizableRaw(),
+                moduleId = "attendantId".asTokenizableRaw(),
+                faceSamples = listOf(
+                    FaceSample(byteArrayOf(), "format", "referenceId"),
+                ),
+            ),
+        )
+
+        val event = ENROLMENT_RECORD_UPDATE
+        mockProgressEmission(listOf(event))
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                withArg { actions -> actions.all { it is Creation } },
+                project,
+            )
+        }
+    }
+
+    @Test
+    fun downSync_shouldProcessRecordUpdateEvent_withDeletions() = runTest {
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(
+            Subject(
+                subjectId = "subjectId",
+                projectId = "projectId",
+                attendantId = "moduleId".asTokenizableRaw(),
+                moduleId = "attendantId".asTokenizableRaw(),
+                faceSamples = listOf(
+                    FaceSample(byteArrayOf(), "format", "referenceIdToDelete"),
+                ),
+            ),
+        )
+
+        val event = ENROLMENT_RECORD_UPDATE
+        mockProgressEmission(listOf(event))
+
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
+
+        coVerify {
+            enrolmentRecordRepository.performActions(
+                withArg { actions -> actions.all { it is Deletion } },
                 project,
             )
         }
