@@ -11,7 +11,14 @@ import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperation
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventsUpSyncOperationState
 
-@Database(entities = [DbEventsDownSyncOperationState::class, DbEventsUpSyncOperationState::class], version = 3, exportSchema = true)
+@Database(
+    entities = [
+        DbEventsDownSyncOperationState::class,
+        DbEventsUpSyncOperationState::class,
+    ],
+    version = 4,
+    exportSchema = true,
+)
 @TypeConverters(Converters::class)
 @Keep
 internal abstract class EventSyncStatusDatabase : RoomDatabase() {
