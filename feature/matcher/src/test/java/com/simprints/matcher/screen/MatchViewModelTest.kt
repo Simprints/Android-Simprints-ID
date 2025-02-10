@@ -54,8 +54,9 @@ internal class MatchViewModelTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
-    private lateinit var cb1: CapturingSlot<() -> Unit>
-
+    private lateinit var cb1: CapturingSlot<(Int) -> Unit>
+    private val onCandidateLoaded: () -> Unit = {}
+    private val totalCandidates = 384
     private lateinit var viewModel: MatchViewModel
 
     @Before
@@ -80,8 +81,8 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 90f),
         )
 
-        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
-            cb1.captured.invoke()
+        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1), onCandidateLoaded) } answers {
+            cb1.captured.invoke(totalCandidates)
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
@@ -124,8 +125,8 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 10f),
         )
 
-        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
-            cb1.captured.invoke()
+        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1), any()) } answers {
+            cb1.captured.invoke(totalCandidates)
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
@@ -149,7 +150,7 @@ internal class MatchViewModelTest {
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
                 MatchViewModel.MatchState.NotStarted,
-                MatchViewModel.MatchState.LoadingCandidates,
+                MatchViewModel.MatchState.LoadingCandidates(totalCandidates, 0),
                 MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1),
             ),
         )
@@ -172,8 +173,8 @@ internal class MatchViewModelTest {
             FingerprintMatchResult.Item("1", 10f),
         )
 
-        coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1)) } answers {
-            cb1.captured.invoke()
+        coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1), any()) } answers {
+            cb1.captured.invoke(totalCandidates)
             MatcherUseCase.MatcherResult(
                 matchResultItems = responseItems,
                 totalCandidates = responseItems.size,
@@ -199,7 +200,7 @@ internal class MatchViewModelTest {
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
                 MatchViewModel.MatchState.NotStarted,
-                MatchViewModel.MatchState.LoadingCandidates,
+                MatchViewModel.MatchState.LoadingCandidates(totalCandidates, 0),
                 MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1),
             ),
         )

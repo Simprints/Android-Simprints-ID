@@ -45,7 +45,7 @@ internal class FingerprintMatcherUseCaseTest {
 
     @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
-
+    private val onCandidateLoaded: () -> Unit = {}
     private lateinit var useCase: FingerprintMatcherUseCase
 
     @Before
@@ -83,7 +83,7 @@ internal class FingerprintMatcherUseCaseTest {
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any()) } returns emptyList()
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), onCandidateLoaded) } returns emptyList()
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         useCase.invoke(
@@ -114,6 +114,7 @@ internal class FingerprintMatcherUseCaseTest {
                 any(),
                 any(),
                 any(),
+                onCandidateLoaded
             )
         } returns listOf(
             FingerprintIdentity(
@@ -150,7 +151,7 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-            onLoadingCandidates = { onLoadingCalled = true },
+            onLoadingStarted = { onLoadingCalled = true },
         )
 
         coVerify { bioSdkWrapper.match(any(), any(), any()) }

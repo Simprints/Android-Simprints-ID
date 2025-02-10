@@ -39,7 +39,7 @@ internal class FaceMatcherUseCaseTest {
 
     @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
-
+    private val onCandidateLoaded: () -> Unit = {}
     private lateinit var useCase: FaceMatcherUseCase
 
     @Before
@@ -91,7 +91,7 @@ internal class FaceMatcherUseCaseTest {
     fun `Correctly calls SDK matcher`() = runTest {
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any()) } returns listOf(
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate")),
@@ -110,7 +110,8 @@ internal class FaceMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-            onLoadingCandidates = { onLoadingCalled = true },
+            onLoadingStarted = { onLoadingCalled = true },
+            onCandidateLoaded
         )
 
         coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
