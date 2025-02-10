@@ -31,7 +31,7 @@ internal class OrchestratorActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Simber.i("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized")
+        Simber.d("OrchestratorActivity.onCreate isGraphInitialized=$isGraphInitialized", tag = ORCHESTRATION)
 
         isGraphInitialized = savedInstanceState?.getBoolean(KEY_IS_GRAPH_INITIALIZED) ?: false
         lifecycle.addObserver(activityTracker)
