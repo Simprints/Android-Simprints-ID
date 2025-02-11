@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 
 @Keep
 sealed class SubjectAction {
-    data class Creation(
+    data class Write(
         val subject: Subject,
     ) : SubjectAction()
 

@@ -9,8 +9,8 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Write
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
@@ -194,7 +194,7 @@ internal class EventDownSyncTask @Inject constructor(
     fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
         val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
         return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
-            listOf(Creation(subject))
+            listOf(Write(subject))
         } else {
             emptyList()
         }
@@ -247,11 +247,11 @@ internal class EventDownSyncTask @Inject constructor(
 
     private fun EventDownSyncOperation.isSyncingByAttendant(): Boolean = !queryEvent.attendantId.isNullOrEmpty()
 
-    private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
+    private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Write? =
         enrolmentRecordCreation?.let {
             val subject = subjectFactory.buildSubjectFromMovePayload(it)
             if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
-                Creation(subject)
+                Write(subject)
             } else {
                 null
             }
@@ -265,7 +265,7 @@ internal class EventDownSyncTask @Inject constructor(
         val subject = subjectFactory.buildSubjectFromUpdatePayload(existingSubject, event.payload)
 
         return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
-            listOf(Creation(subject))
+            listOf(Write(subject))
         } else {
             // Having no samples after update is equal to deletion
             listOf(Deletion(event.payload.subjectId))
