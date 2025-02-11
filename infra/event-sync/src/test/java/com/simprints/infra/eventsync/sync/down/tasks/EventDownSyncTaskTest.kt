@@ -10,8 +10,8 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Write
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -265,13 +265,13 @@ class EventDownSyncTaskTest {
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
-                    Creation(
+                    Write(
                         subjectFactory.buildSubjectFromCreationPayload(
                             event.payload,
                         ),
                     ),
                 ),
-                project
+                project,
             )
         }
     }
@@ -344,9 +344,9 @@ class EventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Write(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -372,9 +372,9 @@ class EventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Write(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -396,7 +396,7 @@ class EventDownSyncTaskTest {
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                 ),
-                project
+                project,
             )
         }
     }
@@ -422,9 +422,9 @@ class EventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Write(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -450,9 +450,9 @@ class EventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Write(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -466,10 +466,8 @@ class EventDownSyncTaskTest {
 
         coVerify {
             enrolmentRecordRepository.performActions(
-                listOf(
-                    Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
-                ),
-                project
+                listOf(Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId)),
+                project,
             )
         }
     }
@@ -485,9 +483,9 @@ class EventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToAttendant2.payload.enrolmentRecordCreation)),
+                    Write(subjectFactory.buildSubjectFromMovePayload(eventToMoveToAttendant2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -503,9 +501,9 @@ class EventDownSyncTaskTest {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
+                    Write(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -527,11 +525,12 @@ class EventDownSyncTaskTest {
         val event = ENROLMENT_RECORD_UPDATE
         mockProgressEmission(listOf(event))
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
-                withArg { actions -> actions.all { it is Creation } },
+                withArg { actions -> actions.all { it is Write } },
+                any(),
             )
         }
     }
@@ -553,11 +552,12 @@ class EventDownSyncTaskTest {
         val event = ENROLMENT_RECORD_UPDATE
         mockProgressEmission(listOf(event))
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
                 withArg { actions -> actions.all { it is Deletion } },
+                any(),
             )
         }
     }
