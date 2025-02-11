@@ -27,6 +27,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -55,7 +56,6 @@ internal class MatchViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     private lateinit var cb1: CapturingSlot<(Int) -> Unit>
-    private val onCandidateLoaded: () -> Unit = {}
     private val totalCandidates = 384
     private lateinit var viewModel: MatchViewModel
 
@@ -81,12 +81,15 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 90f),
         )
 
-        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1), onCandidateLoaded) } answers {
-            cb1.captured.invoke(totalCandidates)
-            MatcherUseCase.MatcherResult(
-                matchResultItems = responseItems,
-                totalCandidates = responseItems.size,
-                matcherName = "MatcherName",
+        coEvery { faceMatcherUseCase.invoke(any()) } returns flow {
+            emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
+            emit(MatcherUseCase.MatcherState.CandidateLoaded)
+            emit(
+                MatcherUseCase.MatcherState.Success(
+                    matchResultItems = responseItems,
+                    totalCandidates = responseItems.size,
+                    matcherName = "MatcherName",
+                )
             )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
@@ -124,13 +127,15 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 20f),
             FaceMatchResult.Item("1", 10f),
         )
-
-        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1), any()) } answers {
-            cb1.captured.invoke(totalCandidates)
-            MatcherUseCase.MatcherResult(
-                matchResultItems = responseItems,
-                totalCandidates = responseItems.size,
-                matcherName = MATCHER_NAME,
+        coEvery { faceMatcherUseCase.invoke(any()) } returns flow {
+            emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
+            emit(MatcherUseCase.MatcherState.CandidateLoaded)
+            emit(
+                MatcherUseCase.MatcherState.Success(
+                    matchResultItems = responseItems,
+                    totalCandidates = responseItems.size,
+                    matcherName = MATCHER_NAME,
+                )
             )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
@@ -150,7 +155,8 @@ internal class MatchViewModelTest {
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
                 MatchViewModel.MatchState.NotStarted,
-                MatchViewModel.MatchState.LoadingCandidates(totalCandidates, 0),
+                MatchViewModel.MatchState.LoadingCandidates(responseItems.size, 0),
+                MatchViewModel.MatchState.LoadingCandidates(responseItems.size, 1),
                 MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1),
             ),
         )
@@ -173,14 +179,18 @@ internal class MatchViewModelTest {
             FingerprintMatchResult.Item("1", 10f),
         )
 
-        coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1), any()) } answers {
-            cb1.captured.invoke(totalCandidates)
-            MatcherUseCase.MatcherResult(
-                matchResultItems = responseItems,
-                totalCandidates = responseItems.size,
-                matcherName = MATCHER_NAME,
+        coEvery { fingerprintMatcherUseCase.invoke(any()) } returns flow {
+            emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
+            emit(MatcherUseCase.MatcherState.CandidateLoaded)
+            emit(
+                MatcherUseCase.MatcherState.Success(
+                    matchResultItems = responseItems,
+                    totalCandidates = responseItems.size,
+                    matcherName = MATCHER_NAME,
+                )
             )
         }
+
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
 
         val states = viewModel.matchState.test()
@@ -200,7 +210,8 @@ internal class MatchViewModelTest {
         assertThat(states.valueHistory()).isEqualTo(
             listOf(
                 MatchViewModel.MatchState.NotStarted,
-                MatchViewModel.MatchState.LoadingCandidates(totalCandidates, 0),
+                MatchViewModel.MatchState.LoadingCandidates(responseItems.size, 0),
+                MatchViewModel.MatchState.LoadingCandidates(responseItems.size, 1),
                 MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1),
             ),
         )
