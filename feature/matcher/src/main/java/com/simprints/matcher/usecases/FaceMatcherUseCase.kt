@@ -12,11 +12,13 @@ import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
-import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
+import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import javax.inject.Inject
 
 internal class FaceMatcherUseCase @Inject constructor(
@@ -30,13 +32,12 @@ internal class FaceMatcherUseCase @Inject constructor(
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingStarted: (totalCandidates: Int) -> Unit,
-        onCandidateLoaded: () -> Unit,
-    ): MatcherResult = coroutineScope {
+    ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
         faceMatcher = resolveFaceBioSdk().matcher
         if (matchParams.probeFaceSamples.isEmpty()) {
-            return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
+            send(MatcherState.Success(emptyList(), 0, faceMatcher.matcherName))
+            return@channelFlow
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
@@ -47,30 +48,34 @@ internal class FaceMatcherUseCase @Inject constructor(
             dataSource = matchParams.biometricDataSource,
         )
         if (totalCandidates == 0) {
-            return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
+            send(MatcherState.Success(emptyList(), 0, faceMatcher.matcherName))
+            return@channelFlow
         }
 
         Simber.i("Matching candidates", tag = crashReportTag)
-        onLoadingStarted(totalCandidates)
-        val resultItems = createRanges(totalCandidates)
-            .map { range ->
-                async(dispatcher) {
-                    val batchCandidates = getCandidates(
-                        queryWithSupportedFormat,
-                        range,
-                        dataSource = matchParams.biometricDataSource,
-                    ){
-                        // When a candidate is loaded
-                        onCandidateLoaded()
+        send(MatcherState.LoadingStarted(totalCandidates))
+        val resultItems = coroutineScope {
+            createRanges(totalCandidates)
+                .map { range ->
+                    async(dispatcher) {
+                        val batchCandidates = getCandidates(
+                            queryWithSupportedFormat,
+                            range,
+                            dataSource = matchParams.biometricDataSource,
+                        ) {
+                            // When a candidate is loaded
+                            trySend(MatcherState.CandidateLoaded)
+                        }
+                        match(batchCandidates, samples)
                     }
-                    match(batchCandidates, samples)
-                }
-            }.awaitAll()
-            .reduce { acc, subSet -> acc.addAll(subSet) }
-            .toList()
+                }.awaitAll()
+                .reduce { acc, subSet -> acc.addAll(subSet) }
+                .toList()
+        }
+
         Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
 
-        MatcherResult(resultItems, totalCandidates, faceMatcher.matcherName)
+        send(MatcherState.Success(resultItems, totalCandidates, faceMatcher.matcherName))
     }
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }

@@ -3,6 +3,7 @@ package com.simprints.matcher.usecases
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
+import kotlinx.coroutines.flow.Flow
 
 internal interface MatcherUseCase {
     val crashReportTag: LoggingConstants.CrashReportTag
@@ -11,15 +12,16 @@ internal interface MatcherUseCase {
      * Returns a MatcherResult which contains a list of [MatchResultItem]s sorted by confidence score in descending order,
      * the total number of candidates that were considered and the name of the matcher that was used
      */
-    suspend operator fun invoke(
-        matchParams: MatchParams,
-        onLoadingStarted: (totalCandidates: Int) -> Unit = {},
-        onCandidateLoaded: () -> Unit = {},
-    ): MatcherResult
+    suspend operator fun invoke(matchParams: MatchParams): Flow<MatcherState>
 
-    data class MatcherResult(
-        val matchResultItems: List<MatchResultItem>,
-        val totalCandidates: Int,
-        val matcherName: String,
-    )
+    sealed class MatcherState {
+        data class LoadingStarted(val totalCandidates: Int) : MatcherState()
+        data object CandidateLoaded : MatcherState()
+        data class Success(
+            val matchResultItems: List<MatchResultItem>,
+            val totalCandidates: Int,
+            val matcherName: String,
+        ) : MatcherState()
+    }
+
 }

@@ -13,9 +13,11 @@ import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
+import com.simprints.matcher.usecases.MatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
@@ -50,37 +52,44 @@ internal class MatchViewModel @Inject constructor(
             else -> fingerprintMatcher
         }
 
-        val matcherResult = matcherUseCase(
-            params,
-            onLoadingStarted = { totalCandidates -> _matchState.postValue(MatchState.LoadingCandidates(totalCandidates, loaded = 0)) },
-            onCandidateLoaded = {
-                val currentState = _matchState.value as? MatchState.LoadingCandidates ?: return@matcherUseCase
-                _matchState.postValue(currentState.copy(loaded = currentState.loaded + 1))
+        matcherUseCase(params).collect { matcherState ->
+            when (matcherState) {
+                MatcherUseCase.MatcherState.CandidateLoaded -> {
+                    (_matchState.value as? MatchState.LoadingCandidates)?.let { currentState ->
+                        _matchState.postValue(currentState.copy(loaded = currentState.loaded + 1))
+                    }
+                }
+
+                is MatcherUseCase.MatcherState.LoadingStarted -> {
+                    _matchState.postValue(MatchState.LoadingCandidates(matcherState.totalCandidates, loaded = 0))
+                }
+
+                is MatcherUseCase.MatcherState.Success -> {
+                    val endTime = timeHelper.now()
+
+                    saveMatchEvent(
+                        startTime,
+                        endTime,
+                        params,
+                        matcherState.totalCandidates,
+                        matcherState.matcherName,
+                        matcherState.matchResultItems,
+                    )
+
+                    setMatchState(matcherState.totalCandidates, matcherState.matchResultItems)
+
+                    // wait a bit for the user to see the results
+                    delay(MATCHING_END_WAIT_TIME_MS)
+
+                    _matchResponse.send(
+                        when {
+                            isFaceMatch -> FaceMatchResult(matcherState.matchResultItems)
+                            else -> FingerprintMatchResult(matcherState.matchResultItems, params.fingerprintSDK!!)
+                        },
+                    )
+                }
             }
-        )
-
-        val endTime = timeHelper.now()
-
-        saveMatchEvent(
-            startTime,
-            endTime,
-            params,
-            matcherResult.totalCandidates,
-            matcherResult.matcherName,
-            matcherResult.matchResultItems,
-        )
-
-        setMatchState(matcherResult.totalCandidates, matcherResult.matchResultItems)
-
-        // wait a bit for the user to see the results
-        delay(MATCHING_END_WAIT_TIME_MS)
-
-        _matchResponse.send(
-            when {
-                isFaceMatch -> FaceMatchResult(matcherResult.matchResultItems)
-                else -> FingerprintMatchResult(matcherResult.matchResultItems, params.fingerprintSDK!!)
-            },
-        )
+        }
     }
 
     private fun setMatchState(
