@@ -219,6 +219,21 @@ class SyncOrchestratorImplTest {
     }
 
     @Test
+    fun `reschedules event sync worker with correct delay`() = runTest {
+        every { eventSyncManager.getPeriodicWorkTags() } returns listOf("tag1", "tag2")
+
+        syncOrchestrator.rescheduleEventSync(true)
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                EVENT_SYNC_WORK_NAME,
+                any(),
+                match { it.workSpec.initialDelay > 0 },
+            )
+        }
+    }
+
+    @Test
     fun `cancel event sync worker cancels correct worker`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 

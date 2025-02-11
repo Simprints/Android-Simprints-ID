@@ -57,7 +57,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
         }
     }
 
-    override suspend fun scheduleBackgroundWork() {
+    override suspend fun scheduleBackgroundWork(withDelay: Boolean) {
         if (authStore.signedInProjectId.isNotEmpty()) {
             workManager.schedulePeriodicWorker<ProjectConfigDownSyncWorker>(
                 SyncConstants.PROJECT_SYNC_WORK_NAME,
@@ -72,7 +72,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
                 SyncConstants.FILE_UP_SYNC_REPEAT_INTERVAL,
                 constraints = getImageUploadConstraints(),
             )
-            rescheduleEventSync()
+            rescheduleEventSync(withDelay)
             if (shouldScheduleFirmwareUpdate()) {
                 workManager.schedulePeriodicWorker<FirmwareFileUpdateWorker>(
                     SyncConstants.FIRMWARE_UPDATE_WORK_NAME,
@@ -110,10 +110,11 @@ internal class SyncOrchestratorImpl @Inject constructor(
             }.map { } // Converts flow emissions to Unit value as we only care about when it happens, not the value
     }
 
-    override fun rescheduleEventSync() {
+    override fun rescheduleEventSync(withDelay: Boolean) {
         workManager.schedulePeriodicWorker<EventSyncMasterWorker>(
             SyncConstants.EVENT_SYNC_WORK_NAME,
             SyncConstants.EVENT_SYNC_WORKER_INTERVAL,
+            initialDelay = if (withDelay) SyncConstants.EVENT_SYNC_WORKER_INTERVAL else 0,
             tags = eventSyncManager.getPeriodicWorkTags(),
         )
     }
