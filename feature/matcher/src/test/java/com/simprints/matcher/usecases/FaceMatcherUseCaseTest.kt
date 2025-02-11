@@ -10,12 +10,18 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResultItem
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -39,7 +45,6 @@ internal class FaceMatcherUseCaseTest {
 
     @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
-    private val onCandidateLoaded: () -> Unit = {}
     private lateinit var useCase: FaceMatcherUseCase
 
     @Before
@@ -89,19 +94,20 @@ internal class FaceMatcherUseCaseTest {
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
-        coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any()) } returns listOf(
+        val totalCandidates = 100
+        val faceIdentities = listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate")),
-            ),
+            )
         )
+        coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
+        coEvery { createRangesUseCase(any()) } returns listOf(0..99)
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any()) } returns faceIdentities
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 42f
 
-        var onLoadingCalled = false
 
-        val result = useCase.invoke(
+        val results = useCase.invoke(
             matchParams = MatchParams(
                 probeFaceSamples = listOf(
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
@@ -110,15 +116,17 @@ internal class FaceMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-            onLoadingStarted = { onLoadingCalled = true },
-            onCandidateLoaded
-        )
+        ).toList()
 
         coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
 
-        assertThat(onLoadingCalled).isTrue()
-
-        assertThat(result.matchResultItems.first().subjectId).isEqualTo("subjectId")
-        assertThat(result.matchResultItems.first().confidence).isEqualTo(42f)
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.LoadingStarted(totalCandidates),
+            MatcherUseCase.MatcherState.Success(
+                matchResultItems = listOf(FaceMatchResult.Item("subjectId", 42f)),
+                totalCandidates = totalCandidates,
+                matcherName = ""
+            )
+        )
     }
 }
