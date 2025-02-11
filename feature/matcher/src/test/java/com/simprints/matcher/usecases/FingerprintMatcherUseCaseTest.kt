@@ -19,6 +19,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -135,8 +136,6 @@ internal class FingerprintMatcherUseCaseTest {
         )
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
-        var onLoadingCalled = false
-
         useCase.invoke(
             matchParams = MatchParams(
                 probeFingerprintSamples = listOf(
@@ -151,12 +150,9 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-            onLoadingStarted = { onLoadingCalled = true },
-        )
+        ).toList()
 
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
-
-        assertThat(onLoadingCalled).isTrue()
     }
 
     private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), 42, "format")
