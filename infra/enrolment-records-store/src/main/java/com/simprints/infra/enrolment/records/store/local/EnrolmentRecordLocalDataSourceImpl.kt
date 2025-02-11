@@ -118,20 +118,38 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         realmWrapper.writeRealm { realm ->
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Creation -> realm.copyToRealm(
-                        action.subject.fromDomainToDb(),
-                        updatePolicy = UpdatePolicy.ALL,
-                    )
+                    is SubjectAction.Write -> {
+                        val newSubject = action.subject.fromDomainToDb()
+
+                        val dbSubject: DbSubject? = realm
+                            .query(DbSubject::class)
+                            .query("$SUBJECT_ID_FIELD == $0", newSubject.subjectId)
+                            .first()
+                            .find()
+
+                        if (dbSubject != null) {
+                            // When updating an existing subject, we must manually delete outdated samples
+                            val fingerprintSampleIds = newSubject.fingerprintSamples.map { it.id }.toSet()
+                            dbSubject.fingerprintSamples
+                                .filterNot { it.id in fingerprintSampleIds }
+                                .takeIf { it.isNotEmpty() }
+                                ?.forEach { realm.delete(it) }
+
+                            val faceSampleIds = newSubject.faceSamples.map { it.id }.toSet()
+                            dbSubject.faceSamples
+                                .filterNot { it.id in faceSampleIds }
+                                .takeIf { it.isNotEmpty() }
+                                ?.forEach { realm.delete(it) }
+                        }
+
+                        realm.copyToRealm(newSubject, updatePolicy = UpdatePolicy.ALL)
+                    }
 
                     is SubjectAction.Deletion -> realm.delete(
                         realm
                             .query(DbSubject::class)
-                            .buildRealmQueryForSubject(
-                                query = SubjectQuery(
-                                    subjectId =
-                                        action.subjectId,
-                                ),
-                            ).find(),
+                            .buildRealmQueryForSubject(query = SubjectQuery(subjectId = action.subjectId))
+                            .find(),
                     )
                 }
             }

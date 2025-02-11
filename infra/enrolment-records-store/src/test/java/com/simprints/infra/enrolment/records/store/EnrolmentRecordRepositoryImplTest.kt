@@ -213,7 +213,7 @@ class EnrolmentRecordRepositoryImplTest {
                 attendantId = attendantIdTokenized,
                 moduleId = moduleIdTokenized,
             )
-            val expectedSubjectActions = listOf(SubjectAction.Creation(expectedSubject))
+            val expectedSubjectActions = listOf(SubjectAction.Write(expectedSubject))
             coVerify { localDataSource.performActions(expectedSubjectActions) }
         }
 

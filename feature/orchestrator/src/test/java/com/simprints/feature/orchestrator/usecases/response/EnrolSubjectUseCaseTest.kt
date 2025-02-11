@@ -93,7 +93,7 @@ class EnrolSubjectUseCaseTest {
         coVerify {
             enrolmentRecordRepository.performActions(
                 withArg {
-                    assertThat(it.first()).isInstanceOf(SubjectAction.Creation::class.java)
+                    assertThat(it.first()).isInstanceOf(SubjectAction.Write::class.java)
                 },
             )
         }
