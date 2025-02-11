@@ -68,7 +68,7 @@ internal class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        useCase.invoke(
+       val results = useCase.invoke(
             MatchParams(
                 probeFingerprintSamples = emptyList(),
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
@@ -76,9 +76,17 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-        )
+        ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                matchResultItems = emptyList(),
+                totalCandidates = 0,
+                matcherName = ""
+            )
+        )
     }
 
     @Test
@@ -87,7 +95,7 @@ internal class FingerprintMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), onCandidateLoaded) } returns emptyList()
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
-        useCase.invoke(
+        val results = useCase.invoke(
             MatchParams(
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(
@@ -101,9 +109,17 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-        )
+        ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                matchResultItems = emptyList(),
+                totalCandidates = 0,
+                matcherName = ""
+            )
+        )
     }
 
     @Test

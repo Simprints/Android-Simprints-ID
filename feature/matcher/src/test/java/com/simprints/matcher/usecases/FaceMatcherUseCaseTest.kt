@@ -63,22 +63,30 @@ internal class FaceMatcherUseCaseTest {
     fun `Skips matching if there are no probes`() = runTest {
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 1f
 
-        useCase.invoke(
+        val results = useCase.invoke(
             MatchParams(
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-        )
+        ).toList()
 
         coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                matchResultItems = emptyList(),
+                totalCandidates = 0,
+                matcherName = ""
+            )
+        )
     }
 
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
-        useCase.invoke(
+        val results = useCase.invoke(
             MatchParams(
                 probeFaceSamples = listOf(
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
@@ -87,9 +95,17 @@ internal class FaceMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-        )
+        ).toList()
 
         coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                matchResultItems = emptyList(),
+                totalCandidates = 0,
+                matcherName = ""
+            )
+        )
     }
 
     @Test
