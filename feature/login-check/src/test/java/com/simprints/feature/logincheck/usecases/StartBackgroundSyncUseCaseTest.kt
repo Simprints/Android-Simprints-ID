@@ -7,7 +7,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -38,9 +37,7 @@ class StartBackgroundSyncUseCaseTest {
 
         useCase.invoke()
 
-        coVerify {
-            syncOrchestrator.scheduleBackgroundWork()
-        }
+        coVerify { syncOrchestrator.scheduleBackgroundWork(any()) }
     }
 
     @Test
@@ -50,7 +47,7 @@ class StartBackgroundSyncUseCaseTest {
 
         useCase.invoke()
 
-        verify { syncOrchestrator.startEventSync() }
+        coVerify { syncOrchestrator.scheduleBackgroundWork(eq(false)) }
     }
 
     @Test
@@ -60,6 +57,6 @@ class StartBackgroundSyncUseCaseTest {
 
         useCase.invoke()
 
-        verify(exactly = 0) { syncOrchestrator.startEventSync() }
+        coVerify { syncOrchestrator.scheduleBackgroundWork(eq(true)) }
     }
 }
