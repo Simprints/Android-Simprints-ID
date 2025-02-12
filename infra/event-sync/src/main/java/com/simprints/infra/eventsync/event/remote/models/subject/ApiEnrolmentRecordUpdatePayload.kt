@@ -8,12 +8,12 @@ import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fr
 @Keep
 internal data class ApiEnrolmentRecordUpdatePayload(
     val subjectId: String,
-    val biometricReferencesAdded: List<ApiBiometricReference>,
-    val biometricReferencesRemoved: List<String>,
-) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordDeletion)
+    val biometricReferencesAdded: List<ApiBiometricReference>?,
+    val biometricReferencesRemoved: List<String>?,
+) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordUpdate)
 
 internal fun ApiEnrolmentRecordUpdatePayload.fromApiToDomain() = EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload(
     subjectId,
-    biometricReferencesAdded.map { it.fromApiToDomain() },
-    biometricReferencesRemoved,
+    biometricReferencesAdded?.map { it.fromApiToDomain() }.orEmpty(),
+    biometricReferencesRemoved.orEmpty(),
 )
