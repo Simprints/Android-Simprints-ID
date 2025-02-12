@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.core.domain.common.fingerprintReferenceId
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
@@ -63,6 +62,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -672,11 +672,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 ),
             )
         }
-        val biometricReferenceId = resultItems
-            .mapNotNull { it.sample }
-            .map { it.templateQualityScore to it.template }
-            .fingerprintReferenceId()
-            .orEmpty()
+        val biometricReferenceId = UUID.randomUUID().toString()
         addBiometricReferenceCreatedEvents(biometricReferenceId, resultItems.mapNotNull { it.captureEventId })
 
         _finishWithFingerprints.send(FingerprintCaptureResult(biometricReferenceId, resultItems))
