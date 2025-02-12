@@ -3,12 +3,15 @@ package com.simprints.infra.eventsync.event.remote.models.session
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiModality
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
+import com.simprints.infra.eventsync.event.usecases.TokenizeEventPayloadFieldsUseCase
 
 @Keep
 internal data class ApiEventScope(
@@ -33,6 +36,8 @@ internal data class ApiEventScope(
         fun fromDomain(
             scope: EventScope,
             events: List<Event>,
+            tokenizeEventPayloadFieldsUseCase: TokenizeEventPayloadFieldsUseCase,
+            project: Project
         ) = ApiEventScope(
             id = scope.id,
             projectId = scope.projectId,
@@ -48,7 +53,7 @@ internal data class ApiEventScope(
             location = scope.payload.location?.fromDomainToApi(),
             projectConfigurationUpdatedAt = scope.payload.projectConfigurationUpdatedAt,
             projectConfigurationId = scope.payload.projectConfigurationId.orEmpty(),
-            events = events.map { it.fromDomainToApi() },
+            events = events.map { it.fromDomainToApi(tokenizeEventPayloadFieldsUseCase, project) },
         )
     }
 }
