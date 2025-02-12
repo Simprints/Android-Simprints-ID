@@ -4,8 +4,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
-import com.simprints.infra.events.event.domain.models.PersonCreationEvent
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
@@ -15,20 +15,20 @@ internal class EnrolSubjectUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {
     suspend operator fun invoke(subject: Subject) {
-        val personCreationEvent = eventRepository
+        val biometricReferenceIds = eventRepository
             .getEventsInCurrentSession()
-            .filterIsInstance<PersonCreationEvent>()
+            .filterIsInstance<BiometricReferenceCreationEvent>()
             .sortedByDescending { it.payload.createdAt }
-            .first()
+            .map { it.payload.id }
 
         eventRepository.addOrUpdateEvent(
-            EnrolmentEventV2(
+            EnrolmentEventV4(
                 timeHelper.now(),
                 subject.subjectId,
                 subject.projectId,
                 subject.moduleId,
                 subject.attendantId,
-                personCreationEvent.id,
+                biometricReferenceIds,
             ),
         )
         enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)))

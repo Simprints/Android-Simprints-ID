@@ -51,6 +51,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         val result = useCase(
             listOf(
                 FaceCaptureResult(
+                    "referenceId",
                     results = listOf(
                         FaceCaptureResult.Item(captureEventId = null, index = 0, sample = null),
                         FaceCaptureResult.Item(
@@ -70,8 +71,9 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
         assertThat(result.first()).isEqualTo(
             EnrolLastBiometricStepResult.FaceCaptureResult(
-                listOf(
-                    FaceTemplateCaptureResult(
+                referenceId = "referenceId",
+                results = listOf(
+                    element = FaceTemplateCaptureResult(
                         template = byteArrayOf(),
                         format = "format",
                     ),
@@ -98,6 +100,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
         val result = useCase(
             listOf(
                 FingerprintCaptureResult(
+                    "referenceId",
                     results = listOf(
                         FingerprintCaptureResult.Item(null, IFingerIdentifier.LEFT_THUMB, null),
                         FingerprintCaptureResult.Item(
@@ -118,7 +121,8 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
         assertThat(result.first()).isEqualTo(
             EnrolLastBiometricStepResult.FingerprintCaptureResult(
-                listOf(
+                referenceId = "referenceId",
+                results = listOf(
                     FingerTemplateCaptureResult(
                         template = byteArrayOf(),
                         templateQualityScore = 0,

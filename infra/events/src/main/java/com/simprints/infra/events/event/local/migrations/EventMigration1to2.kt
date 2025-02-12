@@ -4,7 +4,6 @@ import android.database.Cursor
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
 import org.json.JSONObject
@@ -59,10 +58,10 @@ internal class EventMigration1to2 : Migration(1, 2) {
     ) {
         val jsonData = it.getStringWithColumnName(DB_EVENT_JSON_FIELD)
         jsonData?.let {
-            val originalJson = JSONObject(jsonData).put(DB_EVENT_JSON_EVENT_TYPE, ENROLMENT_V1)
+            val originalJson = JSONObject(jsonData).put(DB_EVENT_JSON_EVENT_TYPE, "ENROLMENT_V1")
             val newPayload = originalJson.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD).put(
                 DB_EVENT_JSON_EVENT_TYPE,
-                ENROLMENT_V1,
+                "ENROLMENT_V1",
             )
             val newJson = originalJson.put(DB_EVENT_JSON_EVENT_PAYLOAD, newPayload)
             database.execSQL("UPDATE DbEvent SET eventJson = ? WHERE id = ?", arrayOf(newJson, id))
@@ -74,7 +73,7 @@ internal class EventMigration1to2 : Migration(1, 2) {
         database: SupportSQLiteDatabase,
     ) {
         id?.let {
-            database.execSQL("UPDATE DbEvent SET type = ? WHERE id = ?", arrayOf(ENROLMENT_V1, it))
+            database.execSQL("UPDATE DbEvent SET type = ? WHERE id = ?", arrayOf("ENROLMENT_V1", it))
         }
     }
 

@@ -1,0 +1,21 @@
+{
+  "id": "c96e03c0-f063-4eb0-94ca-833e0a412965",
+  "type": "BIOMETRIC_REFERENCE_CREATION",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "BIOMETRIC_REFERENCE_CREATION",
+    "eventVersion": 1,
+    "createdAt": 9345678901,
+    "endedAt": 0,
+    "id": "78d13639-ac13-497f-8d81-4e7b08551c93",
+    "modality": "FACE",
+    "captureIds": [
+      "4f599e48-bf94-49b9-a752-8992fd77014c",
+      "bd76b0e6-56d1-4ef2-a119-9a21d90c36dc"
+    ]
+  }
+}

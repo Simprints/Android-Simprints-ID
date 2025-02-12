@@ -17,7 +17,7 @@ extra.apply {
      * Dev version >= 2024.2.2 is required for float quality thresholds
      * Dev version >= 2024.3.0 is required to receive configuration ID
      */
-    set("VERSION_NAME", "2024.3.0")
+    set("VERSION_NAME", "2025.1.0")
 
     /**
      * Build type. The version code describes which build type was used for the build.

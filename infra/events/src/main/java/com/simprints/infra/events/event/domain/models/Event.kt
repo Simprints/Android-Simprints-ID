@@ -9,6 +9,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.AGE_GR
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHORIZATION_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.BIOMETRIC_REFERENCE_CREATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_CONFIRMATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_ENROLMENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_ERROR_KEY
@@ -24,8 +25,8 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.CANDID
 import com.simprints.infra.events.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CONSENT_KEY
-import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V1_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.ENROLMENT_V4_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_DOWN_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.EVENT_UP_SYNC_REQUEST_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
@@ -113,8 +114,8 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = CompletionCheckEvent::class, name = COMPLETION_CHECK_KEY),
     JsonSubTypes.Type(value = ConnectivitySnapshotEvent::class, name = CONNECTIVITY_SNAPSHOT_KEY),
     JsonSubTypes.Type(value = ConsentEvent::class, name = CONSENT_KEY),
-    JsonSubTypes.Type(value = EnrolmentEventV1::class, name = ENROLMENT_V1_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
+    JsonSubTypes.Type(value = EnrolmentEventV4::class, name = ENROLMENT_V4_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FingerprintCaptureBiometricsEvent::class,
@@ -138,6 +139,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = EventUpSyncRequestEvent::class, name = EVENT_UP_SYNC_REQUEST_KEY),
     JsonSubTypes.Type(value = LicenseCheckEvent::class, name = LICENSE_CHECK_KEY),
     JsonSubTypes.Type(value = AgeGroupSelectionEvent::class, name = AGE_GROUP_SELECTION_KEY),
+    JsonSubTypes.Type(value = BiometricReferenceCreationEvent::class, name = BIOMETRIC_REFERENCE_CREATION_KEY),
 )
 abstract class Event {
     abstract val id: String

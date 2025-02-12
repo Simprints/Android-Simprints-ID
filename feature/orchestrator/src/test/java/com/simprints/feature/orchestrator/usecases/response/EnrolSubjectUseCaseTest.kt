@@ -7,9 +7,10 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
-import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
 import com.simprints.infra.events.session.SessionEventRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -49,9 +50,11 @@ class EnrolSubjectUseCaseTest {
     }
 
     @Test
-    fun `Adds enrolment V2 event when called`() = runTest {
+    fun `Adds enrolment V4 event when called`() = runTest {
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            mockk<PersonCreationEvent> { every { id } returns "personCreationId" },
+            mockk<BiometricReferenceCreationEvent> {
+                every { payload.id } returns "referenceId"
+            },
         )
 
         useCase.invoke(
@@ -66,7 +69,7 @@ class EnrolSubjectUseCaseTest {
         coVerify {
             eventRepository.addOrUpdateEvent(
                 withArg {
-                    assertThat(it).isInstanceOf(EnrolmentEventV2::class.java)
+                    assertThat(it).isInstanceOf(EnrolmentEventV4::class.java)
                 },
             )
         }
@@ -97,23 +100,22 @@ class EnrolSubjectUseCaseTest {
     }
 
     @Test
-    fun `Uses latest PersonCreationEvent`() = runTest {
-        val personCreationEvent1 = mockk<PersonCreationEvent> {
-            every { id } returns "personCreationEventId1"
-            every { payload } returns mockk<PersonCreationPayload> {
+    fun `Uses latest all BiometricReferenceCreationEvent`() = runTest {
+        val personCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
+            every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(1)
+                every { id } returns "referenceId1"
             }
         }
-        val personCreationId2 = "personCreationEventId2"
-        val personCreationEvent2 = mockk<PersonCreationEvent> {
-            every { id } returns personCreationId2
-            every { payload } returns mockk<PersonCreationPayload> {
+        val personCreationEvent2 = mockk<BiometricReferenceCreationEvent> {
+            every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(2)
+                every { id } returns "referenceId2"
             }
         }
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            personCreationEvent1,
             personCreationEvent2,
+            personCreationEvent1,
         )
 
         useCase.invoke(
@@ -127,7 +129,11 @@ class EnrolSubjectUseCaseTest {
 
         coVerify {
             eventRepository.addOrUpdateEvent(
-                match { it is EnrolmentEventV2 && it.payload.personCreationEventId == personCreationId2 },
+                withArg {
+                    assertThat(it).isInstanceOf(EnrolmentEventV4::class.java)
+                    assertThat((it as EnrolmentEventV4).payload.biometricReferenceIds)
+                        .containsExactly("referenceId1", "referenceId2")
+                },
             )
         }
     }

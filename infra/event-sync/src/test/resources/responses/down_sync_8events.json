@@ -357,5 +357,63 @@
       "type": "EnrolmentRecordMove",
       "version": 0
     }
+  },
+  {
+    "id": "a3102202-956b-4444-bf3e-75c39cee35ba",
+    "labels": {
+      "attendantId": [
+        "user a"
+      ],
+      "subjectId": [
+        "5d08d867-fa87-41e4-8df0-98c7256950c7"
+      ]
+    },
+    "payload": {
+      "subjectId": "5d08d867-fa87-41e4-8df0-98c7256950c7",
+      "biometricReferencesAdded": [
+        {
+          "format": "NEC_1",
+          "templates": [
+            {
+              "finger": "LEFT_INDEX_FINGER",
+              "quality": 55,
+              "template": "nN33bhY4llJZZFI+3NEsHSDWSDjiNBJCKlc+Pi0HEL/G0TVo3oEHxu+7tOxwze454ExIJnhijFPZxn6pEXjKEJzoaFrN0ncQwsuA7ncQ4BZVfxf7V6YqO6ornrfrv1z0ViYZrItT2yJ5fIdV1NFXb+T2MHxVVQdEs8VZLFI68+QAxLS/gvFKttQ0kjs4UQfGcYSq6tH2vHidTwFtg9F7SZAfzVioC++l7c/7AneN91HBZVCf8q1vChKMXLqaDe7MRIe6nuaRZLGAy/jz5kloBabPFarevp1b0DoFGDTUTzlGDVIwYLPUYqH2myrM2ykbA339GTFZzmYx2+8SQX7px5akcZ35p0bGiNJGAG1odUuqu4DMBMSn4mN3QAzV5BNPNAhPfakbJd+1oeSQOfkKSU0Uh6+qTwW449ZZnjkYRCJn7RI94mFv"
+            },
+            {
+              "finger": "LEFT_THUMB",
+              "quality": 56,
+              "template": "uoHuxFvqWsnNhequ0JkpOoic6D3qLaFhXvL5R5i7xyWpJALAcLBP0LzQbtrvQTYfuhm3pdJa6zkCLH1jGOshLKJsTFqBZk+MPb9+ol0ugGsfSh7UpkLemr3lxgWRCNSzsktzg7cvZvkdv5GIDfi5aObd/MJ5AeNrNXOI6wpuobiQhIeVciBNYsO/MaaNBw8y+Tiqq8eQ1LAz1vo/tuvIWhN45KWEX4BXXePYnPB3J9VNNFsDUDE7Ex6hm5v42dWK53g/yWa1XTDDZHA2yTLWJGrsfDybaVbIPiCJ3NP1ZCAD+iBPdR8B1GzFfkKI31IqZPKEqCvTQUirZDV7pOo6OjozAGAlcscgozA+r2oLqb3agCuimDUpPIP1zwPs+AFIusiwI1wmGEh2zg2Yo7G+wPy3flnrjtJ1tZP08op2k5U0kzJCb2l8KA+G"
+            },
+            {
+              "finger": "RIGHT_4TH_FINGER",
+              "quality": 50,
+              "template": "gnoXCrttqcGy21pE8lHHIvHLZasSfUpWW8/ckM9Sq+DOLOdsueG4SIUdDr9kANtC8Fx+thOPKBO2YMQdfgHplrqlgPql6SB0iGZ7MGV8L8ly3er7QvNyCeNd/NjDPVrJoEAF71XYX7P7WiQLGunkLEsnoD+87H9Id/y4cr6eWTaj7wfXIG/j4ZXIUHn285BfxxJVE76AGc5owXZYX5xcbrWv0CogXj9jEaxh2zhZ/ETX/8ux6HN3K3JatQV8yS6AEB/qCfSPnZjYg1+1tox3iqaguS0zczYyg6Hc7QBpwEgLUhOKAe7adZwDj4fQKX1NHdVcl3WJH/X8MMkP+XzhiD4id00uppoZAN36n1mmXBjY7kdFkBuZn35oPOtFluWdDO8+4x2A8kc5wUhT4xOgkaFNSYuwskqRgHgJQfePImwDE6vzqhuoT/s="
+            },
+            {
+              "finger": "RIGHT_5TH_FINGER",
+              "quality": 44,
+              "template": "bNzfaVB8BKjhcIrY8Q3TSDG0cRXY3sbMUwRW0b4tc0e7xvv9gkkgMJrzeYHWcc7uGoDG0eI61Q+O9OVsmwdJudPembgkyK3loQRhsjQM4UIpGQu8NkGEbAn+9gwmYtTi1ezkzLbjknq5ktHDUxaWPV0PDhNo76cki5HSQRT7Ex1cbA2oJ5mn8sNeQzIoHEDo3VjJfYLgvWZVuugBcFaCLZw2oHUjfhounWZ900jZUzGP3aw0kv52fjkKdmpkldtbycQwOtzbnFnGXXSxR9MfHeBu64MuvoX3LGhMALtQpp/O+3noRxldRmcdu7mTEzuynmZD4v0lQV4X/tstVjplQ1hBug5zGo2W7ObXwcplpRsj0+/dbtmUf9Cck089DkrLd6PWEQOg0vId0WunisR7YiYUj3GKTfBP76JtrPfCJnsJRQy2+9mcJgM="
+            }
+          ],
+          "type": "FingerprintReference"
+        },
+        {
+          "format": "RANK_ONE_1_23",
+          "templates": [
+            {
+              "template": "xq98xkmiTbqHdoYcjTP0x7nb/iX3vl1ltNev/w+ZCvzksLSsylKx2DmPMKVeuKnsgGjHElgI7YrpJAxIFR7PqmvwNnwr/y4PCr2G1/sfetE9Jv8DAzL0mcb2D02aQzZ1hjiAUEeTnE0aUiWtlSMj/ijDvZfRcwTd4xxfyHAE0GEnRB+yvuCimOeQ3lL0bZkjR6okrt48xEWBkgsPHNV7UujGjNPBiOSFHzwcJaidBHPPVkAuBhIXHdOo4jVedYB+2YBQqfrqeCLgL1jMvUKYvvGXszc3eQUL+vQuBl+pqe1j8Yr0l74cKqABfPrkCcb50Vi1DQUiNWTXvkmY3+/T7w8hFp3gWoFm70A/f8kYiBaVVd0Y4Kb5/Mu1UE6kg6ScG8O+z9GtYkpzXvpqRLoyQj/AJtNltZQ70hx1nccl1lUx6ftchbfuJX8qng=="
+            },
+            {
+              "template": "xlzqoNui8yoJduJ48HxnyLzt2wR/Ey1m04Gq8+v4GXlJwQgQNPQLLUkZINR9b7+91yLb8CntoVi0DF3It4wNpQOptL2rynVPL5J5NDrJJsOdMEegbOVup4Co4TbbykalKAcQo/BN1TSpjrh3Ho1mstSsg90bpvY7boI0b7Uql5H6W1GUri2NqnLMw/GOIZiHmmXs4fnWXK9t4ah0i1ctrIbseW8VIViiNe9NzE202HJXJX51+nlLdxXbm9m5bQZhGKQxO4YJdmldqCwIQmBW4D6dw45NbJnsxhN+jpIQV5kpYgQXNRqrzeqo54S4Ta9RulZfJIsFpgK6F9eSBqVjn9iyIvDUXfjes6kcsU8dbWq91apxtREacoJh3b0jlcM6jxpJEaGUSVoVTzz68AqvAB7e11rypconzCPg/sg2fs/Pef85ZvvXfqnR"
+            }
+          ],
+          "type": "FaceReference"
+        }
+      ],
+      "biometricReferencesRemoved": [
+        "5d08d867-fa87-41e4-8df0-98c7256950c7"
+      ],
+      "type": "EnrolmentRecordUpdate"
+    }
   }
 ]

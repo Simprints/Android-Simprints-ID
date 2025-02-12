@@ -20,6 +20,7 @@ class DbSubjectTest {
     companion object {
         private const val GUID = "3f0f8e9a-0a0c-456c-846e-577b1440b6fb"
         private const val PROJECT_ID = "projectId"
+        private const val REFERENCE_ID = "referenceId"
         private val ATTENDANT_ID = "user1".asTokenizableEncrypted()
         private val MODULE_ID = "module".asTokenizableEncrypted()
     }
@@ -31,8 +32,9 @@ class DbSubjectTest {
             Random.nextBytes(64),
             30,
             "NEC_1",
+            REFERENCE_ID,
         )
-        val faceSample = FaceSample(Random.nextBytes(64), "RANK_ONE_1_23")
+        val faceSample = FaceSample(Random.nextBytes(64), "RANK_ONE_1_23", REFERENCE_ID)
 
         val domainSubject = Subject(
             subjectId = GUID,
@@ -55,7 +57,9 @@ class DbSubjectTest {
             assertThat(createdAt).isEqualTo(RealmInstant.from(0, 0))
             assertThat(updatedAt).isEqualTo(RealmInstant.from(1, 500_000_000))
             assertThat(fingerprintSamples.first().id).isEqualTo(fingerprintSample.id)
+            assertThat(fingerprintSamples.first().referenceId).isEqualTo(REFERENCE_ID)
             assertThat(faceSamples.first().id).isEqualTo(faceSample.id)
+            assertThat(faceSamples.first().referenceId).isEqualTo(REFERENCE_ID)
         }
     }
 
@@ -66,10 +70,12 @@ class DbSubjectTest {
             template = Random.nextBytes(64)
             templateQualityScore = 30
             format = "NEC_1"
+            referenceId = REFERENCE_ID
         }
         val faceSample = DbFaceSample().apply {
             template = Random.nextBytes(64)
             format = "RANK_ONE_1_23"
+            referenceId = REFERENCE_ID
         }
 
         val dbSubject = DbSubject().apply {
@@ -95,7 +101,8 @@ class DbSubjectTest {
             assertThat(moduleId).isEqualTo(MODULE_ID)
             assertThat(projectId).isEqualTo(PROJECT_ID)
             assertThat(fingerprintSamples.first().id).isEqualTo(fingerprintSample.id)
-            assertThat(faceSamples.first().id).isEqualTo(faceSample.id)
+            assertThat(fingerprintSamples.first().referenceId).isEqualTo(REFERENCE_ID)
+            assertThat(faceSamples.first().referenceId).isEqualTo(REFERENCE_ID)
         }
     }
 }

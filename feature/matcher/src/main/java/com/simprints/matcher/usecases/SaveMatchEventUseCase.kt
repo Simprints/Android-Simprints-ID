@@ -41,6 +41,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     matchParams.queryForCandidates,
                     matchEntries.firstOrNull(),
                     if (matchParams.isFaceMatch()) null else getFingerprintComparisonStrategy(matchParams.fingerprintSDK!!),
+                    matchParams.probeReferenceId,
                 )
             } else {
                 getOneToManyEvent(
@@ -50,6 +51,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     matchParams.queryForCandidates,
                     candidatesCount,
                     matchEntries,
+                    matchParams.probeReferenceId,
                 )
             }
             eventRepository.addOrUpdateEvent(event)
@@ -75,13 +77,15 @@ internal class SaveMatchEventUseCase @Inject constructor(
         queryForCandidates: SubjectQuery,
         matchEntry: MatchEntry?,
         fingerComparisonStrategy: FingerComparisonStrategy?,
+        biometricReferenceId: String,
     ) = OneToOneMatchEvent(
-        startTime,
-        endTime,
-        queryForCandidates.subjectId!!,
-        matcherName,
-        matchEntry,
-        fingerComparisonStrategy,
+        createdAt = startTime,
+        endTime = endTime,
+        candidateId = queryForCandidates.subjectId!!,
+        matcher = matcherName,
+        result = matchEntry,
+        fingerComparisonStrategy = fingerComparisonStrategy,
+        probeBiometricReferenceId = biometricReferenceId,
     )
 
     private fun getOneToManyEvent(
@@ -91,15 +95,17 @@ internal class SaveMatchEventUseCase @Inject constructor(
         queryForCandidates: SubjectQuery,
         candidatesCount: Int,
         matchEntries: List<MatchEntry>,
+        biometricReferenceId: String,
     ) = OneToManyMatchEvent(
-        startTime,
-        endTime,
-        OneToManyMatchEvent.OneToManyMatchPayload.MatchPool(
+        createdAt = startTime,
+        endTime = endTime,
+        pool = OneToManyMatchEvent.OneToManyMatchPayload.MatchPool(
             queryForCandidates.parseQueryAsCoreMatchPoolType(),
             candidatesCount,
         ),
-        matcherName,
-        matchEntries,
+        matcher = matcherName,
+        result = matchEntries,
+        probeBiometricReferenceId = biometricReferenceId,
     )
 
     private fun SubjectQuery.parseQueryAsCoreMatchPoolType(): OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType = when {

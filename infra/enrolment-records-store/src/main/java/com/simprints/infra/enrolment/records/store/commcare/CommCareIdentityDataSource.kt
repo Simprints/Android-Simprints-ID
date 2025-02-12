@@ -66,6 +66,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 templateQualityScore = fingerprintTemplate.quality,
                                 template = encoder.base64ToBytes(fingerprintTemplate.template),
                                 format = fingerprintReference.format,
+                                referenceId = fingerprintReference.id,
                             )
                         }
                     },
@@ -140,6 +141,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                             FaceSample(
                                 template = encoder.base64ToBytes(faceTemplate.template),
                                 format = faceReference.format,
+                                referenceId = faceReference.id,
                             )
                         }
                     },

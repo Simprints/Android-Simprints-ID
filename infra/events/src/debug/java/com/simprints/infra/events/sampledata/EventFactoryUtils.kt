@@ -16,6 +16,7 @@ import com.simprints.infra.events.event.domain.models.AuthenticationEvent.Authen
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult.FOUND
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
@@ -24,8 +25,8 @@ import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
@@ -316,9 +317,13 @@ fun createEnrolmentEventV2() = EnrolmentEventV2(
     GUID2,
 )
 
-fun createEnrolmentEventV1() = EnrolmentEventV1(
+fun createEnrolmentEventV4() = EnrolmentEventV4(
     CREATED_AT,
     GUID1,
+    DEFAULT_PROJECT_ID,
+    DEFAULT_MODULE_ID,
+    DEFAULT_USER_ID,
+    listOf(GUID1, GUID2),
 )
 
 fun createFingerprintCaptureEvent() = FingerprintCaptureEvent(
@@ -362,6 +367,7 @@ fun createOneToManyMatchEvent() = OneToManyMatchEvent(
     MatchPool(PROJECT, 100),
     "RANK_ONE",
     listOf(MatchEntry(GUID1, 0F)),
+    GUID2,
 )
 
 fun createOneToOneMatchEvent() = OneToOneMatchEvent(
@@ -371,6 +377,7 @@ fun createOneToOneMatchEvent() = OneToOneMatchEvent(
     "SIM_AFIS",
     MatchEntry(GUID1, 10F),
     FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
+    GUID2,
 )
 
 fun createPersonCreationEvent() = PersonCreationEvent(
@@ -452,4 +459,11 @@ fun createAgeGroupSelectionEvent() = AgeGroupSelectionEvent(
     createdAt = CREATED_AT,
     endedAt = ENDED_AT,
     subjectAgeGroup = AgeGroupSelectionEvent.AgeGroup(1, 2),
+)
+
+fun createBiometricReferenceCreationEvent() = BiometricReferenceCreationEvent(
+    startTime = CREATED_AT,
+    referenceId = GUID1,
+    modality = BiometricReferenceCreationEvent.BiometricReferenceModality.FACE,
+    captureIds = listOf(GUID1, GUID2),
 )

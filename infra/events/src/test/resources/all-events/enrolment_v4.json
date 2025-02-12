@@ -1,0 +1,28 @@
+{
+  "id": "d93f16d6-0581-4f8b-8ddf-f3ae8ec3579e",
+  "type": "ENROLMENT_V4",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "ENROLMENT_V4",
+    "eventVersion": 4,
+    "createdAt": 178967890,
+    "endedAt": 0,
+    "subjectId": "9aa64aff-46b5-4ab4-90b5-82c0e6d9725f",
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "moduleId": {
+      "className": "TokenizableString.Raw",
+      "value": "module1"
+    },
+    "attendantId": {
+      "className": "TokenizableString.Raw",
+      "value": "user1"
+    },
+    "biometricReferenceIds": [
+      "94828488-47ce-4c76-8ace-33d69b2a6d75"
+    ]
+  }
+}
