@@ -130,7 +130,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         realmWrapper.writeRealm { realm ->
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Write -> {
+                    is SubjectAction.Creation -> {
                         val newSubject = action.subject
                             .copy(
                                 moduleId = action.subject.moduleId.tokenizeIfNecessary(TokenKeyType.ModuleId, project),

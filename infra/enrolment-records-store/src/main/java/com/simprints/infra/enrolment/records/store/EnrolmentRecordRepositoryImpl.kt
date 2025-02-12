@@ -95,7 +95,7 @@ internal class EnrolmentRecordRepositoryImpl(
                             project = project,
                         )
                         return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
-                    }.map(SubjectAction::Write)
+                    }.map(SubjectAction::Creation)
             localDataSource.performActions(tokenizedSubjectsCreateAction, project)
         } catch (e: Exception) {
             when (e) {

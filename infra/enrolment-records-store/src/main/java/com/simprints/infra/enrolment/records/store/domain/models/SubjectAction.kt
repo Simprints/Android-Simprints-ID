@@ -6,7 +6,7 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 
 @Keep
 sealed class SubjectAction {
-    data class Write(
+    data class Creation(
         val subject: Subject,
     ) : SubjectAction()
 
