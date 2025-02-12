@@ -50,6 +50,7 @@ class EnrolmentRecordRepositoryImplTest {
         }
     }
 
+    private val onCandidateLoaded: () -> Unit = {}  
     private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val localDataSource = mockk<EnrolmentRecordLocalDataSource>(relaxed = true)
     private val commCareDataSource = mockk<IdentityDataSource>(relaxed = true)
@@ -276,16 +277,17 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = 0..10
         val expectedFingerprintIdentities = listOf<FingerprintIdentity>()
-        coEvery { localDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange) } returns expectedFingerprintIdentities
+        coEvery { localDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded) } returns expectedFingerprintIdentities
 
         val fingerprintIdentities = repository.loadFingerprintIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
             dataSource = BiometricDataSource.Simprints,
+            onCandidateLoaded = onCandidateLoaded
         )
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
-        coVerify(exactly = 1) { localDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any()) }
+        coVerify(exactly = 1) { localDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded) }
     }
 
     @Test
@@ -293,16 +295,17 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = 0..10
         val expectedFingerprintIdentities = listOf<FingerprintIdentity>()
-        coEvery { commCareDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange) } returns expectedFingerprintIdentities
+        coEvery { commCareDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded) } returns expectedFingerprintIdentities
 
         val fingerprintIdentities = repository.loadFingerprintIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
             dataSource = BiometricDataSource.CommCare(""),
+            onCandidateLoaded
         )
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
-        coVerify(exactly = 1) { commCareDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any()) }
+        coVerify(exactly = 1) { commCareDataSource.loadFingerprintIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded)  }
     }
 
     @Test
@@ -310,16 +313,17 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = 0..10
         val expectedFaceIdentities = listOf<FaceIdentity>()
-        coEvery { localDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange) } returns expectedFaceIdentities
+        coEvery { localDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded) } returns expectedFaceIdentities
 
         val faceIdentities = repository.loadFaceIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
             dataSource = BiometricDataSource.Simprints,
+            onCandidateLoaded = onCandidateLoaded
         )
 
         assert(faceIdentities == expectedFaceIdentities)
-        coVerify(exactly = 1) { localDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange) }
+        coVerify(exactly = 1) { localDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded) }
     }
 
     @Test
@@ -327,15 +331,16 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedSubjectQuery = SubjectQuery()
         val expectedRange = 0..10
         val expectedFaceIdentities = listOf<FaceIdentity>()
-        coEvery { commCareDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange) } returns expectedFaceIdentities
+        coEvery { commCareDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded) } returns expectedFaceIdentities
 
         val faceIdentities = repository.loadFaceIdentities(
             query = expectedSubjectQuery,
             range = expectedRange,
             dataSource = BiometricDataSource.CommCare(""),
+            onCandidateLoaded = onCandidateLoaded
         )
 
         assert(faceIdentities == expectedFaceIdentities)
-        coVerify(exactly = 1) { commCareDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any()) }
+        coVerify(exactly = 1) { commCareDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any(), onCandidateLoaded) }
     }
 }

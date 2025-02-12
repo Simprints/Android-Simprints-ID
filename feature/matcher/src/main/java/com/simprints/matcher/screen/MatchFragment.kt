@@ -76,11 +76,15 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         }
     }
 
-    private fun setIdentificationProgress(progress: Int) = requireActivity().runOnUiThread {
-        ObjectAnimator
-            .ofInt(binding.faceMatchProgress, "progress", binding.faceMatchProgress.progress, progress)
-            .setDuration(progress * PROGRESS_DURATION_MULTIPLIER)
-            .start()
+    private fun setIdentificationProgress(progress: Int, animate: Boolean) = requireActivity().runOnUiThread {
+        if (animate) {
+            ObjectAnimator
+                .ofInt(binding.faceMatchProgress, "progress", binding.faceMatchProgress.progress, progress)
+                .setDuration(progress * PROGRESS_DURATION_MULTIPLIER)
+                .start()
+        } else {
+            binding.faceMatchProgress.progress = progress
+        }
     }
 
     private fun observeViewModel() {
@@ -93,7 +97,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         viewModel.matchState.observe(viewLifecycleOwner) { matchState ->
             when (matchState) {
                 MatchState.NotStarted -> renderNotStarted()
-                MatchState.LoadingCandidates -> renderLoadingCandidates()
+                is MatchState.LoadingCandidates -> renderLoadingCandidates(matchState)
                 is MatchState.Matching -> renderMatching()
                 is MatchState.Finished -> renderFinished(matchState)
                 is MatchState.NoPermission -> renderNoPermission(matchState)
@@ -111,16 +115,35 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         faceMatchTvMatchingResultStatus3.isGone = true
     }
 
-    private fun renderLoadingCandidates() {
+    private fun renderLoadingCandidates(state: MatchState.LoadingCandidates) {
         binding.faceMatchPermissionRequestButton.isVisible = false
         binding.apply {
-            faceMatchTvMatchingProgressStatus1.isVisible = true
-            faceMatchTvMatchingProgressStatus1.text =
+            val text = if(state.total  > 0) {
+                getString(IDR.string.matcher_loading_candidates) + " (${state.loaded}/${state.total})"
+            } else {
                 getString(IDR.string.matcher_loading_candidates)
-            faceMatchTvMatchingProgressStatus1.setText(IDR.string.matcher_loading_candidates)
+            }
+            faceMatchTvMatchingProgressStatus1.isVisible = true
+            faceMatchTvMatchingProgressStatus1.text = text
             faceMatchProgress.isVisible = true
         }
-        setIdentificationProgress(LOADING_PROGRESS)
+
+        val progress = calculateLoadingCandidatesProgress(state)
+        setIdentificationProgress(progress, animate = false)
+    }
+
+    /**
+     * Returns value for the progress indicator depending on the current match state. It divides the loading indicator starting from
+     * [MATCHING_PROGRESS] up until [LOADING_PROGRESS] into even slices with size of [MatchState.LoadingCandidates.total]. Then it
+     * calculates the percentage to display on the progress bar
+     *
+     * @return integer value between [LOADING_PROGRESS] and [MATCHING_PROGRESS]
+     */
+    private fun calculateLoadingCandidatesProgress(state: MatchState.LoadingCandidates): Int {
+        if (state.total <= 0) return LOADING_PROGRESS
+        val diff = MATCHING_PROGRESS - LOADING_PROGRESS // progress diff from the next step
+        val slices: Float = diff.toFloat() / state.total
+        return LOADING_PROGRESS + (state.loaded * slices).toInt()
     }
 
     private fun renderMatching() {
@@ -129,7 +152,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         binding.faceMatchPermissionRequestButton.isVisible = false
         binding.faceMatchTvMatchingProgressStatus1.setText(IDR.string.matcher_matching_candidates)
 
-        setIdentificationProgress(MATCHING_PROGRESS)
+        setIdentificationProgress(MATCHING_PROGRESS, animate = true)
     }
 
     private fun renderFinished(matchState: MatchState.Finished) {
@@ -172,7 +195,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
             )
         }
 
-        setIdentificationProgress(MAX_PROGRESS)
+        setIdentificationProgress(MAX_PROGRESS, animate = true)
     }
 
     private fun renderNoPermission(state: MatchState.NoPermission) = with(binding) {
@@ -194,6 +217,6 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         private const val MAX_PROGRESS = 100
         private const val PROGRESS_DURATION_MULTIPLIER = 10L
         private const val LOADING_PROGRESS = 25
-        private const val MATCHING_PROGRESS = 50
+        private const val MATCHING_PROGRESS = 75
     }
 }

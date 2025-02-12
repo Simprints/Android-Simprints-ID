@@ -15,11 +15,13 @@ interface IdentityDataSource {
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity>
 
     suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity>
 }

@@ -3,6 +3,7 @@ package com.simprints.infra.enrolment.records.store.local
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -45,7 +46,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
     private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
-
+    private val onCandidateLoaded: () -> Unit = {}
     private var localSubjects: MutableList<Subject> = mutableListOf()
 
     private lateinit var enrolmentRecordLocalDataSource: EnrolmentRecordLocalDataSource
@@ -111,7 +112,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people = enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(SubjectQuery(), IntRange(0, 20))
+            .loadFingerprintIdentities(
+                SubjectQuery(), IntRange(0, 20),
+                BiometricDataSource.Simprints,
+                onCandidateLoaded
+            )
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
@@ -127,6 +132,8 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .loadFingerprintIdentities(
                 SubjectQuery(fingerprintSampleFormat = format),
                 IntRange(0, 20),
+                BiometricDataSource.Simprints,
+                onCandidateLoaded
             ).toList()
 
         verify {
@@ -142,7 +149,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val format = "SupportedFormat"
 
         enrolmentRecordLocalDataSource
-            .loadFingerprintIdentities(SubjectQuery(faceSampleFormat = format), IntRange(0, 20))
+            .loadFingerprintIdentities(
+                SubjectQuery(faceSampleFormat = format), IntRange(0, 20),
+                BiometricDataSource.Simprints,
+                onCandidateLoaded
+            )
             .toList()
 
         verify {
@@ -159,7 +170,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people = enrolmentRecordLocalDataSource
-            .loadFaceIdentities(SubjectQuery(), IntRange(0, 20))
+            .loadFaceIdentities(
+                SubjectQuery(), IntRange(0, 20),
+                BiometricDataSource.Simprints,
+                onCandidateLoaded
+            )
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->

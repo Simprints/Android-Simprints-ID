@@ -19,6 +19,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +46,7 @@ internal class FingerprintMatcherUseCaseTest {
 
     @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
-
+    private val onCandidateLoaded: () -> Unit = {}
     private lateinit var useCase: FingerprintMatcherUseCase
 
     @Before
@@ -67,7 +68,7 @@ internal class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        useCase.invoke(
+       val results = useCase.invoke(
             MatchParams(
                 probeFingerprintSamples = emptyList(),
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
@@ -75,18 +76,26 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-        )
+        ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                matchResultItems = emptyList(),
+                totalCandidates = 0,
+                matcherName = ""
+            )
+        )
     }
 
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any()) } returns emptyList()
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), onCandidateLoaded) } returns emptyList()
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
-        useCase.invoke(
+        val results = useCase.invoke(
             MatchParams(
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(
@@ -100,9 +109,17 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-        )
+        ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
+
+        assertThat(results).containsExactly(
+            MatcherUseCase.MatcherState.Success(
+                matchResultItems = emptyList(),
+                totalCandidates = 0,
+                matcherName = ""
+            )
+        )
     }
 
     @Test
@@ -114,6 +131,7 @@ internal class FingerprintMatcherUseCaseTest {
                 any(),
                 any(),
                 any(),
+                onCandidateLoaded
             )
         } returns listOf(
             FingerprintIdentity(
@@ -134,8 +152,6 @@ internal class FingerprintMatcherUseCaseTest {
         )
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
-        var onLoadingCalled = false
-
         useCase.invoke(
             matchParams = MatchParams(
                 probeFingerprintSamples = listOf(
@@ -150,12 +166,9 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
-            onLoadingCandidates = { onLoadingCalled = true },
-        )
+        ).toList()
 
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
-
-        assertThat(onLoadingCalled).isTrue()
     }
 
     private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), 42, "format")

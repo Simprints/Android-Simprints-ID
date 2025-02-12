@@ -18,11 +18,12 @@ import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
-import com.simprints.matcher.usecases.MatcherUseCase.MatcherResult
+import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import javax.inject.Inject
 
 internal class FingerprintMatcherUseCase @Inject constructor(
@@ -36,13 +37,13 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
-        onLoadingCandidates: () -> Unit,
-    ): MatcherResult = coroutineScope {
+    ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK!!)
 
         if (matchParams.probeFingerprintSamples.isEmpty()) {
-            return@coroutineScope MatcherResult(emptyList(), 0, bioSdkWrapper.matcherName)
+            send(MatcherState.Success(emptyList(), 0, bioSdkWrapper.matcherName))
+            return@channelFlow
         }
         val samples = mapSamples(matchParams.probeFingerprintSamples)
         // Only candidates with supported template format are considered
@@ -52,15 +53,19 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             )
         val totalCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
         if (totalCandidates == 0) {
-            return@coroutineScope MatcherResult(emptyList(), 0, bioSdkWrapper.matcherName)
+            send(MatcherState.Success(emptyList(), 0, bioSdkWrapper.matcherName))
+            return@channelFlow
         }
 
         Simber.i("Matching candidates", tag = crashReportTag)
-        onLoadingCandidates()
+        send(MatcherState.LoadingStarted(totalCandidates))
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
-                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource)
+                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource) {
+                        // When a candidate is loaded
+                        trySend(MatcherState.CandidateLoaded)
+                    }
                     match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK)
                         .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
                             acc.add(FingerprintMatchResult.Item(item.id, item.score))
@@ -71,7 +76,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             .toList()
 
         Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
-        MatcherResult(resultItems, totalCandidates, bioSdkWrapper.matcherName)
+        send(MatcherState.Success(resultItems, totalCandidates, bioSdkWrapper.matcherName))
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
@@ -81,8 +86,9 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        onCandidateLoaded: () -> Unit,
     ) = enrolmentRecordRepository
-        .loadFingerprintIdentities(query, range, dataSource)
+        .loadFingerprintIdentities(query, range, dataSource, onCandidateLoaded)
         .map {
             FingerprintIdentity(
                 it.subjectId,

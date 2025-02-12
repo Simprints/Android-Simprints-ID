@@ -48,7 +48,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query)
+        onCandidateLoaded: () -> Unit,
+    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any {
                 it is FingerprintReference && it.format == query.fingerprintSampleFormat
@@ -75,6 +76,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         range: IntRange,
         callerPackageName: String,
         query: SubjectQuery,
+        onCandidateLoaded: () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> =
             mutableListOf()
@@ -96,6 +98,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
                                 enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query))
+                                onCandidateLoaded()
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
                     }
@@ -121,7 +124,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
-    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query)
+        onCandidateLoaded: () -> Unit,
+    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any {
                 it is FaceReference && it.format == query.faceSampleFormat
