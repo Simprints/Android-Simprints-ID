@@ -283,6 +283,49 @@ class EnrolmentRecordLocalDataSourceImplTest {
     }
 
     @Test
+    fun performSubjectUpdateAction() = runTest {
+        val subject = getFakePerson()
+        every { realmSingleQuery.find() } returns getRandomSubject(
+            faceSamples = listOf(
+                getRandomFaceSample(referenceId = "faceToDelete"),
+                getRandomFaceSample(),
+            ),
+            fingerprintSamples = listOf(
+                getRandomFingerprintSample(referenceId = "fingerToDelete"),
+                getRandomFingerprintSample(),
+            ),
+        ).fromDomainToDb()
+
+        enrolmentRecordLocalDataSource.performActions(
+            listOf(
+                SubjectAction.Update(
+                    subject.subjectId.toString(),
+                    faceSamplesToAdd = listOf(getRandomFaceSample()),
+                    fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
+                    referenceIdsToRemove = listOf("faceToDelete", "fingerToDelete"),
+                ),
+            ),
+            project,
+        )
+        val peopleCount = enrolmentRecordLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(1)
+        verify {
+            mutableRealm.delete(withArg<DbFaceSample> { it.id == "faceToDelete" })
+            mutableRealm.delete(withArg<DbFingerprintSample> { it.id == "faceToDelete" })
+            mutableRealm.copyToRealm(
+                withArg<DbSubject> {
+                    // one old + one new
+                    it.faceSamples.size == 2 &&
+                        it.fingerprintSamples.size == 2 &&
+                        it.faceSamples.none { it.referenceId == "faceToDelete" } &&
+                        it.fingerprintSamples.none { it.referenceId == "fingerToDelete" }
+                },
+                any(),
+            )
+        }
+    }
+
+    @Test
     fun performSubjectDeletionAction() = runTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
@@ -343,21 +386,27 @@ class EnrolmentRecordLocalDataSourceImplTest {
         projectId: String = UUID.randomUUID().toString(),
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
-        faceSamples: Array<FaceSample> = arrayOf(
+        faceSamples: List<FaceSample> = listOf(
             getRandomFaceSample(),
             getRandomFaceSample(),
         ),
+        fingerprintSamples: List<FingerprintSample> = listOf(),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),
         moduleId = moduleId.asTokenizableRaw(),
-        faceSamples = faceSamples.toList(),
+        faceSamples = faceSamples,
+        fingerprintSamples = fingerprintSamples,
     )
 
-    private fun getRandomFaceSample(id: String = UUID.randomUUID().toString()) =
-        FaceSample(Random.nextBytes(64), "faceTemplateFormat", "referenceId", id)
+    private fun getRandomFaceSample(
+        id: String = UUID.randomUUID().toString(),
+        referenceId: String = "referenceId",
+    ) = FaceSample(Random.nextBytes(64), "faceTemplateFormat", referenceId, id)
 
-    private fun getRandomFingerprintSample(id: String = UUID.randomUUID().toString()) =
-        FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), 42, "fingerprintTemplateFormat", "referenceId", id)
+    private fun getRandomFingerprintSample(
+        id: String = UUID.randomUUID().toString(),
+        referenceId: String = "referenceId",
+    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), 42, "fingerprintTemplateFormat", referenceId, id)
 }
