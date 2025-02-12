@@ -14,7 +14,9 @@ import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbFaceSample
 import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbSubject
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.query.find
@@ -120,12 +122,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 when (action) {
                     is SubjectAction.Write -> {
                         val newSubject = action.subject.fromDomainToDb()
-
-                        val dbSubject: DbSubject? = realm
-                            .query(DbSubject::class)
-                            .query("$SUBJECT_ID_FIELD == $0", newSubject.subjectId)
-                            .first()
-                            .find()
+                        val dbSubject: DbSubject? = realm.findSubject(newSubject.subjectId)
 
                         if (dbSubject != null) {
                             // When updating an existing subject, we must manually delete outdated samples
@@ -145,6 +142,29 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                         realm.copyToRealm(newSubject, updatePolicy = UpdatePolicy.ALL)
                     }
 
+                    is SubjectAction.Update -> {
+                        val dbSubject: DbSubject? = realm.findSubject(RealmUUID.from(action.subjectId))
+                        if (dbSubject != null) {
+                            val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
+                            val faceSamplesMap = dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
+                            val fingerprintSamplesMap = dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
+
+                            // Append new samples to the list of samples that remain after removing
+                            dbSubject.faceSamples = (
+                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.fromDomainToDb() }
+                            ).toRealmList()
+                            dbSubject.fingerprintSamples = (
+                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.fromDomainToDb() }
+                            ).toRealmList()
+
+                            faceSamplesMap[true]?.forEach { realm.delete(it) }
+                            fingerprintSamplesMap[true]?.forEach { realm.delete(it) }
+                            realm.copyToRealm(dbSubject, updatePolicy = UpdatePolicy.ALL)
+                        } else {
+                            Simber.i("[SubjectLocalDataSourceImpl] Subject not found for update", tag = REALM_DB)
+                        }
+                    }
+
                     is SubjectAction.Deletion -> realm.delete(
                         realm
                             .query(DbSubject::class)
@@ -155,6 +175,9 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             }
         }
     }
+
+    private fun MutableRealm.findSubject(subjectId: RealmUUID): DbSubject? =
+        query(DbSubject::class).query("$SUBJECT_ID_FIELD == $0", subjectId).first().find()
 
     private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> {
         var realmQuery = this
