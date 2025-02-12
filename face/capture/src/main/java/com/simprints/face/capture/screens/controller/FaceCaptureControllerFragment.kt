@@ -17,15 +17,12 @@ import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.feature.exitform.exitFormConfiguration
-import com.simprints.feature.exitform.toArgs
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import dagger.hilt.android.AndroidEntryPoint
-import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_capture) {
@@ -92,10 +89,6 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
                 findNavController().navigateSafely(
                     this,
                     R.id.action_global_refusalFragment,
-                    exitFormConfiguration {
-                        titleRes = IDR.string.exit_form_title_face
-                        backButtonRes = IDR.string.exit_form_continue_face_button
-                    }.toArgs(),
                 )
             },
         )
@@ -131,7 +124,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
                     R.navigation.graph_face_capture_auto_internal
                 } else {
                     R.navigation.graph_face_capture_internal
-                }
+                },
             )
         }
     }

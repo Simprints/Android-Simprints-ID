@@ -49,13 +49,9 @@
     <string name="enrol_last_biometrics_alert_message_all_param">মুখ/আঙুলের ছাপ</string>
 
     <!-- Exit form -->
-    <string name="exit_form_title_fingerprinting">আপনি কেন আঙ্গুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
-    <string name="exit_form_title_biometrics">বায়োমেট্রিক তথ্য এড়িয়ে গেলেন কেন?</string>
-    <string name="exit_form_title_face">মুখমণ্ডলের ছবি নেয়া এড়িয়ে গেলেন কেন?</string>
+    <string name="exit_form_title">বায়োমেট্রিক তথ্য এড়িয়ে গেলেন কেন?</string>
     <string name="exit_form_other_reason_hint">অতিরিক্ত তথ্য</string>
-    <string name="exit_form_continue_default_button">মুখমণ্ডলের ছবি সংগ্রহ করুন</string>
-    <string name="exit_form_continue_fingerprints_button">আঙ্গুলের ছাপ স্ক্যান করুন</string>
-    <string name="exit_form_continue_face_button">মুখমণ্ডলের ছবি সংগ্রহ করুন</string>
+    <string name="exit_form_continue_button">মুখমণ্ডলের ছবি সংগ্রহ করুন</string>
     <string name="exit_form_submit_button">জমা দিন</string>
     <string name="exit_form_select_option_submit_warning">একটি অপশন সিলেক্ট করুন এবং জমা দিন</string>
     <string name="exit_form_submit_warning">ফর্ম জমা দিন</string>

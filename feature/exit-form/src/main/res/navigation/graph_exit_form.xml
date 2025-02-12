@@ -10,10 +10,6 @@
         android:name="com.simprints.feature.exitform.screen.ExitFormFragment"
         android:label="ExitFormFragment"
         tools:layout="@layout/fragment_exit_form">
-
-        <argument
-            android:name="exitFormConfiguration"
-            app:argType="com.simprints.feature.exitform.config.ExitFormConfiguration" />
     </fragment>
 
 </navigation>

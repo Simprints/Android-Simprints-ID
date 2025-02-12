@@ -49,13 +49,9 @@
     <string name="enrol_last_biometrics_alert_message_all_param">चेहरा/फ़िंगरप्रिंट</string>
 
     <!-- Exit form -->
-    <string name="exit_form_title_fingerprinting">आपने फ़िंगरप्रिंट कैप्चर करना क्यों छोड़ दिया?</string>
-    <string name="exit_form_title_biometrics">आपने बायोमैट्रिक्स जानकारी क्यों नहीं ली?</string>
-    <string name="exit_form_title_face">आपने चेहरे की पहचान क्यों नहीं ली?</string>
+    <string name="exit_form_title">आपने बायोमैट्रिक्स जानकारी क्यों नहीं ली?</string>
     <string name="exit_form_other_reason_hint">अतिरिक्त जानकारी</string>
-    <string name="exit_form_continue_default_button">चेहरे की फ़ोटो लें</string>
-    <string name="exit_form_continue_fingerprints_button">फ़िंगरप्रिंट स्कैन करें</string>
-    <string name="exit_form_continue_face_button">चेहरे की फ़ोटो लें</string>
+    <string name="exit_form_continue_button">चेहरे की फ़ोटो लें</string>
     <string name="exit_form_submit_button">सबमिट करें</string>
     <string name="exit_form_select_option_submit_warning">कृपया किसी एक विकल्प का चयन करें और सबमिट करें</string>
     <string name="exit_form_submit_warning">कृपया फ़ॉर्म सबमिट करें</string>
