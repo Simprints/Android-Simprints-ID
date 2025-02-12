@@ -4,6 +4,8 @@
     <!-- Alert -->
     <string name="alert_title_fallback">সতর্ক বার্তা</string>
     <string name="alert_button_close">বন্ধ করুন</string>
+    <string name="alert_export_data">বিবরণ কপি করুন</string>
+    <string name="alert_export_copied">ক্লিপবোর্ডে ডেটা কপি করা হয়েছে</string>
 
     <!-- Consent -->
     <string name="consent_general_title">সাধারন সম্মতি</string>
@@ -173,9 +175,12 @@
     <string name="face_capture_onboarding_continue_button">সামনে আগাতে যে কোন স্থানে চাপুন</string>
     <string name="face_capture_capturing_title">ছবি তুলুন</string>
     <string name="face_capture_preparation_title">প্রস্তু্তি</string>
+    <string name="face_capture_start_capture">ক্যাপচার শুরু করুন</string>
     <string name="face_capture_title_previewing">স্ক্যান প্রস্তুত হচ্ছে</string>
     <string name="face_capture_title_no_face">মুখ খুঁজে পাওয়া যাচ্ছে না</string>
     <string name="face_capture_error_no_face">ব্যক্তির চেহারা বৃত্তের ভেতর থাকতে হবে</string>
+    <string name="face_capture_title_bad_quality">অস্পষ্ট ছবি</string>
+    <string name="face_capture_error_bad_quality">আরও স্পষ্ট ছবির জন্য আলো সামঞ্জস্য করার চেষ্টা করুন অথবা মুখের অবস্থান পরিবর্তন করুন।</string>
     <string name="face_capture_title_too_far">বেশি দূরে</string>
     <string name="face_capture_error_too_far">কাছে যান</string>
     <string name="face_capture_title_too_close">বেশি কাছে</string>
@@ -240,7 +245,7 @@
     <string name="fingerprint_connect_ota_start_update">আপডেট শুরু করুন</string>
     <string name="fingerprint_connect_ota_recovery_title">স্ক্যানার আপডেট হয়নি</string>
     <string name="fingerprint_connect_ota_recovery_soft_reset">স্ক্যানার বন্ধ করে আবার চালু করুন</string>
-    <string name="fingerprint_connect_ota_recovery_hard_reset">পাওয়ার বাটন ৫ সেকেন্ড চেপে ধরে রাখুন</string>
+    <string name="fingerprint_connect_ota_recovery_hard_reset">১. স্ক্যানার বন্ধ না হওয়া পর্যন্ত পাওয়ার বোতাম টিপুন এবং ধরে রাখুন \n২. ৭ সেকেন্ডের জন্য আবার পাওয়ার বোতাম টিপুন এবং ধরে রাখুন</string>
     <string name="fingerprint_connect_ota_failed_title">স্ক্যানার আপডেট হয়নি</string>
     <string name="fingerprint_connect_ota_failed_instructions">সাহায্যের জন্য সুপারভাইসর এর সাথে যোগাযোগ করুন</string>
     <string name="fingerprint_connect_ota_continue_button">সামনে আগান</string>
@@ -297,7 +302,7 @@
     <string name="fingerprint_capture_rescan_question">আবার স্ক্যান করতে চান?</string>
     <string name="fingerprint_capture_scan">স্ক্যান</string>
     <string name="fingerprint_capture_please_wait">অপেক্ষা করুন</string>
-    <string name="fingerprint_capture_missing_finger_button">আঙ্গুল নেই / কাটা</string>
+    <string name="fingerprint_capture_missing_finger_button">স্কিপ ফিঙ্গার</string>
     <string name="fingerprint_capture_try_another_title">প্রস্তুত হোন</string>
     <string name="fingerprint_capture_try_another_finger">আরেকটি আঙ্গুল চেষ্টা করুন</string>
 
@@ -373,10 +378,14 @@
     <string name="dashboard_preference_summary_settings_fingers">যে আঙ্গুল গুলো স্ক্যান করবেন সেগুলো সিলেক্ট করুন</string>
     <string name="dashboard_preference_summary_sync_information">সিঙ্ক- এর জন্য আরও তথ্য</string>
     <string name="dashboard_preference_summary_update_config">ডিভাইস এবং প্রকল্পের কনফিগারেশন রিফ্রেশ করুন</string>
-    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">একটি ফিঙ্গারপ্রিন্ট স্ক্যান সম্পন্ন হলে ব্যবহারকারীকে স্ক্যানার থেকে তাদের হাত সরানোর জন্য অবহিত করে, এরকম অডিও সতর্কতাগুলি সক্ষম বা অক্ষম করুন৷</string>
+    <string name="dashboard_preference_summary_update_config_last_updated">ডিভাইস এবং প্রোজেক্ট কনফিগারেশন রিফ্রেশ করুন\nসর্বশেষ আপডেট:%s</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">স্ক্যান সম্পূর্ণ হওয়ার জন্য অডিও সতর্কতা, ব্যবহারকারীকে স্ক্যানার থেকে বিষয়ের আঙুলটি সরিয়ে ফেলতে প্ররোচিত করে।</string>
+    <string name="dashboard_preference_summary_enable_auto_capture">ভিউফাইন্ডারে কোনও মুখ ভালোভাবে অবস্থান করলে স্বয়ংক্রিয়ভাবে ছবি তোলা শুরু করুন।</string>
     <string name="dashboard_preference_copied_to_clipboard">কপি করা হয়েছে</string>
     <string name="dashboard_preference_update_config_scheduled">কনফিগারেশন আপডেট শুরু হয়েছে</string>
-    <string name="dashboard_preference_enable_audio_on_scan_complete">ফিঙ্গারপ্রিন্ট স্ক্যান সমাপ্তির অডিও</string>
+    <string name="dashboard_preference_update_config_finished">কনফিগারেশন আপডেট করা হয়েছে</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">অডিও সতর্কতা</string>
+    <string name="dashboard_preference_enable_auto_capture">অটো-ক্যাপচার</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">তথ্য সিঙ্ক করুন</string>
