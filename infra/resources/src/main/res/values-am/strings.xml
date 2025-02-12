@@ -49,13 +49,9 @@
     <string name="enrol_last_biometrics_alert_message_all_param">የፊት / የጣት አሻራ</string>
 
     <!-- Exit form -->
-    <string name="exit_form_title_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
-    <string name="exit_form_title_biometrics">ለምንየጣት አሻራዉን ዘለሉ?</string>
-    <string name="exit_form_title_face">ለምን የፊት ፎቶ መዉሰዱን ዘለሉ?</string>
+    <string name="exit_form_title">ለምንየጣት አሻራዉን ዘለሉ?</string>
     <string name="exit_form_other_reason_hint">ተጨማሪ ኢንፎርሜሽን</string>
-    <string name="exit_form_continue_default_button">የፊቱን ፎቶ ይመዝግቡ</string>
-    <string name="exit_form_continue_fingerprints_button">የጣት አሻራውን እስካን ያድርጉ</string>
-    <string name="exit_form_continue_face_button">የፊቱን ፎቶ ይመዝግቡ</string>
+    <string name="exit_form_continue_button">የፊቱን ፎቶ ይመዝግቡ</string>
     <string name="exit_form_submit_button">ይላኩ</string>
     <string name="exit_form_select_option_submit_warning">እባክዎት ካሉት አማራጮች ይምረጡ እና ይላኩ</string>
     <string name="exit_form_submit_warning">እባክዎት ቅጽን ይላኩ</string>

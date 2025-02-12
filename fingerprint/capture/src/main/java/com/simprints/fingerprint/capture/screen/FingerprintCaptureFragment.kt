@@ -27,9 +27,6 @@ import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.feature.exitform.exitFormConfiguration
-import com.simprints.feature.exitform.scannerOptions
-import com.simprints.feature.exitform.toArgs
 import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
@@ -163,11 +160,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         findNavController().navigateSafely(
             this,
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
-            exitFormConfiguration {
-                titleRes = IDR.string.exit_form_title_fingerprinting
-                backButtonRes = IDR.string.exit_form_continue_fingerprints_button
-                visibleOptions = scannerOptions()
-            }.toArgs(),
         )
     }
 

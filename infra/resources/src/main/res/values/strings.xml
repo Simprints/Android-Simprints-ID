@@ -51,13 +51,9 @@
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
 
     <!-- Exit form -->
-    <string name="exit_form_title_fingerprinting">Why did you skip fingerprinting?</string>
-    <string name="exit_form_title_biometrics">Why did you skip Biometrics?</string>
-    <string name="exit_form_title_face">Why did you skip face capture?</string>
+    <string name="exit_form_title">Why did you skip biometrics?</string>
     <string name="exit_form_other_reason_hint">Additional Information</string>
-    <string name="exit_form_continue_default_button">Capture face</string>
-    <string name="exit_form_continue_fingerprints_button">Scan Fingerprints</string>
-    <string name="exit_form_continue_face_button">Capture face</string>
+    <string name="exit_form_continue_button">Capture biometrics</string>
     <string name="exit_form_submit_button">Submit</string>
     <string name="exit_form_select_option_submit_warning">Please select an option and submit</string>
     <string name="exit_form_submit_warning">Please submit form</string>

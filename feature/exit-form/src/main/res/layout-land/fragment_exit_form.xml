@@ -16,7 +16,7 @@
         style="@style/Text.Headline5.White.Bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/exit_form_title_biometrics"
+        android:text="@string/exit_form_title"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -160,7 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="@string/exit_form_continue_default_button" />
+            android:text="@string/exit_form_continue_button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/exitFormSubmit"

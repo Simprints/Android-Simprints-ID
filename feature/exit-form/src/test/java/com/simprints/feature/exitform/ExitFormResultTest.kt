@@ -1,7 +1,6 @@
 package com.simprints.feature.exitform
 
 import com.google.common.truth.Truth
-import com.simprints.feature.exitform.config.ExitFormOption
 import org.junit.Test
 
 class ExitFormResultTest {

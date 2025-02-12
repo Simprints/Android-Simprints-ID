@@ -7,9 +7,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.usecase.FetchSubjectUseCase
 import com.simprints.feature.fetchsubject.screen.usecase.SaveSubjectFetchEventUseCase
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -36,9 +35,6 @@ internal class FetchSubjectViewModelTest {
     @MockK
     lateinit var saveSubjectFetchEventUseCase: SaveSubjectFetchEventUseCase
 
-    @MockK
-    lateinit var configManager: ConfigManager
-
     private lateinit var viewModel: FetchSubjectViewModel
 
     @Before
@@ -51,7 +47,6 @@ internal class FetchSubjectViewModelTest {
             timeHelper,
             fetchSubjectUseCase,
             saveSubjectFetchEventUseCase,
-            configManager,
         )
     }
 
@@ -97,19 +92,11 @@ internal class FetchSubjectViewModelTest {
     }
 
     @Test
-    fun `startExitForm returns list of modalities`() {
-        coEvery { configManager.getProjectConfiguration().general.modalities } returns listOf(
-            GeneralConfiguration.Modality.FACE,
-        )
-
+    fun `startExitForm returns ShowExitForm`() {
         viewModel.startExitForm()
-        val result = viewModel.subjectState
-            .test()
-            .value()
-            .getContentIfNotHandled()
+        val result = viewModel.subjectState.getOrAwaitValue()
 
-        assertThat(result).isInstanceOf(FetchSubjectState.ShowExitForm::class.java)
-        assertThat((result as FetchSubjectState.ShowExitForm).modalities.size).isEqualTo(1)
+        assertThat(result.peekContent()).isInstanceOf(FetchSubjectState.ShowExitForm::class.java)
     }
 
     companion object {
