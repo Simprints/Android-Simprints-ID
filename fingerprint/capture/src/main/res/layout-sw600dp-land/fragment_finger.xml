@@ -12,7 +12,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/fingerprint_capture_card_height_land"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_default"
         android:theme="@style/Theme.Simprints"
         app:cardElevation="4dp">
@@ -74,13 +74,14 @@
         android:gravity="center"
         android:visibility="gone"
         tools:text="@string/fingerprint_capture_capture_number_text"
-        tools:visibility="visible" />
+         />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:gravity="center"
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <ProgressBar
