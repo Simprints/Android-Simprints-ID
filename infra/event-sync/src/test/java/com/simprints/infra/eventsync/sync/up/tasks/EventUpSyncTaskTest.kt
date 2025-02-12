@@ -22,6 +22,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID3
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createAuthenticationEvent
+import com.simprints.infra.events.sampledata.createBiometricReferenceCreationEvent
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
 import com.simprints.infra.events.sampledata.createEnrolmentEventV4
 import com.simprints.infra.events.sampledata.createEventWithSessionId
@@ -299,6 +300,7 @@ internal class EventUpSyncTaskTest {
             createEnrolmentEventV2(),
             createEnrolmentEventV4(),
             createAlertScreenEvent(),
+            createBiometricReferenceCreationEvent(),
         )
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
@@ -309,7 +311,7 @@ internal class EventUpSyncTaskTest {
                 any(),
                 withArg {
                     assertThat(it.sessions.first().id).isEqualTo(GUID1)
-                    assertThat(it.sessions.first().events).hasSize(4)
+                    assertThat(it.sessions.first().events).hasSize(5)
                 },
                 any(),
             )
