@@ -239,7 +239,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         every { realmSingleQuery.find() } returns null
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Write(subject.fromDbToDomain())),
+            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
@@ -259,7 +259,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val subject = getFakePerson()
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Write(subject.fromDbToDomain())),
+            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
         )
 
         verify {

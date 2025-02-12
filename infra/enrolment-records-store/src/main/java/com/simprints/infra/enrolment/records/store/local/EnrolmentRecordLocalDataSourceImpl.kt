@@ -120,7 +120,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         realmWrapper.writeRealm { realm ->
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Write -> {
+                    is SubjectAction.Creation -> {
                         val newSubject = action.subject.fromDomainToDb()
                         val dbSubject: DbSubject? = realm.findSubject(newSubject.subjectId)
 
