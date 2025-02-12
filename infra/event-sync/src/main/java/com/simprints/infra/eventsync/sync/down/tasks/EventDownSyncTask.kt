@@ -11,7 +11,6 @@ import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositor
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Write
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -260,16 +259,15 @@ internal class EventDownSyncTask @Inject constructor(
     private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
         listOf(Deletion(event.payload.subjectId))
 
-    private suspend fun handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<SubjectAction> {
-        val existingSubject = enrolmentRecordRepository.load(SubjectQuery(subjectId = event.payload.subjectId)).first()
-        val subject = subjectFactory.buildSubjectFromUpdatePayload(existingSubject, event.payload)
-
-        return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
-            listOf(Write(subject))
-        } else {
-            // Having no samples after update is equal to deletion
-            listOf(Deletion(event.payload.subjectId))
-        }
+    private fun handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<SubjectAction> = with(event.payload) {
+        listOf(
+            SubjectAction.Update(
+                subjectId = subjectId,
+                faceSamplesToAdd = subjectFactory.extractFaceSamplesFromBiometricReferences(biometricReferencesAdded),
+                fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
+                referenceIdsToRemove = biometricReferencesRemoved,
+            ),
+        )
     }
 
     companion object {
