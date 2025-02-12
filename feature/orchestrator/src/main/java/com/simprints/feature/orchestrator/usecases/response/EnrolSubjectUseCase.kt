@@ -35,6 +35,6 @@ internal class EnrolSubjectUseCase @Inject constructor(
                 biometricReferenceIds,
             ),
         )
-        enrolmentRecordRepository.performActions(listOf(SubjectAction.Write(subject)), project)
+        enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
     }
 }
