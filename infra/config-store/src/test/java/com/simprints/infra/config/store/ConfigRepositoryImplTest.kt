@@ -249,4 +249,15 @@ class ConfigRepositoryImplTest {
         assertThat(emittedConfigs[1]).isEqualTo(config2)
         coVerify(exactly = 0) { remoteDataSource.getProject(any()) }
     }
+
+    @Test
+    fun `should return project config from local data source`() = runTest {
+        val config = projectConfiguration.copy(projectId = "project1")
+        coEvery { localDataSource.getProjectConfiguration() } returns config
+
+        val result = configServiceImpl.getProjectConfiguration()
+
+        assertThat(result).isEqualTo(config)
+        coVerify { localDataSource.getProjectConfiguration() }
+    }
 }
