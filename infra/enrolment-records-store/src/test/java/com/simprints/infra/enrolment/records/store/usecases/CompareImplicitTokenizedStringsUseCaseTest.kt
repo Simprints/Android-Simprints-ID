@@ -52,7 +52,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
         val s1 = "s1"
         val s2 = "s2"
         useCase(s1, s2, tokenKeyType, project)
-        verify(exactly = 2) { tokenizationProcessor.decrypt(any(), any(), any()) }
+        verify(exactly = 2) { tokenizationProcessor.decrypt(any(), any(), any(), any()) }
     }
 
     @Test
@@ -70,7 +70,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
         val s1 = "s1"
         val s2 = s1
 
-        every { tokenizationProcessor.decrypt(any(), any(), any()) } returns TokenizableString.Tokenized("some value")
+        every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Tokenized("some value")
         val result = useCase(s1, s2, tokenKeyType, project)
         assertTrue(result)
     }

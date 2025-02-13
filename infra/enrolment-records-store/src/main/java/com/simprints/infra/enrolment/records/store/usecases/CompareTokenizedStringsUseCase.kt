@@ -31,7 +31,8 @@ class CompareImplicitTokenizedStringsUseCase @Inject constructor(
         val isAlreadyTokenized = tokenizationProcessor.decrypt(
             encrypted = s.asTokenizableEncrypted(),
             tokenKeyType = tokenKeyType,
-            project = project
+            project = project,
+            logError = false
         ) is TokenizableString.Tokenized
 
         return if (isAlreadyTokenized) {
