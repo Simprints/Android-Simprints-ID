@@ -2,7 +2,10 @@ package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -16,11 +19,13 @@ import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
+import com.simprints.infra.eventsync.event.usecases.TokenizeEventPayloadFieldsUseCase
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -53,6 +58,11 @@ class EventRemoteDataSourceTest {
     @MockK
     private lateinit var eventRemoteInterface: EventRemoteInterface
 
+    private lateinit var useCase: TokenizeEventPayloadFieldsUseCase
+
+    @MockK
+    private lateinit var project: Project
+
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private val query = ApiRemoteEventQuery(
         projectId = DEFAULT_PROJECT_ID,
@@ -75,6 +85,8 @@ class EventRemoteDataSourceTest {
 
         coEvery { authStore.buildClient(EventRemoteInterface::class) } returns simApiClient
         eventRemoteDataSource = EventRemoteDataSource(authStore, JsonHelper)
+        val tokenizationProcessor = TokenizationProcessor(StringTokenizer(EncodingUtilsImplForTests))
+        useCase = TokenizeEventPayloadFieldsUseCase(tokenizationProcessor)
     }
 
     @After
@@ -299,13 +311,14 @@ class EventRemoteDataSourceTest {
             mapOf("x-request-id" to "requestId").toHeaders(),
         )
 
-        val events = listOf(createAlertScreenEvent())
+        val event = createAlertScreenEvent()
+        val events = listOf(event)
         val scope = createSessionScope()
         eventRemoteDataSource.post(
             GUID1,
             DEFAULT_PROJECT_ID,
             ApiUploadEventsBody(
-                sessions = listOf(ApiEventScope.fromDomain(scope, events)),
+                sessions = listOf(ApiEventScope.fromDomain(scope, events, useCase, project)),
             ),
         )
 
@@ -317,7 +330,7 @@ class EventRemoteDataSourceTest {
                 match { body ->
                     assertThat(body.sessions).hasSize(1)
                     assertThat(body.sessions.firstOrNull())
-                        .isEqualTo(ApiEventScope.fromDomain(scope, events))
+                        .isEqualTo(ApiEventScope.fromDomain(scope, events, useCase, project))
                     true
                 },
             )

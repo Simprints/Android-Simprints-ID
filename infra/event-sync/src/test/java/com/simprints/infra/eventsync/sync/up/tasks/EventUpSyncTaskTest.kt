@@ -5,12 +5,14 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -30,12 +32,14 @@ import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
+import com.simprints.infra.eventsync.event.usecases.TokenizeEventPayloadFieldsUseCase
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -83,6 +87,8 @@ internal class EventUpSyncTaskTest {
     @MockK
     private lateinit var eventScope: EventScope
 
+    private lateinit var useCase: TokenizeEventPayloadFieldsUseCase
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -98,6 +104,9 @@ internal class EventUpSyncTaskTest {
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
+        val tokenizationProcessor = TokenizationProcessor(StringTokenizer(EncodingUtilsImplForTests))
+        useCase = TokenizeEventPayloadFieldsUseCase(tokenizationProcessor)
+
         eventUpSyncTask = EventUpSyncTask(
             authStore = authStore,
             eventUpSyncScopeRepo = eventUpSyncScopeRepository,
@@ -106,6 +115,7 @@ internal class EventUpSyncTaskTest {
             timeHelper = timeHelper,
             configManager = configManager,
             jsonHelper = JsonHelper,
+            tokenizeEventPayloadFieldsUseCase = useCase
         )
     }
 
