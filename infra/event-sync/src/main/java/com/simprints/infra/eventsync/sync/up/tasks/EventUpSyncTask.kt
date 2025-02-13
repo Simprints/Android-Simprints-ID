@@ -7,10 +7,12 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
 import com.simprints.infra.config.store.models.canSyncAnalyticsDataToSimprints
 import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
@@ -24,6 +26,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
 import com.simprints.infra.eventsync.event.remote.ApiUploadEventsBody
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
+import com.simprints.infra.eventsync.event.usecases.TokenizeEventPayloadFieldsUseCase
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
@@ -49,6 +52,7 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
+    private val tokenizeEventPayloadFieldsUseCase: TokenizeEventPayloadFieldsUseCase,
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val jsonHelper: JsonHelper,
@@ -63,7 +67,9 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val config = configManager.getProjectConfiguration()
+        val projectWithConfig = configManager.refreshProject(operation.projectId)
+        val project = projectWithConfig.project
+        val config = projectWithConfig.configuration
         var lastOperation = operation.copy()
         var count = 0
         var isUsefulUpload = false
@@ -76,7 +82,7 @@ internal class EventUpSyncTask @Inject constructor(
 
             uploadEventScopeType(
                 eventScope = eventScope,
-                projectId = operation.projectId,
+                project = project,
                 eventScopeTypeToUpload = EventScopeType.SESSION,
                 batchSize = config.synchronization.up.simprints.batchSizes.sessions,
                 eventFilter = { scopes ->
@@ -87,7 +93,7 @@ internal class EventUpSyncTask @Inject constructor(
                 createUpSyncContentContent = {
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(sessionCount = it)
-                },
+                }
             ).collect {
                 count = it
                 lastOperation = lastOperation.copy(
@@ -98,13 +104,13 @@ internal class EventUpSyncTask @Inject constructor(
             }
             uploadEventScopeType(
                 eventScope = eventScope,
-                projectId = operation.projectId,
+                project = project,
                 eventScopeTypeToUpload = EventScopeType.DOWN_SYNC,
                 batchSize = config.synchronization.up.simprints.batchSizes.downSyncs,
                 createUpSyncContentContent = {
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(eventDownSyncCount = it)
-                },
+                }
             ).collect {
                 count = it
                 lastOperation = lastOperation.copy(
@@ -115,7 +121,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
             uploadEventScopeType(
                 eventScope = eventScope,
-                projectId = operation.projectId,
+                project = project,
                 eventScopeTypeToUpload = EventScopeType.UP_SYNC,
                 batchSize = config.synchronization.up.simprints.batchSizes.upSyncs,
                 createUpSyncContentContent = {
@@ -123,7 +129,7 @@ internal class EventUpSyncTask @Inject constructor(
                     EventUpSyncRequestEvent.UpSyncContent(
                         eventUpSyncCount = if (isUsefulUpload) it else 0,
                     )
-                },
+                }
             ).collect {
                 count = it
                 lastOperation = lastOperation.copy(
@@ -163,7 +169,7 @@ internal class EventUpSyncTask @Inject constructor(
 
     private fun uploadEventScopeType(
         eventScope: EventScope,
-        projectId: String,
+        project: Project,
         eventScopeTypeToUpload: EventScopeType,
         batchSize: Int,
         eventFilter: (Map<EventScope, List<Event>?>) -> Map<EventScope, List<Event>?> = { it },
@@ -176,14 +182,14 @@ internal class EventUpSyncTask @Inject constructor(
 
             // Re-emitting the number of uploaded corrupted events
             attemptInvalidEventUpload(
-                projectId,
+                project.id,
                 sessionScopes.getCorruptedScopes(),
             ).collect { emit(it) }
 
             val scopesToUpload = sessionScopes
                 .filterValues { it != null }
                 .let(eventFilter)
-                .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty()) }
+                .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty(), tokenizeEventPayloadFieldsUseCase, project) }
             val uploadedScopes = mutableListOf<String>()
 
             scopesToUpload.takeIf { it.isNotEmpty() }?.apply {
@@ -193,7 +199,7 @@ internal class EventUpSyncTask @Inject constructor(
                 try {
                     val result = eventRemoteDataSource.post(
                         requestId,
-                        projectId,
+                        project.id,
                         this.asApiUploadEventsBody(eventScopeTypeToUpload),
                     )
                     addRequestEvent(
