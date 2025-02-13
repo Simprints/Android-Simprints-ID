@@ -23,6 +23,7 @@ interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity>
 
@@ -30,6 +31,7 @@ interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity>
 }
