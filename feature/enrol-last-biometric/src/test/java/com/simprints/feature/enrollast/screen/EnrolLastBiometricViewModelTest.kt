@@ -135,7 +135,7 @@ internal class EnrolLastBiometricViewModelTest {
         )
 
         coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
-        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any()) }
+        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any(), any()) }
     }
 
     @Test
@@ -193,14 +193,14 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(createParams(listOf()))
 
         coVerify { eventRepository.addOrUpdateEvent(any()) }
-        coVerify { enrolmentRecordRepository.performActions(any()) }
+        coVerify { enrolmentRecordRepository.performActions(any(), any()) }
     }
 
     @Test
     fun `returns failure record saving fails`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
         coEvery { buildSubject.invoke(any()) } returns subject
-        coEvery { enrolmentRecordRepository.performActions(any()) } throws Exception()
+        coEvery { enrolmentRecordRepository.performActions(any(), any()) } throws Exception()
 
         viewModel.enrolBiometric(createParams(listOf()))
 

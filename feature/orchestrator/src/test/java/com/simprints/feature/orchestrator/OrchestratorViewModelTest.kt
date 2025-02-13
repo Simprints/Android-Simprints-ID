@@ -172,7 +172,7 @@ internal class OrchestratorViewModelTest {
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         coEvery { shouldCreatePerson(any(), any(), any()) } returns false
-        coEvery { appResponseBuilder(any(), any(), any()) } returns mockk()
+        coEvery { appResponseBuilder(any(), any(), any(), any()) } returns mockk()
         coJustRun { dailyActivityUseCase(any()) }
         justRun { addCallbackEvent(any()) }
 
