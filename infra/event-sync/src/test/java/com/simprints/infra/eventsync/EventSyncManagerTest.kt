@@ -141,11 +141,11 @@ internal class EventSyncManagerTest {
     @Test
     fun `downSync should call down sync helper`() = runTest {
         coEvery { eventRepository.createEventScope(any()) } returns eventScope
-        coEvery { downSyncTask.downSync(any(), any(), eventScope, project) } returns emptyFlow()
+        coEvery { downSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
 
         eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId")
 
-        coVerify { downSyncTask.downSync(any(), any(), eventScope, project) }
+        coVerify { downSyncTask.downSync(any(), any(), eventScope, any()) }
     }
 
     @Test
