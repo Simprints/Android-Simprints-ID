@@ -1,5 +1,6 @@
 package com.simprints.infra.enrolment.records.store.local
 
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
@@ -48,6 +49,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
         realm
@@ -67,6 +69,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
         realm

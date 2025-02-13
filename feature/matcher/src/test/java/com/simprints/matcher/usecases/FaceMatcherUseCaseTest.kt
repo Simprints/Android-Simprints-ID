@@ -6,6 +6,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
@@ -44,6 +45,9 @@ internal class FaceMatcherUseCaseTest {
     lateinit var faceMatcher: FaceMatcher
 
     @MockK
+    lateinit var project: Project
+
+    @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
     private lateinit var useCase: FaceMatcherUseCase
 
@@ -69,6 +73,7 @@ internal class FaceMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
+            project
         ).toList()
 
         coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
@@ -95,6 +100,7 @@ internal class FaceMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
+            project
         ).toList()
 
         coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
@@ -119,7 +125,7 @@ internal class FaceMatcherUseCaseTest {
         )
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any()) } returns faceIdentities
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any()) } returns faceIdentities
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 42f
 
 
@@ -132,6 +138,7 @@ internal class FaceMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
+            project
         ).toList()
 
         coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }

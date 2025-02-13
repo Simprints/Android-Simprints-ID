@@ -10,6 +10,7 @@ import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
@@ -37,6 +38,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
+        project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
         val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK!!)
@@ -62,7 +64,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         val resultItems = createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
-                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource) {
+                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource, project) {
                         // When a candidate is loaded
                         trySend(MatcherState.CandidateLoaded)
                     }
@@ -86,9 +88,10 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ) = enrolmentRecordRepository
-        .loadFingerprintIdentities(query, range, dataSource, onCandidateLoaded)
+        .loadFingerprintIdentities(query, range, dataSource, project, onCandidateLoaded)
         .map {
             FingerprintIdentity(
                 it.subjectId,

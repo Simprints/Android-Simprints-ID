@@ -3,6 +3,7 @@ package com.simprints.infra.enrolment.records.store.local
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -43,6 +44,9 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
     @MockK
     private lateinit var realmQuery: RealmQuery<DbSubject>
+
+    @MockK
+    private lateinit var project: Project
 
     private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
@@ -115,6 +119,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .loadFingerprintIdentities(
                 SubjectQuery(), IntRange(0, 20),
                 BiometricDataSource.Simprints,
+                project,
                 onCandidateLoaded
             )
             .toList()
@@ -133,6 +138,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
                 SubjectQuery(fingerprintSampleFormat = format),
                 IntRange(0, 20),
                 BiometricDataSource.Simprints,
+                project,
                 onCandidateLoaded
             ).toList()
 
@@ -152,6 +158,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .loadFingerprintIdentities(
                 SubjectQuery(faceSampleFormat = format), IntRange(0, 20),
                 BiometricDataSource.Simprints,
+                project,
                 onCandidateLoaded
             )
             .toList()
@@ -173,6 +180,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
             .loadFaceIdentities(
                 SubjectQuery(), IntRange(0, 20),
                 BiometricDataSource.Simprints,
+                project,
                 onCandidateLoaded
             )
             .toList()
