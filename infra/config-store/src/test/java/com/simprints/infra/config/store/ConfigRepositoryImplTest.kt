@@ -16,6 +16,7 @@ import com.simprints.infra.config.store.testtools.deviceConfiguration
 import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.syntax.assertThrows
@@ -40,6 +41,7 @@ class ConfigRepositoryImplTest {
     private val localDataSource = mockk<ConfigLocalDataSource>(relaxed = true)
     private val remoteDataSource = mockk<ConfigRemoteDataSource>()
     private val simNetwork = mockk<SimNetwork>(relaxed = true)
+    private val tokenizationProcessor = mockk<TokenizationProcessor>(relaxed = true)
 
     private lateinit var configServiceImpl: ConfigRepositoryImpl
 
@@ -49,6 +51,7 @@ class ConfigRepositoryImplTest {
             localDataSource,
             remoteDataSource,
             simNetwork,
+            tokenizationProcessor,
             DEVICE_ID,
         )
     }
@@ -245,5 +248,16 @@ class ConfigRepositoryImplTest {
         assertThat(emittedConfigs[0]).isEqualTo(config1)
         assertThat(emittedConfigs[1]).isEqualTo(config2)
         coVerify(exactly = 0) { remoteDataSource.getProject(any()) }
+    }
+
+    @Test
+    fun `should return project config from local data source`() = runTest {
+        val config = projectConfiguration.copy(projectId = "project1")
+        coEvery { localDataSource.getProjectConfiguration() } returns config
+
+        val result = configServiceImpl.getProjectConfiguration()
+
+        assertThat(result).isEqualTo(config)
+        coVerify { localDataSource.getProjectConfiguration() }
     }
 }

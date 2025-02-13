@@ -1,5 +1,6 @@
 package com.simprints.infra.enrolment.records.store.local
 
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.IdentityDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -12,5 +13,5 @@ interface EnrolmentRecordLocalDataSource : IdentityDataSource {
 
     suspend fun deleteAll()
 
-    suspend fun performActions(actions: List<SubjectAction>)
+    suspend fun performActions(actions: List<SubjectAction>, project: Project)
 }

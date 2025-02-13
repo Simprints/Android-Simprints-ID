@@ -51,6 +51,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         enrolWasAttempted = true
 
         val projectConfig = configManager.getProjectConfiguration()
+        val project = configManager.getProject(projectConfig.projectId)
         val modalities = projectConfig.general.modalities
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)
@@ -70,7 +71,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         try {
             val subject = buildSubject(params)
             registerEvent(subject)
-            enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)))
+            enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
             _finish.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
             Simber.e("Enrolment failed", t, tag = ENROLMENT)

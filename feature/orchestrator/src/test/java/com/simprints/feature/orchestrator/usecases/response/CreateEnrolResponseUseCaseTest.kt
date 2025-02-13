@@ -5,6 +5,7 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
@@ -25,6 +26,9 @@ internal class CreateEnrolResponseUseCaseTest {
     @MockK
     lateinit var enrolSubject: EnrolSubjectUseCase
 
+    @MockK
+    lateinit var project: Project
+
     private val action = mockk<ActionRequest.EnrolActionRequest> {
         every { projectId } returns "projectId"
         every { userId } returns "userId".asTokenizableRaw()
@@ -37,7 +41,7 @@ internal class CreateEnrolResponseUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coJustRun { enrolSubject.invoke(any()) }
+        coJustRun { enrolSubject.invoke(any(), any()) }
 
         useCase = CreateEnrolResponseUseCase(subjectFactory, enrolSubject)
     }
@@ -56,6 +60,7 @@ internal class CreateEnrolResponseUseCaseTest {
                     FaceCaptureResult(emptyList()),
                     mockk(),
                 ),
+                project
             ),
         ).isInstanceOf(AppEnrolResponse::class.java)
     }
@@ -66,6 +71,6 @@ internal class CreateEnrolResponseUseCaseTest {
             subjectFactory.buildSubjectFromCaptureResults(any(), any(), any(), null, null)
         } throws MissingCaptureException()
 
-        assertThat(useCase(action, emptyList())).isInstanceOf(AppErrorResponse::class.java)
+        assertThat(useCase(action, emptyList(), project)).isInstanceOf(AppErrorResponse::class.java)
     }
 }
