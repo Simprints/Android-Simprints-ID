@@ -1,5 +1,6 @@
 package com.simprints.infra.enrolment.records.store
 
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
@@ -15,6 +16,7 @@ interface IdentityDataSource {
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity>
 
@@ -22,6 +24,7 @@ interface IdentityDataSource {
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity>
 }

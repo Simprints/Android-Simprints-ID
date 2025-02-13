@@ -10,11 +10,13 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_INDEX_FINGER
 import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.commcare.CommCareIdentityDataSource.Companion.COLUMN_DATUM_ID
 import com.simprints.infra.enrolment.records.store.commcare.CommCareIdentityDataSource.Companion.COLUMN_VALUE
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.logging.Simber
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -128,11 +130,17 @@ class CommCareIdentityDataSourceTest {
     @MockK
     private lateinit var mockContentResolver: ContentResolver
 
+    @MockK
+    private lateinit var useCase: CompareImplicitTokenizedStringsUseCase
+
     private lateinit var mockMetadataCursor: Cursor
 
     private lateinit var mockDataCursor: Cursor
 
     private lateinit var dataSource: CommCareIdentityDataSource
+
+    @MockK
+    lateinit var project: Project
 
     @Before
     fun setUp() {
@@ -171,8 +179,8 @@ class CommCareIdentityDataSourceTest {
         } returns mockDataCursor
 
         every { encoder.base64ToBytes(any()) } returns byteArrayOf()
-
-        dataSource = CommCareIdentityDataSource(encoder, JsonHelper, context)
+        every { useCase.invoke(any(), any(), any(), any()) } returns true
+        dataSource = CommCareIdentityDataSource(encoder, JsonHelper, useCase, context)
     }
 
     @Test
@@ -197,7 +205,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -241,7 +249,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(faceSampleFormat = templateFormat)
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = dataSource.loadFaceIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFaceIdentities(query, range, project = project) {}
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -283,7 +291,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "NEC_1_5"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -331,7 +339,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(faceSampleFormat = templateFormat)
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = dataSource.loadFaceIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFaceIdentities(query, range, project = project) {}
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -370,7 +378,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -414,7 +422,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(faceSampleFormat = templateFormat)
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = dataSource.loadFaceIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFaceIdentities(query, range, project = project) {}
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -459,7 +467,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..0
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertTrue(actualIdentities.isEmpty())
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -480,7 +488,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 2..3
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertTrue(actualIdentities.isEmpty())
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -518,7 +526,7 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -551,7 +559,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -580,7 +588,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -613,7 +621,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -633,7 +641,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -658,7 +666,7 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range) {}
+        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }

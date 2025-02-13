@@ -12,11 +12,14 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.enrolment.records.store.IdentityDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
@@ -30,6 +33,7 @@ import javax.inject.Inject
 internal class CommCareIdentityDataSource @Inject constructor(
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
+    private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
     @ApplicationContext private val context: Context,
 ) : IdentityDataSource {
     companion object {
@@ -48,8 +52,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
+    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any {
                 it is FingerprintReference && it.format == query.fingerprintSampleFormat
@@ -76,6 +81,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         range: IntRange,
         callerPackageName: String,
         query: SubjectQuery,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> =
@@ -83,7 +89,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         try {
             val caseId = attemptExtractingCaseId(query.metadata)
             if (caseId != null) {
-                return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query)
+                return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project)
             }
 
             context.contentResolver
@@ -97,7 +103,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     if (caseMetadataCursor.moveToPosition(range.first)) {
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query))
+                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project))
                                 onCandidateLoaded()
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
@@ -124,8 +130,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
+    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any {
                 it is FaceReference && it.format == query.faceSampleFormat
@@ -150,6 +157,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         caseId: String,
         callerPackageName: String,
         query: SubjectQuery,
+        project: Project
     ): List<EnrolmentRecordCreationEvent> {
         // Access Case Data Listing for the caseId
         val caseDataUri = getCaseDataUri(callerPackageName).buildUpon().appendPath(caseId).build()
@@ -165,9 +173,21 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     ?.events
                     ?.filterIsInstance<EnrolmentRecordCreationEvent>()
                     ?.filterNot { event ->
+                        // [MS-852] Plain strings from CommCare might be tokenized or untokenized. The only way to properly compare them
+                        // is by trying to decrypt the values to check if already tokenized, and then compare the values
                         (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
-                            (query.attendantId != null && query.attendantId != event.payload.attendantId.value) ||
-                            (query.moduleId != null && query.moduleId != event.payload.moduleId.value)
+                            !compareImplicitTokenizedStringsUseCase(
+                                query.attendantId,
+                                event.payload.attendantId.value,
+                                TokenKeyType.AttendantId,
+                                project
+                            ) ||
+                            !compareImplicitTokenizedStringsUseCase(
+                                query.moduleId,
+                                event.payload.moduleId.value,
+                                TokenKeyType.ModuleId,
+                                project
+                            )
                     }
             }.orEmpty()
     }
