@@ -3,6 +3,8 @@ package com.simprints.infra.enrolment.records.store.local
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -44,6 +46,12 @@ class EnrolmentRecordLocalDataSourceImplTest {
     @MockK
     private lateinit var realmQuery: RealmQuery<DbSubject>
 
+    @MockK
+    private lateinit var tokenizationProcessor: TokenizationProcessor
+
+    @MockK
+    private lateinit var project: Project
+
     private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
     private val onCandidateLoaded: () -> Unit = {}
@@ -79,7 +87,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         every { realm.query(DbSubject::class) } returns realmQuery
         every { mutableRealm.query(DbSubject::class) } returns realmQuery
 
-        enrolmentRecordLocalDataSource = EnrolmentRecordLocalDataSourceImpl(realmWrapperMock)
+        enrolmentRecordLocalDataSource = EnrolmentRecordLocalDataSourceImpl(realmWrapperMock, tokenizationProcessor)
     }
 
     @Test
@@ -226,7 +234,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
     fun performSubjectCreationAction() = runTest {
         val subject = getFakePerson()
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
+            listOf(SubjectAction.Creation(subject.fromDbToDomain())), project
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
@@ -237,7 +245,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Deletion(subject.subjectId.toString())),
+            listOf(SubjectAction.Deletion(subject.subjectId.toString())), project
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
@@ -249,6 +257,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         saveFakePerson(subject)
         enrolmentRecordLocalDataSource.performActions(
             listOf(),
+            project
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
