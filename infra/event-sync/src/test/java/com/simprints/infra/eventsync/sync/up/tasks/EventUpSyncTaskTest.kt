@@ -9,7 +9,9 @@ import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -79,7 +81,13 @@ internal class EventUpSyncTaskTest {
     private lateinit var synchronizationConfiguration: SynchronizationConfiguration
 
     @MockK
+    private lateinit var projectWithConfig: ProjectWithConfig
+
+    @MockK
     private lateinit var projectConfiguration: ProjectConfiguration
+
+    @MockK
+    private lateinit var project: Project
 
     @MockK
     private lateinit var configManager: ConfigManager
@@ -101,6 +109,9 @@ internal class EventUpSyncTaskTest {
             10,
             10,
         )
+        coEvery { configManager.refreshProject(any()) } returns projectWithConfig
+        every { projectWithConfig.project } returns project
+        every { projectWithConfig.configuration } returns projectConfiguration
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
