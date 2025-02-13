@@ -50,12 +50,15 @@ class TokenizationProcessor @Inject constructor(
         encrypted: TokenizableString.Tokenized,
         tokenKeyType: TokenKeyType,
         project: Project,
+        logError: Boolean = true
     ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return encrypted
         return try {
             stringTokenizer.decrypt(encrypted.value, moduleKeyset).asTokenizableRaw()
         } catch (e: Exception) {
-            Simber.e("Failed to decrypt tokenized value", e)
+            if (logError) {
+                Simber.e("Failed to decrypt tokenized value", e)
+            }
             encrypted
         }
     }

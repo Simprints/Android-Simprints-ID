@@ -7,7 +7,9 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -55,6 +57,12 @@ internal class MatchViewModelTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
+    @MockK
+    lateinit var authStore: AuthStore
+
+    @MockK
+    lateinit var configManager: ConfigManager
+
     private lateinit var cb1: CapturingSlot<(Int) -> Unit>
     private val totalCandidates = 384
     private lateinit var viewModel: MatchViewModel
@@ -71,6 +79,8 @@ internal class MatchViewModelTest {
             faceMatcherUseCase,
             fingerprintMatcherUseCase,
             saveMatchEvent,
+            authStore,
+            configManager,
             timeHelper,
         )
     }
@@ -81,7 +91,7 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 90f),
         )
 
-        coEvery { faceMatcherUseCase.invoke(any()) } returns flow {
+        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
@@ -127,7 +137,7 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 20f),
             FaceMatchResult.Item("1", 10f),
         )
-        coEvery { faceMatcherUseCase.invoke(any()) } returns flow {
+        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
@@ -179,7 +189,7 @@ internal class MatchViewModelTest {
             FingerprintMatchResult.Item("1", 10f),
         )
 
-        coEvery { fingerprintMatcherUseCase.invoke(any()) } returns flow {
+        coEvery { fingerprintMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
             emit(
