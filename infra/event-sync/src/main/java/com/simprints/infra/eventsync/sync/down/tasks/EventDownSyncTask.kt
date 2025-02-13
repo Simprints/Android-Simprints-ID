@@ -5,6 +5,7 @@ import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -50,6 +51,7 @@ internal class EventDownSyncTask @Inject constructor(
         scope: CoroutineScope,
         operation: EventDownSyncOperation,
         eventScope: EventScope,
+        project: Project
     ): Flow<EventDownSyncProgress> = flow {
         var lastOperation = operation.copy()
         var count = 0
@@ -85,13 +87,13 @@ internal class EventDownSyncTask @Inject constructor(
                         }
 
                         lastOperation =
-                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
                         emitProgress(lastOperation, count, result.totalCount)
                         batchOfEventsToProcess.clear()
                     }
                 }
 
-            lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+            lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
             emitProgress(lastOperation, count, result.totalCount)
 
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
@@ -104,7 +106,7 @@ internal class EventDownSyncTask @Inject constructor(
             Simber.i("Down sync error", t, tag = SYNC)
             errorType = t.javaClass.simpleName
 
-            lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+            lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
             emitProgress(lastOperation, count, count)
 
             lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now().ms)
@@ -150,6 +152,7 @@ internal class EventDownSyncTask @Inject constructor(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
         lastOperation: EventDownSyncOperation,
+        project: Project
     ): EventDownSyncOperation {
         val actions = batchOfEventsToProcess
             .map { event ->
@@ -168,7 +171,7 @@ internal class EventDownSyncTask @Inject constructor(
                 }
             }.flatten()
 
-        enrolmentRecordRepository.performActions(actions)
+        enrolmentRecordRepository.performActions(actions, project)
 
         return if (batchOfEventsToProcess.isNotEmpty()) {
             lastOperation.copy(

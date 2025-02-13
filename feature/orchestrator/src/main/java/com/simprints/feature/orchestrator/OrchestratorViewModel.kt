@@ -200,10 +200,12 @@ internal class OrchestratorViewModel @Inject constructor(
 
     private fun buildAppResponse() = viewModelScope.launch {
         val projectConfiguration = configManager.getProjectConfiguration()
+        val project = configManager.getProject(projectConfiguration.projectId)
         val appResponse = appResponseBuilder(
             projectConfiguration,
             actionRequest,
             steps.mapNotNull { it.result },
+            project
         )
 
         updateDailyActivity(appResponse)

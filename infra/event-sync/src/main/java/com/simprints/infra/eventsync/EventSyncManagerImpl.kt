@@ -95,7 +95,7 @@ internal class EventSyncManagerImpl @Inject constructor(
                 modes = getProjectModes(configRepository.getProjectConfiguration()),
             ),
         )
-        downSyncTask.downSync(this, op, eventScope).toList()
+        downSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
     }
 
     private fun getProjectModes(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities.map { it.toMode() }
