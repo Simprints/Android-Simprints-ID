@@ -16,6 +16,7 @@ import com.simprints.infra.config.store.testtools.deviceConfiguration
 import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.syntax.assertThrows
@@ -40,6 +41,7 @@ class ConfigRepositoryImplTest {
     private val localDataSource = mockk<ConfigLocalDataSource>(relaxed = true)
     private val remoteDataSource = mockk<ConfigRemoteDataSource>()
     private val simNetwork = mockk<SimNetwork>(relaxed = true)
+    private val tokenizationProcessor = mockk<TokenizationProcessor>(relaxed = true)
 
     private lateinit var configServiceImpl: ConfigRepositoryImpl
 
@@ -49,6 +51,7 @@ class ConfigRepositoryImplTest {
             localDataSource,
             remoteDataSource,
             simNetwork,
+            tokenizationProcessor,
             DEVICE_ID,
         )
     }
