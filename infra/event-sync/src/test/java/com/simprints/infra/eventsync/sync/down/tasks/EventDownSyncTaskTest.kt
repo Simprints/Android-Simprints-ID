@@ -5,6 +5,7 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
@@ -136,6 +137,9 @@ class EventDownSyncTaskTest {
     @MockK
     private lateinit var eventScope: EventScope
 
+    @MockK
+    private lateinit var project: Project
+
     private lateinit var subjectFactory: SubjectFactory
 
     @get:Rule
@@ -166,7 +170,7 @@ class EventDownSyncTaskTest {
         repeat(2 * EVENTS_BATCH_SIZE) { eventsToDownload += ENROLMENT_RECORD_DELETION }
         mockProgressEmission(eventsToDownload)
 
-        val progress = eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        val progress = eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         assertThat(progress.first().progress).isEqualTo(1)
         assertThat(progress.first().operation.state).isEqualTo(RUNNING)
@@ -185,7 +189,7 @@ class EventDownSyncTaskTest {
         repeat(2 * EVENTS_BATCH_SIZE) { eventsToDownload += ENROLMENT_RECORD_DELETION }
         mockProgressEmission(eventsToDownload)
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 1) {
             eventRepository.addOrUpdateEvent(
@@ -204,7 +208,7 @@ class EventDownSyncTaskTest {
     fun downSync_shouldNotAddEventToProvidedScopeIfNoEvents() = runTest {
         mockProgressEmission(emptyList())
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 0) {
             eventRepository.addOrUpdateEvent(any(), any())
@@ -215,7 +219,7 @@ class EventDownSyncTaskTest {
     fun downSync_shouldEmitAFailureIfDownloadFails() = runTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws Throwable("IO Exception")
 
-        val progress = eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        val progress = eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         assertThat(progress.last().operation.state).isEqualTo(FAILED)
         coVerify(exactly = 2) { eventDownSyncScopeRepository.insertOrUpdate(any()) }
@@ -225,13 +229,13 @@ class EventDownSyncTaskTest {
     fun downSync_shouldThrowUpIfRemoteDbNotSignedInExceptionOccurs() = runTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws RemoteDbNotSignedInException()
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
     }
 
     @Test
     fun downSync_shouldAddEventWithErrorIfDownloadFails() = runTest {
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws Throwable("IO Exception")
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 1) {
             eventRepository.addOrUpdateEvent(
@@ -248,7 +252,7 @@ class EventDownSyncTaskTest {
         val event = ENROLMENT_RECORD_CREATION
         mockProgressEmission(listOf(event))
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -259,6 +263,7 @@ class EventDownSyncTaskTest {
                         ),
                     ),
                 ),
+                project
             )
         }
     }
@@ -268,9 +273,9 @@ class EventDownSyncTaskTest {
         val event = ENROLMENT_RECORD_DELETION
         mockProgressEmission(listOf(event))
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
-        coVerify { enrolmentRecordRepository.performActions(listOf(Deletion(event.payload.subjectId))) }
+        coVerify { enrolmentRecordRepository.performActions(listOf(Deletion(event.payload.subjectId)), project) }
     }
 
     @Test
@@ -278,7 +283,7 @@ class EventDownSyncTaskTest {
         val expectedException = Exception("Test")
         coEvery { eventRemoteDataSource.getEvents(any(), any(), any()) } throws expectedException
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 1) {
             eventRepository.addOrUpdateEvent(
@@ -302,7 +307,7 @@ class EventDownSyncTaskTest {
         )
         downloadEventsChannel.cancel(expectedException)
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify(exactly = 1) {
             eventRepository.addOrUpdateEvent(
@@ -325,7 +330,7 @@ class EventDownSyncTaskTest {
             "",
         )
 
-        eventDownSyncTask.downSync(this, moduleOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, moduleOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -333,6 +338,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
+                project
             )
         }
     }
@@ -352,7 +358,7 @@ class EventDownSyncTaskTest {
                 moduleId = DEFAULT_MODULE_ID_2.value,
             ),
         )
-        eventDownSyncTask.downSync(this, syncByModule2, eventScope).toList()
+        eventDownSyncTask.downSync(this, syncByModule2, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -360,6 +366,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
+                project
             )
         }
     }
@@ -374,13 +381,14 @@ class EventDownSyncTaskTest {
             lastInstructionId = "",
         )
 
-        eventDownSyncTask.downSync(this, moduleOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, moduleOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                 ),
+                project
             )
         }
     }
@@ -400,7 +408,7 @@ class EventDownSyncTaskTest {
                 moduleId = DEFAULT_MODULE_ID_2.value,
             ),
         )
-        eventDownSyncTask.downSync(this, syncByModule2, eventScope).toList()
+        eventDownSyncTask.downSync(this, syncByModule2, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -408,6 +416,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
+                project
             )
         }
     }
@@ -427,7 +436,7 @@ class EventDownSyncTaskTest {
                 moduleId = DEFAULT_MODULE_ID.value,
             ),
         )
-        eventDownSyncTask.downSync(this, syncByModule, eventScope).toList()
+        eventDownSyncTask.downSync(this, syncByModule, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -435,6 +444,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
+                project
             )
         }
     }
@@ -444,13 +454,14 @@ class EventDownSyncTaskTest {
         val eventToMoveToAttendant2 = ENROLMENT_RECORD_MOVE_ATTENDANT2
         mockProgressEmission(listOf(eventToMoveToAttendant2))
 
-        eventDownSyncTask.downSync(this, userOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, userOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
                 ),
+                project
             )
         }
     }
@@ -460,7 +471,7 @@ class EventDownSyncTaskTest {
         val eventToMoveToAttendant2 = ENROLMENT_RECORD_MOVE_ATTENDANT
         mockProgressEmission(listOf(eventToMoveToAttendant2))
 
-        eventDownSyncTask.downSync(this, userOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, userOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -468,6 +479,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToAttendant2.payload.enrolmentRecordCreation)),
                 ),
+                project
             )
         }
     }
@@ -477,7 +489,7 @@ class EventDownSyncTaskTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE_MODULE
         mockProgressEmission(listOf(eventToMoveToModule2))
 
-        eventDownSyncTask.downSync(this, projectOp, eventScope).toList()
+        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
         coVerify {
             enrolmentRecordRepository.performActions(
@@ -485,6 +497,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
+                project
             )
         }
     }

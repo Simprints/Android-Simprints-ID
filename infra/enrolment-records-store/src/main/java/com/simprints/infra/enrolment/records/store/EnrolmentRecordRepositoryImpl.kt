@@ -96,7 +96,7 @@ internal class EnrolmentRecordRepositoryImpl(
                         )
                         return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
                     }.map(SubjectAction::Creation)
-            localDataSource.performActions(tokenizedSubjectsCreateAction)
+            localDataSource.performActions(tokenizedSubjectsCreateAction, project)
         } catch (e: Exception) {
             when (e) {
                 is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything

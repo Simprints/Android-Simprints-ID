@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -14,7 +15,7 @@ internal class EnrolSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {
-    suspend operator fun invoke(subject: Subject) {
+    suspend operator fun invoke(subject: Subject, project: Project) {
         val personCreationEvent = eventRepository
             .getEventsInCurrentSession()
             .filterIsInstance<PersonCreationEvent>()
@@ -31,6 +32,6 @@ internal class EnrolSubjectUseCase @Inject constructor(
                 personCreationEvent.id,
             ),
         )
-        enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)))
+        enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
     }
 }
