@@ -28,7 +28,7 @@ data class AuthenticationEvent(
         AUTHENTICATION,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = mapOf(TokenKeyType.AttendantId to payload.userInfo.userId)
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(TokenKeyType.AttendantId to payload.userInfo.userId)
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
         payload = payload.copy(

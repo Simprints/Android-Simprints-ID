@@ -38,7 +38,7 @@ data class EnrolmentCalloutEvent(
         CALLOUT_ENROLMENT,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = mapOf(
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(
         TokenKeyType.AttendantId to payload.userId,
         TokenKeyType.ModuleId to payload.moduleId,
     )

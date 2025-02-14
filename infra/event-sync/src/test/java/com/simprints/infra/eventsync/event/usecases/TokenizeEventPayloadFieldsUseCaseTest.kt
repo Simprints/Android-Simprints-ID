@@ -37,7 +37,7 @@ internal class TokenizeEventPayloadFieldsUseCaseTest {
 
         val tokenizedMap = mapOf(tokenKeyType to rawString)
 
-        every { event.getTokenizedFields() } returns tokenizedMap
+        every { event.getTokenizableFields() } returns tokenizedMap
         every { tokenizationProcessor.encrypt(rawString, tokenKeyType, project) } returns tokenizedString
 
         useCase(event = event, project = project)
@@ -52,7 +52,7 @@ internal class TokenizeEventPayloadFieldsUseCaseTest {
         val tokenizedString = TokenizableString.Tokenized("encrypted")
         val tokenizedMap = mapOf(tokenKeyType to tokenizedString)
 
-        every { event.getTokenizedFields() } returns tokenizedMap
+        every { event.getTokenizableFields() } returns tokenizedMap
 
         useCase(event = event, project = project)
 

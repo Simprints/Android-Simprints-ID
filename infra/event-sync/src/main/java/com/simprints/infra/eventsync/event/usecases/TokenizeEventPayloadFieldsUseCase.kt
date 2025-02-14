@@ -10,7 +10,7 @@ internal class TokenizeEventPayloadFieldsUseCase @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor
 ) {
     operator fun invoke(event: Event, project: Project): Event {
-        val tokenizedFields = event.getTokenizedFields().mapValues { entry ->
+        val tokenizedFields = event.getTokenizableFields().mapValues { entry ->
             val tokenKeyType = entry.key
             return@mapValues when (val tokenizableField = entry.value) {
                 is TokenizableString.Raw -> {

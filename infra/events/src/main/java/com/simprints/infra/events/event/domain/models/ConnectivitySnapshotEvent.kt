@@ -25,7 +25,7 @@ data class ConnectivitySnapshotEvent(
         CONNECTIVITY_SNAPSHOT,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
