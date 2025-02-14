@@ -1,4 +1,4 @@
-package com.simprints.infra.eventsync.event.remote
+package com.simprints.infra.eventsync.event.usecases
 
 import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
@@ -86,8 +86,6 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Sca
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ScannerFirmwareUpdate
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.SuspiciousIntent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Vero2InfoSnapshot
-import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
-import com.simprints.infra.eventsync.event.usecases.TokenizeEventPayloadFieldsUseCase
 import com.simprints.infra.eventsync.event.validateAgeGroupSelectionEventApiModel
 import com.simprints.infra.eventsync.event.validateAlertScreenEventApiModel
 import com.simprints.infra.eventsync.event.validateAuthenticationEventApiModel
@@ -129,10 +127,8 @@ import org.junit.runner.RunWith
 
 @Suppress("IMPLICIT_CAST_TO_ANY", "KotlinConstantConditions")
 @RunWith(AndroidJUnit4::class)
-class ApiEventTest {
+internal class MapDomainEventToApiUseCaseTest {
     private val jackson = JsonHelper.jackson
-    private val tokenizationProcessor = TokenizationProcessor(StringTokenizer(EncodingUtilsImplForTests))
-    private val useCase = TokenizeEventPayloadFieldsUseCase(tokenizationProcessor)
     private val project = Project(
         id = "id",
         name = "name",
@@ -143,12 +139,14 @@ class ApiEventTest {
         baseUrl = "baseUrl",
         tokenizationKeys = emptyMap(),
     )
-
+    private val tokenizationProcessor = TokenizationProcessor(StringTokenizer(EncodingUtilsImplForTests))
+    private val tokenizeEventPayloadFieldsUseCase = TokenizeEventPayloadFieldsUseCase(tokenizationProcessor)
+    private val useCase = MapDomainEventToApiUseCase(tokenizeEventPayloadFieldsUseCase)
 
     @Test
     fun validate_alertScreenEventApiModel() {
         val event = createAlertScreenEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateAlertScreenEventApiModel(json)
@@ -157,7 +155,7 @@ class ApiEventTest {
     @Test
     fun validate_IntentParsingEventApiModel() {
         val event = createIntentParsingEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateIntentParsingEventApiModel(json)
@@ -166,7 +164,7 @@ class ApiEventTest {
     @Test
     fun validate_authenticationEventApiModel() {
         val event = createAuthenticationEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateAuthenticationEventApiModel(json)
@@ -175,7 +173,7 @@ class ApiEventTest {
     @Test
     fun validate_authorizationEventApiModel() {
         val event = createAuthorizationEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateAuthorizationEventApiModel(json)
@@ -184,7 +182,7 @@ class ApiEventTest {
     @Test
     fun validate_calloutEventForVerificationApiModel() {
         val event = createVerificationCalloutEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCalloutEventApiModel(json)
@@ -193,7 +191,7 @@ class ApiEventTest {
     @Test
     fun validate_calloutEventForIdentificationApiModel() {
         val event = createIdentificationCalloutEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCalloutEventApiModel(json)
@@ -202,7 +200,7 @@ class ApiEventTest {
     @Test
     fun validate_calloutEventForEnrolLastBiometricsModel() {
         val event = createLastBiometricsEnrolmentCalloutEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCalloutEventApiModel(json)
@@ -211,7 +209,7 @@ class ApiEventTest {
     @Test
     fun validate_calloutEventForConfirmationApiModel() {
         val event = createConfirmationCalloutEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCalloutEventApiModel(json)
@@ -220,7 +218,7 @@ class ApiEventTest {
     @Test
     fun validate_calloutEventForEnrolmentApiModel() {
         val event = createEnrolmentCalloutEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCalloutEventApiModel(json)
@@ -229,7 +227,7 @@ class ApiEventTest {
     @Test
     fun validate_callbackEventForEnrolmentApiModel() {
         val event = createEnrolmentCallbackEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
@@ -238,7 +236,7 @@ class ApiEventTest {
     @Test
     fun validate_callbackEventForErrorApiModel() {
         val event = createEnrolmentCallbackEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
@@ -247,7 +245,7 @@ class ApiEventTest {
     @Test
     fun validate_callbackEventForIdentificationApiV2Model() {
         val event = createIdentificationCallbackEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCallbackV2EventApiModel(json)
@@ -256,7 +254,7 @@ class ApiEventTest {
     @Test
     fun validate_callbackEventForVerificationV1ApiModel() {
         val event = createVerificationCallbackEventV1()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
@@ -265,7 +263,7 @@ class ApiEventTest {
     @Test
     fun validate_callbackEventForVerificationV2ApiModel() {
         val event = createVerificationCallbackEventV2()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCallbackV2EventApiModel(json)
@@ -274,7 +272,7 @@ class ApiEventTest {
     @Test
     fun validate_callbackEventForRefusalApiModel() {
         val event = createRefusalCallbackEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
@@ -283,7 +281,7 @@ class ApiEventTest {
     @Test
     fun validate_callbackEventForConfirmationApiModel() {
         val event = createConfirmationCallbackEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCallbackV1EventApiModel(json)
@@ -292,7 +290,7 @@ class ApiEventTest {
     @Test
     fun validate_candidateReadEventApiModel() {
         val event = createCandidateReadEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCandidateReadEventApiModel(json)
@@ -301,7 +299,7 @@ class ApiEventTest {
     @Test
     fun validate_connectivitySnapshotEventApiModel() {
         val event = createConnectivitySnapshotEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateConnectivitySnapshotEventApiModel(json)
@@ -310,7 +308,7 @@ class ApiEventTest {
     @Test
     fun validate_consentEventApiModel() {
         val event = createConsentEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateConsentEventApiModel(json)
@@ -319,7 +317,7 @@ class ApiEventTest {
     @Test
     fun validateEnrolmentV1_enrolmentEventApiModel() {
         val event = createEnrolmentEventV1()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateEnrolmentEventV1ApiModel(json)
@@ -328,7 +326,7 @@ class ApiEventTest {
     @Test
     fun validateEnrolmentV2_enrolmentEventApiModel() {
         val event = createEnrolmentEventV2()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateEnrolmentEventV2ApiModel(json)
@@ -337,7 +335,7 @@ class ApiEventTest {
     @Test
     fun validate_completionCheckEventApiModel() {
         val event = createCompletionCheckEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateCompletionCheckEventApiModel(json)
@@ -346,7 +344,7 @@ class ApiEventTest {
     @Test
     fun validate_fingerprintCaptureEventApiModel() {
         val event = createFingerprintCaptureEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFingerprintCaptureEventApiModel(json)
@@ -355,7 +353,7 @@ class ApiEventTest {
     @Test
     fun validate_guidSelectionEventApiModel() {
         val event = createGuidSelectionEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateGuidSelectionEventApiModel(json)
@@ -364,7 +362,7 @@ class ApiEventTest {
     @Test
     fun validate_oneToManyMatchEventApiModel() {
         val event = createOneToManyMatchEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateOneToManyMatchEventApiModel(json)
@@ -373,7 +371,7 @@ class ApiEventTest {
     @Test
     fun validate_oneToOneMatchEventApiModel() {
         val event = createOneToOneMatchEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateOneToOneMatchEventApiModel(json)
@@ -382,7 +380,7 @@ class ApiEventTest {
     @Test
     fun validate_personCreationEventApiModel() {
         val event = createPersonCreationEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validatePersonCreationEvent(json)
@@ -391,7 +389,7 @@ class ApiEventTest {
     @Test
     fun validate_refusalEventApiModel() {
         val event = createRefusalEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateRefusalEventApiModel(json)
@@ -400,7 +398,7 @@ class ApiEventTest {
     @Test
     fun validate_suspiciousIntentEventApiModel() {
         val event = createSuspiciousIntentEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateSuspiciousIntentEventApiModel(json)
@@ -409,7 +407,7 @@ class ApiEventTest {
     @Test
     fun validate_scannerConnectionEventApiModel() {
         val event = createScannerConnectionEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateScannerConnectionEventApiModel(json)
@@ -418,7 +416,7 @@ class ApiEventTest {
     @Test
     fun validate_vero2InfoSnapshotEvent() {
         val event = createVero2InfoSnapshotEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateVero2InfoSnapshotEventApiModel(json)
@@ -427,7 +425,7 @@ class ApiEventTest {
     @Test
     fun validate_scannerFirmwareUpdateEvent() {
         val event = createScannerFirmwareUpdateEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateScannerFirmwareUpdateEventApiModel(json)
@@ -436,7 +434,7 @@ class ApiEventTest {
     @Test
     fun validate_invalidEventApiModel() {
         val event = createInvalidIntentEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateInvalidEventApiModel(json)
@@ -445,7 +443,7 @@ class ApiEventTest {
     @Test
     fun validate_FaceOnboardingCompleteEventApiModel() {
         val event = createFaceOnboardingCompleteEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFaceOnboardingCompleteEventApiModel(json)
@@ -454,7 +452,7 @@ class ApiEventTest {
     @Test
     fun validate_FaceFallbackCaptureEventApiModel() {
         val event = createFaceFallbackCaptureEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFaceFallbackCaptureEventApiModel(json)
@@ -463,7 +461,7 @@ class ApiEventTest {
     @Test
     fun validate_FaceCaptureEventApiModel() {
         val event = createFaceCaptureEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFaceCaptureEventApiModel(json)
@@ -472,7 +470,7 @@ class ApiEventTest {
     @Test
     fun validate_FaceCaptureConfirmationEventApiModel() {
         val event = createFaceCaptureConfirmationEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFaceCaptureConfirmationEventApiModel(json)
@@ -481,7 +479,7 @@ class ApiEventTest {
     @Test
     fun validate_FaceCaptureBiometricsEventApiModel() {
         val event = createFaceCaptureBiometricsEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFaceCaptureBiometricsEventApiModel(json)
@@ -490,7 +488,7 @@ class ApiEventTest {
     @Test
     fun validate_FingerprintCaptureBiometricsEventApiModel() {
         val event = createFingerprintCaptureBiometricsEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFingerprintCaptureBiometricsEventApiModel(json)
@@ -499,7 +497,7 @@ class ApiEventTest {
     @Test
     fun validate_DownSyncRequestEventApiModel() {
         val event = createEventDownSyncRequestEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateDownSyncRequestEventApiModel(json)
@@ -508,7 +506,7 @@ class ApiEventTest {
     @Test
     fun validate_UpSyncRequestEventApiModel() {
         val event = createEventUpSyncRequestEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateUpSyncRequestEventApiModel(json)
@@ -517,7 +515,7 @@ class ApiEventTest {
     @Test
     fun validate_ageGroupSelectionEventApiModel() {
         val event = createAgeGroupSelectionEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateAgeGroupSelectionEventApiModel(json)
@@ -546,7 +544,7 @@ class ApiEventTest {
     @Test
     fun validate_licenseCheckEventApiModel() {
         val event = createLicenseCheckEvent()
-        val apiEvent = event.fromDomainToApi(useCase, project)
+        val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateLicenseCheckEventApiModel(json)
@@ -561,7 +559,7 @@ class ApiEventTest {
         val event = createEnrolmentEventV2().let {
             it.copy(payload = it.payload.copy(moduleId = moduleId))
         }
-        with(event.fromDomainToApi(useCase, project).tokenizedFields) {
+        with(useCase(event, project).tokenizedFields) {
             when (moduleId) {
                 is TokenizableString.Raw -> assertThat(size).isEqualTo(0)
                 is TokenizableString.Tokenized -> {
@@ -576,7 +574,7 @@ class ApiEventTest {
         val event = createEnrolmentEventV2().let {
             it.copy(payload = it.payload.copy(attendantId = attendantId))
         }
-        with(event.fromDomainToApi(useCase, project).tokenizedFields) {
+        with(useCase(event, project).tokenizedFields) {
             when (attendantId) {
                 is TokenizableString.Raw -> assertThat(size).isEqualTo(0)
                 is TokenizableString.Tokenized -> {

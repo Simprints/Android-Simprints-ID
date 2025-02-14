@@ -12,7 +12,6 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
 import com.simprints.infra.config.store.models.canSyncAnalyticsDataToSimprints
 import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
@@ -26,7 +25,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
 import com.simprints.infra.eventsync.event.remote.ApiUploadEventsBody
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
-import com.simprints.infra.eventsync.event.usecases.TokenizeEventPayloadFieldsUseCase
+import com.simprints.infra.eventsync.event.usecases.MapDomainEventScopeToApiUseCase
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
@@ -52,7 +51,7 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val tokenizeEventPayloadFieldsUseCase: TokenizeEventPayloadFieldsUseCase,
+    private val mapDomainEventScopeToApiUseCase: MapDomainEventScopeToApiUseCase,
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val jsonHelper: JsonHelper,
@@ -93,7 +92,7 @@ internal class EventUpSyncTask @Inject constructor(
                 createUpSyncContentContent = {
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(sessionCount = it)
-                }
+                },
             ).collect {
                 count = it
                 lastOperation = lastOperation.copy(
@@ -110,7 +109,7 @@ internal class EventUpSyncTask @Inject constructor(
                 createUpSyncContentContent = {
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(eventDownSyncCount = it)
-                }
+                },
             ).collect {
                 count = it
                 lastOperation = lastOperation.copy(
@@ -129,7 +128,7 @@ internal class EventUpSyncTask @Inject constructor(
                     EventUpSyncRequestEvent.UpSyncContent(
                         eventUpSyncCount = if (isUsefulUpload) it else 0,
                     )
-                }
+                },
             ).collect {
                 count = it
                 lastOperation = lastOperation.copy(
@@ -189,7 +188,7 @@ internal class EventUpSyncTask @Inject constructor(
             val scopesToUpload = sessionScopes
                 .filterValues { it != null }
                 .let(eventFilter)
-                .map { (scope, events) -> ApiEventScope.fromDomain(scope, events.orEmpty(), tokenizeEventPayloadFieldsUseCase, project) }
+                .map { (scope, events) -> mapDomainEventScopeToApiUseCase(scope, events.orEmpty(), project) }
             val uploadedScopes = mutableListOf<String>()
 
             scopesToUpload.takeIf { it.isNotEmpty() }?.apply {
