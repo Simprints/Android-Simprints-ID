@@ -36,7 +36,7 @@ data class EnrolmentEventV2(
         ENROLMENT_V2,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = mapOf(
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(
         TokenKeyType.AttendantId to payload.attendantId,
         TokenKeyType.ModuleId to payload.moduleId,
     )

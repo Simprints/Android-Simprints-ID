@@ -12,7 +12,7 @@ internal class MapDomainEventToApiUseCase @Inject constructor(
 ) {
     operator fun invoke(event: Event, project: Project): ApiEvent = with(tokenizeEventPayloadFieldsUseCase(event, project)) {
         val apiPayload = payload.fromDomainToApi()
-        val tokenizedKeyTypes = getTokenizedFields().filter { it.value is TokenizableString.Tokenized }.keys.toList()
+        val tokenizedKeyTypes = getTokenizableFields().filter { it.value is TokenizableString.Tokenized }.keys.toList()
         val tokenizedFields = tokenizedKeyTypes.mapNotNull(apiPayload::getTokenizedFieldJsonPath)
         ApiEvent(
             id = id,
