@@ -27,7 +27,7 @@ data class AuthorizationEvent(
         AUTHORIZATION,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = if (payload.userInfo == null) {
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = if (payload.userInfo == null) {
         emptyMap()
     } else {
         mapOf(TokenKeyType.AttendantId to payload.userInfo.userId)

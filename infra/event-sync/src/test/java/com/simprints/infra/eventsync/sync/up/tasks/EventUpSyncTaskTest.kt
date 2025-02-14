@@ -1,18 +1,21 @@
 package com.simprints.infra.eventsync.sync.up.tasks
 
 import com.fasterxml.jackson.core.JsonParseException
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
@@ -30,18 +33,15 @@ import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
+import com.simprints.infra.eventsync.event.usecases.MapDomainEventScopeToApiUseCase
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
@@ -75,13 +75,22 @@ internal class EventUpSyncTaskTest {
     private lateinit var synchronizationConfiguration: SynchronizationConfiguration
 
     @MockK
+    private lateinit var projectWithConfig: ProjectWithConfig
+
+    @MockK
     private lateinit var projectConfiguration: ProjectConfiguration
+
+    @MockK
+    private lateinit var project: Project
 
     @MockK
     private lateinit var configManager: ConfigManager
 
     @MockK
     private lateinit var eventScope: EventScope
+
+    @MockK
+    private lateinit var mapDomainEventScopeToApiUseCase: MapDomainEventScopeToApiUseCase
 
     @Before
     fun setUp() {
@@ -95,6 +104,9 @@ internal class EventUpSyncTaskTest {
             10,
             10,
         )
+        coEvery { configManager.refreshProject(any()) } returns projectWithConfig
+        every { projectWithConfig.project } returns project
+        every { projectWithConfig.configuration } returns projectConfiguration
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
@@ -106,6 +118,7 @@ internal class EventUpSyncTaskTest {
             timeHelper = timeHelper,
             configManager = configManager,
             jsonHelper = JsonHelper,
+            mapDomainEventScopeToApiUseCase = mapDomainEventScopeToApiUseCase
         )
     }
 
@@ -232,18 +245,11 @@ internal class EventUpSyncTaskTest {
         )
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
-
-        coVerify {
-            eventRemoteDataSource.post(
-                any(),
-                any(),
-                withArg {
-                    assertThat(it.sessions.first().id).isEqualTo(GUID1)
-                    assertThat(it.sessions.first().events).hasSize(2)
-                },
-                any(),
-            )
+        val capturedRequest = slot<List<Event>>()
+        coVerify(exactly = 1) {
+            mapDomainEventScopeToApiUseCase(any(), capture(capturedRequest), any())
         }
+        assertThat(capturedRequest.captured).hasSize(2)
     }
 
     @Test
@@ -267,17 +273,11 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
-        coVerify {
-            eventRemoteDataSource.post(
-                any(),
-                any(),
-                withArg {
-                    assertThat(it.sessions.first().id).isEqualTo(GUID1)
-                    assertThat(it.sessions.first().events).hasSize(4)
-                },
-                any(),
-            )
+        val capturedRequest = slot<List<Event>>()
+        coVerify(exactly = 1) {
+            mapDomainEventScopeToApiUseCase(any(), capture(capturedRequest), any())
         }
+        assertThat(capturedRequest.captured).hasSize(4)
     }
 
     @Test
@@ -300,17 +300,11 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
-        coVerify {
-            eventRemoteDataSource.post(
-                any(),
-                any(),
-                withArg {
-                    assertThat(it.sessions.first().id).isEqualTo(GUID1)
-                    assertThat(it.sessions.first().events).hasSize(3)
-                },
-                any(),
-            )
+        val capturedRequest = slot<List<Event>>()
+        coVerify(exactly = 1) {
+            mapDomainEventScopeToApiUseCase(any(), capture(capturedRequest), any())
         }
+        assertThat(capturedRequest.captured).hasSize(3)
     }
 
     @Test
@@ -338,9 +332,11 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation, eventScope).toList()
 
+        val capturedRequest = slot<List<String>>()
         coVerify {
-            eventRepo.deleteEventScopes(listOf(GUID1, GUID2))
+            eventRepo.deleteEventScopes(capture(capturedRequest))
         }
+        assertThat(capturedRequest.captured).hasSize(2)
     }
 
     @Test

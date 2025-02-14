@@ -11,49 +11,49 @@ import org.junit.Test
 
 class EventDownSyncRequestEventTest {
     @Test
-    fun `getTokenizedFields returns empty map when attendantId and moduleId are null`() {
+    fun `getTokenizableFields returns empty map when attendantId and moduleId are null`() {
         val event = getEventDownSyncRequestEvent(
             attendantId = null,
             moduleId = null,
         )
 
-        val result = event.getTokenizedFields()
+        val result = event.getTokenizableFields()
 
         assertEquals(emptyMap<TokenKeyType, TokenizableString>(), result)
     }
 
     @Test
-    fun `getTokenizedFields returns map with AttendantId when only attendantId is not null`() {
+    fun `getTokenizableFields returns map with AttendantId when only attendantId is not null`() {
         val event = getEventDownSyncRequestEvent(
             attendantId = "attendantId",
             moduleId = null,
         )
 
-        val result = event.getTokenizedFields()
+        val result = event.getTokenizableFields()
 
         assertEquals(mapOf(TokenKeyType.AttendantId to TokenizableString.Tokenized("attendantId")), result)
     }
 
     @Test
-    fun `getTokenizedFields returns map with ModuleId when only moduleId is not null`() {
+    fun `getTokenizableFields returns map with ModuleId when only moduleId is not null`() {
         val event = getEventDownSyncRequestEvent(
             attendantId = null,
             moduleId = "moduleId",
         )
 
-        val result = event.getTokenizedFields()
+        val result = event.getTokenizableFields()
 
         assertEquals(mapOf(TokenKeyType.ModuleId to TokenizableString.Tokenized("moduleId")), result)
     }
 
     @Test
-    fun `getTokenizedFields returns map with AttendantId and ModuleId when both are not null`() {
+    fun `getTokenizableFields returns map with AttendantId and ModuleId when both are not null`() {
         val event = getEventDownSyncRequestEvent(
             attendantId = "attendantId",
             moduleId = "moduleId",
         )
 
-        val result = event.getTokenizedFields()
+        val result = event.getTokenizableFields()
 
         assertEquals(
             mapOf(

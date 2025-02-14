@@ -148,7 +148,7 @@ abstract class Event {
     abstract var projectId: String?
 
     @JsonIgnore
-    abstract fun getTokenizedFields(): Map<TokenKeyType, TokenizableString>
+    abstract fun getTokenizableFields(): Map<TokenKeyType, TokenizableString>
 
     abstract fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event
 
