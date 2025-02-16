@@ -3,7 +3,6 @@ package com.simprints.infra.enrolment.records.store.commcare
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
@@ -13,12 +12,11 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.store.IdentityDataSource
+import com.simprints.infra.enrolment.records.store.commcare.model.BiometricReferenceWithId
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.logging.Simber
@@ -51,13 +49,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
         .filter { erce ->
-            erce.payload.biometricReferences.any {
+            erce.biometricReferences.any {
                 it is FingerprintReference && it.format == query.fingerprintSampleFormat
             }
         }.map {
             FingerprintIdentity(
-                it.payload.subjectId,
-                it.payload.biometricReferences
+                it.subjectId,
+                it.biometricReferences
                     .filterIsInstance<FingerprintReference>()
                     .flatMap { fingerprintReference ->
                         fingerprintReference.templates.map { fingerprintTemplate ->
@@ -77,8 +75,8 @@ internal class CommCareIdentityDataSource @Inject constructor(
         callerPackageName: String,
         query: SubjectQuery,
         onCandidateLoaded: () -> Unit,
-    ): List<EnrolmentRecordCreationEvent> {
-        val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> =
+    ): List<BiometricReferenceWithId> {
+        val enrolmentRecordCreationEvents: MutableList<BiometricReferenceWithId> =
             mutableListOf()
         try {
             val caseId = attemptExtractingCaseId(query.metadata)
@@ -127,13 +125,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
         .filter { erce ->
-            erce.payload.biometricReferences.any {
+            erce.biometricReferences.any {
                 it is FaceReference && it.format == query.faceSampleFormat
             }
         }.map {
             FaceIdentity(
-                it.payload.subjectId,
-                it.payload.biometricReferences
+                it.subjectId,
+                it.biometricReferences
                     .filterIsInstance<FaceReference>()
                     .flatMap { faceReference ->
                         faceReference.templates.map { faceTemplate ->
@@ -150,7 +148,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         caseId: String,
         callerPackageName: String,
         query: SubjectQuery,
-    ): List<EnrolmentRecordCreationEvent> {
+    ): List<BiometricReferenceWithId> {
         // Access Case Data Listing for the caseId
         val caseDataUri = getCaseDataUri(callerPackageName).buildUpon().appendPath(caseId).build()
 
@@ -162,12 +160,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
                 coSyncEnrolmentRecordEvents
-                    ?.events
-                    ?.filterIsInstance<EnrolmentRecordCreationEvent>()
                     ?.filterNot { event ->
-                        (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
-                            (query.attendantId != null && query.attendantId != event.payload.attendantId.value) ||
-                            (query.moduleId != null && query.moduleId != event.payload.moduleId.value)
+                        (query.subjectId != null && query.subjectId != event.subjectId) ||
+                            (query.attendantId != null && query.attendantId != event.attendantId) ||
+                            (query.moduleId != null && query.moduleId != event.moduleId)
                     }
             }.orEmpty()
     }
@@ -182,17 +178,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
         return ""
     }
 
-    private fun parseRecordEvents(subjectActions: String) = subjectActions.takeIf(String::isNotEmpty)?.let {
-        try {
-            jsonHelper.fromJson<CoSyncEnrolmentRecordEvents>(
-                json = it,
-                module = coSyncSerializationModule,
-                type = object : TypeReference<CoSyncEnrolmentRecordEvents>() {},
-            )
-        } catch (e: Exception) {
-            Simber.e("Error while parsing subjectActions", e)
-            null
-        }
+    private fun parseRecordEvents(subjectActions: String): List<BiometricReferenceWithId>? = subjectActions.takeIf(String::isNotEmpty)?.let {
+            try {
+                return@let JsonEventParser().getRecordEvents(json = it)
+            } catch (e: Exception) {
+                Simber.e("Error while parsing subjectActions", e)
+                emptyList()
+            }
     }
 
     private val coSyncSerializationModule = SimpleModule().apply {
