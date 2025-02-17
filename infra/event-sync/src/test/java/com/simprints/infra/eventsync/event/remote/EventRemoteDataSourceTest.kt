@@ -1,8 +1,9 @@
 package com.simprints.infra.eventsync.event.remote
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -16,21 +17,14 @@ import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
+import com.simprints.infra.eventsync.event.usecases.MapDomainEventScopeToApiUseCase
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.coVerifySequence
-import io.mockk.every
-import io.mockk.excludeRecords
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
@@ -53,6 +47,15 @@ class EventRemoteDataSourceTest {
     @MockK
     private lateinit var eventRemoteInterface: EventRemoteInterface
 
+    @MockK
+    private lateinit var mapDomainEventScopeToApiUseCase: MapDomainEventScopeToApiUseCase
+
+    @MockK
+    private lateinit var project: Project
+
+    @MockK
+    private lateinit var apiEventScope: ApiEventScope
+
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private val query = ApiRemoteEventQuery(
         projectId = DEFAULT_PROJECT_ID,
@@ -74,6 +77,7 @@ class EventRemoteDataSourceTest {
         }
 
         coEvery { authStore.buildClient(EventRemoteInterface::class) } returns simApiClient
+        every { mapDomainEventScopeToApiUseCase(any(), any(), any()) } returns apiEventScope
         eventRemoteDataSource = EventRemoteDataSource(authStore, JsonHelper)
     }
 
@@ -299,13 +303,14 @@ class EventRemoteDataSourceTest {
             mapOf("x-request-id" to "requestId").toHeaders(),
         )
 
-        val events = listOf(createAlertScreenEvent())
+        val event = createAlertScreenEvent()
+        val events = listOf(event)
         val scope = createSessionScope()
         eventRemoteDataSource.post(
             GUID1,
             DEFAULT_PROJECT_ID,
             ApiUploadEventsBody(
-                sessions = listOf(ApiEventScope.fromDomain(scope, events)),
+                sessions = listOf(mapDomainEventScopeToApiUseCase(scope, events, project)),
             ),
         )
 
@@ -317,7 +322,7 @@ class EventRemoteDataSourceTest {
                 match { body ->
                     assertThat(body.sessions).hasSize(1)
                     assertThat(body.sessions.firstOrNull())
-                        .isEqualTo(ApiEventScope.fromDomain(scope, events))
+                        .isEqualTo(apiEventScope)
                     true
                 },
             )
