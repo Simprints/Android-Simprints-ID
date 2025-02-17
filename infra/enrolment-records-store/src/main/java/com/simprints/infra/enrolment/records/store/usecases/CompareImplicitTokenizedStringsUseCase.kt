@@ -54,7 +54,7 @@ class CompareImplicitTokenizedStringsUseCase @Inject constructor(
             tokenKeyType = tokenKeyType,
             project = project,
             logError = false,
-        ) is TokenizableString.Tokenized
+        ) is TokenizableString.Raw
 
         return if (isAlreadyTokenized) {
             s.asTokenizableEncrypted()
