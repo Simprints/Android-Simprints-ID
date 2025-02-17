@@ -8,6 +8,7 @@ import com.simprints.infra.realm.config.RealmConfig
 import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -16,6 +17,7 @@ import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -24,6 +26,9 @@ class RealmWrapperImplTest {
     companion object {
         private const val PROJECT_ID = "projectId"
     }
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     private lateinit var authStore: AuthStore
@@ -67,6 +72,7 @@ class RealmWrapperImplTest {
             realmConfig,
             secureLocalDbKeyProviderMock,
             authStore,
+            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
@@ -84,6 +90,7 @@ class RealmWrapperImplTest {
                 realmConfig,
                 secureLocalDbKeyProviderMock,
                 authStore,
+                testCoroutineRule.testCoroutineDispatcher,
             )
             realmWrapper.readRealm { }
         }

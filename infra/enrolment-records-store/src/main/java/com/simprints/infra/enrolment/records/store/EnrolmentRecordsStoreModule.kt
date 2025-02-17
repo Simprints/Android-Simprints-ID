@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.store
 
 import android.content.Context
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.store.commcare.CommCareIdentityDataSource
@@ -14,6 +15,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Qualifier
 
 @Module(
@@ -42,10 +44,12 @@ class IdentityDataSourceModule {
         encoder: EncodingUtils,
         jsonHelper: JsonHelper,
         @ApplicationContext context: Context,
+        @DispatcherIO dispatcher: CoroutineDispatcher,
     ): IdentityDataSource = CommCareIdentityDataSource(
         encoder = encoder,
         jsonHelper = jsonHelper,
         context = context,
+        dispatcher = dispatcher,
     )
 }
 
