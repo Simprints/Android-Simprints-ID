@@ -16,6 +16,7 @@ import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.Simber
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import junit.framework.TestCase.assertEquals
@@ -24,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
+import org.junit.Rule
 import org.junit.Test
 
 class CommCareIdentityDataSourceTest {
@@ -87,6 +89,9 @@ class CommCareIdentityDataSourceTest {
                 faces = listOf(FaceSample(template = byteArrayOf(), format = "ROC_3")),
             ),
         )
+
+        @get:Rule
+        val testCoroutineRule = TestCoroutineRule()
 
         @JvmStatic
         lateinit var mockMetadataUri: Uri
@@ -172,7 +177,12 @@ class CommCareIdentityDataSourceTest {
 
         every { encoder.base64ToBytes(any()) } returns byteArrayOf()
 
-        dataSource = CommCareIdentityDataSource(encoder, JsonHelper, context)
+        dataSource = CommCareIdentityDataSource(
+            encoder,
+            JsonHelper,
+            context,
+            testCoroutineRule.testCoroutineDispatcher,
+        )
     }
 
     @Test
