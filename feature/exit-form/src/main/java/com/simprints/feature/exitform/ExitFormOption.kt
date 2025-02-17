@@ -1,4 +1,4 @@
-package com.simprints.feature.exitform.config
+package com.simprints.feature.exitform
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.RefusalEvent

@@ -11,11 +11,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.tabs.TabLayout
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.feature.consent.R
 import com.simprints.feature.consent.databinding.FragmentConsentBinding
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.feature.exitform.toArgs
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.listeners.OnTabSelectedListener
@@ -72,15 +72,15 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         viewModel.viewState.observe(viewLifecycleOwner) { state ->
             if (state != null) updateUiWithState(state)
         }
-        viewModel.showExitForm.observe(viewLifecycleOwner) { exitFormConfig ->
-            exitFormConfig.getContentIfNotHandled()?.let {
+        viewModel.showExitForm.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
                 findNavController().navigateSafely(
                     currentFragment = this,
                     actionId = R.id.action_consentFragment_to_refusalFragment,
-                    args = it.toArgs(),
                 )
-            }
-        }
+            },
+        )
         viewModel.returnConsentResult.observe(viewLifecycleOwner) { isApproved ->
             isApproved
                 .getContentIfNotHandled()

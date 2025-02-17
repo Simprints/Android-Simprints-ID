@@ -1,7 +1,6 @@
 package com.simprints.feature.exitform
 
 import androidx.annotation.Keep
-import com.simprints.feature.exitform.config.ExitFormOption
 import java.io.Serializable
 
 @Keep

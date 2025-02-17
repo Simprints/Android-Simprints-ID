@@ -5,13 +5,17 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.feature.exitform.config.ExitFormOption
+import com.simprints.feature.exitform.ExitFormOption
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -24,6 +28,9 @@ internal class ExitFormViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+
+    @MockK
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -40,10 +47,37 @@ internal class ExitFormViewModelTest {
         every { timeHelper.now() } returns Timestamp(1L)
 
         exitFormViewModel = ExitFormViewModel(
+            configManager,
             timeHelper,
             eventRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
+    }
+
+    @Test
+    fun `show default options when configuration doesn't contain fingerprint`() = runTest {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
+        }
+
+        exitFormViewModel.start()
+
+        assertThat(exitFormViewModel.visibleOptions.value).isEqualTo(DEFAULT_OPTIONS)
+    }
+
+    @Test
+    fun `show scanner options when configuration contains fingerprint`() = runTest {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        }
+
+        exitFormViewModel.start()
+
+        val scannerOptions = DEFAULT_OPTIONS.toMutableSet()
+        scannerOptions.remove(ExitFormOption.AppNotWorking)
+        scannerOptions.add(ExitFormOption.ScannerNotWorking)
+
+        assertThat(exitFormViewModel.visibleOptions.value).isEqualTo(scannerOptions)
     }
 
     @Test
@@ -126,5 +160,16 @@ internal class ExitFormViewModelTest {
     companion object {
         val optionDoesNotRequiresInfo = ExitFormOption.ReligiousConcerns
         val optionRequiresInfo = ExitFormOption.Other
+        val DEFAULT_OPTIONS = setOf(
+            ExitFormOption.ReligiousConcerns,
+            ExitFormOption.DataConcerns,
+            ExitFormOption.NoPermission,
+            ExitFormOption.AppNotWorking,
+            ExitFormOption.PersonNotPresent,
+            ExitFormOption.TooYoung,
+            ExitFormOption.WrongAgeGroupSelected,
+            ExitFormOption.UncooperativeChild,
+            ExitFormOption.Other,
+        )
     }
 }
