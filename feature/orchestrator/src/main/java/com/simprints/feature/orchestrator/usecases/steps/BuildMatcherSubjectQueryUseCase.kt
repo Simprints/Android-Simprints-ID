@@ -20,13 +20,13 @@ internal class BuildMatcherSubjectQueryUseCase @Inject constructor() {
 
         IdentificationConfiguration.PoolType.USER -> SubjectQuery(
             projectId = actionRequest.projectId,
-            attendantId = actionRequest.userId.value,
+            attendantId = actionRequest.userId,
             metadata = actionRequest.metadata,
         )
 
         IdentificationConfiguration.PoolType.MODULE -> SubjectQuery(
             projectId = actionRequest.projectId,
-            moduleId = (actionRequest as ActionRequest.FlowAction).moduleId.value,
+            moduleId = (actionRequest as ActionRequest.FlowAction).moduleId,
             metadata = actionRequest.metadata,
         )
     }

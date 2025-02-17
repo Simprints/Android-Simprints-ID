@@ -229,7 +229,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
         configManager.getDeviceConfiguration().selectedModules.map { moduleName ->
             val count = enrolmentRecordRepository.count(
-                SubjectQuery(projectId = projectId, moduleId = moduleName.value),
+                SubjectQuery(projectId = projectId, moduleId = moduleName),
             )
             val decryptedName = when (moduleName) {
                 is TokenizableString.Raw -> moduleName

@@ -19,20 +19,41 @@ import javax.inject.Inject
  *      Even though plain string values are different, they represent the same entity. s1 is going to be encrypted and compared to the s2.
  */
 class CompareImplicitTokenizedStringsUseCase @Inject constructor(
-    private val tokenizationProcessor: TokenizationProcessor
+    private val tokenizationProcessor: TokenizationProcessor,
 ) {
-    operator fun invoke(s1: String?, s2: String, tokenKeyType: TokenKeyType, project: Project): Boolean = when {
+    operator fun invoke(
+        s1: TokenizableString?,
+        s2: String,
+        tokenKeyType: TokenKeyType,
+        project: Project,
+    ): Boolean = when {
         s1 == null -> false
-        s1 == s2 -> true
-        else -> tokenize(s1, tokenKeyType, project) == tokenize(s2, tokenKeyType, project)
+        else -> ensureTokenized(s1, tokenKeyType, project) == ensureTokenized(s2, tokenKeyType, project)
     }
 
-    private fun tokenize(s: String, tokenKeyType: TokenKeyType, project: Project): TokenizableString {
+    private fun ensureTokenized(
+        s: TokenizableString,
+        tokenKeyType: TokenKeyType,
+        project: Project,
+    ): TokenizableString = when (s) {
+        is TokenizableString.Tokenized -> s
+        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
+            decrypted = s,
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+    }
+
+    private fun ensureTokenized(
+        s: String,
+        tokenKeyType: TokenKeyType,
+        project: Project,
+    ): TokenizableString {
         val isAlreadyTokenized = tokenizationProcessor.decrypt(
             encrypted = s.asTokenizableEncrypted(),
             tokenKeyType = tokenKeyType,
             project = project,
-            logError = false
+            logError = false,
         ) is TokenizableString.Tokenized
 
         return if (isAlreadyTokenized) {
@@ -41,7 +62,7 @@ class CompareImplicitTokenizedStringsUseCase @Inject constructor(
             tokenizationProcessor.encrypt(
                 decrypted = s.asTokenizableRaw(),
                 tokenKeyType = tokenKeyType,
-                project = project
+                project = project,
             )
         }
     }

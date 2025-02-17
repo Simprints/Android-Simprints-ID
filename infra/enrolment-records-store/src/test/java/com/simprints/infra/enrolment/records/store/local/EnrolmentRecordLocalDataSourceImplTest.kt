@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.store.local
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
@@ -117,12 +118,12 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
         val people = enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
-                SubjectQuery(), IntRange(0, 20),
+                SubjectQuery(),
+                IntRange(0, 20),
                 BiometricDataSource.Simprints,
                 project,
-                onCandidateLoaded
-            )
-            .toList()
+                onCandidateLoaded,
+            ).toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
@@ -139,7 +140,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
                 IntRange(0, 20),
                 BiometricDataSource.Simprints,
                 project,
-                onCandidateLoaded
+                onCandidateLoaded,
             ).toList()
 
         verify {
@@ -156,12 +157,12 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
         enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
-                SubjectQuery(faceSampleFormat = format), IntRange(0, 20),
+                SubjectQuery(faceSampleFormat = format),
+                IntRange(0, 20),
                 BiometricDataSource.Simprints,
                 project,
-                onCandidateLoaded
-            )
-            .toList()
+                onCandidateLoaded,
+            ).toList()
 
         verify {
             realmQuery.query(
@@ -178,12 +179,12 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
         val people = enrolmentRecordLocalDataSource
             .loadFaceIdentities(
-                SubjectQuery(), IntRange(0, 20),
+                SubjectQuery(),
+                IntRange(0, 20),
                 BiometricDataSource.Simprints,
                 project,
-                onCandidateLoaded
-            )
-            .toList()
+                onCandidateLoaded,
+            ).toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
@@ -209,7 +210,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
         val people =
             enrolmentRecordLocalDataSource
-                .load(SubjectQuery(attendantId = savedPersons[0].attendantId.value))
+                .load(SubjectQuery(attendantId = savedPersons[0].attendantId))
                 .toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
@@ -223,7 +224,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
         val people =
             enrolmentRecordLocalDataSource
-                .load(SubjectQuery(moduleId = fakePerson.moduleId))
+                .load(SubjectQuery(moduleId = fakePerson.moduleId.asTokenizableEncrypted()))
                 .toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
