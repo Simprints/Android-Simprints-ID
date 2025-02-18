@@ -96,7 +96,7 @@ internal class EnrolmentRecordRepositoryImpl(
                         )
                         return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
                     }.map(SubjectAction::Creation)
-            localDataSource.performActions(tokenizedSubjectsCreateAction)
+            localDataSource.performActions(tokenizedSubjectsCreateAction, project)
         } catch (e: Exception) {
             when (e) {
                 is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
@@ -127,15 +127,17 @@ internal class EnrolmentRecordRepositoryImpl(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range, dataSource, onCandidateLoaded)
+    ): List<FingerprintIdentity> = fromIdentityDataSource(dataSource).loadFingerprintIdentities(query, range, dataSource, project, onCandidateLoaded)
 
     override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = fromIdentityDataSource(dataSource).loadFaceIdentities(query, range, dataSource, onCandidateLoaded)
+    ): List<FaceIdentity> = fromIdentityDataSource(dataSource).loadFaceIdentities(query, range, dataSource, project, onCandidateLoaded)
 
     private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
         is BiometricDataSource.Simprints -> localDataSource

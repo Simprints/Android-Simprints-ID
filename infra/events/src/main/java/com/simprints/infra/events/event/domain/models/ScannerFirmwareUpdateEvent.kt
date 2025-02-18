@@ -34,7 +34,7 @@ data class ScannerFirmwareUpdateEvent(
         SCANNER_FIRMWARE_UPDATE,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 

@@ -9,6 +9,7 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -42,6 +43,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private val syncCache: EventSyncCache,
     private val jsonHelper: JsonHelper,
     private val eventRepository: EventRepository,
+    private val configRepository: ConfigRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params),
     WorkerProgressCountReporter {
@@ -69,8 +71,9 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
             val workerId = id.toString()
             var count = syncCache.readProgress(workerId)
             var max: Int? = syncCache.readMax(workerId)
+            val project = configRepository.getProject()
 
-            downSyncTask.downSync(this, getDownSyncOperation(), getEventScope()).collect {
+            downSyncTask.downSync(this, getDownSyncOperation(), getEventScope(), project).collect {
                 count = it.progress
                 max = it.maxProgress
                 syncCache.saveProgress(workerId, count)

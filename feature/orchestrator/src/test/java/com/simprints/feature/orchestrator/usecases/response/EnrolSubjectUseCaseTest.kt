@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -30,6 +31,9 @@ class EnrolSubjectUseCaseTest {
 
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+
+    @MockK
+    private lateinit var project: Project
 
     private lateinit var useCase: EnrolSubjectUseCase
 
@@ -61,6 +65,7 @@ class EnrolSubjectUseCaseTest {
                 attendantId = "moduleId".asTokenizableRaw(),
                 moduleId = "attendantId".asTokenizableRaw(),
             ),
+            project
         )
 
         coVerify {
@@ -85,6 +90,7 @@ class EnrolSubjectUseCaseTest {
                 attendantId = "moduleId".asTokenizableRaw(),
                 moduleId = "attendantId".asTokenizableRaw(),
             ),
+            project
         )
 
         coVerify {
@@ -92,6 +98,7 @@ class EnrolSubjectUseCaseTest {
                 withArg {
                     assertThat(it.first()).isInstanceOf(SubjectAction.Creation::class.java)
                 },
+                project
             )
         }
     }
@@ -123,6 +130,7 @@ class EnrolSubjectUseCaseTest {
                 attendantId = "moduleId".asTokenizableRaw(),
                 moduleId = "attendantId".asTokenizableRaw(),
             ),
+            project
         )
 
         coVerify {

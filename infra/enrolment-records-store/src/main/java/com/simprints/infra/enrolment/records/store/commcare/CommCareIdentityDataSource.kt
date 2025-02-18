@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.net.Uri
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -12,11 +13,14 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.enrolment.records.store.IdentityDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
@@ -24,13 +28,17 @@ import com.simprints.infra.events.event.domain.models.subject.FingerprintReferen
 import com.simprints.infra.logging.Simber
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import javax.inject.Inject
 
 internal class CommCareIdentityDataSource @Inject constructor(
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
+    private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
     @ApplicationContext private val context: Context,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : IdentityDataSource {
     companion object {
         const val COLUMN_CASE_ID = "case_id"
@@ -48,42 +56,43 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
-        .filter { erce ->
-            erce.payload.biometricReferences.any {
-                it is FingerprintReference && it.format == query.fingerprintSampleFormat
+    ): List<FingerprintIdentity> = withContext(dispatcher) {
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+            .filter { erce ->
+                erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
+            }.map {
+                FingerprintIdentity(
+                    it.payload.subjectId,
+                    it.payload.biometricReferences
+                        .filterIsInstance<FingerprintReference>()
+                        .flatMap { fingerprintReference ->
+                            fingerprintReference.templates.map { fingerprintTemplate ->
+                                FingerprintSample(
+                                    fingerIdentifier = fingerprintTemplate.finger,
+                                    templateQualityScore = fingerprintTemplate.quality,
+                                    template = encoder.base64ToBytes(fingerprintTemplate.template),
+                                    format = fingerprintReference.format,
+                                )
+                            }
+                        },
+                )
             }
-        }.map {
-            FingerprintIdentity(
-                it.payload.subjectId,
-                it.payload.biometricReferences
-                    .filterIsInstance<FingerprintReference>()
-                    .flatMap { fingerprintReference ->
-                        fingerprintReference.templates.map { fingerprintTemplate ->
-                            FingerprintSample(
-                                fingerIdentifier = fingerprintTemplate.finger,
-                                templateQualityScore = fingerprintTemplate.quality,
-                                template = encoder.base64ToBytes(fingerprintTemplate.template),
-                                format = fingerprintReference.format,
-                            )
-                        }
-                    },
-            )
-        }
+    }
 
     private fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
         callerPackageName: String,
         query: SubjectQuery,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
-        val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> =
-            mutableListOf()
+        val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
         try {
             val caseId = attemptExtractingCaseId(query.metadata)
             if (caseId != null) {
-                return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query)
+                return loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project)
             }
 
             context.contentResolver
@@ -97,7 +106,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     if (caseMetadataCursor.moveToPosition(range.first)) {
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query))
+                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project))
                                 onCandidateLoaded()
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
@@ -124,32 +133,34 @@ internal class CommCareIdentityDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
+        project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, onCandidateLoaded)
-        .filter { erce ->
-            erce.payload.biometricReferences.any {
-                it is FaceReference && it.format == query.faceSampleFormat
+    ): List<FaceIdentity> = withContext(dispatcher) {
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+            .filter { erce ->
+                erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
+            }.map {
+                FaceIdentity(
+                    it.payload.subjectId,
+                    it.payload.biometricReferences
+                        .filterIsInstance<FaceReference>()
+                        .flatMap { faceReference ->
+                            faceReference.templates.map { faceTemplate ->
+                                FaceSample(
+                                    template = encoder.base64ToBytes(faceTemplate.template),
+                                    format = faceReference.format,
+                                )
+                            }
+                        },
+                )
             }
-        }.map {
-            FaceIdentity(
-                it.payload.subjectId,
-                it.payload.biometricReferences
-                    .filterIsInstance<FaceReference>()
-                    .flatMap { faceReference ->
-                        faceReference.templates.map { faceTemplate ->
-                            FaceSample(
-                                template = encoder.base64ToBytes(faceTemplate.template),
-                                format = faceReference.format,
-                            )
-                        }
-                    },
-            )
-        }
+    }
 
     private fun loadEnrolmentRecordCreationEvents(
         caseId: String,
         callerPackageName: String,
         query: SubjectQuery,
+        project: Project
     ): List<EnrolmentRecordCreationEvent> {
         // Access Case Data Listing for the caseId
         val caseDataUri = getCaseDataUri(callerPackageName).buildUpon().appendPath(caseId).build()
@@ -165,9 +176,21 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     ?.events
                     ?.filterIsInstance<EnrolmentRecordCreationEvent>()
                     ?.filterNot { event ->
+                        // [MS-852] Plain strings from CommCare might be tokenized or untokenized. The only way to properly compare them
+                        // is by trying to decrypt the values to check if already tokenized, and then compare the values
                         (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
-                            (query.attendantId != null && query.attendantId != event.payload.attendantId.value) ||
-                            (query.moduleId != null && query.moduleId != event.payload.moduleId.value)
+                            !compareImplicitTokenizedStringsUseCase(
+                                query.attendantId,
+                                event.payload.attendantId.value,
+                                TokenKeyType.AttendantId,
+                                project
+                            ) ||
+                            !compareImplicitTokenizedStringsUseCase(
+                                query.moduleId,
+                                event.payload.moduleId.value,
+                                TokenKeyType.ModuleId,
+                                project
+                            )
                     }
             }.orEmpty()
     }
@@ -209,7 +232,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     override suspend fun count(
         query: SubjectQuery,
         dataSource: BiometricDataSource,
-    ): Int {
+    ): Int = withContext(dispatcher) {
         var count = 0
         context.contentResolver
             .query(
@@ -219,7 +242,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 null,
                 null,
             )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
-
-        return count
+        count
     }
 }

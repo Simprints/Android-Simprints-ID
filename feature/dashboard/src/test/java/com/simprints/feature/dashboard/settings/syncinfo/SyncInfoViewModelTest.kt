@@ -169,7 +169,7 @@ class SyncInfoViewModelTest {
             enrolmentRecordRepository.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
-                    moduleId = module1.value,
+                    moduleId = module1,
                 ),
             )
         } returns numberForModule1
@@ -177,7 +177,7 @@ class SyncInfoViewModelTest {
             enrolmentRecordRepository.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
-                    moduleId = module2.value,
+                    moduleId = module2,
                 ),
             )
         } returns numberForModule2

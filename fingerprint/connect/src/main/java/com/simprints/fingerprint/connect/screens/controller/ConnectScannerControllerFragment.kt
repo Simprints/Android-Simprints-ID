@@ -25,9 +25,6 @@ import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.feature.exitform.exitFormConfiguration
-import com.simprints.feature.exitform.scannerOptions
-import com.simprints.feature.exitform.toArgs
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
@@ -291,11 +288,6 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         findNavController().navigateSafely(
             this,
             R.id.action_global_to_exitFormFragment,
-            exitFormConfiguration {
-                titleRes = IDR.string.exit_form_title_fingerprinting
-                backButtonRes = IDR.string.exit_form_continue_fingerprints_button
-                visibleOptions = scannerOptions()
-            }.toArgs(),
         )
     }
 

@@ -40,11 +40,9 @@
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Impressão digital</string>
 
-    <string name="exit_form_title_biometrics">Por que pulou a biometria?</string>
-    <string name="exit_form_title_face">Por que pulou a captura de rosto?</string>
+    <string name="exit_form_title">Por que pulou a biometria?</string>
     <string name="exit_form_other_reason_hint">Informação Adicional</string>
-    <string name="exit_form_continue_default_button">Capturar rosto</string>
-    <string name="exit_form_continue_face_button">Capturar rosto</string>
+    <string name="exit_form_continue_button">Capturar rosto</string>
     <string name="exit_form_submit_button">Enviar</string>
     <string name="exit_form_select_option_submit_warning">Selecione uma opção e envie</string>
     <string name="exit_form_submit_warning">Por favor, envie o formulário</string>

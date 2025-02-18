@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
@@ -16,6 +17,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,6 +28,7 @@ class RealmWrapperImpl @Inject constructor(
     private val configFactory: RealmConfig,
     private val securityManager: SecurityManager,
     private val authStore: AuthStore,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : RealmWrapper {
     // Kotlin-realm claims to be thread-safe and there is no need to handle closing manually
     // https://www.mongodb.com/docs/realm/sdk/kotlin/realm-database/frozen-arch/#thread-safe-realms
@@ -82,13 +86,13 @@ class RealmWrapperImpl @Inject constructor(
     /**
      * Executes provided block ensuring a valid Realm instance is used and closed.
      */
-    override suspend fun <R> readRealm(block: (Realm) -> R): R = block(getRealm())
+    override suspend fun <R> readRealm(block: (Realm) -> R): R = withContext(dispatcher) { block(getRealm()) }
 
     /**
      * Executes provided block in a transaction ensuring a valid Realm instance is used and closed.
      */
     override suspend fun <R> writeRealm(block: (MutableRealm) -> R) {
-        getRealm().write(block)
+        withContext(dispatcher) { getRealm().write(block) }
     }
 
     private fun createAndSaveRealmConfig(): RealmConfiguration {

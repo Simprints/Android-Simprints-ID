@@ -34,7 +34,7 @@ data class CandidateReadEvent(
         CANDIDATE_READ,
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+    override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
     override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 

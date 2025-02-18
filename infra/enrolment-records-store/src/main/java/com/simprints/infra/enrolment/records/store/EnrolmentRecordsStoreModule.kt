@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.store
 
 import android.content.Context
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.store.commcare.CommCareIdentityDataSource
@@ -8,12 +9,14 @@ import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDat
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSourceImpl
+import com.simprints.infra.enrolment.records.store.usecases.CompareImplicitTokenizedStringsUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Qualifier
 
 @Module(
@@ -41,11 +44,15 @@ class IdentityDataSourceModule {
     fun provideCommCareIdentityDataSource(
         encoder: EncodingUtils,
         jsonHelper: JsonHelper,
+        compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
         @ApplicationContext context: Context,
+        @DispatcherIO dispatcher: CoroutineDispatcher,
     ): IdentityDataSource = CommCareIdentityDataSource(
         encoder = encoder,
         jsonHelper = jsonHelper,
+        compareImplicitTokenizedStringsUseCase = compareImplicitTokenizedStringsUseCase,
         context = context,
+        dispatcher = dispatcher,
     )
 }
 

@@ -8,6 +8,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
@@ -45,6 +46,9 @@ internal class FingerprintMatcherUseCaseTest {
     lateinit var configManager: ConfigManager
 
     @MockK
+    lateinit var project: Project
+
+    @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
     private val onCandidateLoaded: () -> Unit = {}
     private lateinit var useCase: FingerprintMatcherUseCase
@@ -76,6 +80,7 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
+           project
         ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
@@ -92,7 +97,7 @@ internal class FingerprintMatcherUseCaseTest {
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), onCandidateLoaded) } returns emptyList()
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), project, onCandidateLoaded) } returns emptyList()
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         val results = useCase.invoke(
@@ -109,6 +114,7 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
+            project
         ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
@@ -131,6 +137,7 @@ internal class FingerprintMatcherUseCaseTest {
                 any(),
                 any(),
                 any(),
+                project,
                 onCandidateLoaded
             )
         } returns listOf(
@@ -166,6 +173,7 @@ internal class FingerprintMatcherUseCaseTest {
                 queryForCandidates = SubjectQuery(),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
+            project
         ).toList()
 
         coVerify { bioSdkWrapper.match(any(), any(), any()) }

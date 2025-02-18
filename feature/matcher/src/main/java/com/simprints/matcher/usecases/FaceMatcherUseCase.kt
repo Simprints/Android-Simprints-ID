@@ -5,6 +5,7 @@ import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -32,6 +33,7 @@ internal class FaceMatcherUseCase @Inject constructor(
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
+        project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
         faceMatcher = resolveFaceBioSdk().matcher
@@ -61,6 +63,7 @@ internal class FaceMatcherUseCase @Inject constructor(
                         val batchCandidates = getCandidates(
                             queryWithSupportedFormat,
                             range,
+                            project = project,
                             dataSource = matchParams.biometricDataSource,
                         ) {
                             // When a candidate is loaded
@@ -84,9 +87,10 @@ internal class FaceMatcherUseCase @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        project: Project,
         onCandidateLoaded: () -> Unit,
     ) = enrolmentRecordRepository
-        .loadFaceIdentities(query, range, dataSource, onCandidateLoaded)
+        .loadFaceIdentities(query, range, dataSource, project, onCandidateLoaded)
         .map {
             FaceIdentity(
                 it.subjectId,

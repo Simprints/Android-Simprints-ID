@@ -172,7 +172,7 @@ internal class OrchestratorViewModelTest {
         )
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         coEvery { shouldCreatePerson(any(), any(), any()) } returns false
-        coEvery { appResponseBuilder(any(), any(), any()) } returns mockk()
+        coEvery { appResponseBuilder(any(), any(), any(), any()) } returns mockk()
         coJustRun { dailyActivityUseCase(any()) }
         justRun { addCallbackEvent(any()) }
 
@@ -400,9 +400,12 @@ internal class OrchestratorViewModelTest {
             mockk(),
             mockk(),
         )
+        val id = "projectId"
         coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { projectId } returns id
             every { general.modalities } returns emptyList() andThen projectModalities
         }
+        coEvery { configManager.getProject(id) } returns mockk()
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()
@@ -416,9 +419,12 @@ internal class OrchestratorViewModelTest {
             mockk(),
             mockk(),
         )
+        val id = "projectId"
         coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { projectId } returns id
             every { general.modalities } returns projectModalities
         }
+        coEvery { configManager.getProject(id) } returns mockk()
 
         viewModel.handleAction(mockk())
         viewModel.restoreModalitiesIfNeeded()

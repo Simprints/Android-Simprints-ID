@@ -46,13 +46,9 @@
     <string name="enrol_last_biometrics_alert_message_all_param">Alama ya Uso/Kidole</string>
 
     <!-- Exit form -->
-    <string name="exit_form_title_fingerprinting">Je, kwanini umeruka kuweka alama za vidole?</string>
-    <string name="exit_form_title_biometrics">Kwanini umeruka kuchukua alama ya kidole?</string>
-    <string name="exit_form_title_face">Kwanini umeruka kupiga picha ya uso?</string>
+    <string name="exit_form_title">Kwanini umeruka kuchukua alama ya kidole?</string>
     <string name="exit_form_other_reason_hint">Taarifa za ziada</string>
-    <string name="exit_form_continue_default_button">Rudi kwenye Simprints</string>
-    <string name="exit_form_continue_fingerprints_button">Chukua alama za vidole</string>
-    <string name="exit_form_continue_face_button">Rudi kwenye Simprints</string>
+    <string name="exit_form_continue_button">Rudi kwenye Simprints</string>
     <string name="exit_form_submit_button">Tuma</string>
     <string name="exit_form_select_option_submit_warning">Tafadhali chagua chaguo na utume</string>
     <string name="exit_form_submit_warning">Tafadhali tuma fomu</string>
