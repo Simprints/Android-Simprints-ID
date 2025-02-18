@@ -3,6 +3,7 @@ package com.simprints.feature.validatepool.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.validatepool.usecase.HasRecordsUseCase
 import com.simprints.feature.validatepool.usecase.IsModuleIdNotSyncedUseCase
 import com.simprints.feature.validatepool.usecase.RunBlockingEventSyncUseCase
@@ -90,7 +91,7 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by user when subjects enrolled under other attendant ID returns UserMismatch`() = runTest {
-        val subjectQuery = SubjectQuery(attendantId = "attendantId")
+        val subjectQuery = SubjectQuery(attendantId = "attendantId".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns true
         coEvery { hasRecordsUseCase(subjectQuery) } returns false
 
@@ -103,7 +104,7 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by user when no subjects and should sync returns RequiredSync`() = runTest {
-        val subjectQuery = SubjectQuery(attendantId = "attendantId")
+        val subjectQuery = SubjectQuery(attendantId = "attendantId".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns true
 
@@ -115,7 +116,7 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by user when no subjects and synced returns PoolEmpty`() = runTest {
-        val subjectQuery = SubjectQuery(attendantId = "attendantId")
+        val subjectQuery = SubjectQuery(attendantId = "attendantId".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns false
 
@@ -127,7 +128,7 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by module when module is not synced returns ModuleMismatch`() = runTest {
-        val subjectQuery = SubjectQuery(moduleId = "module1")
+        val subjectQuery = SubjectQuery(moduleId = "module1".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { isModuleIdNotSyncedUseCase(any()) } returns true
 
@@ -140,7 +141,7 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by module when module is synced and not synced recently returns RequiresSync`() = runTest {
-        val subjectQuery = SubjectQuery(moduleId = "module1")
+        val subjectQuery = SubjectQuery(moduleId = "module1".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { isModuleIdNotSyncedUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns true
@@ -152,7 +153,7 @@ class ValidateSubjectPoolViewModelTest {
 
     @Test
     fun `if ID by module when module is synced and synced recently returns PoolEmpty`() = runTest {
-        val subjectQuery = SubjectQuery(moduleId = "module1")
+        val subjectQuery = SubjectQuery(moduleId = "module1".asTokenizableEncrypted())
         coEvery { hasRecordsUseCase(any()) } returns false
         coEvery { isModuleIdNotSyncedUseCase(any()) } returns false
         coEvery { shouldSuggestSyncUseCase() } returns false

@@ -47,7 +47,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     private suspend fun handleUnselectedModules(unselectedModules: List<Module>) {
         val queries = unselectedModules.map {
-            SubjectQuery(moduleId = it.name.value)
+            SubjectQuery(moduleId = it.name)
         }
         enrolmentRecordRepository.delete(queries)
 

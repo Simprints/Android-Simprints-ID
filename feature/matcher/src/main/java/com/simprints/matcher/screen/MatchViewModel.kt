@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -17,7 +19,6 @@ import com.simprints.matcher.usecases.MatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.Serializable
 import javax.inject.Inject
@@ -27,6 +28,8 @@ internal class MatchViewModel @Inject constructor(
     private val faceMatcher: FaceMatcherUseCase,
     private val fingerprintMatcher: FingerprintMatcherUseCase,
     private val saveMatchEvent: SaveMatchEventUseCase,
+    private val authStore: AuthStore,
+    private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
 ) : ViewModel() {
     var isInitialized = false
@@ -51,8 +54,8 @@ internal class MatchViewModel @Inject constructor(
             isFaceMatch -> faceMatcher
             else -> fingerprintMatcher
         }
-
-        matcherUseCase(params).collect { matcherState ->
+        val project = configManager.getProject(authStore.signedInProjectId)
+        matcherUseCase(params, project).collect { matcherState ->
             when (matcherState) {
                 MatcherUseCase.MatcherState.CandidateLoaded -> {
                     (_matchState.value as? MatchState.LoadingCandidates)?.let { currentState ->

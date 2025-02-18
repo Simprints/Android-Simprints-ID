@@ -9,6 +9,7 @@ import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDat
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSourceImpl
+import com.simprints.infra.enrolment.records.store.usecases.CompareImplicitTokenizedStringsUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -43,11 +44,13 @@ class IdentityDataSourceModule {
     fun provideCommCareIdentityDataSource(
         encoder: EncodingUtils,
         jsonHelper: JsonHelper,
+        compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
         @ApplicationContext context: Context,
         @DispatcherIO dispatcher: CoroutineDispatcher,
     ): IdentityDataSource = CommCareIdentityDataSource(
         encoder = encoder,
         jsonHelper = jsonHelper,
+        compareImplicitTokenizedStringsUseCase = compareImplicitTokenizedStringsUseCase,
         context = context,
         dispatcher = dispatcher,
     )

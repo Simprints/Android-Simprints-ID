@@ -3,6 +3,7 @@ package com.simprints.matcher.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
@@ -188,7 +189,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(2L),
             MatchParams(
                 flowType = FlowType.IDENTIFY,
-                queryForCandidates = SubjectQuery(attendantId = "userId"),
+                queryForCandidates = SubjectQuery(attendantId = "userId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             0,
@@ -213,7 +214,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(2L),
             MatchParams(
                 flowType = FlowType.IDENTIFY,
-                queryForCandidates = SubjectQuery(moduleId = "moduleId"),
+                queryForCandidates = SubjectQuery(moduleId = "moduleId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
             ),
             0,

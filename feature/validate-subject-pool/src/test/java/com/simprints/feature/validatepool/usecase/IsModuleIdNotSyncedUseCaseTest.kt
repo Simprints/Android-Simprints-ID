@@ -1,7 +1,7 @@
 package com.simprints.feature.validatepool.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.ConfigRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -23,9 +23,9 @@ class IsModuleIdNotSyncedUseCaseTest {
         coEvery {
             configRepository.getDeviceConfiguration().selectedModules
         } returns listOf(
-            "module1".asTokenizableRaw(),
-            "module2".asTokenizableRaw(),
-            "module3".asTokenizableRaw(),
+            "module1".asTokenizableEncrypted(),
+            "module2".asTokenizableEncrypted(),
+            "module3".asTokenizableEncrypted(),
         )
 
         usecase = IsModuleIdNotSyncedUseCase(configRepository)
@@ -33,11 +33,11 @@ class IsModuleIdNotSyncedUseCaseTest {
 
     @Test
     fun `returns true if module is not synced`() = runTest {
-        assertThat(usecase("module2")).isFalse()
+        assertThat(usecase("module2".asTokenizableEncrypted())).isFalse()
     }
 
     @Test
     fun `returns false if module is synced`() = runTest {
-        assertThat(usecase("moduleNone")).isTrue()
+        assertThat(usecase("moduleNone".asTokenizableEncrypted())).isTrue()
     }
 }
