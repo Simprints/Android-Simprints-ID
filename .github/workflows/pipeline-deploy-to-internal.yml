@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/workflows/reusable-promote-artifact.yml
         secrets: inherit
         with:
-            deployment-track: internal
+            deployment-track: Internal
             upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
             mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
         needs:
@@ -42,7 +42,7 @@ jobs:
         uses: ./.github/workflows/reusable-promote-artifact.yml
         secrets: inherit
         with:
-            deployment-track: alpha
+            deployment-track: Alpha
             upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
             mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
         needs:
