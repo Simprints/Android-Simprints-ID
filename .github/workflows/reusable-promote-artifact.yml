@@ -71,7 +71,7 @@ jobs:
             -   name: Publish app to track
                 uses: r0adkll/upload-google-play@v1
                 with:
-                    serviceAccountJsonPlainText: ${{secrets.GOOGLE_API_KEY_JSON}}
+                    serviceAccountJsonPlainText: ${{secrets.RELEASE_GOOGLE_SERVICES_FILE}}
                     packageName: com.simprints.id
                     releaseFiles: ${{ inputs.upload-artifact }}
                     track: $TRACK
