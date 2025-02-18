@@ -61,7 +61,7 @@ jobs:
                     console_url="$(echo "$output" | grep -o 'https://console\.firebase\.google\.com[^[:space:]]*')"
 
                     # Expose console_url as a step output using $GITHUB_OUTPUT
-                    echo "console_url=$console_url" >> "$GITHUB_OUTPUT"
+                    echo "console_url=$console_url" >> $GITHUB_OUTPUT
 
             -   name: Distribution Summary
                 run: |
