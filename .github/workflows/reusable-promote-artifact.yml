@@ -68,13 +68,25 @@ jobs:
                         echo "TRACK=production" >> $GITHUB_ENV
                     fi
 
-            -   name: Publish app to track
-                uses: r0adkll/upload-google-play@v1
-                with:
-                    serviceAccountJsonPlainText: ${{ secrets.GOOGLE_API_KEY_JSON }}
-                    packageName: com.simprints.id
-                    releaseFiles: ${{ inputs.upload-artifact }}
-                    track: ${{ env.TRACK }}
-                    status: ${{ env.STATUS }}
-                    userFraction: ${{ env.USER_FRACTION }}
-                    mappingFile: ${{ inputs.mapping-file }}
+
+            - name: Publish app (Completed Release)
+              if: env.STATUS == 'completed'
+              uses: r0adkll/upload-google-play@v1
+              with:
+                  serviceAccountJsonPlainText: ${{ secrets.GOOGLE_API_KEY_JSON }}
+                  packageName: com.simprints.id
+                  releaseFiles: ${{ inputs.upload-artifact }}
+                  track: ${{ env.TRACK }}
+                  mappingFile: ${{ inputs.mapping-file }}
+
+            - name: Publish app (Rollout Release)
+              if: env.STATUS == 'inProgress'
+              uses: r0adkll/upload-google-play@v1
+              with:
+                  serviceAccountJsonPlainText: ${{ secrets.GOOGLE_API_KEY_JSON }}
+                  packageName: com.simprints.id
+                  releaseFiles: ${{ inputs.upload-artifact }}
+                  track: ${{ env.TRACK }}
+                  status: ${{ env.STATUS }}
+                  userFraction: ${{ env.USER_FRACTION }}
+                  mappingFile: ${{ inputs.mapping-file }}
