@@ -49,7 +49,7 @@ jobs:
                     if [ "${{ inputs.deployment-track }}" == "Internal" ]; then
                         echo "STATUS=completed" >> $GITHUB_ENV
                         echo "USER_FRACTION=1.0" >> $GITHUB_ENV
-                        echo "TRACK=qa" >> $GITHUB_ENV
+                        echo "TRACK=internal" >> $GITHUB_ENV
                     elif [ "${{ inputs.deployment-track }}" == "Alpha" ]; then
                         echo "STATUS=completed" >> $GITHUB_ENV
                         echo "USER_FRACTION=1.0" >> $GITHUB_ENV
