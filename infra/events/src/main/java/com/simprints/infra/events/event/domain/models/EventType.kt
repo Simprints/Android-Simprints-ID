@@ -14,11 +14,11 @@ enum class EventType {
     // key added: CONSENT_KEY
     CONSENT,
 
-    // key added: ENROLMENT_V1_KEY
-    ENROLMENT_V1,
-
-    // key added: ENROLMENT_V1_KE2
+    // key added: ENROLMENT_V2_KEY
     ENROLMENT_V2,
+
+    // key added: ENROLMENT_V4_KEY
+    ENROLMENT_V4,
 
     // key added: AUTHORIZATION_KEY
     AUTHORIZATION,
@@ -133,6 +133,9 @@ enum class EventType {
 
     // key added: AGE_GROUP_SELECTION_KEY
     AGE_GROUP_SELECTION,
+
+    // key added: BIOMETRIC_REFERENCE_CREATION_KEY
+    BIOMETRIC_REFERENCE_CREATION,
     ;
 
     companion object {
@@ -154,8 +157,8 @@ enum class EventType {
         const val FACE_CAPTURE_CONFIRMATION_KEY = "FACE_CAPTURE_CONFIRMATION"
         const val AUTHENTICATION_KEY = "AUTHENTICATION"
         const val CONSENT_KEY = "CONSENT"
-        const val ENROLMENT_V1_KEY = "ENROLMENT_V1"
         const val ENROLMENT_V2_KEY = "ENROLMENT_V2"
+        const val ENROLMENT_V4_KEY = "ENROLMENT_V4"
         const val AUTHORIZATION_KEY = "AUTHORIZATION"
         const val FINGERPRINT_CAPTURE_KEY = "FINGERPRINT_CAPTURE"
         const val FINGERPRINT_CAPTURE_BIOMETRICS_KEY = "FINGERPRINT_CAPTURE_BIOMETRICS"
@@ -178,5 +181,6 @@ enum class EventType {
         const val EVENT_UP_SYNC_REQUEST_KEY = "EVENT_UP_SYNC_REQUEST"
         const val LICENSE_CHECK_KEY = "LICENSE_CHECK"
         const val AGE_GROUP_SELECTION_KEY = "AGE_GROUP_SELECTION"
+        const val BIOMETRIC_REFERENCE_CREATION_KEY = "BIOMETRIC_REFERENCE_CREATION"
     }
 }

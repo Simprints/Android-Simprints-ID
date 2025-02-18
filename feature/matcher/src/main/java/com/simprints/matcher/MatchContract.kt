@@ -10,6 +10,7 @@ object MatchContract {
     val DESTINATION = R.id.matcherFragment
 
     fun getArgs(
+        referenceId: String = "",
         fingerprintSamples: List<MatchParams.FingerprintSample> = emptyList(),
         faceSamples: List<MatchParams.FaceSample> = emptyList(),
         fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
@@ -18,6 +19,7 @@ object MatchContract {
         biometricDataSource: BiometricDataSource,
     ) = MatchFragmentArgs(
         MatchParams(
+            referenceId,
             faceSamples,
             fingerprintSamples,
             fingerprintSDK,

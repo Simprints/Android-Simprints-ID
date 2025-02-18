@@ -63,7 +63,7 @@ class MapRefusalOrErrorResultUseCaseTest {
         listOf(
             FetchSubjectResult(found = true),
             SetupResult(isSuccess = true),
-            FaceCaptureResult(emptyList()),
+            FaceCaptureResult("", emptyList()),
         ).forEach { result -> assertThat(useCase(result, mockk())).isNull() }
     }
 

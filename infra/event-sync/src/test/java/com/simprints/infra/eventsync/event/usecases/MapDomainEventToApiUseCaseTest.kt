@@ -15,6 +15,7 @@ import com.simprints.infra.events.sampledata.createAgeGroupSelectionEvent
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createAuthenticationEvent
 import com.simprints.infra.events.sampledata.createAuthorizationEvent
+import com.simprints.infra.events.sampledata.createBiometricReferenceCreationEvent
 import com.simprints.infra.events.sampledata.createCandidateReadEvent
 import com.simprints.infra.events.sampledata.createCompletionCheckEvent
 import com.simprints.infra.events.sampledata.createConfirmationCallbackEvent
@@ -23,8 +24,8 @@ import com.simprints.infra.events.sampledata.createConnectivitySnapshotEvent
 import com.simprints.infra.events.sampledata.createConsentEvent
 import com.simprints.infra.events.sampledata.createEnrolmentCallbackEvent
 import com.simprints.infra.events.sampledata.createEnrolmentCalloutEvent
-import com.simprints.infra.events.sampledata.createEnrolmentEventV1
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
+import com.simprints.infra.events.sampledata.createEnrolmentEventV4
 import com.simprints.infra.events.sampledata.createEventDownSyncRequestEvent
 import com.simprints.infra.events.sampledata.createEventUpSyncRequestEvent
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
@@ -58,6 +59,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Age
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AlertScreen
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authentication
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Authorization
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.BiometricReferenceCreation
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callback
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callout
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.CandidateRead
@@ -90,6 +92,7 @@ import com.simprints.infra.eventsync.event.validateAgeGroupSelectionEventApiMode
 import com.simprints.infra.eventsync.event.validateAlertScreenEventApiModel
 import com.simprints.infra.eventsync.event.validateAuthenticationEventApiModel
 import com.simprints.infra.eventsync.event.validateAuthorizationEventApiModel
+import com.simprints.infra.eventsync.event.validateBiometricReferenceCreationEventApiModel
 import com.simprints.infra.eventsync.event.validateCallbackV1EventApiModel
 import com.simprints.infra.eventsync.event.validateCallbackV2EventApiModel
 import com.simprints.infra.eventsync.event.validateCalloutEventApiModel
@@ -99,8 +102,8 @@ import com.simprints.infra.eventsync.event.validateCompletionCheckEventApiModel
 import com.simprints.infra.eventsync.event.validateConnectivitySnapshotEventApiModel
 import com.simprints.infra.eventsync.event.validateConsentEventApiModel
 import com.simprints.infra.eventsync.event.validateDownSyncRequestEventApiModel
-import com.simprints.infra.eventsync.event.validateEnrolmentEventV1ApiModel
 import com.simprints.infra.eventsync.event.validateEnrolmentEventV2ApiModel
+import com.simprints.infra.eventsync.event.validateEnrolmentEventV4ApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureBiometricsEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureConfirmationEventApiModel
 import com.simprints.infra.eventsync.event.validateFaceCaptureEventApiModel
@@ -315,21 +318,21 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
-    fun validateEnrolmentV1_enrolmentEventApiModel() {
-        val event = createEnrolmentEventV1()
-        val apiEvent = useCase(event, project)
-        val json = JSONObject(jackson.writeValueAsString(apiEvent))
-
-        validateEnrolmentEventV1ApiModel(json)
-    }
-
-    @Test
     fun validateEnrolmentV2_enrolmentEventApiModel() {
         val event = createEnrolmentEventV2()
         val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateEnrolmentEventV2ApiModel(json)
+    }
+
+    @Test
+    fun validateEnrolmentV4_enrolmentEventApiModel() {
+        val event = createEnrolmentEventV4()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateEnrolmentEventV4ApiModel(json)
     }
 
     @Test
@@ -522,6 +525,15 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun validate_biometricReferenceCreationEventApiModel() {
+        val event = createBiometricReferenceCreationEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateBiometricReferenceCreationEventApiModel(json)
+    }
+
+    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -621,6 +633,7 @@ internal class MapDomainEventToApiUseCaseTest {
             EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
             LicenseCheck -> validate_licenseCheckEventApiModel()
             AgeGroupSelection -> validate_ageGroupSelectionEventApiModel()
+            BiometricReferenceCreation -> validate_biometricReferenceCreationEventApiModel()
             null -> TODO()
         }.safeSealedWhens
     }

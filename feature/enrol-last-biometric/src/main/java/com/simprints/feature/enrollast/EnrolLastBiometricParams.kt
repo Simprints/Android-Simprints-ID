@@ -39,12 +39,14 @@ sealed class EnrolLastBiometricStepResult : Parcelable {
     @Keep
     @Parcelize
     data class FingerprintCaptureResult(
+        val referenceId: String,
         val results: List<FingerTemplateCaptureResult>,
     ) : EnrolLastBiometricStepResult()
 
     @Keep
     @Parcelize
     data class FaceCaptureResult(
+        val referenceId: String,
         val results: List<FaceTemplateCaptureResult>,
     ) : EnrolLastBiometricStepResult()
 }

@@ -192,7 +192,6 @@ class EventPayloadTest {
             ),
         ),
         ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED),
-        EnrolmentEventV1(CREATED_AT, GUID2),
         EnrolmentEventV2(
             createdAt = CREATED_AT,
             subjectId = GUID1,
@@ -200,6 +199,14 @@ class EventPayloadTest {
             moduleId = DEFAULT_MODULE_ID,
             attendantId = DEFAULT_USER_ID,
             personCreationEventId = GUID2,
+        ),
+        EnrolmentEventV4(
+            createdAt = CREATED_AT,
+            subjectId = GUID1,
+            projectId = DEFAULT_PROJECT_ID,
+            moduleId = DEFAULT_MODULE_ID,
+            attendantId = DEFAULT_USER_ID,
+            biometricReferenceIds = listOf(GUID1, GUID2),
         ),
         GuidSelectionEvent(CREATED_AT, GUID1),
         IntentParsingEvent(CREATED_AT, COMMCARE),
@@ -210,6 +217,7 @@ class EventPayloadTest {
             pool = MatchPool(PROJECT, 100),
             matcher = "MATCHER_NAME",
             result = listOf(MatchEntry(GUID1, 0F)),
+            probeBiometricReferenceId = GUID1,
         ),
         OneToOneMatchEvent(
             createdAt = CREATED_AT,
@@ -218,6 +226,7 @@ class EventPayloadTest {
             matcher = "MATCHER_NAME",
             result = MatchEntry(GUID1, 0F),
             fingerComparisonStrategy = FingerComparisonStrategy.SAME_FINGER,
+            probeBiometricReferenceId = GUID1,
         ),
         PersonCreationEvent(
             startTime = CREATED_AT,

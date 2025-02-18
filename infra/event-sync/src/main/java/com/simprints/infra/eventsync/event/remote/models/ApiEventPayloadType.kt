@@ -6,6 +6,7 @@ import com.simprints.infra.events.event.domain.models.EventType.AGE_GROUP_SELECT
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
 import com.simprints.infra.events.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.infra.events.event.domain.models.EventType.BIOMETRIC_REFERENCE_CREATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
@@ -21,8 +22,8 @@ import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
-import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V4
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_DOWN_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.EVENT_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
@@ -147,6 +148,9 @@ internal enum class ApiEventPayloadType {
     // key added: AGE_GROUP_SELECTION_KEY
     AgeGroupSelection,
 
+    // key added: BIOMETRIC_REFERENCE_CREATION_KEY
+    BiometricReferenceCreation,
+
     ;
 
     companion object {
@@ -180,13 +184,14 @@ internal enum class ApiEventPayloadType {
         const val FINGERPRINT_CAPTURE_BIOMETRICS_KEY = "FingerprintCaptureBiometrics"
         const val EVENT_DOWN_SYNC_REQUEST_KEY = "EventDownSyncRequest"
         const val EVENT_UP_SYNC_REQUEST_KEY = "EventUpSyncRequest"
+        const val BIOMETRIC_REFERENCE_CREATION_KEY = "BiometricReferenceCreation"
     }
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     AUTHENTICATION -> ApiEventPayloadType.Authentication
     CONSENT -> ApiEventPayloadType.Consent
-    ENROLMENT_V1, ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
+    ENROLMENT_V2, ENROLMENT_V4 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
     FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
     ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToOneMatch
@@ -229,12 +234,13 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
     LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
     AGE_GROUP_SELECTION -> ApiEventPayloadType.AgeGroupSelection
+    BIOMETRIC_REFERENCE_CREATION -> ApiEventPayloadType.BiometricReferenceCreation
 }
 
 internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.Authentication -> AUTHENTICATION
     ApiEventPayloadType.Consent -> CONSENT
-    ApiEventPayloadType.Enrolment -> ENROLMENT_V2
+    ApiEventPayloadType.Enrolment -> ENROLMENT_V4
     ApiEventPayloadType.Authorization -> AUTHORIZATION
     ApiEventPayloadType.FingerprintCapture -> FINGERPRINT_CAPTURE
     ApiEventPayloadType.OneToOneMatch -> ONE_TO_MANY_MATCH
@@ -262,6 +268,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
     ApiEventPayloadType.LicenseCheck -> LICENSE_CHECK
     ApiEventPayloadType.AgeGroupSelection -> AGE_GROUP_SELECTION
+    ApiEventPayloadType.BiometricReferenceCreation -> BIOMETRIC_REFERENCE_CREATION
     ApiEventPayloadType.Callout -> throw UnsupportedOperationException("")
     ApiEventPayloadType.Callback -> throw UnsupportedOperationException("")
 }

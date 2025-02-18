@@ -11,7 +11,6 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -121,6 +120,15 @@ class FaceCaptureViewModelTest {
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
         coVerify(atLeast = 1) { faceImageUseCase.invoke(any(), any()) }
+    }
+
+    @Test
+    fun `Save biometric reference creation when flow finishes`() {
+        viewModel.captureFinished(faceDetections)
+        viewModel.flowFinished()
+        coVerify(atLeast = 1) {
+            eventReporter.addBiometricReferenceCreationEvents(any(), any())
+        }
     }
 
     @Test

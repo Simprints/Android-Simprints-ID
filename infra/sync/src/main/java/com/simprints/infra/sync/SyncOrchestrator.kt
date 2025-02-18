@@ -3,7 +3,7 @@ package com.simprints.infra.sync
 import kotlinx.coroutines.flow.Flow
 
 interface SyncOrchestrator {
-    suspend fun scheduleBackgroundWork()
+    suspend fun scheduleBackgroundWork(withDelay: Boolean = false)
 
     suspend fun cancelBackgroundWork()
 
@@ -13,7 +13,7 @@ interface SyncOrchestrator {
      */
     fun refreshConfiguration(): Flow<Unit>
 
-    fun rescheduleEventSync()
+    fun rescheduleEventSync(withDelay: Boolean = false)
 
     fun cancelEventSync()
 
