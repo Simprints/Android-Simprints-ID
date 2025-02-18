@@ -4,6 +4,8 @@
     <!-- Alert -->
     <string name="alert_title_fallback">Alerte</string>
     <string name="alert_button_close">Fermer</string>
+    <string name="alert_export_data">Copier les détails</string>
+    <string name="alert_export_copied">Copié dans le presse papier</string>
 
     <!-- Consent -->
     <string name="consent_general_title">Consentement général</string>
@@ -51,7 +53,7 @@
     <!-- Exit form -->
     <string name="exit_form_title">Pourquoi avez-vous passé la capture biométrique ?</string>
     <string name="exit_form_other_reason_hint">Informations supplémentaires</string>
-    <string name="exit_form_continue_button">Retourner à Simprints</string>
+    <string name="exit_form_continue_button">Capturer les données biométriques</string>
     <string name="exit_form_submit_button">Soumettre</string>
     <string name="exit_form_select_option_submit_warning">Veuillez sélectionner une option et soumettre</string>
     <string name="exit_form_submit_warning">Veuillez soumettre le formulaire</string>
@@ -174,9 +176,12 @@
     <string name="face_capture_onboarding_continue_button">Touchez n\'importe où pour continuer</string>
     <string name="face_capture_capturing_title">Capture en direct</string>
     <string name="face_capture_preparation_title">Préparation</string>
+    <string name="face_capture_start_capture">Démarrer la capture</string>
     <string name="face_capture_title_previewing">Préparation du scan</string>
     <string name="face_capture_title_no_face">Aucun visage détecté</string>
     <string name="face_capture_error_no_face">Assurez-vous que le visage soit dans le cercle</string>
+    <string name="face_capture_title_bad_quality">Image floue</string>
+    <string name="face_capture_error_bad_quality">Essayez d\'ajuster l\'éclairage ou de repositionner le visage pour obtenir une meilleure photo.</string>
     <string name="face_capture_title_too_far">Trop loin</string>
     <string name="face_capture_error_too_far">Rapprochez-vous</string>
     <string name="face_capture_title_too_close">Trop près</string>
@@ -241,7 +246,7 @@
     <string name="fingerprint_connect_ota_start_update">Commencer la mise à jour</string>
     <string name="fingerprint_connect_ota_recovery_title">La mise à jour du scanner a échoué</string>
     <string name="fingerprint_connect_ota_recovery_soft_reset">Eteignez le scanner puis rallumez le.</string>
-    <string name="fingerprint_connect_ota_recovery_hard_reset">Appuyez et maintenez le bouton d\'alimentation pendant 5 secondes</string>
+    <string name="fingerprint_connect_ota_recovery_hard_reset">1. Appuyer sur le bouton d\'alimentation et le maintenir enfoncé jusqu\'à ce que le scanner s\'éteigne \n2. Appuyer à nouveau sur le bouton d\'alimentation et le maintenir enfoncé pendant 7 secondes.</string>
     <string name="fingerprint_connect_ota_failed_title">La mise à jour du scanner a échoué</string>
     <string name="fingerprint_connect_ota_failed_instructions">Veuillez contact votre superviseur pour avoir de l\'aide</string>
     <string name="fingerprint_connect_ota_continue_button">Continuer</string>
@@ -294,7 +299,7 @@
     <string name="fingerprint_capture_rescan_question">Rescanner?</string>
     <string name="fingerprint_capture_scan">Scanner</string>
     <string name="fingerprint_capture_please_wait">Veuillez attendre</string>
-    <string name="fingerprint_capture_missing_finger_button">Doigt manquant</string>
+    <string name="fingerprint_capture_missing_finger_button">Passer le doigt</string>
     <string name="fingerprint_capture_try_another_title">Préparez vous</string>
     <string name="fingerprint_capture_try_another_finger">Veuillez essayer un autre doigt</string>
 
@@ -374,10 +379,14 @@
     <string name="dashboard_preference_summary_settings_fingers">Voir les doigts qui vont être scannés</string>
     <string name="dashboard_preference_summary_sync_information">Plus de détails sur la synchronisation</string>
     <string name="dashboard_preference_summary_update_config">Actualiser la configuration de l\'appareil et du projet</string>
-    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Activer ou désactiver les alertes audio lorsqu\'une analyse d\'empreintes digitales est terminée, avertissant l\'utilisateur de retirer sa main du scanner.</string>
+    <string name="dashboard_preference_summary_update_config_last_updated">Actualiser la configuration de l\'appareil et du projet \nDernière mise à jour : %s</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">Alertes sonores pour la fin du scan, invitant l\'utilisateur à retirer le doigt du sujet du scanner.</string>
+    <string name="dashboard_preference_summary_enable_auto_capture">Commencer automatiquement à prendre des photos lorsqu\'un visage est bien positionné dans le viseur.</string>
     <string name="dashboard_preference_copied_to_clipboard">Copié dans le presse-papier</string>
     <string name="dashboard_preference_update_config_scheduled">Mise à jour de la configuration démarrée</string>
-    <string name="dashboard_preference_enable_audio_on_scan_complete">Alerte Sonore</string>
+    <string name="dashboard_preference_update_config_finished">Configuration mise à jour</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">Alerte audio</string>
+    <string name="dashboard_preference_enable_auto_capture">Auto-capture</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Informations sur la synchronisation</string>
