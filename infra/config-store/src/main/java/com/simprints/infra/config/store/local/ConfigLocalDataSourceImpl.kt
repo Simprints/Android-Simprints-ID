@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.local
 
 import androidx.datastore.core.DataStore
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.AbsolutePath
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
@@ -21,8 +22,10 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Vero1Configuration
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -34,6 +37,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     private val projectDataStore: DataStore<ProtoProject>,
     private val configDataStore: DataStore<ProtoProjectConfiguration>,
     private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>,
+    private val tokenizationProcessor: TokenizationProcessor
 ) : ConfigLocalDataSource {
     override suspend fun saveProject(project: Project) {
         projectDataStore.updateData { project.toProto() }
@@ -76,7 +80,21 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         configDataStore.updateData { it.toBuilder().clear().build() }
     }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration = deviceConfigDataStore.data.first().toDomain()
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration {
+        val config = deviceConfigDataStore.data.first().toDomain()
+        val tokenizedModules = config.selectedModules.map {moduleId ->
+            when(moduleId) {
+                is TokenizableString.Raw -> tokenizationProcessor.encrypt(
+                    decrypted = moduleId,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = getProject()
+                )
+                is TokenizableString.Tokenized -> moduleId
+            }
+        }
+        config.selectedModules = tokenizedModules
+        return config
+    }
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) {
         deviceConfigDataStore.updateData { currentData ->

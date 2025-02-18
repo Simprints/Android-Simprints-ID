@@ -215,7 +215,7 @@ class EnrolmentRecordRepositoryImplTest {
                 moduleId = moduleIdTokenized,
             )
             val expectedSubjectActions = listOf(SubjectAction.Creation(expectedSubject))
-            coVerify { localDataSource.performActions(expectedSubjectActions) }
+            coVerify { localDataSource.performActions(expectedSubjectActions, project) }
         }
 
     @Test
@@ -238,7 +238,7 @@ class EnrolmentRecordRepositoryImplTest {
         coEvery { localDataSource.load(any()) } returns listOf(subject)
 
         repository.tokenizeExistingRecords(project)
-        coVerify { localDataSource.performActions(emptyList()) }
+        coVerify { localDataSource.performActions(emptyList(), project) }
     }
 
     @Test

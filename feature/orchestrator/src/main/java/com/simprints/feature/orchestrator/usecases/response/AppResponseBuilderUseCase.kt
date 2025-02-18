@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -20,9 +21,10 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         request: ActionRequest?,
         results: List<Serializable>,
+        project: Project
     ): AppResponse = when (request) {
         is ActionRequest.EnrolActionRequest -> if (isNewEnrolment(projectConfiguration, results)) {
-            handleEnrolment(request, results)
+            handleEnrolment(request, results, project)
         } else {
             handleIdentify(projectConfiguration, results)
         }

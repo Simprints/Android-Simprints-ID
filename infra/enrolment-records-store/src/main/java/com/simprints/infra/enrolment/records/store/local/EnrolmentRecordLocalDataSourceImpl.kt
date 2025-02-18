@@ -1,6 +1,9 @@
 package com.simprints.infra.enrolment.records.store.local
 
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
@@ -24,6 +27,7 @@ import javax.inject.Inject
 
 internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     private val realmWrapper: RealmWrapper,
+    private val tokenizationProcessor: TokenizationProcessor,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
@@ -111,7 +115,10 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             .toInt()
     }
 
-    override suspend fun performActions(actions: List<SubjectAction>) {
+    override suspend fun performActions(
+        actions: List<SubjectAction>,
+        project: Project,
+    ) {
         // if there is no actions to perform return to avoid useless realm operations
         if (actions.isEmpty()) {
             Simber.d("[SubjectLocalDataSourceImpl] No realm actions to perform", tag = REALM_DB)
@@ -121,10 +128,14 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         realmWrapper.writeRealm { realm ->
             actions.forEach { action ->
                 when (action) {
-                    is SubjectAction.Creation -> realm.copyToRealm(
-                        action.subject.fromDomainToDb(),
-                        updatePolicy = UpdatePolicy.ALL,
-                    )
+                    is SubjectAction.Creation -> {
+                        val tokenizedModuleId = action.subject.moduleId.tokenizeIfNecessary(TokenKeyType.ModuleId, project)
+                        val tokenizedAttendantId = action.subject.attendantId.tokenizeIfNecessary(TokenKeyType.AttendantId, project)
+                        realm.copyToRealm(
+                            action.subject.copy(moduleId = tokenizedModuleId, attendantId = tokenizedAttendantId).fromDomainToDb(),
+                            updatePolicy = UpdatePolicy.ALL,
+                        )
+                    }
 
                     is SubjectAction.Deletion -> realm.delete(
                         realm
@@ -139,6 +150,19 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun TokenizableString.tokenizeIfNecessary(
+        tokenKeyType: TokenKeyType,
+        project: Project,
+    ) = when (this) {
+        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
+            decrypted = this,
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+
+        is TokenizableString.Tokenized -> this
     }
 
     private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> {

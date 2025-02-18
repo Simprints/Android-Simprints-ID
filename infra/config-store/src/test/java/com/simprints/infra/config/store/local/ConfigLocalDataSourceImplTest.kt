@@ -20,6 +20,7 @@ import com.simprints.infra.config.store.testtools.identificationConfiguration
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
 import kotlinx.coroutines.launch
@@ -57,6 +58,9 @@ class ConfigLocalDataSourceImplTest {
         produceFile = { testContext.dataStoreFile(TEST_DEVICE_CONFIG_DATASTORE_NAME) },
     )
 
+    private val tokenizationProcessor = mockk<TokenizationProcessor>(relaxed = true)
+
+
     private lateinit var configLocalDataSourceImpl: ConfigLocalDataSourceImpl
 
     @Before
@@ -68,6 +72,7 @@ class ConfigLocalDataSourceImplTest {
             testProjectDataStore,
             testProjectConfigDataStore,
             testDeviceConfigDataStore,
+            tokenizationProcessor
         )
     }
 
