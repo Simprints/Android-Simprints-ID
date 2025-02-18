@@ -46,35 +46,35 @@ jobs:
 
             -   name: Set vars
                 run: |
-                    if [ "${{inputs.deployment-track}}" == "Internal" ]; then
-                        STATUS="completed"
-                        USER_FRACTION=1.0
-                        TRACK="qa"
-                    elif [ "${{inputs.deployment-track}}" == "Alpha" ]; then
-                        STATUS="completed"
-                        USER_FRACTION=1.0
-                        TRACK="alpha"
-                    elif [ "${{inputs.deployment-track}}" == "Prod-25-Percent-Rollout" ]; then
-                        STATUS="inProgress"
-                        USER_FRACTION=0.25
-                        TRACK="production"
-                    elif [ "${{inputs.deployment-track}}" == "Prod-50-Percent-Rollout" ]; then
-                        STATUS="inProgress"
-                        USER_FRACTION=0.5
-                        TRACK="production"
-                    elif [ "${{inputs.deployment-track}}" == "Prod-100-Percent-Rollout" ]; then
-                        STATUS="completed"
-                        USER_FRACTION=1.0
-                        TRACK="production"
+                    if [ "${{ inputs.deployment-track }}" == "Internal" ]; then
+                        echo "STATUS=completed" >> $GITHUB_ENV
+                        echo "USER_FRACTION=1.0" >> $GITHUB_ENV
+                        echo "TRACK=qa" >> $GITHUB_ENV
+                    elif [ "${{ inputs.deployment-track }}" == "Alpha" ]; then
+                        echo "STATUS=completed" >> $GITHUB_ENV
+                        echo "USER_FRACTION=1.0" >> $GITHUB_ENV
+                        echo "TRACK=alpha" >> $GITHUB_ENV
+                    elif [ "${{ inputs.deployment-track }}" == "Prod-25-Percent-Rollout" ]; then
+                        echo "STATUS=inProgress" >> $GITHUB_ENV
+                        echo "USER_FRACTION=0.25" >> $GITHUB_ENV
+                        echo "TRACK=production" >> $GITHUB_ENV
+                    elif [ "${{ inputs.deployment-track }}" == "Prod-50-Percent-Rollout" ]; then
+                        echo "STATUS=inProgress" >> $GITHUB_ENV
+                        echo "USER_FRACTION=0.5" >> $GITHUB_ENV
+                        echo "TRACK=production" >> $GITHUB_ENV
+                    elif [ "${{ inputs.deployment-track }}" == "Prod-100-Percent-Rollout" ]; then
+                        echo "STATUS=completed" >> $GITHUB_ENV
+                        echo "USER_FRACTION=1.0" >> $GITHUB_ENV
+                        echo "TRACK=production" >> $GITHUB_ENV
                     fi
 
             -   name: Publish app to track
                 uses: r0adkll/upload-google-play@v1
                 with:
-                    serviceAccountJsonPlainText: ${{secrets.GOOGLE_API_KEY_JSON}}
+                    serviceAccountJsonPlainText: ${{ secrets.GOOGLE_API_KEY_JSON }}
                     packageName: com.simprints.id
                     releaseFiles: ${{ inputs.upload-artifact }}
-                    track: $TRACK
-                    status: $STATUS
-                    userFraction: $USER_FRACTION
+                    track: ${{ env.TRACK }}
+                    status: ${{ env.STATUS }}
+                    userFraction: ${{ env.USER_FRACTION }}
                     mappingFile: ${{ inputs.mapping-file }}
