@@ -29,6 +29,7 @@ jobs:
 
     deploy-internal-build:
         uses: ./.github/workflows/reusable-promote-artifact.yml
+        secrets: inherit
         with:
             deployment-track: internal
             upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
@@ -39,6 +40,7 @@ jobs:
 
     deploy-alpha-build:
         uses: ./.github/workflows/reusable-promote-artifact.yml
+        secrets: inherit
         with:
             deployment-track: alpha
             upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
