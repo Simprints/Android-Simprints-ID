@@ -13,6 +13,7 @@ jobs:
     build-internal-aab:
         uses: ./.github/workflows/reusable-build-apk.yml
         secrets: inherit
+        needs: get-version
         with:
             build-environment: internal
             version-name: ${{ needs.get-version.outputs.version-name }}
