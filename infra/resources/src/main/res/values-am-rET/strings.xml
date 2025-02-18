@@ -4,6 +4,8 @@
     <!-- Alert -->
     <string name="alert_title_fallback">ማንቂያ</string>
     <string name="alert_button_close">ዝጋ</string>
+    <string name="alert_export_data">ዝርዝሮችን ይቅዱ</string>
+    <string name="alert_export_copied">ውሂብ ወደ ቅንጥብ ሰሌዳ ተቀድቷል።</string>
 
     <!-- Consent -->
     <string name="consent_general_title">ፈቃደኝነት</string>
@@ -49,13 +51,9 @@
     <string name="enrol_last_biometrics_alert_message_all_param">ፊት /የጣት አሻራ</string>
 
     <!-- Exit form -->
-    <string name="exit_form_title_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
-    <string name="exit_form_title_biometrics">የጣት አሻራ ለምን ተዘለለ?</string>
-    <string name="exit_form_title_face">ፌስ መመዝገቡ ለምን ተዝለለ?</string>
+    <string name="exit_form_title">ለምንየጣት አሻራዉን ዘለሉ?</string>
     <string name="exit_form_other_reason_hint">ተጨማሪ ኢንፎርሜሽን</string>
-    <string name="exit_form_continue_default_button">ፊቱን ያዝ</string>
-    <string name="exit_form_continue_fingerprints_button">የጣት አሻራውን እስካን ያድርጉ</string>
-    <string name="exit_form_continue_face_button">ፊቱን ያዝ</string>
+    <string name="exit_form_continue_button">ባዮሜትሪክስ ይያዙ</string>
     <string name="exit_form_submit_button">ይላኩ</string>
     <string name="exit_form_select_option_submit_warning">እባክዎት ካሉት አማራጮች ይምረጡ እና ይላኩ</string>
     <string name="exit_form_submit_warning">እባክዎት ቅጽን ይላኩ</string>
@@ -173,9 +171,12 @@
     <string name="face_capture_onboarding_continue_button">ለመቀጠል ስልኩ ሰሌዳ(የትኛውም ቦታ)  ተጫን</string>
     <string name="face_capture_capturing_title">አሁን ላይ(ላይቭ) ማንሳት</string>
     <string name="face_capture_preparation_title">ለማንሳት በዝግጅት ላይ</string>
+    <string name="face_capture_start_capture">መያዝ ጀምር</string>
     <string name="face_capture_title_previewing">ለማንሳት እየተዘጋጀ</string>
     <string name="face_capture_title_no_face">ምንም ፊት ማግኘት አልቻለም</string>
     <string name="face_capture_error_no_face">ፊቱ ክቡን መሙላቱን ያረጋግጡ</string>
+    <string name="face_capture_title_bad_quality">ግልጽ ያልሆነ ምስል</string>
+    <string name="face_capture_error_bad_quality">ይበልጥ ግልጽ የሆነ ፎቶ ለማግኘት መብራቱን ለማስተካከል ወይም ፊቱን ለማስተካከል ይሞክሩ</string>
     <string name="face_capture_title_too_far">ፊቱ በጣም ርቋል</string>
     <string name="face_capture_error_too_far">ቀረብ አድርግ(ፊት ርቋል)</string>
     <string name="face_capture_title_too_close">ፊቱ በጣም ቀርቧል</string>
@@ -240,7 +241,7 @@
     <string name="fingerprint_connect_ota_start_update">አፕዴት አስጀምር</string>
     <string name="fingerprint_connect_ota_recovery_title">ስካነር አፕዴት አልተሳካም</string>
     <string name="fingerprint_connect_ota_recovery_soft_reset">ስካነሩን አጥፍተህ እንደገና አብራ</string>
-    <string name="fingerprint_connect_ota_recovery_hard_reset">ማስነሻና ማጥፊያውን ለ 5 ሴኮንድ መጫን</string>
+    <string name="fingerprint_connect_ota_recovery_hard_reset">1. ስካነር እስኪጠፋ ድረስ የኃይል ቁልፉን ተጭነው ይያዙ \n2. የኃይል አዝራሩን እንደገና ለ 7 ሰከንዶች ተጭነው ይያዙት</string>
     <string name="fingerprint_connect_ota_failed_title">ስካነር አፕዴት አልተሳካም</string>
     <string name="fingerprint_connect_ota_failed_instructions">ለእርዳታ ሱፐርቫይዘሩን አሳዉቅ</string>
     <string name="fingerprint_connect_ota_continue_button">ቀጥል</string>
@@ -297,7 +298,7 @@
     <string name="fingerprint_capture_rescan_question">እንደገና እስካን ይደረግ?</string>
     <string name="fingerprint_capture_scan">እስካን</string>
     <string name="fingerprint_capture_please_wait">እባክዎትን ይጠብቁ</string>
-    <string name="fingerprint_capture_missing_finger_button">ይህ ጣት የለም</string>
+    <string name="fingerprint_capture_missing_finger_button">ጣት ዝለል</string>
     <string name="fingerprint_capture_try_another_title">ዝግጁ ነው</string>
     <string name="fingerprint_capture_try_another_finger">እባክዎት ሌላ ጣት ይሞክሩ</string>
 
@@ -373,10 +374,14 @@
     <string name="dashboard_preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="dashboard_preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
     <string name="dashboard_preference_summary_update_config">መሣሪያን እና የፕሮጀክት ውቅርን ያድሱ</string>
-    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">የጣት አሻራ ቅኝት ሲጠናቀቅ የድምጽ ማንቂያዎችን ያንቁ ወይም ያሰናክሉ፣ ተጠቃሚው እጃቸውን ከስካነር እንዲያነሱ ያሳውቁ።</string>
+    <string name="dashboard_preference_summary_update_config_last_updated">መሣሪያን እና የፕሮጀክት ውቅርን ያድሱ\nመጨረሻ የዘመነው፡%s</string>
+    <string name="dashboard_preference_summary_enable_audio_on_scan_complete">ለቃኝ ማጠናቀቅ የድምጽ ማንቂያዎች ተጠቃሚው የርዕሱን ጣት ከስካነር እንዲያስወግድ ይገፋፋዋል።</string>
+    <string name="dashboard_preference_summary_enable_auto_capture">አንድ ፊት በእይታ መፈለጊያው ውስጥ በደንብ ሲቀመጥ በራስ-ሰር ፎቶ ማንሳት ይጀምሩ</string>
     <string name="dashboard_preference_copied_to_clipboard">ወደ  clipboard ተገልብጧል </string>
     <string name="dashboard_preference_update_config_scheduled">የማዋቀር ዝማኔ ተጀምሯል</string>
-    <string name="dashboard_preference_enable_audio_on_scan_complete">የጣት አሻራ ቅኝት ሲጠናቀቅ ኦዲዮ</string>
+    <string name="dashboard_preference_update_config_finished">ውቅረት ተዘምኗል</string>
+    <string name="dashboard_preference_enable_audio_on_scan_complete">የድምጽ ማንቂያ</string>
+    <string name="dashboard_preference_enable_auto_capture">ራስ-ሰር ቀረጻ</string>
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">ሲንክ የተደረገ መረጃ</string>
