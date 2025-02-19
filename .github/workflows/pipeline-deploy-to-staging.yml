@@ -13,8 +13,9 @@ jobs:
     build-staging-apk:
         uses: ./.github/workflows/reusable-build-apk.yml
         secrets: inherit
+        needs: get-version
         with:
-            build-environment: staging
+            build-environment: Staging
             version-name: ${{ needs.get-version.outputs.version-name }}
 
     deploy-to-firebase:
@@ -23,5 +24,5 @@ jobs:
         needs:
             - build-staging-apk
         with:
-            build-environment: staging
+            build-environment: Staging
             upload-artifact: ${{ needs.build-staging-apk.outputs.build-artifact }}

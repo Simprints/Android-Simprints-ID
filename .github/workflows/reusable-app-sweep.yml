@@ -16,7 +16,7 @@ jobs:
         name: App Sweep Security Scan
         runs-on: ubuntu-latest
         timeout-minutes: ${{ fromJSON(vars.JOB_TIMEOUT_MINUTES) }}
-        environment: internal
+        environment: Internal
 
         steps:
             -   name: Download AAB artifact
