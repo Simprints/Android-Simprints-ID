@@ -184,10 +184,10 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             )
         }
         if (query.attendantId != null) {
-            realmQuery = realmQuery.query("$USER_ID_FIELD == $0", query.attendantId)
+            realmQuery = realmQuery.query("$USER_ID_FIELD == $0", query.attendantId.value)
         }
         if (query.moduleId != null) {
-            realmQuery = realmQuery.query("$MODULE_ID_FIELD == $0", query.moduleId)
+            realmQuery = realmQuery.query("$MODULE_ID_FIELD == $0", query.moduleId.value)
         }
         if (query.fingerprintSampleFormat != null) {
             realmQuery = realmQuery.query(
