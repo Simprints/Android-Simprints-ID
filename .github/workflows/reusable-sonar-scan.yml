@@ -69,4 +69,11 @@ jobs:
                     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 run: |
-                    ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 --info
+                    # Check if the event is a pull request
+                    if [ "${{ github.event_name }}" == "pull_request" ]; then
+                        # Run SonarQube scan without branch name param as sonarqube will detect PR branch
+                        ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 --info
+                    else
+                        # Run SonarQube scan with branch name param
+                        ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 -Dsonar.branch.name=${{ github.ref_name }} --info
+                    fi

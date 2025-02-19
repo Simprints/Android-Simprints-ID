@@ -13,6 +13,7 @@ jobs:
     build-internal-aab:
         uses: ./.github/workflows/reusable-build-apk.yml
         secrets: inherit
+        needs: get-version
         with:
             build-environment: internal
             version-name: ${{ needs.get-version.outputs.version-name }}
@@ -28,21 +29,10 @@ jobs:
 
     deploy-internal-build:
         uses: ./.github/workflows/reusable-promote-artifact.yml
+        secrets: inherit
         with:
-            deployment-track: internal
+            deployment-track: Internal
             upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
             mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
         needs:
             - build-internal-aab
-            - run-app-sweep
-
-    deploy-alpha-build:
-        uses: ./.github/workflows/reusable-promote-artifact.yml
-        with:
-            deployment-track: alpha
-            upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
-            mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
-        needs:
-            - build-internal-aab
-            - run-app-sweep
-            - deploy-internal-build
