@@ -15,7 +15,7 @@ jobs:
         secrets: inherit
         needs: get-version
         with:
-            build-environment: internal
+            build-environment: Internal
             version-name: ${{ needs.get-version.outputs.version-name }}
 
     run-app-sweep:
