@@ -9,7 +9,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import javax.inject.Inject
 
 /**
- * Use case that checks two plain strings values but considers that the tokenization state of one of the values
+ * Use case that checks two TokenizableStrings but considers that the tokenization state of one of the values
  * might differ from another. In this case this use tries to bring both strings to the same tokenization state
  * and compare their values.
  * Example:
@@ -17,13 +17,16 @@ import javax.inject.Inject
  *      s2 = 'AWcDe/==seF1LkcF4'    - tokenized value (result of tokenizing the 'abc' value)
  *
  *      Even though plain string values are different, they represent the same entity. s1 is going to be encrypted and compared to the s2.
+ *
+ *      Given the implementation of TokenizationClassNameDeserializer - if a value is TokenizableString.Tokenized, we can be sure that it is tokenized.
+ *      Only deserialized TokenizableString.Raw values have uncertain tokenization state.
  */
 class CompareImplicitTokenizedStringsUseCase @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
 ) {
     operator fun invoke(
         s1: TokenizableString?,
-        s2: String,
+        s2: TokenizableString,
         tokenKeyType: TokenKeyType,
         project: Project,
     ): Boolean = when {
@@ -37,33 +40,23 @@ class CompareImplicitTokenizedStringsUseCase @Inject constructor(
         project: Project,
     ): TokenizableString = when (s) {
         is TokenizableString.Tokenized -> s
-        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-            decrypted = s,
-            tokenKeyType = tokenKeyType,
-            project = project,
-        )
-    }
-
-    private fun ensureTokenized(
-        s: String,
-        tokenKeyType: TokenKeyType,
-        project: Project,
-    ): TokenizableString {
-        val isAlreadyTokenized = tokenizationProcessor.decrypt(
-            encrypted = s.asTokenizableEncrypted(),
-            tokenKeyType = tokenKeyType,
-            project = project,
-            logError = false,
-        ) is TokenizableString.Raw
-
-        return if (isAlreadyTokenized) {
-            s.asTokenizableEncrypted()
-        } else {
-            tokenizationProcessor.encrypt(
-                decrypted = s.asTokenizableRaw(),
+        is TokenizableString.Raw -> {
+            val isAlreadyTokenized = tokenizationProcessor.decrypt(
+                encrypted = s.value.asTokenizableEncrypted(),
                 tokenKeyType = tokenKeyType,
                 project = project,
-            )
+                logError = false,
+            ) is TokenizableString.Raw
+
+            if (isAlreadyTokenized) {
+                s.value.asTokenizableEncrypted()
+            } else {
+                tokenizationProcessor.encrypt(
+                    decrypted = s.value.asTokenizableRaw(),
+                    tokenKeyType = tokenKeyType,
+                    project = project,
+                )
+            }
         }
     }
 }

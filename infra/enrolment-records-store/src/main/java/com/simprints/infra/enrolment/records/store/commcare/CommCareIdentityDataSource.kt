@@ -40,14 +40,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : IdentityDataSource {
-    companion object {
-        const val COLUMN_CASE_ID = "case_id"
-        const val COLUMN_DATUM_ID = "datum_id"
-        const val COLUMN_VALUE = "value"
-
-        const val ARG_CASE_ID = "caseId"
-    }
-
     private fun getCaseMetadataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/case")
 
     private fun getCaseDataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/data")
@@ -106,7 +98,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     if (caseMetadataCursor.moveToPosition(range.first)) {
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project))
+                                enrolmentRecordCreationEvents.addAll(
+                                    loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
+                                )
                                 onCandidateLoaded()
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
@@ -160,7 +154,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         caseId: String,
         callerPackageName: String,
         query: SubjectQuery,
-        project: Project
+        project: Project,
     ): List<EnrolmentRecordCreationEvent> {
         // Access Case Data Listing for the caseId
         val caseDataUri = getCaseDataUri(callerPackageName).buildUpon().appendPath(caseId).build()
@@ -181,15 +175,15 @@ internal class CommCareIdentityDataSource @Inject constructor(
                         (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
                             !compareImplicitTokenizedStringsUseCase(
                                 query.attendantId,
-                                event.payload.attendantId.value,
+                                event.payload.attendantId,
                                 TokenKeyType.AttendantId,
-                                project
+                                project,
                             ) ||
                             !compareImplicitTokenizedStringsUseCase(
                                 query.moduleId,
-                                event.payload.moduleId.value,
+                                event.payload.moduleId,
                                 TokenKeyType.ModuleId,
-                                project
+                                project,
                             )
                     }
             }.orEmpty()
@@ -243,5 +237,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 null,
             )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
         count
+    }
+
+    companion object {
+        const val COLUMN_CASE_ID = "case_id"
+        const val COLUMN_DATUM_ID = "datum_id"
+        const val COLUMN_VALUE = "value"
+
+        const val ARG_CASE_ID = "caseId"
     }
 }

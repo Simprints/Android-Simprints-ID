@@ -34,7 +34,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should return false when s1 is null`() {
         val s1 = null
-        val s2 = "s2"
+        val s2 = TokenizableString.Raw("s2")
 
         val result = useCase(s1, s2, tokenKeyType, project)
 
@@ -44,7 +44,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should return true if strings are equal (both untokenized)`() {
         val s1 = "s1".asTokenizableRaw()
-        val s2 = s1.value
+        val s2 = s1
         every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Tokenized("some value")
 
         val result = useCase(s1, s2, tokenKeyType, project)
@@ -56,7 +56,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should return false if strings are not equal (both untokenized)`() {
         val s1 = "s1".asTokenizableRaw()
-        val s2 = "s2"
+        val s2 = "s2".asTokenizableRaw()
         every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Tokenized("some value")
 
         val result = useCase(s1, s2, tokenKeyType, project)
@@ -68,7 +68,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should call encrypt if only first is tokenized)`() {
         val s1 = "s1".asTokenizableEncrypted()
-        val s2 = "s2"
+        val s2 = "s2".asTokenizableRaw()
         every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Tokenized("some value")
 
         useCase(s1, s2, tokenKeyType, project)
@@ -79,8 +79,8 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should call encrypt if only second is tokenized)`() {
         val s1 = "s1".asTokenizableRaw()
-        val s2 = "encrypted s1"
-        every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Raw(s2)
+        val s2 = "encrypted s1".asTokenizableEncrypted()
+        every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Tokenized("some value")
 
         useCase(s1, s2, tokenKeyType, project)
 
@@ -90,7 +90,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should not call encrypt and return true if both strings are tokenized and equal`() {
         val s1 = "s1".asTokenizableEncrypted()
-        val s2 = s1.value
+        val s2 = "s1".asTokenizableEncrypted()
         every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Raw("some value")
 
         val result = useCase(s1, s2, tokenKeyType, project)
@@ -102,7 +102,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should not call encrypt and return false if both strings are tokenized but not equal`() {
         val s1 = "s1".asTokenizableEncrypted()
-        val s2 = "s2"
+        val s2 = "s2".asTokenizableEncrypted()
         every { tokenizationProcessor.decrypt(any(), any(), any(), any()) } returns TokenizableString.Raw("some value")
 
         val result = useCase(s1, s2, tokenKeyType, project)
@@ -114,7 +114,7 @@ class CompareImplicitTokenizedStringsUseCaseTest {
     @Test
     fun `should return false if not equal`() {
         val s1 = "s1".asTokenizableRaw()
-        val s2 = "s2"
+        val s2 = "s2".asTokenizableRaw()
 
         val result = useCase(s1, s2, tokenKeyType, project)
 
