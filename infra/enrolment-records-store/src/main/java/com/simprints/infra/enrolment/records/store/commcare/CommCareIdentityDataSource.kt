@@ -169,25 +169,44 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 coSyncEnrolmentRecordEvents
                     ?.events
                     ?.filterIsInstance<EnrolmentRecordCreationEvent>()
-                    ?.filterNot { event ->
+                    ?.filter { event ->
                         // [MS-852] Plain strings from CommCare might be tokenized or untokenized. The only way to properly compare them
                         // is by trying to decrypt the values to check if already tokenized, and then compare the values
-                        (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
-                            !compareImplicitTokenizedStringsUseCase(
-                                query.attendantId,
-                                event.payload.attendantId,
-                                TokenKeyType.AttendantId,
-                                project,
-                            ) ||
-                            !compareImplicitTokenizedStringsUseCase(
-                                query.moduleId,
-                                event.payload.moduleId,
-                                TokenKeyType.ModuleId,
-                                project,
-                            )
+                        isSubjectIdNullOrMatching(query, event) &&
+                            isAttendantIdNullOrMatching(query, event, project) &&
+                            isModuleIdNullOrMatching(query, event, project)
                     }
             }.orEmpty()
     }
+
+    private fun isSubjectIdNullOrMatching(
+        query: SubjectQuery,
+        event: EnrolmentRecordCreationEvent,
+    ): Boolean = query.subjectId == null || query.subjectId == event.payload.subjectId
+
+    private fun isAttendantIdNullOrMatching(
+        query: SubjectQuery,
+        event: EnrolmentRecordCreationEvent,
+        project: Project,
+    ): Boolean = query.attendantId == null ||
+        compareImplicitTokenizedStringsUseCase(
+            query.attendantId,
+            event.payload.attendantId,
+            TokenKeyType.AttendantId,
+            project,
+        )
+
+    private fun isModuleIdNullOrMatching(
+        query: SubjectQuery,
+        event: EnrolmentRecordCreationEvent,
+        project: Project,
+    ): Boolean = query.moduleId == null ||
+        compareImplicitTokenizedStringsUseCase(
+            query.moduleId,
+            event.payload.moduleId,
+            TokenKeyType.ModuleId,
+            project,
+        )
 
     private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
         while (caseDataCursor.moveToNext()) {
