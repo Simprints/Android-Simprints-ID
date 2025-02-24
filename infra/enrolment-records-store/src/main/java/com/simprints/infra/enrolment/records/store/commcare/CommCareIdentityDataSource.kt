@@ -21,6 +21,7 @@ import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.usecases.CompareImplicitTokenizedStringsUseCase
+import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
@@ -239,6 +240,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
         addDeserializer(
             TokenizableString::class.java,
             TokenizationClassNameDeserializer(),
+        )
+        addDeserializer(
+            EnrolmentRecordCreationEvent::class.java,
+            CoSyncEnrolmentRecordCreationEventDeserializer(),
         )
     }
 
