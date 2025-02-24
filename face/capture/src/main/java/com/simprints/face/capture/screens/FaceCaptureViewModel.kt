@@ -18,7 +18,6 @@ import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -56,6 +55,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     // Updated in live feedback screen
     var attemptNumber: Int = 0
     var samplesToCapture = 1
+    var initialised = false
 
     var shouldCheckCameraPermissions = AtomicBoolean(true)
 
@@ -90,6 +90,11 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
+        if (initialised) {
+            Simber.i("Face bio SDK already initialised", tag = FACE_CAPTURE)
+            return@launch
+        }
+
         Simber.i("Starting face capture flow", tag = FACE_CAPTURE)
 
         val licenseVendor = Vendor.RankOne
@@ -124,10 +129,9 @@ internal class FaceCaptureViewModel @Inject constructor(
         saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
 
-    fun setupAutoCapture() =
-        viewModelScope.launch {
-            _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
-        }
+    fun setupAutoCapture() = viewModelScope.launch {
+        _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
+    }
 
     private suspend fun initialize(
         activity: Activity,
@@ -139,6 +143,7 @@ internal class FaceCaptureViewModel @Inject constructor(
             // This is should reported as an error
             return LicenseStatus.ERROR
         }
+        initialised = true
         return LicenseStatus.VALID
     }
 

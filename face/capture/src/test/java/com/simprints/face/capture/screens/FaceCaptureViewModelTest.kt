@@ -11,7 +11,6 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
-import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -161,7 +160,7 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `test initFaceBioSdk should initialize faceBioSdk`() {
+    fun `test initFaceBioSdk should initialize faceBioSdk only once`() {
         // Given
         val license = "license"
         every { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns true
@@ -173,8 +172,11 @@ class FaceCaptureViewModelTest {
 
         // When
         viewModel.initFaceBioSdk(mockk())
+        viewModel.initFaceBioSdk(mockk())
+        viewModel.initFaceBioSdk(mockk())
+
         // Then
-        coVerify { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
+        coVerify(exactly = 1) { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.VALID)
     }
 
