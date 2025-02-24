@@ -46,16 +46,16 @@ class ConfigManager @Inject constructor(
         }
     }
 
-    fun watchProjectConfiguration(): Flow<ProjectConfiguration> =
-        configRepository.watchProjectConfiguration()
-            .onStart { getProjectConfiguration() } // to invoke download if empty
+    fun watchProjectConfiguration(): Flow<ProjectConfiguration> = configRepository
+        .watchProjectConfiguration()
+        .onStart { getProjectConfiguration() } // to invoke download if empty
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration = configRepository.getDeviceConfiguration()
 
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
         configRepository.updateDeviceConfiguration(update)
 
-    suspend fun getPrivacyNotice(
+    fun getPrivacyNotice(
         projectId: String,
         language: String,
     ): Flow<PrivacyNoticeResult> = configRepository.getPrivacyNotice(

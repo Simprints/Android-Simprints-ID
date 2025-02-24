@@ -68,7 +68,7 @@ internal class PrivacyNoticeViewModel @Inject constructor(
             }
     }
 
-    private suspend fun attemptDownloadingLanguage(
+    private fun attemptDownloadingLanguage(
         projectId: String,
         deviceLanguage: String,
     ): Flow<PrivacyNoticeState> = configManager.getPrivacyNotice(projectId, deviceLanguage).map { it.toPrivacyNoticeViewState() }
