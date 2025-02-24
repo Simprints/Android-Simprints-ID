@@ -153,7 +153,7 @@ class LibSimprintsResponseMapperTest {
         assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
-        assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isFalse() // Default value
+        assertThat(extras.keySet()).doesNotContain(Constants.SIMPRINTS_VERIFICATION_SUCCESS)
     }
 
     @Test
@@ -179,6 +179,7 @@ class LibSimprintsResponseMapperTest {
         assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+        assertThat(extras.keySet()).contains(Constants.SIMPRINTS_VERIFICATION_SUCCESS)
         assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isEqualTo(false)
     }
 
@@ -204,7 +205,6 @@ class LibSimprintsResponseMapperTest {
         assertThat(extraVerification?.guid).isEqualTo("guid")
         assertThat(extraVerification?.tier).isEqualTo(LegacyTier.TIER_1)
         assertThat(extraVerification?.getConfidence()).isEqualTo(50)
-        // assertThat(extraVerification?.isSuccess).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
         assertThat(extras.getBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS)).isTrue()
     }
@@ -230,6 +230,32 @@ class LibSimprintsResponseMapperTest {
         assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
             """
             {"guid":"guid","confidenceBand":"HIGH","confidence":50,"isSuccess":true}
+            """.trimIndent(),
+        )
+        assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
+    }
+
+    @Test
+    fun `correctly maps verify response without success after LibSimprints refactoring`() {
+        val extras = mapper(
+            ActionResponse.VerifyActionResponse(
+                actionIdentifier = VerifyActionFactory
+                    .getIdentifier()
+                    .copy(contractVersion = VersionsList.INITIAL_REWORK),
+                sessionId = "sessionId",
+                matchResult = AppMatchResult(
+                    guid = "guid",
+                    confidenceScore = 50,
+                    matchConfidence = AppMatchConfidence.HIGH,
+                    verificationSuccess = null,
+                ),
+            ),
+        )
+
+        assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
+        assertThat(extras.getString(Constants.SIMPRINTS_VERIFICATION)).isEqualTo(
+            """
+            {"guid":"guid","confidenceBand":"HIGH","confidence":50}
             """.trimIndent(),
         )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isTrue()
