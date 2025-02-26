@@ -9,7 +9,6 @@ import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.toRealmInstant
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.getValue
-import io.realm.kotlin.dynamic.getValueList
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.types.RealmUUID
 import java.util.Date

@@ -14,6 +14,5 @@ dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
     implementation(project(":infra:events"))
-    implementation(project(":infra:enrolment-records-store"))
-
+    implementation(project(":infra:enrolment-records:repository"))
 }

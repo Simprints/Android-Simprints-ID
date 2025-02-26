@@ -30,13 +30,12 @@ jobs:
         with:
             modules: |
                 infra:orchestrator-data
-                infra:realm
+                infra:enrolment-records:repository
+                :infra:enrolment-records:realm-store
                 infra:recent-user-activity
                 infra:config-store
                 infra:config-sync
                 infra:sync
-                infra:auth-store
-                infra:auth-logic
             reportsId: infra1
 
     infra-unit-tests-2:
@@ -46,10 +45,11 @@ jobs:
         with:
             modules: |
                 infra:events
-                infra:event-sync
-                infra:enrolment-records-store
+                infra:event-sync                
                 infra:license
                 infra:images
+                infra:auth-store
+                infra:auth-logic
             reportsId: infra2
 
     feature-unit-tests1:

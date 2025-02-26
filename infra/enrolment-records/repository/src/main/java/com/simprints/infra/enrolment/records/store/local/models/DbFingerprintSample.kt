@@ -6,7 +6,7 @@ import com.simprints.infra.realm.models.DbFingerprintSample
 
 internal fun DbFingerprintSample.fromDbToDomain(): FingerprintSample = FingerprintSample(
     id = id,
-    fingerIdentifier = IFingerIdentifier.values()[fingerIdentifier],
+    fingerIdentifier = IFingerIdentifier.entries[fingerIdentifier],
     template = template,
     templateQualityScore = templateQualityScore,
     format = format,

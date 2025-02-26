@@ -11,7 +11,7 @@ android {
 dependencies {
 
     implementation(project(":infra:orchestrator-data"))
-    implementation(project(":infra:enrolment-records-store"))
+    implementation(project(":infra:enrolment-records:repository"))
     implementation(project(":infra:events"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
