@@ -5,7 +5,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent

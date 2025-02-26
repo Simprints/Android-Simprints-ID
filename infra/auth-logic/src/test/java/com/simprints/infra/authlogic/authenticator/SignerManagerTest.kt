@@ -8,7 +8,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.images.ImageRepository

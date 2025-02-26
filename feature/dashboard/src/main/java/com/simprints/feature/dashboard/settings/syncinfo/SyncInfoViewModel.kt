@@ -20,8 +20,8 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.DownSyncCounts

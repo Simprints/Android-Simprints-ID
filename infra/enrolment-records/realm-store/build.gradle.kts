@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.simprints.infra.realm"
+    namespace = "com.simprints.infra.enrolment.records.realm.store"
 }
 
 dependencies {

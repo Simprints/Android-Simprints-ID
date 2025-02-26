@@ -9,7 +9,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference

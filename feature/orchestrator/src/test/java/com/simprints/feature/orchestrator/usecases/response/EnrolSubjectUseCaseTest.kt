@@ -5,9 +5,9 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload

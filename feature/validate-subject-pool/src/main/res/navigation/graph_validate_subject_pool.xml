@@ -13,7 +13,7 @@
 
         <argument
             android:name="subjectQuery"
-            app:argType="com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery" />
+            app:argType="com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery" />
 
     </fragment>
 

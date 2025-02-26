@@ -6,9 +6,9 @@ import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult

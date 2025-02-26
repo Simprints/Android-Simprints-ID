@@ -31,7 +31,7 @@ jobs:
             modules: |
                 infra:orchestrator-data
                 infra:enrolment-records:repository
-                :infra:enrolment-records:realm-store
+                infra:enrolment-records:realm-store
                 infra:recent-user-activity
                 infra:config-store
                 infra:config-sync

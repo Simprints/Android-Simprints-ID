@@ -12,9 +12,9 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult

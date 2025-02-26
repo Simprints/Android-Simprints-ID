@@ -3,10 +3,10 @@ package com.simprints.infra.config.store.local.migrations
 import androidx.datastore.core.DataMigration
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.models.ProtoProject
+import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
+import com.simprints.infra.enrolment.records.realm.store.models.DbProject
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.realm.RealmWrapper
-import com.simprints.infra.realm.models.DbProject
 import javax.inject.Inject
 
 /**

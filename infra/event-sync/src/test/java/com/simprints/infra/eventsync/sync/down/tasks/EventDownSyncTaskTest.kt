@@ -7,9 +7,9 @@ import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -37,6 +37,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -44,7 +45,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.UUID
-import kotlin.coroutines.cancellation.CancellationException
 
 class EventDownSyncTaskTest {
     companion object {
@@ -263,7 +263,7 @@ class EventDownSyncTaskTest {
                         ),
                     ),
                 ),
-                project
+                project,
             )
         }
     }
@@ -338,7 +338,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -366,7 +366,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -388,7 +388,7 @@ class EventDownSyncTaskTest {
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                 ),
-                project
+                project,
             )
         }
     }
@@ -416,7 +416,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -444,7 +444,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -461,7 +461,7 @@ class EventDownSyncTaskTest {
                 listOf(
                     Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
                 ),
-                project
+                project,
             )
         }
     }
@@ -479,7 +479,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToAttendant2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToAttendant2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }
@@ -497,7 +497,7 @@ class EventDownSyncTaskTest {
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId),
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation)),
                 ),
-                project
+                project,
             )
         }
     }

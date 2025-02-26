@@ -6,7 +6,7 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

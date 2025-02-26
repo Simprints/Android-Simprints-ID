@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.testtools.protoProject
-import com.simprints.infra.realm.RealmWrapper
-import com.simprints.infra.realm.models.DbProject
+import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
+import com.simprints.infra.enrolment.records.realm.store.models.DbProject
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

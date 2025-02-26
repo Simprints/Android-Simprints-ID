@@ -5,7 +5,7 @@ import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.license.LicenseRepository

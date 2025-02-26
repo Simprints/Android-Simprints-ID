@@ -1,7 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 

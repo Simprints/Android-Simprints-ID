@@ -29,8 +29,8 @@ import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.isAgeRestricted
 import com.simprints.infra.config.store.models.sortedUniqueAgeGroups
-import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.matcher.MatchContract
 import javax.inject.Inject
