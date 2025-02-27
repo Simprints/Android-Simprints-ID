@@ -74,7 +74,8 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                             guid = response.matchResult.guid,
                         ),
                     )
-                    putBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS, response.matchResult.verificationSuccess == true)
+                    response.matchResult.verificationSuccess
+                        ?.let { putBoolean(Constants.SIMPRINTS_VERIFICATION_SUCCESS, it) }
                 }
 
                 else -> putString(
@@ -83,7 +84,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                         guid = response.matchResult.guid,
                         confidence = response.matchResult.confidenceScore.toFloat(),
                         confidenceBand = ConfidenceBand.valueOf(response.matchResult.matchConfidence.name),
-                        isSuccess = response.matchResult.verificationSuccess == true,
+                        isSuccess = response.matchResult.verificationSuccess,
                     ).toJson(),
                 )
             }

@@ -98,7 +98,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
         val result = useCase("projectId", "subjectId")
 
         coVerify { enrolmentRecordRepository.load(any()) }
-        coVerify { jsonHelper.toJson(any()) }
+        coVerify { jsonHelper.toJson(any(), any()) }
         assertThat(result).isNotNull()
     }
 }

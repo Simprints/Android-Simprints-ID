@@ -79,7 +79,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
         localDataSource.deletePrivacyNotices()
     }
 
-    override suspend fun getPrivacyNotice(
+    override fun getPrivacyNotice(
         projectId: String,
         language: String,
     ): Flow<PrivacyNoticeResult> = flow {
@@ -102,14 +102,14 @@ internal class ConfigRepositoryImpl @Inject constructor(
                             is TokenizableString.Raw -> tokenizationProcessor.encrypt(
                                 decrypted = moduleId,
                                 tokenKeyType = TokenKeyType.ModuleId,
-                                project = project
+                                project = project,
                             )
 
                             is TokenizableString.Tokenized -> moduleId
                         }
-                    }
-                )
-            )
+                    },
+                ),
+            ),
         )
     }
 

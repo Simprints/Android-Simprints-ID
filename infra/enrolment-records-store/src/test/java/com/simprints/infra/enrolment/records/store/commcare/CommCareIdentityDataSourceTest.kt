@@ -8,6 +8,7 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_INDEX_FINGER
 import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.models.Project
@@ -259,7 +260,14 @@ class CommCareIdentityDataSourceTest {
             SUBJECT_ACTIONS_FACE_2,
         )
         val templateFormat = "ROC_1_23"
-        val query = SubjectQuery(faceSampleFormat = templateFormat)
+        val query = SubjectQuery(
+            faceSampleFormat = templateFormat,
+            attendantId = TokenizableString.Tokenized(
+                value = "AdySMrjuy7uq0Dcxov3rUFIw66uXTFrKd0BnzSr9MYXl5maWEpyKQT8AUdcPuVHUWpOkO88=",
+            ),
+            moduleId = TokenizableString.Tokenized(value = "AWuA3H0WGtHI2uod+ePZ3yiWTt9etQ=="),
+            subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
+        )
         val range = 0..expectedFaceIdentities.size
         val actualIdentities = dataSource.loadFaceIdentities(query, range, project = project) {}
 

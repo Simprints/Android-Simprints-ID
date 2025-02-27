@@ -25,7 +25,7 @@ interface ConfigRepository {
 
     suspend fun clearData()
 
-    suspend fun getPrivacyNotice(
+    fun getPrivacyNotice(
         projectId: String,
         language: String,
     ): Flow<PrivacyNoticeResult>

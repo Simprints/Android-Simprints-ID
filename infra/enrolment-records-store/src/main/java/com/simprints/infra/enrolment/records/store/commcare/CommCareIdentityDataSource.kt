@@ -21,6 +21,7 @@ import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.usecases.CompareImplicitTokenizedStringsUseCase
+import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
@@ -40,14 +41,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : IdentityDataSource {
-    companion object {
-        const val COLUMN_CASE_ID = "case_id"
-        const val COLUMN_DATUM_ID = "datum_id"
-        const val COLUMN_VALUE = "value"
-
-        const val ARG_CASE_ID = "caseId"
-    }
-
     private fun getCaseMetadataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/case")
 
     private fun getCaseDataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/data")
@@ -106,7 +99,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     if (caseMetadataCursor.moveToPosition(range.first)) {
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                                enrolmentRecordCreationEvents.addAll(loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project))
+                                enrolmentRecordCreationEvents.addAll(
+                                    loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
+                                )
                                 onCandidateLoaded()
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
@@ -160,7 +155,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         caseId: String,
         callerPackageName: String,
         query: SubjectQuery,
-        project: Project
+        project: Project,
     ): List<EnrolmentRecordCreationEvent> {
         // Access Case Data Listing for the caseId
         val caseDataUri = getCaseDataUri(callerPackageName).buildUpon().appendPath(caseId).build()
@@ -175,25 +170,44 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 coSyncEnrolmentRecordEvents
                     ?.events
                     ?.filterIsInstance<EnrolmentRecordCreationEvent>()
-                    ?.filterNot { event ->
+                    ?.filter { event ->
                         // [MS-852] Plain strings from CommCare might be tokenized or untokenized. The only way to properly compare them
                         // is by trying to decrypt the values to check if already tokenized, and then compare the values
-                        (query.subjectId != null && query.subjectId != event.payload.subjectId) ||
-                            !compareImplicitTokenizedStringsUseCase(
-                                query.attendantId,
-                                event.payload.attendantId.value,
-                                TokenKeyType.AttendantId,
-                                project
-                            ) ||
-                            !compareImplicitTokenizedStringsUseCase(
-                                query.moduleId,
-                                event.payload.moduleId.value,
-                                TokenKeyType.ModuleId,
-                                project
-                            )
+                        isSubjectIdNullOrMatching(query, event) &&
+                            isAttendantIdNullOrMatching(query, event, project) &&
+                            isModuleIdNullOrMatching(query, event, project)
                     }
             }.orEmpty()
     }
+
+    private fun isSubjectIdNullOrMatching(
+        query: SubjectQuery,
+        event: EnrolmentRecordCreationEvent,
+    ): Boolean = query.subjectId == null || query.subjectId == event.payload.subjectId
+
+    private fun isAttendantIdNullOrMatching(
+        query: SubjectQuery,
+        event: EnrolmentRecordCreationEvent,
+        project: Project,
+    ): Boolean = query.attendantId == null ||
+        compareImplicitTokenizedStringsUseCase(
+            query.attendantId,
+            event.payload.attendantId,
+            TokenKeyType.AttendantId,
+            project,
+        )
+
+    private fun isModuleIdNullOrMatching(
+        query: SubjectQuery,
+        event: EnrolmentRecordCreationEvent,
+        project: Project,
+    ): Boolean = query.moduleId == null ||
+        compareImplicitTokenizedStringsUseCase(
+            query.moduleId,
+            event.payload.moduleId,
+            TokenKeyType.ModuleId,
+            project,
+        )
 
     private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
         while (caseDataCursor.moveToNext()) {
@@ -227,6 +241,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
             TokenizableString::class.java,
             TokenizationClassNameDeserializer(),
         )
+        addDeserializer(
+            EnrolmentRecordCreationEvent::class.java,
+            CoSyncEnrolmentRecordCreationEventDeserializer(),
+        )
     }
 
     override suspend fun count(
@@ -243,5 +261,13 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 null,
             )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
         count
+    }
+
+    companion object {
+        const val COLUMN_CASE_ID = "case_id"
+        const val COLUMN_DATUM_ID = "datum_id"
+        const val COLUMN_VALUE = "value"
+
+        const val ARG_CASE_ID = "caseId"
     }
 }
