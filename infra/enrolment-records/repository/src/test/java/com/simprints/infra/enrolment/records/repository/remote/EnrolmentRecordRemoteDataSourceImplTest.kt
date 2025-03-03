@@ -77,9 +77,10 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     FINGERPRINT_TEMPLATE,
                     50,
                     "ISO_19794_2",
+                    "5289df73-7df5-3326-bcdd-22597afb1fac",
                 ),
             ),
-            faceSamples = listOf(FaceSample(FACE_TEMPLATE, "faceTemplateFormat")),
+            faceSamples = listOf(FaceSample(FACE_TEMPLATE, "faceTemplateFormat", "b4a3ba90-6413-32b4-a4ea-a841a5a400ec")),
         )
         val expectedRecord = ApiEnrolmentRecord(
             subjectId = SUBJECT_ID,

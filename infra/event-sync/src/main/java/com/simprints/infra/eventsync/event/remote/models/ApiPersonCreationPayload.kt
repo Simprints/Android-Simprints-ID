@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
 
 @Keep
+@Deprecated("Replaced by ApiBiometricReferenceCreationEvent in 2025.1.0")
 internal data class ApiPersonCreationPayload(
     override val startTime: ApiTimestamp,
     val fingerprintCaptureIds: List<String>?,

@@ -5,6 +5,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
@@ -100,4 +101,18 @@ internal class SimpleCaptureEventReporter @Inject constructor(
             it.format,
         )
     }!!
+
+    fun addBiometricReferenceCreationEvents(
+        referenceId: String,
+        captureIds: List<String>,
+    ) = sessionCoroutineScope.launch {
+        eventRepository.addOrUpdateEvent(
+            BiometricReferenceCreationEvent(
+                startTime = timeHelper.now(),
+                referenceId = referenceId,
+                modality = BiometricReferenceCreationEvent.BiometricReferenceModality.FACE,
+                captureIds = captureIds,
+            ),
+        )
+    }
 }

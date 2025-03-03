@@ -7,6 +7,7 @@ import java.io.Serializable
 
 @Keep
 data class FingerprintCaptureResult(
+    val referenceId: String,
     var results: List<Item>,
 ) : Serializable {
     @Keep

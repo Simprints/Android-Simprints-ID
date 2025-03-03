@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
 import java.util.UUID
 
 @Keep
+@Deprecated("Replaced by v4 in 2025.1.0")
 data class EnrolmentEventV2(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: EnrolmentPayload,

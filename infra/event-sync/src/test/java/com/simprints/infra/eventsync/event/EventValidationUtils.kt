@@ -303,16 +303,6 @@ fun validateConsentEventApiModel(json: JSONObject) {
     }
 }
 
-fun validateEnrolmentEventV1ApiModel(json: JSONObject) {
-    validateCommonParams(json, "Enrolment", 2)
-
-    with(json.getJSONObject("payload")) {
-        validateTimestamp(getJSONObject("startTime"))
-        assertThat(getString("personId").isValidGuid()).isTrue()
-        assertThat(length()).isEqualTo(2)
-    }
-}
-
 fun validateEnrolmentEventV2ApiModel(json: JSONObject) {
     validateCommonParams(json, "Enrolment", 3)
 
@@ -323,6 +313,20 @@ fun validateEnrolmentEventV2ApiModel(json: JSONObject) {
         assertThat(getString("moduleId")).isNotNull()
         assertThat(getString("attendantId")).isNotNull()
         assertThat(getString("personCreationEventId")).isNotNull()
+        assertThat(length()).isEqualTo(6)
+    }
+}
+
+fun validateEnrolmentEventV4ApiModel(json: JSONObject) {
+    validateCommonParams(json, "Enrolment", 4)
+
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("subjectId")).isNotNull()
+        assertThat(getString("projectId")).isNotNull()
+        assertThat(getString("moduleId")).isNotNull()
+        assertThat(getString("attendantId")).isNotNull()
+        assertThat(getJSONArray("biometricReferenceIds")).isNotNull()
         assertThat(length()).isEqualTo(6)
     }
 }
@@ -378,7 +382,7 @@ fun validateMatchEntryApiModel(json: JSONObject) {
 }
 
 fun validateOneToManyMatchEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "OneToManyMatch", 2)
+    validateCommonParams(json, "OneToManyMatch", 3)
 
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
@@ -393,12 +397,13 @@ fun validateOneToManyMatchEventApiModel(json: JSONObject) {
         for (i in 0 until matchEntries.length()) {
             validateMatchEntryApiModel(matchEntries.getJSONObject(i))
         }
-        assertThat(length()).isEqualTo(5)
+        assertThat(getString("probeBiometricReferenceId").isValidGuid()).isTrue()
+        assertThat(length()).isEqualTo(6)
     }
 }
 
 fun validateOneToOneMatchEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "OneToOneMatch", 3)
+    validateCommonParams(json, "OneToOneMatch", 4)
 
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
@@ -413,7 +418,8 @@ fun validateOneToOneMatchEventApiModel(json: JSONObject) {
         with(getJSONObject("result")) {
             validateMatchEntryApiModel(this)
         }
-        assertThat(length()).isEqualTo(6)
+        assertThat(getString("probeBiometricReferenceId").isValidGuid()).isTrue()
+        assertThat(length()).isEqualTo(7)
     }
 }
 
@@ -628,6 +634,16 @@ fun validateAgeGroupSelectionEventApiModel(json: JSONObject) {
         validateTimestamp(getJSONObject("startTime"))
         validateTimestamp(getJSONObject("endTime"))
         assertThat(getString("subjectAgeGroup")).isNotNull()
+    }
+}
+
+fun validateBiometricReferenceCreationEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "BiometricReferenceCreation", 1)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        assertThat(getString("id")).isNotNull()
+        assertThat(getString("modality")).isNotNull()
+        assertThat(getString("captureIds")).isNotNull()
     }
 }
 

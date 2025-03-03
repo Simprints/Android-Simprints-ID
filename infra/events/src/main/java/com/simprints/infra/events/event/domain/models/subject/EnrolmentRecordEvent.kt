@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(value = EnrolmentRecordCreationEvent::class, name = "EnrolmentRecordCreation"),
     JsonSubTypes.Type(value = EnrolmentRecordMoveEvent::class, name = "EnrolmentRecordMove"),
     JsonSubTypes.Type(value = EnrolmentRecordDeletionEvent::class, name = "EnrolmentRecordDeletion"),
+    JsonSubTypes.Type(value = EnrolmentRecordUpdateEvent::class, name = "EnrolmentRecordUpdate"),
 )
 @Keep
 sealed class EnrolmentRecordEvent(

@@ -24,6 +24,7 @@ import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.LiveFeedbackState
 import com.simprints.fingerprint.capture.state.ScanResult
+import com.simprints.fingerprint.capture.usecase.AddBiometricReferenceCreationEventUseCase
 import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
@@ -61,6 +62,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -74,6 +76,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
     private val addCaptureEvents: AddCaptureEventsUseCase,
+    private val addBiometricReferenceCreationEvents: AddBiometricReferenceCreationEventUseCase,
     private val tracker: FingerprintScanningStatusTracker,
     private val isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase,
     @ExternalScope private val externalScope: CoroutineScope,
@@ -669,7 +672,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 ),
             )
         }
-        _finishWithFingerprints.send(FingerprintCaptureResult(resultItems))
+        val biometricReferenceId = UUID.randomUUID().toString()
+        addBiometricReferenceCreationEvents(biometricReferenceId, resultItems.mapNotNull { it.captureEventId })
+
+        _finishWithFingerprints.send(FingerprintCaptureResult(biometricReferenceId, resultItems))
     }
 
     private suspend fun saveImageIfExists(

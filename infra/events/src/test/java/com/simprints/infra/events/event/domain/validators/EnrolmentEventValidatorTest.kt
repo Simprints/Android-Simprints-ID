@@ -2,7 +2,8 @@ package com.simprints.infra.events.event.domain.validators
 
 import com.simprints.infra.events.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.createEnrolmentEventV2
+import com.simprints.infra.events.sampledata.createBiometricReferenceCreationEvent
+import com.simprints.infra.events.sampledata.createEnrolmentEventV4
 import com.simprints.infra.events.sampledata.createEventWithSessionId
 import com.simprints.infra.events.sampledata.createFaceCaptureEvent
 import com.simprints.infra.events.sampledata.createFingerprintCaptureEvent
@@ -20,24 +21,24 @@ internal class EnrolmentEventValidatorTest {
     }
 
     @Test
-    fun validate_shouldValidateIfBiometricCaptureAndPersonCreationIsPresent() {
+    fun validate_shouldValidateIfBiometricCaptureAndBiometricCreationIsPresent() {
         val currentEvents = listOf(createFaceCaptureEvent(), createPersonCreationEvent())
-        validator.run { validate(currentEvents, createEnrolmentEventV2()) }
+        validator.run { validate(currentEvents, createBiometricReferenceCreationEvent()) }
     }
 
     @Test
     fun validate_shouldThrowIfBiometricCaptureIsNotPresent() {
         assertThrows<EnrolmentEventValidatorException> {
-            val currentEvents = listOf(createEventWithSessionId(GUID1, GUID1), createPersonCreationEvent())
-            validator.validate(currentEvents, createEnrolmentEventV2())
+            val currentEvents = listOf(createEventWithSessionId(GUID1, GUID1), createBiometricReferenceCreationEvent())
+            validator.validate(currentEvents, createEnrolmentEventV4())
         }
     }
 
     @Test
-    fun validate_shouldThrowIfPersonCreationIsNotPresent() {
+    fun validate_shouldThrowIfBiometricCreationEventIsNotPresent() {
         assertThrows<EnrolmentEventValidatorException> {
             val currentEvents = listOf(createFingerprintCaptureEvent())
-            validator.validate(currentEvents, createEnrolmentEventV2())
+            validator.validate(currentEvents, createEnrolmentEventV4())
         }
     }
 }

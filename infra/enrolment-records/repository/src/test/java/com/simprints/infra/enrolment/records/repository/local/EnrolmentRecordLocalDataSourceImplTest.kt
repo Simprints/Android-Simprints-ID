@@ -2,11 +2,15 @@ package com.simprints.infra.enrolment.records.repository.local
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
+import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
+import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
@@ -28,6 +32,7 @@ import io.mockk.verify
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -46,6 +51,9 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
     @MockK
     private lateinit var realmQuery: RealmQuery<DbSubject>
+
+    @MockK
+    private lateinit var realmSingleQuery: RealmSingleQuery<DbSubject>
 
     @MockK
     private lateinit var tokenizationProcessor: TokenizationProcessor
@@ -88,7 +96,13 @@ class EnrolmentRecordLocalDataSourceImplTest {
         every { realm.query(DbSubject::class) } returns realmQuery
         every { mutableRealm.query(DbSubject::class) } returns realmQuery
 
-        enrolmentRecordLocalDataSource = EnrolmentRecordLocalDataSourceImpl(realmWrapperMock, tokenizationProcessor)
+        every { realmQuery.query(any(), any()) } returns realmQuery
+        every { realmQuery.first() } returns realmSingleQuery
+
+        enrolmentRecordLocalDataSource = EnrolmentRecordLocalDataSourceImpl(
+            realmWrapperMock,
+            tokenizationProcessor,
+        )
     }
 
     @Test
@@ -212,10 +226,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people =
-            enrolmentRecordLocalDataSource
-                .load(SubjectQuery(attendantId = savedPersons[0].attendantId))
-                .toList()
+        val people = enrolmentRecordLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId)).toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
         }
@@ -226,10 +237,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people =
-            enrolmentRecordLocalDataSource
-                .load(SubjectQuery(moduleId = fakePerson.moduleId.asTokenizableEncrypted()))
-                .toList()
+        val people = enrolmentRecordLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId.asTokenizableEncrypted())).toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
         }
@@ -238,12 +246,83 @@ class EnrolmentRecordLocalDataSourceImplTest {
     @Test
     fun performSubjectCreationAction() = runTest {
         val subject = getFakePerson()
+        every { realmSingleQuery.find() } returns null
+
         enrolmentRecordLocalDataSource.performActions(
             listOf(SubjectAction.Creation(subject.fromDbToDomain())),
             project,
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
+    }
+
+    @Test
+    fun performSubjectCreationAction_deletesOldSamples() = runTest {
+        every { realmSingleQuery.find() } returns getRandomSubject()
+            .copy(
+                faceSamples = listOf(
+                    getRandomFaceSample("faceToDelete"),
+                ),
+                fingerprintSamples = listOf(
+                    getRandomFingerprintSample("fingerToDelete"),
+                ),
+            ).fromDomainToDb()
+        val subject = getFakePerson()
+
+        enrolmentRecordLocalDataSource.performActions(
+            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
+            project,
+        )
+
+        verify {
+            mutableRealm.delete(withArg<DbFaceSample> { it.id == "faceToDelete" })
+            mutableRealm.delete(withArg<DbFingerprintSample> { it.id == "faceToDelete" })
+        }
+        val peopleCount = enrolmentRecordLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(1)
+    }
+
+    @Test
+    fun performSubjectUpdateAction() = runTest {
+        val subject = getFakePerson()
+        every { realmSingleQuery.find() } returns getRandomSubject(
+            faceSamples = listOf(
+                getRandomFaceSample(referenceId = "faceToDelete"),
+                getRandomFaceSample(),
+            ),
+            fingerprintSamples = listOf(
+                getRandomFingerprintSample(referenceId = "fingerToDelete"),
+                getRandomFingerprintSample(),
+            ),
+        ).fromDomainToDb()
+
+        enrolmentRecordLocalDataSource.performActions(
+            listOf(
+                SubjectAction.Update(
+                    subject.subjectId.toString(),
+                    faceSamplesToAdd = listOf(getRandomFaceSample()),
+                    fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
+                    referenceIdsToRemove = listOf("faceToDelete", "fingerToDelete"),
+                ),
+            ),
+            project,
+        )
+        val peopleCount = enrolmentRecordLocalDataSource.count()
+        assertThat(peopleCount).isEqualTo(1)
+        verify {
+            mutableRealm.delete(withArg<DbFaceSample> { it.id == "faceToDelete" })
+            mutableRealm.delete(withArg<DbFingerprintSample> { it.id == "faceToDelete" })
+            mutableRealm.copyToRealm(
+                withArg<DbSubject> {
+                    // one old + one new
+                    it.faceSamples.size == 2 &&
+                        it.fingerprintSamples.size == 2 &&
+                        it.faceSamples.none { it.referenceId == "faceToDelete" } &&
+                        it.fingerprintSamples.none { it.referenceId == "fingerToDelete" }
+                },
+                any(),
+            )
+        }
     }
 
     @Test
@@ -307,15 +386,27 @@ class EnrolmentRecordLocalDataSourceImplTest {
         projectId: String = UUID.randomUUID().toString(),
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
-        faceSamples: Array<FaceSample> = arrayOf(
-            FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
-            FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
+        faceSamples: List<FaceSample> = listOf(
+            getRandomFaceSample(),
+            getRandomFaceSample(),
         ),
+        fingerprintSamples: List<FingerprintSample> = listOf(),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
         attendantId = userId.asTokenizableRaw(),
         moduleId = moduleId.asTokenizableRaw(),
-        faceSamples = faceSamples.toList(),
+        faceSamples = faceSamples,
+        fingerprintSamples = fingerprintSamples,
     )
+
+    private fun getRandomFaceSample(
+        id: String = UUID.randomUUID().toString(),
+        referenceId: String = "referenceId",
+    ) = FaceSample(Random.nextBytes(64), "faceTemplateFormat", referenceId, id)
+
+    private fun getRandomFingerprintSample(
+        id: String = UUID.randomUUID().toString(),
+        referenceId: String = "referenceId",
+    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), 42, "fingerprintTemplateFormat", referenceId, id)
 }

@@ -12,6 +12,7 @@ data class FingerprintSample(
     val template: ByteArray,
     val templateQualityScore: Int,
     val format: String,
+    val referenceId: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {
@@ -33,16 +34,4 @@ data class FingerprintSample(
         result = 31 * result + templateQualityScore
         return result
     }
-}
-
-// Generates a unique id for a list of samples.
-// It concats the templates (sorted by quality score) and creates a UUID from that.
-fun List<FingerprintSample>.uniqueId(): String? = if (this.isNotEmpty()) {
-    UUID.nameUUIDFromBytes(concatTemplates()).toString()
-} else {
-    null
-}
-
-fun List<FingerprintSample>.concatTemplates(): ByteArray = this.sortedBy { it.templateQualityScore }.fold(byteArrayOf()) { acc, sample ->
-    acc + sample.template
 }

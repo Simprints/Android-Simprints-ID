@@ -16,6 +16,7 @@ import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.LiveFeedbackState
 import com.simprints.fingerprint.capture.state.ScanResult
+import com.simprints.fingerprint.capture.usecase.AddBiometricReferenceCreationEventUseCase
 import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
@@ -104,6 +105,9 @@ class FingerprintCaptureViewModelTest {
     private lateinit var addCaptureEventsUseCase: AddCaptureEventsUseCase
 
     @MockK
+    private lateinit var addBiometricReferenceCreatedEvents: AddBiometricReferenceCreationEventUseCase
+
+    @MockK
     private lateinit var isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase
 
     private val getStartStateUseCase = GetStartStateUseCase()
@@ -153,6 +157,7 @@ class FingerprintCaptureViewModelTest {
             getNextFingerToAdd = getNextFingerToAddUseCase,
             getStartState = getStartStateUseCase,
             addCaptureEvents = addCaptureEventsUseCase,
+            addBiometricReferenceCreationEvents = addBiometricReferenceCreatedEvents,
             tracker = tracker,
             isNoFingerDetectedLimitReachedUseCase = isNoFingerDetectedLimitReachedUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
@@ -204,7 +209,7 @@ class FingerprintCaptureViewModelTest {
     }
 
     @Test
-    fun `test scanner supports image transfer then isImageTransferRequired should be equal to scanningTimeoutMs + imageTransferTimeoutMs`() =
+    fun `test scanner supports image transfer then isImageTransferRequired should be scanningTimeoutMs + imageTransferTimeoutMs`() =
         runTest {
             withImageTransfer()
             every { scanner.isImageTransferSupported() } returns true
@@ -515,6 +520,7 @@ class FingerprintCaptureViewModelTest {
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 4) { saveImageUseCase.invoke(any(), any(), any(), any()) }
 
+        coVerify { addBiometricReferenceCreatedEvents.invoke(any(), any()) }
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(FOUR_FINGERS_IDS.size)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactlyElementsIn(
@@ -572,6 +578,7 @@ class FingerprintCaptureViewModelTest {
 
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 2) { saveImageUseCase.invoke(any(), any(), any(), any()) }
+        coVerify { addBiometricReferenceCreatedEvents.invoke(any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)
@@ -628,6 +635,7 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
         vm.handleConfirmFingerprintsAndContinue()
         coVerify(exactly = 0) { saveImageUseCase.invoke(any(), any(), any(), any()) }
+        coVerify { addBiometricReferenceCreatedEvents.invoke(any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)

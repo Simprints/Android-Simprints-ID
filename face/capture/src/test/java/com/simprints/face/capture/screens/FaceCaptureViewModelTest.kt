@@ -123,6 +123,15 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
+    fun `Save biometric reference creation when flow finishes`() {
+        viewModel.captureFinished(faceDetections)
+        viewModel.flowFinished()
+        coVerify(atLeast = 1) {
+            eventReporter.addBiometricReferenceCreationEvents(any(), any())
+        }
+    }
+
+    @Test
     fun `Recapture requests clears capture list`() {
         viewModel.captureFinished(faceDetections)
         viewModel.recapture()

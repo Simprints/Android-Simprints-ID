@@ -9,7 +9,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -110,7 +109,7 @@ class EventMigration1to2Test {
         id: String,
     ) {
         val cursor = retrieveCursorWithEventById(db, id)
-        assertThat(cursor.getStringWithColumnName("type")).isEqualTo(ENROLMENT_V1.toString())
+        assertThat(cursor.getStringWithColumnName("type")).isEqualTo("ENROLMENT_V1")
 
         val eventJson = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
         assertThat(eventJson.getString("type")).isEqualTo("ENROLMENT_V1")

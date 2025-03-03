@@ -13,6 +13,7 @@ import kotlinx.parcelize.Parcelize
 @Keep
 @Parcelize
 data class MatchParams(
+    val probeReferenceId: String,
     val probeFaceSamples: List<FaceSample> = emptyList(),
     val probeFingerprintSamples: List<FingerprintSample> = emptyList(),
     val fingerprintSDK: FingerprintConfiguration.BioSdk? = null,

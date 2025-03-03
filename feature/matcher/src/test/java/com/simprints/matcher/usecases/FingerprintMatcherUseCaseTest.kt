@@ -74,6 +74,7 @@ internal class FingerprintMatcherUseCaseTest {
     fun `Skips matching if there are no probes`() = runTest {
        val results = useCase.invoke(
             MatchParams(
+                probeReferenceId = "referenceId",
                 probeFingerprintSamples = emptyList(),
                 fingerprintSDK = SECUGEN_SIM_MATCHER,
                 flowType = FlowType.VERIFY,
@@ -102,6 +103,7 @@ internal class FingerprintMatcherUseCaseTest {
 
         val results = useCase.invoke(
             MatchParams(
+                probeReferenceId = "referenceId",
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(
                         IFingerIdentifier.LEFT_3RD_FINGER,
@@ -161,6 +163,7 @@ internal class FingerprintMatcherUseCaseTest {
 
         useCase.invoke(
             matchParams = MatchParams(
+                probeReferenceId = "referenceId",
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(
                         IFingerIdentifier.LEFT_3RD_FINGER,
@@ -179,5 +182,5 @@ internal class FingerprintMatcherUseCaseTest {
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
     }
 
-    private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), 42, "format")
+    private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), 42, "format", "referenceId")
 }

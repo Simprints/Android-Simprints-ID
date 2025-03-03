@@ -10,10 +10,12 @@ internal fun DbFingerprintSample.fromDbToDomain(): FingerprintSample = Fingerpri
     template = template,
     templateQualityScore = templateQualityScore,
     format = format,
+    referenceId = referenceId,
 )
 
 internal fun FingerprintSample.fromDomainToDb(): DbFingerprintSample = DbFingerprintSample().also { sample ->
     sample.id = id
+    sample.referenceId = referenceId
     sample.fingerIdentifier = fingerIdentifier.ordinal
     sample.template = template
     sample.templateQualityScore = templateQualityScore

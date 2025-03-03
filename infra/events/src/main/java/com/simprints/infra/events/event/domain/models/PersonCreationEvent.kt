@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
 import java.util.UUID
 
 @Keep
+@Deprecated("Replaced by BiometricReferenceCreationEvent in 2025.1.0")
 data class PersonCreationEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: PersonCreationPayload,
@@ -40,6 +41,7 @@ data class PersonCreationEvent(
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment, verification or identification
     @Keep
+    @Deprecated("Replaced by BiometricReferenceCreationEvent")
     data class PersonCreationPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,

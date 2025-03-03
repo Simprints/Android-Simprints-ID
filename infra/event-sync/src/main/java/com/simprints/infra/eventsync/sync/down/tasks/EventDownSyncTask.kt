@@ -20,6 +20,7 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -51,7 +52,7 @@ internal class EventDownSyncTask @Inject constructor(
         scope: CoroutineScope,
         operation: EventDownSyncOperation,
         eventScope: EventScope,
-        project: Project
+        project: Project,
     ): Flow<EventDownSyncProgress> = flow {
         var lastOperation = operation.copy()
         var count = 0
@@ -152,7 +153,7 @@ internal class EventDownSyncTask @Inject constructor(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
         lastOperation: EventDownSyncOperation,
-        project: Project
+        project: Project,
     ): EventDownSyncOperation {
         val actions = batchOfEventsToProcess
             .map { event ->
@@ -167,6 +168,10 @@ internal class EventDownSyncTask @Inject constructor(
 
                     EnrolmentRecordEventType.EnrolmentRecordMove -> {
                         handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
+                    }
+
+                    EnrolmentRecordEventType.EnrolmentRecordUpdate -> {
+                        handleSubjectUpdateEvent(event as EnrolmentRecordUpdateEvent)
                     }
                 }
             }.flatten()
@@ -253,6 +258,17 @@ internal class EventDownSyncTask @Inject constructor(
 
     private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
         listOf(Deletion(event.payload.subjectId))
+
+    private fun handleSubjectUpdateEvent(event: EnrolmentRecordUpdateEvent): List<SubjectAction> = with(event.payload) {
+        listOf(
+            SubjectAction.Update(
+                subjectId = subjectId,
+                faceSamplesToAdd = subjectFactory.extractFaceSamplesFromBiometricReferences(biometricReferencesAdded),
+                fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
+                referenceIdsToRemove = biometricReferencesRemoved,
+            ),
+        )
+    }
 
     companion object {
         const val EVENTS_BATCH_SIZE = 200

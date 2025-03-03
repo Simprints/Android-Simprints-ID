@@ -11,7 +11,9 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.OneToManyMatchPayloadV3
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload.OneToOneMatchPayloadV4
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
@@ -67,6 +69,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
@@ -91,6 +94,7 @@ class SaveMatchEventUseCaseTest {
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
                     assertThat(it.payload.result?.score).isEqualTo(0.5f)
+                    assertThat((it.payload as OneToOneMatchPayloadV4).probeBiometricReferenceId).isEqualTo("referenceId")
                 },
             )
         }
@@ -102,6 +106,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFingerprintSamples = listOf(
@@ -133,6 +138,7 @@ class SaveMatchEventUseCaseTest {
                     assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                     assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
                     assertThat(it.payload.result?.score).isEqualTo(0.5f)
+                    assertThat((it.payload as OneToOneMatchPayloadV4).probeBiometricReferenceId).isEqualTo("referenceId")
                 },
             )
         }
@@ -144,6 +150,7 @@ class SaveMatchEventUseCaseTest {
             startTime = Timestamp(1L),
             endTime = Timestamp(2L),
             matchParams = MatchParams(
+                probeReferenceId = "referenceId",
                 probeFaceSamples = emptyList(),
                 probeFingerprintSamples = emptyList(),
                 fingerprintSDK = null,
@@ -177,6 +184,7 @@ class SaveMatchEventUseCaseTest {
                             ?.last()
                             ?.candidateId,
                     ).isEqualTo("guid2")
+                    assertThat((it.payload as OneToManyMatchPayloadV3).probeBiometricReferenceId).isEqualTo("referenceId")
                 },
             )
         }
@@ -188,6 +196,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(attendantId = "userId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -213,6 +222,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId".asTokenizableEncrypted()),
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -238,6 +248,7 @@ class SaveMatchEventUseCaseTest {
             Timestamp(1L),
             Timestamp(2L),
             MatchParams(
+                probeReferenceId = "referenceId",
                 emptyList(),
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(),

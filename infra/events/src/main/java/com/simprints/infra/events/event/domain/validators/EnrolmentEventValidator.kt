@@ -1,8 +1,8 @@
 package com.simprints.infra.events.event.domain.validators
 
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.exceptions.validator.EnrolmentEventValidatorException
@@ -16,17 +16,17 @@ internal class EnrolmentEventValidator : EventValidator {
         currentEvents: List<Event>,
         eventToAdd: Event,
     ) {
-        if (eventToAdd is EnrolmentEventV2) {
+        if (eventToAdd is EnrolmentEventV4) {
             val hasFingerprint = currentEvents.any { it is FingerprintCaptureEvent }
             val hasFace = currentEvents.any { it is FaceCaptureEvent }
-            val hasPersonCreation = currentEvents.any { it is PersonCreationEvent }
+            val hasBiometricReference = currentEvents.any { it is BiometricReferenceCreationEvent }
 
             if (!hasFingerprint && !hasFace) {
                 throw EnrolmentEventValidatorException("Missing fingerprint or face capture event")
             }
 
-            if (!hasPersonCreation) {
-                throw EnrolmentEventValidatorException("Missing person creation event")
+            if (!hasBiometricReference) {
+                throw EnrolmentEventValidatorException("Missing biometric reference creation event")
             }
         }
     }

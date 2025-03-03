@@ -14,9 +14,10 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent.BiometricReferenceCreationPayload
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
-import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -213,30 +214,36 @@ internal class EnrolLastBiometricViewModelTest {
     }
 
     @Test
-    fun `Uses latest PersonCreationEvent for Enrolment event`() = runTest {
-        val personCreationEvent1 = mockk<PersonCreationEvent> {
-            every { id } returns "personCreationEventId1"
-            every { payload } returns mockk<PersonCreationPayload> {
+    fun `Uses all BiometricReferenceCreationEvent for Enrolment event`() = runTest {
+        val biometricReferenceCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
+            every { id } returns "biometricReferenceCreationEventId1"
+            every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(1)
+                every { id } returns "referenceId1"
             }
         }
-        val personCreationId2 = "personCreationEventId2"
-        val personCreationEvent2 = mockk<PersonCreationEvent> {
-            every { id } returns personCreationId2
-            every { payload } returns mockk<PersonCreationPayload> {
+        val biometricReferenceCreationEvent2 = mockk<BiometricReferenceCreationEvent> {
+            every { id } returns "biometricReferenceCreationEventId2"
+            every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(2)
+                every { id } returns "referenceId2"
             }
         }
+
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            personCreationEvent1,
-            personCreationEvent2,
+            biometricReferenceCreationEvent2,
+            biometricReferenceCreationEvent1,
         )
 
         viewModel.enrolBiometric(createParams(listOf()))
 
         coVerify {
             eventRepository.addOrUpdateEvent(
-                match { it is EnrolmentEventV2 && it.payload.personCreationEventId == personCreationId2 },
+                withArg {
+                    assertThat(it).isInstanceOf(EnrolmentEventV4::class.java)
+                    assertThat((it.payload as EnrolmentEventV4.EnrolmentPayload).biometricReferenceIds)
+                        .containsExactly("referenceId1", "referenceId2")
+                },
             )
         }
     }

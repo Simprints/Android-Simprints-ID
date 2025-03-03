@@ -24,10 +24,8 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
-import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
-import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
@@ -55,8 +53,6 @@ internal class OrchestratorViewModel @Inject constructor(
     private val locationStore: LocationStore,
     private val stepsBuilder: BuildStepsUseCase,
     private val mapRefusalOrErrorResult: MapRefusalOrErrorResultUseCase,
-    private val shouldCreatePerson: ShouldCreatePersonUseCase,
-    private val createPersonEvent: CreatePersonEventUseCase,
     private val appResponseBuilder: AppResponseBuilderUseCase,
     private val addCallbackEvent: AddCallbackEventUseCase,
     private val updateDailyActivity: UpdateDailyActivityUseCase,
@@ -113,11 +109,6 @@ internal class OrchestratorViewModel @Inject constructor(
             Simber.i("Completed step: ${step.id}", tag = ORCHESTRATION)
 
             updateMatcherStepPayload(step, result)
-        }
-
-        if (shouldCreatePerson(actionRequest, modalities, steps)) {
-            Simber.i("Creating person event", tag = ORCHESTRATION)
-            createPersonEvent(steps.mapNotNull { it.result })
         }
 
         if (result is SelectSubjectAgeGroupResult) {
@@ -226,7 +217,7 @@ internal class OrchestratorViewModel @Inject constructor(
                     .map { MatchParams.FaceSample(it.faceId, it.template) }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
-                    ?.toFaceStepArgs(faceSamples)
+                    ?.toFaceStepArgs(result.referenceId, faceSamples)
 
                 if (newPayload != null) {
                     matchingStep.payload = newPayload
@@ -257,7 +248,7 @@ internal class OrchestratorViewModel @Inject constructor(
                     }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
-                    ?.toFingerprintStepArgs(fingerprintSamples)
+                    ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
 
                 if (newPayload != null) {
                     matchingStep.payload = newPayload

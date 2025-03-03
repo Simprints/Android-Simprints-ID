@@ -5,8 +5,8 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
-import com.simprints.infra.events.event.domain.models.PersonCreationEvent
+import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.session.SessionEventRepository
 import javax.inject.Inject
 
@@ -15,21 +15,24 @@ internal class EnrolSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {
-    suspend operator fun invoke(subject: Subject, project: Project) {
-        val personCreationEvent = eventRepository
+    suspend operator fun invoke(
+        subject: Subject,
+        project: Project,
+    ) {
+        val biometricReferenceIds = eventRepository
             .getEventsInCurrentSession()
-            .filterIsInstance<PersonCreationEvent>()
+            .filterIsInstance<BiometricReferenceCreationEvent>()
             .sortedByDescending { it.payload.createdAt }
-            .first()
+            .map { it.payload.id }
 
         eventRepository.addOrUpdateEvent(
-            EnrolmentEventV2(
+            EnrolmentEventV4(
                 timeHelper.now(),
                 subject.subjectId,
                 subject.projectId,
                 subject.moduleId,
                 subject.attendantId,
-                personCreationEvent.id,
+                biometricReferenceIds,
             ),
         )
         enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
