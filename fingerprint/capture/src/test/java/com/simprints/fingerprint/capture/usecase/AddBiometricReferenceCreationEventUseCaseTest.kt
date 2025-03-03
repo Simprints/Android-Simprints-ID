@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-internal class AddBiometricReferenceCreationEventsUseCaseTest {
+internal class AddBiometricReferenceCreationEventUseCaseTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -25,7 +25,7 @@ internal class AddBiometricReferenceCreationEventsUseCaseTest {
     @MockK
     lateinit var eventRepo: SessionEventRepository
 
-    private lateinit var useCase: AddBiometricReferenceCreationEventsUseCase
+    private lateinit var useCase: AddBiometricReferenceCreationEventUseCase
 
     @Before
     fun setUp() {
@@ -33,7 +33,7 @@ internal class AddBiometricReferenceCreationEventsUseCaseTest {
 
         coJustRun { eventRepo.addOrUpdateEvent(any()) }
 
-        useCase = AddBiometricReferenceCreationEventsUseCase(
+        useCase = AddBiometricReferenceCreationEventUseCase(
             timeHelper,
             eventRepo,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),

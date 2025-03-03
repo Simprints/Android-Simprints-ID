@@ -16,7 +16,7 @@ import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.LiveFeedbackState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.fingerprint.capture.usecase.AddBiometricReferenceCreationEventsUseCase
+import com.simprints.fingerprint.capture.usecase.AddBiometricReferenceCreationEventUseCase
 import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
@@ -105,7 +105,7 @@ class FingerprintCaptureViewModelTest {
     private lateinit var addCaptureEventsUseCase: AddCaptureEventsUseCase
 
     @MockK
-    private lateinit var addBiometricReferenceCreatedEvents: AddBiometricReferenceCreationEventsUseCase
+    private lateinit var addBiometricReferenceCreatedEvents: AddBiometricReferenceCreationEventUseCase
 
     @MockK
     private lateinit var isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase
@@ -157,7 +157,7 @@ class FingerprintCaptureViewModelTest {
             getNextFingerToAdd = getNextFingerToAddUseCase,
             getStartState = getStartStateUseCase,
             addCaptureEvents = addCaptureEventsUseCase,
-            addBiometricReferenceCreatedEvents = addBiometricReferenceCreatedEvents,
+            addBiometricReferenceCreationEvents = addBiometricReferenceCreatedEvents,
             tracker = tracker,
             isNoFingerDetectedLimitReachedUseCase = isNoFingerDetectedLimitReachedUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),

@@ -26,7 +26,7 @@ internal class EnrolmentEventValidator : EventValidator {
             }
 
             if (!hasBiometricReference) {
-                throw EnrolmentEventValidatorException("Missing person creation event")
+                throw EnrolmentEventValidatorException("Missing biometric reference creation event")
             }
         }
     }

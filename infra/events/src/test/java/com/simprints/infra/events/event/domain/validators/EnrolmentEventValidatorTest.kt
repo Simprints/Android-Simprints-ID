@@ -21,7 +21,7 @@ internal class EnrolmentEventValidatorTest {
     }
 
     @Test
-    fun validate_shouldValidateIfBiometricCaptureAndPersonCreationIsPresent() {
+    fun validate_shouldValidateIfBiometricCaptureAndBiometricCreationIsPresent() {
         val currentEvents = listOf(createFaceCaptureEvent(), createPersonCreationEvent())
         validator.run { validate(currentEvents, createBiometricReferenceCreationEvent()) }
     }

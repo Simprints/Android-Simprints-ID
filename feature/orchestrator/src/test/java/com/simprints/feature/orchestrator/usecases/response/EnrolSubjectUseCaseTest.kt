@@ -107,22 +107,22 @@ class EnrolSubjectUseCaseTest {
     }
 
     @Test
-    fun `Uses latest all BiometricReferenceCreationEvent`() = runTest {
-        val personCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
+    fun `Uses all BiometricReferenceCreationEvent`() = runTest {
+        val biometricReferenceCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
             every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(1)
                 every { id } returns "referenceId1"
             }
         }
-        val personCreationEvent2 = mockk<BiometricReferenceCreationEvent> {
+        val biometricReferenceCreationEvent2 = mockk<BiometricReferenceCreationEvent> {
             every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(2)
                 every { id } returns "referenceId2"
             }
         }
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            personCreationEvent2,
-            personCreationEvent1,
+            biometricReferenceCreationEvent2,
+            biometricReferenceCreationEvent1,
         )
 
         useCase.invoke(

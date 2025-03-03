@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class AddBiometricReferenceCreationEventsUseCase @Inject constructor(
+internal class AddBiometricReferenceCreationEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: SessionEventRepository,
     @SessionCoroutineScope private val sessionCoroutineScope: CoroutineScope,

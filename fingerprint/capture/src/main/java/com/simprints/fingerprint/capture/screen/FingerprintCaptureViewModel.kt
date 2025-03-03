@@ -24,7 +24,7 @@ import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.state.LiveFeedbackState
 import com.simprints.fingerprint.capture.state.ScanResult
-import com.simprints.fingerprint.capture.usecase.AddBiometricReferenceCreationEventsUseCase
+import com.simprints.fingerprint.capture.usecase.AddBiometricReferenceCreationEventUseCase
 import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
@@ -76,7 +76,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
     private val addCaptureEvents: AddCaptureEventsUseCase,
-    private val addBiometricReferenceCreatedEvents: AddBiometricReferenceCreationEventsUseCase,
+    private val addBiometricReferenceCreationEvents: AddBiometricReferenceCreationEventUseCase,
     private val tracker: FingerprintScanningStatusTracker,
     private val isNoFingerDetectedLimitReachedUseCase: IsNoFingerDetectedLimitReachedUseCase,
     @ExternalScope private val externalScope: CoroutineScope,
@@ -673,7 +673,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             )
         }
         val biometricReferenceId = UUID.randomUUID().toString()
-        addBiometricReferenceCreatedEvents(biometricReferenceId, resultItems.mapNotNull { it.captureEventId })
+        addBiometricReferenceCreationEvents(biometricReferenceId, resultItems.mapNotNull { it.captureEventId })
 
         _finishWithFingerprints.send(FingerprintCaptureResult(biometricReferenceId, resultItems))
     }

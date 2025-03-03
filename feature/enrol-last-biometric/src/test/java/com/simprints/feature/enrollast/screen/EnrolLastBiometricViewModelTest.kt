@@ -214,17 +214,16 @@ internal class EnrolLastBiometricViewModelTest {
     }
 
     @Test
-    fun `Uses all PersonCreationEvents for Enrolment event`() = runTest {
-        val personCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
-            every { id } returns "personCreationEventId1"
+    fun `Uses all BiometricReferenceCreationEvent for Enrolment event`() = runTest {
+        val biometricReferenceCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
+            every { id } returns "biometricReferenceCreationEventId1"
             every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(1)
                 every { id } returns "referenceId1"
             }
         }
-        val personCreationId2 = "personCreationEventId2"
-        val personCreationEvent2 = mockk<BiometricReferenceCreationEvent> {
-            every { id } returns personCreationId2
+        val biometricReferenceCreationEvent2 = mockk<BiometricReferenceCreationEvent> {
+            every { id } returns "biometricReferenceCreationEventId2"
             every { payload } returns mockk<BiometricReferenceCreationPayload> {
                 every { createdAt } returns Timestamp(2)
                 every { id } returns "referenceId2"
@@ -232,8 +231,8 @@ internal class EnrolLastBiometricViewModelTest {
         }
 
         coEvery { eventRepository.getEventsInCurrentSession() } returns listOf(
-            personCreationEvent2,
-            personCreationEvent1,
+            biometricReferenceCreationEvent2,
+            biometricReferenceCreationEvent1,
         )
 
         viewModel.enrolBiometric(createParams(listOf()))
