@@ -122,8 +122,8 @@ class SubjectFactory @Inject constructor(
 
     fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
         ?.filterIsInstance<FingerprintReference>()
-        ?.firstOrNull()
-        ?.let { reference -> reference.templates.map { buildFingerprintSample(it, reference.format, reference.id) } }
+        ?.map { reference -> reference.templates.map { buildFingerprintSample(it, reference.format, reference.id) } }
+        ?.flatten()
         ?: emptyList()
 
     private fun buildFingerprintSample(
@@ -140,8 +140,8 @@ class SubjectFactory @Inject constructor(
 
     fun extractFaceSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
         ?.filterIsInstance<FaceReference>()
-        ?.firstOrNull()
-        ?.let { reference -> reference.templates.map { buildFaceSample(it, reference.format, reference.id) } }
+        ?.map { reference -> reference.templates.map { buildFaceSample(it, reference.format, reference.id) } }
+        ?.flatten()
         ?: emptyList()
 
     private fun buildFaceSample(
