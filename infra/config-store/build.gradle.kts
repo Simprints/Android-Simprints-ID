@@ -5,12 +5,11 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.config.store"
-
 }
 
 dependencies {
     implementation(project(":infra:auth-store"))
-    implementation(project(":infra:realm"))
+    implementation(project(":infra:enrolment-records:realm-store"))
 
     implementation(libs.datastore)
 

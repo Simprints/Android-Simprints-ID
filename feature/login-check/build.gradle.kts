@@ -19,5 +19,5 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:recent-user-activity"))
-    implementation(project(":infra:enrolment-records-store"))
+    implementation(project(":infra:enrolment-records:repository"))
 }

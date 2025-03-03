@@ -64,7 +64,7 @@ Following the guidelines above the end goal of SID should look roughly like:
 - infralogging (com.simprints.infra.logging)
 - infralogin (com.simprints.infra.login)
 - infranetwork (com.simprints.infra.networking)
-- infrarealm (com.simprints.infra.realm)
+- infrarealm (com.simprints.infra.enrolment.records.realm.store)
 - infrasecurity (com.simprints.infra.security)
 
 *Note: There is no longer a core module. There should be no "catch all" module, because it will just become a graveyard / completely overused, like the previous ID module. Every module should have a clear singular purpose.* </br>

@@ -14,7 +14,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
+import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState

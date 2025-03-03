@@ -3,7 +3,7 @@ package com.simprints.feature.logincheck.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScope

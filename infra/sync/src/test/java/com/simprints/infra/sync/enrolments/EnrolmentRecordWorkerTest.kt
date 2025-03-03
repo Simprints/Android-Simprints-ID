@@ -5,7 +5,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.sync.SyncConstants
 import io.mockk.coEvery
 import io.mockk.coVerify

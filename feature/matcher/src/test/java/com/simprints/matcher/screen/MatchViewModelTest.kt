@@ -10,7 +10,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams

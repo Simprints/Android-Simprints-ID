@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    
+
     implementation(project(":infra:config-store"))
-    implementation(project(":infra:enrolment-records-store"))
+    implementation(project(":infra:enrolment-records:repository"))
 }

@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":fingerprint:capture"))
 
     implementation(project(":infra:orchestrator-data"))
-    implementation(project(":infra:enrolment-records-store"))
+    implementation(project(":infra:enrolment-records:repository"))
     implementation(project(":infra:recent-user-activity"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))

@@ -9,7 +9,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.infra.config.store.models.Finger
-import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import java.util.Date
 import java.util.UUID
