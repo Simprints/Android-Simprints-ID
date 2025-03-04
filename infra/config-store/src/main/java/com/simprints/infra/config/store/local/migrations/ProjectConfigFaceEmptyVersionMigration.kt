@@ -11,8 +11,8 @@ class ProjectConfigFaceEmptyVersionMigration @Inject constructor() : DataMigrati
         Simber.i("Migration of project configuration face bio sdk empty version is done", tag = MIGRATION)
     }
 
-    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData.face) {
-        rankOne.version.isEmpty()
+    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData) {
+        hasFace() && face.rankOne.version.isEmpty()
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {

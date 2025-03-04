@@ -15,8 +15,8 @@ class ProjectConfigFaceBioSdkMigration @Inject constructor() : DataMigration<Pro
         Simber.i("Migration of project configuration face bio sdk is done", tag = MIGRATION)
     }
 
-    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData.face) {
-        !hasRankOne() || allowedSdksCount == 0
+    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData) {
+        hasFace() && (!face.hasRankOne() || face.allowedSdksCount == 0)
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {

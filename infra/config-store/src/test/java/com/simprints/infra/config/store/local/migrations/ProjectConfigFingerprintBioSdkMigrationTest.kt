@@ -28,6 +28,17 @@ class ProjectConfigFingerprintBioSdkMigrationTest {
     }
 
     @Test
+    fun `should not migrate if doesn't have fingerprint`() = runTest {
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .build()
+
+        val shouldMigrate = ProjectConfigFingerprintBioSdkMigration().shouldMigrate(currentData)
+
+        Truth.assertThat(shouldMigrate).isFalse()
+    }
+
+    @Test
     fun `should not migrate if fingerprint has nec`() = runTest {
         val currentData = ProtoProjectConfiguration
             .newBuilder()
