@@ -25,6 +25,15 @@ internal interface EventRoomDao {
     @Query("select count(*) from DbEvent where type = :type")
     fun observeCountFromType(type: EventType): Flow<Int>
 
+    @Query(
+        """
+        select count(*) from DbEvent 
+        left join DbEventScope on DbEvent.scopeId = DbEventScope.id 
+        where DbEventScope.end_unixMs is not null
+        """,
+    )
+    fun observeCountInClosedScopes(): Flow<Int>
+
     @Query("delete from DbEvent where scopeId = :scopeId")
     suspend fun deleteAllFromScope(scopeId: String)
 

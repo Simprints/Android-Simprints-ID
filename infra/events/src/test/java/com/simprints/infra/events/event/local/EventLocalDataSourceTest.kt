@@ -423,6 +423,13 @@ internal class EventLocalDataSourceTest {
     }
 
     @Test
+    fun observeEventCountInClosedScopes() = runTest {
+        eventLocalDataSource.observeEventCountInClosedScopes().toList()
+
+        coVerify { eventDao.observeCountInClosedScopes() }
+    }
+
+    @Test
     fun observeCountWithAProjectIdAndTypeQuery() = runTest {
         eventLocalDataSource
             .observeEventCount(

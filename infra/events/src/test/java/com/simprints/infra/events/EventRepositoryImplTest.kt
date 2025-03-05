@@ -339,6 +339,15 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `should delegate observeEventCountInClosedScopes calls`() = runTest {
+        coEvery { eventLocalDataSource.observeEventCountInClosedScopes() } returns flowOf(7)
+
+        assertThat(eventRepo.observeEventCountInClosedScopes().firstOrNull()).isEqualTo(7)
+
+        coVerify { eventLocalDataSource.observeEventCountInClosedScopes() }
+    }
+
+    @Test
     fun `insert event into event scope should update event fields`() = runTest {
         val scope = createSessionScope(GUID1)
         val event = createAlertScreenEvent()

@@ -57,6 +57,8 @@ interface EventRepository {
 
     suspend fun observeEventCount(type: EventType?): Flow<Int>
 
+    suspend fun observeEventCountInClosedScopes(): Flow<Int>
+
     suspend fun addOrUpdateEvent(
         scope: EventScope,
         event: Event,
