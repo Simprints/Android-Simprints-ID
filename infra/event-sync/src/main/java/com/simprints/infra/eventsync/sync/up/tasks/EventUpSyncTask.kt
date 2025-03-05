@@ -72,7 +72,6 @@ internal class EventUpSyncTask @Inject constructor(
         val project = projectWithConfig.project
         val config = projectWithConfig.configuration
         var lastOperation = operation.copy()
-        var count = 0
         var isUsefulUpload = false
 
         try {
@@ -95,8 +94,7 @@ internal class EventUpSyncTask @Inject constructor(
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(sessionCount = it)
                 },
-            ).collect {
-                count = it
+            ).collect { count ->
                 lastOperation = lastOperation.copy(
                     lastState = RUNNING,
                     lastSyncTime = timeHelper.now().ms,
@@ -112,8 +110,7 @@ internal class EventUpSyncTask @Inject constructor(
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(eventDownSyncCount = it)
                 },
-            ).collect {
-                count = it
+            ).collect { count ->
                 lastOperation = lastOperation.copy(
                     lastState = RUNNING,
                     lastSyncTime = timeHelper.now().ms,
@@ -131,8 +128,7 @@ internal class EventUpSyncTask @Inject constructor(
                         eventUpSyncCount = if (isUsefulUpload) it else 0,
                     )
                 },
-            ).collect {
-                count = it
+            ).collect { count ->
                 lastOperation = lastOperation.copy(
                     lastState = RUNNING,
                     lastSyncTime = timeHelper.now().ms,
@@ -144,7 +140,7 @@ internal class EventUpSyncTask @Inject constructor(
                 lastSyncTime = timeHelper.now().ms,
             )
 
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, 0)
         } catch (t: Throwable) {
             if (t is RemoteDbNotSignedInException) {
                 throw t
@@ -156,7 +152,7 @@ internal class EventUpSyncTask @Inject constructor(
                 lastSyncTime = timeHelper.now().ms,
             )
 
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, 0)
         }
     }
 
@@ -331,7 +327,7 @@ internal class EventUpSyncTask @Inject constructor(
         else -> emptyList()
     }
 
-    private suspend fun attemptInvalidEventUpload(
+    private fun attemptInvalidEventUpload(
         projectId: String,
         corruptedScopes: Set<EventScope>,
     ) = flow {
