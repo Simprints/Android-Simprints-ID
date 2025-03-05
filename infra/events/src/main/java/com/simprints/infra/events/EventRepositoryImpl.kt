@@ -169,6 +169,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.observeEventCount()
     }
 
+    override suspend fun observeEventCountInClosedScopes(): Flow<Int> = eventLocalDataSource.observeEventCountInClosedScopes()
+
     override suspend fun addOrUpdateEvent(
         scope: EventScope,
         event: Event,

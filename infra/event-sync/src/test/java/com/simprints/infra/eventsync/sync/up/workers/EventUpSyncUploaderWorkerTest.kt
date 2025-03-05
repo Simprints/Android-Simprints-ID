@@ -73,7 +73,7 @@ internal class EventUpSyncUploaderWorkerTest {
 
         coEvery { eventSyncCache.readProgress(any()) } returns 0
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { eventRepository.observeEventCount(any()) } returns flowOf(12)
+        coEvery { eventRepository.observeEventCountInClosedScopes() } returns flowOf(12)
     }
 
     @Test

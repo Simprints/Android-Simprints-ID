@@ -77,7 +77,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
             val max = eventRepository
-                .observeEventCount(null)
+                .observeEventCountInClosedScopes()
                 .firstOrNull() ?: 0
 
             upSyncTask.upSync(upSyncScope.operation, getEventScope()).collect {

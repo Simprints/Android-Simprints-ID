@@ -147,6 +147,10 @@ internal open class EventLocalDataSource @Inject constructor(
         eventDao.observeCountFromType(type = type)
     }
 
+    suspend fun observeEventCountInClosedScopes(): Flow<Int> = useRoomFlow(readingDispatcher) {
+        eventDao.observeCountInClosedScopes()
+    }
+
     suspend fun loadAllEvents(): Flow<Event> = useRoom(readingDispatcher) {
         eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
