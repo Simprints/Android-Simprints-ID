@@ -34,6 +34,7 @@ internal class MatchViewModel @Inject constructor(
 ) : ViewModel() {
     var isInitialized = false
         private set
+    private var candidatesLoaded = 0
 
     var shouldCheckPermission: Boolean = true
 
@@ -55,11 +56,13 @@ internal class MatchViewModel @Inject constructor(
             else -> fingerprintMatcher
         }
         val project = configManager.getProject(authStore.signedInProjectId)
+        candidatesLoaded = 0
         matcherUseCase(params, project).collect { matcherState ->
             when (matcherState) {
                 MatcherUseCase.MatcherState.CandidateLoaded -> {
                     (_matchState.value as? MatchState.LoadingCandidates)?.let { currentState ->
-                        _matchState.postValue(currentState.copy(loaded = currentState.loaded + 1))
+                        candidatesLoaded++
+                        _matchState.postValue(currentState.copy(loaded = candidatesLoaded))
                     }
                 }
 
