@@ -63,15 +63,16 @@ internal class FaceMatcherUseCaseTest {
     fun `Skips matching if there are no probes`() = runTest {
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 1f
 
-        val results = useCase.invoke(
-            MatchParams(
-                probeReferenceId = "referenceId",
-                flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.Simprints,
-            ),
-            project
-        ).toList()
+        val results = useCase
+            .invoke(
+                MatchParams(
+                    probeReferenceId = "referenceId",
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
+                ),
+                project,
+            ).toList()
 
         coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
 
@@ -79,8 +80,8 @@ internal class FaceMatcherUseCaseTest {
             MatcherUseCase.MatcherState.Success(
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
-                matcherName = ""
-            )
+                matcherName = "",
+            ),
         )
     }
 
@@ -88,18 +89,19 @@ internal class FaceMatcherUseCaseTest {
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
-        val results = useCase.invoke(
-            MatchParams(
-                probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(
-                    MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+        val results = useCase
+            .invoke(
+                MatchParams(
+                    probeReferenceId = "referenceId",
+                    probeFaceSamples = listOf(
+                        MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+                    ),
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
                 ),
-                flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.Simprints,
-            ),
-            project
-        ).toList()
+                project,
+            ).toList()
 
         coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
 
@@ -107,48 +109,56 @@ internal class FaceMatcherUseCaseTest {
             MatcherUseCase.MatcherState.Success(
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
-                matcherName = ""
-            )
+                matcherName = "",
+            ),
         )
     }
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        val totalCandidates = 100
+        val totalCandidates = 1
         val faceIdentities = listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate")),
-            )
+            ),
         )
-        coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
+        coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any()) } returns faceIdentities
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any()) } coAnswers {
+            // Call the onCandidateLoaded callback (5th parameter)
+            val onCandidateLoaded = arg<() -> Unit>(4)
+            onCandidateLoaded()
+
+            // Return the face identities
+            faceIdentities
+        }
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 42f
 
-
-        val results = useCase.invoke(
-            matchParams = MatchParams(
-                probeReferenceId = "referenceId",
-                probeFaceSamples = listOf(
-                    MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+        val results = useCase
+            .invoke(
+                matchParams = MatchParams(
+                    probeReferenceId = "referenceId",
+                    probeFaceSamples = listOf(
+                        MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
+                    ),
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
                 ),
-                flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.Simprints,
-            ),
-            project
-        ).toList()
+                project,
+            ).toList()
 
         coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.LoadingStarted(totalCandidates),
+            MatcherUseCase.MatcherState.CandidateLoaded,
             MatcherUseCase.MatcherState.Success(
                 matchResultItems = listOf(FaceMatchResult.Item("subjectId", 42f)),
                 totalCandidates = totalCandidates,
-                matcherName = ""
-            )
+                matcherName = "",
+            ),
         )
     }
 }
