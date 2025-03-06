@@ -52,10 +52,11 @@ internal class CommCareIdentityDataSource @Inject constructor(
         project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity> = withContext(dispatcher) {
-        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
             .filter { erce ->
                 erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
             }.map {
+                onCandidateLoaded()
                 FingerprintIdentity(
                     it.payload.subjectId,
                     it.payload.biometricReferences
@@ -80,7 +81,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
         callerPackageName: String,
         query: SubjectQuery,
         project: Project,
-        onCandidateLoaded: () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
         try {
@@ -103,7 +103,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                 enrolmentRecordCreationEvents.addAll(
                                     loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
                                 )
-                                onCandidateLoaded()
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
                     }
@@ -132,10 +131,11 @@ internal class CommCareIdentityDataSource @Inject constructor(
         project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity> = withContext(dispatcher) {
-        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
             .filter { erce ->
                 erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
             }.map {
+                onCandidateLoaded()
                 FaceIdentity(
                     it.payload.subjectId,
                     it.payload.biometricReferences

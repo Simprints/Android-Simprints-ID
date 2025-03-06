@@ -53,19 +53,24 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             matchParams.queryForCandidates.copy(
                 fingerprintSampleFormat = bioSdkWrapper.supportedTemplateFormat,
             )
-        val totalCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
-        if (totalCandidates == 0) {
+        val expectedCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
+        if (expectedCandidates == 0) {
             send(MatcherState.Success(emptyList(), 0, bioSdkWrapper.matcherName))
             return@channelFlow
         }
 
         Simber.i("Matching candidates", tag = crashReportTag)
-        send(MatcherState.LoadingStarted(totalCandidates))
-        val resultItems = createRanges(totalCandidates)
+        send(MatcherState.LoadingStarted(expectedCandidates))
+        // When using local DB loadedCandidates = expectedCandidates
+        // However, when using CommCare as data source, loadedCandidates < expectedCandidates
+        // as it's count function does not take into account filtering criteria
+        var loadedCandidates = 0
+        val resultItems = createRanges(expectedCandidates)
             .map { range ->
                 async(dispatcher) {
                     val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource, project) {
                         // When a candidate is loaded
+                        loadedCandidates++
                         trySend(MatcherState.CandidateLoaded)
                     }
                     match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK)
@@ -77,8 +82,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             .reduce { acc, subSet -> acc.addAll(subSet) }
             .toList()
 
-        Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
-        send(MatcherState.Success(resultItems, totalCandidates, bioSdkWrapper.matcherName))
+        Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
+        send(MatcherState.Success(resultItems, loadedCandidates, bioSdkWrapper.matcherName))
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes

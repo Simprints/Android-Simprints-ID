@@ -45,19 +45,23 @@ internal class FaceMatcherUseCase @Inject constructor(
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
             faceSampleFormat = faceMatcher.supportedTemplateFormat,
         )
-        val totalCandidates = enrolmentRecordRepository.count(
+        val expectedCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat,
             dataSource = matchParams.biometricDataSource,
         )
-        if (totalCandidates == 0) {
+        if (expectedCandidates == 0) {
             send(MatcherState.Success(emptyList(), 0, faceMatcher.matcherName))
             return@channelFlow
         }
 
         Simber.i("Matching candidates", tag = crashReportTag)
-        send(MatcherState.LoadingStarted(totalCandidates))
+        send(MatcherState.LoadingStarted(expectedCandidates))
+        // When using local DB loadedCandidates = expectedCandidates
+        // However, when using CommCare as data source, loadedCandidates < expectedCandidates
+        // as it's count function does not take into account filtering criteria
+        var loadedCandidates = 0
         val resultItems = coroutineScope {
-            createRanges(totalCandidates)
+            createRanges(expectedCandidates)
                 .map { range ->
                     async(dispatcher) {
                         val batchCandidates = getCandidates(
@@ -67,6 +71,7 @@ internal class FaceMatcherUseCase @Inject constructor(
                             dataSource = matchParams.biometricDataSource,
                         ) {
                             // When a candidate is loaded
+                            loadedCandidates++
                             trySend(MatcherState.CandidateLoaded)
                         }
                         match(batchCandidates, samples)
@@ -76,9 +81,9 @@ internal class FaceMatcherUseCase @Inject constructor(
                 .toList()
         }
 
-        Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
+        Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
 
-        send(MatcherState.Success(resultItems, totalCandidates, faceMatcher.matcherName))
+        send(MatcherState.Success(resultItems, loadedCandidates, faceMatcher.matcherName))
     }
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
