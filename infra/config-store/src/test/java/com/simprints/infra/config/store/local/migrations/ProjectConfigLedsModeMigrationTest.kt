@@ -35,8 +35,22 @@ class ProjectConfigLedsModeMigrationTest {
     }
 
     @Test
+    fun `test doesn't have fingerprint, then shouldMigrate should return false`() = runBlocking {
+        // Given
+        every { mockProtoConfig.fingerprint } returns null
+
+        // When
+        val result = migration.shouldMigrate(mockProtoConfig)
+
+        // Then
+        assertThat(result).isFalse()
+    }
+
+    @Test
     fun `test displayLiveFeedback is enabled, then shouldMigrate should return true`() = runBlocking {
         // Given
+        every { mockProtoConfig.hasFingerprint() } returns true
+        every { mockProtoConfig.fingerprint } returns mockFingerprint
         val mockVero2 = mockk<ProtoVero2Configuration>(relaxed = true)
         every { mockProtoConfig.fingerprint.secugenSimMatcher.vero2 } returns mockVero2
         every { mockVero2.displayLiveFeedback } returns true
@@ -51,6 +65,8 @@ class ProjectConfigLedsModeMigrationTest {
     @Test
     fun `test displayLiveFeedback is disabled, then shouldMigrate should return false`() = runBlocking {
         // Given
+        every { mockProtoConfig.hasFingerprint() } returns true
+        every { mockProtoConfig.fingerprint } returns mockFingerprint
         val mockVero2 = mockk<ProtoVero2Configuration>(relaxed = true)
         every { mockProtoConfig.fingerprint.secugenSimMatcher.vero2 } returns mockVero2
         every { mockVero2.displayLiveFeedback } returns false

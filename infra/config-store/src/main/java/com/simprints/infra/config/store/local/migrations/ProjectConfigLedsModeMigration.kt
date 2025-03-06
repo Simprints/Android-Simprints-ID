@@ -15,8 +15,9 @@ class ProjectConfigLedsModeMigration @Inject constructor() : DataMigration<Proto
         Simber.i("Migration of project configuration displayLiveFeedback to leds mode is done", tag = MIGRATION)
     }
 
-    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) =
-        currentData.fingerprint.secugenSimMatcher.vero2.displayLiveFeedback
+    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData) {
+        hasFingerprint() && fingerprint.secugenSimMatcher.vero2.displayLiveFeedback
+    }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
         Simber.i("Start migration of project configuration displayLiveFeedback to leds mode ", tag = MIGRATION)

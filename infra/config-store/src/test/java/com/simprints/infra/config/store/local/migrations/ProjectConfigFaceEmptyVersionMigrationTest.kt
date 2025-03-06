@@ -9,6 +9,17 @@ import org.junit.Test
 
 class ProjectConfigFaceEmptyVersionMigrationTest {
     @Test
+    fun `should not migrate if doesn't have face`() = runTest {
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .build()
+
+        val shouldMigrate = ProjectConfigFaceEmptyVersionMigration().shouldMigrate(currentData)
+
+        assertThat(shouldMigrate).isFalse()
+    }
+
+    @Test
     fun `should migrate if face has empty version`() = runTest {
         val currentData = ProtoProjectConfiguration
             .newBuilder()

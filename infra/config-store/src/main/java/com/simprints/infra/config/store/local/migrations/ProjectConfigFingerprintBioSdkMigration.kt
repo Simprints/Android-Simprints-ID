@@ -15,8 +15,8 @@ class ProjectConfigFingerprintBioSdkMigration @Inject constructor() : DataMigrat
         Simber.i("Migration of project configuration fingerprint bio sdk is done", tag = MIGRATION)
     }
 
-    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData.fingerprint) {
-        !(hasNec() || hasSecugenSimMatcher())
+    override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData) {
+        hasFingerprint() && !(fingerprint.hasNec() || fingerprint.hasSecugenSimMatcher())
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {

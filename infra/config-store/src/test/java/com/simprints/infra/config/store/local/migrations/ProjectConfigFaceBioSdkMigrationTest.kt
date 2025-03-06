@@ -10,6 +10,16 @@ import org.junit.Test
 
 class ProjectConfigFaceBioSdkMigrationTest {
     @Test
+    fun `should not migrate if doesn't have face`() = runTest {
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .build()
+        val shouldMigrate = ProjectConfigFaceBioSdkMigration().shouldMigrate(currentData)
+
+        assertThat(shouldMigrate).isFalse()
+    }
+
+    @Test
     fun `should migrate if face has no rankone config`() = runTest {
         val currentData = ProtoProjectConfiguration
             .newBuilder()
