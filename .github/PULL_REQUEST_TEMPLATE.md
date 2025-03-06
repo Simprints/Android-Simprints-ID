@@ -1,20 +1,21 @@
----
-name: Feature PR
-about: Additions and improvements to SID
-
----
-
 [JIRA ticket]()
 Will be released in: **version**
+
+### Root cause analysis (for bugfixes only)
+
+First known affected version: **version**
+
+* Describe how the issue was found and what causes it
+* Include images to better illustrate the issue
 
 ### Notable changes
 
 * Describe the main changes in the PR with the reasons why they are required
 * Include images to better illustrate the changes
 
-### Testing guidance (optional)
+### Testing guidance
 
-* Describe how the reviewers can try the new features out
+* Describe how the reviewers can verify that issue is fixed
 
 ### Additional work checklist
 
