@@ -1,7 +1,7 @@
 package com.simprints.infra.network
 
 import com.simprints.infra.network.apiclient.SimApiClientImpl
-import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
+import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
 import com.simprints.infra.network.url.BaseUrlProvider
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
@@ -15,7 +15,7 @@ class SimNetworkImplTest {
     private lateinit var baseUrlProvider: BaseUrlProvider
 
     @MockK
-    private lateinit var okHttpClientBuilder: DefaultOkHttpClientBuilder
+    private lateinit var okHttpClientBuilder: BuildOkHttpClientUseCase
 
     @Before
     fun setUp() {
