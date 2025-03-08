@@ -9,11 +9,10 @@ import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.RetryableCloudException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.network.exceptions.isCausedFromBadNetworkConnection
-import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
+import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
 import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -27,7 +26,7 @@ import kotlin.reflect.KClass
  */
 internal class SimApiClientImpl<T : SimRemoteInterface>(
     private val service: KClass<T>,
-    private val okHttpClientBuilder: DefaultOkHttpClientBuilder,
+    private val buildOkHttpClient: BuildOkHttpClientUseCase,
     private val url: String,
     private val deviceId: String,
     private val versionName: String,
@@ -51,12 +50,8 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(JsonHelper.jackson))
             .baseUrl(url)
-            .client(okHttpClientConfig.build())
+            .client(buildOkHttpClient(authToken, deviceId, versionName))
             .build()
-    }
-
-    private val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        okHttpClientBuilder.get(authToken, deviceId, versionName)
     }
 
     override suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V = try {
@@ -106,7 +101,7 @@ internal class SimApiClientImpl<T : SimRemoteInterface>(
 
     private fun HttpException.parseEstimatedOutage(): Long? = try {
         response()?.headers()?.get(HEADER_RETRY_AFTER)?.toLong()
-    } catch (e: NumberFormatException) {
+    } catch (_: NumberFormatException) {
         null
     }
 }

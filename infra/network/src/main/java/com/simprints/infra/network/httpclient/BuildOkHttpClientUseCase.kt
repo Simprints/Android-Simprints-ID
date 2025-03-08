@@ -19,8 +19,10 @@ import okio.buffer
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 
-internal class DefaultOkHttpClientBuilder @Inject constructor(
+@Singleton
+internal class BuildOkHttpClientUseCase @Inject constructor(
     @ApplicationContext private val ctx: Context,
     private val networkCache: Cache,
     private val persistentLogger: PersistentLogger,
@@ -29,6 +31,8 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
         const val DEVICE_ID_HEADER = "X-Device-ID"
         const val AUTHORIZATION_HEADER = "Authorization"
         const val USER_AGENT_HEADER = "User-Agent"
+        const val READ_TIMEOUT = 60L
+        const val WRITE_TIMEOUT = 60L
 
         /**
          * This header can be used to force a specific version of the API endpoint to be used.
@@ -40,20 +44,49 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
         const val FORCE_VERSION_HEADER = "X-Force-Version"
     }
 
-    fun get(
+    private var okHttpClient: OkHttpClient? = null
+    private var currentAuthToken: String? = null
+
+    private val lock = Any() // synchronization lock for the okHttpClient lazy property
+
+    /**
+     * Retrieves an instance of [OkHttpClient], ensuring that the same instance is reused unless the authentication token changes.
+     *
+     * This method is **thread-safe** using `synchronized(lock)`, ensuring that only one instance of `OkHttpClient` is created at a time.
+     * If the provided `authToken` differs from the current stored token, a **new OkHttpClient instance** is created.
+     * Otherwise, the existing client instance is reused to optimize memory usage and prevent OOM errors.
+     *
+     * @param authToken The authentication token used for secure API requests. If `null`, a non-authenticated client is used.
+     * @param deviceId A unique identifier for the device, added to the request headers.
+     * @param versionName The application version name, added to the request headers.
+     * @return An instance of [OkHttpClient] configured based on the provided parameters.
+     *
+     */
+    operator fun invoke(
         authToken: String? = null,
         deviceId: String,
         versionName: String,
-    ): OkHttpClient.Builder = OkHttpClient
+    ): OkHttpClient = synchronized(lock) {
+        if (okHttpClient == null || currentAuthToken != authToken) {
+            currentAuthToken = authToken
+            okHttpClient = buildOkHttpClient(deviceId, versionName)
+        }
+        okHttpClient!!
+    }
+
+    private fun buildOkHttpClient(
+        deviceId: String,
+        versionName: String,
+    ) = OkHttpClient
         .Builder()
         .cache(networkCache)
         .followRedirects(false)
         .followSslRedirects(false)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+        .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
         .apply {
-            if (!authToken.isNullOrBlank()) {
-                addInterceptor(buildAuthenticationInterceptor(authToken))
+            if (!currentAuthToken.isNullOrBlank()) {
+                addInterceptor(buildAuthenticationInterceptor(currentAuthToken!!))
             }
         }.addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
         .addInterceptor(buildDeviceIdInterceptor(deviceId))
@@ -64,6 +97,7 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
                 addInterceptor(buildSimberLoggingInterceptor())
             }
         }.addInterceptor(buildPersistentLoggerInterceptor())
+        .build()
 
     private fun buildAuthenticationInterceptor(authToken: String) = Interceptor { chain ->
         val newRequest = chain

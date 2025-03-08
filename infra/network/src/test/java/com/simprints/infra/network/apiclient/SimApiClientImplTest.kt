@@ -7,7 +7,7 @@ import com.simprints.infra.network.exceptions.ApiError
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
+import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
 import com.simprints.logging.persistent.PersistentLogger
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -38,7 +38,7 @@ class SimApiClientImplTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var simApiClientImpl: SimApiClientImpl<FakeRetrofitInterface>
 
-    private lateinit var httpClientBuilder: DefaultOkHttpClientBuilder
+    private lateinit var httpClientBuilder: BuildOkHttpClientUseCase
 
     @Before
     fun setup() {
@@ -46,7 +46,7 @@ class SimApiClientImplTest {
 
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        httpClientBuilder = DefaultOkHttpClientBuilder(
+        httpClientBuilder = BuildOkHttpClientUseCase(
             mockk(),
             networkCache,
             persistentLogger,

@@ -1,14 +1,16 @@
 package com.simprints.infra.network
 
 import com.simprints.infra.network.apiclient.SimApiClientImpl
-import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
+import com.simprints.infra.network.httpclient.BuildOkHttpClientUseCase
 import com.simprints.infra.network.url.BaseUrlProvider
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.reflect.KClass
 
+@Singleton
 internal class SimNetworkImpl @Inject constructor(
     private val baseUrlProvider: BaseUrlProvider,
-    private val okHttpClientBuilder: DefaultOkHttpClientBuilder,
+    private val buildOkHttpClient: BuildOkHttpClientUseCase,
 ) : SimNetwork {
     override fun <T : SimRemoteInterface> getSimApiClient(
         remoteInterface: KClass<T>,
@@ -17,7 +19,7 @@ internal class SimNetworkImpl @Inject constructor(
         authToken: String?,
     ): SimNetwork.SimApiClient<T> = SimApiClientImpl(
         remoteInterface,
-        okHttpClientBuilder,
+        buildOkHttpClient,
         getApiBaseUrl(),
         deviceId,
         versionName,
