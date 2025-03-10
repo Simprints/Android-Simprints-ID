@@ -64,6 +64,15 @@ dependencyResolutionManagement {
                 password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
             }
         }
+
+        maven {
+            url = uri("https://maven.pkg.github.com/Simprints/Biometrics-SimFace")
+            credentials {
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
+            }
+        }
     }
 }
 
@@ -93,6 +102,13 @@ include(
     ":face:infra:bio-sdk-resolver",
     ":face:infra:roc-v1",
     ":face:infra:roc-v3",
+)
+
+// Ear modality modules
+include(
+    ":ear:infra:base-bio-sdk",
+    ":ear:infra:bio-sdk-resolver",
+    ":ear:infra:ear-simface-sdk",
 )
 
 // Feature modules

@@ -69,6 +69,7 @@ roc_wrapper_version = "1.23.0"
 roc_wrapper-v3_version = "3.1.0"
 nec_version = "1.5.0"
 secugen_version = "1.1.0"
+simface = "2024.4.3"
 
 junit_version = "4.13.2"
 junit_ext_version = "1.2.1"
@@ -203,6 +204,8 @@ nec-wrapper = { module = " com.simprints:necwrapper", version.ref = "nec_version
 nec-lib = { module = "com.nec:lib", version.ref = "nec_version" }
 # secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
 secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
+# simface
+simface = { module = "com.simprints.biometrics:simface", version.ref = "simface" }
 
 #hilt
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
