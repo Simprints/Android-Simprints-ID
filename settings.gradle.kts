@@ -106,6 +106,7 @@ include(
 
 // Ear modality modules
 include(
+    ":ear:capture",
     ":ear:infra:base-bio-sdk",
     ":ear:infra:bio-sdk-resolver",
     ":ear:infra:ear-simface-sdk",

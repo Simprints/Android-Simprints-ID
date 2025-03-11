@@ -1,10 +1,10 @@
-package com.simprints.face.capture.screens.livefeedback.views
+package com.simprints.core.camera
 
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.RectF
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
 /**
  * This is the brawl that paints the progress bar to the screen.
@@ -15,7 +15,7 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
  * created dashed lines up the angle defined.
  */
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-internal class ProgressPainter(
+class ProgressPainter(
     progressColor: Int,
     var max: Int,
     private val strokeWidth: Float,

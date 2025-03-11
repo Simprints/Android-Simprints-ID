@@ -246,7 +246,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(
                 true,
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
+                ContextCompat.getDrawable(requireContext(), IDR.drawable.ic_checked_white_18dp),
             )
         }
         toggleCaptureButtons(true)
@@ -261,7 +261,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(
                 true,
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
+                ContextCompat.getDrawable(requireContext(), IDR.drawable.ic_checked_white_18dp),
             )
         }
 

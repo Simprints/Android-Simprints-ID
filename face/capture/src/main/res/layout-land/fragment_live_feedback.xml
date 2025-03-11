@@ -14,12 +14,12 @@
         android:layout_height="match_parent"
         android:keepScreenOn="true" />
 
-    <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
+    <com.simprints.core.camera.CameraTargetOverlay
         android:id="@+id/capture_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
+    <com.simprints.core.camera.DashedCircularProgress
         android:id="@+id/capture_progress"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -29,7 +29,7 @@
         app:dcp_max="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintHeight_percent="@dimen/capture_target_size_percent"
+        app:layout_constraintHeight_percent="@dimen/camera_capture_target_size_percent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

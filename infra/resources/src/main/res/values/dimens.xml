@@ -35,4 +35,8 @@
     <dimen name="fingerprint_capture_indicator_size">32dp</dimen>
     <dimen name="fingerprint_capture_card_height_land">320dp</dimen>
     <!-- endregion -->
+
+    <!-- camera capture -->
+    <item name="camera_capture_guideline_margin_percent" format="float" type="dimen">0.1</item>
+    <item name="camera_capture_target_size_percent" format="float" type="dimen">0.9</item>
 </resources>

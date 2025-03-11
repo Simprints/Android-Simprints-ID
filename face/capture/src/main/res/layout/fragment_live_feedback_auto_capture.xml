@@ -20,14 +20,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="@dimen/guideline_margin_percent" />
+        app:layout_constraintGuide_percent="@dimen/camera_capture_guideline_margin_percent" />
 
-    <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
+    <com.simprints.core.camera.CameraTargetOverlay
         android:id="@+id/capture_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
+    <com.simprints.core.camera.DashedCircularProgress
         android:id="@+id/capture_progress"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -39,7 +39,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/capture_guide_frame"
-        app:layout_constraintWidth_percent="@dimen/capture_target_size_percent"
+        app:layout_constraintWidth_percent="@dimen/camera_capture_target_size_percent"
         tools:visibility="visible" />
 
     <com.google.android.material.button.MaterialButton

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_ear_capture_internal"
+    app:startDestination="@id/earPreviewFeedbackFragment">
+
+    <fragment
+        android:id="@+id/earPreviewFeedbackFragment"
+        android:name="com.simprints.ear.capture.screen.preview.EarPreviewFeedbackFragment"
+        android:label="EarPreviewFeedbackFragment"
+        tools:layout="@layout/fragment_ear_preview">
+        <action
+            android:id="@+id/action_earPreviewFeedbackFragment_to_earConfirmationFragment"
+            app:destination="@id/earConfirmationFragment"
+            app:popUpTo="@+id/graph_ear_capture_internal"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/earConfirmationFragment"
+        android:name="com.simprints.ear.capture.screen.confirmation.EarConfirmationFragment"
+        android:label="EarConfirmationFragment"
+        tools:layout="@layout/fragment_ear_confirmation">
+        <action
+            android:id="@+id/action_earConfirmationFragment_to_earPreviewFeedbackFragment"
+            app:destination="@id/earPreviewFeedbackFragment"
+            app:popUpTo="@+id/graph_ear_capture_internal"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_global_earPreviewFeedback"
+        app:destination="@+id/earPreviewFeedbackFragment"
+        app:popUpTo="@+id/graph_ear_capture_internal"
+        app:popUpToInclusive="true" />
+</navigation>

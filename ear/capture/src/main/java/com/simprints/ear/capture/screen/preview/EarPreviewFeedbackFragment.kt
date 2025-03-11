@@ -1,4 +1,4 @@
-package com.simprints.face.capture.screens.livefeedbackautocapture
+package com.simprints.ear.capture.screen.preview
 
 import android.Manifest
 import android.content.Intent
@@ -26,11 +26,12 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
-import com.simprints.face.capture.R
-import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
-import com.simprints.face.capture.models.FaceDetection
-import com.simprints.face.capture.screens.FaceCaptureViewModel
-import com.simprints.face.capture.screens.livefeedback.CropToTargetOverlayAnalyzer
+import com.simprints.ear.capture.R
+import com.simprints.ear.capture.databinding.FragmentEarPreviewBinding
+import com.simprints.ear.capture.models.EarDetection
+import com.simprints.ear.capture.screen.EarCaptureViewModel
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
@@ -41,21 +42,15 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.simprints.infra.resources.R as IDR
 
-/**
- * As the user is capturing subject's face, they are presented with this fragment, which displays
- * live information about distance and whether the face is ready to be captured or not.
- * It also displays the capture process of the face and then sends this result to
- * [com.simprints.face.capture.screens.confirmation.ConfirmationFragment]
- */
 @AndroidEntryPoint
-internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live_feedback_auto_capture) {
+internal class EarPreviewFeedbackFragment : Fragment(R.layout.fragment_ear_preview) {
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
 
-    private val mainVm: FaceCaptureViewModel by activityViewModels()
+    private val mainVm: EarCaptureViewModel by activityViewModels()
 
-    private val vm: LiveFeedbackAutoCaptureFragmentViewModel by viewModels()
-    private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
+    private val vm: EarPreviewFragmentViewModel by viewModels()
+    private val binding by viewBinding(FragmentEarPreviewBinding::bind)
 
     private lateinit var screenSize: Size
     private lateinit var targetResolution: Size
@@ -75,18 +70,16 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        Simber.i("LiveFeedbackFragment started", tag = ORCHESTRATION)
         initFragment()
     }
 
     private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
-        binding.captureProgress.max = 1 // normalized progress
 
-        binding.captureFeedbackBtn.setOnClickListener {
-            vm.startCapture()
-            binding.captureFeedbackBtn.isClickable = false
-        }
+        binding.captureFeedbackBtn.setOnClickListener { vm.startCapture() }
+        binding.captureProgress.max = mainVm.samplesToCapture
 
         // Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
@@ -101,9 +94,6 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             return@launch
         }
-        vm.holdOffCapture()
-        binding.captureFeedbackBtn.isClickable = true
-
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
         // ImageAnalysis
@@ -127,13 +117,14 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(
-            this@LiveFeedbackAutoCaptureFragment,
+            this@EarPreviewFeedbackFragment,
             DEFAULT_BACK_CAMERA,
             preview,
             imageAnalyzer,
         )
         // Attach the view's surface provider to preview use case
         preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
+        Simber.i("Camera setup finished", tag = FACE_CAPTURE)
     }
 
     override fun onResume() {
@@ -170,15 +161,15 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
 
         vm.capturingState.observe(viewLifecycleOwner) {
             @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA") when (it) {
-                LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
+                EarPreviewFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
 
-                LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
+                EarPreviewFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
 
-                LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED -> {
+                EarPreviewFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
                         currentFragment = this,
-                        directions = LiveFeedbackAutoCaptureFragmentDirections.actionFaceLiveFeedbackFragmentToFaceConfirmationFragment(),
+                        actionId = R.id.action_earPreviewFeedbackFragment_to_earConfirmationFragment,
                     )
                 }
             }
@@ -189,7 +180,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         try {
             vm.process(croppedBitmap = image)
         } catch (t: Throwable) {
-            Simber.e("Image analysis crashed", t)
+            Simber.e("Image analysis crashed", t, tag = FACE_CAPTURE)
             // Image analysis is running in bg thread
             lifecycleScope.launch {
                 mainVm.submitError(t)
@@ -197,16 +188,11 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         }
     }
 
-    private fun renderCurrentDetection(faceDetection: FaceDetection) {
+    private fun renderCurrentDetection(faceDetection: EarDetection) {
         when (faceDetection.status) {
-            FaceDetection.Status.NOFACE -> renderNoFace()
-            FaceDetection.Status.OFFYAW -> renderFaceNotStraight()
-            FaceDetection.Status.OFFROLL -> renderFaceNotStraight()
-            FaceDetection.Status.TOOCLOSE -> renderFaceTooClose()
-            FaceDetection.Status.TOOFAR -> renderFaceTooFar()
-            FaceDetection.Status.BAD_QUALITY -> renderBadQuality()
-            FaceDetection.Status.VALID -> renderValidFace()
-            FaceDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
+            EarDetection.Status.NO_EAR -> renderNoEar()
+            EarDetection.Status.VALID -> renderValidFace()
+            EarDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
         }
     }
 
@@ -222,11 +208,11 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
     private fun renderCapturingNotStarted() {
         binding.apply {
             captureOverlay.drawSemiTransparentTarget()
-            captureFeedbackBtn.setText(IDR.string.face_capture_start_capture)
+            captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
             captureFeedbackBtn.isVisible = true
-            captureFeedbackBtn.isChecked = true
             captureFeedbackPermissionButton.isGone = true
         }
+        toggleCaptureButtons(false)
     }
 
     private fun renderCapturing() {
@@ -237,11 +223,12 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
         }
+        toggleCaptureButtons(false)
     }
 
     private fun renderValidFace() {
         binding.apply {
-            captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
+            captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
             captureFeedbackTxtExplanation.text = null
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
@@ -251,6 +238,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
                 ContextCompat.getDrawable(requireContext(), IDR.drawable.ic_checked_white_18dp),
             )
         }
+        toggleCaptureButtons(true)
     }
 
     private fun renderValidCapturingFace() {
@@ -279,58 +267,21 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
 
+        toggleCaptureButtons(false)
         renderProgressBar(false)
     }
 
-    private fun renderFaceTooClose() {
+    private fun renderNoEar() {
         binding.apply {
-            captureFeedbackBtn.setText(IDR.string.face_capture_title_too_close)
-            captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_too_close)
+            captureFeedbackBtn.setText("No ear")
+            captureFeedbackTxtExplanation.setText("Show more ear")
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
         }
 
-        renderProgressBar(false)
-    }
-
-    private fun renderNoFace() {
-        binding.apply {
-            captureFeedbackBtn.setText(IDR.string.face_capture_title_no_face)
-            captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_no_face)
-            captureFeedbackBtn.isVisible = true
-            captureFeedbackPermissionButton.isGone = true
-
-            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
-        }
-
-        renderProgressBar(false)
-    }
-
-    private fun renderFaceNotStraight() {
-        binding.apply {
-            captureFeedbackBtn.setText(IDR.string.face_capture_title_look_straight)
-            captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_look_straight)
-            captureFeedbackBtn.isVisible = true
-            captureFeedbackPermissionButton.isGone = true
-
-            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
-        }
-
-        renderProgressBar(false)
-    }
-
-    private fun renderBadQuality() {
-        binding.apply {
-            captureFeedbackBtn.setText(IDR.string.face_capture_title_bad_quality)
-            captureFeedbackTxtExplanation.setText(IDR.string.face_capture_error_bad_quality)
-            captureFeedbackBtn.isVisible = true
-            captureFeedbackPermissionButton.isGone = true
-
-            captureFeedbackBtn.setCheckedWithLeftDrawable(false)
-        }
-
+        toggleCaptureButtons(false)
         renderProgressBar(false)
     }
 
@@ -347,8 +298,12 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
                 progressColor,
             )
 
-            captureProgress.value = vm.getAutoCaptureImagingProgressNormalized()
+            captureProgress.value = vm.userCaptures.size.toFloat()
         }
+    }
+
+    private fun toggleCaptureButtons(valid: Boolean) {
+        binding.captureFeedbackBtn.isClickable = valid
     }
 
     private fun renderNoPermission(shouldOpenSettings: Boolean) {
@@ -370,5 +325,6 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
                 }
             }
         }
+        toggleCaptureButtons(false)
     }
 }

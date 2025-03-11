@@ -1,4 +1,4 @@
-package com.simprints.face.capture.screens.livefeedback.views
+package com.simprints.core.camera
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -6,9 +6,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extentions.dpToPx
-import com.simprints.face.capture.R
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.resources.R
 
 /**
  * This is a variant of circular progress bar that have spaces between bars (as opposed to a filled
@@ -24,7 +24,7 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
  * just the max number of steps you are going to use.
  */
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-internal class DashedCircularProgress(
+class DashedCircularProgress(
     context: Context,
     attrs: AttributeSet,
 ) : FrameLayout(context, attrs) {

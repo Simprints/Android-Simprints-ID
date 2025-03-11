@@ -5,7 +5,7 @@ import android.graphics.RectF
 import androidx.camera.core.ImageProxy
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
+import com.simprints.core.camera.CameraTargetOverlay
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

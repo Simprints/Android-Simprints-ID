@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/graph_ear_capture"
+    app:startDestination="@id/earCaptureControllerFragment">
+
+    <fragment
+        android:id="@+id/earCaptureControllerFragment"
+        android:name="com.simprints.ear.capture.screen.controller.EarCaptureControllerFragment"
+        android:label="EarCaptureController">
+        <argument
+            android:name="samplesToCapture"
+            app:argType="integer" />
+    </fragment>
+
+    <include app:graph="@navigation/graph_alert" />
+    <action
+        android:id="@+id/action_global_errorFragment"
+        app:destination="@id/graph_alert"
+        app:popUpTo="@id/earCaptureControllerFragment"
+        app:popUpToInclusive="true" />
+
+
+    <include app:graph="@navigation/graph_exit_form" />
+    <action
+        android:id="@+id/action_global_refusalFragment"
+        app:destination="@+id/graph_exit_form" />
+</navigation>

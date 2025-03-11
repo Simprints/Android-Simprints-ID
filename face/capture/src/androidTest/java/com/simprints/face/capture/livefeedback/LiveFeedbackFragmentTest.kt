@@ -54,7 +54,7 @@ class LiveFeedbackFragmentTest {
         // Is this test really useful for the UI??
         onView(
             allOf(
-                withId(R.id.capture_feedback_txt_title),
+                withId(R.id.capture_feedback_txt_explanation),
                 withText(IDR.string.face_capture_title_previewing),
             ),
         ).check(matches(isDisplayed()))

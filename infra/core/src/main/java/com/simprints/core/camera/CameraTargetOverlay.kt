@@ -1,4 +1,4 @@
-package com.simprints.face.capture.screens.livefeedback.views
+package com.simprints.core.camera
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,14 +10,14 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.res.ResourcesCompat
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extentions.dpToPx
-import com.simprints.face.capture.R
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.resources.R
 import kotlin.math.max
 import kotlin.math.min
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-internal class CameraTargetOverlay(
+class CameraTargetOverlay(
     context: Context,
     attrs: AttributeSet,
 ) : AppCompatImageView(context, attrs) {
@@ -93,11 +93,11 @@ internal class CameraTargetOverlay(
     ) {
         // Calculate the margin as 10% of the max dimension
         val guidelineMarginPercent =
-            ResourcesCompat.getFloat(context.resources, R.dimen.guideline_margin_percent)
+            ResourcesCompat.getFloat(context.resources, R.dimen.camera_capture_guideline_margin_percent)
         val margin = (max(width, height) * guidelineMarginPercent).toInt()
 
         val multiplier =
-            ResourcesCompat.getFloat(context.resources, R.dimen.capture_target_size_percent)
+            ResourcesCompat.getFloat(context.resources, R.dimen.camera_capture_target_size_percent)
 
         val radius = (min(width, height) * multiplier) / 2
 

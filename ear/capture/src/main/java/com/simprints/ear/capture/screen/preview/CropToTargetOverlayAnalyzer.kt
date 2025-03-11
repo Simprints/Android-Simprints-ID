@@ -1,4 +1,4 @@
-package com.simprints.face.capture.screens.livefeedback
+package com.simprints.ear.capture.screen.preview
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageAnalysis
