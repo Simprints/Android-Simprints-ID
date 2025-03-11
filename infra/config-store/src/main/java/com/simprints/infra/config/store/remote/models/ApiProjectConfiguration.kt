@@ -22,6 +22,7 @@ internal data class ApiProjectConfiguration(
         updatedAt,
         general.toDomain(),
         face?.toDomain(),
+        face?.toDomain(), // TODO duplicating face configuration for now
         fingerprint?.toDomain(),
         consent.toDomain(),
         identification.toDomain(),

@@ -69,6 +69,7 @@ internal data class OldProjectConfig(
         updatedAt = "",
         general = generalConfiguration(),
         face = faceConfiguration(),
+        ear = faceConfiguration(),
         fingerprint = fingerprintConfiguration(),
         consent = consentConfiguration(),
         identification = identificationConfiguration(),

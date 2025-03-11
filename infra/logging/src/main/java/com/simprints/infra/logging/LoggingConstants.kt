@@ -35,6 +35,7 @@ object LoggingConstants {
         FACE_CAPTURE,
         FINGER_MATCHING,
         FACE_MATCHING,
+        EAR_MATCHING,
         LICENSE,
         SETTINGS,
         ALERT,

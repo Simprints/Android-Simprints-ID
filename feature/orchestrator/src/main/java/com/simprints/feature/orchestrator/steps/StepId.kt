@@ -17,7 +17,7 @@ internal object StepId {
     const val VALIDATE_ID_POOL = STEP_BASE_CORE + 6
     const val SELECT_SUBJECT_AGE = STEP_BASE_CORE + 7
 
-    // Face step ids
+    // Fingerprint step ids
     private const val STEP_BASE_FINGERPRINT = 300
     const val FINGERPRINT_CAPTURE = STEP_BASE_FINGERPRINT + 2
     const val FINGERPRINT_MATCHER = STEP_BASE_FINGERPRINT + 3
@@ -26,4 +26,9 @@ internal object StepId {
     private const val STEP_BASE_FACE = 500
     const val FACE_CAPTURE = STEP_BASE_FACE + 2
     const val FACE_MATCHER = STEP_BASE_FACE + 3
+
+    // Ear step ids
+    private const val STEP_BASE_EAR = 700
+    const val EAR_CAPTURE = STEP_BASE_EAR + 2
+    const val EAR_MATCHER = STEP_BASE_EAR + 3
 }

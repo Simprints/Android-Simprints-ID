@@ -5,10 +5,12 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
+import com.simprints.infra.enrolment.records.realm.store.models.DbEarSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EarIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
@@ -40,6 +42,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         const val IS_MODULE_ID_TOKENIZED_FIELD = "isModuleIdTokenized"
         const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
         const val FACE_SAMPLES_FIELD = "faceSamples"
+        const val EAR_SAMPLES_FIELD = "earSamples"
         const val FORMAT_FIELD = "format"
     }
 
@@ -87,6 +90,26 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 FaceIdentity(
                     subject.subjectId.toString(),
                     subject.faceSamples.map(DbFaceSample::fromDbToDomain),
+                )
+            }
+    }
+
+    override suspend fun loadEarIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+        dataSource: BiometricDataSource,
+        project: Project,
+        onCandidateLoaded: () -> Unit,
+    ): List<EarIdentity> = realmWrapper.readRealm { realm ->
+        realm
+            .query(DbSubject::class)
+            .buildRealmQueryForSubject(query)
+            .find { it.subList(range.first, range.last) }
+            .map { subject ->
+                onCandidateLoaded()
+                EarIdentity(
+                    subject.subjectId.toString(),
+                    subject.earSamples.map(DbEarSample::fromDbToDomain),
                 )
             }
     }
@@ -151,6 +174,12 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                                 .filterNot { it.id in faceSampleIds }
                                 .takeIf { it.isNotEmpty() }
                                 ?.forEach { realm.delete(it) }
+
+                            val earSampleIds = newSubject.earSamples.map { it.id }.toSet()
+                            dbSubject.earSamples
+                                .filterNot { it.id in earSampleIds }
+                                .takeIf { it.isNotEmpty() }
+                                ?.forEach { realm.delete(it) }
                         }
 
                         realm.copyToRealm(newSubject, updatePolicy = UpdatePolicy.ALL)
@@ -162,6 +191,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                             val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
                             val faceSamplesMap = dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
                             val fingerprintSamplesMap = dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
+                            val earSamplesMap = dbSubject.earSamples.groupBy { it.referenceId in referencesToDelete }
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
@@ -170,9 +200,13 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                             dbSubject.fingerprintSamples = (
                                 fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.fromDomainToDb() }
                             ).toRealmList()
+                            dbSubject.earSamples = (
+                                earSamplesMap[false].orEmpty() + action.earSamplesToAdd.map { it.fromDomainToDb() }
+                            ).toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
                             fingerprintSamplesMap[true]?.forEach { realm.delete(it) }
+                            earSamplesMap[true]?.forEach { realm.delete(it) }
                             realm.copyToRealm(dbSubject, updatePolicy = UpdatePolicy.ALL)
                         } else {
                             Simber.i("[SubjectLocalDataSourceImpl] Subject not found for update", tag = REALM_DB)
@@ -240,6 +274,12 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             realmQuery = realmQuery.query(
                 "ANY $FACE_SAMPLES_FIELD.$FORMAT_FIELD == $0",
                 query.faceSampleFormat,
+            )
+        }
+        if (query.faceSampleFormat != null) {
+            realmQuery = realmQuery.query(
+                "ANY $EAR_SAMPLES_FIELD.$FORMAT_FIELD == $0",
+                query.earSampleFormat,
             )
         }
         if (query.afterSubjectId != null) {

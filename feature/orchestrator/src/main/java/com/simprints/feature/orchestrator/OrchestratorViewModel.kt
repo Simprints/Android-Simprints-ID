@@ -13,6 +13,7 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.ear.capture.EarCaptureResult
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
@@ -196,7 +197,7 @@ internal class OrchestratorViewModel @Inject constructor(
             projectConfiguration,
             actionRequest,
             steps.mapNotNull { it.result },
-            project
+            project,
         )
 
         updateDailyActivity(appResponse)
@@ -249,6 +250,22 @@ internal class OrchestratorViewModel @Inject constructor(
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFingerprintStepArgs(result.referenceId, fingerprintSamples)
+
+                if (newPayload != null) {
+                    matchingStep.payload = newPayload
+                }
+            }
+        }
+        if (currentStep.id == StepId.EAR_CAPTURE && result is EarCaptureResult) {
+            val matchingStep = steps.firstOrNull { it.id == StepId.EAR_MATCHER }
+
+            if (matchingStep != null) {
+                val earSamples = result.results
+                    .mapNotNull { it.sample }
+                    .map { MatchParams.EarSample(it.faceId, it.template) }
+                val newPayload = matchingStep.payload
+                    .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
+                    ?.toEarStepArgs(result.referenceId, earSamples)
 
                 if (newPayload != null) {
                     matchingStep.payload = newPayload

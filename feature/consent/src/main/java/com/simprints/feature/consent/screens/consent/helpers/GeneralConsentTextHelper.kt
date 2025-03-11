@@ -112,6 +112,7 @@ internal data class GeneralConsentTextHelper(
         modalities: List<Modality>,
     ) = when (modalities.first()) {
         Modality.FACE -> context.getString(R.string.consent_biometric_general_face)
+        Modality.EAR -> context.getString(R.string.consent_biometric_general_face)
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_general_fingerprint)
     }
 
@@ -132,6 +133,7 @@ internal data class GeneralConsentTextHelper(
         modalities: List<Modality>,
     ) = when (modalities.first()) {
         Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
+        Modality.EAR -> context.getString(R.string.consent_biometrics_access_face)
         Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
     }
 }

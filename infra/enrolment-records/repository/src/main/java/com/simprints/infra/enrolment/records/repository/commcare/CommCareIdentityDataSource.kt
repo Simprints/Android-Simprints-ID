@@ -6,6 +6,7 @@ import android.net.Uri
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.ear.EarSample
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -17,12 +18,14 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.enrolment.records.repository.IdentityDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EarIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
+import com.simprints.infra.events.event.domain.models.subject.EarReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
@@ -143,6 +146,35 @@ internal class CommCareIdentityDataSource @Inject constructor(
                         .flatMap { faceReference ->
                             faceReference.templates.map { faceTemplate ->
                                 FaceSample(
+                                    template = encoder.base64ToBytes(faceTemplate.template),
+                                    format = faceReference.format,
+                                    referenceId = faceReference.id,
+                                )
+                            }
+                        },
+                )
+            }
+    }
+
+    override suspend fun loadEarIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+        dataSource: BiometricDataSource,
+        project: Project,
+        onCandidateLoaded: () -> Unit,
+    ): List<EarIdentity> = withContext(dispatcher) {
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
+            .filter { erce ->
+                erce.payload.biometricReferences.any { it is EarReference && it.format == query.earSampleFormat }
+            }.map {
+                onCandidateLoaded()
+                EarIdentity(
+                    it.payload.subjectId,
+                    it.payload.biometricReferences
+                        .filterIsInstance<EarReference>()
+                        .flatMap { faceReference ->
+                            faceReference.templates.map { faceTemplate ->
+                                EarSample(
                                     template = encoder.base64ToBytes(faceTemplate.template),
                                     format = faceReference.format,
                                     referenceId = faceReference.id,

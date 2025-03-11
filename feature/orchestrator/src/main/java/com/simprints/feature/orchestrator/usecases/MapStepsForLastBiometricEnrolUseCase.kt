@@ -1,6 +1,8 @@
 package com.simprints.feature.orchestrator.usecases
 
+import com.simprints.ear.capture.EarCaptureResult
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.enrollast.EarTemplateCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
@@ -8,6 +10,7 @@ import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.enrollast.MatchResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.fromModuleApiToDomain
+import com.simprints.matcher.EarMatchResult
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
@@ -44,6 +47,15 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             )
 
             is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
+                result.results.map { MatchResult(it.subjectId, it.confidence) },
+            )
+
+            is EarCaptureResult -> EnrolLastBiometricStepResult.EarCaptureResult(
+                result.referenceId,
+                result.results.mapNotNull { it.sample }.map { EarTemplateCaptureResult(it.template, it.format) },
+            )
+
+            is EarMatchResult -> EnrolLastBiometricStepResult.EarMatchResult(
                 result.results.map { MatchResult(it.subjectId, it.confidence) },
             )
 

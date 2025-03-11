@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":infra:config-sync"))
 
     implementation(project(":face:infra:bio-sdk-resolver"))
+    implementation(project(":ear:infra:bio-sdk-resolver"))
 
     implementation(project(":fingerprint:infra:bio-sdk"))
     implementation(project(":infra:auth-store"))

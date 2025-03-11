@@ -28,6 +28,7 @@ message ProtoGeneralConfiguration {
     enum Modality {
         FACE = 0;
         FINGERPRINT = 1;
+        EAR = 2;
     }
 }
 

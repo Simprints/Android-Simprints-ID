@@ -3,6 +3,7 @@ package com.simprints.infra.events.event.domain.models.subject
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.EAR_REFERENCE_KEY
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
 
@@ -10,6 +11,7 @@ import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 @JsonSubTypes(
     JsonSubTypes.Type(value = FaceReference::class, name = FACE_REFERENCE_KEY),
     JsonSubTypes.Type(value = FingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY),
+    JsonSubTypes.Type(value = EarReference::class, name = EAR_REFERENCE_KEY),
 )
 @Keep
 sealed class BiometricReference(
@@ -31,6 +33,13 @@ data class FingerprintReference(
     val metadata: HashMap<String, String>? = null,
 ) : BiometricReference(id, BiometricReferenceType.FINGERPRINT_REFERENCE)
 
+data class EarReference(
+    override val id: String,
+    val templates: List<EarTemplate>,
+    val format: String,
+    val metadata: HashMap<String, String>? = null,
+) : BiometricReference(id, BiometricReferenceType.EAR_REFERENCE)
+
 enum class BiometricReferenceType {
     // a constant key is required to serialise/deserialize
     // BiometricReference correctly with Jackson (see annotation in BiometricReference).
@@ -42,10 +51,14 @@ enum class BiometricReferenceType {
     // key added: FINGERPRINT_REFERENCE
     FINGERPRINT_REFERENCE,
 
+    // key added: EAR_REFERENCE
+    EAR_REFERENCE,
+
     ;
 
     companion object {
         const val FACE_REFERENCE_KEY = "FACE_REFERENCE"
         const val FINGERPRINT_REFERENCE_KEY = "FINGERPRINT_REFERENCE"
+        const val EAR_REFERENCE_KEY = "EAR_REFERENCE"
     }
 }

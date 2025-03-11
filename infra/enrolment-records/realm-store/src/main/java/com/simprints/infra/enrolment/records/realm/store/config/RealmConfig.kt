@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.enrolment.records.realm.store.BuildConfig
 import com.simprints.infra.enrolment.records.realm.store.migration.RealmMigrations
+import com.simprints.infra.enrolment.records.realm.store.models.DbEarSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbProject
@@ -24,6 +25,7 @@ class RealmConfig @Inject constructor() {
             setOf(
                 DbFingerprintSample::class,
                 DbFaceSample::class,
+                DbEarSample::class,
                 DbSubject::class,
                 DbProject::class,
             ),
@@ -36,6 +38,6 @@ class RealmConfig @Inject constructor() {
         .build()
 
     companion object {
-        private const val REALM_SCHEMA_VERSION: Long = 16
+        private const val REALM_SCHEMA_VERSION: Long = 17
     }
 }

@@ -68,6 +68,10 @@
         android:id="@+id/action_orchestratorFragment_to_fingerprintCapture"
         app:destination="@id/graph_fingerprint_capture" />
 
+    <include app:graph="@navigation/graph_ear_capture" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_earCapture"
+        app:destination="@id/graph_ear_capture" />
 
     <include app:graph="@navigation/graph_matcher" />
     <action

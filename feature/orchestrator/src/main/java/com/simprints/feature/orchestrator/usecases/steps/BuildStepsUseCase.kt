@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.usecases.steps
 
 import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowType
+import com.simprints.ear.capture.EarCaptureContract
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
@@ -376,6 +377,15 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             }
         }
+
+        Modality.EAR -> listOf(
+            Step(
+                id = StepId.EAR_CAPTURE,
+                navigationActionId = R.id.action_orchestratorFragment_to_earCapture,
+                destinationId = EarCaptureContract.DESTINATION,
+                payload = EarCaptureContract.getArgs(2),
+            ),
+        )
     }
 
     /**
@@ -436,6 +446,20 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             }
         }
+
+        Modality.EAR -> listOf(
+            // Face bio SDK is currently ignored until we add a second one
+            Step(
+                id = StepId.EAR_MATCHER,
+                navigationActionId = R.id.action_orchestratorFragment_to_matcher,
+                destinationId = MatchContract.DESTINATION,
+                payload = MatchStepStubPayload.asBundle(
+                    flowType,
+                    subjectQuery,
+                    biometricDataSource,
+                ),
+            ),
+        )
     }
 
     private fun buildEnrolLastBiometricStep(

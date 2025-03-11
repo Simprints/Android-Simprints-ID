@@ -8,6 +8,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.exceptions.RealmUninitialisedException
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EarIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
@@ -140,6 +141,15 @@ internal class EnrolmentRecordRepositoryImpl(
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity> = fromIdentityDataSource(dataSource)
         .loadFaceIdentities(query, range, dataSource, project, onCandidateLoaded)
+
+    override suspend fun loadEarIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+        dataSource: BiometricDataSource,
+        project: Project,
+        onCandidateLoaded: () -> Unit,
+    ): List<EarIdentity> = fromIdentityDataSource(dataSource)
+        .loadEarIdentities(query, range, dataSource, project, onCandidateLoaded)
 
     private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
         is BiometricDataSource.Simprints -> localDataSource

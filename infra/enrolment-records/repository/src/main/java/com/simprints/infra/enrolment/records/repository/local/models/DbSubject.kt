@@ -1,10 +1,12 @@
 package com.simprints.infra.enrolment.records.repository.local.models
 
+import com.simprints.core.domain.ear.EarSample
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.domain.tokenization.isTokenized
+import com.simprints.infra.enrolment.records.realm.store.models.DbEarSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
@@ -29,6 +31,7 @@ internal fun DbSubject.fromDbToDomain(): Subject {
         updatedAt = updatedAt?.toDate(),
         fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
         faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain),
+        earSamples = earSamples.map(DbEarSample::fromDbToDomain),
     )
 }
 
@@ -42,6 +45,7 @@ internal fun Subject.fromDomainToDb(): DbSubject = DbSubject().also { subject ->
     subject.fingerprintSamples =
         fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList()
     subject.faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
+    subject.earSamples = earSamples.map(EarSample::fromDomainToDb).toRealmList()
     subject.isModuleIdTokenized = moduleId.isTokenized()
     subject.isAttendantIdTokenized = attendantId.isTokenized()
 }

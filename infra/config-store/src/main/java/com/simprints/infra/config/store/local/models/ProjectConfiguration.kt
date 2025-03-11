@@ -33,6 +33,7 @@ internal fun ProtoProjectConfiguration.toDomain(): ProjectConfiguration = Projec
     updatedAt,
     general.toDomain(),
     hasFace().let { if (it) face.toDomain() else null },
+    hasFace().let { if (it) face.toDomain() else null },
     hasFingerprint().let { if (it) fingerprint.toDomain() else null },
     consent.toDomain(),
     identification.toDomain(),

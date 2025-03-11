@@ -30,11 +30,13 @@ internal data class ApiGeneralConfiguration(
     enum class Modality {
         FACE,
         FINGERPRINT,
+        EAR,
         ;
 
         fun toDomain(): GeneralConfiguration.Modality = when (this) {
-            FACE -> GeneralConfiguration.Modality.FACE
+            FACE -> GeneralConfiguration.Modality.EAR // TODO for now substituring face with ear
             FINGERPRINT -> GeneralConfiguration.Modality.FINGERPRINT
+            EAR -> GeneralConfiguration.Modality.EAR
         }
     }
 }

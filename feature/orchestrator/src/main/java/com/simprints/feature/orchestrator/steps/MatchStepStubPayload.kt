@@ -46,6 +46,17 @@ internal data class MatchStepStubPayload(
         biometricDataSource = biometricDataSource,
     )
 
+    fun toEarStepArgs(
+        referenceId: String,
+        samples: List<MatchParams.EarSample>,
+    ) = MatchContract.getArgs(
+        referenceId = referenceId,
+        earSamples = samples,
+        flowType = flowType,
+        subjectQuery = subjectQuery,
+        biometricDataSource = biometricDataSource,
+    )
+
     companion object {
         const val STUB_KEY = "match_step_stub_payload"
 

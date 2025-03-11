@@ -12,6 +12,7 @@ data class SubjectQuery(
     val attendantId: TokenizableString? = null,
     val fingerprintSampleFormat: String? = null,
     val faceSampleFormat: String? = null,
+    val earSampleFormat: String? = null,
     val hasUntokenizedFields: Boolean? = null,
     val moduleId: TokenizableString? = null,
     val sort: Boolean = false,

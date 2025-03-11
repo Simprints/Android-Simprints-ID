@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.repository
 
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.EarIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -27,4 +28,12 @@ interface IdentityDataSource {
         project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity>
+
+    suspend fun loadEarIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        project: Project,
+        onCandidateLoaded: () -> Unit,
+    ): List<EarIdentity>
 }

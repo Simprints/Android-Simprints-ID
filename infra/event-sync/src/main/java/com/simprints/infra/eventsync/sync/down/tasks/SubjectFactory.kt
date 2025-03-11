@@ -1,14 +1,18 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
+import com.simprints.core.domain.ear.EarSample
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.ear.capture.EarCaptureResult
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
+import com.simprints.infra.events.event.domain.models.subject.EarReference
+import com.simprints.infra.events.event.domain.models.subject.EarTemplate
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent.EnrolmentRecordUpdatePayload
@@ -32,6 +36,7 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
+            earSamples = extractEarSamplesFromBiometricReferences(this.biometricReferences),
         )
     }
 
@@ -43,6 +48,7 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
+            earSamples = extractEarSamplesFromBiometricReferences(this.biometricReferences),
         )
     }
 
@@ -52,6 +58,7 @@ class SubjectFactory @Inject constructor(
     ): Subject {
         val removedBiometricReferences = payload.biometricReferencesRemoved.toSet() // to make lookup O(1)
         val addedFaceSamples = extractFaceSamplesFromBiometricReferences(payload.biometricReferencesAdded)
+        val addedEarSamples = extractEarSamplesFromBiometricReferences(payload.biometricReferencesAdded)
         val addedFingerprintSamples = extractFingerprintSamplesFromBiometricReferences(payload.biometricReferencesAdded)
 
         return existingSubject.copy(
@@ -61,6 +68,9 @@ class SubjectFactory @Inject constructor(
             fingerprintSamples = existingSubject.fingerprintSamples
                 .filterNot { it.referenceId in removedBiometricReferences }
                 .plus(addedFingerprintSamples),
+            earSamples = existingSubject.earSamples
+                .filterNot { it.referenceId in removedBiometricReferences }
+                .plus(addedEarSamples),
         )
     }
 
@@ -70,6 +80,7 @@ class SubjectFactory @Inject constructor(
         moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResult?,
         faceResponse: FaceCaptureResult?,
+        earResponse: EarCaptureResult?,
     ): Subject {
         val subjectId = UUID.randomUUID().toString()
         return buildSubject(
@@ -80,6 +91,7 @@ class SubjectFactory @Inject constructor(
             createdAt = Date(timeHelper.now().ms),
             fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
             faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
+            earSamples = earResponse?.let { extractEarSamples(it) }.orEmpty(),
         )
     }
 
@@ -92,6 +104,7 @@ class SubjectFactory @Inject constructor(
         updatedAt: Date? = null,
         fingerprintSamples: List<FingerprintSample> = emptyList(),
         faceSamples: List<FaceSample> = emptyList(),
+        earSamples: List<EarSample> = emptyList(),
     ) = Subject(
         subjectId = subjectId,
         projectId = projectId,
@@ -101,6 +114,7 @@ class SubjectFactory @Inject constructor(
         updatedAt = updatedAt,
         fingerprintSamples = fingerprintSamples,
         faceSamples = faceSamples,
+        earSamples = earSamples,
     )
 
     private fun extractFingerprintSamples(fingerprintResponse: FingerprintCaptureResult) =
@@ -119,6 +133,10 @@ class SubjectFactory @Inject constructor(
     private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
         .mapNotNull { it.sample }
         .map { FaceSample(it.template, it.format, faceResponse.referenceId) }
+
+    private fun extractEarSamples(earResponse: EarCaptureResult) = earResponse.results
+        .mapNotNull { it.sample }
+        .map { EarSample(it.template, it.format, earResponse.referenceId) }
 
     fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
         ?.filterIsInstance<FingerprintReference>()
@@ -149,6 +167,22 @@ class SubjectFactory @Inject constructor(
         format: String,
         referenceId: String,
     ) = FaceSample(
+        template = encodingUtils.base64ToBytes(template.template),
+        format = format,
+        referenceId = referenceId,
+    )
+
+    fun extractEarSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) = biometricReferences
+        ?.filterIsInstance<EarReference>()
+        ?.map { reference -> reference.templates.map { buildEarSample(it, reference.format, reference.id) } }
+        ?.flatten()
+        ?: emptyList()
+
+    private fun buildEarSample(
+        template: EarTemplate,
+        format: String,
+        referenceId: String,
+    ) = EarSample(
         template = encodingUtils.base64ToBytes(template.template),
         format = format,
         referenceId = referenceId,

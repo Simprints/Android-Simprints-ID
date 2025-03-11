@@ -265,6 +265,7 @@ internal class EventDownSyncTask @Inject constructor(
                 subjectId = subjectId,
                 faceSamplesToAdd = subjectFactory.extractFaceSamplesFromBiometricReferences(biometricReferencesAdded),
                 fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
+                earSamplesToAdd = subjectFactory.extractEarSamplesFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,
             ),
         )

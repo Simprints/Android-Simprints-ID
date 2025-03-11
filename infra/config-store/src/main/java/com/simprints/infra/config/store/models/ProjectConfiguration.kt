@@ -6,6 +6,7 @@ data class ProjectConfiguration(
     val updatedAt: String,
     val general: GeneralConfiguration,
     val face: FaceConfiguration?,
+    val ear: FaceConfiguration?,
     val fingerprint: FingerprintConfiguration?,
     val consent: ConsentConfiguration,
     val identification: IdentificationConfiguration,

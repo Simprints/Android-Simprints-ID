@@ -18,6 +18,7 @@ internal fun GeneralConfiguration.toProto(): ProtoGeneralConfiguration = ProtoGe
 internal fun GeneralConfiguration.Modality.toProto(): ProtoGeneralConfiguration.Modality = when (this) {
     GeneralConfiguration.Modality.FACE -> ProtoGeneralConfiguration.Modality.FACE
     GeneralConfiguration.Modality.FINGERPRINT -> ProtoGeneralConfiguration.Modality.FINGERPRINT
+    GeneralConfiguration.Modality.EAR -> ProtoGeneralConfiguration.Modality.EAR
 }
 
 internal fun ProtoGeneralConfiguration.toDomain(): GeneralConfiguration = GeneralConfiguration(
@@ -31,8 +32,9 @@ internal fun ProtoGeneralConfiguration.toDomain(): GeneralConfiguration = Genera
 )
 
 internal fun ProtoGeneralConfiguration.Modality.toDomain(): GeneralConfiguration.Modality = when (this) {
-    ProtoGeneralConfiguration.Modality.FACE -> GeneralConfiguration.Modality.FACE
+    ProtoGeneralConfiguration.Modality.FACE -> GeneralConfiguration.Modality.EAR // TODO for now
     ProtoGeneralConfiguration.Modality.FINGERPRINT -> GeneralConfiguration.Modality.FINGERPRINT
+    ProtoGeneralConfiguration.Modality.EAR -> GeneralConfiguration.Modality.EAR
     ProtoGeneralConfiguration.Modality.UNRECOGNIZED -> throw InvalidProtobufEnumException("invalid modality $name")
 }
 

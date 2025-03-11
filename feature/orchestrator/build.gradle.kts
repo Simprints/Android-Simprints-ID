@@ -28,6 +28,8 @@ dependencies {
     implementation(project(":fingerprint:connect"))
     implementation(project(":fingerprint:capture"))
 
+    implementation(project(":ear:capture"))
+
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:enrolment-records:repository"))
     implementation(project(":infra:recent-user-activity"))

@@ -38,6 +38,12 @@ sealed class EnrolLastBiometricStepResult : Parcelable {
 
     @Keep
     @Parcelize
+    data class EarMatchResult(
+        val results: List<MatchResult>,
+    ) : EnrolLastBiometricStepResult()
+
+    @Keep
+    @Parcelize
     data class FingerprintCaptureResult(
         val referenceId: String,
         val results: List<FingerTemplateCaptureResult>,
@@ -48,6 +54,13 @@ sealed class EnrolLastBiometricStepResult : Parcelable {
     data class FaceCaptureResult(
         val referenceId: String,
         val results: List<FaceTemplateCaptureResult>,
+    ) : EnrolLastBiometricStepResult()
+
+    @Keep
+    @Parcelize
+    data class EarCaptureResult(
+        val referenceId: String,
+        val results: List<EarTemplateCaptureResult>,
     ) : EnrolLastBiometricStepResult()
 }
 
@@ -92,6 +105,31 @@ data class FingerTemplateCaptureResult(
 @Keep
 @Parcelize
 data class FaceTemplateCaptureResult(
+    val template: ByteArray,
+    val format: String,
+) : Parcelable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FaceTemplateCaptureResult
+
+        if (!template.contentEquals(other.template)) return false
+        if (format != other.format) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = template.contentHashCode()
+        result = 31 * result + format.hashCode()
+        return result
+    }
+}
+
+@Keep
+@Parcelize
+data class EarTemplateCaptureResult(
     val template: ByteArray,
     val format: String,
 ) : Parcelable {

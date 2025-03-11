@@ -9,10 +9,12 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.matcher.EarMatchResult
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
+import com.simprints.matcher.usecases.EarMatcherUseCase
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.MatcherUseCase
@@ -27,6 +29,7 @@ import javax.inject.Inject
 internal class MatchViewModel @Inject constructor(
     private val faceMatcher: FaceMatcherUseCase,
     private val fingerprintMatcher: FingerprintMatcherUseCase,
+    private val earMatcher: EarMatcherUseCase,
     private val saveMatchEvent: SaveMatchEventUseCase,
     private val authStore: AuthStore,
     private val configManager: ConfigManager,
@@ -50,8 +53,10 @@ internal class MatchViewModel @Inject constructor(
         val startTime = timeHelper.now()
 
         val isFaceMatch = params.isFaceMatch()
+        val isEarMatch = params.isEarMatch()
         val matcherUseCase = when {
             isFaceMatch -> faceMatcher
+            isEarMatch -> earMatcher
             else -> fingerprintMatcher
         }
         val project = configManager.getProject(authStore.signedInProjectId)
@@ -87,6 +92,7 @@ internal class MatchViewModel @Inject constructor(
                     _matchResponse.send(
                         when {
                             isFaceMatch -> FaceMatchResult(matcherState.matchResultItems)
+                            isEarMatch -> EarMatchResult(matcherState.matchResultItems)
                             else -> FingerprintMatchResult(matcherState.matchResultItems, params.fingerprintSDK!!)
                         },
                     )

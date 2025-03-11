@@ -5,6 +5,7 @@ import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.matcher.EarMatchResult
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
@@ -25,14 +26,17 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         val fingerprintResults = getFingerprintResults(results, projectConfiguration)
         val bestFingerprintConfidence = fingerprintResults.firstOrNull()?.confidenceScore ?: 0
 
+        val earResults = getEarMatchResults(results, projectConfiguration)
+        val bestEarConfidence = earResults.firstOrNull()?.confidenceScore ?: 0
+
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             // Return the results with the highest confidence score
-            identifications = if (bestFingerprintConfidence > bestFaceConfidence) {
-                fingerprintResults
-            } else {
-                faceResults
-            },
+            identifications = listOf(
+                bestFingerprintConfidence to fingerprintResults,
+                bestFaceConfidence to faceResults,
+                bestEarConfidence to earResults,
+            ).maxBy { it.first }.second,
         )
     }
 
@@ -72,6 +76,24 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                 .ifEmpty { goodResults }
                 .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
                 .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
+        }
+    } ?: emptyList()
+
+    private fun getEarMatchResults(
+        results: List<Serializable>,
+        projectConfiguration: ProjectConfiguration,
+    ) = results.filterIsInstance<EarMatchResult>().lastOrNull()?.let { earMatchResult ->
+        projectConfiguration.ear?.decisionPolicy?.let { earDecisionPolicy ->
+            val matches = earMatchResult.results
+            val goodResults = matches
+                .filter { it.confidence >= earDecisionPolicy.low }
+                .sortedByDescending { it.confidence }
+            // Attempt to include only high confidence matches
+            goodResults
+                .filter { it.confidence >= earDecisionPolicy.high }
+                .ifEmpty { goodResults }
+                .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                .map { AppMatchResult(it.subjectId, it.confidence, earDecisionPolicy) }
         }
     } ?: emptyList()
 }

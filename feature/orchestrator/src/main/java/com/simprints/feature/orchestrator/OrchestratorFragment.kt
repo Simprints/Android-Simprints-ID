@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.ear.capture.EarCaptureContract
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
@@ -122,6 +123,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(MatchContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(FaceCaptureContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(FingerprintCaptureContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(EarCaptureContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(FetchSubjectContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(ValidateSubjectPoolContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(SelectSubjectAgeGroupContract.DESTINATION, orchestratorVm::handleResult)
