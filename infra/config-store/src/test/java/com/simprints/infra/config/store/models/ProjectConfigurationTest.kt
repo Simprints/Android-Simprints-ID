@@ -219,7 +219,7 @@ class ProjectConfigurationTest {
                     frequency = it.key,
                 ),
             )
-            assertThat(config.isEventDownSyncAllowed()).isEqualTo(it.value)
+            assertThat(config.isSimprintsEventDownSyncAllowed()).isEqualTo(it.value)
         }
     }
 

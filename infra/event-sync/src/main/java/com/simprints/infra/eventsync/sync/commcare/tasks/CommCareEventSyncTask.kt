@@ -1,10 +1,9 @@
-package com.simprints.infra.eventsync.sync.down.tasks
+package com.simprints.infra.eventsync.sync.commcare.tasks
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -21,13 +20,13 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
-import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
+import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
-import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.sync.common.EventDownSyncProgress
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
@@ -35,19 +34,17 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import java.util.UUID
 import javax.inject.Inject
 
-internal class EventDownSyncTask @Inject constructor(
+internal class CommCareEventSyncTask @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
-    private val eventRemoteDataSource: EventRemoteDataSource,
+    private val commCareEventDataSource: CommCareEventDataSource,
     private val eventRepository: EventRepository,
 ) {
     fun downSync(
@@ -63,23 +60,15 @@ internal class EventDownSyncTask @Inject constructor(
 
         var firstEventTimestamp: Timestamp? = null
         val requestId = UUID.randomUUID().toString()
-        var result: EventDownSyncResult? = null
+        var result: CommCareEventSyncResult? = null
         var errorType: String? = null
 
         try {
-            result = eventRemoteDataSource.getEvents(
-                requestId,
-                operation.queryEvent.fromDomainToApi(),
-                scope,
-            )
+            Simber.d("CommCareEventSyncTask started", tag = "CommCareSync")
+            result = commCareEventDataSource.getEvents()
 
-            result.eventStream
-                .consumeAsFlow()
-                .catch {
-                    // Track a case when event stream is closed due to a parser error,
-                    // but the exception is handled gracefully and channel is closed correctly.
-                    errorType = it.javaClass.simpleName
-                }.collect {
+            result.eventFlow
+                .collect {
                     batchOfEventsToProcess.add(it)
                     count++
                     // We immediately process the first event to initialise a progress
@@ -101,12 +90,16 @@ internal class EventDownSyncTask @Inject constructor(
 
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, result.totalCount)
+
+            Simber.d("CommCareEventSyncTask finished", tag = "CommCareSync")
+
+            // TODO(milen): delete subjectIds not in the event list
         } catch (t: Throwable) {
-            if (t is RemoteDbNotSignedInException) {
+            if (t is SecurityException) {
                 throw t
             }
 
-            Simber.i("Down sync error", t, tag = SYNC)
+            Simber.i("CommCare sync error", t, tag = SYNC)
             errorType = t.javaClass.simpleName
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
@@ -136,7 +129,7 @@ internal class EventDownSyncTask @Inject constructor(
                     msToFirstResponseByte = firstEventTimestamp?.let { it.ms - requestStartTime.ms },
                     eventRead = count,
                     errorType = errorType,
-                    responseStatus = result?.status,
+                    responseStatus = null,
                 ),
             )
         }
@@ -151,6 +144,7 @@ internal class EventDownSyncTask @Inject constructor(
         this.emit(EventDownSyncProgress(lastOperation, count, max))
     }
 
+    //TODO(milen): this common functionality should be extrated
     private suspend fun processBatchedEvents(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
