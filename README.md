@@ -196,3 +196,7 @@ After creating the universal apk from app bundle, run command to install apk on 
 
 Deploying to the Google Play Store and Firebase distribution has several steps. For a full guide
 go [here](.github/workflows/README.md) to get more details. 
+
+## Additional Info
+
+This project is tested with BrowserStack.
