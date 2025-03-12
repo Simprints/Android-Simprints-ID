@@ -4,7 +4,7 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest

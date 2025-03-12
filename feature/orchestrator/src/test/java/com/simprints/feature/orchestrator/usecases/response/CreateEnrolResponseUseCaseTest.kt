@@ -6,7 +6,7 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse

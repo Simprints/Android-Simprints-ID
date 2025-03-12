@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":infra:enrolment-records:repository"))
     implementation(project(":infra:recent-user-activity"))
 
+    implementation(libs.libsimprints)
     implementation(libs.workManager.work)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)

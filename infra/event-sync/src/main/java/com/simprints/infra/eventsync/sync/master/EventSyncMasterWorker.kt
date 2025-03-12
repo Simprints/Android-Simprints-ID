@@ -14,10 +14,12 @@ import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.eventsync.sync.commcare.CommCareEventSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.getAllSubjectsSyncWorkersInfo
 import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
@@ -38,6 +40,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     @Assisted params: WorkerParameters,
     private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
+    private val commCareSyncWorkerBuilder: CommCareEventSyncWorkersBuilder,
     private val configManager: ConfigManager,
     private val eventSyncCache: EventSyncCache,
     private val eventRepository: EventRepository,
@@ -96,7 +99,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         ).also { Simber.d("Scheduled ${it.size} up workers", tag = tag) }
                 }
 
-                if (configuration.isEventDownSyncAllowed()) {
+                if (configuration.isSimprintsEventDownSyncAllowed()) {
                     // TODO: Remove after all users have updated to 2025.3.0
                     // In versions before 2025.3.0 a bug prevented single subject down-sync scopes from being closed and uploaded.
                     // Attempting to close any such scopes and recover at least some of the data.
@@ -111,7 +114,18 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
-                        ).also { Simber.d("Scheduled ${it.size} down workers", tag = tag) }
+                        ).also { Simber.d("Scheduled ${it.size} Simprints down workers", tag = tag) }
+                } else if (configuration.isCommCareEventDownSyncAllowed()) {
+                    eventRepository.createEventScope(
+                        EventScopeType.DOWN_SYNC,
+                        downSyncWorkerScopeId,
+                    )
+
+                    workerChain += commCareSyncWorkerBuilder
+                        .buildDownSyncWorkerChain(
+                            uniqueSyncId,
+                            downSyncWorkerScopeId,
+                        ).also { Simber.d("Scheduled ${it.size} CommCare down workers", tag = tag) }
                 }
 
                 val endSyncReporterWorker =
@@ -158,9 +172,9 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
 
     private fun getLastSyncId(): String? = syncWorkers.last().getUniqueSyncId()
 
-    private fun isSyncRunning(): Boolean = !getWorkInfoForRunningSyncWorkers().isNullOrEmpty()
+    private fun isSyncRunning(): Boolean = getWorkInfoForRunningSyncWorkers().isNotEmpty()
 
-    private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? = syncWorkers?.filter {
+    private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo> = syncWorkers.filter {
         it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED
     }
 

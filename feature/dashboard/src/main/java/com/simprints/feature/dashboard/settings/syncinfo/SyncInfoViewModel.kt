@@ -17,7 +17,7 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -211,7 +211,7 @@ internal class SyncInfoViewModel @Inject constructor(
         .collect { _recordsToUpSync.postValue(it) }
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
-        if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
+        if (configManager.getProjectConfiguration().isSimprintsEventDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             DownSyncCounts(0, isLowerBound = false)

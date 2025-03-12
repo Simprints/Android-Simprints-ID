@@ -32,7 +32,7 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
@@ -185,7 +185,7 @@ internal class SyncViewModel @Inject constructor(
             }
         }
         configManager.getProjectConfiguration().also { configuration ->
-            _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
+            _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isSimprintsEventDownSyncAllowed())
         }
         eventSyncManager
             .countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4))
