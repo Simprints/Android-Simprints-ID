@@ -22,17 +22,19 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
+@Singleton
 internal open class EventLocalDataSource @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
     private val jsonHelper: JsonHelper,
     @DispatcherIO private val readingDispatcher: CoroutineDispatcher,
     @NonCancellableIO private val writingContext: CoroutineContext,
 ) {
-    private var eventDao: EventRoomDao = eventDatabaseFactory.build().eventDao
+    private var eventDao: EventRoomDao = eventDatabaseFactory.get().eventDao
 
-    private var scopeDao: SessionScopeRoomDao = eventDatabaseFactory.build().scopeDao
+    private var scopeDao: SessionScopeRoomDao = eventDatabaseFactory.get().scopeDao
 
     private val mutex = Mutex()
 
@@ -44,7 +46,7 @@ internal open class EventLocalDataSource @Inject constructor(
             block()
         } catch (ex: SQLiteException) {
             if (isFileCorruption(ex)) {
-                rebuildDatabase(ex)
+                recreateDatabase(ex)
                 // Retry operation with new file and key
                 block()
             } else {
@@ -60,7 +62,7 @@ internal open class EventLocalDataSource @Inject constructor(
         try {
             block().catch { cause ->
                 if (isFileCorruption(cause)) {
-                    rebuildDatabase(cause)
+                    recreateDatabase(cause)
                     // Recreate flow and re-emit values with the new file and key
                     emitAll(block())
                 } else {
@@ -69,7 +71,7 @@ internal open class EventLocalDataSource @Inject constructor(
             }
         } catch (ex: SQLiteException) {
             if (isFileCorruption(ex)) {
-                rebuildDatabase(ex)
+                recreateDatabase(ex)
                 // Recreate flow with the new file and key
                 block()
             } else {
@@ -81,17 +83,11 @@ internal open class EventLocalDataSource @Inject constructor(
     private fun isFileCorruption(ex: Throwable) = ex is SQLiteDatabaseCorruptException ||
         ex.let { it as? SQLiteException }?.message?.contains("file is not a database") == true
 
-    private suspend fun rebuildDatabase(ex: Throwable) = mutex.withLock {
-        // DB corruption detected; either DB file or key is corrupt
-        // 1. Delete DB file in order to create a new one at next init
-        eventDatabaseFactory.deleteDatabase()
-        // 2. Recreate the DB key
-        eventDatabaseFactory.recreateDatabaseKey()
-        // 3. Log exception after recreating the key so we get extra info
-        Simber.e("Rebuilt event DB due to error", ex, tag = DB_CORRUPTION)
-        // 4. Rebuild database
-        eventDao = eventDatabaseFactory.build().eventDao
-        scopeDao = eventDatabaseFactory.build().scopeDao
+    private suspend fun recreateDatabase(ex: Throwable) = mutex.withLock {
+        eventDatabaseFactory.recreateDatabase()
+        Simber.e("Recreated event DB due to error", ex, tag = DB_CORRUPTION)
+        eventDao = eventDatabaseFactory.get().eventDao
+        scopeDao = eventDatabaseFactory.get().scopeDao
     }
 
     suspend fun saveEventScope(scope: EventScope) = useRoom(writingContext) {
