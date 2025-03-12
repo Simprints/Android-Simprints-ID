@@ -4,9 +4,9 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.database.sqlite.SQLiteException
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.core.app.*
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
@@ -20,7 +20,8 @@ import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.*
-import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.impl.annotations.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -44,6 +45,7 @@ internal class EventLocalDataSourceTest {
     @RelaxedMockK
     lateinit var eventDatabaseFactory: EventDatabaseFactory
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         MockKAnnotations.init(this)
@@ -57,7 +59,7 @@ internal class EventLocalDataSourceTest {
         eventDao = db.eventDao
         scopeDao = db.scopeDao
 
-        every { eventDatabaseFactory.build() } returns db
+        every { eventDatabaseFactory.get() } returns db
         mockDaoLoadToMakeNothing()
 
         eventLocalDataSource = EventLocalDataSource(
@@ -78,9 +80,8 @@ internal class EventLocalDataSourceTest {
         eventLocalDataSource.loadAllEvents()
         // Then
         verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
+            eventDatabaseFactory.recreateDatabase()
+            eventDatabaseFactory.get()
         }
         coVerify(exactly = 2) { eventDao.loadAll() }
     }
@@ -95,9 +96,7 @@ internal class EventLocalDataSourceTest {
         eventLocalDataSource.loadAllEvents()
         // Then
         verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 2) { eventDao.loadAll() }
     }
@@ -110,7 +109,7 @@ internal class EventLocalDataSourceTest {
         assertThrows<SQLiteException> { eventLocalDataSource.loadAllEvents() }
         // Then
         verify(exactly = 0) {
-            eventDatabaseFactory.deleteDatabase()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 1) { eventDao.loadAll() }
     }
@@ -123,7 +122,7 @@ internal class EventLocalDataSourceTest {
         assertThrows<Exception> { eventLocalDataSource.loadAllEvents() }
         // Then
         verify(exactly = 0) {
-            eventDatabaseFactory.deleteDatabase()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 1) { eventDao.loadAll() }
     }
@@ -137,11 +136,7 @@ internal class EventLocalDataSourceTest {
         // When
         eventLocalDataSource.observeEventCount().toList()
         // Then
-        verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
-        }
+        verify { eventDatabaseFactory.recreateDatabase() }
         coVerify(exactly = 2) { eventDao.observeCount() }
     }
 
@@ -155,7 +150,7 @@ internal class EventLocalDataSourceTest {
         }
         // Then
         verify(exactly = 0) {
-            eventDatabaseFactory.deleteDatabase()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 1) { eventDao.observeCount() }
     }
@@ -169,11 +164,7 @@ internal class EventLocalDataSourceTest {
         // When
         eventLocalDataSource.observeEventCount().toList()
         // Then
-        verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
-        }
+        verify { eventDatabaseFactory.recreateDatabase() }
         coVerify(exactly = 2) { eventDao.observeCount() }
     }
 
@@ -187,7 +178,7 @@ internal class EventLocalDataSourceTest {
         }
         // Then
         verify(exactly = 0) {
-            eventDatabaseFactory.deleteDatabase()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 1) { eventDao.observeCount() }
     }
@@ -202,9 +193,7 @@ internal class EventLocalDataSourceTest {
         val count = eventLocalDataSource.observeEventCount().toList()
         // Then
         verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 2) { eventDao.observeCount() }
         assertThat(count).isEqualTo(listOf(1, 2, 3))
@@ -219,11 +208,7 @@ internal class EventLocalDataSourceTest {
         // When
         eventLocalDataSource.observeEventCount().toList()
         // Then
-        verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
-        }
+        verify { eventDatabaseFactory.recreateDatabase() }
         coVerify(exactly = 2) { eventDao.observeCount() }
     }
 
@@ -237,7 +222,7 @@ internal class EventLocalDataSourceTest {
                 eventLocalDataSource.observeEventCount().toList()
             }
             // Then
-            verify(exactly = 0) { eventDatabaseFactory.deleteDatabase() }
+            verify(exactly = 0) { eventDatabaseFactory.recreateDatabase() }
             coVerify(exactly = 1) { eventDao.observeCount() }
         }
 
@@ -252,9 +237,7 @@ internal class EventLocalDataSourceTest {
             eventLocalDataSource.observeEventCount().toList()
             // Then
             verify {
-                eventDatabaseFactory.deleteDatabase()
-                eventDatabaseFactory.recreateDatabaseKey()
-                eventDatabaseFactory.build()
+                eventDatabaseFactory.recreateDatabase()
             }
             coVerify(exactly = 2) { eventDao.observeCount() }
         }
@@ -268,7 +251,7 @@ internal class EventLocalDataSourceTest {
             eventLocalDataSource.observeEventCount().toList()
         }
         // Then
-        verify(exactly = 0) { eventDatabaseFactory.deleteDatabase() }
+        verify(exactly = 0) { eventDatabaseFactory.recreateDatabase() }
         coVerify(exactly = 1) { eventDao.observeCount() }
     }
 
@@ -282,9 +265,7 @@ internal class EventLocalDataSourceTest {
         val count = eventLocalDataSource.observeEventCount().toList()
         // Then
         verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 2) { eventDao.observeCount() }
         assertThat(count).isEqualTo(listOf(1, 2, 3))
@@ -301,9 +282,7 @@ internal class EventLocalDataSourceTest {
         }
         // Then
         verify {
-            eventDatabaseFactory.deleteDatabase()
-            eventDatabaseFactory.recreateDatabaseKey()
-            eventDatabaseFactory.build()
+            eventDatabaseFactory.recreateDatabase()
         }
         coVerify(exactly = 2) { eventDao.observeCount() }
     }
@@ -484,7 +463,7 @@ internal class EventLocalDataSourceTest {
         coEvery { scopeDao.count(any()) } returns 0
         every { db.eventDao } returns eventDao
         every { db.scopeDao } returns scopeDao
-        every { eventDatabaseFactory.build() } returns db
+        every { eventDatabaseFactory.get() } returns db
     }
 
     @After
