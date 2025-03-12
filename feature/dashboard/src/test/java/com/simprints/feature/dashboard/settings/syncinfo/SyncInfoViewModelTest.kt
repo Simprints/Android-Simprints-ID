@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -202,6 +203,13 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should initialize the recordsToDownSync live data to the count otherwise`() = runTest {
+        //TODO(milen): temp, remove when new config is implemented
+        mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
+        val projectConfiguration = mockk<ProjectConfiguration>()
+        every { projectConfiguration.isSimprintsEventDownSyncAllowed() } returns true
+        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
+
+
         val module1 = "module1".asTokenizableEncrypted()
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(module1)
