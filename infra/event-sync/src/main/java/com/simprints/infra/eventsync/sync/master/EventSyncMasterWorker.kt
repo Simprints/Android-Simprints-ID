@@ -14,10 +14,12 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
+import com.simprints.infra.config.store.models.isCommCareSyncAllowed
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.eventsync.sync.commcare.CommCareEventSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.getAllSubjectsSyncWorkersInfo
 import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
@@ -38,6 +40,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     @Assisted params: WorkerParameters,
     private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
+    private val commCareSyncWorkerBuilder: CommCareEventSyncWorkersBuilder,
     private val configManager: ConfigManager,
     private val eventSyncCache: EventSyncCache,
     private val eventRepository: EventRepository,
@@ -107,6 +110,17 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
                         ).also { Simber.d("Scheduled ${it.size} down workers", tag = tag) }
+                } else if (configuration.isCommCareSyncAllowed()) {
+                    eventRepository.createEventScope(
+                        EventScopeType.DOWN_SYNC,
+                        downSyncWorkerScopeId,
+                    )
+
+                    workerChain += commCareSyncWorkerBuilder
+                        .buildDownSyncWorkerChain(
+                            uniqueSyncId,
+                            downSyncWorkerScopeId,
+                        ).also { Simber.d("Scheduled ${it.size} CommCare workers", tag = tag) }
                 }
 
                 val endSyncReporterWorker =
