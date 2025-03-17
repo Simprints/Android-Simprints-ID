@@ -4,8 +4,6 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.infra.realm.models.DbFaceSample
-import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbSubject
 import java.util.Date
 
@@ -23,8 +21,6 @@ internal fun DbSubject.fromDbToDomain(): Subject {
         createdAt = createdAt?.toDate(),
         updatedAt = updatedAt?.toDate(),
         toSync = toSync,
-        fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
-        faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain),
     )
 }
 
@@ -36,13 +32,13 @@ internal fun Subject.fromDomainToDb(): DbSubject = DbSubject().also { subject ->
     subject.createdAt = createdAt?.time
     subject.updatedAt = updatedAt?.time
     subject.toSync = toSync
-    subject.fingerprintSamples.addAll(
-        this.fingerprintSamples.map { it.fromDomainToDb() },
-    )
+//    subject.fingerprintSamples.addAll(
+//        this.fingerprintSamples.map { it.fromDomainToDb() },
+//    )
 
-    subject.faceSamples.addAll(
-        this.faceSamples.map { it.fromDomainToDb() },
-    )
+//    subject.faceSamples.addAll(
+//        this.faceSamples.map { it.fromDomainToDb() },
+//    )
     subject.isModuleIdTokenized = moduleId.isTokenized()
     subject.isAttendantIdTokenized = attendantId.isTokenized()
 }

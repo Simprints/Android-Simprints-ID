@@ -13,4 +13,6 @@ interface EnrolmentRecordLocalDataSource : IdentityDataSource {
     suspend fun deleteAll()
 
     suspend fun performActions(actions: List<SubjectAction>)
+
+    suspend fun getNearestNeighbour(facesample: FloatArray): List<Pair<String, Float>>
 }

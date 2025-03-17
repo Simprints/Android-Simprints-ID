@@ -19,7 +19,7 @@ data class FingerprintCaptureResult(
     @Keep
     data class Sample(
         val fingerIdentifier: IFingerIdentifier,
-        val template: ByteArray,
+        val template: FloatArray,
         val templateQualityScore: Int,
         val imageRef: SecuredImageRef?,
         val format: String,

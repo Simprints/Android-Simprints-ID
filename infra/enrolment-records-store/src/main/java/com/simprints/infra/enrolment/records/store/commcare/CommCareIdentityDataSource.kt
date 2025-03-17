@@ -63,7 +63,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                             FingerprintSample(
                                 fingerIdentifier = fingerprintTemplate.finger,
                                 templateQualityScore = fingerprintTemplate.quality,
-                                template = encoder.base64ToBytes(fingerprintTemplate.template),
+                                template = encoder.base64ToFloatArray(fingerprintTemplate.template),
                                 format = fingerprintReference.format,
                             )
                         }
@@ -134,7 +134,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     .flatMap { faceReference ->
                         faceReference.templates.map { faceTemplate ->
                             FaceSample(
-                                template = encoder.base64ToBytes(faceTemplate.template),
+                                template = encoder.base64ToFloatArray(faceTemplate.template),
                                 format = faceReference.format,
                             )
                         }

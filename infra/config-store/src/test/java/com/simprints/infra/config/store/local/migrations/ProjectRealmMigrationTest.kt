@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.testtools.protoProject
-import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.ObjectboxWrapper
 import com.simprints.infra.realm.models.DbProject
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
@@ -31,7 +31,7 @@ class ProjectRealmMigrationTest {
     private lateinit var authStore: AuthStore
 
     @MockK
-    private lateinit var realmWrapper: RealmWrapper
+    private lateinit var realmWrapper: ObjectboxWrapper
 
     @MockK
     private lateinit var realm: Realm

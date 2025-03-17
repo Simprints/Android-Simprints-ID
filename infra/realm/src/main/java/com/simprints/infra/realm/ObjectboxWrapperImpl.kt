@@ -17,19 +17,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RealmWrapperImpl @Inject constructor(
+class ObjectboxWrapperImpl @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val securityManager: SecurityManager,
     private val authStore: AuthStore,
-) : RealmWrapper {
-    private lateinit var boxStore: BoxStore
+) : ObjectboxWrapper {
+    private var boxStore: BoxStore
 
     init {
 
         val builder = MyObjectBox.builder().androidContext(appContext)
 
         if (BuildConfig.DB_ENCRYPTION) {
-            //   builder.encryptionKey(encryptionKey.value) only available in objectbox  comercial version
+            //   builder.encryptionKey(encryptionKey.value) only available in objectbox  commercial version
         }
 
         boxStore = builder.build()

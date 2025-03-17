@@ -161,7 +161,7 @@ internal class FaceCaptureViewModel @Inject constructor(
                     index = index,
                     sample = FaceCaptureResult.Sample(
                         faceId = detection.id,
-                        template = detection.face?.template ?: ByteArray(0),
+                        template = detection.face?.template ?: FloatArray(0),
                         imageRef = detection.securedImageRef,
                         format = detection.face?.format ?: "",
                     ),

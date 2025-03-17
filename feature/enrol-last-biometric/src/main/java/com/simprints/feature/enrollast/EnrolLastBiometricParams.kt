@@ -60,7 +60,7 @@ data class MatchResult(
 @Parcelize
 data class FingerTemplateCaptureResult(
     val finger: Finger,
-    val template: ByteArray,
+    val template: FloatArray,
     val templateQualityScore: Int,
     val format: String,
 ) : Parcelable {
@@ -90,7 +90,7 @@ data class FingerTemplateCaptureResult(
 @Keep
 @Parcelize
 data class FaceTemplateCaptureResult(
-    val template: ByteArray,
+    val template: FloatArray,
     val format: String,
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {

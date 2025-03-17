@@ -6,5 +6,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class FaceSample(
     val faceId: String,
-    val template: ByteArray,
+    val template: FloatArray,
 ) : Parcelable

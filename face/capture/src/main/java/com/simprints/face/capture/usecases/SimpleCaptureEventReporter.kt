@@ -93,7 +93,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
         FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
             it.yaw,
             it.roll,
-            encodingUtils.byteArrayToBase64(it.template),
+            encodingUtils.floatArrayToBase64(it.template),
             it.quality,
             it.format,
         )

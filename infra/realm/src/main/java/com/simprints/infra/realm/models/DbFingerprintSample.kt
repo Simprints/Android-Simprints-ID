@@ -3,8 +3,8 @@ package com.simprints.infra.realm.models
 import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import io.objectbox.annotation.Entity
+import io.objectbox.annotation.HnswIndex
 import io.objectbox.annotation.Id
-import io.objectbox.relation.ToOne
 import java.util.UUID
 
 @Keep
@@ -13,10 +13,9 @@ import java.util.UUID
 data class DbFingerprintSample(
     @Id var id: Long = 0,
     var uuid: String = UUID.randomUUID().toString(),
+    var subjectId: String,
     var fingerIdentifier: Int = -1,
-    var template: ByteArray = byteArrayOf(),
+    @HnswIndex(dimensions = 512) var template: FloatArray = floatArrayOf(),
     var templateQualityScore: Int = -1,
     var format: String = "",
-) {
-    lateinit var subject: ToOne<DbSubject>
-}
+)

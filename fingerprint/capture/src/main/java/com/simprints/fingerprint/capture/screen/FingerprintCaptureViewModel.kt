@@ -662,7 +662,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 captureEventId = captureEventIds[captureId],
                 sample = FingerprintCaptureResult.Sample(
                     fingerIdentifier = captureId.finger,
-                    template = collectedFinger.scanResult.template,
+                    template = floatArrayOf(), // collectedFinger.scanResult.template,
                     templateQualityScore = collectedFinger.scanResult.qualityScore,
                     imageRef = imageRefs[captureId]?.let { SecuredImageRef(Path(it.relativePath.parts)) },
                     format = collectedFinger.scanResult.templateFormat,

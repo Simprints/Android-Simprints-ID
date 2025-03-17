@@ -8,6 +8,7 @@ import ai.roc.rocsdk.embedded.roc_landmark
 import android.graphics.Bitmap
 import android.graphics.Rect
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.tools.utils.byteArrayToFloatArray
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import java.nio.ByteBuffer
@@ -69,7 +70,7 @@ class RocV3Detector @Inject constructor() : FaceDetector {
                 yawValue,
                 detection.rotation,
                 qualityValue,
-                roc3.cdata(roc3.roc_cast(template), roc3.ROC_FACE_FAST_FV_SIZE.toInt()),
+                byteArrayToFloatArray(roc3.cdata(roc3.roc_cast(template), roc3.ROC_FACE_FAST_FV_SIZE.toInt())),
                 RANK_ONE_TEMPLATE_FORMAT_3_1,
             )
         } else {

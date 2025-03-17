@@ -5,7 +5,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.MIGRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.ObjectboxWrapper
 import javax.inject.Inject
 
 /**
@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 internal class ProjectRealmMigration @Inject constructor(
     private val authStore: AuthStore,
-    private val realmWrapper: RealmWrapper,
+    private val realmWrapper: ObjectboxWrapper,
 ) : DataMigration<ProtoProject> {
     companion object {
         const val PROJECT_ID_FIELD = "id"

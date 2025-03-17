@@ -100,7 +100,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
 
     private fun FingerprintIdentity.templateForFinger(fingerId: FingerIdentifier) = fingerprints.find { it.fingerId == fingerId }
 
-    private fun Fingerprint.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
+    private fun Fingerprint.toNecTemplate() = NECTemplate(byteArrayOf(), 0) // Quality score not used
 
     private fun getOverallScore(
         total: Double,

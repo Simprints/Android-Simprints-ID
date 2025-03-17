@@ -11,8 +11,8 @@ abstract class FaceMatcher {
      * Returns a comparison score of two templates  from 0.0 - 100.0
      */
     abstract suspend fun getComparisonScore(
-        probe: ByteArray,
-        matchAgainst: ByteArray,
+        probe: FloatArray,
+        matchAgainst: FloatArray,
     ): Float
 
     /**

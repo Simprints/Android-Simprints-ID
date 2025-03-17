@@ -11,11 +11,9 @@ import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.ObjectboxWrapper
 import com.simprints.infra.realm.models.DbFaceSample
 import com.simprints.infra.realm.models.DbFaceSample_
-import com.simprints.infra.realm.models.DbFingerprintSample
-import com.simprints.infra.realm.models.DbFingerprintSample_
 import com.simprints.infra.realm.models.DbSubject
 import com.simprints.infra.realm.models.DbSubject_
 import io.objectbox.Box
@@ -25,9 +23,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
+import kotlin.time.measureTimedValue
 
 internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
-    private val realmWrapper: RealmWrapper,
+    private val realmWrapper: ObjectboxWrapper,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
@@ -95,17 +94,9 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
-//        realmWrapper.writeRealm { realm ->
-//            queries.forEach {
-//                realm.delete(realm.query(DbSubject::class).buildBoxQueryForSubject(it))
-//            }
-//        }
     }
 
     override suspend fun deleteAll() {
-//        realmWrapper.writeRealm { realm ->
-//            realm.deleteAll()
-//        }
     }
 
     override suspend fun count(
@@ -123,6 +114,18 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         count
     }
 
+    override suspend fun getNearestNeighbour(facesample: FloatArray): List<Pair<String, Float>> = realmWrapper.readObjectBox { store ->
+        val result = measureTimedValue {
+            val query = store.boxFor<DbFaceSample>().query(DbFaceSample_.template.nearestNeighbors(facesample, 10)).build()
+            val result = query.findWithScores()
+            result.map {
+                Pair(it.get().subjectId, it.score.toFloat())
+            }
+        }
+        log("getNearestNeighbour time: ${result.duration.inWholeMilliseconds}")
+        result.value
+    }
+
     override suspend fun performActions(actions: List<SubjectAction>): Unit = withContext(dispatcher) {
         // if there is no actions to perform return to avoid useless realm operations
         if (actions.isEmpty()) {
@@ -136,28 +139,23 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
 
                     when (action) {
                         is SubjectAction.Creation -> {
-                            val timeTaken = measureTimeMillis {
-//                                for (i in 0 until 10000) {
-                                val subject = action.subject.fromDomainToDb()
-//                                    subject.subjectUuid = UUID.randomUUID().toString()
-//                                    subject.id = 0
-//                                    // save also a new face sample
-//                                    subject.faceSamples.forEach {
-//                                        it.id = 0
-//                                        it.uuid = UUID.randomUUID().toString()
-//                                    }
+                            val subject = action.subject.fromDomainToDb()
+                            try {
+                                // put face samples first
+                                val dbfaceSamples = action.subject.faceSamples.map { it.fromDomainToDb(subject.subjectUuid) }
+                                store.boxFor<DbFaceSample>().put(dbfaceSamples)
+                                // put the subject
                                 box.put(subject)
-//                                }
+                            } catch (e: Exception) {
+                                Simber.e("Error creating subject ${action.subject.subjectId}", e)
                             }
-//                            log("insert records taken: ${timeTaken}ms")
                         }
 
                         is SubjectAction.Deletion -> box.remove(
                             box
                                 .buildBoxQueryForSubject(
                                     query = SubjectQuery(
-                                        subjectId =
-                                            action.subjectId,
+                                        subjectId = action.subjectId,
                                     ),
                                 ).find(),
                         )
@@ -196,20 +194,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 DbSubject_.moduleId.equal(query.moduleId),
             )
         }
-        if (query.fingerprintSampleFormat != null) {
-            queryBuilder
-                .link<DbFingerprintSample>(DbSubject_.fingerprintSamples)
-                .apply(
-                    DbFingerprintSample_.format.equal(query.fingerprintSampleFormat),
-                )
-        }
-        if (query.faceSampleFormat != null) {
-            queryBuilder
-                .link<DbFaceSample>(DbSubject_.faceSamples)
-                .apply(
-                    DbFaceSample_.format.equal(query.faceSampleFormat),
-                )
-        }
+
         if (query.afterSubjectId != null) {
 //            queryBuilder.apply(
 //                DbSubject_.subjectUuid.greaterThan(query.afterSubjectId),

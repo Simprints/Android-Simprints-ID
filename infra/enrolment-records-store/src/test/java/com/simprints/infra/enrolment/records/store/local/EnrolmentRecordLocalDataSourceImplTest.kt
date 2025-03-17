@@ -11,7 +11,7 @@ import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDat
 import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl.Companion.FORMAT_FIELD
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
-import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.ObjectboxWrapper
 import com.simprints.infra.realm.models.DbSubject
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
@@ -38,7 +38,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
     private lateinit var mutableRealm: MutableRealm
 
     @MockK
-    private lateinit var realmWrapperMock: RealmWrapper
+    private lateinit var realmWrapperMock: ObjectboxWrapper
 
     @MockK
     private lateinit var realmQuery: RealmQuery<DbSubject>

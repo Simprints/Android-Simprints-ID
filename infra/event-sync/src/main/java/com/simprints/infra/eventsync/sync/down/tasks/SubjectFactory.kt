@@ -118,7 +118,7 @@ class SubjectFactory @Inject constructor(
         format: String,
     ): FingerprintSample = FingerprintSample(
         fingerIdentifier = template.finger,
-        template = encodingUtils.base64ToBytes(template.template),
+        template = encodingUtils.base64ToFloatArray(template.template),
         templateQualityScore = template.quality,
         format = format,
     )
@@ -132,5 +132,5 @@ class SubjectFactory @Inject constructor(
     private fun buildFaceSample(
         template: FaceTemplate,
         format: String,
-    ) = FaceSample(encodingUtils.base64ToBytes(template.template), format)
+    ) = FaceSample(encodingUtils.base64ToFloatArray(template.template), format)
 }

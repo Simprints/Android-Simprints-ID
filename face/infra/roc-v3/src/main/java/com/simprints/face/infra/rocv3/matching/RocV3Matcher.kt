@@ -22,14 +22,14 @@ class RocV3Matcher @Inject constructor() : FaceMatcher() {
         reason = "This function uses roc class that has native functions and can't be mocked",
     )
     override suspend fun getComparisonScore(
-        probe: ByteArray,
-        matchAgainst: ByteArray,
+        probe: FloatArray,
+        matchAgainst: FloatArray,
     ): Float {
         val probeTemplate = roc.new_uint8_t_array(ROC_FACE_FAST_FV_SIZE.toInt())
-        roc.memmove(roc.roc_cast(probeTemplate), probe)
+        //  roc.memmove(roc.roc_cast(probeTemplate), probe)
 
         val matchTemplate = roc.new_uint8_t_array(ROC_FACE_FAST_FV_SIZE.toInt())
-        roc.memmove(roc.roc_cast(matchTemplate), matchAgainst)
+        //  roc.memmove(roc.roc_cast(matchTemplate), matchAgainst)
 
         val similarity = roc.roc_embedded_compare_templates(
             probeTemplate,

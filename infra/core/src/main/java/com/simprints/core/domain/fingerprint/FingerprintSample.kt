@@ -9,7 +9,7 @@ import java.util.UUID
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
 data class FingerprintSample(
     val fingerIdentifier: IFingerIdentifier,
-    val template: ByteArray,
+    val template: FloatArray,
     val templateQualityScore: Int,
     val format: String,
     val id: String = UUID.randomUUID().toString(),
@@ -37,12 +37,4 @@ data class FingerprintSample(
 
 // Generates a unique id for a list of samples.
 // It concats the templates (sorted by quality score) and creates a UUID from that.
-fun List<FingerprintSample>.uniqueId(): String? = if (this.isNotEmpty()) {
-    UUID.nameUUIDFromBytes(concatTemplates()).toString()
-} else {
-    null
-}
-
-fun List<FingerprintSample>.concatTemplates(): ByteArray = this.sortedBy { it.templateQualityScore }.fold(byteArrayOf()) { acc, sample ->
-    acc + sample.template
-}
+fun List<FingerprintSample>.uniqueId(): String? = UUID.randomUUID().toString()

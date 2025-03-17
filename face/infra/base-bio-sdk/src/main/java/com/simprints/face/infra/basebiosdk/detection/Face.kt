@@ -23,7 +23,7 @@ data class Face(
     val yaw: Float,
     var roll: Float,
     val quality: Float,
-    val template: ByteArray,
+    val template: FloatArray,
     val format: String,
 ) {
     // Relative = coordinates are fractions of the source image dimensions

@@ -8,7 +8,7 @@ import java.util.UUID
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
 data class FaceSample(
-    val template: ByteArray,
+    val template: FloatArray,
     val format: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
@@ -29,15 +29,8 @@ data class FaceSample(
 // Generates a unique id for a list of samples.
 // It concats the templates (sorted by quality score) and creates a UUID from that. Or null if there
 // are not templates
-fun List<FaceSample>.uniqueId(): String? = if (this.isNotEmpty()) {
-    UUID
-        .nameUUIDFromBytes(
-            concatTemplates(),
-        ).toString()
-} else {
-    null
-}
+fun List<FaceSample>.uniqueId(): String? = UUID.randomUUID().toString()
 
-fun List<FaceSample>.concatTemplates(): ByteArray = this.sortedBy { it.template.contentHashCode() }.fold(byteArrayOf()) { acc, sample ->
+fun List<FaceSample>.concatTemplates(): FloatArray = this.sortedBy { it.template.contentHashCode() }.fold(floatArrayOf()) { acc, sample ->
     acc + sample.template
 }

@@ -2,7 +2,6 @@ package com.simprints.infra.enrolment.records.store.remote.models.fingerprint
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.fingerprint.concatTemplates
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.store.remote.models.ApiBiometricReference
 import java.util.UUID
@@ -17,11 +16,11 @@ internal data class ApiFingerprintReference(
 
 internal fun List<FingerprintSample>.toApi(encoder: EncodingUtils): ApiFingerprintReference? = if (isNotEmpty()) {
     ApiFingerprintReference(
-        UUID.nameUUIDFromBytes(concatTemplates()).toString(),
+        UUID.randomUUID().toString(), // We will test with face no need to fix fingerprint
         map {
             ApiFingerprintTemplate(
                 it.templateQualityScore,
-                encoder.byteArrayToBase64(it.template),
+                encoder.floatArrayToBase64(it.template),
                 it.fingerIdentifier.toApi(),
             )
         },

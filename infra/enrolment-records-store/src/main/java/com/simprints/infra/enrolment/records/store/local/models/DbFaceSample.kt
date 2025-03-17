@@ -9,7 +9,7 @@ internal fun DbFaceSample.fromDbToDomain(): FaceSample = FaceSample(
     format = format,
 )
 
-internal fun FaceSample.fromDomainToDb(): DbFaceSample = DbFaceSample().also { sample ->
+internal fun FaceSample.fromDomainToDb(subjectId: String): DbFaceSample = DbFaceSample(subjectId = subjectId).also { sample ->
     sample.uuid = id
     sample.template = template
     sample.format = format

@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.face.concatTemplates
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.floatArrayToByteArray
 import com.simprints.infra.enrolment.records.store.remote.models.ApiBiometricReference
 import java.util.UUID
 
@@ -17,9 +18,9 @@ internal data class ApiFaceReference(
 
 internal fun List<FaceSample>.toApi(encoder: EncodingUtils): ApiFaceReference? = if (isNotEmpty()) {
     ApiFaceReference(
-        UUID.nameUUIDFromBytes(concatTemplates()).toString(),
+        UUID.nameUUIDFromBytes(floatArrayToByteArray(concatTemplates())).toString(),
         map {
-            ApiFaceTemplate(encoder.byteArrayToBase64(it.template))
+            ApiFaceTemplate(encoder.floatArrayToBase64(it.template))
         },
         first().format,
     )

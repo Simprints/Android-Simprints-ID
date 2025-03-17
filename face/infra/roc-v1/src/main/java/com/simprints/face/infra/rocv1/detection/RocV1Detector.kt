@@ -106,7 +106,7 @@ class RocV1Detector @Inject constructor() : FaceDetector {
             yawValue,
             rocFace.face.rotation,
             qualityValue,
-            roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
+            floatArrayOf(),
             RANK_ONE_TEMPLATE_FORMAT_1_23,
         )
 

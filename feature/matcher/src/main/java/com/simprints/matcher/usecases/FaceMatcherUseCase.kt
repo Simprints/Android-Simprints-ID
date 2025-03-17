@@ -36,33 +36,13 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
-        val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = faceMatcher.supportedTemplateFormat,
-        )
-        val totalCandidates = enrolmentRecordRepository.count(
-            queryWithSupportedFormat,
-            dataSource = matchParams.biometricDataSource,
-        )
-        if (totalCandidates == 0) {
-            return@coroutineScope MatcherResult(emptyList(), 0, faceMatcher.matcherName)
+        val resultItems = enrolmentRecordRepository.getNearestNeighbour(samples[0].template).map {
+            FaceMatchResult.Item(
+                it.first,
+                it.second,
+            )
         }
-
-        Simber.i("Matching candidates", tag = crashReportTag)
-        onLoadingCandidates()
-        val resultItems = createRanges(totalCandidates)
-            .map { range ->
-
-                val batchCandidates = getCandidates(
-                    queryWithSupportedFormat,
-                    range,
-                    dataSource = matchParams.biometricDataSource,
-                )
-                match(batchCandidates, samples)
-            }.reduce { acc, subSet -> acc.addAll(subSet) }
-            .toList()
-        Simber.i("Matched $totalCandidates candidates", tag = crashReportTag)
-
-        MatcherResult(resultItems, totalCandidates, faceMatcher.matcherName)
+        MatcherResult(resultItems, 1000, faceMatcher.matcherName)
     }
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }

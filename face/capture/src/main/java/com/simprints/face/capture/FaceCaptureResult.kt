@@ -18,7 +18,7 @@ data class FaceCaptureResult(
     @Keep
     data class Sample(
         val faceId: String,
-        val template: ByteArray,
+        val template: FloatArray,
         val imageRef: SecuredImageRef?,
         val format: String,
     ) : Serializable

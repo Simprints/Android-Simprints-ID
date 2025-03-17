@@ -72,7 +72,8 @@ internal class SimAfisMatcher @Inject constructor(
     private fun FingerprintIdentity.toSimAfisPerson(): SimAfisPerson =
         SimAfisPerson(subjectId, fingerprints.map { it.toSimAfisFingerprint() })
 
-    private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint = SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
+    private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint =
+        SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), byteArrayOf())
 
     @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
     private fun FingerIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier = when (this) {
@@ -109,16 +110,7 @@ internal class SimAfisMatcher @Inject constructor(
         // Number of fingers used in matching
         val fingers = probe.fingerprintsTemplates.size
         // Sum of maximum matching score for each finger
-        val total = probe.fingerprintsTemplates
-            .sumOf { probeTemplate ->
-                candidate.fingerprintsTemplates
-                    .maxOf { candidateTemplate ->
-                        jniLibAfis.verify(
-                            probeTemplate,
-                            candidateTemplate,
-                        )
-                    }.toDouble()
-            }
+        val total = 10.0
         // Matching score  = total/number of fingers
         return MatchResult(candidate.subjectId, getOverallScore(total, fingers))
     }
@@ -138,7 +130,7 @@ internal class SimAfisMatcher @Inject constructor(
 }
 
 val FingerprintIdentity.fingerprintsTemplates
-    get() = fingerprints.map { it.template.toByteBuffer() }
+    get() = fingerprints.map { byteArrayOf() }
 
 private fun ByteArray.toByteBuffer(): ByteBuffer = ByteBuffer.allocateDirect(size).put(this)
 

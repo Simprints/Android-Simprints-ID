@@ -43,7 +43,7 @@ class RealmWrapperImplTest {
     @MockK
     private lateinit var realm: Realm
 
-    private lateinit var realmWrapper: RealmWrapperImpl
+    private lateinit var realmWrapper: ObjectboxWrapperImpl
 
     @Before
     fun setUp() {
@@ -62,7 +62,7 @@ class RealmWrapperImplTest {
         every { Realm.Companion.open(any()) } returns realm
         coJustRun { realm.write(any()) }
 
-        realmWrapper = RealmWrapperImpl(
+        realmWrapper = ObjectboxWrapperImpl(
             context,
             realmConfig,
             secureLocalDbKeyProviderMock,
@@ -79,7 +79,7 @@ class RealmWrapperImplTest {
     fun `test useRealmInstance creates realm instance should throw if no signed in project`() = runTest {
         assertThrows<RealmUninitialisedException> {
             every { authStore.signedInProjectId } returns ""
-            realmWrapper = RealmWrapperImpl(
+            realmWrapper = ObjectboxWrapperImpl(
                 ApplicationProvider.getApplicationContext(),
                 realmConfig,
                 secureLocalDbKeyProviderMock,

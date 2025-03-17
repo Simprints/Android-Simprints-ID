@@ -12,10 +12,11 @@ internal fun DbFingerprintSample.fromDbToDomain(): FingerprintSample = Fingerpri
     format = format,
 )
 
-internal fun FingerprintSample.fromDomainToDb(): DbFingerprintSample = DbFingerprintSample().also { sample ->
-    sample.uuid = id
-    sample.fingerIdentifier = fingerIdentifier.ordinal
-    sample.template = template
-    sample.templateQualityScore = templateQualityScore
-    sample.format = format
-}
+internal fun FingerprintSample.fromDomainToDb(subjectId: String): DbFingerprintSample =
+    DbFingerprintSample(subjectId = subjectId).also { sample ->
+        sample.uuid = id
+        sample.fingerIdentifier = fingerIdentifier.ordinal
+        sample.template = template
+        sample.templateQualityScore = templateQualityScore
+        sample.format = format
+    }
