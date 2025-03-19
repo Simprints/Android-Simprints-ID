@@ -1,21 +1,21 @@
 package com.simprints.feature.enrollast.screen.usecase
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.MatchResult
+import com.simprints.feature.enrollast.screen.EnrolLastState
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import org.junit.Before
 import org.junit.Test
 
-class HasDuplicateEnrolmentsUseCaseTest {
-    private lateinit var useCase: HasDuplicateEnrolmentsUseCase
+class CheckDuplicateEnrolmentsErrorsUseCaseTest {
+    private lateinit var useCase: CheckForDuplicateEnrolmentsUseCase
 
     @Before
     fun setUp() {
-        useCase = HasDuplicateEnrolmentsUseCase()
+        useCase = CheckForDuplicateEnrolmentsUseCase()
     }
 
     @Test
@@ -25,7 +25,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             steps = emptyList(),
         )
 
-        assertThat(result).isFalse()
+        assertThat(result).isNull()
     }
 
     @Test
@@ -40,7 +40,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             ),
         )
 
-        assertThat(result).isFalse()
+        assertThat(result).isNull()
     }
 
     @Test
@@ -56,7 +56,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             ),
         )
 
-        assertThat(result).isFalse()
+        assertThat(result).isNull()
     }
 
     @Test
@@ -71,7 +71,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             ),
         )
 
-        assertThat(result).isFalse()
+        assertThat(result).isNull()
     }
 
     @Test
@@ -87,7 +87,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             ),
         )
 
-        assertThat(result).isFalse()
+        assertThat(result).isNull()
     }
 
     @Test
@@ -97,7 +97,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             steps = emptyList(),
         )
 
-        assertThat(result).isTrue()
+        assertThat(result).isEqualTo(EnrolLastState.ErrorType.NO_MATCH_RESULTS)
     }
 
     @Test
@@ -112,7 +112,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             ),
         )
 
-        assertThat(result).isTrue()
+        assertThat(result).isEqualTo(EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS)
     }
 
     @Test
@@ -128,7 +128,7 @@ class HasDuplicateEnrolmentsUseCaseTest {
             ),
         )
 
-        assertThat(result).isTrue()
+        assertThat(result).isEqualTo(EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS)
     }
 
     private fun mockProjectConfig(

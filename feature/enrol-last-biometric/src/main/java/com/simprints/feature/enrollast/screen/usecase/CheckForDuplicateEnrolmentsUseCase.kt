@@ -1,17 +1,18 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
+import com.simprints.feature.enrollast.screen.EnrolLastState
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
+internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
     operator fun invoke(
         projectConfig: ProjectConfiguration,
         steps: List<EnrolLastBiometricStepResult>,
-    ): Boolean {
-        if (!projectConfig.general.duplicateBiometricEnrolmentCheck) return false
+    ): EnrolLastState.ErrorType? {
+        if (!projectConfig.general.duplicateBiometricEnrolmentCheck) return null
 
         val fingerprintResponse = getFingerprintMatchResult(steps)
         val faceResponse = getFaceMatchResult(steps)
@@ -19,15 +20,15 @@ internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
         return when {
             fingerprintResponse == null && faceResponse == null -> {
                 Simber.w("No match response. Must be either fingerprint, face or both", tag = ENROLMENT)
-                true
+                EnrolLastState.ErrorType.NO_MATCH_RESULTS
             }
 
             isAnyResponseWithHighConfidence(projectConfig, fingerprintResponse, faceResponse) -> {
                 Simber.i("There is a subject with confidence score above the high confidence level", tag = ENROLMENT)
-                true
+                EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
             }
 
-            else -> false
+            else -> null
         }
     }
 
