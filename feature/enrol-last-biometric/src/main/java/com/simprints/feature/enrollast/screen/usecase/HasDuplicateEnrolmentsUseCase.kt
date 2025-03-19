@@ -18,7 +18,7 @@ internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
 
         return when {
             fingerprintResponse == null && faceResponse == null -> {
-                Simber.i("No capture response. Must be either fingerprint, face or both", tag = ENROLMENT)
+                Simber.w("No match response. Must be either fingerprint, face or both", tag = ENROLMENT)
                 true
             }
 
