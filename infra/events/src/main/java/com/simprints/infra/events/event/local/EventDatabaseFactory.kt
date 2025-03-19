@@ -7,17 +7,28 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class EventDatabaseFactory @Inject constructor(
     @ApplicationContext val ctx: Context,
     private val securityManager: SecurityManager,
 ) {
-    fun build(): EventRoomDatabase {
+    private lateinit var eventDatabase: EventRoomDatabase
+
+    fun get(): EventRoomDatabase {
+        if (!::eventDatabase.isInitialized) {
+            build()
+        }
+        return eventDatabase
+    }
+
+    private fun build() {
         try {
             val key = getOrCreateKey(DB_NAME)
             val passphrase: ByteArray = getBytes(key)
             val factory = SupportFactory(passphrase)
-            return EventRoomDatabase.getDatabase(
+            eventDatabase = EventRoomDatabase.getDatabase(
                 ctx,
                 factory,
                 DB_NAME,
@@ -38,12 +49,14 @@ internal class EventDatabaseFactory @Inject constructor(
         securityManager.getLocalDbKeyOrThrow(dbName)
     }.value.decodeToString().toCharArray()
 
-    fun deleteDatabase() {
+    fun recreateDatabase() {
+        // DB corruption detected; either DB file or key is corrupt
+        // 1. Delete DB file in order to create a new one at next init
         ctx.deleteDatabase(DB_NAME)
-    }
-
-    fun recreateDatabaseKey() {
+        // 2. Recreate the DB key
         securityManager.recreateLocalDatabaseKey(DB_NAME)
+        // 3. Rebuild the DB
+        build()
     }
 
     companion object {
