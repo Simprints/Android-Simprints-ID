@@ -124,6 +124,7 @@ include(
     ":infra:config-sync",
     ":infra:enrolment-records:repository",
     ":infra:enrolment-records:realm-store",
+    ":infra:enrolment-records:room-store",
     ":infra:images",
     ":infra:license",
     ":infra:logging",

@@ -24,6 +24,7 @@ androidx_viewpager_version = "1.1.0"
 androidx_security_version = "1.0.0"
 androidx_annotation_version = "1.9.1"
 androidx_arch_core_version = "2.2.0"
+androidx_paging_version = "3.3.6"
 matertial_version = "1.12.0"
 
 hilt_version = "2.56.2"
@@ -103,6 +104,7 @@ androidX-appcompat-resource = { module = "androidx.appcompat:appcompat-resources
 androidX-Room-core = { module = "androidx.room:room-runtime", version.ref = "androidx_room_version" }
 androidX-Room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx_room_version" }
 androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx_room_version" }
+androidX-paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "androidx_paging_version" }
 #Lifecycle
 androidX-lifecycle = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-scope = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle_version" }
