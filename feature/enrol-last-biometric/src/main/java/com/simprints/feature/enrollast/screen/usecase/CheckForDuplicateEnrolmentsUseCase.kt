@@ -19,7 +19,11 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
 
         return when {
             fingerprintResponse == null && faceResponse == null -> {
-                Simber.w("No match response. Must be either fingerprint, face or both", tag = ENROLMENT)
+                Simber.e(
+                    "No match response. Must be either fingerprint, face or both",
+                    MissingMatchResultException(),
+                    tag = ENROLMENT
+                )
                 EnrolLastState.ErrorType.NO_MATCH_RESULTS
             }
 
@@ -62,4 +66,6 @@ internal class CheckForDuplicateEnrolmentsUseCase @Inject constructor() {
         return fingerprintResponse?.results?.any { it.confidenceScore >= fingerprintThreshold } == true ||
             faceResponse?.results?.any { it.confidenceScore >= faceThreshold } == true
     }
+
+    private class MissingMatchResultException() : IllegalStateException("No match response in duplicate check.")
 }
