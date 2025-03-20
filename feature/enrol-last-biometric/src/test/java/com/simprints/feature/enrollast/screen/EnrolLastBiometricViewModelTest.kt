@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
@@ -9,7 +9,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
-import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
+import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -20,12 +20,8 @@ import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -54,7 +50,7 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
-    lateinit var hasDuplicateEnrolments: HasDuplicateEnrolmentsUseCase
+    lateinit var checkForDuplicateEnrolments: CheckForDuplicateEnrolmentsUseCase
 
     @MockK
     lateinit var buildSubject: BuildSubjectUseCase
@@ -83,7 +79,7 @@ internal class EnrolLastBiometricViewModelTest {
             configManager,
             eventRepository,
             enrolmentRecordRepository,
-            hasDuplicateEnrolments,
+            checkForDuplicateEnrolments,
             buildSubject,
         )
     }
@@ -159,7 +155,7 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `returns failure when has duplicate enrolments`() = runTest {
-        every { hasDuplicateEnrolments.invoke(any(), any()) } returns true
+        every { checkForDuplicateEnrolments.invoke(any(), any()) } returns EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
 
         viewModel.enrolBiometric(createParams(listOf()))
 
@@ -174,7 +170,7 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `returns success when no duplicate enrolments`() = runTest {
-        every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
+        every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
         coEvery { buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
@@ -188,7 +184,7 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `saves event and record when no duplicate enrolments`() = runTest {
-        every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
+        every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
         coEvery { buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
@@ -199,7 +195,7 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `returns failure record saving fails`() = runTest {
-        every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
+        every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
         coEvery { buildSubject.invoke(any()) } returns subject
         coEvery { enrolmentRecordRepository.performActions(any(), any()) } throws Exception()
 
@@ -215,6 +211,7 @@ internal class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `Uses all BiometricReferenceCreationEvent for Enrolment event`() = runTest {
+        every { checkForDuplicateEnrolments.invoke(any(), any()) } returns null
         val biometricReferenceCreationEvent1 = mockk<BiometricReferenceCreationEvent> {
             every { id } returns "biometricReferenceCreationEventId1"
             every { payload } returns mockk<BiometricReferenceCreationPayload> {

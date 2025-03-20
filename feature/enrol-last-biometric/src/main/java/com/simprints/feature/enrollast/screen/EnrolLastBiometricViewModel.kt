@@ -9,10 +9,9 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
-import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
-import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
+import com.simprints.feature.enrollast.screen.usecase.CheckForDuplicateEnrolmentsUseCase
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
@@ -32,7 +31,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val hasDuplicateEnrolments: HasDuplicateEnrolmentsUseCase,
+    private val checkForDuplicateEnrolments: CheckForDuplicateEnrolmentsUseCase,
     private val buildSubject: BuildSubjectUseCase,
 ) : ViewModel() {
     val finish: LiveData<LiveDataEventWithContent<EnrolLastState>>
@@ -63,8 +62,9 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             )
             return@launch
         }
-        if (hasDuplicateEnrolments(projectConfig, params.steps)) {
-            _finish.send(EnrolLastState.Failed(DUPLICATE_ENROLMENTS, modalities))
+        val duplicateEnrolmentError = checkForDuplicateEnrolments(projectConfig, params.steps)
+        if (duplicateEnrolmentError != null) {
+            _finish.send(EnrolLastState.Failed(duplicateEnrolmentError, modalities))
             return@launch
         }
 

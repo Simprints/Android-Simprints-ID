@@ -13,6 +13,7 @@ internal sealed class EnrolLastState {
     ) : EnrolLastState()
 
     enum class ErrorType {
+        NO_MATCH_RESULTS,
         DUPLICATE_ENROLMENTS,
         GENERAL_ERROR,
     }

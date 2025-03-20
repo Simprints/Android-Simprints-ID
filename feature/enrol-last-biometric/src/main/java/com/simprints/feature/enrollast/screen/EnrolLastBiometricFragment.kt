@@ -20,6 +20,7 @@ import com.simprints.feature.enrollast.R
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
+import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.NO_MATCH_RESULTS
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
@@ -84,6 +85,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
     }
 
     private fun getAlertMessage(errorType: ErrorType) = when (errorType) {
+        NO_MATCH_RESULTS -> IDR.string.enrol_last_biometrics_alert_message
         DUPLICATE_ENROLMENTS -> IDR.string.enrol_last_biometrics_alert_message_duplicate_records
         GENERAL_ERROR -> IDR.string.enrol_last_biometrics_alert_message
     }
