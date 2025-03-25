@@ -1,33 +1,40 @@
 package com.simprints.face.infra.rocv1.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
-import com.simprints.face.infra.rocv1.detection.RocV1Detector.Companion.RANK_ONE_TEMPLATE_FORMAT_1_23
+import com.simprints.face.infra.basebiosdk.matching.FaceSample
+import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.rocConstants.ROC_FAST_FV_SIZE
-import javax.inject.Inject
 
-class RocV1Matcher @Inject constructor() : FaceMatcher() {
-    override val matcherName
-        get() = "RANK_ONE"
+@ExcludedFromGeneratedTestCoverageReports(
+    reason = "This function uses roc class that has native functions and can't be mocked",
+)
+class RocV1Matcher(
+    override val probeSamples: List<FaceSample>
+) : FaceMatcher(probeSamples) {
 
-    override val supportedTemplateFormat
-        get() = RANK_ONE_TEMPLATE_FORMAT_1_23
+    var probeTemplates: List<SWIGTYPE_p_unsigned_char> = probeSamples.mapIndexed { i, probe ->
+        val probeTemplate: SWIGTYPE_p_unsigned_char =
+            roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
+        roc.memmove(roc.roc_cast(probeTemplate), probe.template)
+        probeTemplate
+    }
 
-    // Ignore this method from test coverage calculations
-    // because it uses jni native code which is hard to test
-    @ExcludedFromGeneratedTestCoverageReports(
-        reason = "This function uses roc class that has native functions and can't be mocked",
-    )
-    override suspend fun getComparisonScore(
-        probe: ByteArray,
-        matchAgainst: ByteArray,
+    override suspend fun getHighestComparisonScoreForCandidate(candidate: FaceIdentity): Float =
+        probeTemplates.flatMap { probeTemplate ->
+            candidate.faces.map { face ->
+                getSimilarityScoreForCandidate(probeTemplate, face.template)
+            }
+        }.max()
+
+    private fun getSimilarityScoreForCandidate(
+        probeTemplate: SWIGTYPE_p_unsigned_char,
+        candidateTemplate: ByteArray
     ): Float {
-        val probeTemplate = roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
-        roc.memmove(roc.roc_cast(probeTemplate), probe)
-
         val matchTemplate = roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
-        roc.memmove(roc.roc_cast(matchTemplate), matchAgainst)
+        roc.memmove(roc.roc_cast(matchTemplate), candidateTemplate)
 
         val similarity = roc.roc_embedded_compare_templates(
             probeTemplate,
@@ -35,10 +42,12 @@ class RocV1Matcher @Inject constructor() : FaceMatcher() {
             matchTemplate,
             ROC_FAST_FV_SIZE,
         )
-
-        roc.delete_uint8_t_array(probeTemplate)
         roc.delete_uint8_t_array(matchTemplate)
 
-        return (similarity * 100)
+        return similarity * 100f
+    }
+
+    override fun close() {
+        probeTemplates.forEach { roc.delete_uint8_t_array(it) }
     }
 }
