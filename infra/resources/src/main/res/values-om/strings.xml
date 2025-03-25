@@ -3,6 +3,7 @@
 
     <!-- Alert -->
     <string name="alert_title_fallback">Yaadachiisa</string>
+    <string name="alert_button_close">ማንቂያ</string>
     <!-- Consent -->
     <string name="consent_general_title">Hayyama</string>
     <string name="consent_enrol">%2$s %1$s keessatti akka si galmeessee gara fuulduraatti adda si baasuu barbaada.</string>
@@ -13,7 +14,6 @@
     <string name="consent_parental_enrol">%1$s keessatti galmeessee gara fuulduraatti adda baasuuf %2$s gochuun barbaada.</string>
     <string name="consent_parental_id_verify">Galmee isaanii %1$s argachuuf %2$s gochuun barbaada.</string>
     <string name="consent_parental_share_data_yes">Dhaabbanni bu’aa hin arganne UK keessatti argamu %1$s fi Simprints %2$s isaanii fi bakka amma jiran ni argatu.</string>
-    <string name="consent_parental_confirmation">%1$s mucaa keessanii fayyadamuu nan danda\'aa? Mee \"Ani fudhadha\", \"ani dide\", ykn \"Gaaffii qaba.\" jedhi.</string>
     <string name="consent_biometric_general_face">Suuraa fuula keessanii kaasuun</string>
     <string name="consent_biometric_concat_modalities">Fi</string>
     <string name="consent_decline_button">Hin ta’u</string>
@@ -32,10 +32,7 @@
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Ashaaraa Qubaa</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Fuula/Ashaaraa Qubaa</string>
 
-    <!-- Exit form -->
-    <string name="exit_form_title_fingerprinting">Ashaaraa qubaa fudhuu maaliif addaan kutta?</string>
     <string name="exit_form_other_reason_hint">Odeeffannoo dabalataa</string>
-    <string name="exit_form_continue_fingerprints_button">Ashaaraa qubaa fuudhi</string>
     <string name="exit_form_submit_button">Ol ergi</string>
     <string name="exit_form_select_option_submit_warning">\"Maaloo tokko filachuun ol ergi \"</string>
     <string name="exit_form_submit_warning">Maaloo unkicha ol ergi</string>
@@ -62,11 +59,9 @@
     <string name="login_qr_code_scanning_problem_error">Yeroo Koodii QR iskaan gochaa jiruutti rakkoo uumamee jira</string>
     <string name="login_invalid_qr_code_error">Koodiin QR iskaanii tahe hin fudhatamne.</string>
     <string name="login_missing_credentials_error">Waan wal hinsimne jira. Maaloo, ID fayyadamaa, ID projektii fi furtuu sirriitti ilaaluun irra deebi\'uun yaali</string>
-    <string name="login_invalid_credentials_error">Ragaa dogoggoraa. Maaloo, irra deebi\'uun ID projektii fi furtuu isaa ilaali</string>
     <string name="login_project_id_intent_mismatch_error">ID projektii barbaadameen adda. Maaloo, siistam administreetara kee waliin dubbadhu</string>
     <string name="login_no_network_error">Offline waan jirtuuf. Maaloo intarneetii kee ilaali.</string>
     <string name="login_server_error">Sarvarii quunnamuuf yaalii godhamu hin milkoofne. Maaloo booda irra deebi\'uun yaali.</string>
-
     <!-- Matcher -->
     <string name="matcher_please_wait">Maaloo hanga nuti adda baafannutti eegi</string>
     <string name="matcher_loading_candidates">Maamila fe\'aa</string>
@@ -91,7 +86,6 @@
         <item quantity="one">%d walsimsiisa</item>
         <item quantity="other">%d walsimsiisa</item>
     </plurals>
-
     <string name="orchestrator_configuration_error_title">Dogoggora \'Configuration\'</string>
     <string name="orchestrator_project_id_error_message">Dogoggorri \'configuration\' uumameera (Projektii ID\'n adda) maaloo fuula screen(home screen) keessaa bahii suppervaayizera kee quunnami.</string>
     <string name="orchestrator_outdated_google_play_services_alert_title">Tajaajila Google Play yeroon isaa darbe</string>
@@ -114,14 +108,6 @@
     <!-- Select subject -->
     <string name="select_subject_confirmation_sent">Mirkaneessi ergame</string>
     <string name="select_subject_redirecting_back">Duubatti si qajeelchuu</string>
-
-    <!-- Face config -->
-    <string name="face_configuration_started">Moodaaliitii fuula qindeessuu</string>
-    <string name="face_configuration_downloading">Faayilota barbaachisoo ta\'an buufachuu</string>
-    <string name="face_configuration_licence_invalid_title">Hayyamni sirrii miti</string>
-    <string name="face_configuration_licence_invalid_message">Hayyamni fuula sirrii miti, maaloo bulchaa sirna kee qunnami</string>
-    <string name="face_configuration_generic_error_title">Dogoggora qindeessaa</string>
-    <string name="face_configuration_generic_error_message">Yeroo haala fuula qindeessuu dogongorri uumame, maaloo bulchaa sirna kee qunnami</string>
 
     <!-- Face capture -->
     <string name="face_capture_onboarding_light">Bakka ibsaa gaarii qabu barbaadi.</string>
@@ -192,7 +178,6 @@
     <string name="fingerprint_connect_ota_start_update">Haaromsu jalqabii</string>
     <string name="fingerprint_connect_ota_recovery_title">Haaromsi skaanaraa hin milkoofne</string>
     <string name="fingerprint_connect_ota_recovery_soft_reset">Skaanarii cufii irra deebiin banii</string>
-    <string name="fingerprint_connect_ota_recovery_hard_reset">Secondii 5f humna ibsaa gadiqabii turi</string>
     <string name="fingerprint_connect_ota_failed_title">Haaromsi skaanaraa hin milkoofne</string>
     <string name="fingerprint_connect_ota_failed_instructions">Gargaarsaaf supervayizaraa keequnnamii</string>
     <string name="fingerprint_connect_ota_continue_button">Itti fufi</string>
@@ -210,7 +195,6 @@
     <string name="fingerprint_connect_bluetooth_not_enabled_error_message">Bluetooth\'n banaa miti, maaloo banaa ta\'uu isaa mijeessaa keessaa mirkaneeffadhuu irra deebi\'ii yaali.</string>
     <string name="fingerprint_connect_multiple_scanners_found_error_message">Iskaanariin tokkoo ol bilbila waliin quunnamanii jiru, maaloo skaanarii hin barbaachisne bilbila waliin akka wal hin quunnamne taasisi.</string>
 
-    <!-- Fingerprint capture -->
     <string name="fingerprint_capture_enrol_title">Galmee</string>
     <string name="fingerprint_capture_identify_title">Adda baafannaa</string>
     <string name="fingerprint_capture_verify_title">Mirkaneeffannaa</string>
@@ -244,7 +228,6 @@
     <string name="fingerprint_capture_rescan_question">Irra deebiin \'scan\' haa ta\'uu?</string>
     <string name="fingerprint_capture_scan">Scan\' godhi</string>
     <string name="fingerprint_capture_please_wait">Maaloo eegi</string>
-    <string name="fingerprint_capture_missing_finger_button">Qubni kun hin jiru</string>
     <string name="fingerprint_capture_try_another_title">Qophaa\'i</string>
     <string name="fingerprint_capture_try_another_finger">Quba biraa haa yaallu</string>
 
@@ -308,12 +291,10 @@
     <string name="dashboard_preference_device_id_title">ID Meeshaa</string>
     <string name="dashboard_preference_summary_settings_fingers">Quba ashaaraan isaa fuudhuu barbaaddu filadhu</string>
     <string name="dashboard_preference_summary_sync_information">Bal\'inaan siinkirrattii</string>
-
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Odeffannoo Siinkii</string>
     <string name="dashboard_sync_info_select_modules_button">Moojuliiwwan filadhu</string>
     <string name="dashboard_sync_info_records_to_upload">Barreeffama olfe\'aa</string>
-    <string name="dashboard_sync_info_records_to_download">Barreeffama gad-buussuf</string>
     <string name="dashboard_sync_info_records_to_delete">Barreeffama haquuf</string>
     <string name="dashboard_sync_info_total_records_on_device">Barreeffama waliigalaa meeshaarra</string>
     <string name="dashboard_sync_info_selected_modules">Moojuula filatamee</string>
@@ -359,4 +340,4 @@
     <string name="error_backend_maintenance_message">Sirnichi yeroo ammaa suphaadhaaf sarara ala ta\'ee jira. Mee booda irra deebi\'ii yaalaa.</string>
     <string name="error_backend_maintenance_with_time_message">Sirnichi yeroo ammaa suphaadhaaf sarara ala ta\'ee jira. Mee %s booda irra deebi\'ii yaali</string>
 
-</resources>
+    </resources>
