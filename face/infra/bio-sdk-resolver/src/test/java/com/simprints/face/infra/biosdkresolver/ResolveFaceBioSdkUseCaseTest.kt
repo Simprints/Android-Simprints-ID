@@ -1,13 +1,11 @@
 package com.simprints.face.infra.biosdkresolver
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.ConfigRepository
-import io.mockk.coEvery
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.lang.IllegalArgumentException
 
 class ResolveFaceBioSdkUseCaseTest {
     private lateinit var resolveFaceBioSdkUseCase: ResolveFaceBioSdkUseCase
@@ -17,9 +15,10 @@ class ResolveFaceBioSdkUseCaseTest {
 
     @Before
     fun setUp() {
-        rocV1BioSdk = RocV1BioSdk(mockk(), mockk(), mockk())
-        rocV3BioSdk = RocV3BioSdk(mockk(), mockk(), mockk())
-        resolveFaceBioSdkUseCase = ResolveFaceBioSdkUseCase(configRepository, rocV1BioSdk, rocV3BioSdk)
+        rocV1BioSdk = RocV1BioSdk(mockk(), mockk())
+        rocV3BioSdk = RocV3BioSdk(mockk(), mockk())
+        resolveFaceBioSdkUseCase =
+            ResolveFaceBioSdkUseCase(configRepository, rocV1BioSdk, rocV3BioSdk)
     }
 
     @Test(expected = IllegalArgumentException::class)
