@@ -10,7 +10,6 @@ import java.util.UUID
 data class FingerprintSample(
     val fingerIdentifier: IFingerIdentifier,
     val template: ByteArray,
-    val templateQualityScore: Int,
     val format: String,
     val referenceId: String,
     val id: String = UUID.randomUUID().toString(),
@@ -23,7 +22,6 @@ data class FingerprintSample(
 
         if (fingerIdentifier != other.fingerIdentifier) return false
         if (!template.contentEquals(other.template)) return false
-        if (templateQualityScore != other.templateQualityScore) return false
 
         return true
     }
@@ -31,7 +29,6 @@ data class FingerprintSample(
     override fun hashCode(): Int {
         var result = fingerIdentifier.hashCode()
         result = 31 * result + template.contentHashCode()
-        result = 31 * result + templateQualityScore
         return result
     }
 }

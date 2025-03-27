@@ -23,7 +23,7 @@ class ApiEnrolmentRecordMoveEventTest {
                     ApiFingerprintReference(
                         "fpRefId",
                         listOf(
-                            ApiFingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB),
+                            ApiFingerprintTemplate("template", IFingerIdentifier.LEFT_THUMB),
                         ),
                         "NEC_1",
                     ),
@@ -46,7 +46,7 @@ class ApiEnrolmentRecordMoveEventTest {
                     FingerprintReference(
                         "fpRefId",
                         listOf(
-                            FingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB),
+                            FingerprintTemplate("template", IFingerIdentifier.LEFT_THUMB),
                         ),
                         "NEC_1",
                     ),

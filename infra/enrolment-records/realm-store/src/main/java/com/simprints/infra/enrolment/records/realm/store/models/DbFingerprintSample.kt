@@ -13,6 +13,5 @@ class DbFingerprintSample : RealmObject {
     var referenceId = ""
     var fingerIdentifier: Int = -1
     var template: ByteArray = byteArrayOf()
-    var templateQualityScore: Int = -1
     var format: String = ""
 }

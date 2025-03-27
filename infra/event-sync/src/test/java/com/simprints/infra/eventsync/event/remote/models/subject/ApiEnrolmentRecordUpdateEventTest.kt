@@ -22,7 +22,7 @@ class ApiEnrolmentRecordUpdateEventTest {
                 ApiFingerprintReference(
                     "fpRefId",
                     listOf(
-                        ApiFingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB),
+                        ApiFingerprintTemplate("template", IFingerIdentifier.LEFT_THUMB),
                     ),
                     "NEC_1",
                 ),
@@ -39,7 +39,7 @@ class ApiEnrolmentRecordUpdateEventTest {
             listOf(
                 FingerprintReference(
                     "fpRefId",
-                    listOf(FingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB)),
+                    listOf(FingerprintTemplate("template", IFingerIdentifier.LEFT_THUMB)),
                     "NEC_1",
                 ),
                 FaceReference(
