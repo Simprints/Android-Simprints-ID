@@ -52,14 +52,12 @@ class CommCareIdentityDataSourceTest {
                 fingerprints = listOf(
                     FingerprintSample(
                         fingerIdentifier = LEFT_THUMB,
-                        templateQualityScore = 99,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
                     ),
                     FingerprintSample(
                         fingerIdentifier = LEFT_INDEX_FINGER,
-                        templateQualityScore = 88,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
@@ -71,14 +69,12 @@ class CommCareIdentityDataSourceTest {
                 fingerprints = listOf(
                     FingerprintSample(
                         fingerIdentifier = LEFT_THUMB,
-                        templateQualityScore = 77,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
                     ),
                     FingerprintSample(
                         fingerIdentifier = LEFT_INDEX_FINGER,
-                        templateQualityScore = 66,
                         template = byteArrayOf(),
                         format = "ISO_19794_2",
                         referenceId = "referenceId",
@@ -245,7 +241,6 @@ class CommCareIdentityDataSourceTest {
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                                    expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&
@@ -338,7 +333,6 @@ class CommCareIdentityDataSourceTest {
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                                    expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&
@@ -425,7 +419,6 @@ class CommCareIdentityDataSourceTest {
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                                    expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&
@@ -573,7 +566,6 @@ class CommCareIdentityDataSourceTest {
                         expected.fingerprints
                             .zip(actual.fingerprints) { expectedFingerprint, actualFingerprint ->
                                 expectedFingerprint.fingerIdentifier == actualFingerprint.fingerIdentifier &&
-                                    expectedFingerprint.templateQualityScore == actualFingerprint.templateQualityScore &&
                                     expectedFingerprint.template.contentEquals(
                                         actualFingerprint.template,
                                     ) &&

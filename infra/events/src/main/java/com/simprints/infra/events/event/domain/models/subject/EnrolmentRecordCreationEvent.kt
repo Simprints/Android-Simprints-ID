@@ -65,7 +65,6 @@ data class EnrolmentRecordCreationEvent(
                 fingerprintSamples.first().referenceId,
                 fingerprintSamples.map {
                     FingerprintTemplate(
-                        it.templateQualityScore,
                         encoder.byteArrayToBase64(it.template),
                         it.fingerIdentifier,
                     )

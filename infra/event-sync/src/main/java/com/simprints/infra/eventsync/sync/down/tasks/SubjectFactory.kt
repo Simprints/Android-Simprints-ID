@@ -109,7 +109,6 @@ class SubjectFactory @Inject constructor(
                 FingerprintSample(
                     captureResult.identifier,
                     sample.template,
-                    sample.templateQualityScore,
                     sample.format,
                     fingerprintResponse.referenceId,
                 )
@@ -133,7 +132,6 @@ class SubjectFactory @Inject constructor(
     ): FingerprintSample = FingerprintSample(
         fingerIdentifier = template.finger,
         template = encodingUtils.base64ToBytes(template.template),
-        templateQualityScore = template.quality,
         format = format,
         referenceId = referenceId,
     )

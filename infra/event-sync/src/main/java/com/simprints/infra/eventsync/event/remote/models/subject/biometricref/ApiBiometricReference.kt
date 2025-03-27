@@ -63,6 +63,6 @@ internal fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
 internal fun ApiFingerprintReference.fromApiToDomain() =
     DomainFingerprintReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
 
-internal fun ApiFingerprintTemplate.fromApiToDomain() = FingerprintTemplate(quality, template, IFingerIdentifier.valueOf(finger.name))
+internal fun ApiFingerprintTemplate.fromApiToDomain() = FingerprintTemplate(template, IFingerIdentifier.valueOf(finger.name))
 
-internal fun FingerprintTemplate.fromDomainToApi() = ApiFingerprintTemplate(quality, template, finger)
+internal fun FingerprintTemplate.fromDomainToApi() = ApiFingerprintTemplate(template, finger)

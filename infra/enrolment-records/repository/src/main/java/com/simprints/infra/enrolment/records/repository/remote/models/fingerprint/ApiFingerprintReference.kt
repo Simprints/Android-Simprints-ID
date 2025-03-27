@@ -18,7 +18,6 @@ internal fun List<FingerprintSample>.toApi(encoder: EncodingUtils): ApiFingerpri
         first().referenceId,
         map {
             ApiFingerprintTemplate(
-                it.templateQualityScore,
                 encoder.byteArrayToBase64(it.template),
                 it.fingerIdentifier.toApi(),
             )
