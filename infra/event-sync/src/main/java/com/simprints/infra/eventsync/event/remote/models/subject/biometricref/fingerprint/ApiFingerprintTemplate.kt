@@ -5,7 +5,6 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 
 @Keep
 internal data class ApiFingerprintTemplate(
-    val quality: Int,
     val template: String,
     val finger: IFingerIdentifier,
 )

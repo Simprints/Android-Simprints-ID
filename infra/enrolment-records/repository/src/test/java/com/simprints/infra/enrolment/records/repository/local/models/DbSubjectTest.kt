@@ -30,7 +30,6 @@ class DbSubjectTest {
         val fingerprintSample = FingerprintSample(
             IFingerIdentifier.RIGHT_3RD_FINGER,
             Random.nextBytes(64),
-            30,
             "NEC_1",
             REFERENCE_ID,
         )
@@ -68,7 +67,6 @@ class DbSubjectTest {
         val fingerprintSample = DbFingerprintSample().apply {
             fingerIdentifier = IFingerIdentifier.RIGHT_3RD_FINGER.ordinal
             template = Random.nextBytes(64)
-            templateQualityScore = 30
             format = "NEC_1"
             referenceId = REFERENCE_ID
         }
