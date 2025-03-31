@@ -58,7 +58,7 @@ rootbeer_version = "0.1.1"
 commons_io_version = "2.18.0"
 kronos_version = "0.0.1-alpha11"
 # Protobuf version is tied to Firebase dependencies and must be checked for compatibility on each update
-protobuf_version = "4.26.1"
+protobuf_version = "4.30.2"
 circleImageView_version = "3.1.0"
 kermit_version = "2.0.5"
 zip4j_version = "2.11.5"
