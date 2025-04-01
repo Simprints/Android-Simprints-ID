@@ -12,10 +12,12 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.extentions.nullIfEmpty
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
+import com.simprints.feature.externalcredential.model.ExternalCredentialSearchResponse
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -44,6 +46,7 @@ import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,6 +62,9 @@ internal class OrchestratorViewModel @Inject constructor(
     private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) : ViewModel() {
     var isRequestProcessed = false
+
+    // [MS-960] New enrolments require 'subjectId' to be generated before building app response
+    private val enrolmentSubjectId = UUID.randomUUID().toString()
     private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
     private var actionRequest: ActionRequest? = null
@@ -81,7 +87,7 @@ internal class OrchestratorViewModel @Inject constructor(
             // In case of a follow-up action, we should restore completed steps from cache
             // and add new ones to the list. This way all session steps are available throughout
             // the app for reference (i.e. have we already captured face in this session?)
-            steps = cache.steps + stepsBuilder.build(action, projectConfiguration)
+            steps = cache.steps + stepsBuilder.build(action, projectConfiguration, enrolmentSubjectId)
             Simber.i("Steps to execute: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
@@ -109,6 +115,7 @@ internal class OrchestratorViewModel @Inject constructor(
             Simber.i("Completed step: ${step.id}", tag = ORCHESTRATION)
 
             updateMatcherStepPayload(step, result)
+            updateSearchAndVerifyMatcherParamsIfNeeded(step, result)
         }
 
         if (result is SelectSubjectAgeGroupResult) {
@@ -171,6 +178,41 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     /**
+     * [Ms-960] If 'Search and Verify' feature is enabled, then during the Identification flow it is necessary to call the 'Matcher' step
+     * with conditional params.
+     *
+     * When id of the [currentStep] is [StepId.FACE_MATCHER] is [StepId.FINGERPRINT_MATCHER], and the [result] of the previous step is
+     * [ExternalCredentialSearchResponse], then the 'Matcher' step needs to be called for either 1:1 or 1:N match depending on the [result]
+     *
+     * - If [ExternalCredentialSearchResponse] contains subject id, it indicates that there is a subject ID in the local DB. In this case
+     * the 'Matcher' step needs to run match against this particular subject ID (1:1)
+     * - If [ExternalCredentialSearchResponse] does not contains subject id, it indicates that there is no subject ID associated with the
+     * provided external credential in the local DB. In this case the 'Matcher' step needs to run match against all records (1:N)
+     *
+     * @param currentStep current step in the chain
+     * @param result result of the current step
+     */
+    private fun updateSearchAndVerifyMatcherParamsIfNeeded(currentStep: Step, result: Serializable) {
+        if (currentStep.id == StepId.EXTERNAL_CREDENTIAL && result is ExternalCredentialSearchResponse) {
+            val foundSubjectId = result.subjectId?.nullIfEmpty()
+            val matchingSteps = listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER)
+            val matchingStep = steps.firstOrNull { it.id in matchingSteps } ?: return
+            val matchingPayload = matchingStep.payload.getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY) ?: return
+
+            // If associated Subject ID is found via external credential, matching against 1:1. Otherwise, matching against 1:N
+            val updatedSubjectQuery = matchingPayload.subjectQuery.copy(
+                subjectId = foundSubjectId
+            )
+
+            val updatedMatchingPayload = matchingPayload.copy(
+                subjectQuery = updatedSubjectQuery
+            )
+
+            matchingStep.payload = MatchStepStubPayload.asBundle(updatedMatchingPayload)
+        }
+    }
+
+    /**
      * Update the enrol last biometric params in case there were more steps executed in the current flow.
      */
     private fun updateEnrolLastBiometricParamsIfNeeded(step: Step) {
@@ -193,10 +235,12 @@ internal class OrchestratorViewModel @Inject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
         val project = configManager.getProject(projectConfiguration.projectId)
         val appResponse = appResponseBuilder(
-            projectConfiguration,
-            actionRequest,
-            steps.mapNotNull { it.result },
-            project
+            projectConfiguration =
+                projectConfiguration,
+            request = actionRequest,
+            results = steps.mapNotNull { it.result },
+            project = project,
+            enrolmentSubjectId = enrolmentSubjectId
         )
 
         updateDailyActivity(appResponse)

@@ -463,4 +463,8 @@
         <item quantity="other">%d years</item>
     </plurals>
 
+    <!--  External credentials  -->
+    <string name="external_credential_title">Scan QR</string>
+
+
 </resources>

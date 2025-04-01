@@ -120,6 +120,10 @@
 
     <style name="Text.Headline3" parent="Widget.MaterialComponents.TextView">
         <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline3</item>
+    </style><!-- H3 variants -->
+
+    <style name="Text.Headline3.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
     </style>
 
     <!-- H4 variants -->

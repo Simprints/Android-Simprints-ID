@@ -6,6 +6,7 @@ import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
+import com.simprints.feature.externalcredential.ExternalCredentialContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
@@ -43,12 +44,14 @@ internal class BuildStepsUseCase @Inject constructor(
     fun build(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
+        enrolmentSubjectId: String
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
             buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
             buildCaptureAndMatchStepsForEnrol(action, projectConfiguration),
+            buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.ENROL)
         )
 
         is ActionRequest.IdentifyActionRequest -> {
@@ -64,6 +67,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
+                buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.IDENTIFY),
                 buildCaptureAndMatchStepsForIdentify(
                     action,
                     projectConfiguration,
@@ -119,6 +123,32 @@ internal class BuildStepsUseCase @Inject constructor(
         )
 
         else -> emptyList()
+    }
+
+    private fun buildExternalCredentialStepIfNeeded(
+        enrolmentSubjectId: String,
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowType
+    ): List<Step> {
+        // TODO [MS-960] Use actual feature flag value
+        // val isExternalCredentialEnabled = projectConfiguration.custom?.contains("isExternalCredentialEnabled")
+        val isExternalCredentialEnabled = true
+        if (!isExternalCredentialEnabled) return emptyList()
+
+        return when (flowType) {
+            FlowType.ENROL, FlowType.IDENTIFY -> {
+                listOf(
+                    Step(
+                        id = StepId.EXTERNAL_CREDENTIAL,
+                        navigationActionId = R.id.action_orchestratorFragment_to_externalCredential,
+                        destinationId = ExternalCredentialContract.DESTINATION,
+                        payload = ExternalCredentialContract.getArgs(subjectId = enrolmentSubjectId, flowType = flowType),
+                    )
+                )
+            }
+
+            FlowType.VERIFY -> emptyList()
+        }
     }
 
     private fun buildCaptureAndMatchStepsForEnrol(
@@ -468,7 +498,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         steps = mapStepsForLastBiometrics(cache.steps.mapNotNull { it.result }),
                     ),
                 )
-        )
+            )
     }
 
     private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest) = listOf(

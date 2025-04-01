@@ -8,6 +8,7 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbProject
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
+import com.simprints.infra.enrolment.records.realm.store.models.QrExternalCredentialRealm
 import io.realm.kotlin.RealmConfiguration
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,6 +27,7 @@ class RealmConfig @Inject constructor() {
                 DbFaceSample::class,
                 DbSubject::class,
                 DbProject::class,
+                QrExternalCredentialRealm::class,
             ),
         ).name("$databaseName.realm")
         .schemaVersion(REALM_SCHEMA_VERSION)

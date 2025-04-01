@@ -54,6 +54,8 @@ internal data class MatchStepStubPayload(
             subjectQuery: SubjectQuery,
             biometricDataSource: BiometricDataSource,
             fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
-        ) = bundleOf(STUB_KEY to MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, fingerprintSDK))
+        ) = asBundle(MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, fingerprintSDK))
+
+        fun asBundle(payload: MatchStepStubPayload) = bundleOf(STUB_KEY to payload)
     }
 }

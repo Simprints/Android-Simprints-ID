@@ -79,4 +79,10 @@
         android:id="@+id/action_orchestratorFragment_to_validateSubjectPool"
         app:destination="@id/graph_validate_subject_pool"
         />
+
+    <include app:graph="@navigation/graph_external_credential" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_externalCredential"
+        app:destination="@id/graph_external_credential"
+        />
 </navigation>

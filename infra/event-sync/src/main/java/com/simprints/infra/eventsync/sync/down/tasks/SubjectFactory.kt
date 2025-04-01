@@ -66,12 +66,12 @@ class SubjectFactory @Inject constructor(
 
     fun buildSubjectFromCaptureResults(
         projectId: String,
+        subjectId: String,
         attendantId: TokenizableString,
         moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResult?,
         faceResponse: FaceCaptureResult?,
     ): Subject {
-        val subjectId = UUID.randomUUID().toString()
         return buildSubject(
             subjectId = subjectId,
             projectId = projectId,
