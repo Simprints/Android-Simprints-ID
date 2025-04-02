@@ -1,0 +1,21 @@
+<vector android:height="200dp" android:viewportHeight="120"
+    android:viewportWidth="120" android:width="200dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M0,0l4,0l0,30l-4,0z" android:strokeWidth="0.16733685"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M0,0l40,0l0,4l-40,0z" android:strokeWidth="0.16733819"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M0,0l4,0l0,40l-4,0z" android:strokeWidth="0.16733685"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M80,0l40,0l0,4l-40,0z" android:strokeWidth="0.16733819"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M116,0l4,0l0,40l-4,0z" android:strokeWidth="0.16733806"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M0,80l4,0l0,40l-4,0z" android:strokeWidth="0.16733685"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M0,116l40,0l0,4l-40,0z" android:strokeWidth="0.16733526"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M80,116l40,0l0,4l-40,0z" android:strokeWidth="0.16733526"/>
+    <path android:fillColor="@color/simprints_green"
+        android:pathData="M116,80l4,0l0,36l-4,0z" android:strokeWidth="0.18330976"/>
+</vector>
