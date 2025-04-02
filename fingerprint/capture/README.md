@@ -1,20 +1,13 @@
-# Fingerprint Modality Module
+# Fingerprint capture
 
-This is the main module for the fingerprint modality in Simprints ID.
+This is how the fingerprint module works internally to capture the fingerprints, extract the templates, and return the results to
+SimprintsID.
 
-### Further READMEs
+## FingerprintCaptureFragment
 
-The main domain sub-packages are:
+This fragment is the entry point into the fingepringt capture flow and it is responsible for:
 
-- [Connection](../connect/README.md) \- which handles connetion to the scanner.
-- [Scanner](../infra/scanner/README.md)
-  \- which handles high-level interfacing with the `fingerprint:infra:scanner` module for using a Vero fingerprint scanner.
-
-The satellite libraries of the fingerprint modality that are used in this module are:
-
-- [`fingerprint:scanner`](../infra/scanner/README.md)
-  \- which handles low-level communication with the fingerprint scanner and tucks it behind a `Scanner` class abstraction.
-- [`fingerprint:scannermock`](../infra/scannermock/README.md)
-  \- which is a utility package providing mocking and simulation options for the fingerprint scanner for testing and debugging.
-- [`feature:module`](../../feature/matcher/README.md)
-  \- which houses the algorithms for matching fingerprints and provides an interface for their use.
+- Launching scanner connection sub-flow
+- Leading user over fingerprint capture step by step
+- Saving captured fingerprint images if necessary
+- Finishing the flow and reporting the capture results to the calling module

@@ -2,9 +2,11 @@
 
 ## Overview
 
-This package provides an interface for the Vero 2 fingerprint scanner, enabling communication over Bluetooth. The main class, [`Scanner`](scanner/Scanner.kt), serves as the primary entry point for accessing all supported functionalities of the Vero 2.
+This package provides an interface for the Vero 2 fingerprint scanner, enabling communication over Bluetooth. The main class, [
+`Scanner`](scanner/Scanner.kt), serves as the primary entry point for accessing all supported functionalities of the Vero 2.
 
-Although written in Kotlin for Android, the package is platform-agnostic, as it has no Android-specific dependencies. It requires only `java.io.InputStream` and `java.io.OutputStream`, which are provided after establishing a Bluetooth socket connection.
+Although written in Kotlin for Android, the package is platform-agnostic, as it has no Android-specific dependencies. It requires only
+`java.io.InputStream` and `java.io.OutputStream`, which are provided after establishing a Bluetooth socket connection.
 
 ---
 
@@ -132,5 +134,6 @@ Vero 2 comprises three chips:
 
 ---
 
-This README provides a detailed overview of the Fingerprint Scanner V2 package. For further details, explore the source code and accompanying documentation.
+This README provides a detailed overview of the Fingerprint Scanner V2 package. For further details, explore the source code and
+accompanying documentation.
 

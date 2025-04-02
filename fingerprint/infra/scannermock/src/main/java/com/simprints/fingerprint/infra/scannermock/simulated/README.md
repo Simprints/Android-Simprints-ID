@@ -1,9 +1,7 @@
 # Simulated Scanner
 
-This package is for simulating the Vero fingerprint scanner for use in
-testing, mocking, and debugging. It relies on the
-[Component Bluetooth Abstractions](../../../../../../../../fingerprintscanner/src/main/java/com/simprints/fingerprintscanner/component/bluetooth/)
-being used in place of Android Bluetooth classes.
+This package is for simulating the Vero fingerprint scanner for use in testing, mocking, and debugging. It relies on the Component Bluetooth
+Abstractions being used in place of Android Bluetooth classes.
 
 It works by reading all bytes that are trying to be sent over Bluetooth,
 interpreting them, and sending back an appropriate response. It aims to
@@ -48,15 +46,15 @@ class SimulatedScannerManager(
 - `simulationSpeedBehaviour` - How much delay should the simulation add
   before responding to messages.
     - `SimulationSpeedBehaviour.INSTANT` will add no delay at all between
-    receiving a command and returning the response, allowing for very
-    fast communication. This is ideal for unit and integration tests.
-    This setting is the default.
+      receiving a command and returning the response, allowing for very
+      fast communication. This is ideal for unit and integration tests.
+      This setting is the default.
     - `SimulationSpeedBehaviour.REALISTIC` will add a delay between
-    receiving a command and returning a response depending on the
-    command, allowing for a realistic feel for the simulated scanner.
-    Additionally, time will be added between Bluetooth packets. This is
-    ideal for User-Acceptance Testing or for load-testing the
-    `fingerprintscanner` module code.
+      receiving a command and returning a response depending on the
+      command, allowing for a realistic feel for the simulated scanner.
+      Additionally, time will be added between Bluetooth packets. This is
+      ideal for User-Acceptance Testing or for load-testing the
+      `fingerprintscanner` module code.
 - `simulatedFingers` - An array of
   [`SimulatedFinger`s](./common/SimulatedFinger.kt) which are the
   fingerprints that will be returned by the simulation upon successive
@@ -67,12 +65,12 @@ class SimulatedScannerManager(
   beginning of the array.
     - The default is `SimulatedFinger.person1TwoFingersGoodScan`.
     - Multiple versions of the same finger can be used in tests for
-    successful matching with good match scores during testing, or
-    different people/fingers can be used for low match scores.
+      successful matching with good match scores during testing, or
+      different people/fingers can be used for low match scores.
     - There are options for good scans and poor scans that yield different
-    quality scores.
+      quality scores.
     - There is an option for if no finger is detected by the scanner at
-    all, `SimulatedFinger.NO_FINGER`.
+      all, `SimulatedFinger.NO_FINGER`.
 - `pairedScannerAddresses` - This is a set of MAC addresses that the
   will act as if they are paired to the Bluetooth adapter. By default,
   there is one valid paired MAC address that corresponds to a Vero 1.
