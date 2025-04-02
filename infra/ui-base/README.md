@@ -4,8 +4,7 @@ This module serves as a common foundation for all modules with any kind on UI.
 
 Things that should be stored here:
 
-* Common UI dependencies that are used in all/most feature modules shared via `api()` declaration in
-  modules build file
+* Common UI dependencies that are used in all/most feature modules shared via `api()` declaration in modules build file
 * Generic utilities that simplify work with UI-related Android API
 
 Things that must not be in this module:
