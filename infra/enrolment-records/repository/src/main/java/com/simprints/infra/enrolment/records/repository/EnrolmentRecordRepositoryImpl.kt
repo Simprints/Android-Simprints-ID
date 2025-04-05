@@ -9,9 +9,13 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.exceptions.RealmUninitialisedException
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
+import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,41 +24,24 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-internal class EnrolmentRecordRepositoryImpl(
-    context: Context,
+internal class EnrolmentRecordRepositoryImpl @Inject constructor(
+    @ApplicationContext context: Context,
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
-    private val localDataSource: EnrolmentRecordLocalDataSource,
-    private val commCareDataSource: IdentityDataSource,
+    @CommCareDataSource private val commCareDataSource: IdentityDataSource,
     private val tokenizationProcessor: TokenizationProcessor,
-    private val dispatcher: CoroutineDispatcher,
+    private val selectEnrolmentRecordLocalDataSource: SelectEnrolmentRecordLocalDataSourceUseCase,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
-) : EnrolmentRecordRepository,
-    EnrolmentRecordLocalDataSource by localDataSource {
-    @Inject
-    constructor(
-        @ApplicationContext context: Context,
-        remoteDataSource: EnrolmentRecordRemoteDataSource,
-        localDataSource: EnrolmentRecordLocalDataSource,
-        @CommCareDataSource commCareDataSource: IdentityDataSource,
-        tokenizationProcessor: TokenizationProcessor,
-        @DispatcherIO dispatcher: CoroutineDispatcher,
-    ) : this(
-        context = context,
-        remoteDataSource = remoteDataSource,
-        localDataSource = localDataSource,
-        commCareDataSource = commCareDataSource,
-        tokenizationProcessor = tokenizationProcessor,
-        dispatcher = dispatcher,
-        batchSize = BATCH_SIZE,
-    )
-
+) : EnrolmentRecordRepository {
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
     companion object {
-        private const val BATCH_SIZE = 80
+        const val BATCH_SIZE = 80
         private const val PREF_FILE_NAME = "UPLOAD_ENROLMENT_RECORDS_PROGRESS"
         private const val PROGRESS_KEY = "PROGRESS"
     }
+
+    private val localDataSource: EnrolmentRecordLocalDataSource by lazy { selectEnrolmentRecordLocalDataSource() }
 
     override suspend fun uploadRecords(subjectIds: List<String>) = withContext(dispatcher) {
         val lastUploadedRecord = prefs.getString(PROGRESS_KEY, null)
@@ -155,4 +142,15 @@ internal class EnrolmentRecordRepositoryImpl(
         is BiometricDataSource.Simprints -> localDataSource
         is BiometricDataSource.CommCare -> commCareDataSource
     }
+
+    override suspend fun load(query: SubjectQuery): List<Subject> = localDataSource.load(query)
+
+    override suspend fun delete(queries: List<SubjectQuery>) = localDataSource.delete(queries)
+
+    override suspend fun deleteAll() = localDataSource.deleteAll()
+
+    override suspend fun performActions(
+        actions: List<SubjectAction>,
+        project: Project,
+    ) = localDataSource.performActions(actions, project)
 }

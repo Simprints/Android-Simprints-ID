@@ -25,12 +25,13 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
 )
 @Suppress("ArrayInDataClass")
 data class DbFingerprintSample(
-    @PrimaryKey
-    val id: String,
-    val subjectId: String,
-    val fingerIdentifier: Int,
-    val template: ByteArray,
-    val templateQualityScore: Int,
-    val format: String,
-    val referenceId: String,
+    //  Auto-incrementing key for pagination
+    @PrimaryKey(autoGenerate = true)
+    val rowId: Long = 0, // This field is automatically assigned by Room
+    val uuid: String = "",
+    val subjectId: String = "",
+    val fingerIdentifier: Int = 0,
+    val template: ByteArray = byteArrayOf(),
+    val format: String = "",
+    val referenceId: String = "",
 )

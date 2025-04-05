@@ -15,8 +15,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.models.fromDbToDomain
-import com.simprints.infra.enrolment.records.repository.local.models.fromDomainToDb
+import com.simprints.infra.enrolment.records.repository.local.models.toDomain
+import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
 import com.simprints.infra.logging.Simber
 import io.realm.kotlin.MutableRealm
@@ -30,8 +30,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import javax.inject.Inject
+import javax.inject.Singleton
 
-internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
+@Singleton
+internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     private val realmWrapper: RealmWrapper,
     private val tokenizationProcessor: TokenizationProcessor,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
@@ -54,7 +56,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .find()
-            .map { dbSubject -> dbSubject.fromDbToDomain() }
+            .map { dbSubject -> dbSubject.toDomain() }
     }
 
     override fun loadFaceIdentities(
@@ -110,7 +112,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 onCandidateLoaded()
                 FingerprintIdentity(
                     subject.subjectId.toString(),
-                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
+                    subject.fingerprintSamples.map(DbFingerprintSample::toDomain),
                 )
             }
     }
@@ -128,7 +130,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 onCandidateLoaded()
                 FaceIdentity(
                     subject.subjectId.toString(),
-                    subject.faceSamples.map(DbFaceSample::fromDbToDomain),
+                    subject.faceSamples.map(DbFaceSample::toDomain),
                 )
             }
     }
@@ -177,7 +179,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                             .copy(
                                 moduleId = action.subject.moduleId.tokenizeIfNecessary(TokenKeyType.ModuleId, project),
                                 attendantId = action.subject.attendantId.tokenizeIfNecessary(TokenKeyType.AttendantId, project),
-                            ).fromDomainToDb()
+                            ).toRealmDb()
                         val dbSubject: DbSubject? = realm.findSubject(newSubject.subjectId)
 
                         if (dbSubject != null) {
@@ -207,10 +209,10 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
-                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.fromDomainToDb() }
+                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
                             dbSubject.fingerprintSamples = (
-                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.fromDomainToDb() }
+                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
