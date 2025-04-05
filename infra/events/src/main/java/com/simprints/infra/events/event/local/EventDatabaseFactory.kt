@@ -4,8 +4,7 @@ import android.content.Context
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import net.sqlcipher.database.SQLiteDatabase.getBytes
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,7 +26,7 @@ internal class EventDatabaseFactory @Inject constructor(
         try {
             val key = getOrCreateKey(DB_NAME)
             val passphrase: ByteArray = getBytes(key)
-            val factory = SupportFactory(passphrase)
+            val factory = SupportOpenHelperFactory(passphrase)
             eventDatabase = EventRoomDatabase.getDatabase(
                 ctx,
                 factory,

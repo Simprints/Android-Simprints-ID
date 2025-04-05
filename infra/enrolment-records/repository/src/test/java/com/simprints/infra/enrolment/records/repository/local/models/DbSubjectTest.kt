@@ -46,7 +46,7 @@ class DbSubjectTest {
             faceSamples = listOf(faceSample),
         )
 
-        val dbSubject = domainSubject.fromDomainToDb()
+        val dbSubject = domainSubject.toRealmDb()
 
         with(dbSubject) {
             assertThat(subjectId).isEqualTo(RealmUUID.from(GUID))
@@ -89,7 +89,7 @@ class DbSubjectTest {
             isAttendantIdTokenized = true
         }
 
-        val domainSubject = dbSubject.fromDbToDomain()
+        val domainSubject = dbSubject.toDomain()
 
         with(domainSubject) {
             assertThat(subjectId).isEqualTo(GUID)
