@@ -5,9 +5,8 @@ import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositoryImpl.Companion.BATCH_SIZE
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSourceImpl
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSourceImpl
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
@@ -29,9 +28,6 @@ import javax.inject.Qualifier
 abstract class EnrolmentRecordsStoreModule {
     @Binds
     internal abstract fun bindEnrolmentRecordRepository(impl: EnrolmentRecordRepositoryImpl): EnrolmentRecordRepository
-
-    @Binds
-    internal abstract fun bindEnrolmentRecordLocalDataSource(impl: EnrolmentRecordLocalDataSourceImpl): EnrolmentRecordLocalDataSource
 
     @Binds
     internal abstract fun bindEnrolmentRecordRemoteDataSource(impl: EnrolmentRecordRemoteDataSourceImpl): EnrolmentRecordRemoteDataSource
@@ -57,6 +53,9 @@ class IdentityDataSourceModule {
         context = context,
         dispatcher = dispatcher,
     )
+
+    @Provides
+    fun provideBatchSize(): Int = BATCH_SIZE
 }
 
 @Qualifier

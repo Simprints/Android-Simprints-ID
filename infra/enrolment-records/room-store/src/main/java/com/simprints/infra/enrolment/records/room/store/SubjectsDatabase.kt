@@ -12,7 +12,11 @@ import net.sqlcipher.database.SupportFactory
 import javax.inject.Singleton
 
 @Singleton
-@Database(entities = [DbSubject::class, DbFingerprintSample::class, DbFaceSample::class], version = 1, exportSchema = true)
+@Database(
+    entities = [DbSubject::class, DbFingerprintSample::class, DbFaceSample::class],
+    version = 1,
+    exportSchema = true,
+)
 @Keep
 abstract class SubjectsDatabase : RoomDatabase() {
     abstract val subjectDao: SubjectDao

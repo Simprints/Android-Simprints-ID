@@ -9,5 +9,4 @@ android {
 
 dependencies {
     implementation(project(":infra:auth-store"))
-    implementation(libs.androidX.paging)
 }
