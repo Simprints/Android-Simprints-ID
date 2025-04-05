@@ -14,11 +14,9 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
+import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -53,6 +51,7 @@ class EnrolmentRecordRepositoryImplTest {
     private val onCandidateLoaded: () -> Unit = {}
     private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val localDataSource = mockk<EnrolmentRecordLocalDataSource>(relaxed = true)
+    private val selectEnrolmentRecordLocalDataSource = mockk<SelectEnrolmentRecordLocalDataSourceUseCase>()
     private val commCareDataSource = mockk<IdentityDataSource>(relaxed = true)
     private val remoteDataSource = mockk<EnrolmentRecordRemoteDataSource>(relaxed = true)
     private val prefsEditor = mockk<SharedPreferences.Editor>(relaxed = true)
@@ -69,11 +68,11 @@ class EnrolmentRecordRepositoryImplTest {
     fun setup() {
         every { prefsEditor.putString(any(), any()) } returns prefsEditor
         every { prefsEditor.remove(any()) } returns prefsEditor
-
+        every { selectEnrolmentRecordLocalDataSource() } returns localDataSource
         repository = EnrolmentRecordRepositoryImpl(
             context = ctx,
             remoteDataSource = remoteDataSource,
-            localDataSource = localDataSource,
+            selectEnrolmentRecordLocalDataSource = selectEnrolmentRecordLocalDataSource,
             commCareDataSource = commCareDataSource,
             tokenizationProcessor = tokenizationProcessor,
             dispatcher = UnconfinedTestDispatcher(),
@@ -367,7 +366,9 @@ class EnrolmentRecordRepositoryImplTest {
         )
 
         assert(faceIdentities == expectedFaceIdentities)
-        coVerify(exactly = 1) { localDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any(), project, onCandidateLoaded) }
+        coVerify(exactly = 1) {
+            localDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any(), project, onCandidateLoaded)
+        }
     }
 
     @Test
