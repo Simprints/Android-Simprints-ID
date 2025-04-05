@@ -19,9 +19,7 @@ data class FaceSample(
 
         other as FaceSample
 
-        if (!template.contentEquals(other.template)) return false
-
-        return true
+        return template.contentEquals(other.template)
     }
 
     override fun hashCode(): Int = template.contentHashCode()

@@ -1,12 +1,12 @@
 package com.simprints.feature.dashboard.debug
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
@@ -14,7 +14,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
+import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
@@ -43,7 +43,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var eventRepository: EventRepository
 
     @Inject
-    lateinit var enrolmentRecordRepository: EnrolmentRecordLocalDataSource
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @Inject
     @DispatcherIO
@@ -71,7 +71,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             val ssb = SpannableStringBuilder(
                 coloredText(
                     "\n$message",
-                    Color.parseColor(getRandomColor()),
+                    getRandomColor().toColorInt(),
                 ),
             )
 
