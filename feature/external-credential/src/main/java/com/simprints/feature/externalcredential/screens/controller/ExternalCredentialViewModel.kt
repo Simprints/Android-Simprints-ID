@@ -65,7 +65,7 @@ internal class ExternalCredentialViewModel @Inject constructor(
         )?.subjectId
 
         _externalCredentialSaveResponse.send(
-            ExternalCredentialSearchResponse(subjectId = subjectId!!, externalCredential = data)
+            ExternalCredentialSearchResponse(subjectId = subjectId, externalCredential = data)
         )
     }
 
