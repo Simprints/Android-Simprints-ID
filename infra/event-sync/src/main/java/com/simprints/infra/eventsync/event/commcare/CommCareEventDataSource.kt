@@ -45,15 +45,27 @@ internal class CommCareEventDataSource @Inject constructor(
 
     private fun loadEnrolmentRecordCreationEvents(): Flow<EnrolmentRecordCreationEvent> = flow {
         try {
+            // First collect all case IDs in a list
+            Simber.d("Start listing caseIds", tag = "CommCareSync")
+            val caseIds = mutableListOf<String>()
             context.contentResolver
-                .query(CASE_METADATA_URI, null, null, null, null)
-                ?.use { caseMetadataCursor ->
-                    while (caseMetadataCursor.moveToNext()) {
-                        caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                            loadEnrolmentRecordCreationEvents(caseId).collect { emit(it) }
+                .query(CASE_METADATA_URI, arrayOf(COLUMN_CASE_ID), null, null, null)
+                ?.use { cursor ->
+                    while (cursor.moveToNext()) {
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
+                            caseIds.add(caseId)
                         }
                     }
                 }
+            Simber.d("Finished listing caseIds", tag = "CommCareSync")
+
+            // Process case IDs in batches to avoid large pauses
+            val batchSize = 20 // Adjust based on performance testing
+            caseIds.chunked(batchSize).forEach { batch ->
+                batch.forEach { caseId ->
+                    loadEnrolmentRecordCreationEvents(caseId).collect { emit(it) }
+                }
+            }
         } catch (e: Exception) {
             Simber.e("Error while querying CommCare", e)
         }
@@ -78,12 +90,15 @@ internal class CommCareEventDataSource @Inject constructor(
     }
 
     private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
+        Simber.d("Start looking for subjectActions", tag = "CommCareSync")
         while (caseDataCursor.moveToNext()) {
             val key = caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID))
             if (key == SIMPRINTS_COSYNC_SUBJECT_ACTIONS) {
+                Simber.d("Found subjectActions", tag = "CommCareSync")
                 return caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_VALUE))
             }
         }
+        Simber.d("No subjectActions found", tag = "CommCareSync")
         return ""
     }
 
@@ -117,7 +132,7 @@ internal class CommCareEventDataSource @Inject constructor(
 
     companion object {
         // TODO(milen): This is a hardcoded package name. We need to find a way to get the package name dynamically
-        const val CALLER_PACKAGE_NAME = "org.commcare.dalvik"
+        const val CALLER_PACKAGE_NAME = "org.commcare.dalvik.debug"
 
         private val CASE_METADATA_URI: Uri = "content://$CALLER_PACKAGE_NAME.case/casedb/case".toUri()
         private val CASE_DATA_URI: Uri = "content://$CALLER_PACKAGE_NAME.case/casedb/data".toUri()

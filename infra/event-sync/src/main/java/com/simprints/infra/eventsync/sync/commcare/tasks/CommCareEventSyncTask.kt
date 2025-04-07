@@ -65,6 +65,7 @@ internal class CommCareEventSyncTask @Inject constructor(
         var errorType: String? = null
 
         try {
+            Simber.d("CommCareEventSyncTask started", tag = "CommCareSync")
             result = commCareEventDataSource.getEvents()
 
             result.eventFlow
@@ -90,6 +91,8 @@ internal class CommCareEventSyncTask @Inject constructor(
 
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, result.totalCount)
+
+            Simber.d("CommCareEventSyncTask finished", tag = "CommCareSync")
 
             // TODO(milen): delete subjectIds not in the event list
         } catch (t: Throwable) {
