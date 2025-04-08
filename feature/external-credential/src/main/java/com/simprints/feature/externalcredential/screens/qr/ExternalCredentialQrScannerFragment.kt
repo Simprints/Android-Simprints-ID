@@ -51,7 +51,7 @@ internal class ExternalCredentialQrScannerFragment : Fragment(R.layout.fragment_
                         Toast.makeText(requireActivity(), "No camera", Toast.LENGTH_LONG).show()
                     }.collectLatest { qrCode ->
                         if (qrCode.isNotEmpty()) {
-                            viewModel.processExternalCredentialAndFinish(data = qrCode)
+                            viewModel.processExternalCredential(data = qrCode)
                         }
                     }
             }

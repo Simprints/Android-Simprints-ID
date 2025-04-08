@@ -7,18 +7,20 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.GraphExternalCredentialInternalDirections
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.feature.externalcredential.R
+import com.simprints.feature.externalcredential.model.ExternalCredentialConfirmationResult
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 
 @AndroidEntryPoint
-class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external_credential_controller){
+class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external_credential_controller) {
     private val args: ExternalCredentialControllerFragmentArgs by navArgs()
 
     private val viewModel: ExternalCredentialViewModel by activityViewModels()
@@ -66,6 +68,25 @@ class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external
             },
         )
 
+        viewModel.recaptureEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    GraphExternalCredentialInternalDirections.actionGlobalExternalCredentialQrScanner(),
+                )
+            },
+        )
+
+        viewModel.externalCredentialResult.observe(viewLifecycleOwner) {
+            it?.let {
+                internalNavController?.navigateSafely(
+                    currentlyDisplayedInternalFragment,
+                    R.id.externalCredentialConfirmation,
+                    args = ExternalCredentialConfirmationResult.getArgs(it.credential, it.result)
+                )
+            }
+        }
     }
 
 }
