@@ -14,3 +14,6 @@ data class ExternalCredentialSearchResponse(
     val subjectId: String?,
     val externalCredential: String,
 ) : Serializable
+
+@Keep
+class ExternalCredentialSkipResponse() : Serializable

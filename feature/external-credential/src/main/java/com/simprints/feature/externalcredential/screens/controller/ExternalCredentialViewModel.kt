@@ -13,6 +13,7 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialSaveResponse
 import com.simprints.feature.externalcredential.model.ExternalCredentialSearchResponse
+import com.simprints.feature.externalcredential.model.ExternalCredentialSkipResponse
 import com.simprints.infra.external.credential.store.model.ExternalCredential
 import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -82,6 +83,10 @@ internal class ExternalCredentialViewModel @Inject constructor(
     fun recapture() {
         _externalCredentialResult.value = null
         _recaptureEvent.send()
+    }
+
+    fun skipScanning() {
+        _externalCredentialSaveResponse.send(ExternalCredentialSkipResponse())
     }
 
     private suspend fun saveCredential(data: String): ExternalCredential.QrCode {

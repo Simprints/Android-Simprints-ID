@@ -42,6 +42,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.matcher.MatchContract
 import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -122,6 +123,7 @@ internal class OrchestratorViewModel @Inject constructor(
             val captureAndMatchSteps = stepsBuilder.buildCaptureAndMatchStepsForAgeGroup(
                 actionRequest!!,
                 projectConfiguration,
+                enrolmentSubjectId = enrolmentSubjectId,
                 result.ageGroup,
             )
             steps = steps + captureAndMatchSteps
@@ -197,18 +199,22 @@ internal class OrchestratorViewModel @Inject constructor(
             val foundSubjectId = result.subjectId?.nullIfEmpty()
             val matchingSteps = listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER)
             val matchingStep = steps.firstOrNull { it.id in matchingSteps } ?: return
-            val matchingPayload = matchingStep.payload.getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY) ?: return
+            val matchParams = matchingStep.payload.getParcelable<MatchParams>("params") ?: return
 
             // If associated Subject ID is found via external credential, matching against 1:1. Otherwise, matching against 1:N
-            val updatedSubjectQuery = matchingPayload.subjectQuery.copy(
+            val updatedSubjectQuery = matchParams.queryForCandidates.copy(
                 subjectId = foundSubjectId
             )
 
-            val updatedMatchingPayload = matchingPayload.copy(
-                subjectQuery = updatedSubjectQuery
+            matchingStep.payload = MatchContract.getArgs(
+                referenceId = matchParams.probeReferenceId,
+                fingerprintSamples = matchParams.probeFingerprintSamples,
+                faceSamples = matchParams.probeFaceSamples,
+                fingerprintSDK = matchParams.fingerprintSDK,
+                flowType = matchParams.flowType,
+                subjectQuery = updatedSubjectQuery,
+                biometricDataSource = matchParams.biometricDataSource,
             )
-
-            matchingStep.payload = MatchStepStubPayload.asBundle(updatedMatchingPayload)
         }
     }
 

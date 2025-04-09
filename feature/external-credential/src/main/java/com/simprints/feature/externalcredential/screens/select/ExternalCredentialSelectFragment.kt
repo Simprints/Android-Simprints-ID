@@ -29,5 +29,8 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                 ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialQrScanner(),
             )
         }
+        binding.skipExternalCredentialScan.setOnClickListener {
+            viewModel.skipScanning()
+        }
     }
 }

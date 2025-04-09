@@ -464,7 +464,7 @@
     </plurals>
 
     <!--  External credentials  -->
-    <string name="external_credential_title">Scan QR</string>
+    <string name="external_credential_title">Scan external credential</string>
 
 
 </resources>

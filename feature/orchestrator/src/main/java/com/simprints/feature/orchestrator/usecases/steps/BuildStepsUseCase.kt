@@ -67,10 +67,10 @@ internal class BuildStepsUseCase @Inject constructor(
                 ),
                 buildAgeSelectionStepIfNeeded(action, projectConfiguration),
                 buildConsentStepIfNeeded(ConsentType.IDENTIFY, projectConfiguration),
-                buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.IDENTIFY),
                 buildCaptureAndMatchStepsForIdentify(
                     action,
                     projectConfiguration,
+                    enrolmentSubjectId = enrolmentSubjectId,
                     subjectQuery = subjectQuery,
                 ),
             )
@@ -101,6 +101,7 @@ internal class BuildStepsUseCase @Inject constructor(
     fun buildCaptureAndMatchStepsForAgeGroup(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
+        enrolmentSubjectId: String,
         ageGroup: AgeGroup,
     ): List<Step> = when (action) {
         is ActionRequest.EnrolActionRequest -> buildCaptureAndMatchStepsForEnrol(
@@ -113,6 +114,7 @@ internal class BuildStepsUseCase @Inject constructor(
             action,
             projectConfiguration,
             ageGroup,
+            enrolmentSubjectId = enrolmentSubjectId,
             subjectQuery = buildMatcherSubjectQuery(projectConfiguration, action),
         )
 
@@ -186,6 +188,7 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         ageGroup: AgeGroup? = null,
         subjectQuery: SubjectQuery,
+        enrolmentSubjectId: String
     ): List<Step> {
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
 
@@ -195,6 +198,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 FlowType.IDENTIFY,
                 resolvedAgeGroup,
             ),
+            buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.IDENTIFY),
             buildMatcherSteps(
                 projectConfiguration,
                 FlowType.IDENTIFY,
