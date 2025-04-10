@@ -8,6 +8,5 @@ It is split into two subpackages depending on which generation of Vero is being 
 
 ### Bluetooth Component Abstractions
 
-It's important to use the
-[Component abstractions](src/main/java/com/simprints/fingerprint/infra/scanner/component/bluetooth) for connecting via
-Bluetooth and acquiring a Bluetooth socket so that mocking and replacing of the Bluetooth adapter can occur easily.
+It's important to use the[Component abstractions](src/main/java/com/simprints/fingerprint/infra/scanner/component/bluetooth) for connecting
+via Bluetooth and acquiring a Bluetooth socket so that mocking and replacing of the Bluetooth adapter can occur easily.

@@ -9,9 +9,7 @@ import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.SSLProtocolException
 
 /**
- * A very lightweight wrapper around Timber in case we ever decide to use a different logging
- * library.
- * @see <a href="URL#https://github.com/JakeWharton/timber">Timber</a>
+ * A very lightweight wrapper around logging library in case we ever decide to use a different one.
  */
 object Simber {
     /**
