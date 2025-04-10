@@ -5,15 +5,19 @@ import androidx.annotation.Keep
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.simprints.infra.enrolment.records.room.store.models.DbFaceSample
-import com.simprints.infra.enrolment.records.room.store.models.DbFingerprintSample
+import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
-import net.sqlcipher.database.SupportFactory
+import com.simprints.infra.enrolment.records.room.store.models.DbSubjectTemplateFormatMap
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Singleton
 
 @Singleton
 @Database(
-    entities = [DbSubject::class, DbFingerprintSample::class, DbFaceSample::class],
+    entities = [
+        DbSubject::class,
+        DbBiometricTemplate::class,
+        DbSubjectTemplateFormatMap::class,
+    ],
     version = 1,
     exportSchema = true,
 )
@@ -24,7 +28,7 @@ abstract class SubjectsDatabase : RoomDatabase() {
     companion object {
         fun getDatabase(
             context: Context,
-            factory: SupportFactory,
+            factory: SupportOpenHelperFactory,
             dbName: String,
         ): SubjectsDatabase {
             val builder = Room.databaseBuilder(context, SubjectsDatabase::class.java, dbName)

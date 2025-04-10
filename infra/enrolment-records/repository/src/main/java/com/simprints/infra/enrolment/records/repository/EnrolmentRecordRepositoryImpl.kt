@@ -29,7 +29,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val selectEnrolmentRecordLocalDataSource: SelectEnrolmentRecordLocalDataSourceUseCase,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
-    private val batchSize: Int,
+    @EnrolmentBatchSize private val batchSize: Int,
 ) : EnrolmentRecordRepository {
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 

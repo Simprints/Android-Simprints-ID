@@ -1,7 +1,6 @@
 plugins {
     id("simprints.infra")
     id("kotlin-parcelize")
-    id("simprints.library.room")
 }
 
 android {
@@ -18,4 +17,5 @@ dependencies {
     implementation(libs.libsimprints)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
+    implementation(libs.androidX.room.core)
 }

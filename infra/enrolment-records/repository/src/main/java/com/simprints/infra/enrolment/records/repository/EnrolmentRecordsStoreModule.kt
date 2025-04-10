@@ -51,6 +51,7 @@ class IdentityDataSourceModule {
         dispatcher = dispatcher,
     )
 
+    @EnrolmentBatchSize
     @Provides
     fun provideBatchSize(): Int = BATCH_SIZE
 }
@@ -58,3 +59,7 @@ class IdentityDataSourceModule {
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class CommCareDataSource
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class EnrolmentBatchSize

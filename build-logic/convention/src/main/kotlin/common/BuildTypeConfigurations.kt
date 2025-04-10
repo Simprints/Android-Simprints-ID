@@ -37,7 +37,13 @@ fun Project.configureDbEncryptionBuild() {
             }
 
             getByName(BuildTypes.DEBUG) {
-                buildConfigField("Boolean", "DB_ENCRYPTION", "$propDbEncrypted")
+                // Set false only if running tests
+                val isTestTask = gradle.startParameter.taskNames.any {
+                    it.contains("test", ignoreCase = true) || it.contains("connected", ignoreCase = true)
+                }
+
+                val dbEncryptionValue = if (isTestTask) "false" else "$propDbEncrypted"
+                buildConfigField("Boolean", "DB_ENCRYPTION", dbEncryptionValue)
             }
         }
     }
