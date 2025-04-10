@@ -10,10 +10,5 @@ data class SubjectBiometrics(
         parentColumn = SUBJECT_ID_COLUMN,
         entityColumn = SUBJECT_ID_COLUMN,
     )
-    val fingerprintSamples: List<DbFingerprintSample>,
-    @Relation(
-        parentColumn = SUBJECT_ID_COLUMN,
-        entityColumn = SUBJECT_ID_COLUMN,
-    )
-    val faceSamples: List<DbFaceSample>,
+    val biometricTemplates: List<DbBiometricTemplate>,
 )
