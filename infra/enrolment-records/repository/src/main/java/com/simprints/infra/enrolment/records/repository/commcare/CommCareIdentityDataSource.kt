@@ -3,6 +3,7 @@ package com.simprints.infra.enrolment.records.repository.commcare
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import androidx.core.net.toUri
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.DispatcherIO
@@ -41,9 +42,9 @@ internal class CommCareIdentityDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : IdentityDataSource {
-    private fun getCaseMetadataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/case")
+    private fun getCaseMetadataUri(packageName: String): Uri = "content://$packageName.case/casedb/case".toUri()
 
-    private fun getCaseDataUri(packageName: String): Uri = Uri.parse("content://$packageName.case/casedb/data")
+    private fun getCaseDataUri(packageName: String): Uri = "content://$packageName.case/casedb/data".toUri()
 
     override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
@@ -65,7 +66,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
                             fingerprintReference.templates.map { fingerprintTemplate ->
                                 FingerprintSample(
                                     fingerIdentifier = fingerprintTemplate.finger,
-                                    templateQualityScore = fingerprintTemplate.quality,
                                     template = encoder.base64ToBytes(fingerprintTemplate.template),
                                     format = fingerprintReference.format,
                                     referenceId = fingerprintReference.id,

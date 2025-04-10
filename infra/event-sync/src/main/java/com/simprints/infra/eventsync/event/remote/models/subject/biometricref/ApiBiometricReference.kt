@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
-import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.face.ApiFaceReference
@@ -40,15 +39,6 @@ internal enum class ApiBiometricReferenceType {
     FingerprintReference,
 }
 
-internal fun BiometricReference.fromDomainToApi() = when (this) {
-    is DomainFaceReference -> {
-        ApiFaceReference(id, templates.map { it.fromDomainToApi() }, format, metadata)
-    }
-    is DomainFingerprintReference -> {
-        ApiFingerprintReference(id, templates.map { it.fromDomainToApi() }, format, metadata)
-    }
-}
-
 internal fun ApiBiometricReference.fromApiToDomain() = when (this.type) {
     ApiBiometricReferenceType.FaceReference -> (this as ApiFaceReference).fromApiToDomain()
     ApiBiometricReferenceType.FingerprintReference -> (this as ApiFingerprintReference).fromApiToDomain()
@@ -63,6 +53,4 @@ internal fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
 internal fun ApiFingerprintReference.fromApiToDomain() =
     DomainFingerprintReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
 
-internal fun ApiFingerprintTemplate.fromApiToDomain() = FingerprintTemplate(quality, template, IFingerIdentifier.valueOf(finger.name))
-
-internal fun FingerprintTemplate.fromDomainToApi() = ApiFingerprintTemplate(quality, template, finger)
+internal fun ApiFingerprintTemplate.fromApiToDomain() = FingerprintTemplate(template, IFingerIdentifier.valueOf(finger.name))

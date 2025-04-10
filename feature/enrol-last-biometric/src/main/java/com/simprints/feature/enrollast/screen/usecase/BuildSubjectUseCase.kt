@@ -47,7 +47,6 @@ internal class BuildSubjectUseCase @Inject constructor(
     ) = FingerprintSample(
         fromDomainToModuleApi(result.finger),
         result.template,
-        result.templateQualityScore,
         result.format,
         referenceId,
     )

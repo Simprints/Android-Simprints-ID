@@ -408,5 +408,5 @@ class EnrolmentRecordLocalDataSourceImplTest {
     private fun getRandomFingerprintSample(
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
-    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), 42, "fingerprintTemplateFormat", referenceId, id)
+    ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
 }
