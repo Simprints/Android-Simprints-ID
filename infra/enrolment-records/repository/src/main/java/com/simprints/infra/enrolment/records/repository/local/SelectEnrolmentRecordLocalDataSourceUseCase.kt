@@ -8,6 +8,6 @@ internal class SelectEnrolmentRecordLocalDataSourceUseCase @Inject constructor(
 ) {
     operator fun invoke(): EnrolmentRecordLocalDataSource {
         // Todo later we will add logic to select the data source
-        return roomDataSource
+        return realmDataSource
     }
 }
