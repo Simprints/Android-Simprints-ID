@@ -31,12 +31,11 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val selectEnrolmentRecordLocalDataSource: SelectEnrolmentRecordLocalDataSourceUseCase,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
-    private val batchSize: Int,
+    @EnrolmentBatchSize private val batchSize: Int,
 ) : EnrolmentRecordRepository {
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
     companion object {
-        const val BATCH_SIZE = 80
         private const val PREF_FILE_NAME = "UPLOAD_ENROLMENT_RECORDS_PROGRESS"
         private const val PROGRESS_KEY = "PROGRESS"
     }
