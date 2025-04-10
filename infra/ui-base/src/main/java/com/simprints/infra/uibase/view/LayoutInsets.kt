@@ -7,6 +7,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.updatePadding
 import com.google.android.material.appbar.AppBarLayout
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import java.util.LinkedList
 
 
@@ -20,6 +21,7 @@ import java.util.LinkedList
  *   - the first instance of [AppBarLayout] if present
  *   - to the root view.
  */
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 fun applySystemBarInsets(view: View) {
     ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
         val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -38,6 +40,7 @@ fun applySystemBarInsets(view: View) {
 /**
  * Recursively traverse the layout and find the first instance of AppBarLayout.
  */
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 private tailrec fun findAppBarLayout(views: LinkedList<View>): AppBarLayout? {
     if (views.isEmpty()) return null
     val currentView = views.removeFirst()
