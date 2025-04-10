@@ -29,20 +29,20 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
     )
 
     private fun Project.createJacocoTask() {
-        tasks.register("jacocoTestReport", JacocoReport::class.java) {
+        tasks.create("jacocoTestReport", JacocoReport::class.java) {
             dependsOn(tasks.withType<Test>().matching { it.name.lowercase().contains("debug") })
 
             reports.xml.required.set(true)
             reports.html.required.set(false) // Disable html reports to decrease report upload/download time in github pipeline
 
-            val javaTree = fileTree("${project.layout.buildDirectory}/intermediates/javac/debug/classes") { exclude(fileFilter) }
-            val kotlinTree = fileTree("${project.layout.buildDirectory}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
+            val javaTree = fileTree("${project.buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
+            val kotlinTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
             classDirectories.setFrom(files(javaTree, kotlinTree))
 
             sourceDirectories.setFrom(files("${project.projectDir}/src/main/java"))
 
             executionData.setFrom(
-                fileTree("${layout.buildDirectory}") {
+                fileTree("$buildDir") {
                     include(
                         "jacoco/testDebugUnitTest.exec",
                         "outputs/code-coverage/connected/*coverage.ec",

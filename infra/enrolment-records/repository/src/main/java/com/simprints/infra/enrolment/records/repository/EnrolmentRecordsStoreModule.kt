@@ -5,7 +5,6 @@ import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositoryImpl.Companion.BATCH_SIZE
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSourceImpl
@@ -54,10 +53,19 @@ class IdentityDataSourceModule {
         dispatcher = dispatcher,
     )
 
+    @EnrolmentBatchSize
     @Provides
     fun provideBatchSize(): Int = BATCH_SIZE
+
+    companion object {
+        const val BATCH_SIZE = 80
+    }
 }
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class CommCareDataSource
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class EnrolmentBatchSize

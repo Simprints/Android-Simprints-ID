@@ -3,7 +3,12 @@ package com.simprints.infra.enrolment.records.repository.local
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
@@ -14,135 +19,192 @@ import com.simprints.infra.enrolment.records.repository.local.models.toRoomDb
 import com.simprints.infra.enrolment.records.room.store.SubjectDao
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
+import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ROOM_RECORDS_DB
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.system.measureTimeMillis
-import kotlin.time.measureTimedValue
-import com.simprints.infra.enrolment.records.repository.domain.models.Subject as SubjectDomain
+import com.simprints.infra.enrolment.records.repository.domain.models.Subject as DomainSubject
 
+/**
+ * Local data source for enrolment records using Room.
+ */
 @Singleton
 internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     private val subjectsDatabaseFactory: SubjectsDatabaseFactory,
+    private val tokenizationProcessor: TokenizationProcessor,
+    private val queryBuilder: RoomEnrolmentRecordQueryBuilder,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
-    val database: SubjectsDatabase by lazy { subjectsDatabaseFactory.get() }
-    val subjectDao: SubjectDao by lazy { subjectsDatabaseFactory.get().subjectDao }
-
-    override suspend fun load(query: SubjectQuery): List<SubjectDomain> = withContext(dispatcherIO) {
-        val sqlQuery = buildSubjectQuery(query)
-        subjectDao.loadSubjects(SimpleSQLiteQuery(sqlQuery.first, sqlQuery.second.toTypedArray())).map { it.toDomain() }
+    companion object {
+        // only one concurrent operation is allowed as we use the last seen subject ID to load biometric identities
+        private const val PARALLELISM = 1
     }
 
-    override suspend fun loadFingerprintIdentities(
+    private val database: SubjectsDatabase by lazy { subjectsDatabaseFactory.get() }
+    private val subjectDao: SubjectDao by lazy { database.subjectDao }
+
+    /**
+     * Loads subjects matching the given query.
+     * Don't use this method if the query contains format fields (faceSampleFormat or fingerprintSampleFormat).
+     * instead, use loadFaceIdentities or loadFingerprintIdentities methods.
+     */
+    override suspend fun load(query: SubjectQuery): List<DomainSubject> = withContext(dispatcherIO) {
+        if (query.hasUntokenizedFields == true) {
+            Simber.d(
+                "[load] Query has untokenized fields, returning empty list as all records are tokenized.",
+                tag = ROOM_RECORDS_DB,
+            )
+            return@withContext emptyList()
+        }
+        subjectDao.loadSubjects(queryBuilder.buildSubjectQuery(query)).map { it.toDomain() }
+    }
+
+    /**
+     * Counts subjects matching the given query.
+     */
+    override suspend fun count(
         query: SubjectQuery,
-        range: IntRange,
+        dataSource: BiometricDataSource,
+    ): Int = withContext(dispatcherIO) {
+        subjectDao.countSubjects(queryBuilder.buildCountQuery(query))
+    }
+
+    /**
+     * Loads face identities in paged ranges.
+     */
+    override fun loadFaceIdentities(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
+        scope: CoroutineScope,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = withContext(dispatcherIO) {
+    ): ReceiveChannel<List<FaceIdentity>> = loadBiometricIdentitiesPaged(
+        query = query,
+        ranges = ranges,
+        format = requireNotNull(query.faceSampleFormat) { "faceSampleFormat required" },
+        createIdentity = { subjectId, templates ->
+            FaceIdentity(
+                subjectId = subjectId,
+                faces = templates.map { sample ->
+                    FaceSample(
+                        template = sample.templateData,
+                        id = sample.uuid,
+                        format = sample.format,
+                        referenceId = sample.referenceId,
+                    )
+                },
+            )
+        },
+        onCandidateLoaded = onCandidateLoaded,
+        scope = scope,
+    )
+
+    /**
+     * Loads fingerprint identities in paged ranges.
+     */
+    override fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
+        project: Project,
+        scope: CoroutineScope,
+        onCandidateLoaded: () -> Unit,
+    ): ReceiveChannel<List<FingerprintIdentity>> = loadBiometricIdentitiesPaged(
+        query = query,
+        ranges = ranges,
+        format = requireNotNull(query.fingerprintSampleFormat) { "fingerprintSampleFormat required" },
+        createIdentity = { subjectId, templates ->
+            FingerprintIdentity(
+                subjectId = subjectId,
+                fingerprints = templates.map { sample ->
+                    FingerprintSample(
+                        fingerIdentifier = IFingerIdentifier.entries[sample.identifier!!],
+                        template = sample.templateData,
+                        id = sample.uuid,
+                        format = sample.format,
+                        referenceId = sample.referenceId,
+                    )
+                },
+            )
+        },
+        onCandidateLoaded = onCandidateLoaded,
+        scope = scope,
+    )
+
+    private fun <T> loadBiometricIdentitiesPaged(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
+        format: String,
+        createIdentity: (String, List<DbBiometricTemplate>) -> T,
+        onCandidateLoaded: () -> Unit,
+        scope: CoroutineScope,
+    ): ReceiveChannel<List<T>> {
+        var lastSeenSubjectId: String? = null
+        var lastOffset = 0
+        return loadIdentitiesConcurrently(
+            ranges = ranges,
+            dispatcher = dispatcherIO,
+            parallelism = PARALLELISM,
+            scope = scope,
+        ) { range ->
+            require(lastOffset == range.first) {
+                "[loadBiometricIdentitiesPaged] The range start must match the last seen sample count. " +
+                    "Expected: $lastOffset, Actual: ${range.first}"
+            }
+            val identities = loadBiometricIdentities(
+                query = query,
+                pageSize = range.last - range.first,
+                lastSeenSubjectId = lastSeenSubjectId,
+                format = format,
+                createIdentity = createIdentity,
+                onCandidateLoaded = onCandidateLoaded,
+            )
+            lastSeenSubjectId = identities.lastOrNull()?.let {
+                (it as? FaceIdentity)?.subjectId ?: (it as? FingerprintIdentity)?.subjectId
+            }
+            lastOffset = range.last
+            identities
+        }
+    }
+
+    private suspend fun <T> loadBiometricIdentities(
+        query: SubjectQuery,
+        pageSize: Int,
+        format: String?,
+        lastSeenSubjectId: String?,
+        createIdentity: (subjectId: String, samples: List<DbBiometricTemplate>) -> T,
+        onCandidateLoaded: () -> Unit,
+    ): List<T> = withContext(dispatcherIO) {
+        requireNotNull(format) { "Appropriate sampleFormat is required for loading biometric identities." }
         subjectDao
-            .getSubjectsWithFingerprintSamples(
-                query.projectId,
-                query.subjectId,
-                query.subjectIds,
-                query.attendantId?.value,
-                query.moduleId?.value,
-                query.fingerprintSampleFormat,
-                range.first,
-                range.last,
-            ).map {
+            .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, pageSize, lastSeenSubjectId))
+            .map { (subjectId, templates) ->
                 onCandidateLoaded()
-                FingerprintIdentity(
-                    subjectId = it.key,
-                    fingerprints = it.value.map { sample -> sample.toDomain() },
-                )
+                createIdentity(subjectId, templates)
             }
     }
 
-    override suspend fun loadFaceIdentities(
-        query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource,
-        project: Project,
-        onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = withContext(dispatcherIO) {
-        val result = measureTimedValue {
-            subjectDao
-                .getSubjectsWithFaceSamples(
-                    query.projectId,
-                    query.subjectId,
-                    query.subjectIds,
-                    query.attendantId?.value,
-                    query.moduleId?.value,
-                    query.faceSampleFormat,
-                    range.first,
-                    range.last,
-                ).map {
-                    onCandidateLoaded()
-                    FaceIdentity(
-                        subjectId = it.key,
-                        faces = it.value.map { sample -> sample.toDomain() },
-                    )
-                }
-        }
-        log("loadFaceIdentities ${result.value.size} in  ${result.duration.inWholeMilliseconds} ms")
-        return@withContext result.value
-    }
-
-    private fun buildSubjectQuery(query: SubjectQuery): Pair<String, List<Any?>> {
-        val (whereClause, args) = buildWhereClause(query)
-        val orderBy = if (query.sort) "ORDER BY s.subjectId ASC" else ""
-        val sql =
-            """
-            SELECT * FROM DbSubject s
-            LEFT JOIN DbFingerprintSample fingerprint ON s.subjectId = fingerprint.subjectId
-            LEFT JOIN DbFaceSample face ON s.subjectId = face.subjectId
-            $whereClause
-            $orderBy
-            """.trimIndent()
-        return Pair(sql, args)
-    }
-
-    private fun buildWhereClause(query: SubjectQuery): Pair<String, MutableList<Any?>> {
-        val whereClauses = mutableListOf<String>()
-        val args = mutableListOf<Any?>()
-
-        query.projectId?.let {
-            whereClauses.add("s.projectId = ?")
-            args.add(it)
-        }
-        query.subjectId?.let {
-            whereClauses.add("s.subjectId = ?")
-            args.add(it)
-        }
-        query.subjectIds?.takeIf { it.isNotEmpty() }?.let {
-            whereClauses.add("s.subjectId IN (${it.joinToString(",") { "?" }})")
-            args.addAll(it)
-        }
-        query.attendantId?.let {
-            whereClauses.add("s.attendantId = ?")
-            args.add(it)
-        }
-        query.moduleId?.let {
-            whereClauses.add("s.moduleId = ?")
-            args.add(it)
-        }
-        if (query.hasUntokenizedFields == true) {
-            whereClauses.add("(s.isAttendantIdTokenized = 0 OR s.isModuleIdTokenized = 0)")
-        }
-
-        val whereClause = if (whereClauses.isNotEmpty()) "WHERE ${whereClauses.joinToString(" AND ")}" else ""
-        return Pair(whereClause, args)
-    }
-
     override suspend fun delete(queries: List<SubjectQuery>) {
+        Simber.i("[delete] Deleting subjects with queries: $queries", tag = ROOM_RECORDS_DB)
         database.withTransaction {
-            queries.forEach {
-                val (whereClause, args) = buildWhereClause(it)
+            queries.forEach { query ->
+                require(query.faceSampleFormat == null && query.fingerprintSampleFormat == null) {
+                    val errorMsg = "faceSampleFormat and fingerprintSampleFormat are not supported for deletion"
+                    Simber.i("[delete] $errorMsg", tag = ROOM_RECORDS_DB)
+                    errorMsg
+                }
+                val (whereClause, args) = queryBuilder.buildWhereAndOrderByClause(
+                    query,
+                    subjectAlias = "",
+                    templateAlias = "",
+                )
                 val sql = "DELETE FROM DbSubject $whereClause"
                 subjectDao.deleteSubjects(SimpleSQLiteQuery(sql, args.toTypedArray()))
             }
@@ -150,72 +212,99 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     }
 
     override suspend fun deleteAll() {
+        Simber.i("[deleteAll] Deleting all subjects.", tag = ROOM_RECORDS_DB)
         subjectDao.deleteSubjects(SimpleSQLiteQuery("DELETE FROM DbSubject"))
-    }
-
-    override suspend fun count(
-        query: SubjectQuery,
-        dataSource: BiometricDataSource,
-    ): Int = withContext(dispatcherIO) {
-        var result = 0
-        val timeTaken = measureTimeMillis {
-            result = subjectDao.countSubjects()
-        }
-        log("count $result : $timeTaken ms")
-        result
     }
 
     override suspend fun performActions(
         actions: List<SubjectAction>,
         project: Project,
     ) {
-        val timeTaken = measureTimeMillis {
-            database.withTransaction {
-                actions.forEach { action ->
-                    when (action) {
-                        is SubjectAction.Creation -> createSubject(action.subject)
-                        is SubjectAction.Update -> Unit
-                        is SubjectAction.Deletion -> deleteSubject(action.subjectId)
-                    }
+        database.withTransaction {
+            actions.forEach { action ->
+                Simber.d("[performActions] Performing action: $action", tag = ROOM_RECORDS_DB)
+                when (action) {
+                    is SubjectAction.Creation -> createSubject(action.subject, project)
+                    is SubjectAction.Update -> updateSubject(action)
+                    is SubjectAction.Deletion -> deleteSubject(action.subjectId)
                 }
             }
         }
-        log("performActions ${actions.size}  in : $timeTaken ms")
     }
 
-    private suspend fun createSubject(subject: SubjectDomain) {
-        val subjectId = subject.subjectId
+    private suspend fun createSubject(
+        subject: DomainSubject,
+        project: Project,
+    ) {
+        require(subject.faceSamples.isNotEmpty() || subject.fingerprintSamples.isNotEmpty()) {
+            val errorMsg = "Subject should include at least one of the face or fingerprint samples"
+            Simber.i(
+                "[createSubject] $errorMsg for subjectId: ${subject.subjectId}",
+                tag = ROOM_RECORDS_DB,
+            )
+            errorMsg
+        }
         val dbSubject = DbSubject(
             subjectId = subject.subjectId,
             projectId = subject.projectId,
-            attendantId = subject.attendantId.value,
-            moduleId = subject.moduleId.value,
+            attendantId = tokenizationProcessor
+                .tokenizeIfNecessary(
+                    subject.attendantId,
+                    TokenKeyType.AttendantId,
+                    project,
+                ).value,
+            moduleId = tokenizationProcessor
+                .tokenizeIfNecessary(
+                    subject.moduleId,
+                    TokenKeyType.ModuleId,
+                    project,
+                ).value,
             createdAt = subject.createdAt?.time,
             updatedAt = subject.updatedAt?.time,
-            isAttendantIdTokenized = false,
-            isModuleIdTokenized = false,
         )
-
         subjectDao.insertSubject(dbSubject)
-
-        // Insert fingerprints
-        val dbFingerprints = subject.fingerprintSamples.map { it.toRoomDb(subjectId) }
-        if (dbFingerprints.isNotEmpty()) {
-            subjectDao.insertFingerprintSamples(dbFingerprints)
+        subject.fingerprintSamples.takeIf { it.isNotEmpty() }?.let { samples ->
+            val dbFingerprints = samples.map { it.toRoomDb(subject.subjectId) }
+            subjectDao.insertBiometricSamples(dbFingerprints)
         }
+        subject.faceSamples.takeIf { it.isNotEmpty() }?.let { samples ->
+            val dbFaces = samples.map { it.toRoomDb(subject.subjectId) }
+            subjectDao.insertBiometricSamples(dbFaces)
+        }
+    }
 
-        // Insert face samples
-        val dbFaces = subject.faceSamples.map { it.toRoomDb(subjectId) }
-        if (dbFaces.isNotEmpty()) {
-            subjectDao.insertFaceSamples(dbFaces)
+    private suspend fun updateSubject(action: SubjectAction.Update) {
+        val dbSubject = subjectDao.getSubject(action.subjectId)
+        if (dbSubject != null) {
+            val referencesToDelete = action.referenceIdsToRemove.toSet()
+            require(
+                referencesToDelete.size != dbSubject.biometricTemplates.size ||
+                    action.faceSamplesToAdd.isNotEmpty() ||
+                    action.fingerprintSamplesToAdd.isNotEmpty(),
+            ) {
+                val errorMsg = "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
+                Simber.i("[updateSubject] $errorMsg", tag = ROOM_RECORDS_DB)
+                errorMsg
+            }
+            dbSubject.biometricTemplates.filter { it.referenceId in referencesToDelete }.forEach {
+                subjectDao.deleteBiometricSample(it.uuid)
+            }
+            val templatesToAdd =
+                action.faceSamplesToAdd.map { it.toRoomDb(action.subjectId) } +
+                    action.fingerprintSamplesToAdd.map { it.toRoomDb(action.subjectId) }
+            if (templatesToAdd.isNotEmpty()) {
+                subjectDao.insertBiometricSamples(templatesToAdd)
+            }
+        } else {
+            Simber.i(
+                "[updateSubject] Subject ${action.subjectId} not found for update",
+                tag = ROOM_RECORDS_DB,
+            )
         }
     }
 
     private suspend fun deleteSubject(subjectId: String) {
+        Simber.d("[deleteSubject] Deleting subject: $subjectId", tag = ROOM_RECORDS_DB)
         subjectDao.deleteSubject(subjectId)
     }
-}
-
-fun log(message: String) {
-    Simber.i(message, tag = "roomrecords")
 }

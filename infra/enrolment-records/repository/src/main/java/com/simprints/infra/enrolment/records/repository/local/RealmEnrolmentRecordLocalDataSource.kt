@@ -179,8 +179,17 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     is SubjectAction.Creation -> {
                         val newSubject = action.subject
                             .copy(
-                                moduleId = action.subject.moduleId.tokenizeIfNecessary(TokenKeyType.ModuleId, project),
-                                attendantId = action.subject.attendantId.tokenizeIfNecessary(TokenKeyType.AttendantId, project),
+                                moduleId =
+                                    tokenizationProcessor.tokenizeIfNecessary(
+                                        action.subject.moduleId,
+                                        TokenKeyType.ModuleId,
+                                        project,
+                                    ),
+                                attendantId = tokenizationProcessor.tokenizeIfNecessary(
+                                    action.subject.attendantId,
+                                    TokenKeyType.AttendantId,
+                                    project,
+                                ),
                             ).toRealmDb()
                         val dbSubject: DbSubject? = realm.findSubject(newSubject.subjectId)
 
@@ -234,19 +243,6 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun TokenizableString.tokenizeIfNecessary(
-        tokenKeyType: TokenKeyType,
-        project: Project,
-    ) = when (this) {
-        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-            decrypted = this,
-            tokenKeyType = tokenKeyType,
-            project = project,
-        )
-
-        is TokenizableString.Tokenized -> this
     }
 
     private fun MutableRealm.findSubject(subjectId: RealmUUID): DbSubject? =
