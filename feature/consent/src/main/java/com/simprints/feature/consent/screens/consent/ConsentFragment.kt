@@ -18,6 +18,7 @@ import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.listeners.OnTabSelectedListener
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -37,6 +38,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("ConsentFragment started", tag = ORCHESTRATION)
 
         binding.consentPrivacyNotice.paintFlags = binding.consentPrivacyNotice.paintFlags or Paint.UNDERLINE_TEXT_FLAG

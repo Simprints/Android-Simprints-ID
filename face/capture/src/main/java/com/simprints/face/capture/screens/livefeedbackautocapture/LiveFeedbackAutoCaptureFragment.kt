@@ -32,6 +32,7 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.face.capture.screens.livefeedback.CropToTargetOverlayAnalyzer
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -75,6 +76,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         initFragment()
     }
 

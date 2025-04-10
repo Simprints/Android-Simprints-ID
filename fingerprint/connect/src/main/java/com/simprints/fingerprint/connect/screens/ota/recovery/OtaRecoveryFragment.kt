@@ -12,6 +12,7 @@ import com.simprints.fingerprint.connect.databinding.FragmentOtaRecoveryBinding
 import com.simprints.fingerprint.connect.screens.ota.OtaFragmentParams
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +37,7 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         screenReporter.reportOtaRecovery()
 
         setRecoveryStrategyInstructions()
@@ -55,7 +57,7 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
                 OtaRecoveryStrategy.HARD_RESET -> IDR.string.fingerprint_connect_ota_recovery_hard_reset
                 OtaRecoveryStrategy.SOFT_RESET,
                 OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY,
-                -> IDR.string.fingerprint_connect_ota_recovery_soft_reset
+                    -> IDR.string.fingerprint_connect_ota_recovery_soft_reset
             },
         )
     }

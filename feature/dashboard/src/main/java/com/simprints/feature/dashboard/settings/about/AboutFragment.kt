@@ -19,6 +19,7 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Clipboard
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -74,6 +75,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         binding.settingsAboutToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }

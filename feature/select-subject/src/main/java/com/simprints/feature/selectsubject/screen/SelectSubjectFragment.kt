@@ -10,6 +10,7 @@ import com.simprints.feature.selectsubject.R
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,6 +24,7 @@ internal class SelectSubjectFragment : Fragment(R.layout.fragment_select_subject
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("SelectSubjectFragment started", tag = ORCHESTRATION)
 
         viewModel.finish.observe(viewLifecycleOwner) {

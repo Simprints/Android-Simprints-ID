@@ -42,6 +42,7 @@ import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChec
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -77,6 +78,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("LoginFormFragment started", tag = ORCHESTRATION)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {

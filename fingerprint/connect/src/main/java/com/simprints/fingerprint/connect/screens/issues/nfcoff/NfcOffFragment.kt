@@ -12,6 +12,7 @@ import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentNfcOffBinding
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.NfcManager
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,6 +44,7 @@ internal class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         screenReporter.reportNfcNotEnabled()
 
         if (!nfcManager.doesDeviceHaveNfcCapability()) {

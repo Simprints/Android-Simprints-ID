@@ -15,6 +15,7 @@ import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.fetchsubject.R
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -30,6 +31,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("FetchSubjectFragment started", tag = ORCHESTRATION)
 
         with(findNavController()) {
@@ -62,7 +64,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
     private fun handleFetchState(state: FetchSubjectState) = when (state) {
         FetchSubjectState.FoundLocal,
         FetchSubjectState.FoundRemote,
-        -> finishWithResult(true)
+            -> finishWithResult(true)
 
         FetchSubjectState.NotFound -> openAlert(FetchSubjectAlerts.subjectNotFoundOnline().toArgs())
         FetchSubjectState.ConnectionError -> openAlert(FetchSubjectAlerts.subjectNotFoundOffline().toArgs())

@@ -17,6 +17,7 @@ import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.R
@@ -51,6 +52,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("MatchFragment started (isFace=${args.params.isFaceMatch()})", tag = ORCHESTRATION)
 
         observeViewModel()

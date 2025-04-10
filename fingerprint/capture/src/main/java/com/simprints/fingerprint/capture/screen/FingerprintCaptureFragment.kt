@@ -44,6 +44,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTUR
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -79,6 +80,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("FingerprintCaptureFragment started", tag = ORCHESTRATION)
 
         findNavController().handleResult<AlertResult>(

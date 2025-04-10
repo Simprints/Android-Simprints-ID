@@ -12,6 +12,7 @@ import com.simprints.feature.consent.R
 import com.simprints.feature.consent.databinding.FragmentPrivacyBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -26,6 +27,7 @@ internal class PrivacyNoticeFragment : Fragment(R.layout.fragment_privacy) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("PrivacyNoticeFragment started", tag = ORCHESTRATION)
 
         binding.privacyText.movementMethod = ScrollingMovementMethod()

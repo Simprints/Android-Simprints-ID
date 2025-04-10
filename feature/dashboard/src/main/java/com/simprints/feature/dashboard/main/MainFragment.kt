@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.feature.dashboard.BuildConfig
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentMainBinding
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,7 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         binding.dashboardToolbar.setOnMenuItemClickListener {
             menuItemClicked(it)
         }

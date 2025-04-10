@@ -16,6 +16,7 @@ import com.simprints.feature.exitform.databinding.FragmentExitFormBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.listeners.TextWatcherOnChangeListener
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -36,6 +37,7 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("ExitFormFragment started", tag = ORCHESTRATION)
 
         binding.exitFormTitle.setText(IDR.string.exit_form_title)

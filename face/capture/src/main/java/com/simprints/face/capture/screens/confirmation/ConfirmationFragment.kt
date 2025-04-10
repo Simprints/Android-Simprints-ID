@@ -12,6 +12,7 @@ import com.simprints.face.capture.databinding.FragmentConfirmationBinding
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -36,6 +37,8 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
+
         Simber.i("ConfirmationFragment started", tag = ORCHESTRATION)
         startTime = faceTimeHelper.now()
 

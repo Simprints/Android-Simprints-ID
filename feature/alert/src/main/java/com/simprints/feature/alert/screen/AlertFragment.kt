@@ -21,6 +21,7 @@ import com.simprints.feature.alert.databinding.FragmentAlertBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ALERT
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.setResult
 import com.simprints.infra.uibase.system.Clipboard
 import com.simprints.infra.uibase.view.setTextWithFallbacks
@@ -39,6 +40,7 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("AlertFragment started", tag = ORCHESTRATION)
 
         val config = args.alertConfiguration
