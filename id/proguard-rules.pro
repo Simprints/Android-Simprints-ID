@@ -55,8 +55,8 @@
     public <init>(java.lang.reflect.Type);
 }
 
-#net.zetetic:android-database-sqlcipher
--keep class net.sqlcipher.** { *; }
+#net.zetetic:android-sqlcipher
+-keep class net.zetetic.database.sqlcipher.** { *; }
 
 # Dont warn about the missing files during the obfuscation
 -dontwarn com.simprints.**
