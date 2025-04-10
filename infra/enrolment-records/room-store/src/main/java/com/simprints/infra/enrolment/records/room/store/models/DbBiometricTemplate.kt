@@ -4,11 +4,12 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.FORMAT_COLUMN
+import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.FORMAT_COLUMN
+import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.TEMPLATE_TABLE_NAME
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_ID_COLUMN
 
 @Entity(
-    tableName = "DbFingerprintSample",
+    tableName = TEMPLATE_TABLE_NAME,
     foreignKeys = [
         ForeignKey(
             entity = DbSubject::class,
@@ -18,20 +19,22 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
         ),
     ],
     indices = [
-        Index(value = [FORMAT_COLUMN]),
-        Index(value = [SUBJECT_ID_COLUMN]),
-
+        Index(value = [SUBJECT_ID_COLUMN, FORMAT_COLUMN]),
     ],
 )
 @Suppress("ArrayInDataClass")
-data class DbFingerprintSample(
-    //  Auto-incrementing key for pagination
-    @PrimaryKey(autoGenerate = true)
-    val rowId: Long = 0, // This field is automatically assigned by Room
+data class DbBiometricTemplate(
+    @PrimaryKey
     val uuid: String = "",
     val subjectId: String = "",
-    val fingerIdentifier: Int = 0,
-    val template: ByteArray = byteArrayOf(),
+    val identifier: Int? = null, // e.g the finger number or other identifier for the biometric
+    val templateData: ByteArray = byteArrayOf(),
     val format: String = "",
     val referenceId: String = "",
-)
+    val modality: Int = Modality.FINGERPRINT.id,
+) {
+    companion object {
+        const val TEMPLATE_TABLE_NAME = "DbBiometricTemplate"
+        const val FORMAT_COLUMN = "format"
+    }
+}

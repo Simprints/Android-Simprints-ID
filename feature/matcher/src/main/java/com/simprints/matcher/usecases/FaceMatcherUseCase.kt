@@ -15,6 +15,9 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import javax.inject.Inject
@@ -57,22 +60,26 @@ internal class FaceMatcherUseCase @Inject constructor(
         // However, when using CommCare as data source, loadedCandidates < expectedCandidates
         // as it's count function does not take into account filtering criteria
         var loadedCandidates = 0
-        val resultItems =
+        val resultItems = coroutineScope {
             createRanges(expectedCandidates)
                 .map { range ->
-                    val batchCandidates = getCandidates(
-                        queryWithSupportedFormat,
-                        range,
-                        project = project,
-                        dataSource = matchParams.biometricDataSource,
-                    ) {
-                        // When a candidate is loaded
-                        loadedCandidates++
-                        trySend(MatcherState.CandidateLoaded)
+                    async(dispatcher) {
+                        val batchCandidates = getCandidates(
+                            queryWithSupportedFormat,
+                            range,
+                            project = project,
+                            dataSource = matchParams.biometricDataSource,
+                        ) {
+                            // When a candidate is loaded
+                            loadedCandidates++
+                            trySend(MatcherState.CandidateLoaded)
+                        }
+                        bioSdk.createMatcher(samples).use { match(it, batchCandidates) }
                     }
-                    bioSdk.createMatcher(samples).use { match(it, batchCandidates) }
-                }.reduce { acc, subSet -> acc.addAll(subSet) }
+                }.awaitAll()
+                .reduce { acc, subSet -> acc.addAll(subSet) }
                 .toList()
+        }
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
 

@@ -3,19 +3,52 @@ package com.simprints.infra.enrolment.records.room.store.models
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.ATTENDANT_ID_COLUMN
-import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.MODULE_ID_COLUMN
-import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.PROJECT_ID_COLUMN
-import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_ID_COLUMN
+import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_TABLE_NAME
 import java.util.UUID
 
+/**
+ * Represents a Subject entry in the local database.
+ *
+ * Indexes are crucial for query performance, especially for large datasets.
+ * The indexes defined here are chosen based on the common query patterns observed
+ * in SubjectDao, particularly the frequent use of projectId, filtering by either
+ * moduleId or attendantId, and the ordering requirements of the loadSamples query.
+ *
+ * Note: Indexes speed up read operations (SELECT) but can slightly slow down
+ * write operations (INSERT, UPDATE, DELETE) and consume additional storage space.
+ */
 @Entity(
-    tableName = "DbSubject",
+    tableName = SUBJECT_TABLE_NAME,
     indices = [
-        Index(value = [SUBJECT_ID_COLUMN]),
-        Index(value = [PROJECT_ID_COLUMN]),
-        Index(value = [ATTENDANT_ID_COLUMN]),
-        Index(value = [MODULE_ID_COLUMN]),
+        // --- Primary Indexes based on Dominant Query Patterns ---
+        // These indexes are designed to cover the most frequent and performance-critical queries.
+
+        /**
+         * Index for queries filtering by Project ID and Module ID, ordered by creation date.
+         * - `projectId` is first because it's always included in WHERE clauses.
+         * - `moduleId` is second to support filtering by project AND module.
+         * - `createdAt` is last to efficiently handle `ORDER BY createdAt` for pagination
+         * (like in `loadSamples`) after filtering by project/module.
+         * Covers queries like: WHERE projectId = ? AND moduleId = ? ORDER BY createdAt
+         */
+        Index(value = [DbSubject.PROJECT_ID_COLUMN, DbSubject.MODULE_ID_COLUMN, DbSubject.CREATED_AT_COLUMN]),
+
+        /**
+         * Index for queries filtering by Project ID and Attendant ID, ordered by creation date.
+         * - `projectId` is first (always present in filters).
+         * - `attendantId` is second to support filtering by project AND attendant.
+         * - `createdAt` is last for efficient `ORDER BY createdAt` after filtering.
+         * Covers queries like: WHERE projectId = ? AND attendantId = ? ORDER BY createdAt
+         */
+        Index(value = [DbSubject.PROJECT_ID_COLUMN, DbSubject.ATTENDANT_ID_COLUMN, DbSubject.CREATED_AT_COLUMN]),
+
+        /**
+         * : Index solely on Project ID.
+         * Useful for frequent queries filtering *only* by projectId.
+         * Covers queries like: WHERE projectId = ?
+         */
+        Index(value = [DbSubject.PROJECT_ID_COLUMN, DbSubject.CREATED_AT_COLUMN]),
+
     ],
 )
 data class DbSubject(
@@ -26,14 +59,16 @@ data class DbSubject(
     val moduleId: String = "",
     val createdAt: Long? = 0,
     val updatedAt: Long? = 0,
-    val isAttendantIdTokenized: Boolean = false,
-    val isModuleIdTokenized: Boolean = false,
 ) {
+    /**
+     * Companion object holding constants for column names.
+     */
     companion object {
+        const val SUBJECT_TABLE_NAME = "DbSubject"
         const val SUBJECT_ID_COLUMN = "subjectId"
         const val PROJECT_ID_COLUMN = "projectId"
         const val ATTENDANT_ID_COLUMN = "attendantId"
         const val MODULE_ID_COLUMN = "moduleId"
-        const val FORMAT_COLUMN = "format"
+        const val CREATED_AT_COLUMN = "createdAt"
     }
 }

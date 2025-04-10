@@ -4,10 +4,11 @@ import android.content.Context
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.text.toByteArray
 
 @Singleton
 class SubjectsDatabaseFactory @Inject constructor(
@@ -30,8 +31,8 @@ class SubjectsDatabaseFactory @Inject constructor(
     @OptIn(ExperimentalStdlibApi::class)
     private fun build(): SubjectsDatabase = try {
         val key = getOrCreateKey()
-        val passphrase: ByteArray = SQLiteDatabase.getBytes(key)
-        val factory = SupportFactory(passphrase)
+        val passphrase: ByteArray = key.toByteArray(Charset.forName("UTF-8"))
+        val factory = SupportOpenHelperFactory(passphrase)
         SubjectsDatabase.getDatabase(
             ctx,
             factory,
@@ -42,13 +43,13 @@ class SubjectsDatabaseFactory @Inject constructor(
         throw t
     }
 
-    private fun getOrCreateKey(): CharArray = try {
+    private fun getOrCreateKey() = try {
         secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DB_NAME)
     } catch (t: Throwable) {
         t.message?.let { Simber.d(it) }
         secureLocalDbKeyProvider.createLocalDatabaseKeyIfMissing(DB_NAME)
         secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DB_NAME)
-    }.value.decodeToString().toCharArray()
+    }.value.decodeToString()
 
     companion object {
         private const val DB_NAME = "db-subjects"
