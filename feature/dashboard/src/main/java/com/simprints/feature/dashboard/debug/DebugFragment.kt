@@ -19,6 +19,7 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -57,6 +58,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
 
         eventSyncManager.getLastSyncState().observe(viewLifecycleOwner) { state ->
             val states =

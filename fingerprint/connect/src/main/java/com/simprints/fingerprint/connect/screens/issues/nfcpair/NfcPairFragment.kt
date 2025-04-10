@@ -24,6 +24,7 @@ import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcTag
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -67,6 +68,7 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         screenReporter.reportNfcPairing()
 
         setupScannerPhoneTappingAnimation()

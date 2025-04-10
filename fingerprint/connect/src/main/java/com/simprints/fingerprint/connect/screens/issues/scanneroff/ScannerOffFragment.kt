@@ -12,6 +12,7 @@ import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentScannerOffBinding
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -33,6 +34,7 @@ internal class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         screenReporter.reportScannerOff()
 
         binding.tryAgainButton.setOnClickListener {
