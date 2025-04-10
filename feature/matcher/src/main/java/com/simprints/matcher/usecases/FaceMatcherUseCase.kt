@@ -1,6 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.core.DispatcherBG
+import com.simprints.core.DispatcherIO
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
@@ -15,15 +16,22 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 internal class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
@@ -57,27 +65,40 @@ internal class FaceMatcherUseCase @Inject constructor(
         // However, when using CommCare as data source, loadedCandidates < expectedCandidates
         // as it's count function does not take into account filtering criteria
         var loadedCandidates = 0
-        val resultItems =
-            createRanges(expectedCandidates)
-                .map { range ->
-                    val batchCandidates = getCandidates(
-                        queryWithSupportedFormat,
-                        range,
-                        project = project,
-                        dataSource = matchParams.biometricDataSource,
-                    ) {
-                        // When a candidate is loaded
-                        loadedCandidates++
-                        trySend(MatcherState.CandidateLoaded)
+        val numWorkers = Runtime.getRuntime().availableProcessors()
+        val channel = Channel<List<FaceIdentity>>(numWorkers)
+        val resultSet = MatchResultSet<FaceMatchResult.Item>()
+        val mutex = Mutex()
+        // Producer(s) - single or multiple
+        val producer = launch(dispatcherIO) {
+            for (range in createRanges(expectedCandidates)) {
+                val batch = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource, project) {
+                    trySend(MatcherState.CandidateLoaded)
+                    loadedCandidates++
+                }
+
+                channel.send(batch)
+            }
+            channel.close()
+        }
+
+        val consumers = List(numWorkers) {
+            launch(dispatcherBG) {
+                for (batchCandidates in channel) {
+                    val subSet = bioSdk.createMatcher(samples).use { match(it, batchCandidates) }
+                    // Merge results safely
+                    mutex.withLock {
+                        resultSet.addAll(subSet)
                     }
-                    bioSdk.createMatcher(samples).use { match(it, batchCandidates) }
-                }.reduce { acc, subSet -> acc.addAll(subSet) }
-                .toList()
+                }
+            }
+        }
+        // Wait for all
+        producer.join()
+        consumers.joinAll()
 
-        Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
-
-        send(MatcherState.Success(resultItems, loadedCandidates, bioSdk.matcherName))
-    }
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates, bioSdk.matcherName))
+    }.flowOn(dispatcherBG)
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
 

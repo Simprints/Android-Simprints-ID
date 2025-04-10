@@ -24,9 +24,8 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
 )
 @Suppress("ArrayInDataClass")
 data class DbFaceSample(
-    //  Auto-incrementing key for pagination
     @PrimaryKey(autoGenerate = true)
-    val rowId: Long = 0, // This field is automatically assigned by Room
+    val id: Long = 0,
     val uuid: String = "",
     val subjectId: String = "",
     val template: ByteArray = byteArrayOf(),

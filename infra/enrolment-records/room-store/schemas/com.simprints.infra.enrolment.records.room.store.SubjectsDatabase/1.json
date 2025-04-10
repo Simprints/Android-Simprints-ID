@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f2e5005e3569ee84f0bd388c5485c5bf",
+    "identityHash": "acef29530da90cfe36824b55b7ef4952",
     "entities": [
       {
         "tableName": "DbSubject",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`subjectId` TEXT NOT NULL, `projectId` TEXT NOT NULL, `attendantId` TEXT NOT NULL, `moduleId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `isAttendantIdTokenized` INTEGER NOT NULL, `isModuleIdTokenized` INTEGER NOT NULL, PRIMARY KEY(`subjectId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`subjectId` TEXT NOT NULL, `projectId` TEXT NOT NULL, `attendantId` TEXT NOT NULL, `moduleId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`subjectId`))",
         "fields": [
           {
             "fieldPath": "subjectId",
@@ -43,18 +43,6 @@
             "columnName": "updatedAt",
             "affinity": "INTEGER",
             "notNull": false
-          },
-          {
-            "fieldPath": "isAttendantIdTokenized",
-            "columnName": "isAttendantIdTokenized",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isModuleIdTokenized",
-            "columnName": "isModuleIdTokenized",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -99,17 +87,26 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_DbSubject_moduleId` ON `${TABLE_NAME}` (`moduleId`)"
+          },
+          {
+            "name": "index_DbSubject_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbSubject_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
           }
         ],
         "foreignKeys": []
       },
       {
         "tableName": "DbFingerprintSample",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rowId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `fingerIdentifier` INTEGER NOT NULL, `template` BLOB NOT NULL, `format` TEXT NOT NULL, `referenceId` TEXT NOT NULL, FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `fingerIdentifier` INTEGER NOT NULL, `template` BLOB NOT NULL, `format` TEXT NOT NULL, `referenceId` TEXT NOT NULL, FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
-            "fieldPath": "rowId",
-            "columnName": "rowId",
+            "fieldPath": "id",
+            "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -153,27 +150,19 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "rowId"
+            "id"
           ]
         },
         "indices": [
           {
-            "name": "index_DbFingerprintSample_format",
+            "name": "index_DbFingerprintSample_format_subjectId",
             "unique": false,
             "columnNames": [
-              "format"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbFingerprintSample_format` ON `${TABLE_NAME}` (`format`)"
-          },
-          {
-            "name": "index_DbFingerprintSample_subjectId",
-            "unique": false,
-            "columnNames": [
+              "format",
               "subjectId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbFingerprintSample_subjectId` ON `${TABLE_NAME}` (`subjectId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbFingerprintSample_format_subjectId` ON `${TABLE_NAME}` (`format`, `subjectId`)"
           }
         ],
         "foreignKeys": [
@@ -192,11 +181,11 @@
       },
       {
         "tableName": "DbFaceSample",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rowId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `template` BLOB NOT NULL, `format` TEXT NOT NULL, `referenceId` TEXT NOT NULL, FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `template` BLOB NOT NULL, `format` TEXT NOT NULL, `referenceId` TEXT NOT NULL, FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
-            "fieldPath": "rowId",
-            "columnName": "rowId",
+            "fieldPath": "id",
+            "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -234,7 +223,7 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "rowId"
+            "id"
           ]
         },
         "indices": [
@@ -270,12 +259,67 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "DbSubjectTemplateFormatMap",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `subjectId` TEXT NOT NULL, `format` TEXT NOT NULL, FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subjectId",
+            "columnName": "subjectId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "format",
+            "columnName": "format",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_DbSubjectTemplateFormatMap_subjectId_format",
+            "unique": false,
+            "columnNames": [
+              "subjectId",
+              "format"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbSubjectTemplateFormatMap_subjectId_format` ON `${TABLE_NAME}` (`subjectId`, `format`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "DbSubject",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "subjectId"
+            ],
+            "referencedColumns": [
+              "subjectId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f2e5005e3569ee84f0bd388c5485c5bf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'acef29530da90cfe36824b55b7ef4952')"
     ]
   }
 }

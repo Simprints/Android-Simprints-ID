@@ -8,7 +8,7 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_ID_COLUMN
 
 @Entity(
-    tableName = "DbFingerprintSample",
+    tableName = "DbSubjectTemplateFormatMap",
     foreignKeys = [
         ForeignKey(
             entity = DbSubject::class,
@@ -18,17 +18,12 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
         ),
     ],
     indices = [
-        Index(value = [FORMAT_COLUMN,SUBJECT_ID_COLUMN]),
+        Index(value = [SUBJECT_ID_COLUMN, FORMAT_COLUMN]),
     ],
 )
-@Suppress("ArrayInDataClass")
-data class DbFingerprintSample(
+data class DbSubjectTemplateFormatMap(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val uuid: String = "",
-    val subjectId: String = "",
-    val fingerIdentifier: Int = 0,
-    val template: ByteArray = byteArrayOf(),
-    val format: String = "",
-    val referenceId: String = "",
+    val subjectId: String,
+    val format: String,
 )

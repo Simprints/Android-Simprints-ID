@@ -8,12 +8,18 @@ import androidx.room.RoomDatabase
 import com.simprints.infra.enrolment.records.room.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.room.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
+import com.simprints.infra.enrolment.records.room.store.models.DbSubjectTemplateFormatMap
 import net.sqlcipher.database.SupportFactory
 import javax.inject.Singleton
 
 @Singleton
 @Database(
-    entities = [DbSubject::class, DbFingerprintSample::class, DbFaceSample::class],
+    entities = [
+        DbSubject::class,
+        DbFingerprintSample::class,
+        DbFaceSample::class,
+        DbSubjectTemplateFormatMap::class,
+    ],
     version = 1,
     exportSchema = true,
 )

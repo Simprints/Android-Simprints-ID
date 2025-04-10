@@ -16,9 +16,9 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource.Companion.FORMAT_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FORMAT_FIELD
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
 import io.mockk.CapturingSlot
@@ -249,7 +249,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         every { realmSingleQuery.find() } returns null
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
+            listOf(SubjectAction.Creation(subject.toDomain())),
             project,
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
@@ -266,7 +266,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 fingerprintSamples = listOf(
                     getRandomFingerprintSample("fingerToDelete"),
                 ),
-            ).fromDomainToDb()
+            ).toRealmDb()
         val subject = getFakePerson()
 
         enrolmentRecordLocalDataSource.performActions(
@@ -294,7 +294,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 getRandomFingerprintSample(referenceId = "fingerToDelete"),
                 getRandomFingerprintSample(),
             ),
-        ).fromDomainToDb()
+        ).toRealmDb()
 
         enrolmentRecordLocalDataSource.performActions(
             listOf(
