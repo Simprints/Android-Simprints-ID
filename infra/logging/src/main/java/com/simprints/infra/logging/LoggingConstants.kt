@@ -39,6 +39,7 @@ object LoggingConstants {
         SETTINGS,
         ALERT,
         REALM_DB,
+        ROOM_RECORDS_DB,
         DB_CORRUPTION,
         ENROLMENT,
         APP_SCOPE_ERROR,
