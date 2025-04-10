@@ -4,8 +4,8 @@ import android.content.Context
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import net.sqlcipher.database.SQLiteDatabase.getBytes
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,8 +26,8 @@ internal class EventDatabaseFactory @Inject constructor(
     private fun build() {
         try {
             val key = getOrCreateKey(DB_NAME)
-            val passphrase: ByteArray = getBytes(key)
-            val factory = SupportFactory(passphrase)
+            val passphrase: ByteArray = key.toByteArray(Charset.forName("UTF-8"))
+            val factory = SupportOpenHelperFactory(passphrase)
             eventDatabase = EventRoomDatabase.getDatabase(
                 ctx,
                 factory,
@@ -41,13 +41,13 @@ internal class EventDatabaseFactory @Inject constructor(
 
     private fun getOrCreateKey(
         @Suppress("SameParameterValue") dbName: String,
-    ): CharArray = try {
+    ) = try {
         securityManager.getLocalDbKeyOrThrow(dbName)
     } catch (t: Throwable) {
         t.message?.let { Simber.d(it) }
         securityManager.createLocalDatabaseKeyIfMissing(dbName)
         securityManager.getLocalDbKeyOrThrow(dbName)
-    }.value.decodeToString().toCharArray()
+    }.value.decodeToString()
 
     fun recreateDatabase() {
         // DB corruption detected; either DB file or key is corrupt
