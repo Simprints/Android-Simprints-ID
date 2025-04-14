@@ -27,7 +27,7 @@ internal class CommCareEventDataSource @Inject constructor(
 ) {
     suspend fun getEvents(): CommCareEventSyncResult {
         val totalCount = count()
-        val eventFlow = loadEnrolmentRecordCreationEvents()
+        val eventFlow = loadEnrolmentRecordCreationEventsBySubjectActions()
 
         return CommCareEventSyncResult(
             totalCount = totalCount,
@@ -89,14 +89,39 @@ internal class CommCareEventDataSource @Inject constructor(
             }
     }
 
-    private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
-        Simber.d("Start looking for subjectActions", tag = "CommCareSync")
-        while (caseDataCursor.moveToNext()) {
-            val key = caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID))
-            if (key == SIMPRINTS_COSYNC_SUBJECT_ACTIONS) {
-                Simber.d("Found subjectActions", tag = "CommCareSync")
-                return caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_VALUE))
+    private fun loadEnrolmentRecordCreationEventsBySubjectActions(): Flow<EnrolmentRecordCreationEvent> = flow {
+        // Access Case Data Listing for the caseId
+        val caseDataUri = Uri
+            .parse("content://$CALLER_PACKAGE_NAME.case/casedb/data/123")
+            .buildUpon()
+            .appendQueryParameter("mode", "property_filter")
+            .appendQueryParameter("property_name", SIMPRINTS_COSYNC_SUBJECT_ACTIONS)
+            .build()
+
+        context.contentResolver
+            .query(caseDataUri, null, null, null, null)
+            ?.use { caseDataCursor ->
+                while (caseDataCursor.moveToNext()) {
+                    var subjectActions = getSubjectActionsValue(caseDataCursor)
+                    Simber.d(subjectActions)
+                    val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
+
+                    coSyncEnrolmentRecordEvents
+                        ?.events
+                        ?.filterIsInstance<EnrolmentRecordCreationEvent>()
+                        ?.forEach { emit(it) }
+                }
             }
+    }
+
+    private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
+//        Simber.d("Start looking for subjectActions", tag = "CommCareSync")
+//        while (caseDataCursor.moveToNext()) {
+        val key = caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID))
+        if (key == SIMPRINTS_COSYNC_SUBJECT_ACTIONS) {
+//            Simber.d("Found subjectActions", tag = "CommCareSync")
+            return caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_VALUE))
+//            }
         }
         Simber.d("No subjectActions found", tag = "CommCareSync")
         return ""
