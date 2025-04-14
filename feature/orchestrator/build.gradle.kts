@@ -25,6 +25,8 @@ dependencies {
 
     implementation(project(":face:capture"))
 
+    implementation(project(":document:capture"))
+
     implementation(project(":fingerprint:connect"))
     implementation(project(":fingerprint:capture"))
 

@@ -193,6 +193,10 @@
     <string name="face_capture_recapture_button">Recapture</string>
     <string name="face_capture_finish_button">Tap to continue</string>
 
+    <!-- Document capture -->
+    <string name="document_capture_onboarding_fill">Place the document in the frame.</string>
+    <string name="document_capture_title">Document has been captured.</string>
+
     <!-- Fingerprint connect -->
     <string name="fingerprint_connect_error_title">Error occurred</string>
     <string name="fingerprint_connect_unexpected_error_message">Please try again and if Simprints does not work contact your system administrator</string>

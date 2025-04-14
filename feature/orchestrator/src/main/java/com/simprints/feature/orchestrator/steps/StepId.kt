@@ -26,4 +26,9 @@ internal object StepId {
     private const val STEP_BASE_FACE = 500
     const val FACE_CAPTURE = STEP_BASE_FACE + 2
     const val FACE_MATCHER = STEP_BASE_FACE + 3
+
+    // Document step ids
+    private const val STEP_BASE_DOCUMENT = 700
+    const val DOCUMENT_CAPTURE = STEP_BASE_DOCUMENT + 2
+    const val DOCUMENT_MATCHER = STEP_BASE_DOCUMENT + 3
 }

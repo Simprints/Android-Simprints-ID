@@ -18,6 +18,8 @@ dependencies {
 
     implementation(project(":face:infra:bio-sdk-resolver"))
 
+    implementation(project(":document:infra:document-sdk-resolver"))
+
     implementation(project(":fingerprint:infra:bio-sdk"))
     implementation(project(":infra:auth-store"))
 }

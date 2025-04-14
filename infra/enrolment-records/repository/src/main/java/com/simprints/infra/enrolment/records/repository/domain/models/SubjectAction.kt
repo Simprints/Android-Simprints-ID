@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.document.DocumentSample
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 
@@ -14,6 +15,7 @@ sealed class SubjectAction {
         val subjectId: String,
         val faceSamplesToAdd: List<FaceSample>,
         val fingerprintSamplesToAdd: List<FingerprintSample>,
+        val documentSamplesToAdd: List<DocumentSample>,
         val referenceIdsToRemove: List<String>,
     ) : SubjectAction()
 

@@ -33,6 +33,7 @@ object LoggingConstants {
         SESSION,
         FINGER_CAPTURE,
         FACE_CAPTURE,
+        DOCUMENT_CAPTURE,
         FINGER_MATCHING,
         FACE_MATCHING,
         LICENSE,

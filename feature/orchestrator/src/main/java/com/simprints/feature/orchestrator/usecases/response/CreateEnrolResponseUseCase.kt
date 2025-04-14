@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.document.capture.DocumentCaptureResult
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
@@ -25,6 +26,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
     ): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
+        val documentCapture = results.filterIsInstance(DocumentCaptureResult::class.java).lastOrNull()
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(
@@ -33,6 +35,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
                 moduleId = request.moduleId,
                 fingerprintResponse = fingerprintCapture,
                 faceResponse = faceCapture,
+                documentResponse = documentCapture,
             )
             enrolSubject(subject, project)
 

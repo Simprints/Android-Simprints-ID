@@ -1,10 +1,12 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.matcher.DocumentMatchResult
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
@@ -25,14 +27,17 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         val fingerprintResults = getFingerprintResults(results, projectConfiguration)
         val bestFingerprintConfidence = fingerprintResults.firstOrNull()?.confidenceScore ?: 0
 
+        val documentResults = getDocumentMatchResults(results, projectConfiguration)
+        val bestDocumentConfidence = documentResults.firstOrNull()?.confidenceScore ?: 0
+
         return AppIdentifyResponse(
             sessionId = currentSessionId,
             // Return the results with the highest confidence score
-            identifications = if (bestFingerprintConfidence > bestFaceConfidence) {
-                fingerprintResults
-            } else {
-                faceResults
-            },
+            identifications = listOf(
+                faceResults to bestFaceConfidence,
+                fingerprintResults to bestFingerprintConfidence,
+                documentResults to bestDocumentConfidence,
+            ).maxByOrNull { (results, score) -> score }?.let { (results, score) -> results } ?: emptyList(),
         )
     }
 
@@ -73,5 +78,16 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
                 .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
                 .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
         }
+    } ?: emptyList()
+
+    private fun getDocumentMatchResults(
+        results: List<Serializable>,
+        projectConfiguration: ProjectConfiguration,
+    ) = results.filterIsInstance<DocumentMatchResult>().lastOrNull()?.let { documentMatchResult ->
+        // todo add decision policy to document modality and use it
+        documentMatchResult.results
+            .sortedByDescending { it.confidence }
+            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+            .map { AppMatchResult(it.subjectId, it.confidence, DecisionPolicy(0, 0, 1)) }
     } ?: emptyList()
 }

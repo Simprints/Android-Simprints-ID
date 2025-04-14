@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_MATCHING
 import com.simprints.infra.logging.Simber
@@ -8,6 +9,7 @@ import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
+import com.simprints.matcher.DocumentMatchResult
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
@@ -20,6 +22,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
     ): AppResponse = listOfNotNull(
         getFingerprintMatchResults(projectConfiguration, results),
         getFaceMatchResults(projectConfiguration, results),
+        getDocumentMatchResults(projectConfiguration, results),
     ).maxByOrNull { it.confidenceScore }
         ?.let { AppVerifyResponse(it) }
         ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR).also {
@@ -69,5 +72,25 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
                         )
                     }
             }
+        }
+
+    private fun getDocumentMatchResults(
+        projectConfiguration: ProjectConfiguration,
+        results: List<Serializable>,
+    ) = results
+        .filterIsInstance<DocumentMatchResult>()
+        .lastOrNull()
+        ?.let { documentMatchResult ->
+            // todo add decision policy to document modality and use it
+            documentMatchResult.results
+                .maxByOrNull { it.confidence }
+                ?.let {
+                    AppMatchResult(
+                        guid = it.subjectId,
+                        confidenceScore = it.confidence,
+                        decisionPolicy = DecisionPolicy(0, 0, 1),
+                        verificationMatchThreshold = 0f,
+                    )
+                }
         }
 }

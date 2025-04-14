@@ -95,6 +95,14 @@ include(
     ":face:infra:roc-v3",
 )
 
+// Document modality modules
+include(
+    ":document:capture",
+    ":document:infra:base-document-sdk",
+    ":document:infra:document-sdk-resolver",
+    ":document:infra:mlkit",
+)
+
 // Feature modules
 include(
     ":feature:orchestrator",

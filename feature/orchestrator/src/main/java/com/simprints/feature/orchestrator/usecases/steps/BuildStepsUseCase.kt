@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.usecases.steps
 
 import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowType
+import com.simprints.document.capture.DocumentCaptureContract
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
@@ -317,6 +318,7 @@ internal class BuildStepsUseCase @Inject constructor(
         cache.ageGroup = ageGroup
 
         return capturingModalitiesForFlowType(projectConfiguration, flowType)
+            .let { listOf(Modality.DOCUMENT) } // Forced as part of Document Modality PoC // todo implement in config and remove
             .flatMap { modality ->
                 buildCaptureStepsForModality(modality, projectConfiguration, ageGroup, flowType)
             }.takeIf { it.isNotEmpty() } ?: projectConfiguration.general.modalities.flatMap { modality ->
@@ -376,6 +378,18 @@ internal class BuildStepsUseCase @Inject constructor(
                 )
             }
         }
+
+        Modality.DOCUMENT -> {
+            // Document modality SDK selection omitted. Single SDK. // todo implement document modality SDK selection
+            listOf(
+                Step(
+                    id = StepId.DOCUMENT_CAPTURE,
+                    navigationActionId = R.id.action_orchestratorFragment_to_documentCapture,
+                    destinationId = DocumentCaptureContract.DESTINATION,
+                    payload = DocumentCaptureContract.getArgs(),
+                )
+            )
+        }
     }
 
     /**
@@ -391,6 +405,7 @@ internal class BuildStepsUseCase @Inject constructor(
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
     ): List<Step> = projectConfiguration.general.matchingModalities
+        .let { listOf(Modality.DOCUMENT) } // Forced as part of Document Modality PoC // todo implement in config and remove
         .flatMap { modality ->
             buildMatcherStepsForModality(modality, projectConfiguration, ageGroup, flowType, subjectQuery, biometricDataSource)
         }.takeIf { it.isNotEmpty() } ?: projectConfiguration.general.modalities.flatMap { modality ->
@@ -435,6 +450,22 @@ internal class BuildStepsUseCase @Inject constructor(
                     ),
                 )
             }
+        }
+
+        Modality.DOCUMENT -> {
+            // Document modality SDK selection omitted. Single SDK. // todo implement document modality SDK selection
+            listOf(
+                Step(
+                    id = StepId.DOCUMENT_MATCHER,
+                    navigationActionId = R.id.action_orchestratorFragment_to_matcher,
+                    destinationId = MatchContract.DESTINATION,
+                    payload = MatchStepStubPayload.asBundle(
+                        flowType,
+                        subjectQuery,
+                        biometricDataSource,
+                    ),
+                )
+            )
         }
     }
 

@@ -22,6 +22,7 @@ class DbSubject : RealmObject {
 
     var fingerprintSamples: RealmList<DbFingerprintSample> = realmListOf()
     var faceSamples: RealmList<DbFaceSample> = realmListOf()
+    var documentSamples: RealmList<DbDocumentSample> = realmListOf()
 
     var isAttendantIdTokenized: Boolean = false
     var isModuleIdTokenized: Boolean = false

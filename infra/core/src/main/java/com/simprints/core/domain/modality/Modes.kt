@@ -6,4 +6,5 @@ import androidx.annotation.Keep
 enum class Modes {
     FINGERPRINT,
     FACE,
+    DOCUMENT,
 }

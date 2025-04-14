@@ -70,6 +70,7 @@ class SubjectFactory @Inject constructor(
         moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResult?,
         faceResponse: FaceCaptureResult?,
+        documentResponse: DocumentCaptureResult?,
     ): Subject {
         val subjectId = UUID.randomUUID().toString()
         return buildSubject(

@@ -30,6 +30,17 @@ data class FaceMatchResult(
 }
 
 @Keep
+data class DocumentMatchResult(
+    override val results: List<MatchResultItem>,
+) : MatchResult {
+    @Keep
+    data class Item(
+        override val subjectId: String,
+        override val confidence: Float,
+    ) : MatchResultItem
+}
+
+@Keep
 data class FingerprintMatchResult(
     override val results: List<MatchResultItem>,
     val sdk: FingerprintConfiguration.BioSdk,

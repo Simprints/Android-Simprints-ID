@@ -13,11 +13,13 @@ data class GeneralConfiguration(
 ) {
     enum class Modality {
         FACE,
+        DOCUMENT,
         FINGERPRINT,
         ;
 
         fun toMode(): Modes = when (this) {
             FACE -> Modes.FACE
+            DOCUMENT -> Modes.DOCUMENT
             FINGERPRINT -> Modes.FINGERPRINT
         }
     }
