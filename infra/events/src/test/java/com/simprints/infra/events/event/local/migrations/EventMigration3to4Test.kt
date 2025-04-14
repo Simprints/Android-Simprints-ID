@@ -53,7 +53,7 @@ class EventMigration3to4Test {
         setupV3DbWithEvent(randomUUID())
         helper.runMigrationsAndValidate(TEST_DB, 4, true, migrationSpy)
 
-        verify(exactly = 1) { migrationSpy.migrate(any()) }
+        verify(exactly = 1) { migrationSpy.migrate(any<SupportSQLiteDatabase>()) }
         verify(exactly = 1) { migrationSpy.migrateConnectivityEvents(any()) }
     }
 

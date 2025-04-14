@@ -52,7 +52,7 @@ class EventMigration5to6Test {
         setupV5DbWithEvent(randomUUID())
         helper.runMigrationsAndValidate(TEST_DB, 6, true, migrationSpy)
 
-        verify(exactly = 1) { migrationSpy.migrate(any()) }
+        verify(exactly = 1) { migrationSpy.migrate(any<SupportSQLiteDatabase>()) }
         verify(exactly = 1) { migrationSpy.migrateConnectivityEvents(any()) }
     }
 
