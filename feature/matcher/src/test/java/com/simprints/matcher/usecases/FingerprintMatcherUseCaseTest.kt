@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -16,9 +16,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -66,6 +64,7 @@ internal class FingerprintMatcherUseCaseTest {
             resolveBioSdkWrapperUseCase,
             configManager,
             createRangesUseCase,
+            testCoroutineRule.testCoroutineDispatcher,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
