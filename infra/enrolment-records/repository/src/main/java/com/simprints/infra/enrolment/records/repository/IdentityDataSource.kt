@@ -5,6 +5,15 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 
 interface IdentityDataSource {
     suspend fun count(
@@ -12,19 +21,47 @@ interface IdentityDataSource {
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
 
-    suspend fun loadFingerprintIdentities(
+    fun loadFingerprintIdentities(
         query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity>
+    ): ReceiveChannel<List<FingerprintIdentity>>
 
-    suspend fun loadFaceIdentities(
+    fun loadFaceIdentities(
         query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity>
+    ): ReceiveChannel<List<FaceIdentity>>
+
+    /**
+     * Loads identities concurrently using the provided dispatcher and parallelism level.
+     *
+     */
+    fun <T> loadIdentitiesConcurrently(
+        ranges: List<IntRange>,
+        dispatcher: CoroutineDispatcher,
+        parallelism: Int,
+        load: suspend (IntRange) -> List<T>,
+    ): ReceiveChannel<List<T>> {
+        val channel = Channel<List<T>>(parallelism)
+        val scope = CoroutineScope(dispatcher + SupervisorJob())
+        val semaphore = Semaphore(parallelism)
+
+        scope.launch {
+            ranges
+                .map { range ->
+                    launch {
+                        semaphore.withPermit {
+                            channel.send(load(range))
+                        }
+                    }
+                }.joinAll()
+            channel.close()
+        }
+        return channel
+    }
 }

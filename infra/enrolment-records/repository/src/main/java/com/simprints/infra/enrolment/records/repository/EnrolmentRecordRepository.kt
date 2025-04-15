@@ -3,8 +3,6 @@ package com.simprints.infra.enrolment.records.repository
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
 
@@ -18,20 +16,4 @@ interface EnrolmentRecordRepository : EnrolmentRecordLocalDataSource {
         query: SubjectQuery,
         dataSource: BiometricDataSource,
     ): Int
-
-    override suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource,
-        project: Project,
-        onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity>
-
-    override suspend fun loadFaceIdentities(
-        query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource,
-        project: Project,
-        onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity>
 }
