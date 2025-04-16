@@ -1,6 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.core.DispatcherBG
+import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
@@ -21,10 +22,11 @@ import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class FingerprintMatcherUseCase @Inject constructor(
@@ -32,9 +34,16 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
     private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
+    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
+
+    // When using local DB loadedCandidates = expectedCandidates
+    // However, when using CommCare as data source, loadedCandidates < expectedCandidates
+    // as it's count function does not take into account filtering criteria
+    // This var is not thread safe
+    var loadedCandidates = 0
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
@@ -61,29 +70,71 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
-        // When using local DB loadedCandidates = expectedCandidates
-        // However, when using CommCare as data source, loadedCandidates < expectedCandidates
-        // as it's count function does not take into account filtering criteria
-        var loadedCandidates = 0
-        val resultItems = createRanges(expectedCandidates)
-            .map { range ->
-                async(dispatcher) {
-                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource, project) {
-                        // When a candidate is loaded
-                        loadedCandidates++
-                        trySend(MatcherState.CandidateLoaded)
-                    }
-                    match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK)
-                        .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
-                            acc.add(FingerprintMatchResult.Item(item.id, item.score))
-                        }
-                }
-            }.awaitAll()
-            .reduce { acc, subSet -> acc.addAll(subSet) }
-            .toList()
+        loadedCandidates = 0
+        val numConsumers = Runtime.getRuntime().availableProcessors() - 1 // Leave one for other tasks
+        val channel = Channel<List<FingerprintIdentity>>(capacity = numConsumers)
+        val resultSet = MatchResultSet<FingerprintMatchResult.Item>()
+        val producerJob = launch(dispatcherIO) {
+            produceCandidates(
+                channel,
+                expectedCandidates,
+                queryWithSupportedFormat,
+                project,
+                matchParams,
+                this@channelFlow,
+            )
+        }
+        // Start Consumers in BG thread
+        val consumerJobs = List(numConsumers) {
+            launch(dispatcherBG) {
+                consumeAndMatch(channel, samples, resultSet, bioSdkWrapper, matchParams)
+            }
+        }
+        // Wait for all to complete
+        producerJob.join()
+        consumerJobs.forEach { it.join() }
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
-        send(MatcherState.Success(resultItems, loadedCandidates, bioSdkWrapper.matcherName))
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates, bioSdkWrapper.matcherName))
+    }
+
+    suspend fun produceCandidates(
+        channel: SendChannel<List<FingerprintIdentity>>,
+        expectedCandidates: Int,
+        queryWithSupportedFormat: SubjectQuery,
+        project: Project,
+        matchParams: MatchParams,
+        progressTracker: SendChannel<MatcherState>,
+    ) {
+        for (range in createRanges(expectedCandidates)) {
+            val batch = getCandidates(
+                queryWithSupportedFormat,
+                range,
+                project = project,
+                dataSource = matchParams.biometricDataSource,
+            ) {
+                loadedCandidates++
+                progressTracker.trySend(MatcherState.CandidateLoaded)
+            }
+            channel.send(batch) // Send batch to consumers
+        }
+        channel.close() // Close channel when done
+    }
+
+    private suspend fun consumeAndMatch(
+        channel: Channel<List<FingerprintIdentity>>,
+        samples: List<Fingerprint>,
+        resultSet: MatchResultSet<FingerprintMatchResult.Item>,
+        bioSdkWrapper: BioSdkWrapper,
+        matchParams: MatchParams,
+    ) {
+        for (batch in channel) {
+            val matchResults = match(samples, batch, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK!!)
+                .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
+                    acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                }
+            resultSet.addAll(matchResults)
+        }
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
