@@ -1,4 +1,4 @@
-package com.simprints.feature.externalcredential.tools.camera
+package com.simprints.infra.uibase.camera.qrscan
 
 
 import com.google.android.gms.tasks.Task
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports(
     reason = "This is just an injectable wrapper around MLKit barcode analyzer",
 )
-internal class QrCodeDetector @Inject constructor() {
+class QrCodeDetector @Inject constructor() {
     private val scanner = BarcodeScanning.getClient(
         BarcodeScannerOptions
             .Builder()

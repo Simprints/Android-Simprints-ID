@@ -1,4 +1,4 @@
-package com.simprints.feature.externalcredential.tools.camera
+package com.simprints.infra.uibase.camera.qrscan
 
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-internal class QrCodeAnalyzer @Inject constructor(
+class QrCodeAnalyzer @Inject constructor(
     private val qrCodeDetector: QrCodeDetector,
     @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ImageAnalysis.Analyzer {

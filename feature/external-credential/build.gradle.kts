@@ -9,12 +9,6 @@ android {
 
 dependencies {
     implementation(project(":infra:external-credential-store"))
+    implementation(project(":infra:ui-base"))
     implementation(project(":feature:exit-form"))
-
-    // QR scanner related
-    implementation(libs.androidX.cameraX.core)
-    implementation(libs.androidX.cameraX.lifecycle)
-    implementation(libs.androidX.cameraX.view)
-    implementation(libs.jackson.core)
-    implementation(libs.playServices.barcode)
 }

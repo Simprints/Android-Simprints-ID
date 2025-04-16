@@ -1,4 +1,4 @@
-package com.simprints.feature.externalcredential.tools.camera
+package com.simprints.infra.uibase.camera.qrscan
 
 import android.content.Context
 import androidx.camera.core.AspectRatio
@@ -9,9 +9,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports(
     reason = "This is an injectable wrapper around cameraX and ML kit APIs. There is no business logic.",
 )
-internal class CameraHelper @Inject constructor(
+class CameraHelper @Inject constructor(
     @ApplicationContext private val context: Context,
     private val cameraFocusManager: CameraFocusManager,
 ) {

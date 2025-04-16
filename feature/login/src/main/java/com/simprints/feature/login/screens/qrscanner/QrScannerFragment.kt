@@ -14,9 +14,9 @@ import com.google.firebase.analytics.FirebaseAnalytics.Event.LOGIN
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentQrScannerBinding
-import com.simprints.feature.login.tools.camera.CameraHelper
-import com.simprints.feature.login.tools.camera.QrCodeAnalyzer
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.camera.qrscan.CameraHelper
+import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint

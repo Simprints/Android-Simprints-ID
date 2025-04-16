@@ -1,4 +1,5 @@
 plugins {
+    id("simprints.infra")
     id("simprints.android.library")
 }
 
@@ -31,6 +32,12 @@ dependencies {
     api(libs.androidX.ui.cardview)
 
     api(libs.androidX.navigation.fragment)
+
+    api(libs.androidX.cameraX.core)
+    api(libs.androidX.cameraX.lifecycle)
+    api(libs.androidX.cameraX.view)
+    api(libs.jackson.core)
+    api(libs.playServices.barcode)
 
     testImplementation(project(":infra:test-tools"))
 }

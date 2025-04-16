@@ -10,22 +10,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import com.google.firebase.analytics.FirebaseAnalytics.Event.LOGIN
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.feature.externalcredential.R
 import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialQrScannerBinding
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
-import com.simprints.feature.externalcredential.tools.camera.CameraHelper
-import com.simprints.feature.externalcredential.tools.camera.QrCodeAnalyzer
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.camera.qrscan.CameraHelper
+import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
