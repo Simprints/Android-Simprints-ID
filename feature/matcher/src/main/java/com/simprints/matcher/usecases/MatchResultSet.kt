@@ -8,10 +8,9 @@ internal class MatchResultSet<T : MatchResultItem>(
 ) {
     private var lowestConfidence: Float = 0f
 
-    private val treeSet = TreeSet { o1: T, o2: T ->
-        // Reverse order for descending sort
-        -1 * o1.confidence.compareTo(o2.confidence)
-    }
+    private val treeSet = TreeSet(
+        compareByDescending<T> { it.confidence }.thenByDescending { it.subjectId },
+    )
 
     fun add(element: T): MatchResultSet<T> {
         if (lowestConfidence > element.confidence) {
