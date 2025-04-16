@@ -5,6 +5,7 @@ import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilde
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.security.root.RootManager
 import io.mockk.*
+import org.junit.Ignore
 import org.junit.Test
 
 class SecurityManagerImplTest {
@@ -52,6 +53,8 @@ class SecurityManagerImplTest {
     }
 
     @Test
+    @Ignore("PenTest 2025. Root check is temporary removed from 2025.1.0 version for testing purposes")
+    // TODO PenTest 2025. Revert addition of the @Ignore annotation
     fun `calling check device root prefs should call the root manager`() {
         val rootManager: RootManager = spyk()
         val securityManager = SecurityManagerImpl(mockk(), mockk(), rootManager, mockk())

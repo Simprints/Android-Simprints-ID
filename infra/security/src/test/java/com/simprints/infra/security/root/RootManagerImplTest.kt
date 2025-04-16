@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 class RootManagerImplTest {
@@ -20,6 +21,8 @@ class RootManagerImplTest {
     }
 
     @Test
+    @Ignore("PenTest 2025. Root check is temporary removed from 2025.1.0 version for testing purposes")
+    // TODO PenTest 2025. Revert addition of the @Ignore annotation
     fun `should throw an exception if the device is rooted`() {
         every { anyConstructed<RootBeer>().isRooted } returns true
 
@@ -29,6 +32,8 @@ class RootManagerImplTest {
     }
 
     @Test
+    @Ignore("PenTest 2025. Root check is temporary removed from 2025.1.0 version for testing purposes")
+    // TODO PenTest 2025. Revert addition of the @Ignore annotation
     fun `should not throw an exception if the device is not rooted`() {
         every { anyConstructed<RootBeer>().isRooted } returns false
 

@@ -10,6 +10,10 @@ internal class RootManagerImpl @Inject constructor(
     @ApplicationContext private val ctx: Context,
 ) : RootManager {
     override fun checkIfDeviceIsRooted() {
-        if (RootBeer(ctx).isRooted) throw RootedDeviceException()
+        // TODO Revert the changes to this file
+        // PenTest 2025, the root check is removed because the PenTesters are using root devices, and it prevents them from proceeding
+        // further
+
+        // if (RootBeer(ctx).isRooted) throw RootedDeviceException()
     }
 }
