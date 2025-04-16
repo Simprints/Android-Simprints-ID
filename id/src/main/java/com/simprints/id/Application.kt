@@ -8,6 +8,7 @@ import com.simprints.core.CoreApplication
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extentions.deviceHardwareId
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.infra.eventsync.BuildConfig.DB_ENCRYPTION
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
@@ -61,6 +62,9 @@ open class Application :
         appScope.launch {
             syncOrchestrator.cleanupWorkers()
             syncOrchestrator.scheduleBackgroundWork()
+        }
+        if (DB_ENCRYPTION) {
+            System.loadLibrary("sqlcipher")
         }
     }
 }
