@@ -7,6 +7,7 @@ import androidx.fragment.app.activityViewModels
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentConnectBinding
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 
 internal class ConnectFragment : Fragment(R.layout.fragment_connect) {
@@ -18,6 +19,7 @@ internal class ConnectFragment : Fragment(R.layout.fragment_connect) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
 
         viewModel.currentStep.observe(viewLifecycleOwner) { step ->
             binding.connectTitle.setText(step.messageRes)

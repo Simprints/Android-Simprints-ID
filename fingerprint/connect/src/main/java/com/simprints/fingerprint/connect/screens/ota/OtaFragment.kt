@@ -15,6 +15,7 @@ import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentOtaBinding
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,6 +40,7 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         screenReporter.reportOta()
 
         listenForProgress()
