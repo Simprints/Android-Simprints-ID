@@ -17,6 +17,7 @@ import com.simprints.feature.login.databinding.FragmentQrScannerBinding
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.camera.qrscan.CameraHelper
 import com.simprints.infra.uibase.camera.qrscan.QrCodeAnalyzer
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,6 +51,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {

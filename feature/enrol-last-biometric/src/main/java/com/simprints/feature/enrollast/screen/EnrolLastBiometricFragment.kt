@@ -25,6 +25,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -41,6 +42,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("EnrolLastBiometricFragment started", tag = ORCHESTRATION)
 
         findNavController().handleResult<AlertResult>(

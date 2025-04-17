@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentFingerSelectionBinding
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,6 +25,7 @@ internal class FingerSelectionFragment : Fragment(R.layout.fragment_finger_selec
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
 
         initRecyclerView()
         listenForItemChanges()

@@ -75,7 +75,6 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                 FingerprintSample(
                     IFingerIdentifier.LEFT_3RD_FINGER,
                     FINGERPRINT_TEMPLATE,
-                    50,
                     "ISO_19794_2",
                     "5289df73-7df5-3326-bcdd-22597afb1fac",
                 ),
@@ -91,7 +90,6 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     id = "5289df73-7df5-3326-bcdd-22597afb1fac",
                     templates = listOf(
                         ApiFingerprintTemplate(
-                            quality = 50,
                             template = BASE64_FINGERPRINT_TEMPLATE,
                             finger = ApiFinger.LEFT_3RD_FINGER,
                         ),

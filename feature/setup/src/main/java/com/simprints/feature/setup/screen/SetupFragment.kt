@@ -24,6 +24,7 @@ import com.simprints.infra.license.models.LicenseState.Started
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -61,6 +62,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("SetupFragment started", tag = ORCHESTRATION)
 
         findNavController().handleResult<AlertResult>(

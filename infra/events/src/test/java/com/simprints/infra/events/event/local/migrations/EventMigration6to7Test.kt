@@ -70,7 +70,7 @@ class EventMigration6to7Test {
         setupV6DbWithEvent(createMatchingEvent(randomUUID()))
         helper.runMigrationsAndValidate(TEST_DB, 7, true, migrationSpy)
 
-        verify(exactly = 1) { migrationSpy.migrate(any()) }
+        verify(exactly = 1) { migrationSpy.migrate(any<SupportSQLiteDatabase>()) }
     }
 
     @Test

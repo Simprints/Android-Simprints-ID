@@ -33,6 +33,7 @@ import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -76,6 +77,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
+
         Simber.i("LiveFeedbackFragment started", tag = ORCHESTRATION)
         initFragment()
     }

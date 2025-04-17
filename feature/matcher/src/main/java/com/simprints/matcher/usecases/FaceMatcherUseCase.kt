@@ -28,7 +28,6 @@ internal class FaceMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
-    private lateinit var faceMatcher: FaceMatcher
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
     override suspend operator fun invoke(
@@ -36,21 +35,22 @@ internal class FaceMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        faceMatcher = resolveFaceBioSdk().matcher
+        val bioSdk = resolveFaceBioSdk()
+
         if (matchParams.probeFaceSamples.isEmpty()) {
-            send(MatcherState.Success(emptyList(), 0, faceMatcher.matcherName))
+            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
             return@channelFlow
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = faceMatcher.supportedTemplateFormat,
+            faceSampleFormat = bioSdk.templateFormat,
         )
         val expectedCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat,
             dataSource = matchParams.biometricDataSource,
         )
         if (expectedCandidates == 0) {
-            send(MatcherState.Success(emptyList(), 0, faceMatcher.matcherName))
+            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
             return@channelFlow
         }
 
@@ -61,6 +61,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         // as it's count function does not take into account filtering criteria
         var loadedCandidates = 0
         val resultItems = coroutineScope {
+
             createRanges(expectedCandidates)
                 .map { range ->
                     async(dispatcher) {
@@ -74,7 +75,7 @@ internal class FaceMatcherUseCase @Inject constructor(
                             loadedCandidates++
                             trySend(MatcherState.CandidateLoaded)
                         }
-                        match(batchCandidates, samples)
+                        bioSdk.createMatcher(samples).use { match(it, batchCandidates) }
                     }
                 }.awaitAll()
                 .reduce { acc, subSet -> acc.addAll(subSet) }
@@ -83,7 +84,7 @@ internal class FaceMatcherUseCase @Inject constructor(
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
 
-        send(MatcherState.Success(resultItems, loadedCandidates, faceMatcher.matcherName))
+        send(MatcherState.Success(resultItems, loadedCandidates, bioSdk.matcherName))
     }
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
@@ -104,13 +105,13 @@ internal class FaceMatcherUseCase @Inject constructor(
         }
 
     private suspend fun match(
-        batchCandidates: List<FaceIdentity>,
-        samples: List<FaceSample>,
-    ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, item ->
+        matcher: FaceMatcher,
+        batchCandidates: List<FaceIdentity>
+    ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, candidate ->
         acc.add(
             FaceMatchResult.Item(
-                item.subjectId,
-                faceMatcher.getHighestComparisonScoreForCandidate(samples, item),
+                candidate.subjectId,
+                matcher.getHighestComparisonScoreForCandidate(candidate),
             ),
         )
     }

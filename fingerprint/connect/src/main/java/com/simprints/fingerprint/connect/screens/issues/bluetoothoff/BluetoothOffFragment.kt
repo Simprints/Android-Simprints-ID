@@ -20,6 +20,7 @@ import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.infra.uibase.extensions.showToast
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,6 +64,7 @@ internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) 
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         screenReporter.reportBluetoothNotEnabled()
 
         binding.turnOnBluetoothButton.setOnClickListener {

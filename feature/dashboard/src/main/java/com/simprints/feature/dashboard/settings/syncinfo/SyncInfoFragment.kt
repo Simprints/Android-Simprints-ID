@@ -18,6 +18,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -39,6 +40,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
 
         binding.selectedModulesView.adapter = moduleCountAdapter
         setupClickListeners()
