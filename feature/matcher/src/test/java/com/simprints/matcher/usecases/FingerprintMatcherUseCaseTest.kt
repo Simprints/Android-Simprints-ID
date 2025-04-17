@@ -72,17 +72,18 @@ internal class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-       val results = useCase.invoke(
-            MatchParams(
-                probeReferenceId = "referenceId",
-                probeFingerprintSamples = emptyList(),
-                fingerprintSDK = SECUGEN_SIM_MATCHER,
-                flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.Simprints,
-            ),
-           project
-        ).toList()
+        val results = useCase
+            .invoke(
+                MatchParams(
+                    probeReferenceId = "referenceId",
+                    probeFingerprintSamples = emptyList(),
+                    fingerprintSDK = SECUGEN_SIM_MATCHER,
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
+                ),
+                project,
+            ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
 
@@ -90,8 +91,8 @@ internal class FingerprintMatcherUseCaseTest {
             MatcherUseCase.MatcherState.Success(
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
-                matcherName = ""
-            )
+                matcherName = "",
+            ),
         )
     }
 
@@ -101,23 +102,24 @@ internal class FingerprintMatcherUseCaseTest {
         coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), project, onCandidateLoaded) } returns emptyList()
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
-        val results = useCase.invoke(
-            MatchParams(
-                probeReferenceId = "referenceId",
-                probeFingerprintSamples = listOf(
-                    MatchParams.FingerprintSample(
-                        IFingerIdentifier.LEFT_3RD_FINGER,
-                        "format",
-                        byteArrayOf(1, 2, 3),
+        val results = useCase
+            .invoke(
+                MatchParams(
+                    probeReferenceId = "referenceId",
+                    probeFingerprintSamples = listOf(
+                        MatchParams.FingerprintSample(
+                            IFingerIdentifier.LEFT_3RD_FINGER,
+                            "format",
+                            byteArrayOf(1, 2, 3),
+                        ),
                     ),
+                    fingerprintSDK = SECUGEN_SIM_MATCHER,
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
                 ),
-                fingerprintSDK = SECUGEN_SIM_MATCHER,
-                flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.Simprints,
-            ),
-            project
-        ).toList()
+                project,
+            ).toList()
 
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
 
@@ -125,8 +127,8 @@ internal class FingerprintMatcherUseCaseTest {
             MatcherUseCase.MatcherState.Success(
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
-                matcherName = ""
-            )
+                matcherName = "",
+            ),
         )
     }
 
@@ -140,7 +142,7 @@ internal class FingerprintMatcherUseCaseTest {
                 any(),
                 any(),
                 project,
-                onCandidateLoaded
+                onCandidateLoaded,
             )
         } returns listOf(
             FingerprintIdentity(
@@ -161,26 +163,27 @@ internal class FingerprintMatcherUseCaseTest {
         )
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
-        useCase.invoke(
-            matchParams = MatchParams(
-                probeReferenceId = "referenceId",
-                probeFingerprintSamples = listOf(
-                    MatchParams.FingerprintSample(
-                        IFingerIdentifier.LEFT_3RD_FINGER,
-                        "format",
-                        byteArrayOf(1, 2, 3),
+        useCase
+            .invoke(
+                matchParams = MatchParams(
+                    probeReferenceId = "referenceId",
+                    probeFingerprintSamples = listOf(
+                        MatchParams.FingerprintSample(
+                            IFingerIdentifier.LEFT_3RD_FINGER,
+                            "format",
+                            byteArrayOf(1, 2, 3),
+                        ),
                     ),
+                    fingerprintSDK = SECUGEN_SIM_MATCHER,
+                    flowType = FlowType.VERIFY,
+                    queryForCandidates = SubjectQuery(),
+                    biometricDataSource = BiometricDataSource.Simprints,
                 ),
-                fingerprintSDK = SECUGEN_SIM_MATCHER,
-                flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery(),
-                biometricDataSource = BiometricDataSource.Simprints,
-            ),
-            project
-        ).toList()
+                project,
+            ).toList()
 
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
     }
 
-    private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), 42, "format", "referenceId")
+    private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), "format", "referenceId")
 }

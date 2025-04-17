@@ -13,6 +13,7 @@ import com.simprints.fingerprint.connect.databinding.FragmentOtaFailedBinding
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
 import com.simprints.fingerprint.connect.screens.ota.FetchOtaResult
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,6 +43,7 @@ internal class OtaFailedFragment : Fragment(R.layout.fragment_ota_failed) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         screenReporter.reportOtaFailed()
         connectScannerViewModel.setBackButtonToExitWithError()
 

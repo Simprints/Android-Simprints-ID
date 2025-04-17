@@ -72,7 +72,6 @@ class SubjectFactoryTest {
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                 ),
@@ -108,7 +107,6 @@ class SubjectFactoryTest {
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                 ),
@@ -135,14 +133,12 @@ class SubjectFactoryTest {
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-1",
                 ),
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-2",
                 ),
@@ -170,7 +166,6 @@ class SubjectFactoryTest {
                     format = REFERENCE_FORMAT,
                     templates = listOf(
                         FingerprintTemplate(
-                            quality = QUALITY,
                             template = BASE_64_BYTES.toString(),
                             finger = IFingerIdentifier.LEFT_THUMB,
                         ),
@@ -194,14 +189,12 @@ class SubjectFactoryTest {
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-1",
                 ),
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = "referenceId-finger-5",
                 ),
@@ -236,7 +229,6 @@ class SubjectFactoryTest {
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                 ),
@@ -300,7 +292,6 @@ class SubjectFactoryTest {
                 FingerprintSample(
                     fingerIdentifier = IDENTIFIER,
                     template = BASE_64_BYTES,
-                    templateQualityScore = QUALITY,
                     format = REFERENCE_FORMAT,
                     referenceId = REFERENCE_ID,
                 ),
@@ -342,7 +333,6 @@ class SubjectFactoryTest {
             format = REFERENCE_FORMAT,
             templates = listOf(
                 FingerprintTemplate(
-                    quality = QUALITY,
                     template = TEMPLATE_NAME,
                     finger = IDENTIFIER,
                 ),

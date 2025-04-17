@@ -8,7 +8,6 @@ internal fun DbFingerprintSample.fromDbToDomain(): FingerprintSample = Fingerpri
     id = id,
     fingerIdentifier = IFingerIdentifier.entries[fingerIdentifier],
     template = template,
-    templateQualityScore = templateQualityScore,
     format = format,
     referenceId = referenceId,
 )
@@ -18,6 +17,5 @@ internal fun FingerprintSample.fromDomainToDb(): DbFingerprintSample = DbFingerp
     sample.referenceId = referenceId
     sample.fingerIdentifier = fingerIdentifier.ordinal
     sample.template = template
-    sample.templateQualityScore = templateQualityScore
     sample.format = format
 }

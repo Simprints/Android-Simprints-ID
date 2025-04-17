@@ -12,6 +12,7 @@ import com.simprints.face.capture.databinding.FragmentPreparationBinding
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,6 +36,7 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
         Simber.i("PreparationFragment started", tag = ORCHESTRATION)
 
         startTime = faceTimeHelper.now()

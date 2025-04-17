@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
@@ -14,9 +14,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQue
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -50,7 +48,7 @@ internal class FaceMatcherUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { resolveFaceBioSdk().matcher } returns faceMatcher
+        coEvery { resolveFaceBioSdk().createMatcher(any()) } returns faceMatcher
         useCase = FaceMatcherUseCase(
             enrolmentRecordRepository,
             resolveFaceBioSdk,
@@ -61,7 +59,7 @@ internal class FaceMatcherUseCaseTest {
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 1f
+        coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any()) } returns 1f
 
         val results = useCase
             .invoke(
@@ -74,7 +72,7 @@ internal class FaceMatcherUseCaseTest {
                 project,
             ).toList()
 
-        coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
+        coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any()) }
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
@@ -103,7 +101,7 @@ internal class FaceMatcherUseCaseTest {
                 project,
             ).toList()
 
-        coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
+        coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any()) }
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.Success(
@@ -133,7 +131,7 @@ internal class FaceMatcherUseCaseTest {
             // Return the face identities
             faceIdentities
         }
-        coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 42f
+        coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any()) } returns 42f
 
         val results = useCase
             .invoke(
@@ -149,7 +147,7 @@ internal class FaceMatcherUseCaseTest {
                 project,
             ).toList()
 
-        coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
+        coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any()) }
 
         assertThat(results).containsExactly(
             MatcherUseCase.MatcherState.LoadingStarted(totalCandidates),

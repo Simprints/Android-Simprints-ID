@@ -1,13 +1,13 @@
 # How matching works
 
-Calling feature module provides `MatchParams` in navigation arguments with a list of
-either `FaceSample` or `FingerprintSample` and a query to load the candidates from the database.
+Calling feature module provides `MatchParams` in navigation arguments with a list of either `FaceSample` or `FingerprintSample` and a query
+to load the candidates from the database.
 
-Matching needs to compare the probes templates with all the candidates templates and return a list
-of X candidates sorted descending by their higher comparison scores.
+Matching needs to compare the probes templates with all the candidates templates and return a list of X candidates sorted descending by
+their higher comparison scores.
 
-- Sample list is provided because the Capture flow can return more than one capture (depending on
-  the configuration). Each probe has its own template.
+- Sample list is provided because the Capture flow can return more than one capture (depending on the configuration). Each probe has its own
+  template.
 - Each candidate have a guid and a list of samples.
 
 What this means is that the number of comparisons will be:
@@ -16,21 +16,17 @@ What this means is that the number of comparisons will be:
 p * c * cs
 ```
 
-p - number of probes
-c - number of candidates
-cs - number of samples per candidate
+p** - number of probes, **c** - number of candidates, **cs** - number of samples per candidate
 
 Example: if the configuration say that each capture has 2 samples, and the database already has 3
 people, 12 comparisons will be made (2 * 3 * 2).
 
 ## Sorting the comparison scores
 
-For response, calling module expects a MatchResult with a list of a guid and confidence score pairs.
-This means that no matter how many samples the candidate has, only the highest comparison score will
-be return.
+For response, calling module expects a MatchResult with a list of a guid and confidence score pairs. This means that no matter how many
+samples the candidate has, only the highest comparison score will be return.
 
-What is being done is during a comparison of probes against a candidate, only the highest score of
-all is kept and added to the MatchResult.
+What is being done is during a comparison of probes against a candidate, only the highest score of all is kept and added to the MatchResult.
 
 Example:
 
@@ -50,7 +46,6 @@ the `mean` down as (1 + 0) / 2 = 0.5.
 
 # Concurrency
 
-Because the process of matching can be expensive - it needs to match `n` probes against `f`
-candidate faces - we tried to run it in parallel. That way, we can run multiple matching at the
-same time. Also, since the list will be ordered later, we don't need to care about the order that
-the results are returned as well.
+Because the process of matching can be expensive - it needs to match `n` probes against `f` candidate faces - we tried to run it in batches
+in parallel.
+That way, we can run multiple matching at the same time. Also, to reduce memory pressure the results are stored in a limited sorted tree.

@@ -1,34 +1,43 @@
-# Face modality
+# Capture Flow
 
-The face modality was created as a way to have contactless biometrics as an option for SimprintsID.
+This is how the face module works internally to capture the faces, extract the templates, and return the results to SimprintsID.
 
-##  Important links
+## FaceCaptureControllerFragment
 
-* [Confluence](https://simprints.atlassian.net/wiki/spaces/CS/overview)
-* [Jira](https://simprints.atlassian.net/secure/RapidBoard.jspa?rapidView=19)
+The shared fragment (and its ViewModel) is responsible for:
 
-## Flow overview
+- Checking that the correct parameters were sent from calling module for a correct capture
+- Start the internal Navigation Graph
+- Managing the next steps of the navigation by using events and the Navigation Graph
+- Saving the captures on disk once the flow is finished correctly
+- Finish the flow correctly and return the correct result to calling module
 
-Calling module start the face modality navigating with `FaceCaptureControllerFragmentArgs` as bundle.
-This first thing that the face capture needs to do is initialize the required SDK, loading the SDK library and making sure the SDK license is in place and is valid.
+## When the flow finishes correctly
 
-To understand more how the capture flow works, check the capture [README](src/main/java/com/simprints/face/capture/README.md).
+The FaceCaptureViewModel receives all captures and saves the valid ones on disk.
 
-## Detection
+## PreparationFragment
 
-The detection phase is when the app analyzes a PreviewFrame (already cropped by FrameProcessor) and returns a Face that it found (or null if none).
-The methods on the Detectors are suspend functions because the process to get a Face can be onerous (you should use `withContext(Dispatchers.IO)`).
-Note that the Face returned also have a template already in it, making it a one step to find a face and extract the template for the app.
-It was done that way because most SDKs tested returned a template when looking for a face. Currently we only use the analyze method that receives a `PreviewFrame`,
-the method to analyze a `Bitmap` is there for future necessity (it was used by the R&D team).
+It is a simple fragment where the user sees a preparation on how to capture a good face image. Its only responsibility is to show the
+message and start the LiveFeedbackFragment.
 
-### MockFaceDetector
+## LiveFeedbackFragment
 
-This is a mock detector that always return true and wait a bit (200ms) before returning a face with an empty template.
+The responsibility of this fragment (and its ViewModel) is to make sure the user receives correct information on the state of the face on
+the screen, i.e. if the face is valid or not and how to fix it.
+This fragment is also responsible to start the camera and handle the frames being passed downstream from our camera library.
 
-## RankOne
+The FaceCaptureViewModel has a channel that starts receiving frames when the camera starts. The LiveFeedbackFragment subscribe to that
+channel and process each frame.
 
-RankOne is the SDK of choice for face recognition - after we did some extensive testing with lots of other providers.
-RankOne gives an SDK to copy to inside Simprints. It lives inside the respective infra module.
+If the face is valid, the fragment will prompt the user to start a capture and at that time will start saving each new frame as a capture.
+After the number of required captures is done, the fragment finishes and goes to the ConfirmationFragment.
 
-Current RankOne version = 1.23 (with OpenMP disabled)
+During the live feedback process, while the user is trying to center the face on the frame, the ViewModel will keep any good image as a
+fallback image. This is to make sure that the user always has at least one good image, even if they move the phone too fast during the
+capture process.
+
+## ConfirmationFragment
+
+If all goes well, the user comes to a screen that congratulates them on taking a good photo and ask them to continue their flow.
+If the previewed captures are not satisfactory, user can return to the LiveFeedbackFragment and try again.

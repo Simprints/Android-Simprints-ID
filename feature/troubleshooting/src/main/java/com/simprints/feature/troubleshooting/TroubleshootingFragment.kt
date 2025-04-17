@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.troubleshooting.databinding.FragmentTroubleshootingBinding
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,7 @@ internal class TroubleshootingFragment : Fragment(R.layout.fragment_troubleshoot
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        applySystemBarInsets(view)
 
         binding.troubleshootingToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
