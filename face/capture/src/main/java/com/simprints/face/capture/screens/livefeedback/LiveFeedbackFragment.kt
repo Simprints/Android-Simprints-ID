@@ -96,6 +96,13 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 vm.initCapture(mainVm.samplesToCapture, mainVm.attemptNumber)
             }
         }
+
+        binding.captureInstructionsBtn.setOnClickListener {
+            findNavController().navigateSafely(
+                currentFragment = this,
+                directions = LiveFeedbackFragmentDirections.actionFaceLiveFeedbackFragmentToFacePreparationFragment(),
+            )
+        }
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */

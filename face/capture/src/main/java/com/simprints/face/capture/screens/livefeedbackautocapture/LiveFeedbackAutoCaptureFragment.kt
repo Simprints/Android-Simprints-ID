@@ -27,7 +27,7 @@ import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.face.capture.R
-import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
+import com.simprints.face.capture.databinding.FragmentLiveFeedbackAutoCaptureBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.face.capture.screens.livefeedback.CropToTargetOverlayAnalyzer
@@ -56,7 +56,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
     private val mainVm: FaceCaptureViewModel by activityViewModels()
 
     private val vm: LiveFeedbackAutoCaptureFragmentViewModel by viewModels()
-    private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
+    private val binding by viewBinding(FragmentLiveFeedbackAutoCaptureBinding::bind)
 
     private lateinit var screenSize: Size
     private lateinit var targetResolution: Size
@@ -95,6 +95,13 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
             if (view != null) {
                 vm.initCapture(mainVm.samplesToCapture, mainVm.attemptNumber)
             }
+        }
+
+        binding.captureInstructionsBtn.setOnClickListener {
+            findNavController().navigateSafely(
+                currentFragment = this,
+                directions = LiveFeedbackAutoCaptureFragmentDirections.actionFaceLiveFeedbackFragmentToFacePreparationFragment(),
+            )
         }
     }
 
