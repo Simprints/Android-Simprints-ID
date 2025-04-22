@@ -172,6 +172,7 @@
     <string name="face_capture_capturing_title">Live Capture</string>
     <string name="face_capture_preparation_title">Preparation</string>
     <string name="face_capture_start_capture">Start capture</string>
+    <string name="face_capture_instructions_title">Instructions</string>
     <string name="face_capture_title_previewing">Preparing to scan</string>
     <string name="face_capture_title_no_face">No face detected</string>
     <string name="face_capture_error_no_face">Make sure the face fills the circle</string>

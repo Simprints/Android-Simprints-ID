@@ -87,4 +87,22 @@
         app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_explanation"
         tools:visibility="visible" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/capture_instructions_btn"
+        style="@style/Text.Subtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_margin="@dimen/margin_large"
+        android:background="@drawable/feedback_instructions_outline"
+        android:paddingHorizontal="@dimen/padding_default"
+        android:paddingVertical="0dp"
+        android:includeFontPadding="false"
+        android:gravity="center"
+        android:text="@string/face_capture_instructions_title"
+        android:textColor="@color/feedback_instructions_text"
+        app:backgroundTint="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
