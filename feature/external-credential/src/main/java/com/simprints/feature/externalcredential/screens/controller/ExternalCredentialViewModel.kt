@@ -42,6 +42,10 @@ internal class ExternalCredentialViewModel @Inject constructor(
         get() = _recaptureEvent
     private val _recaptureEvent = MutableLiveData<LiveDataEvent>()
 
+    val exitFormEvent: LiveData<LiveDataEvent>
+        get() = _exitFormEvent
+    private val _exitFormEvent = MutableLiveData<LiveDataEvent>()
+
     fun setConfig(params: ExternalCredentialParams) {
         subjectId = params.subjectId
         flowType = params.flowType
@@ -98,6 +102,10 @@ internal class ExternalCredentialViewModel @Inject constructor(
 
     private suspend fun searchSubjectId(data: String): String? {
         return externalCredentialRepository.findByCredential(credential = data)?.subjectId
+    }
+
+    fun handleBackButton() {
+        _exitFormEvent.send()
     }
 
 }

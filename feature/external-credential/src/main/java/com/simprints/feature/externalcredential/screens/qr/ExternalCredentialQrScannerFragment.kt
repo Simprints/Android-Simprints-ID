@@ -4,6 +4,7 @@ import android.Manifest.permission.CAMERA
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -70,6 +71,11 @@ internal class ExternalCredentialQrScannerFragment : Fragment(R.layout.fragment_
 
         if (requireActivity().hasPermission(CAMERA)) {
             startCamera()
+        }
+
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            viewModel.recapture()
         }
     }
 

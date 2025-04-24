@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.controller
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
@@ -57,6 +58,17 @@ class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external
         internalNavController?.setGraph(R.navigation.graph_external_credential_internal)
 
         observeViewModel()
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            when (internalNavController?.currentDestination?.id) {
+                R.id.externalCredentialSelectFragment,
+                R.id.externalCredentialQrConfirmation,
+                R.id.externalCredentialOcrScan,
+                    -> viewModel.handleBackButton()
+
+                else -> findNavController().popBackStack()
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -77,6 +89,15 @@ class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external
             },
         )
 
+        viewModel.exitFormEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventObserver {
+                findNavController().navigateSafely(
+                    this,
+                    R.id.action_global_refusalFragment,
+                )
+            },
+        )
     }
 
 }

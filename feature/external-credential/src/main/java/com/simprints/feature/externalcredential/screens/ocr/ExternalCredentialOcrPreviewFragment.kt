@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -20,6 +21,7 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -50,7 +52,8 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExternalCredentialOcrPreviewFragment : Fragment(R.layout.fragment_external_credential_ocr_preview) {
+class ExternalCredentialOcrPreviewFragment :
+    Fragment(R.layout.fragment_external_credential_ocr_preview) {
     private val args: ExternalCredentialOcrPreviewFragmentArgs by navArgs()
     private val binding by viewBinding(FragmentExternalCredentialOcrPreviewBinding::bind)
     private val flowViewModel: ExternalCredentialViewModel by activityViewModels()
@@ -73,6 +76,10 @@ class ExternalCredentialOcrPreviewFragment : Fragment(R.layout.fragment_external
         }
         observeState()
         validateArgs()
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            flowViewModel.recapture()
+        }
     }
 
     override fun onDestroy() {
@@ -107,33 +114,42 @@ class ExternalCredentialOcrPreviewFragment : Fragment(R.layout.fragment_external
     private fun saveImageAndProceed(image: Bitmap) {
         lifecycleScope.launch {
             try {
-                navigateToOcrScanning(savePreprocessedImageToCache(image, requireContext()))
+                val path = savePreprocessedImageToCache(image, requireContext())
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    navigateToOcrScanning(preprocessedImagePath = path)
+                }
             } catch (e: Exception) {
-                renderErrorState(OcrPreviewState.Error("Error processing image: ${e.message}"))
+                Simber.e("Cannot save OCR image and proceed", e)
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    renderErrorState(OcrPreviewState.Error("Error processing image: ${e.message}"))
+                }
             }
         }
     }
 
     private fun observeState() {
-        ocrViewModel.stateLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { state ->
-            when (state) {
-                is OcrPreviewState.Error -> renderErrorState(state)
-                OcrPreviewState.Loading -> renderLoadingState(isLoading = true)
-                is OcrPreviewState.Success -> saveImageAndProceed(state.preprocessedImage)
-                OcrPreviewState.Initial -> renderInitialState()
-            }
-        })
+        ocrViewModel.stateLiveData.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver { state ->
+                when (state) {
+                    is OcrPreviewState.Error -> renderErrorState(state)
+                    OcrPreviewState.Loading -> renderLoadingState(isLoading = true)
+                    is OcrPreviewState.Success -> saveImageAndProceed(state.preprocessedImage)
+                    OcrPreviewState.Initial -> renderInitialState()
+                }
+            })
     }
 
-    private suspend fun savePreprocessedImageToCache(image: Bitmap, context: Context): String = withContext(ioDispatcher) {
-        val imageFileName = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
-            .format(System.currentTimeMillis()) + "-preprocessed.jpg"
-        val file = File(context.cacheDir, imageFileName)
-        FileOutputStream(file).use { out ->
-            image.compress(Bitmap.CompressFormat.JPEG, 100, out)
+    private suspend fun savePreprocessedImageToCache(image: Bitmap, context: Context): String =
+        withContext(ioDispatcher) {
+            val imageFileName = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
+                .format(System.currentTimeMillis()) + "-preprocessed.jpg"
+            val file = File(context.cacheDir, imageFileName)
+            FileOutputStream(file).use { out ->
+                image.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
+            return@withContext file.absolutePath
         }
-        return@withContext file.absolutePath
-    }
 
     private fun renderInitialState() {
         dialog?.dismiss()
@@ -158,7 +174,10 @@ class ExternalCredentialOcrPreviewFragment : Fragment(R.layout.fragment_external
         findNavController().navigateSafely(
             this,
             ExternalCredentialOcrPreviewFragmentDirections.actionExternalCredentialOcrPreviewToExternaCredentialOcrScan(
-                ocrScanParams = OcrScanParams(imagePath = preprocessedImagePath, ocrParams = args.ocrParams)
+                ocrScanParams = OcrScanParams(
+                    imagePath = preprocessedImagePath,
+                    ocrParams = args.ocrParams
+                )
             ),
         )
     }
