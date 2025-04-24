@@ -8,7 +8,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.feature.externalcredential.model.ExternalCredentialConfirmationResult
+import com.simprints.feature.externalcredential.model.ExternalCredentialValidation
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
 import com.simprints.feature.externalcredential.model.ExternalCredentialSaveResponse
@@ -16,6 +16,7 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialSearchRe
 import com.simprints.feature.externalcredential.model.ExternalCredentialSkipResponse
 import com.simprints.infra.external.credential.store.model.ExternalCredential
 import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -23,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ExternalCredentialViewModel @Inject constructor(
-    private val externalCredentialRepository: ExternalCredentialRepository<ExternalCredential.QrCode>
+    private val externalCredentialRepository: ExternalCredentialRepository
 ) : ViewModel() {
 
     private var subjectId: String? = null
@@ -33,9 +34,9 @@ internal class ExternalCredentialViewModel @Inject constructor(
         get() = _externalCredentialSaveResponse
     private val _externalCredentialSaveResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
-    val externalCredentialResult: LiveData<ExternalCredentialConfirmationResult?>
+    val externalCredentialResultDetails: LiveData<ExternalCredentialValidation?>
         get() = _externalCredentialResult
-    private val _externalCredentialResult = MutableLiveData<ExternalCredentialConfirmationResult?>()
+    private val _externalCredentialResult = MutableLiveData<ExternalCredentialValidation?>()
 
     val recaptureEvent: LiveData<LiveDataEvent>
         get() = _recaptureEvent
@@ -46,38 +47,44 @@ internal class ExternalCredentialViewModel @Inject constructor(
         flowType = params.flowType
     }
 
-    fun processExternalCredential(data: String) = viewModelScope.launch {
-        val result: ExternalCredentialConfirmationResult = when (flowType) {
-            // When enrolling new subject, it is necessary to link the external credential with subjectId, therefore, saving it.
-            FlowType.ENROL -> {
-                // TODO [MS-964] Probably move 'saveCredential()' to use case. Repo throws exception when the QR code is already saved
-                val credential = runCatching { saveCredential(data) }.getOrNull()
-                val result = when (credential) {
-                    null -> ExternalCredentialResult.ENROL_DUPLICATE_FOUND
-                    else -> ExternalCredentialResult.ENROL_OK
+    fun validateExternalCredential(credentialId: String) = viewModelScope.launch {
+        val savedSubjectId = searchSubjectId(credentialId)
+        val subjectId = if (flowType == FlowType.ENROL) subjectId else savedSubjectId
+        val result = if (credentialId.isEmpty()) {
+            ExternalCredentialResult.CREDENTIAL_EMPTY
+        } else {
+            when (flowType) {
+                FlowType.ENROL -> when (savedSubjectId) {
+                    null -> ExternalCredentialResult.ENROL_OK
+                    else -> ExternalCredentialResult.ENROL_DUPLICATE_FOUND
                 }
-                ExternalCredentialConfirmationResult(ExternalCredential.QrCode(credential?.subjectId, data), result)
-            }
 
-            // During any other flow type, it is necessary to find the subject ID linked to the external credential
-            else -> {
-                val subjectId = searchSubjectId(data)
-                val result = when (subjectId) {
+                else -> when (savedSubjectId) {
                     null -> ExternalCredentialResult.SEARCH_NOT_FOUND
                     else -> ExternalCredentialResult.SEARCH_FOUND
                 }
-                ExternalCredentialConfirmationResult(ExternalCredential.QrCode(subjectId, data), result)
             }
         }
-        _externalCredentialResult.value = result
+        _externalCredentialResult.value =
+            ExternalCredentialValidation(ExternalCredential(subjectId = subjectId, data = credentialId), result)
     }
 
-    fun confirmAndFinishFlow(credential: ExternalCredential.QrCode) = viewModelScope.launch {
-        val response = when (flowType) {
-            FlowType.ENROL -> ExternalCredentialSaveResponse(subjectId = credential.subjectId!!, externalCredential = credential.data)
-            else -> ExternalCredentialSearchResponse(subjectId = credential.subjectId, externalCredential = credential.data)
+    fun confirmAndFinishFlow(credential: ExternalCredential) = viewModelScope.launch {
+        try {
+            val response = when (flowType) {
+                FlowType.ENROL -> {
+                    externalCredentialRepository.save(credential)
+                    ExternalCredentialSaveResponse(subjectId = credential.subjectId!!, externalCredential = credential.data)
+                }
+
+                else -> {
+                    ExternalCredentialSearchResponse(subjectId = credential.subjectId, externalCredential = credential.data)
+                }
+            }
+            _externalCredentialSaveResponse.send(response)
+        } catch (e: Exception) {
+            Simber.e("Unable to finish external credential [$flowType] flow", e)
         }
-        _externalCredentialSaveResponse.send(response)
     }
 
     fun recapture() {
@@ -89,24 +96,8 @@ internal class ExternalCredentialViewModel @Inject constructor(
         _externalCredentialSaveResponse.send(ExternalCredentialSkipResponse())
     }
 
-    private suspend fun saveCredential(data: String): ExternalCredential.QrCode {
-        val result = ExternalCredential.QrCode(
-            data = data,
-            subjectId = subjectId!!
-        )
-        externalCredentialRepository.save(
-            credential = result
-        )
-        return result
-    }
-
     private suspend fun searchSubjectId(data: String): String? {
-        return externalCredentialRepository.findByCredential(
-            credential = ExternalCredential.QrCode(
-                data = data,
-                subjectId = subjectId
-            )
-        )?.subjectId
+        return externalCredentialRepository.findByCredential(credential = data)?.subjectId
     }
 
 }

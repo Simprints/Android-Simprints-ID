@@ -61,20 +61,20 @@ internal class Authenticator @Inject constructor(
         return result.also { addEventAndUpdateProjectIdIfRequired(it.toDomainResult(), projectId, userId) }
     }
 
-    private fun extractResultFromException(t: Throwable): AuthenticateDataResult = when (t) {
-        is IOException -> AuthenticateDataResult.Offline
-        is NetworkConnectionException -> AuthenticateDataResult.Offline
-        is AuthRequestInvalidCredentialsException -> AuthenticateDataResult.BadCredentials
-        is SyncCloudIntegrationException -> AuthenticateDataResult.TechnicalFailure
-        is BackendMaintenanceException -> {
-            AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
-        }
-
-        is RequestingIntegrityTokenException -> AuthenticateDataResult.IntegrityException
-        is MissingOrOutdatedGooglePlayStoreApp -> AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp
-        is IntegrityServiceTemporaryDown -> AuthenticateDataResult.IntegrityServiceTemporaryDown
-        else -> AuthenticateDataResult.Unknown
+private fun extractResultFromException(t: Throwable): AuthenticateDataResult = when (t) {
+    is IOException -> AuthenticateDataResult.Offline
+    is NetworkConnectionException -> AuthenticateDataResult.Offline
+    is AuthRequestInvalidCredentialsException -> AuthenticateDataResult.BadCredentials
+    is SyncCloudIntegrationException -> AuthenticateDataResult.TechnicalFailure
+    is BackendMaintenanceException -> {
+        AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
     }
+
+    is RequestingIntegrityTokenException -> AuthenticateDataResult.IntegrityException
+    is MissingOrOutdatedGooglePlayStoreApp -> AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp
+    is IntegrityServiceTemporaryDown -> AuthenticateDataResult.IntegrityServiceTemporaryDown
+    else -> AuthenticateDataResult.Unknown
+}
 
     private fun log(message: String) {
         Simber.i(message, tag = LOGIN)

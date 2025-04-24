@@ -16,4 +16,4 @@ data class ExternalCredentialSearchResponse(
 ) : Serializable
 
 @Keep
-class ExternalCredentialSkipResponse() : Serializable
+class ExternalCredentialSkipResponse : Serializable

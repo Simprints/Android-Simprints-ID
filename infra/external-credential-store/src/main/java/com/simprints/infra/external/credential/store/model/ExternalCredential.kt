@@ -3,15 +3,11 @@ package com.simprints.infra.external.credential.store.model
 import android.os.Parcelable
 import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
-sealed class ExternalCredential {
-
-    abstract val subjectId: String?
-
-    @Keep
-    @Parcelize
-    data class QrCode(
-        override val subjectId: String?,
-        val data: String,
-    ) : ExternalCredential(), Parcelable
-}
+@Keep
+@Parcelize
+data class ExternalCredential(
+    val data: String,
+    val subjectId: String?,
+) : Parcelable, Serializable

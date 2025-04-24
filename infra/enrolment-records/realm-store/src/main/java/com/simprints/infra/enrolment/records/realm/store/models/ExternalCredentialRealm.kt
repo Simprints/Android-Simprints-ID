@@ -5,7 +5,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
 @Keep
-class QrExternalCredentialRealm : RealmObject {
+class ExternalCredentialRealm : RealmObject {
     @PrimaryKey
     var data: String = ""
     var subjectId: String = ""

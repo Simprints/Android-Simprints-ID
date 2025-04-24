@@ -68,12 +68,21 @@
         <item name="colorOnPrimary">@color/simprints_text_white</item>
     </style>
 
+    <style name="Widget.Simprints.Button.Green.Dark">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.Green.Dark</item>
+    </style>
+
     <style name="Widget.Simprints.Button.Green">
         <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.Green</item>
     </style>
 
-    <style name="ThemeOverlay.Simprints.Button.Green" parent="">
+    <style name="ThemeOverlay.Simprints.Button.Green.Dark" parent="">
         <item name="colorPrimary">@color/simprints_green_dark</item>
+        <item name="colorOnPrimary">@color/simprints_text_white</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Button.Green" parent="">
+        <item name="colorPrimary">@color/simprints_green</item>
         <item name="colorOnPrimary">@color/simprints_text_white</item>
     </style>
 

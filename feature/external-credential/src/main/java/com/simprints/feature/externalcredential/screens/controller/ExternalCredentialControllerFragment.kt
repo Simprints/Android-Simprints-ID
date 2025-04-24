@@ -14,7 +14,6 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.externalcredential.GraphExternalCredentialInternalDirections
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.feature.externalcredential.R
-import com.simprints.feature.externalcredential.model.ExternalCredentialConfirmationResult
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -73,20 +72,11 @@ class ExternalCredentialControllerFragment : Fragment(R.layout.fragment_external
             LiveDataEventObserver {
                 internalNavController?.navigateSafely(
                     currentlyDisplayedInternalFragment,
-                    GraphExternalCredentialInternalDirections.actionGlobalExternalCredentialQrScanner(),
+                    GraphExternalCredentialInternalDirections.actionGlobalExternalCredentialSelect(),
                 )
             },
         )
 
-        viewModel.externalCredentialResult.observe(viewLifecycleOwner) {
-            it?.let {
-                internalNavController?.navigateSafely(
-                    currentlyDisplayedInternalFragment,
-                    R.id.externalCredentialConfirmation,
-                    args = ExternalCredentialConfirmationResult.getArgs(it.credential, it.result)
-                )
-            }
-        }
     }
 
 }

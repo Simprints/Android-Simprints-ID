@@ -7,8 +7,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.tools.extentions.nullIfEmpty
 import com.simprints.feature.externalcredential.R
-import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialConfirmationBinding
+import com.simprints.feature.externalcredential.databinding.FragmentExternalCredentialQrConfirmationBinding
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -16,10 +17,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-internal class ExternalCredentialConfirmationFragment : Fragment(R.layout.fragment_external_credential_confirmation) {
+internal class ExternalCredentialQrConfirmationFragment : Fragment(R.layout.fragment_external_credential_qr_confirmation) {
     private val viewModel: ExternalCredentialViewModel by activityViewModels()
-    private val binding by viewBinding(FragmentExternalCredentialConfirmationBinding::bind)
-    private val args: ExternalCredentialConfirmationFragmentArgs by navArgs()
+    private val binding by viewBinding(FragmentExternalCredentialQrConfirmationBinding::bind)
+    private val args: ExternalCredentialQrConfirmationFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,9 +61,19 @@ internal class ExternalCredentialConfirmationFragment : Fragment(R.layout.fragme
                 externalCredentialStatusTitle.text = "No subject linked to QR code"
                 confirmationBtn.text = "Search 1:N"
             }
+
+            ExternalCredentialResult.CREDENTIAL_EMPTY -> {
+                externalCredentialSmallIcon.isVisible = false
+                confirmationBtn.isVisible = false
+                externalCredentialSubjectId.isVisible = false
+                externalCredentialLargeIcon.setImageResource(R.drawable.ic_warning)
+                // [MS-964] For some reason this is the only resolved way to make the icon red
+                externalCredentialLargeIcon.setColorFilter(ContextCompat.getColor(requireContext(), IDR.color.simprints_red_dark))
+                externalCredentialStatusTitle.text = "Cannot process QR code data"
+            }
         }
 
-        externalCredentialBody.text = "QR data: ${result.credential.data}"
+        externalCredentialBody.text = "QR data: ${result.credential.data.nullIfEmpty() ?: "???"}"
         externalCredentialSubjectId.text = "SubjectId: ${result.credential.subjectId}"
 
         binding.confirmationBtn.setOnClickListener {

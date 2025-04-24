@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/errorContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="@dimen/margin_large">
+
+    <TextView
+        style="@style/Text.Headline5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/orchestrator_generic_error_title" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/margin_default"
+        android:background="@color/simprints_text_grey_light" />
+
+    <TextView
+        android:id="@+id/errorMessage"
+        style="@style/Text.Subtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="OCR error message" />
+
+    <Button
+        android:id="@+id/buttonClose"
+        style="@style/Widget.Simprints.Button"
+        android:layout_marginTop="@dimen/margin_large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/id_pool_validation_action_close" />
+</LinearLayout>

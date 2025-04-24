@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/errorContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="@dimen/margin_large">
+
+    <TextView
+        style="@style/Text.Headline5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter ID to scan" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/margin_default"
+        android:background="@color/simprints_text_grey_light" />
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_info"
+            android:layout_width="16dp"
+            android:layout_height="16dp"/>
+        <View
+            android:layout_marginHorizontal="@dimen/margin_default"
+            android:background="@color/simprints_grey_light"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"/>
+        <TextView
+            android:id="@+id/errorMessage"
+            style="@style/Text.Subtitle2.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="'Search and Verify' requires and external credential ID. Enter the name of the fields that is going to be used as a personal identifier. Make sure to avoid any personally-identifiable data." />
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_large">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ocrDocumentId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Document field"
+            android:inputType="textNoSuggestions" />
+
+        <requestFocus />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:enabled="false"
+        android:id="@+id/buttonScan"
+        style="@style/Widget.Simprints.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_large"
+        android:text="@string/fingerprint_capture_scan" />
+</LinearLayout>
