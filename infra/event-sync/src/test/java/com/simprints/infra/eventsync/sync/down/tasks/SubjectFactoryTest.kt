@@ -246,6 +246,7 @@ class SubjectFactoryTest {
             projectId = expected.projectId,
             attendantId = expected.attendantId,
             moduleId = expected.moduleId,
+            subjectId = expected.subjectId,
             fingerprintResponse = FingerprintCaptureResult(
                 GUID1,
                 listOf(
