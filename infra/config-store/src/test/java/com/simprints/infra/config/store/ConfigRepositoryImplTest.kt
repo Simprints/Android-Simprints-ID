@@ -17,9 +17,15 @@ import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.HttpException
+import retrofit2.Response
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -27,6 +33,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -47,6 +54,7 @@ class ConfigRepositoryImplTest {
 
     @Before
     fun setup() {
+        mockkStatic(Simber::class)
         configServiceImpl = ConfigRepositoryImpl(
             localDataSource,
             remoteDataSource,
@@ -54,6 +62,11 @@ class ConfigRepositoryImplTest {
             tokenizationProcessor,
             DEVICE_ID,
         )
+    }
+
+    @After
+    fun cleanup() {
+        unmockkStatic(Simber::class)
     }
 
     @Test
@@ -259,5 +272,43 @@ class ConfigRepositoryImplTest {
 
         assertThat(result).isEqualTo(config)
         coVerify { localDataSource.getProjectConfiguration() }
+    }
+
+    @Test
+    fun `should log when failing to download privacy notice with non-404 response status code`() = runTest {
+        val code = 500
+        val exception = Exception("Server error").apply {
+            initCause(HttpException(Response.error<String>(code, "".toResponseBody(null))))
+        }
+        every { localDataSource.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE) } returns false
+        coEvery {
+            remoteDataSource.getPrivacyNotice(
+                PROJECT_ID,
+                "${PRIVACY_NOTICE_FILE}_$LANGUAGE",
+            )
+        } throws exception
+
+        configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+
+        verify(exactly = 1) { Simber.i(eq("Failed to download privacy notice"), eq(exception)) }
+    }
+
+    @Test
+    fun `should not log when failing to download privacy notice with 404 response status code`() = runTest {
+        val code = 404
+        val exception = Exception("Resource not found").apply {
+            initCause(HttpException(Response.error<String>(code, "".toResponseBody(null))))
+        }
+        every { localDataSource.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE) } returns false
+        coEvery {
+            remoteDataSource.getPrivacyNotice(
+                PROJECT_ID,
+                "${PRIVACY_NOTICE_FILE}_$LANGUAGE",
+            )
+        } throws exception
+
+        configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
+
+        verify(exactly = 0) { Simber.i(any(), any()) }
     }
 }
