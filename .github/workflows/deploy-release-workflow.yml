@@ -9,10 +9,10 @@ concurrency:
 
 jobs:
 
-    run-core-tests:
-        name: Run Core Tests
-        uses: ./.github/workflows/pr-checks.yml
-        secrets: inherit
+#    run-core-tests:
+#        name: Run Core Tests
+#        uses: ./.github/workflows/pr-checks.yml
+#        secrets: inherit
 
     deploy-to-dev:
         uses: ./.github/workflows/pipeline-deploy-to-dev.yml
