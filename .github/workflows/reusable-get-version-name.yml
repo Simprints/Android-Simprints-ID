@@ -47,6 +47,12 @@ name: "[Reusable] Get Version Name"
 
 on:
     workflow_call:
+        inputs:
+            version-source:
+                type: string
+                description: "Where to get the version from: 'branch' or 'internal'"
+                default: "internal"
+
         outputs:
             version-name:
                 description: "The version name extracted from the source"
