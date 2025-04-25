@@ -8,7 +8,7 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-
+# TODO [MS-953] revert changes
 #    run-core-tests:
 #        name: Run Core Tests
 #        uses: ./.github/workflows/pr-checks.yml

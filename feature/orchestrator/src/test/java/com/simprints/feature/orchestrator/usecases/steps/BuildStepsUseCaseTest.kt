@@ -23,7 +23,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
-
+// TODO [MS-953] revert changes
 class BuildStepsUseCaseTest {
     /**
     @RelaxedMockK

@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-
+// TODO [MS-953] revert changes
 internal class QrCodeAnalyzerTest {/**
     @MockK
     lateinit var mockQrCodeDetector: QrCodeDetector

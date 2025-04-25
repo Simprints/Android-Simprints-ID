@@ -12,7 +12,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-
+// TODO [MS-953] revert changes
 internal class AppResponseBuilderUseCaseTest {/**
     @MockK
     lateinit var isNewEnrolment: IsNewEnrolmentUseCase
