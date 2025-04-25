@@ -1,14 +1,52 @@
 # Parse out the version name based on the release type
+#name: "[Reusable] Get Version Name"
+#
+#on:
+#    workflow_call:
+#        inputs:
+#            version-source:
+#                type: string
+#                description: "Where to get the version from: 'branch' or 'internal'"
+#                default: "internal"
+#
+#        outputs:
+#            version-name:
+#                description: "The version name extracted from the source"
+#                value: ${{ jobs.extract-version.outputs.version-name }}
+#
+#jobs:
+#    extract-version:
+#        runs-on: ubuntu-latest
+#
+#        outputs:
+#            version-name: ${{ steps.extract.outputs.version-name }}
+#
+#        steps:
+#            -   name: Checkout if using internal version
+#                if: ${{ inputs.version-source == 'internal' }}
+#                uses: actions/checkout@v4
+#
+#            -   name: Extract version
+#                id: extract
+#                run: |
+#                    if [ "${{ inputs.version-source }}" = "branch" ]; then
+#                      last_part="${GITHUB_REF_NAME##*/}"
+#                      echo "version-name=$last_part" >> $GITHUB_OUTPUT
+#                    elif [ "${{ inputs.version-source }}" = "internal" ]; then
+#                        VERSION_NAME=$(grep 'set("VERSION_NAME"' build-logic/build_properties.gradle.kts \
+#                        | sed -E 's/.*set\("VERSION_NAME",[[:space:]]*"([^"]+)".*/\1/')
+#                        echo "version-name=$VERSION_NAME" >> $GITHUB_OUTPUT
+#                    else
+#                      echo "Error: Unknown version-source '${{ inputs.version-source }}'"
+#                      exit 1
+#                    fi
+
+# TODO [MS-953] revert changes to pipeline
+# Parse out the version name based on the release type
 name: "[Reusable] Get Version Name"
 
 on:
     workflow_call:
-        inputs:
-            version-source:
-                type: string
-                description: "Where to get the version from: 'branch' or 'internal'"
-                default: "internal"
-
         outputs:
             version-name:
                 description: "The version name extracted from the source"
@@ -22,21 +60,7 @@ jobs:
             version-name: ${{ steps.extract.outputs.version-name }}
 
         steps:
-            -   name: Checkout if using internal version
-                if: ${{ inputs.version-source == 'internal' }}
-                uses: actions/checkout@v4
-
-            -   name: Extract version
-                id: extract
-                run: |
-                    if [ "${{ inputs.version-source }}" = "branch" ]; then
-                      last_part="${GITHUB_REF_NAME##*/}"
-                      echo "version-name=$last_part" >> $GITHUB_OUTPUT              
-                    elif [ "${{ inputs.version-source }}" = "internal" ]; then
-                        VERSION_NAME=$(grep 'set("VERSION_NAME"' build-logic/build_properties.gradle.kts \
-                        | sed -E 's/.*set\("VERSION_NAME",[[:space:]]*"([^"]+)".*/\1/')                   
-                        echo "version-name=$VERSION_NAME" >> $GITHUB_OUTPUT
-                    else
-                      echo "Error: Unknown version-source '${{ inputs.version-source }}'"
-                      exit 1
-                    fi
+            - name: Return special OCR staging version [MS-953]
+              id: extract
+              run: |
+                  echo "version-name=2025.1.0-OCR-special+Staging.81.2" >> $GITHUB_OUTPUT
