@@ -69,4 +69,4 @@ jobs:
             - name: Return special OCR staging version [MS-953]
               id: extract
               run: |
-                  echo "version-name=2025.1.0-OCR-special+Staging.81.2" >> $GITHUB_OUTPUT
+                  echo "version-name=2025.1.0-OCR-special" >> $GITHUB_OUTPUT
