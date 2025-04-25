@@ -8,15 +8,14 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-# TODO [MS-953] revert changes
 #    run-core-tests:
 #        name: Run Core Tests
 #        uses: ./.github/workflows/pr-checks.yml
 #        secrets: inherit
 
-    deploy-to-dev:
-        uses: ./.github/workflows/pipeline-deploy-to-dev.yml
-        secrets: inherit
+#    deploy-to-dev:
+#        uses: ./.github/workflows/pipeline-deploy-to-dev.yml
+#        secrets: inherit
 #        needs:
 #            - run-core-tests
 
@@ -26,8 +25,8 @@ jobs:
 #        needs:
 #            - run-core-tests
 
-    deploy-to-internal:
-        uses: ./.github/workflows/pipeline-deploy-to-internal.yml
-        secrets: inherit
+#    deploy-to-internal:
+#        uses: ./.github/workflows/pipeline-deploy-to-internal.yml
+#        secrets: inherit
 #        needs:
 #            - run-core-tests
