@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/margin_large"
+    tools:background="@color/simprints_blue">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:elevation="2dp"
+        app:cardCornerRadius="8dp">
+
+        <LinearLayout
+            android:id="@+id/ocrBlockContainer"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/margin_default">
+
+            <TextView
+                android:id="@+id/ocrId"
+                style="@style/Text.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Block #1" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/linesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_ocr_line"
+                tools:orientation="vertical" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

@@ -24,8 +24,8 @@ import com.simprints.feature.externalcredential.databinding.FragmentExternalCred
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
 import com.simprints.feature.externalcredential.screens.controller.ExternalCredentialViewModel
 import com.simprints.feature.externalcredential.screens.ocr.model.OcrScanState
-import com.simprints.feature.externalcredential.screens.ocr.view.OcrResultAdapter
-import com.simprints.feature.externalcredential.screens.ocr.view.OcrResultItem
+import com.simprints.feature.externalcredential.screens.ocr.view.OcrBlockAdapter
+import com.simprints.feature.externalcredential.screens.ocr.view.OcrBlockItem
 import com.simprints.feature.externalcredential.screens.ocr.view.ZoomController
 import com.simprints.feature.externalcredential.screens.ocr.viewmodel.OcrScanViewModel
 import com.simprints.infra.external.credential.store.model.ExternalCredential
@@ -160,25 +160,35 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
     private fun renderOcrFields(fields: Map<String, String?>, ocrAllText: Text) {
         val recyclerView: RecyclerView = binding.rvOcrFields
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val header = OcrResultItem("Requested fields (For Debug)", "")
+        val header = OcrBlockItem("Requested fields (For Debug)", "")
         val data = fields.map {
-            OcrResultItem(id = it.key, text = it.value ?: "???")
+            OcrBlockItem(id = it.key, text = it.value ?: "???")
         }
-        val headerAllFields = OcrResultItem("--------------------------------\nALL FIELDS READ WITH OCR", "")
+        val headerAllFields = OcrBlockItem("--------------------------------\nALL FIELDS READ WITH OCR", "")
         val allFields = ocrAllText.textBlocks.mapIndexed { index, textBlock ->
             val text = textBlock.lines.joinToString(separator = "\n") { line ->
                 "  - ${line.text} (${String.format("%.2f", line.confidence * 100)}%)"
             }
-            OcrResultItem(id = "Block #${index + 1}", text = text, lines = textBlock.lines)
+            OcrBlockItem(id = "Block #${index + 1}", text = text, lines = textBlock.lines)
         }
-        recyclerView.adapter = OcrResultAdapter(
+        recyclerView.adapter = OcrBlockAdapter(
             items = listOf(header) + data + listOf(headerAllFields) + allFields,
-            onLineClicked = { lines ->
-                binding.ocrBoxesOverlay.init(lines, binding.imageCardPreview)
-                binding.ocrBoxesOverlay.invalidate()
-                binding.ocrBoxesOverlay.isVisible = true
-            }
+            onBlockClicked = { ocrBlock ->
+                highlightOcrLinesOnImage(ocrBlock.lines)
+            },
+            onLineClicked = { line -> highlightOcrLinesOnImage(listOf(line)) },
+            onUseLineButtonClicked = { line ->
+                highlightOcrLinesOnImage(listOf(line))
+                binding.externalCredentialText.text = line.text
+                flowViewModel.validateExternalCredential(credentialId = binding.externalCredentialText.text.toString())
+            },
         )
+    }
+
+    private fun highlightOcrLinesOnImage(lines: List<Text.Line>) {
+        binding.ocrBoxesOverlay.init(lines, binding.imageCardPreview)
+        binding.ocrBoxesOverlay.invalidate()
+        binding.ocrBoxesOverlay.isVisible = true
     }
 
     private fun renderCardEnrolOk(credential: ExternalCredential) {
