@@ -36,6 +36,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.net.HttpURLConnection
 
 class ConfigRepositoryImplTest {
     companion object {
@@ -276,7 +277,7 @@ class ConfigRepositoryImplTest {
 
     @Test
     fun `should log when failing to download privacy notice with non-404 response status code`() = runTest {
-        val code = 500
+        val code = HttpURLConnection.HTTP_INTERNAL_ERROR // 500
         val exception = Exception("Server error").apply {
             initCause(HttpException(Response.error<String>(code, "".toResponseBody(null))))
         }
@@ -295,7 +296,7 @@ class ConfigRepositoryImplTest {
 
     @Test
     fun `should not log when failing to download privacy notice with 404 response status code`() = runTest {
-        val code = 404
+        val code = HttpURLConnection.HTTP_NOT_FOUND
         val exception = Exception("Resource not found").apply {
             initCause(HttpException(Response.error<String>(code, "".toResponseBody(null))))
         }
