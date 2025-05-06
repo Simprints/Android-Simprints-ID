@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
-import com.simprints.face.capture.usecases.GetAndTurnOffPreparationInstructionsShowingUseCase
+import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
@@ -74,7 +74,7 @@ class FaceCaptureViewModelTest {
     private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
 
     @MockK
-    private lateinit var getAndTurnOffPreparationInstructionsShowing: GetAndTurnOffPreparationInstructionsShowingUseCase
+    private lateinit var shouldShowInstructionsScreen: ShouldShowInstructionsScreenUseCase
 
     private lateinit var viewModel: FaceCaptureViewModel
 
@@ -104,7 +104,7 @@ class FaceCaptureViewModelTest {
             },
             saveLicenseCheckEvent,
             isUsingAutoCapture,
-            getAndTurnOffPreparationInstructionsShowing,
+            shouldShowInstructionsScreen,
             "deviceId",
         )
     }
@@ -310,10 +310,10 @@ class FaceCaptureViewModelTest {
     @Test
     fun `preparation instructions screen should be set to showing according to its use case`() {
         // Given
-        coEvery { getAndTurnOffPreparationInstructionsShowing() } returns true
+        coEvery { shouldShowInstructionsScreen() } returns true
 
         // When
-        val isShowing = viewModel.getAndTurnOffIfPreparationInstructionsShowing()
+        val isShowing = viewModel.shouldShowInstructionsScreen()
 
         // Then
         assertThat(isShowing).isTrue()

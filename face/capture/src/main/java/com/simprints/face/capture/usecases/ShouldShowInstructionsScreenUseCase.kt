@@ -7,7 +7,7 @@ import javax.inject.Singleton
 import androidx.core.content.edit
 
 @Singleton
-class GetAndTurnOffPreparationInstructionsShowingUseCase @Inject constructor(
+class ShouldShowInstructionsScreenUseCase @Inject constructor(
     private val securityManager: SecurityManager,
 ) {
     operator fun invoke(): Boolean {

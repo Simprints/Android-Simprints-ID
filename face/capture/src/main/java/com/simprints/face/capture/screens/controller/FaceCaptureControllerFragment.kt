@@ -127,7 +127,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
                 },
             )
             graph?.setStartDestination(
-                if (viewModel.getAndTurnOffIfPreparationInstructionsShowing()) {
+                if (viewModel.shouldShowInstructionsScreen()) {
                     R.id.facePreparationFragment
                 } else {
                     R.id.faceLiveFeedbackFragment
