@@ -320,18 +320,6 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `preparation instructions screen should be set to not showing according to its use case`() {
-        // Given
-        coEvery { getAndTurnOffPreparationInstructionsShowing() } returns false
-
-        // When
-        val isShowing = viewModel.getAndTurnOffIfPreparationInstructionsShowing()
-
-        // Then
-        assertThat(isShowing).isFalse()
-    }
-
-    @Test
     fun `test initFaceBioSdk should return error when re-download fails`() {
         // Given
         val license = "license"

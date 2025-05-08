@@ -52,7 +52,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
     private val isUsingAutoCapture: IsUsingAutoCaptureUseCase,
-    private val shouldShowInstructionsScreen: ShouldShowInstructionsScreenUseCase,
+    private val shouldShowInstructions: ShouldShowInstructionsScreenUseCase,
     @DeviceID private val deviceID: String,
 ) : ViewModel() {
     // Updated in live feedback screen
@@ -137,7 +137,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun shouldShowInstructionsScreen(): Boolean =
-        shouldShowInstructionsScreen()
+        shouldShowInstructions()
 
     private suspend fun initialize(
         activity: Activity,
