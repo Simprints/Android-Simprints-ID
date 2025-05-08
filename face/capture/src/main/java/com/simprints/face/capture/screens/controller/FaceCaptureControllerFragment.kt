@@ -119,13 +119,23 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
 
         viewModel.setupAutoCapture()
         viewModel.isAutoCaptureEnabled.observe(viewLifecycleOwner) { isAutoCaptureEnabled ->
-            internalNavController?.setGraph(
+            val graph = internalNavController?.navInflater?.inflate(
                 if (isAutoCaptureEnabled) {
                     R.navigation.graph_face_capture_auto_internal
                 } else {
                     R.navigation.graph_face_capture_internal
                 },
             )
+            graph?.setStartDestination(
+                if (viewModel.shouldShowInstructionsScreen()) {
+                    R.id.facePreparationFragment
+                } else {
+                    R.id.faceLiveFeedbackFragment
+                }
+            )
+            graph?.let {
+                internalNavController?.setGraph(graph, null)
+            }
         }
     }
 

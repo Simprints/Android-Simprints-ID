@@ -13,6 +13,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
+import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
@@ -51,6 +52,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
     private val isUsingAutoCapture: IsUsingAutoCaptureUseCase,
+    private val shouldShowInstructions: ShouldShowInstructionsScreenUseCase,
     @DeviceID private val deviceID: String,
 ) : ViewModel() {
     // Updated in live feedback screen
@@ -133,6 +135,9 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun setupAutoCapture() = viewModelScope.launch {
         _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
     }
+
+    fun shouldShowInstructionsScreen(): Boolean =
+        shouldShowInstructions()
 
     private suspend fun initialize(
         activity: Activity,

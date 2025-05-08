@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
+import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
@@ -72,6 +73,9 @@ class FaceCaptureViewModelTest {
     @MockK
     private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
 
+    @MockK
+    private lateinit var shouldShowInstructionsScreen: ShouldShowInstructionsScreenUseCase
+
     private lateinit var viewModel: FaceCaptureViewModel
 
     private val faceDetections = listOf<FaceDetection>(
@@ -100,6 +104,7 @@ class FaceCaptureViewModelTest {
             },
             saveLicenseCheckEvent,
             isUsingAutoCapture,
+            shouldShowInstructionsScreen,
             "deviceId",
         )
     }
@@ -300,6 +305,18 @@ class FaceCaptureViewModelTest {
 
         // Then
         assertThat(viewModel.isAutoCaptureEnabled.getOrAwaitValue()).isFalse()
+    }
+
+    @Test
+    fun `preparation instructions screen should be set to showing according to its use case`() {
+        // Given
+        coEvery { shouldShowInstructionsScreen() } returns true
+
+        // When
+        val isShowing = viewModel.shouldShowInstructionsScreen()
+
+        // Then
+        assertThat(isShowing).isTrue()
     }
 
     @Test
