@@ -61,7 +61,6 @@ internal class FaceMatcherUseCase @Inject constructor(
         // as it's count function does not take into account filtering criteria
         var loadedCandidates = 0
         val resultItems = coroutineScope {
-
             createRanges(expectedCandidates)
                 .map { range ->
                     async(dispatcher) {
@@ -106,7 +105,7 @@ internal class FaceMatcherUseCase @Inject constructor(
 
     private suspend fun match(
         matcher: FaceMatcher,
-        batchCandidates: List<FaceIdentity>
+        batchCandidates: List<FaceIdentity>,
     ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, candidate ->
         acc.add(
             FaceMatchResult.Item(

@@ -249,7 +249,6 @@ testing-AndroidX-core = { module = "androidx.arch.core:core-testing", version.re
 testing-AndroidX-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx_test_orchestrator_version" }
 testing-AndroidX-runner = { module = "androidx.test:runner", version.ref = "androidx_version" }
 testing-AndroidX-room = { module = "androidx.room:room-testing", version.ref = "androidx_room_version" }
-testing-AndroidX-navigation = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
 testing-AndroidX-uiAutomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiAutomator_version" }
 
 # Dependencies of the included build-logic
