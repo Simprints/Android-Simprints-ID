@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import retrofit2.HttpException
+import java.net.HttpURLConnection
 import javax.inject.Inject
 
 internal class ConfigRepositoryImpl @Inject constructor(
@@ -125,7 +127,10 @@ internal class ConfigRepositoryImpl @Inject constructor(
             localDataSource.storePrivacyNotice(projectId, language, privacyNotice)
             flowCollector.emit(Succeed(language, privacyNotice))
         } catch (t: Throwable) {
-            Simber.i("Failed to download privacy notice", t)
+            if ((t.cause as? HttpException)?.code() != HttpURLConnection.HTTP_NOT_FOUND) {
+                // Non-existence of resource isn't considered a download failure
+                Simber.i("Failed to download privacy notice", t)
+            }
             flowCollector.emit(
                 if (t is BackendMaintenanceException) {
                     FailedBecauseBackendMaintenance(language, t, t.estimatedOutage)

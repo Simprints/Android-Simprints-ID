@@ -54,7 +54,8 @@ findNavController().handleResult<ExitFormResult>(
 ) { }
 
 // Navigate to screen
-findNavController(R.id.host_fragment).navigate(
+findNavController(R.id.host_fragment).navigateSafely(
+    this,
     R.id.action_global_refusalFragment,
     exitFormConfiguration { /* configuration */ }.toArgs(),
 )

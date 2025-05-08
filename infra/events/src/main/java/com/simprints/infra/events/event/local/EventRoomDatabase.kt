@@ -24,7 +24,7 @@ import com.simprints.infra.events.event.local.migrations.EventMigration8to9
 import com.simprints.infra.events.event.local.migrations.EventMigration9to10
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.DbEventScope
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 @Database(
     entities = [
@@ -44,7 +44,7 @@ internal abstract class EventRoomDatabase : RoomDatabase() {
     companion object {
         fun getDatabase(
             context: Context,
-            factory: SupportFactory,
+            factory: SupportOpenHelperFactory,
             dbName: String,
         ): EventRoomDatabase {
             val builder = Room
@@ -68,7 +68,6 @@ internal abstract class EventRoomDatabase : RoomDatabase() {
             if (BuildConfig.DB_ENCRYPTION) {
                 builder.openHelperFactory(factory)
             }
-
             return builder.build()
         }
     }

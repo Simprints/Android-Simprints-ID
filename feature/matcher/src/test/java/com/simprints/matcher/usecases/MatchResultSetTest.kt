@@ -46,4 +46,23 @@ class MatchResultSetTest {
             ),
         )
     }
+
+    // On equal confidence scores sort by id
+    @Test
+    fun `Stores results sorted descending by confidence and id`() {
+        val set = MatchResultSet<FingerprintMatchResult.Item>(3)
+
+        set.add(FingerprintMatchResult.Item("4", 0.4f))
+        set.add(FingerprintMatchResult.Item("1", 0.4f))
+        set.add(FingerprintMatchResult.Item("3", 0.3f))
+        set.add(FingerprintMatchResult.Item("2", 0.3f))
+
+        assertThat(set.toList()).isEqualTo(
+            listOf(
+                FingerprintMatchResult.Item("4", 0.4f),
+                FingerprintMatchResult.Item("1", 0.4f),
+                FingerprintMatchResult.Item("3", 0.3f),
+            ),
+        )
+    }
 }
