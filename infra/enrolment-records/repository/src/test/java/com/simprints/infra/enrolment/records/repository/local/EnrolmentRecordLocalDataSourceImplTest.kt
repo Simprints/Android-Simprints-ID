@@ -13,6 +13,8 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -33,6 +35,9 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -68,6 +73,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
     private lateinit var enrolmentRecordLocalDataSource: EnrolmentRecordLocalDataSource
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -102,6 +108,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         enrolmentRecordLocalDataSource = EnrolmentRecordLocalDataSourceImpl(
             realmWrapperMock,
             tokenizationProcessor,
+            UnconfinedTestDispatcher(),
         )
     }
 
@@ -134,14 +141,15 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people = enrolmentRecordLocalDataSource
+        val people = mutableListOf<FingerprintIdentity>()
+        enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
                 onCandidateLoaded,
-            ).toList()
+            ).consumeEach { people.addAll(it) }
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
@@ -155,11 +163,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
         enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(fingerprintSampleFormat = format),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
                 onCandidateLoaded,
-            ).toList()
+            ).consumeEach { }
 
         verify {
             realmQuery.query(
@@ -176,12 +184,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
         enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(faceSampleFormat = format),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
                 onCandidateLoaded,
-            ).toList()
-
+            ).consumeEach { }
         verify {
             realmQuery.query(
                 "ANY ${FACE_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
@@ -195,15 +202,17 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people = enrolmentRecordLocalDataSource
+        val people = mutableListOf<FaceIdentity>()
+        enrolmentRecordLocalDataSource
             .loadFaceIdentities(
                 SubjectQuery(),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
                 onCandidateLoaded,
-            ).toList()
-
+            ).consumeEach {
+                people.addAll(it)
+            }
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }

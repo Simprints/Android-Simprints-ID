@@ -129,7 +129,7 @@ internal class FaceMatcherUseCaseTest {
             onCandidateLoaded()
 
             // Return the face identities
-            faceIdentities
+            createTestChannel(faceIdentities)
         }
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any()) } returns 42f
 

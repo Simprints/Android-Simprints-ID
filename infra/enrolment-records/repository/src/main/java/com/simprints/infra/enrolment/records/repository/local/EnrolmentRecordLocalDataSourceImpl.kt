@@ -1,5 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local
 
+import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -25,11 +26,14 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.query.find
 import io.realm.kotlin.types.RealmUUID
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.ReceiveChannel
 import javax.inject.Inject
 
 internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     private val realmWrapper: RealmWrapper,
     private val tokenizationProcessor: TokenizationProcessor,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
@@ -51,11 +55,47 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             .map { dbSubject -> dbSubject.fromDbToDomain() }
     }
 
-    override suspend fun loadFingerprintIdentities(
+    val parallelism = 1 // only one reader at a time
+
+    override fun loadFaceIdentities(
         query: SubjectQuery,
-        range: IntRange,
+        ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
+        onCandidateLoaded: () -> Unit,
+    ): ReceiveChannel<List<FaceIdentity>> = loadIdentitiesConcurrently(
+        ranges = ranges,
+        dispatcher = dispatcher,
+        parallelism = parallelism,
+    ) { range ->
+        loadFaceIdentities(
+            query = query,
+            range = range,
+            onCandidateLoaded = onCandidateLoaded,
+        )
+    }
+
+    override fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
+        project: Project,
+        onCandidateLoaded: () -> Unit,
+    ): ReceiveChannel<List<FingerprintIdentity>> = loadIdentitiesConcurrently(
+        ranges = ranges,
+        dispatcher = dispatcher,
+        parallelism = parallelism,
+    ) { range ->
+        loadFingerprintIdentities(
+            query = query,
+            range = range,
+            onCandidateLoaded = onCandidateLoaded,
+        )
+    }
+
+    private suspend fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        range: IntRange,
         onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
         realm
@@ -71,11 +111,9 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             }
     }
 
-    override suspend fun loadFaceIdentities(
+    private suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
-        dataSource: BiometricDataSource,
-        project: Project,
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
         realm
