@@ -18,15 +18,12 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource.Companion.FORMAT_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FORMAT_FIELD
 import com.simprints.infra.enrolment.records.repository.local.models.toDomain
 import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
-import io.mockk.CapturingSlot
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -34,6 +31,8 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -63,12 +62,12 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     @MockK
     private lateinit var project: Project
 
-    private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
+    private lateinit var blockCapture: CapturingSlot<suspend (Realm) -> Any>
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
-    private val onCandidateLoaded: () -> Unit = {}
+    private val onCandidateLoaded: suspend () -> Unit = {}
     private var localSubjects: MutableList<Subject> = mutableListOf()
 
-    private lateinit var enrolmentRecordLocalDataSource: EnrolmentRecordLocalDataSource
+    private lateinit var enrolmentRecordLocalDataSource: RealmEnrolmentRecordLocalDataSource
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -86,7 +85,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         blockCapture = slot()
         coEvery { realmWrapperMock.readRealm(capture(blockCapture)) } answers {
-            blockCapture.captured.invoke(realm)
+            runBlocking { blockCapture.captured.invoke(realm) }
         }
         mutableBlockCapture = slot()
         coEvery { realmWrapperMock.writeRealm(capture(mutableBlockCapture)) } answers {
@@ -259,7 +258,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         every { realmSingleQuery.find() } returns null
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
+            listOf(SubjectAction.Creation(subject.toDomain())),
             project,
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
@@ -276,7 +275,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 fingerprintSamples = listOf(
                     getRandomFingerprintSample("fingerToDelete"),
                 ),
-            ).fromDomainToDb()
+            ).toRealmDb()
         val subject = getFakePerson()
 
         enrolmentRecordLocalDataSource.performActions(
@@ -304,7 +303,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 getRandomFingerprintSample(referenceId = "fingerToDelete"),
                 getRandomFingerprintSample(),
             ),
-        ).fromDomainToDb()
+        ).toRealmDb()
 
         enrolmentRecordLocalDataSource.performActions(
             listOf(
@@ -367,6 +366,19 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `loadAllSubjectsInBatches with no subjects should return empty list and close channel`() = runTest {
+        val batchSize = 10
+
+        every { realmQuery.sort(RealmEnrolmentRecordLocalDataSource.SUBJECT_ID_FIELD, any()) } returns realmQuery
+
+        val channel = enrolmentRecordLocalDataSource.loadAllSubjectsInBatches(batchSize)
+        val result = channel.toList()
+
+        assertThat(result).isEmpty()
     }
 
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()

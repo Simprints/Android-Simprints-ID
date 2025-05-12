@@ -79,6 +79,4 @@ internal fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) = this
 
 internal fun WorkManager.getAllSubjectsSyncWorkersInfo() = getWorkInfosByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
 
-internal fun MutableList<WorkInfo>.sortByScheduledTime() = sortBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }
-
 internal fun List<WorkInfo>.sortByScheduledTime() = sortedBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }
