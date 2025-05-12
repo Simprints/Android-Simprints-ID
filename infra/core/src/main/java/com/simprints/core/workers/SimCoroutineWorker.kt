@@ -93,7 +93,7 @@ abstract class SimCoroutineWorker(
                 applicationContext,
                 WORKER_FOREGROUND_NOTIFICATION_CHANNEL_ID,
             ).setContentTitle(context.getString(R.string.notification_sync_title))
-            .setContentText(context.getString(R.string.notification_sync_description))
+            .setContentText(context.getString(notificationDescription))
             .setSmallIcon(R.drawable.ic_notification_sync)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -108,6 +108,8 @@ abstract class SimCoroutineWorker(
             ForegroundInfo(WORKER_FOREGROUND_NOTIFICATION_ID, notification)
         }
     }
+
+    open val notificationDescription = R.string.notification_sync_description
 
     protected fun crashlyticsLog(message: String) {
         Simber.i(message, tag = tag)

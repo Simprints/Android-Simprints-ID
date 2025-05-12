@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":infra:core"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:sync"))
+    implementation(project(":infra:enrolment-records:repository"))
 
     implementation(project(":feature:orchestrator"))
     implementation(project(":feature:dashboard"))

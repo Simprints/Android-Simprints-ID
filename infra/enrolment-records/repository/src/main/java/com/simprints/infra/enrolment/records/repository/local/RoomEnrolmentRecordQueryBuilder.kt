@@ -11,7 +11,7 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_TABLE_NAME
 import com.simprints.infra.enrolment.records.room.store.models.DbSubjectTemplateFormatMap.Companion.FORMAT_MAP_TABLE_NAME
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     fun buildSubjectQuery(query: SubjectQuery): SimpleSQLiteQuery {

@@ -24,6 +24,9 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.query.find
 import io.realm.kotlin.types.RealmUUID
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -256,5 +259,33 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
         }
         return realmQuery
+    }
+
+    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<Subject>> = channelFlow {
+        var lastId: RealmUUID? = null
+        realmWrapper.readRealm { realm ->
+            launch {
+                val baseQuery = realm.query(DbSubject::class)
+                while (true) {
+                    val pagedQuery = if (lastId != null) {
+                        baseQuery.query("$SUBJECT_ID_FIELD > $0", lastId)
+                    } else {
+                        baseQuery
+                    }
+
+                    val batch = pagedQuery
+                        .sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
+                        .find { it.take(batchSize) }
+                        .map { it.toDomain() }
+
+                    if (batch.isEmpty()) {
+                        close() // close the flow when done
+                        break
+                    }
+                    send(batch)
+                    lastId = RealmUUID.from(batch.last().subjectId)
+                }
+            }
+        }
     }
 }
