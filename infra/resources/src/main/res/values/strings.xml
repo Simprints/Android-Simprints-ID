@@ -438,6 +438,7 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">Sync in progress</string>
+    <string name="notification_migration_description">Storage optimization in progress</string>
 
     <!-- Identification pool validation -->
     <string name="id_pool_validation_issue_title">Identification issue</string>
