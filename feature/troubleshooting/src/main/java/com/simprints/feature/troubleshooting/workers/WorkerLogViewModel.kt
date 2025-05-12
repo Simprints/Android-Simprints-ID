@@ -30,6 +30,7 @@ internal class WorkerLogViewModel @Inject constructor(
                 .collect { infos ->
                     infos
                         .map { formatWorkInfo(it) }
+                        .sortedBy { it.title }
                         .take(50)
                         .ifEmpty { listOf(TroubleshootingItemViewData("No data")) }
                         .let { _workers.postValue(it) }

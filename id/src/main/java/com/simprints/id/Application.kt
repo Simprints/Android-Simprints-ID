@@ -8,6 +8,7 @@ import com.simprints.core.CoreApplication
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.tools.extentions.deviceHardwareId
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.eventsync.BuildConfig.DB_ENCRYPTION
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
@@ -29,6 +30,8 @@ open class Application :
 
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
+
+    @Inject lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
 
     @AppScope
     @Inject
@@ -60,6 +63,7 @@ open class Application :
         SimberBuilder.initialize(this)
         Simber.setUserProperty(DEVICE_ID, deviceHardwareId)
         appScope.launch {
+            realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             syncOrchestrator.cleanupWorkers()
             syncOrchestrator.scheduleBackgroundWork()
         }

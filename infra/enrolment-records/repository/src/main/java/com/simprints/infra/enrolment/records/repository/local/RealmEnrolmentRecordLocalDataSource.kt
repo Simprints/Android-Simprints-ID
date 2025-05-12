@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -29,6 +28,9 @@ import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -59,7 +61,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -79,7 +81,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         )
     }
 
-    override fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -299,5 +301,33 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
         }
         return realmQuery
+    }
+
+    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<Subject>> = channelFlow {
+        var lastId: RealmUUID? = null
+        realmWrapper.readRealm { realm ->
+            launch {
+                val baseQuery = realm.query(DbSubject::class)
+                while (true) {
+                    val pagedQuery = if (lastId != null) {
+                        baseQuery.query("$SUBJECT_ID_FIELD > $0", lastId)
+                    } else {
+                        baseQuery
+                    }
+
+                    val batch = pagedQuery
+                        .sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
+                        .find { it.take(batchSize) }
+                        .map { it.toDomain() }
+
+                    if (batch.isEmpty()) {
+                        close() // close the flow when done
+                        break
+                    }
+                    send(batch)
+                    lastId = RealmUUID.from(batch.last().subjectId)
+                }
+            }
+        }
     }
 }
