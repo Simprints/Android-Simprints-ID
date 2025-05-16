@@ -50,8 +50,7 @@ internal class BuildStepsUseCase @Inject constructor(
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
             buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
-            buildCaptureAndMatchStepsForEnrol(action, projectConfiguration),
-            buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.ENROL)
+            buildCaptureAndMatchStepsForEnrol(action, projectConfiguration, enrolmentSubjectId = enrolmentSubjectId),
         )
 
         is ActionRequest.IdentifyActionRequest -> {
@@ -107,6 +106,7 @@ internal class BuildStepsUseCase @Inject constructor(
         is ActionRequest.EnrolActionRequest -> buildCaptureAndMatchStepsForEnrol(
             action,
             projectConfiguration,
+            enrolmentSubjectId = enrolmentSubjectId,
             ageGroup,
         )
 
@@ -156,6 +156,7 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildCaptureAndMatchStepsForEnrol(
         action: ActionRequest.EnrolActionRequest,
         projectConfiguration: ProjectConfiguration,
+        enrolmentSubjectId: String,
         ageGroup: AgeGroup? = null,
     ): List<Step> {
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
@@ -166,6 +167,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 FlowType.ENROL,
                 resolvedAgeGroup,
             ),
+            buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.ENROL),
             if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
                 buildMatcherSteps(
                     projectConfiguration,
