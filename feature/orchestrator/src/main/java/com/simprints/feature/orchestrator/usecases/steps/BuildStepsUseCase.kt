@@ -44,7 +44,8 @@ internal class BuildStepsUseCase @Inject constructor(
     fun build(
         action: ActionRequest,
         projectConfiguration: ProjectConfiguration,
-        enrolmentSubjectId: String
+        enrolmentSubjectId: String,
+        cachedExternalCredentialId: String?
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
             buildSetupStep(),
@@ -93,7 +94,7 @@ internal class BuildStepsUseCase @Inject constructor(
         )
 
         is ActionRequest.ConfirmIdentityActionRequest -> listOf(
-            buildConfirmIdentityStep(action),
+            buildConfirmIdentityStep(action, cachedExternalCredentialId),
         )
     }.flatten()
 
@@ -507,7 +508,7 @@ internal class BuildStepsUseCase @Inject constructor(
             )
     }
 
-    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest) = listOf(
+    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest, cachedExternalCredentialId: String?) = listOf(
         Step(
             id = StepId.CONFIRM_IDENTITY,
             navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
@@ -515,6 +516,7 @@ internal class BuildStepsUseCase @Inject constructor(
             payload = SelectSubjectContract.getArgs(
                 projectId = action.projectId,
                 subjectId = action.selectedGuid,
+                externalCredentialId = cachedExternalCredentialId
             ),
         ),
     )

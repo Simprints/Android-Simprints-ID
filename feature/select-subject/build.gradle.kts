@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":infra:external-credential-store"))
     implementation(project(":infra:events"))
     implementation(project(":infra:auth-store"))
 }

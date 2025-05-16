@@ -8,5 +8,6 @@ object SelectSubjectContract {
     fun getArgs(
         projectId: String,
         subjectId: String,
-    ) = SelectSubjectFragmentArgs(projectId, subjectId).toBundle()
+        externalCredentialId: String?,
+    ) = SelectSubjectFragmentArgs(projectId = projectId, subjectId = subjectId, externalCredentialId = externalCredentialId).toBundle()
 }

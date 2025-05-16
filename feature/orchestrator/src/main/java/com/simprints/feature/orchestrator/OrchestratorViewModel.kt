@@ -88,7 +88,9 @@ internal class OrchestratorViewModel @Inject constructor(
             // In case of a follow-up action, we should restore completed steps from cache
             // and add new ones to the list. This way all session steps are available throughout
             // the app for reference (i.e. have we already captured face in this session?)
-            steps = cache.steps + stepsBuilder.build(action, projectConfiguration, enrolmentSubjectId)
+            val cachedSteps = cache.steps
+            val cachedExternalCredentialId = getCachedCredentialId(cachedSteps)
+            steps = cachedSteps + stepsBuilder.build(action, projectConfiguration, enrolmentSubjectId, cachedExternalCredentialId)
             Simber.i("Steps to execute: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
@@ -96,6 +98,16 @@ internal class OrchestratorViewModel @Inject constructor(
         }
 
         doNextStep()
+    }
+
+    private fun getCachedCredentialId(steps: List<Step>): String? {
+        steps.map { step ->
+            if (step.id == StepId.EXTERNAL_CREDENTIAL) {
+                val result = step.result as? ExternalCredentialSearchResponse ?: return null
+                return result.externalCredential.nullIfEmpty()
+            }
+        }
+        return null
     }
 
     fun handleResult(result: Serializable) = viewModelScope.launch {

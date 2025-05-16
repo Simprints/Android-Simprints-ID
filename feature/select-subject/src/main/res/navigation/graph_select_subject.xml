@@ -18,6 +18,11 @@
         <argument
             android:name="subjectId"
             app:argType="string" />
+
+        <argument
+            android:name="externalCredentialId"
+            app:nullable="true"
+            app:argType="string" />
     </fragment>
 
 </navigation>
