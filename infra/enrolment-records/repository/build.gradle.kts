@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:enrolment-records:realm-store"))
+    implementation(project(":infra:enrolment-records:room-store"))
     implementation(project(":infra:events"))
 
     implementation(libs.libsimprints)

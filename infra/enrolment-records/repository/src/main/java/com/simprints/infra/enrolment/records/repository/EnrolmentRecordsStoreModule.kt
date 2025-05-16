@@ -5,8 +5,6 @@ import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSourceImpl
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSourceImpl
 import com.simprints.infra.enrolment.records.repository.usecases.CompareImplicitTokenizedStringsUseCase
@@ -30,9 +28,6 @@ abstract class EnrolmentRecordsStoreModule {
     internal abstract fun bindEnrolmentRecordRepository(impl: EnrolmentRecordRepositoryImpl): EnrolmentRecordRepository
 
     @Binds
-    internal abstract fun bindEnrolmentRecordLocalDataSource(impl: EnrolmentRecordLocalDataSourceImpl): EnrolmentRecordLocalDataSource
-
-    @Binds
     internal abstract fun bindEnrolmentRecordRemoteDataSource(impl: EnrolmentRecordRemoteDataSourceImpl): EnrolmentRecordRemoteDataSource
 }
 
@@ -54,8 +49,20 @@ class IdentityDataSourceModule {
         context = context,
         dispatcher = dispatcher,
     )
+
+    @EnrolmentBatchSize
+    @Provides
+    fun provideBatchSize(): Int = BATCH_SIZE
+
+    companion object {
+        const val BATCH_SIZE = 80
+    }
 }
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class CommCareDataSource
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class EnrolmentBatchSize
