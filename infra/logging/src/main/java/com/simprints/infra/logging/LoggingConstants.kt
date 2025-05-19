@@ -45,5 +45,6 @@ object LoggingConstants {
         APP_SCOPE_ERROR,
         ORCHESTRATION,
         MIGRATION,
+        REALM_DB_MIGRATION,
     }
 }

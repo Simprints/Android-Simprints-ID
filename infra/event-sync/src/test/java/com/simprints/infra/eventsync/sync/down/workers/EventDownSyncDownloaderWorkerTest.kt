@@ -10,6 +10,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
@@ -31,6 +32,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -61,11 +63,12 @@ internal class EventDownSyncDownloaderWorkerTest {
     @MockK
     lateinit var eventScope: EventScope
 
-
     @MockK
     lateinit var configRepository: ConfigRepository
 
     private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
+
+    @MockK lateinit var migrationFlagsStore: RealmToRoomMigrationFlagsStore
 
     @Before
     fun setUp() {
@@ -86,7 +89,40 @@ internal class EventDownSyncDownloaderWorkerTest {
             eventRepository,
             configRepository,
             testCoroutineRule.testCoroutineDispatcher,
+            migrationFlagsStore,
         )
+    }
+
+    @Test
+    fun `worker when migration is in progress should retry and not set down sync in progress`() = runTest {
+        coEvery { migrationFlagsStore.isMigrationInProgress() } returns true
+
+        val result = eventDownSyncDownloaderWorker.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+        coVerify(exactly = 0) { migrationFlagsStore.setDownSyncInProgress(true) }
+        coVerify(exactly = 0) { migrationFlagsStore.setDownSyncInProgress(false) }
+    }
+
+    @Test
+    fun `worker when migration is not in progress should set down sync in progress to true then false`() = runTest {
+        coEvery { migrationFlagsStore.isMigrationInProgress() } returns false
+
+        eventDownSyncDownloaderWorker.doWork()
+
+        coVerify(exactly = 1) { migrationFlagsStore.setDownSyncInProgress(true) }
+        coVerify(exactly = 1) { migrationFlagsStore.setDownSyncInProgress(false) }
+    }
+
+    @Test
+    fun `worker when migration is not in progress and exception occurs should set down sync in progress to true then false`() = runTest {
+        coEvery { migrationFlagsStore.isMigrationInProgress() } returns false
+        coEvery { downSyncTask.downSync(any(), any(), any(), any()) } throws RuntimeException("Test exception")
+
+        eventDownSyncDownloaderWorker.doWork()
+
+        coVerify(exactly = 1) { migrationFlagsStore.setDownSyncInProgress(true) }
+        coVerify(exactly = 1) { migrationFlagsStore.setDownSyncInProgress(false) }
     }
 
     @Test
