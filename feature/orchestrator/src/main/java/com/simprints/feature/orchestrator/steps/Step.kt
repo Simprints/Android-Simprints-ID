@@ -10,6 +10,9 @@ import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.externalcredential.model.ExternalCredentialSaveResponse
+import com.simprints.feature.externalcredential.model.ExternalCredentialSearchResponse
+import com.simprints.feature.externalcredential.model.ExternalCredentialSkipResponse
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
@@ -54,6 +57,9 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
+    JsonSubTypes.Type(value = ExternalCredentialSaveResponse::class, name = "ExternalCredentialSaveResponse"),
+    JsonSubTypes.Type(value = ExternalCredentialSearchResponse::class, name = "ExternalCredentialSearchResponse"),
+    JsonSubTypes.Type(value = ExternalCredentialSkipResponse::class, name = "ExternalCredentialSkipResponse"),
 )
 abstract class SerializableMixin : Serializable
 
