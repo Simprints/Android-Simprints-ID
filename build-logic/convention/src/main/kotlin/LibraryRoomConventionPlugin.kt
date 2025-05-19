@@ -1,5 +1,6 @@
 import androidx.room.gradle.RoomExtension
 import com.android.build.api.dsl.LibraryExtension
+import common.api
 import common.configureDbEncryptionBuild
 import common.getLibs
 import common.implementation
@@ -38,7 +39,7 @@ class LibraryRoomConventionPlugin : Plugin<Project> {
 
             val libs = getLibs()
             dependencies {
-                implementation(libs, "androidX.Room.core")
+                api(libs, "androidX.Room.core")
                 implementation(libs, "androidX.Room.ktx")
                 ksp(libs, "androidX.Room.compiler")
 
