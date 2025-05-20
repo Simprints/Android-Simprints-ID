@@ -23,9 +23,16 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         results: List<Serializable>,
         project: Project,
         enrolmentSubjectId: String?,
+        externalCredential: String?
     ): AppResponse = when (request) {
         is ActionRequest.EnrolActionRequest -> if (isNewEnrolment(projectConfiguration, results)) {
-            handleEnrolment(request, results, project, enrolmentSubjectId!!)
+            handleEnrolment(
+                request = request,
+                results = results,
+                project = project,
+                subjectId = enrolmentSubjectId!!,
+                externalCredential = externalCredential,
+            )
         } else {
             handleIdentify(projectConfiguration, results)
         }

@@ -15,4 +15,5 @@ dependencies {
     implementation(project(":infra:config-sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:enrolment-records:repository"))
+    implementation(project(":infra:external-credential-store"))
 }

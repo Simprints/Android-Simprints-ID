@@ -3,17 +3,29 @@ package com.simprints.feature.externalcredential.model
 import androidx.annotation.Keep
 import java.io.Serializable
 
-@Keep
-data class ExternalCredentialSaveResponse(
-    val subjectId: String,
-    val externalCredential: String,
-) : Serializable
 
-@Keep
-data class ExternalCredentialSearchResponse(
-    val subjectId: String?,
-    val externalCredential: String,
-) : Serializable
+sealed class ExternalCredentialResponse : Serializable {
 
-@Keep
-class ExternalCredentialSkipResponse : Serializable
+    abstract val externalCredential: String?
+    abstract val imagePreviewPath: String?
+
+    @Keep
+    data class ExternalCredentialSaveResponse(
+        val subjectId: String,
+        override val externalCredential: String,
+        override val imagePreviewPath: String?,
+    ) : ExternalCredentialResponse()
+
+    @Keep
+    data class ExternalCredentialSearchResponse(
+        val subjectId: String?,
+        override val externalCredential: String,
+        override val imagePreviewPath: String?,
+    ) : ExternalCredentialResponse()
+
+    @Keep
+    data class ExternalCredentialSkipResponse(
+        override val externalCredential: String? = null,
+        override val imagePreviewPath: String? = null,
+    ) : ExternalCredentialResponse()
+}

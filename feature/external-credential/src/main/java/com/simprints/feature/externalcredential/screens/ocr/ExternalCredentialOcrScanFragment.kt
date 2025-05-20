@@ -66,7 +66,7 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
     private fun initListeners() = with(binding) {
         buttonConfirm.setOnClickListener {
             flowViewModel.externalCredentialResultDetails.value?.let {
-                flowViewModel.confirmAndFinishFlow(credential = it.credential)
+                flowViewModel.confirmAndFinishFlow(credential = it.credential, imagePath = args.ocrScanParams.imagePath)
             }
         }
 

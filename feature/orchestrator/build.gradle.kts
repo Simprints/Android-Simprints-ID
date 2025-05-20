@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:images"))
+    implementation(project(":infra:external-credential-store"))
 
     implementation(libs.jackson.core)
 }

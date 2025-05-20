@@ -10,12 +10,14 @@ object EnrolLastBiometricContract {
         projectId: String,
         userId: TokenizableString,
         moduleId: TokenizableString,
+        externalCredentialId: String?,
         steps: List<EnrolLastBiometricStepResult>,
     ) = EnrolLastBiometricFragmentArgs(
         EnrolLastBiometricParams(
             projectId = projectId,
             userId = userId,
             moduleId = moduleId,
+            externalCredentialId = externalCredentialId,
             steps = steps,
         ),
     ).toBundle()

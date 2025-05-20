@@ -17,7 +17,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
-import com.simprints.feature.externalcredential.model.ExternalCredentialSearchResponse
+import com.simprints.feature.externalcredential.model.ExternalCredentialResponse
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.exceptions.SubjectAgeNotSupportedException
 import com.simprints.feature.orchestrator.model.OrchestratorResult
@@ -89,8 +89,8 @@ internal class OrchestratorViewModel @Inject constructor(
             // and add new ones to the list. This way all session steps are available throughout
             // the app for reference (i.e. have we already captured face in this session?)
             val cachedSteps = cache.steps
-            val cachedExternalCredentialId = getCachedCredentialId(cachedSteps)
-            steps = cachedSteps + stepsBuilder.build(action, projectConfiguration, enrolmentSubjectId, cachedExternalCredentialId)
+            val cachedExternalCredentialResponse = getCachedCredentialResponse(cachedSteps)
+            steps = cachedSteps + stepsBuilder.build(action, projectConfiguration, enrolmentSubjectId, cachedExternalCredentialResponse)
             Simber.i("Steps to execute: ${steps.joinToString { it.id.toString() }}", tag = ORCHESTRATION)
         } catch (_: SubjectAgeNotSupportedException) {
             handleErrorResponse(AppErrorResponse(AppErrorReason.AGE_GROUP_NOT_SUPPORTED))
@@ -100,11 +100,10 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
-    private fun getCachedCredentialId(steps: List<Step>): String? {
+    private fun getCachedCredentialResponse(steps: List<Step>): ExternalCredentialResponse? {
         steps.map { step ->
             if (step.id == StepId.EXTERNAL_CREDENTIAL) {
-                val result = step.result as? ExternalCredentialSearchResponse ?: return null
-                return result.externalCredential.nullIfEmpty()
+                return step.result as? ExternalCredentialResponse
             }
         }
         return null
@@ -207,7 +206,7 @@ internal class OrchestratorViewModel @Inject constructor(
      * @param result result of the current step
      */
     private fun updateSearchAndVerifyMatcherParamsIfNeeded(currentStep: Step, result: Serializable) {
-        if (currentStep.id == StepId.EXTERNAL_CREDENTIAL && result is ExternalCredentialSearchResponse) {
+        if (currentStep.id == StepId.EXTERNAL_CREDENTIAL && result is ExternalCredentialResponse.ExternalCredentialSearchResponse) {
             val foundSubjectId = result.subjectId?.nullIfEmpty()
             val matchingSteps = listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER)
             val matchingStep = steps.firstOrNull { it.id in matchingSteps } ?: return
@@ -244,6 +243,7 @@ internal class OrchestratorViewModel @Inject constructor(
                     userId = updatedParams.userId,
                     moduleId = updatedParams.moduleId,
                     steps = updatedParams.steps,
+                    externalCredentialId = updatedParams.externalCredentialId
                 )
             }
         }
@@ -252,13 +252,15 @@ internal class OrchestratorViewModel @Inject constructor(
     private fun buildAppResponse() = viewModelScope.launch {
         val projectConfiguration = configManager.getProjectConfiguration()
         val project = configManager.getProject(projectConfiguration.projectId)
+        val externalCredential = getCachedCredentialResponse(steps)?.externalCredential
         val appResponse = appResponseBuilder(
             projectConfiguration =
                 projectConfiguration,
             request = actionRequest,
             results = steps.mapNotNull { it.result },
             project = project,
-            enrolmentSubjectId = enrolmentSubjectId
+            enrolmentSubjectId = enrolmentSubjectId,
+            externalCredential = externalCredential,
         )
 
         updateDailyActivity(appResponse)

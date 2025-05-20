@@ -5,6 +5,8 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
+import com.simprints.infra.external.credential.store.model.ExternalCredential
+import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -17,12 +19,14 @@ import javax.inject.Inject
 internal class CreateEnrolResponseUseCase @Inject constructor(
     private val subjectFactory: SubjectFactory,
     private val enrolSubject: EnrolSubjectUseCase,
+    private val externalCredentialRepository: ExternalCredentialRepository
 ) {
     suspend operator fun invoke(
         request: ActionRequest.EnrolActionRequest,
         results: List<Serializable>,
         project: Project,
         subjectId: String,
+        externalCredential: String?
     ): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
@@ -37,7 +41,9 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
                 faceResponse = faceCapture,
             )
             enrolSubject(subject, project)
-
+            if (externalCredential != null) {
+                externalCredentialRepository.save(ExternalCredential(externalCredential, subjectId))
+            }
             AppEnrolResponse(subject.subjectId)
         } catch (e: Exception) {
             Simber.e("Error creating enrol response", e, tag = ORCHESTRATION)

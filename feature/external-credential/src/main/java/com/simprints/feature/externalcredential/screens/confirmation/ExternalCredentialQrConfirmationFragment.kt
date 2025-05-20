@@ -78,7 +78,8 @@ internal class ExternalCredentialQrConfirmationFragment : Fragment(R.layout.frag
 
         binding.confirmationBtn.setOnClickListener {
             val confirmationResult = args.externalCredentialConfirmationResult
-            viewModel.confirmAndFinishFlow(credential = confirmationResult.credential)
+            // [MS-985] The imagePath for QR code is null because we don't currently store the scanned image
+            viewModel.confirmAndFinishFlow(credential = confirmationResult.credential, imagePath = null)
         }
 
         binding.recaptureBtn.setOnClickListener {

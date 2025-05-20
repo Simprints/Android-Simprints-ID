@@ -10,10 +10,8 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.externalcredential.model.ExternalCredentialValidation
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
+import com.simprints.feature.externalcredential.model.ExternalCredentialResponse
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
-import com.simprints.feature.externalcredential.model.ExternalCredentialSaveResponse
-import com.simprints.feature.externalcredential.model.ExternalCredentialSearchResponse
-import com.simprints.feature.externalcredential.model.ExternalCredentialSkipResponse
 import com.simprints.infra.external.credential.store.model.ExternalCredential
 import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
 import com.simprints.infra.logging.Simber
@@ -73,16 +71,23 @@ internal class ExternalCredentialViewModel @Inject constructor(
             ExternalCredentialValidation(ExternalCredential(subjectId = subjectId, data = credentialId), result)
     }
 
-    fun confirmAndFinishFlow(credential: ExternalCredential) = viewModelScope.launch {
+    fun confirmAndFinishFlow(credential: ExternalCredential, imagePath: String?) = viewModelScope.launch {
         try {
             val response = when (flowType) {
                 FlowType.ENROL -> {
-                    externalCredentialRepository.save(credential)
-                    ExternalCredentialSaveResponse(subjectId = credential.subjectId!!, externalCredential = credential.data)
+                    ExternalCredentialResponse.ExternalCredentialSaveResponse(
+                        subjectId = credential.subjectId!!,
+                        externalCredential = credential.data,
+                        imagePreviewPath = imagePath
+                    )
                 }
 
                 else -> {
-                    ExternalCredentialSearchResponse(subjectId = credential.subjectId, externalCredential = credential.data)
+                    ExternalCredentialResponse.ExternalCredentialSearchResponse(
+                        subjectId = credential.subjectId,
+                        externalCredential = credential.data,
+                        imagePreviewPath = imagePath
+                    )
                 }
             }
             _externalCredentialSaveResponse.send(response)
@@ -97,7 +102,7 @@ internal class ExternalCredentialViewModel @Inject constructor(
     }
 
     fun skipScanning() {
-        _externalCredentialSaveResponse.send(ExternalCredentialSkipResponse())
+        _externalCredentialSaveResponse.send(ExternalCredentialResponse.ExternalCredentialSkipResponse())
     }
 
     private suspend fun searchSubjectId(data: String): String? {

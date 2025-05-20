@@ -19,6 +19,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAct
 import com.simprints.infra.events.event.domain.models.BiometricReferenceCreationEvent
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.infra.external.credential.store.model.ExternalCredential
+import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +33,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val eventRepository: SessionEventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val externalCredentialRepository: ExternalCredentialRepository,
     private val checkForDuplicateEnrolments: CheckForDuplicateEnrolmentsUseCase,
     private val buildSubject: BuildSubjectUseCase,
 ) : ViewModel() {
@@ -72,6 +75,9 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             val subject = buildSubject(params)
             registerEvent(subject)
             enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
+            if (params.externalCredentialId != null) {
+                externalCredentialRepository.save(ExternalCredential(data = params.externalCredentialId, subjectId = subject.subjectId))
+            }
             _finish.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
             Simber.e("Enrolment failed", t, tag = ENROLMENT)
