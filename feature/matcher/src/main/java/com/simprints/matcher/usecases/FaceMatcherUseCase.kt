@@ -18,6 +18,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.math.min
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
@@ -29,12 +30,6 @@ internal class FaceMatcherUseCase @Inject constructor(
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
-
-    // When using local DB loadedCandidates = expectedCandidates
-    // However, when using CommCare as data source, loadedCandidates < expectedCandidates
-    // as it's count function does not take into account filtering criteria
-    // This var is not thread safe
-    var loadedCandidates = 0
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
@@ -59,9 +54,14 @@ internal class FaceMatcherUseCase @Inject constructor(
             send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
             return@channelFlow
         }
-        loadedCandidates = 0
+
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
+
+        // When using local DB loadedCandidates = expectedCandidates
+        // However, when using CommCare as data source, loadedCandidates < expectedCandidates
+        // as it's count function does not take into account filtering criteria
+        val loadedCandidates = AtomicInteger(0)
         val availableProcessors = Runtime.getRuntime().availableProcessors()
         val ranges = createRanges(expectedCandidates, availableProcessors)
         // if number of ranges less than the number of cores then use the number of ranges
@@ -76,7 +76,7 @@ internal class FaceMatcherUseCase @Inject constructor(
                 project = project,
                 scope = this,
                 onCandidateLoaded = {
-                    loadedCandidates++
+                    loadedCandidates.incrementAndGet()
                     this.trySend(MatcherState.CandidateLoaded)
                 },
             )
@@ -89,7 +89,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         }
         // Wait for all to complete
         consumerJobs.forEach { it.join() }
-        send(MatcherState.Success(resultSet.toList(), loadedCandidates, bioSdk.matcherName))
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
     }
 
     suspend fun consumeAndMatch(
