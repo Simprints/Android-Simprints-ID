@@ -62,9 +62,10 @@ internal class FaceMatcherUseCase @Inject constructor(
         loadedCandidates = 0
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
-        val ranges = createRanges(expectedCandidates)
+        val availableProcessors = Runtime.getRuntime().availableProcessors()
+        val ranges = createRanges(expectedCandidates, availableProcessors)
         // if number of ranges less than the number of cores then use the number of ranges
-        val numConsumers = min(Runtime.getRuntime().availableProcessors(), ranges.size)
+        val numConsumers = min(availableProcessors, ranges.size)
 
         val resultSet = MatchResultSet<FaceMatchResult.Item>()
         val candidatesChannel = enrolmentRecordRepository

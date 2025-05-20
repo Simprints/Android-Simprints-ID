@@ -68,9 +68,10 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
         loadedCandidates = 0
-        val ranges = createRanges(expectedCandidates)
+        val availableProcessors = Runtime.getRuntime().availableProcessors()
+        val ranges = createRanges(expectedCandidates, availableProcessors)
         // if number of ranges less than the number of cores then use the number of ranges
-        val numConsumers = min(Runtime.getRuntime().availableProcessors(), ranges.size)
+        val numConsumers = min(availableProcessors, ranges.size)
         val channel = enrolmentRecordRepository.loadFingerprintIdentities(
             query = queryWithSupportedFormat,
             ranges = ranges,

@@ -102,7 +102,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                                     loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
                                 )
                             }
-                        } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position < range.last)
+                        } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position <= range.last)
                     }
                 }
         } catch (e: Exception) {
@@ -157,7 +157,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         return context.contentResolver
             .query(caseDataUri, null, null, null, null)
             ?.use { caseDataCursor ->
-                var subjectActions = getSubjectActionsValue(caseDataCursor)
+                val subjectActions = getSubjectActionsValue(caseDataCursor)
                 Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
