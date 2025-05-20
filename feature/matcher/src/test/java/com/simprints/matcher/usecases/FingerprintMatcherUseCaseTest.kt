@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -16,11 +16,12 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -50,7 +51,6 @@ internal class FingerprintMatcherUseCaseTest {
 
     @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
-    private val onCandidateLoaded: () -> Unit = {}
     private lateinit var useCase: FingerprintMatcherUseCase
 
     @Before
@@ -99,7 +99,8 @@ internal class FingerprintMatcherUseCaseTest {
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), project, onCandidateLoaded) } returns emptyList()
+        coEvery { enrolmentRecordRepository.loadFingerprintIdentities(any(), any(), any(), project, any(), any()) } returns
+            createTestChannel(emptyList())
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         val results = useCase
@@ -142,25 +143,29 @@ internal class FingerprintMatcherUseCaseTest {
                 any(),
                 any(),
                 project,
-                onCandidateLoaded,
+                any(),
+                any(),
             )
-        } returns listOf(
-            FingerprintIdentity(
-                "personId",
+        } returns
+            createTestChannel(
                 listOf(
-                    fingerprintSample(IFingerIdentifier.RIGHT_5TH_FINGER),
-                    fingerprintSample(IFingerIdentifier.RIGHT_4TH_FINGER),
-                    fingerprintSample(IFingerIdentifier.RIGHT_3RD_FINGER),
-                    fingerprintSample(IFingerIdentifier.RIGHT_INDEX_FINGER),
-                    fingerprintSample(IFingerIdentifier.RIGHT_THUMB),
-                    fingerprintSample(IFingerIdentifier.LEFT_THUMB),
-                    fingerprintSample(IFingerIdentifier.LEFT_INDEX_FINGER),
-                    fingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER),
-                    fingerprintSample(IFingerIdentifier.LEFT_4TH_FINGER),
-                    fingerprintSample(IFingerIdentifier.LEFT_5TH_FINGER),
+                    FingerprintIdentity(
+                        "personId",
+                        listOf(
+                            fingerprintSample(IFingerIdentifier.RIGHT_5TH_FINGER),
+                            fingerprintSample(IFingerIdentifier.RIGHT_4TH_FINGER),
+                            fingerprintSample(IFingerIdentifier.RIGHT_3RD_FINGER),
+                            fingerprintSample(IFingerIdentifier.RIGHT_INDEX_FINGER),
+                            fingerprintSample(IFingerIdentifier.RIGHT_THUMB),
+                            fingerprintSample(IFingerIdentifier.LEFT_THUMB),
+                            fingerprintSample(IFingerIdentifier.LEFT_INDEX_FINGER),
+                            fingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER),
+                            fingerprintSample(IFingerIdentifier.LEFT_4TH_FINGER),
+                            fingerprintSample(IFingerIdentifier.LEFT_5TH_FINGER),
+                        ),
+                    ),
                 ),
-            ),
-        )
+            )
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         useCase
@@ -181,9 +186,19 @@ internal class FingerprintMatcherUseCaseTest {
                 ),
                 project,
             ).toList()
-
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
     }
 
     private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), "format", "referenceId")
+}
+
+fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<List<T>> {
+    val channel = Channel<List<T>>(lists.size)
+    runBlocking {
+        for (list in lists) {
+            channel.send(list)
+        }
+        channel.close()
+    }
+    return channel
 }

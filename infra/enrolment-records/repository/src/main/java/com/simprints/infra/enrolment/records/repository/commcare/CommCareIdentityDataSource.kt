@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -31,6 +31,8 @@ import com.simprints.infra.logging.Simber
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import javax.inject.Inject
@@ -40,41 +42,37 @@ internal class CommCareIdentityDataSource @Inject constructor(
     private val jsonHelper: JsonHelper,
     private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
     @ApplicationContext private val context: Context,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : IdentityDataSource {
     private fun getCaseMetadataUri(packageName: String): Uri = "content://$packageName.case/casedb/case".toUri()
 
     private fun getCaseDataUri(packageName: String): Uri = "content://$packageName.case/casedb/data".toUri()
 
-    override suspend fun loadFingerprintIdentities(
+    private fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = withContext(dispatcher) {
-        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
-            .filter { erce ->
-                erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
-            }.map {
-                onCandidateLoaded()
-                FingerprintIdentity(
-                    it.payload.subjectId,
-                    it.payload.biometricReferences
-                        .filterIsInstance<FingerprintReference>()
-                        .flatMap { fingerprintReference ->
-                            fingerprintReference.templates.map { fingerprintTemplate ->
-                                FingerprintSample(
-                                    fingerIdentifier = fingerprintTemplate.finger,
-                                    template = encoder.base64ToBytes(fingerprintTemplate.template),
-                                    format = fingerprintReference.format,
-                                    referenceId = fingerprintReference.id,
-                                )
-                            }
-                        },
-                )
-            }
-    }
+    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
+        .filter { erce ->
+            erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
+        }.map {
+            onCandidateLoaded()
+            FingerprintIdentity(
+                it.payload.subjectId,
+                it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
+                    fingerprintReference.templates.map { fingerprintTemplate ->
+                        FingerprintSample(
+                            fingerIdentifier = fingerprintTemplate.finger,
+                            template = encoder.base64ToBytes(fingerprintTemplate.template),
+                            format = fingerprintReference.format,
+                            referenceId = fingerprintReference.id,
+                        )
+                    }
+                },
+            )
+        }
 
     private fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
@@ -114,44 +112,38 @@ internal class CommCareIdentityDataSource @Inject constructor(
         return enrolmentRecordCreationEvents
     }
 
-    private fun attemptExtractingCaseId(metadata: String?) = metadata
-        ?.takeUnless { it.isEmpty() }
-        ?.let {
-            try {
-                JsonHelper.fromJson<Map<String, Any>>(it)[ARG_CASE_ID] as? String
-            } catch (_: JSONException) {
-                null
-            }
+    private fun attemptExtractingCaseId(metadata: String?) = metadata?.takeUnless { it.isEmpty() }?.let {
+        try {
+            JsonHelper.fromJson<Map<String, Any>>(it)[ARG_CASE_ID] as? String
+        } catch (_: JSONException) {
+            null
         }
+    }
 
-    override suspend fun loadFaceIdentities(
+    private fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = withContext(dispatcher) {
-        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
-            .filter { erce ->
-                erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
-            }.map {
-                onCandidateLoaded()
-                FaceIdentity(
-                    it.payload.subjectId,
-                    it.payload.biometricReferences
-                        .filterIsInstance<FaceReference>()
-                        .flatMap { faceReference ->
-                            faceReference.templates.map { faceTemplate ->
-                                FaceSample(
-                                    template = encoder.base64ToBytes(faceTemplate.template),
-                                    format = faceReference.format,
-                                    referenceId = faceReference.id,
-                                )
-                            }
-                        },
-                )
-            }
-    }
+    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
+        .filter { erce ->
+            erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
+        }.map {
+            onCandidateLoaded()
+            FaceIdentity(
+                it.payload.subjectId,
+                it.payload.biometricReferences.filterIsInstance<FaceReference>().flatMap { faceReference ->
+                    faceReference.templates.map { faceTemplate ->
+                        FaceSample(
+                            template = encoder.base64ToBytes(faceTemplate.template),
+                            format = faceReference.format,
+                            referenceId = faceReference.id,
+                        )
+                    }
+                },
+            )
+        }
 
     private fun loadEnrolmentRecordCreationEvents(
         caseId: String,
@@ -169,16 +161,17 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
-                coSyncEnrolmentRecordEvents
-                    ?.events
-                    ?.filterIsInstance<EnrolmentRecordCreationEvent>()
-                    ?.filter { event ->
-                        // [MS-852] Plain strings from CommCare might be tokenized or untokenized. The only way to properly compare them
-                        // is by trying to decrypt the values to check if already tokenized, and then compare the values
-                        isSubjectIdNullOrMatching(query, event) &&
-                            isAttendantIdNullOrMatching(query, event, project) &&
-                            isModuleIdNullOrMatching(query, event, project)
-                    }
+                coSyncEnrolmentRecordEvents?.events?.filterIsInstance<EnrolmentRecordCreationEvent>()?.filter { event ->
+                    // [MS-852] Plain strings from CommCare might be tokenized or untokenized. The only way to properly compare them
+                    // is by trying to decrypt the values to check if already tokenized, and then compare the values
+                    isSubjectIdNullOrMatching(query, event) &&
+                        isAttendantIdNullOrMatching(
+                            query,
+                            event,
+                            project,
+                        ) &&
+                        isModuleIdNullOrMatching(query, event, project)
+                }
             }.orEmpty()
     }
 
@@ -263,6 +256,52 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 null,
             )?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
         count
+    }
+
+    private val parallelism = Runtime.getRuntime().availableProcessors()
+
+    override fun loadFaceIdentities(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
+        project: Project,
+        scope: CoroutineScope,
+        onCandidateLoaded: () -> Unit,
+    ): ReceiveChannel<List<FaceIdentity>> = loadIdentitiesConcurrently(
+        ranges = ranges,
+        dispatcher = dispatcher,
+        parallelism = parallelism,
+        scope = scope,
+    ) { range ->
+        loadFaceIdentities(
+            query = query,
+            range = range,
+            project = project,
+            dataSource = dataSource,
+            onCandidateLoaded = onCandidateLoaded,
+        )
+    }
+
+    override fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
+        project: Project,
+        scope: CoroutineScope,
+        onCandidateLoaded: () -> Unit,
+    ): ReceiveChannel<List<FingerprintIdentity>> = loadIdentitiesConcurrently(
+        ranges = ranges,
+        dispatcher = dispatcher,
+        parallelism = parallelism,
+        scope = scope,
+    ) { range ->
+        loadFingerprintIdentities(
+            query = query,
+            range = range,
+            project = project,
+            dataSource = dataSource,
+            onCandidateLoaded = onCandidateLoaded,
+        )
     }
 
     companion object {

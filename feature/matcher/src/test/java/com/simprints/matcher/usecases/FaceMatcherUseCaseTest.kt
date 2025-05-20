@@ -123,13 +123,13 @@ internal class FaceMatcherUseCaseTest {
         )
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any()) } coAnswers {
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any(), any()) } coAnswers {
             // Call the onCandidateLoaded callback (5th parameter)
-            val onCandidateLoaded = arg<() -> Unit>(4)
+            val onCandidateLoaded = arg<() -> Unit>(5)
             onCandidateLoaded()
 
             // Return the face identities
-            faceIdentities
+            createTestChannel(faceIdentities)
         }
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any()) } returns 42f
 
