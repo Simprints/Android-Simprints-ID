@@ -44,6 +44,7 @@ import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import com.simprints.matcher.MatchContract
 import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -253,6 +254,7 @@ internal class OrchestratorViewModel @Inject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
         val project = configManager.getProject(projectConfiguration.projectId)
         val externalCredential = getCachedCredentialResponse(steps)?.externalCredential
+        val shouldReturnSearchAndVerifyFlag = shouldReturnSearchAndVerifyFlag(steps)
         val appResponse = appResponseBuilder(
             projectConfiguration =
                 projectConfiguration,
@@ -261,11 +263,31 @@ internal class OrchestratorViewModel @Inject constructor(
             project = project,
             enrolmentSubjectId = enrolmentSubjectId,
             externalCredential = externalCredential,
+            shouldReturnSearchAndVerifyFlag = shouldReturnSearchAndVerifyFlag,
         )
 
         updateDailyActivity(appResponse)
         addCallbackEvent(appResponse)
         _appResponse.send(OrchestratorResult(actionRequest, appResponse))
+    }
+
+    private fun shouldReturnSearchAndVerifyFlag(steps: List<Step>): Boolean {
+        // [MS-992] Only 'IdentifyActionRequest' require search & verify flag to be returned
+        if (actionRequest !is ActionRequest.IdentifyActionRequest)
+            return false
+
+        val matchingSteps = listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER)
+        val matchingStep = steps.firstOrNull { it.id in matchingSteps } ?: return false
+        val matchParams = matchingStep.payload.getParcelable<MatchParams>("params") ?: return false
+        if(matchParams.queryForCandidates.subjectId?.nullIfEmpty() == null) {
+            // [MS-992] Verifying that matching step received a single 'Subject ID' to match against. This check eliminates possibility
+            // of returning a positive flag when 1:N search returned a single item. Search & Verify flag should only be returned if 1:1
+            // match occurred.
+            return false
+        }
+        val matchResult = matchingStep.result as? MatchResult ?: return false
+        // [MS-992] Returning 'searchAndVerifyMatched=true' only when 1:1 match was made and the result is positive
+        return matchResult.results.size == 1
     }
 
     private fun updateMatcherStepPayload(

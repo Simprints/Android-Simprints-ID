@@ -23,7 +23,8 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         results: List<Serializable>,
         project: Project,
         enrolmentSubjectId: String?,
-        externalCredential: String?
+        externalCredential: String?,
+        shouldReturnSearchAndVerifyFlag: Boolean,
     ): AppResponse = when (request) {
         is ActionRequest.EnrolActionRequest -> if (isNewEnrolment(projectConfiguration, results)) {
             handleEnrolment(
@@ -34,10 +35,10 @@ internal class AppResponseBuilderUseCase @Inject constructor(
                 externalCredential = externalCredential,
             )
         } else {
-            handleIdentify(projectConfiguration, results)
+            handleIdentify(projectConfiguration, results, shouldReturnSearchAndVerifyFlag)
         }
 
-        is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, results)
+        is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, results, shouldReturnSearchAndVerifyFlag)
         is ActionRequest.VerifyActionRequest -> handleVerify(projectConfiguration, results)
         is ActionRequest.ConfirmIdentityActionRequest -> handleConfirmIdentity(results)
         is ActionRequest.EnrolLastBiometricActionRequest -> handleEnrolLastBiometric(results)

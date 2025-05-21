@@ -16,6 +16,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
+        shouldReturnSearchAndVerifyFlag : Boolean,
     ): AppResponse {
         val currentSessionId = eventRepository.getCurrentSessionScope().id
 
@@ -25,14 +26,21 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         val fingerprintResults = getFingerprintResults(results, projectConfiguration)
         val bestFingerprintConfidence = fingerprintResults.firstOrNull()?.confidenceScore ?: 0
 
+        // Return the results with the highest confidence score
+        val identifications = if (bestFingerprintConfidence > bestFaceConfidence) {
+            fingerprintResults
+        } else {
+            faceResults
+        }
+        // [MS-992] 'searchAndVerifyMatched' flag should only be returned if 'Search & Verify' was used (1:1 match), and the identification
+        // result contains a single item. Flag should be null and in any other case
+        val searchAndVerifyMatched = if (shouldReturnSearchAndVerifyFlag) {
+            identifications.size == 1
+        } else null
         return AppIdentifyResponse(
             sessionId = currentSessionId,
-            // Return the results with the highest confidence score
-            identifications = if (bestFingerprintConfidence > bestFaceConfidence) {
-                fingerprintResults
-            } else {
-                faceResults
-            },
+            identifications = identifications,
+            searchAndVerifyMatched = searchAndVerifyMatched,
         )
     }
 

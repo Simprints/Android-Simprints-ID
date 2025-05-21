@@ -53,6 +53,11 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
                         .toJson(),
                 )
             }
+        }.apply {
+            // [MS-992] If 'searchAndVerifyMatched' is here to stay, it should be added to the LibSimprints
+            response.searchAndVerifyMatched?.let { isSearchAndVerifyMatched ->
+                putBoolean("searchAndVerifyMatched", isSearchAndVerifyMatched)
+            }
         }
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(

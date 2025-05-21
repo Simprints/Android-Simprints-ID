@@ -22,6 +22,7 @@ sealed class ActionResponse(
         override val actionIdentifier: ActionRequestIdentifier,
         override val sessionId: String,
         val identifications: List<AppMatchResult>,
+        val searchAndVerifyMatched : Boolean?,
     ) : ActionResponse(actionIdentifier, sessionId)
 
     @ExcludedFromGeneratedTestCoverageReports("Data struct")

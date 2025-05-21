@@ -10,4 +10,5 @@ import kotlinx.parcelize.Parcelize
 data class AppIdentifyResponse(
     val identifications: List<AppMatchResult>,
     val sessionId: String,
+    val searchAndVerifyMatched : Boolean?
 ) : AppResponse()

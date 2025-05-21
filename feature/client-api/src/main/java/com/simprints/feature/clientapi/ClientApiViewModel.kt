@@ -139,6 +139,7 @@ class ClientApiViewModel @Inject internal constructor(
                     actionIdentifier = action.actionIdentifier,
                     sessionId = currentSessionId,
                     identifications = identifyResponse.identifications,
+                    searchAndVerifyMatched = identifyResponse.searchAndVerifyMatched
                 ),
             ),
         )

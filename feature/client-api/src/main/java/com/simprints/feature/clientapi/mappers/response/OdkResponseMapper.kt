@@ -24,7 +24,12 @@ internal class OdkResponseMapper @Inject constructor() {
             OdkConstants.ODK_TIERS_KEY to response.identifications.joinField { it.tier.name },
             OdkConstants.ODK_MATCH_CONFIDENCE_FLAGS_KEY to response.identifications.joinField { it.matchConfidence.name },
             OdkConstants.ODK_HIGHEST_MATCH_CONFIDENCE_FLAG_KEY to response.identifications.getHighestConfidence().name,
-        ).addFlowCompletedCheckBasedOnAction(response.actionIdentifier, true)
+        ).addFlowCompletedCheckBasedOnAction(response.actionIdentifier, true).apply {
+            // [MS-992] If 'searchAndVerifyMatched' is here to stay, it should be added to the LibSimprints
+            response.searchAndVerifyMatched?.let { isSearchAndVerifyMatched ->
+                putBoolean("searchAndVerifyMatched", isSearchAndVerifyMatched)
+            }
+        }
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(
             OdkConstants.ODK_SESSION_ID to response.sessionId,
