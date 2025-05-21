@@ -36,12 +36,15 @@ import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchContract
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResult
@@ -141,7 +144,61 @@ internal class OrchestratorViewModel @Inject constructor(
             steps = steps + captureAndMatchSteps
         }
 
+        if (result is MatchResult) {
+            getOneToManyMatchStepIfNecessary(result, configManager.getProjectConfiguration())?.let { oneToManyMatchStep ->
+                Simber.i("Falling back to 1:N biometric search because External Credential biometrics do not match scanned biometrics")
+                steps = steps + oneToManyMatchStep
+            }
+        }
+
         doNextStep()
+    }
+
+    private fun getOneToManyMatchStepIfNecessary(matchResult: MatchResult, config: ProjectConfiguration): Step? {
+        // [MS-984] 1:1 falls back to 1:N only during identification request
+        if (actionRequest !is ActionRequest.IdentifyActionRequest)
+            return null
+
+
+        val matchStep = steps.lastOrNull { it.id == StepId.FACE_MATCHER || it.id == StepId.FINGERPRINT_MATCHER }?.copy() ?: return null
+        val matchParams = matchStep.payload.getParcelable<MatchParams>("params") ?: return null
+        if(matchParams.queryForCandidates.subjectId?.isEmpty() == true){
+            // 1:N match was already done
+            return null
+        }
+
+        matchResult.results.firstOrNull()?.confidence?.let { confidence ->
+            val decisionPolicy = when (matchResult) {
+                is FaceMatchResult -> config.face?.decisionPolicy
+                is FingerprintMatchResult -> config.fingerprint?.getSdkConfiguration(matchResult.sdk)?.decisionPolicy
+                else -> null
+            } ?: return null
+
+            if (confidence > decisionPolicy.low) {
+                Simber.i("1:1 Match step confidence [$confidence] is above low threshold of [${decisionPolicy.low}]. Not falling back to 1:N")
+                return null
+            }
+        }
+
+        // matching against 1:N
+        val updatedSubjectQuery = matchParams.queryForCandidates.copy(
+            subjectId = null
+        )
+
+        with(matchStep) {
+            status = StepStatus.NOT_STARTED
+            result = null
+            payload = MatchContract.getArgs(
+                referenceId = matchParams.probeReferenceId,
+                fingerprintSamples = matchParams.probeFingerprintSamples,
+                faceSamples = matchParams.probeFaceSamples,
+                fingerprintSDK = matchParams.fingerprintSDK,
+                flowType = matchParams.flowType,
+                subjectQuery = updatedSubjectQuery,
+                biometricDataSource = matchParams.biometricDataSource,
+            )
+        }
+        return matchStep
     }
 
     fun handleErrorResponse(errorResponse: AppResponse) {
@@ -279,7 +336,7 @@ internal class OrchestratorViewModel @Inject constructor(
         val matchingSteps = listOf(StepId.FACE_MATCHER, StepId.FINGERPRINT_MATCHER)
         val matchingStep = steps.firstOrNull { it.id in matchingSteps } ?: return false
         val matchParams = matchingStep.payload.getParcelable<MatchParams>("params") ?: return false
-        if(matchParams.queryForCandidates.subjectId?.nullIfEmpty() == null) {
+        if (matchParams.queryForCandidates.subjectId?.nullIfEmpty() == null) {
             // [MS-992] Verifying that matching step received a single 'Subject ID' to match against. This check eliminates possibility
             // of returning a positive flag when 1:N search returned a single item. Search & Verify flag should only be returned if 1:1
             // match occurred.
