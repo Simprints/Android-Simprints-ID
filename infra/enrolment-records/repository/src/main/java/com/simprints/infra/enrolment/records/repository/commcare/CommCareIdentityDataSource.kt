@@ -54,11 +54,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
+    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
         }.map {
-            onCandidateLoaded()
             FingerprintIdentity(
                 it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
@@ -79,6 +78,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         callerPackageName: String,
         query: SubjectQuery,
         project: Project,
+        onCandidateLoaded: () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
         try {
@@ -100,7 +100,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
                                 enrolmentRecordCreationEvents.addAll(
                                     loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
-                                )
+                                ).also { onCandidateLoaded() }
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position <= range.last)
                     }
@@ -126,11 +126,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project)
+    ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
         }.map {
-            onCandidateLoaded()
             FaceIdentity(
                 it.payload.subjectId,
                 it.payload.biometricReferences.filterIsInstance<FaceReference>().flatMap { faceReference ->
