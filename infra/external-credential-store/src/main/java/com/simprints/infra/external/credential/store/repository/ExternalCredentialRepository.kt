@@ -13,7 +13,13 @@ class ExternalCredentialRepository @Inject constructor(
 ) {
 
     suspend fun save(credential: ExternalCredential) = withContext(dispatcher) {
+        // [MS-984] Deleting an existing records just in case. Currently, overrides are allowed (May 2025)
+        deleteByCredential(credential.data)
         localDataSource.save(credential)
+    }
+
+    suspend fun deleteByCredential(credential: String) = withContext(dispatcher) {
+        localDataSource.deleteByCredential(credential)
     }
 
     suspend fun findByCredential(credential: String): ExternalCredential? =

@@ -5,6 +5,7 @@ import com.simprints.infra.enrolment.records.realm.store.models.ExternalCredenti
 import com.simprints.infra.external.credential.store.datasource.local.mapper.ExternalCredentialMapper.fromDb
 import com.simprints.infra.external.credential.store.datasource.local.mapper.ExternalCredentialMapper.toDB
 import com.simprints.infra.external.credential.store.model.ExternalCredential
+import io.realm.kotlin.ext.query
 import javax.inject.Inject
 
 class ExternalCredentialLocalDataSource @Inject constructor(
@@ -31,4 +32,13 @@ class ExternalCredentialLocalDataSource @Inject constructor(
                 .find()
                 ?.fromDb()
         }
+
+    suspend fun deleteByCredential(credential: String) = realmWrapper.writeRealm { realm ->
+        realm.query(ExternalCredentialRealm::class, "data == $0", credential)
+            .first()
+            .find()
+            ?.let {
+                realm.delete(it)
+            }
+    }
 }
