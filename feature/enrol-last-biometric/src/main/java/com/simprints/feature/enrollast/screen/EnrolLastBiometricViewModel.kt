@@ -37,9 +37,12 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private val checkForDuplicateEnrolments: CheckForDuplicateEnrolmentsUseCase,
     private val buildSubject: BuildSubjectUseCase,
 ) : ViewModel() {
-    val finish: LiveData<LiveDataEventWithContent<EnrolLastState>>
+    val enrolLastStateLiveData: LiveData<LiveDataEventWithContent<EnrolLastState>>
+        get() = _enrolLastStateLiveData
+    private var _enrolLastStateLiveData = MutableLiveData<LiveDataEventWithContent<EnrolLastState>>()
+    val finish: LiveData<LiveDataEventWithContent<ExternalCredentialSaveState>>
         get() = _finish
-    private var _finish = MutableLiveData<LiveDataEventWithContent<EnrolLastState>>()
+    private var _finish = MutableLiveData<LiveDataEventWithContent<ExternalCredentialSaveState>>()
 
     private var enrolWasAttempted = false
 
@@ -58,7 +61,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)
         if (previousLastEnrolmentResult != null) {
-            _finish.send(
+            _enrolLastStateLiveData.send(
                 previousLastEnrolmentResult.subjectId
                     ?.let { EnrolLastState.Success(it) }
                     ?: EnrolLastState.Failed(GENERAL_ERROR, modalities),
@@ -67,7 +70,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         }
         val duplicateEnrolmentError = checkForDuplicateEnrolments(projectConfig, params.steps)
         if (duplicateEnrolmentError != null) {
-            _finish.send(EnrolLastState.Failed(duplicateEnrolmentError, modalities))
+            _enrolLastStateLiveData.send(EnrolLastState.Failed(duplicateEnrolmentError, modalities))
             return@launch
         }
 
@@ -75,13 +78,10 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             val subject = buildSubject(params)
             registerEvent(subject)
             enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)), project)
-            if (params.externalCredentialId != null) {
-                externalCredentialRepository.save(ExternalCredential(data = params.externalCredentialId, subjectId = subject.subjectId))
-            }
-            _finish.send(EnrolLastState.Success(subject.subjectId))
+            _enrolLastStateLiveData.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
             Simber.e("Enrolment failed", t, tag = ENROLMENT)
-            _finish.send(EnrolLastState.Failed(GENERAL_ERROR, modalities))
+            _enrolLastStateLiveData.send(EnrolLastState.Failed(GENERAL_ERROR, modalities))
         }
     }
 
@@ -107,5 +107,15 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
                 biometricReferenceIds,
             ),
         )
+    }
+
+    fun saveExternalCredential(externalCred: String, subjectId: String) = viewModelScope.launch {
+        try {
+            externalCredentialRepository.save(ExternalCredential(data = externalCred, subjectId = subjectId))
+            _finish.send(ExternalCredentialSaveState.Success(subjectId))
+        } catch (t: Throwable) {
+            Simber.e("External Credential Enrolment failed", t, tag = ENROLMENT)
+            _finish.send(ExternalCredentialSaveState.Failed(subjectId))
+        }
     }
 }

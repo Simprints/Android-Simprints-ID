@@ -162,7 +162,8 @@ internal class OrchestratorViewModel @Inject constructor(
 
         val matchStep = steps.lastOrNull { it.id == StepId.FACE_MATCHER || it.id == StepId.FINGERPRINT_MATCHER }?.copy() ?: return null
         val matchParams = matchStep.payload.getParcelable<MatchParams>("params") ?: return null
-        if(matchParams.queryForCandidates.subjectId?.isEmpty() == true){
+        val subjectId = matchParams.queryForCandidates.subjectId
+        if(subjectId?.nullIfEmpty() == null){
             // 1:N match was already done
             return null
         }
@@ -301,7 +302,9 @@ internal class OrchestratorViewModel @Inject constructor(
                     userId = updatedParams.userId,
                     moduleId = updatedParams.moduleId,
                     steps = updatedParams.steps,
-                    externalCredentialId = updatedParams.externalCredentialId
+                    externalCredentialId = updatedParams.externalCredentialId,
+                    externalCredentialImagePath = updatedParams.externalCredentialImagePath
+
                 )
             }
         }

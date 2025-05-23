@@ -49,6 +49,7 @@
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
+    <string name="enrol_last_biometrics_alert_message_external_credential">Unable to save external credential due to internal error. Record is saved!</string>
 
     <!-- Exit form -->
     <string name="exit_form_title">Why did you skip biometrics?</string>

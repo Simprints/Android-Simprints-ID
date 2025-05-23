@@ -94,7 +94,8 @@ internal class BuildStepsUseCase @Inject constructor(
             buildEnrolLastBiometricStep(
                 action = action,
                 projectConfiguration = projectConfiguration,
-                cachedExternalCredentialId = cachedExternalCredentialResponse?.externalCredential
+                cachedExternalCredentialId = cachedExternalCredentialResponse?.externalCredential,
+                cachedExternalCredentialImagePath = cachedExternalCredentialResponse?.imagePreviewPath
             ),
         )
 
@@ -484,6 +485,7 @@ internal class BuildStepsUseCase @Inject constructor(
         action: ActionRequest.EnrolLastBiometricActionRequest,
         projectConfiguration: ProjectConfiguration,
         cachedExternalCredentialId: String?,
+        cachedExternalCredentialImagePath: String?,
     ): List<Step> {
         // Get capture steps needed for enrolment
         val enrolCaptureSteps = buildCaptureSteps(
@@ -509,6 +511,7 @@ internal class BuildStepsUseCase @Inject constructor(
                         userId = action.userId,
                         moduleId = action.moduleId,
                         externalCredentialId = cachedExternalCredentialId,
+                        externalCredentialImagePath = cachedExternalCredentialImagePath,
                         steps = mapStepsForLastBiometrics(cache.steps.mapNotNull { it.result }),
                     ),
                 )

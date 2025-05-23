@@ -14,6 +14,7 @@ data class EnrolLastBiometricParams(
     val userId: TokenizableString,
     val moduleId: TokenizableString,
     val externalCredentialId: String?,
+    val externalCredentialImagePath: String?,
     val steps: List<EnrolLastBiometricStepResult>,
 ) : Parcelable
 

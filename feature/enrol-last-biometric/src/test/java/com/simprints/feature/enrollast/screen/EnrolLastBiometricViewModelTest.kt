@@ -114,7 +114,7 @@ internal class EnrolLastBiometricViewModelTest {
             ),
         )
 
-        val result = viewModel.finish
+        val result = viewModel.enrolLastStateLiveData
             .test()
             .value()
             .getContentIfNotHandled()
@@ -146,7 +146,7 @@ internal class EnrolLastBiometricViewModelTest {
         )
 
         val result =
-            viewModel.finish
+            viewModel.enrolLastStateLiveData
                 .test()
                 .value()
                 .getContentIfNotHandled() as EnrolLastState.Failed
@@ -160,7 +160,7 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(createParams(listOf()))
 
         val result =
-            viewModel.finish
+            viewModel.enrolLastStateLiveData
                 .test()
                 .value()
                 .getContentIfNotHandled() as EnrolLastState.Failed
@@ -175,7 +175,7 @@ internal class EnrolLastBiometricViewModelTest {
 
         viewModel.enrolBiometric(createParams(listOf()))
 
-        val result = viewModel.finish
+        val result = viewModel.enrolLastStateLiveData
             .test()
             .value()
             .getContentIfNotHandled()
@@ -202,7 +202,7 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(createParams(listOf()))
 
         val result =
-            viewModel.finish
+            viewModel.enrolLastStateLiveData
                 .test()
                 .value()
                 .getContentIfNotHandled() as EnrolLastState.Failed

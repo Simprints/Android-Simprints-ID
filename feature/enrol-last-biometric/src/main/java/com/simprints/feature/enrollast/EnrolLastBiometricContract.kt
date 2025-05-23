@@ -11,6 +11,7 @@ object EnrolLastBiometricContract {
         userId: TokenizableString,
         moduleId: TokenizableString,
         externalCredentialId: String?,
+        externalCredentialImagePath: String?,
         steps: List<EnrolLastBiometricStepResult>,
     ) = EnrolLastBiometricFragmentArgs(
         EnrolLastBiometricParams(
@@ -18,6 +19,7 @@ object EnrolLastBiometricContract {
             userId = userId,
             moduleId = moduleId,
             externalCredentialId = externalCredentialId,
+            externalCredentialImagePath = externalCredentialImagePath,
             steps = steps,
         ),
     ).toBundle()
