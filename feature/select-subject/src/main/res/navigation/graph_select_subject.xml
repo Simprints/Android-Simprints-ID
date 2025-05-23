@@ -23,6 +23,11 @@
             android:name="externalCredentialId"
             app:nullable="true"
             app:argType="string" />
+
+        <argument
+            android:name="externalCredentialImagePath"
+            app:nullable="true"
+            app:argType="string" />
     </fragment>
 
 </navigation>

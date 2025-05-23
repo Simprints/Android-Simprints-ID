@@ -114,7 +114,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             externalCredentialRepository.save(ExternalCredential(data = externalCred, subjectId = subjectId))
             _finish.send(ExternalCredentialSaveState.Success(subjectId))
         } catch (t: Throwable) {
-            Simber.e("External Credential Enrolment failed", t, tag = ENROLMENT)
+            Simber.e("External Credential Enrolment in 'Enrol Last' failed", t, tag = ENROLMENT)
             _finish.send(ExternalCredentialSaveState.Failed(subjectId))
         }
     }

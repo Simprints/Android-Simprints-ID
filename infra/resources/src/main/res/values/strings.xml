@@ -153,6 +153,7 @@
     <!-- Select subject -->
     <string name="select_subject_confirmation_sent">Confirmation sent</string>
     <string name="select_subject_redirecting_back">Redirecting you back</string>
+    <string name="select_subject_processing">Processing…</string>
 
     <!-- Setup module -->
     <string name="configuration_started">Configuring modalities</string>

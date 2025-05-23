@@ -100,7 +100,11 @@ internal class BuildStepsUseCase @Inject constructor(
         )
 
         is ActionRequest.ConfirmIdentityActionRequest -> listOf(
-            buildConfirmIdentityStep(action, cachedExternalCredentialId = cachedExternalCredentialResponse?.externalCredential),
+            buildConfirmIdentityStep(
+                action,
+                cachedExternalCredentialId = cachedExternalCredentialResponse?.externalCredential,
+                cachedExternalCredentialImagePath = cachedExternalCredentialResponse?.imagePreviewPath
+            ),
         )
     }.flatten()
 
@@ -518,7 +522,11 @@ internal class BuildStepsUseCase @Inject constructor(
             )
     }
 
-    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest, cachedExternalCredentialId: String?) = listOf(
+    private fun buildConfirmIdentityStep(
+        action: ActionRequest.ConfirmIdentityActionRequest,
+        cachedExternalCredentialId: String?,
+        cachedExternalCredentialImagePath: String?
+    ) = listOf(
         Step(
             id = StepId.CONFIRM_IDENTITY,
             navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
@@ -526,7 +534,8 @@ internal class BuildStepsUseCase @Inject constructor(
             payload = SelectSubjectContract.getArgs(
                 projectId = action.projectId,
                 subjectId = action.selectedGuid,
-                externalCredentialId = cachedExternalCredentialId
+                externalCredentialId = cachedExternalCredentialId,
+                externalCredentialImagePath = cachedExternalCredentialImagePath,
             ),
         ),
     )

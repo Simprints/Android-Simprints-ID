@@ -9,5 +9,11 @@ object SelectSubjectContract {
         projectId: String,
         subjectId: String,
         externalCredentialId: String?,
-    ) = SelectSubjectFragmentArgs(projectId = projectId, subjectId = subjectId, externalCredentialId = externalCredentialId).toBundle()
+        externalCredentialImagePath: String?,
+    ) = SelectSubjectFragmentArgs(
+        projectId = projectId,
+        subjectId = subjectId,
+        externalCredentialId = externalCredentialId,
+        externalCredentialImagePath = externalCredentialImagePath
+    ).toBundle()
 }
