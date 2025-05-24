@@ -197,6 +197,8 @@ internal class OrchestratorViewModel @Inject constructor(
                 flowType = matchParams.flowType,
                 subjectQuery = updatedSubjectQuery,
                 biometricDataSource = matchParams.biometricDataSource,
+                shouldDisplay1toNFallbackMessage = true
+
             )
         }
         return matchStep
@@ -284,6 +286,7 @@ internal class OrchestratorViewModel @Inject constructor(
                 flowType = matchParams.flowType,
                 subjectQuery = updatedSubjectQuery,
                 biometricDataSource = matchParams.biometricDataSource,
+                shouldDisplay1toNFallbackMessage = false
             )
         }
     }

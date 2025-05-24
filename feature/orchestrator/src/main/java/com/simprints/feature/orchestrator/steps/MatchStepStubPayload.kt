@@ -26,17 +26,20 @@ internal data class MatchStepStubPayload(
     fun toFaceStepArgs(
         referenceId: String,
         samples: List<MatchParams.FaceSample>,
+        shouldDisplay1toNFallbackMessage: Boolean = false
     ) = MatchContract.getArgs(
         referenceId = referenceId,
         faceSamples = samples,
         flowType = flowType,
         subjectQuery = subjectQuery,
         biometricDataSource = biometricDataSource,
+        shouldDisplay1toNFallbackMessage = shouldDisplay1toNFallbackMessage
     )
 
     fun toFingerprintStepArgs(
         referenceId: String,
         samples: List<MatchParams.FingerprintSample>,
+        shouldDisplay1toNFallbackMessage: Boolean = false
     ) = MatchContract.getArgs(
         referenceId = referenceId,
         fingerprintSamples = samples,
@@ -44,6 +47,7 @@ internal data class MatchStepStubPayload(
         flowType = flowType,
         subjectQuery = subjectQuery,
         biometricDataSource = biometricDataSource,
+        shouldDisplay1toNFallbackMessage = shouldDisplay1toNFallbackMessage
     )
 
     companion object {

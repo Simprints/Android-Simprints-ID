@@ -17,6 +17,7 @@ object MatchContract {
         flowType: FlowType,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
+        shouldDisplay1toNFallbackMessage: Boolean,
     ) = MatchFragmentArgs(
         MatchParams(
             referenceId,
@@ -26,6 +27,7 @@ object MatchContract {
             flowType,
             subjectQuery,
             biometricDataSource,
+            shouldDisplay1toNFallbackMessage
         ),
     ).toBundle()
 }

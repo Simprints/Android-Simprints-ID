@@ -20,6 +20,9 @@ data class MatchParams(
     val flowType: FlowType,
     val queryForCandidates: SubjectQuery,
     val biometricDataSource: BiometricDataSource,
+    // [MS-984] If 1:1 match step results are below threshold, the same match step with 1:N params is launched. This flag helps to
+    // communicate to user that the match step is launched again with 1:N setup now
+    val shouldDisplay1toNFallbackMessage: Boolean,
 ) : Parcelable {
     fun isFaceMatch() = probeFaceSamples.isNotEmpty()
 

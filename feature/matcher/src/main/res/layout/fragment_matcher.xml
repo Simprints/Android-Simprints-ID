@@ -6,6 +6,61 @@
     android:layout_height="match_parent"
     android:padding="@dimen/margin_large">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/fallback_message"
+        style="@style/Text.Subtitle2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_huge"
+        android:visibility="gone"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toTopOf="@id/face_match_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/margin_large">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_info"
+                app:tint="@color/simprints_blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_large"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.Subtitle1.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="Search &amp; Verify has low score" />
+
+                <TextView
+                    style="@style/Text.Subtitle2.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="Using 1:N biometric search" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
     <TextView
         android:id="@+id/face_match_message"
         style="@style/Text.Subtitle2"
@@ -16,7 +71,7 @@
         app:layout_constraintBottom_toTopOf="@id/face_match_progress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fallback_message"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -31,7 +86,7 @@
         app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingProgressStatus1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/face_match_message"
+        app:layout_constraintTop_toBottomOf="@+id/face_match_message"
         tools:progress="50" />
 
     <TextView

@@ -60,6 +60,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
 
     override fun onResume() {
         super.onResume()
+        binding.fallbackMessage.isVisible = args.params.shouldDisplay1toNFallbackMessage
         val requiredPermissionName = args.params.biometricDataSource
             .permissionName()
             ?.takeUnless { requireActivity().hasPermission(it) }
@@ -120,7 +121,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private fun renderLoadingCandidates(state: MatchState.LoadingCandidates) {
         binding.faceMatchPermissionRequestButton.isVisible = false
         binding.apply {
-            val text = if(state.total  > 0) {
+            val text = if (state.total > 0) {
                 getString(IDR.string.matcher_loading_candidates) + " (${state.loaded}/${state.total})"
             } else {
                 getString(IDR.string.matcher_loading_candidates)
