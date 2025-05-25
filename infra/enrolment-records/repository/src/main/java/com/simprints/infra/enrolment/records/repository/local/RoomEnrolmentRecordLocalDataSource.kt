@@ -20,8 +20,7 @@ import com.simprints.infra.enrolment.records.room.store.SubjectDao
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
-import com.simprints.infra.enrolment.records.room.store.models.DbSubject
-import com.simprints.infra.enrolment.records.room.store.models.DbSubjectTemplateFormatMap
+import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.TEMPLATE_TABLE_NAME
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ROOM_RECORDS_DB
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
@@ -53,7 +52,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             )
             return@withContext emptyList() // All records inserted in this database are tokenized
         }
-        subjectDao.loadSubjects(queryBuilder.buildSubjectQuery(query)).map { it.toDomain() }
+        subjectDao.loadSubjects(queryBuilder.buildSubjectQuery(query)).groupBy { it.subjectId }.map { it.value.toDomain() }
     }
 
     override suspend fun count(
@@ -121,13 +120,12 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         database.withTransaction {
             queries.forEach { query ->
                 require(query.faceSampleFormat == null && query.fingerprintSampleFormat == null) {
-                    val errorMsg =
-                        "faceSampleFormat and fingerprintSampleFormat are not supported for deletion"
+                    val errorMsg = "faceSampleFormat and fingerprintSampleFormat are not supported for deletion"
                     Simber.i("[delete] $errorMsg", tag = ROOM_RECORDS_DB)
                     errorMsg
                 }
-                val (whereClause, args) = queryBuilder.buildWhereClauseForDelete(query)
-                val sql = "DELETE FROM DbSubject $whereClause"
+                val (whereClause, args) = queryBuilder.buildWhereClause(query)
+                val sql = "DELETE FROM $TEMPLATE_TABLE_NAME $whereClause"
                 subjectDao.deleteSubjects(SimpleSQLiteQuery(sql, args.toTypedArray()))
             }
         }
@@ -135,7 +133,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
 
     override suspend fun deleteAll() {
         Simber.i("[deleteAll] Deleting all subjects.", tag = ROOM_RECORDS_DB)
-        subjectDao.deleteSubjects(SimpleSQLiteQuery("DELETE FROM DbSubject"))
+        subjectDao.deleteSubjects(SimpleSQLiteQuery("DELETE FROM $TEMPLATE_TABLE_NAME"))
     }
 
     override suspend fun performActions(
@@ -170,9 +168,10 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
 
         subjectDao
             .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, range))
-            .map { (subjectId, templates) ->
+            .groupBy { it.subjectId }
+            .map {
                 onCandidateLoaded()
-                createIdentity(subjectId, templates)
+                createIdentity(it.key, it.value)
             }
     }
 
@@ -189,79 +188,76 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             errorMsg
         }
         val subjectId = subject.subjectId
-        val dbSubject = DbSubject(
-            subjectId = subject.subjectId,
-            projectId = subject.projectId,
-            attendantId = tokenizationProcessor
-                .tokenizeIfNecessary(
-                    subject.attendantId,
-                    TokenKeyType.AttendantId,
-                    project,
-                ).value,
-            moduleId = tokenizationProcessor
-                .tokenizeIfNecessary(
-                    subject.moduleId,
-                    TokenKeyType.ModuleId,
-                    project,
-                ).value,
-            createdAt = subject.createdAt?.time,
-            updatedAt = subject.updatedAt?.time,
-        )
 
-        subjectDao.insertSubject(dbSubject)
-
-        val supportedFormats = mutableSetOf<String>()
+        val projectId = subject.projectId
+        val attendantId = tokenizationProcessor
+            .tokenizeIfNecessary(
+                subject.attendantId,
+                TokenKeyType.AttendantId,
+                project,
+            ).value
+        val moduleId = tokenizationProcessor
+            .tokenizeIfNecessary(
+                subject.moduleId,
+                TokenKeyType.ModuleId,
+                project,
+            ).value
+        val createdAt = subject.createdAt?.time
+        val updatedAt = subject.updatedAt?.time
 
         subject.fingerprintSamples.takeIf { it.isNotEmpty() }?.let { samples ->
             val dbFingerprints = samples.map {
-                supportedFormats.add(it.format)
-                it.toRoomDb(subjectId)
+                it.toRoomDb(subjectId, projectId, attendantId, moduleId, createdAt, updatedAt)
             }
             subjectDao.insertBiometricSamples(dbFingerprints)
         }
 
         subject.faceSamples.takeIf { it.isNotEmpty() }?.let { samples ->
             val dbFaces = samples.map {
-                supportedFormats.add(it.format)
-                it.toRoomDb(subjectId)
+                it.toRoomDb(subjectId, projectId, attendantId, moduleId, createdAt, updatedAt)
             }
             subjectDao.insertBiometricSamples(dbFaces)
-        }
-        supportedFormats.forEach { format ->
-            subjectDao.insertSubjectTemplateMapping(
-                DbSubjectTemplateFormatMap(
-                    subjectId = subjectId,
-                    format = format,
-                ),
-            )
         }
     }
 
     private suspend fun updateSubject(action: SubjectAction.Update) {
-        val dbSubject = subjectDao.getSubject(action.subjectId)
+        val dbTemplates = subjectDao.getSubject(action.subjectId)
 
-        if (dbSubject != null) {
+        if (dbTemplates.isNotEmpty()) {
             // delete face and finger samples
             val referencesToDelete = action.referenceIdsToRemove.toSet()
             require(
-                referencesToDelete.size != dbSubject.biometricTemplates.size ||
+                referencesToDelete.size != dbTemplates.size ||
                     action.faceSamplesToAdd.isNotEmpty() ||
                     action.fingerprintSamplesToAdd.isNotEmpty(),
             ) {
-                val errorMsg =
-                    "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
+                val errorMsg = "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
                 Simber.i("[updateSubject] $errorMsg", tag = ROOM_RECORDS_DB)
                 errorMsg
             }
-            dbSubject.biometricTemplates
-                .filter { it.referenceId in referencesToDelete }
-                .forEach {
-                    subjectDao.deleteBiometricSample(it.uuid)
-                }
+            val projectId = dbTemplates.first().projectId
+            val attendantId = dbTemplates.first().attendantId
+            val moduleId = dbTemplates.first().moduleId
+            val createdAt = dbTemplates.first().createdAt
+            val updatedAt = dbTemplates.first().updatedAt
+
+            dbTemplates.filter { it.referenceId in referencesToDelete }.forEach {
+                subjectDao.deleteBiometricSample(it.uuid)
+            }
 
             // add face and finger samples
-            val templatesToAdd = action.faceSamplesToAdd.map { it.toRoomDb(action.subjectId) } +
-                action.fingerprintSamplesToAdd.map { it.toRoomDb(action.subjectId) }
+            val templatesToAdd = action.faceSamplesToAdd.map {
+                it.toRoomDb(action.subjectId, projectId, attendantId, moduleId, createdAt, updatedAt)
+            } + action.fingerprintSamplesToAdd.map {
+                it.toRoomDb(
+                    action.subjectId,
+                    projectId,
+                    attendantId,
+                    moduleId,
+                    createdAt,
+                    updatedAt,
+                )
+            }
 
             if (templatesToAdd.isNotEmpty()) {
                 subjectDao.insertBiometricSamples(templatesToAdd)

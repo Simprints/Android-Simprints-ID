@@ -1,8 +1,8 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
-import com.google.common.truth.Truth.assertThat
+import androidx.test.core.app.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -15,9 +15,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQue
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -27,6 +25,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.Date
+import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class RoomEnrollmentRecordLocalDataSourceTest {
@@ -109,7 +108,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         projectId = PROJECT_1_ID,
         attendantId = ATTENDANT_1_ID,
         moduleId = MODULE_1_ID,
-        faceSamples = listOf(faceSample1),
+        faceSamples = listOf(faceSample1.copy(id = UUID.randomUUID().toString())),
         fingerprintSamples = emptyList(),
         createdAt = date,
         updatedAt = date,
@@ -120,7 +119,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         attendantId = ATTENDANT_1_ID,
         moduleId = MODULE_1_ID,
         faceSamples = emptyList(),
-        fingerprintSamples = listOf(fingerprintSample1),
+        fingerprintSamples = listOf(fingerprintSample1.copy(id = UUID.randomUUID().toString())),
         createdAt = date,
         updatedAt = date,
     )
@@ -130,7 +129,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         attendantId = ATTENDANT_1_ID,
         moduleId = MODULE_2_ID,
         faceSamples = listOf(faceSample2),
-        fingerprintSamples = listOf(fingerprintSample2),
+        fingerprintSamples = listOf(fingerprintSample2.copy(id = UUID.randomUUID().toString())),
     )
     private val subject4P2WithBoth = Subject(
         subjectId = "subj-004",
@@ -138,7 +137,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         attendantId = ATTENDANT_2_ID,
         moduleId = MODULE_2_ID,
         faceSamples = listOf(faceSample3Project2),
-        fingerprintSamples = listOf(fingerprintSample3Project2),
+        fingerprintSamples = listOf(fingerprintSample3Project2.copy(id = UUID.randomUUID().toString())),
         createdAt = date,
         updatedAt = date,
     )
@@ -148,7 +147,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         projectId = PROJECT_2_ID,
         attendantId = ATTENDANT_2_ID,
         moduleId = MODULE_3_ID,
-        faceSamples = listOf(faceSample3Project2),
+        faceSamples = listOf(faceSample3Project2.copy(id = UUID.randomUUID().toString())),
         fingerprintSamples = emptyList(),
         createdAt = Date(date.time + 1000), // Slightly different time
         updatedAt = Date(date.time + 1000),
@@ -160,7 +159,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         attendantId = ATTENDANT_1_ID,
         moduleId = MODULE_3_ID,
         faceSamples = emptyList(),
-        fingerprintSamples = listOf(fingerprintSample3Project2),
+        fingerprintSamples = listOf(fingerprintSample3Project2.copy(id = UUID.randomUUID().toString())),
         createdAt = Date(date.time + 2000), // Different time
         updatedAt = Date(date.time + 2000),
     )
@@ -172,6 +171,21 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         createdAt = date,
         updatedAt = date,
     )
+    val initialData = listOf(
+        SubjectAction.Creation(subject1P1WithFace),
+        SubjectAction.Creation(subject2P1WithFinger),
+        SubjectAction.Creation(subject3P1WithBoth),
+        SubjectAction.Creation(subject4P2WithBoth),
+        SubjectAction.Creation(subject5P2WithFace),
+        SubjectAction.Creation(subject6P2WithFinger),
+    )
+
+    private suspend fun setupInitialData() {
+        dataSource.performActions(
+            initialData,
+            project, // Use the mocked project instance
+        )
+    }
 
     private val project: Project = mockk()
     private lateinit var mockCallback: () -> Unit
@@ -199,22 +213,6 @@ class RoomEnrollmentRecordLocalDataSourceTest {
             dataSource.deleteAll()
             subjectDatabaseFactory.get().close() // Close the database connection
         }
-    }
-
-    val initialData = listOf(
-        SubjectAction.Creation(subject1P1WithFace),
-        SubjectAction.Creation(subject2P1WithFinger),
-        SubjectAction.Creation(subject3P1WithBoth),
-        SubjectAction.Creation(subject4P2WithBoth),
-        SubjectAction.Creation(subject5P2WithFace),
-        SubjectAction.Creation(subject6P2WithFinger),
-    )
-
-    private suspend fun setupInitialData() {
-        dataSource.performActions(
-            initialData,
-            project, // Use the mocked project instance
-        )
     }
 
     // --- Test Cases ---
@@ -458,9 +456,12 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         // Original Update action instantiation style maintained
         val updateAction = SubjectAction.Update(
             subjectId = subject1P1WithFace.subjectId,
-            faceSamplesToAdd = listOf(faceSample1, faceSample2),
-            fingerprintSamplesToAdd = listOf(fingerprintSample1),
-            referenceIdsToRemove = listOf(),
+            faceSamplesToAdd = listOf(
+                faceSample1.copy(id = UUID.randomUUID().toString()),
+                faceSample2.copy(id = UUID.randomUUID().toString()),
+            ),
+            fingerprintSamplesToAdd = listOf(fingerprintSample1.copy(id = UUID.randomUUID().toString())),
+            referenceIdsToRemove = listOf(faceSample1.referenceId),
         )
 
         // When
@@ -585,12 +586,13 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         assertThat(loadedP1Roc3).hasSize(1)
         assertThat(loadedP1Roc3[0].subjectId).isEqualTo(subject3P1WithBoth.subjectId)
 
-        assertThat(loadedP2Roc1).hasSize(1)
-        assertThat(loadedP2Roc1[0].subjectId).isEqualTo(subject5P2WithFace.subjectId)
+        assertThat(loadedP2Roc1).hasSize(2)
+        assertThat(loadedP2Roc1[0].subjectId).isEqualTo(subject4P2WithBoth.subjectId)
 
-        assertThat(loadedAllRoc1).hasSize(2)
+        assertThat(loadedAllRoc1).hasSize(3)
         assertThat(loadedAllRoc1.map { it.subjectId }).containsExactly(
             subject1P1WithFace.subjectId,
+            subject4P2WithBoth.subjectId,
             subject5P2WithFace.subjectId,
         )
     }
@@ -605,21 +607,24 @@ class RoomEnrollmentRecordLocalDataSourceTest {
             SubjectQuery(
                 projectId = PROJECT_1_ID,
                 fingerprintSampleFormat = NEC_FORMAT,
+                sort = true,
             ),
         )
         val loadedP1Iso = dataSource.load(
             SubjectQuery(
                 projectId = PROJECT_1_ID,
                 fingerprintSampleFormat = ISO_FORMAT,
+                sort = true,
             ),
         )
         val loadedP2Nec = dataSource.load(
             SubjectQuery(
                 projectId = PROJECT_2_ID,
                 fingerprintSampleFormat = NEC_FORMAT,
+                sort = true,
             ),
         )
-        val loadedAllNec = dataSource.load(SubjectQuery(fingerprintSampleFormat = NEC_FORMAT))
+        val loadedAllNec = dataSource.load(SubjectQuery(fingerprintSampleFormat = NEC_FORMAT, sort = true))
 
         // Then
         assertThat(loadedP1Nec).hasSize(1)
@@ -628,12 +633,13 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         assertThat(loadedP1Iso).hasSize(1)
         assertThat(loadedP1Iso[0].subjectId).isEqualTo(subject3P1WithBoth.subjectId)
 
-        assertThat(loadedP2Nec).hasSize(1)
-        assertThat(loadedP2Nec[0].subjectId).isEqualTo(subject6P2WithFinger.subjectId)
+        assertThat(loadedP2Nec).hasSize(2)
+        assertThat(loadedP2Nec[0].subjectId).isEqualTo(subject4P2WithBoth.subjectId)
 
-        assertThat(loadedAllNec).hasSize(2)
+        assertThat(loadedAllNec).hasSize(3)
         assertThat(loadedAllNec.map { it.subjectId }).containsExactly(
             subject2P1WithFinger.subjectId,
+            subject4P2WithBoth.subjectId,
             subject6P2WithFinger.subjectId,
         )
     }
@@ -898,12 +904,12 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         assertThat(loadedP1Iso[0].fingerprints).isEqualTo(subject3P1WithBoth.fingerprintSamples)
 
         // Then - P2 NEC
-        assertThat(loadedP2Nec).hasSize(1)
-        assertThat(loadedP2Nec[0].subjectId).isEqualTo(subject6P2WithFinger.subjectId)
+        assertThat(loadedP2Nec).hasSize(2)
+        assertThat(loadedP2Nec[0].subjectId).isEqualTo(subject4P2WithBoth.subjectId)
         assertThat(loadedP2Nec[0].fingerprints).hasSize(1)
         assertThat(loadedP2Nec[0].fingerprints[0].format).isEqualTo(NEC_FORMAT)
 
-        verify(exactly = 3) { mockCallback() }
+        verify(exactly = 4) { mockCallback() }
     }
 
     @Test
@@ -1073,10 +1079,10 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         assertThat(loadedP1Roc3[0].faces).isEqualTo(subject3P1WithBoth.faceSamples)
 
         // Then - P2 ROC_1
-        assertThat(loadedP2Roc1).hasSize(1)
-        assertThat(loadedP2Roc1[0].subjectId).isEqualTo(subject5P2WithFace.subjectId)
+        assertThat(loadedP2Roc1).hasSize(2)
+        assertThat(loadedP2Roc1[0].subjectId).isEqualTo(subject4P2WithBoth.subjectId)
 
-        verify(exactly = 3) { mockCallback() }
+        verify(exactly = 4) { mockCallback() }
     }
 
     @Test
