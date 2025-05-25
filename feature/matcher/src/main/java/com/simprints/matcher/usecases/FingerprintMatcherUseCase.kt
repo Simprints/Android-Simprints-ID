@@ -13,28 +13,34 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerCo
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.min
+import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity as DomainFingerprintIdentity
 
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
     private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
+
+    // When using local DB loadedCandidates = expectedCandidates
+    // However, when using CommCare as data source, loadedCandidates < expectedCandidates
+    // as it's count function does not take into account filtering criteria
+    // This var is not thread safe
+    var loadedCandidates = 0
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
@@ -61,54 +67,55 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
-        // When using local DB loadedCandidates = expectedCandidates
-        // However, when using CommCare as data source, loadedCandidates < expectedCandidates
-        // as it's count function does not take into account filtering criteria
-        var loadedCandidates = 0
-        val resultItems = createRanges(expectedCandidates)
-            .map { range ->
-                async(dispatcher) {
-                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource, project) {
-                        // When a candidate is loaded
-                        loadedCandidates++
-                        trySend(MatcherState.CandidateLoaded)
-                    }
-                    match(samples, batchCandidates, matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK)
-                        .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
-                            acc.add(FingerprintMatchResult.Item(item.id, item.score))
-                        }
-                }
-            }.awaitAll()
-            .reduce { acc, subSet -> acc.addAll(subSet) }
-            .toList()
+        loadedCandidates = 0
+        val ranges = createRanges(expectedCandidates)
+        // if number of ranges less than the number of cores then use the number of ranges
+        val numConsumers = min(Runtime.getRuntime().availableProcessors(), ranges.size)
+        val channel = enrolmentRecordRepository.loadFingerprintIdentities(
+            query = queryWithSupportedFormat,
+            ranges = ranges,
+            dataSource = matchParams.biometricDataSource,
+            scope = this,
+            project = project,
+        ) {
+            loadedCandidates++
+            trySend(MatcherState.CandidateLoaded)
+        }
+
+        val resultSet = MatchResultSet<FingerprintMatchResult.Item>()
+
+        // Start Consumers in BG thread
+        val consumerJobs = List(numConsumers) {
+            launch(dispatcherBG) {
+                consumeAndMatch(channel, samples, resultSet, bioSdkWrapper, matchParams)
+            }
+        }
+        // Wait for all to complete
+        consumerJobs.forEach { it.join() }
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
-        send(MatcherState.Success(resultItems, loadedCandidates, bioSdkWrapper.matcherName))
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates, bioSdkWrapper.matcherName))
+    }
+
+    private suspend fun consumeAndMatch(
+        channel: ReceiveChannel<List<DomainFingerprintIdentity>>,
+        samples: List<Fingerprint>,
+        resultSet: MatchResultSet<FingerprintMatchResult.Item>,
+        bioSdkWrapper: BioSdkWrapper,
+        matchParams: MatchParams,
+    ) {
+        for (batch in channel) {
+            val matchResults =
+                match(samples, batch.mapToFingerprintIdentity(), matchParams.flowType, bioSdkWrapper, bioSdk = matchParams.fingerprintSDK!!)
+                    .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
+                        acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                    }
+            resultSet.addAll(matchResults)
+        }
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
         .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
-
-    private suspend fun getCandidates(
-        query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
-        project: Project,
-        onCandidateLoaded: () -> Unit,
-    ) = enrolmentRecordRepository
-        .loadFingerprintIdentities(query, range, dataSource, project, onCandidateLoaded)
-        .map {
-            FingerprintIdentity(
-                it.subjectId,
-                it.fingerprints.map { finger ->
-                    Fingerprint(
-                        finger.fingerIdentifier.toMatcherDomain(),
-                        finger.template,
-                        finger.format,
-                    )
-                },
-            )
-        }
 
     private suspend fun match(
         probes: List<Fingerprint>,
@@ -143,5 +150,18 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         IFingerIdentifier.LEFT_3RD_FINGER -> FingerIdentifier.LEFT_3RD_FINGER
         IFingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
         IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
+    }
+
+    private fun List<DomainFingerprintIdentity>.mapToFingerprintIdentity() = map {
+        FingerprintIdentity(
+            it.subjectId,
+            it.fingerprints.map { finger ->
+                Fingerprint(
+                    finger.fingerIdentifier.toMatcherDomain(),
+                    finger.template,
+                    finger.format,
+                )
+            },
+        )
     }
 }
