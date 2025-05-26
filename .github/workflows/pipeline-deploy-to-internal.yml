@@ -36,3 +36,7 @@ jobs:
             mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
         needs:
             - build-internal-aab
+    tag-release:
+        uses: ./.github/workflows/reusable-update-release-git-tag.yml
+        needs: deploy-internal-build
+        secrets: inherit

@@ -27,6 +27,11 @@
             app:destination="@id/faceConfirmationFragment"
             app:popUpTo="@+id/graph_face_capture_auto_internal"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_faceLiveFeedbackFragment_to_facePreparationFragment"
+            app:destination="@id/facePreparationFragment"
+            app:popUpTo="@+id/graph_face_capture_auto_internal"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
