@@ -8,18 +8,16 @@ import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTempla
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.PROJECT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.SUBJECT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.TEMPLATE_TABLE_NAME
+import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_TABLE_NAME
 import javax.inject.Inject
-import kotlin.io.println
 
 internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     fun buildSubjectQuery(query: SubjectQuery): SimpleSQLiteQuery {
         val (whereClause, args) = buildWhereClause(query)
-        val orderBy = if (query.sort) "ORDER BY $SUBJECT_ID_COLUMN ASC" else ""
         val sql =
             """
              SELECT * FROM $TEMPLATE_TABLE_NAME 
             $whereClause
-            $orderBy
             """.trimIndent()
         println(sql)
         println("----")
@@ -28,7 +26,13 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
 
     fun buildCountQuery(query: SubjectQuery): SimpleSQLiteQuery {
         val (whereClause, args) = buildWhereClause(query)
-        val sql = "SELECT COUNT(DISTINCT $SUBJECT_ID_COLUMN) FROM $TEMPLATE_TABLE_NAME $whereClause"
+
+        val sql = if (query.faceSampleFormat != null || query.fingerprintSampleFormat != null) {
+            "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S JOIN  $TEMPLATE_TABLE_NAME T" +
+                " on T.subjectId = S.subjectId $whereClause "
+        } else {
+            "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  $whereClause "
+        }
         println(sql)
         println("----")
 
@@ -37,17 +41,23 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
 
     fun buildBiometricTemplatesQuery(
         query: SubjectQuery,
-        range: IntRange,
+        pageSize: Int,
+        lastSeenSubjectId: String? = null,
     ): SimpleSQLiteQuery {
-        val (whereClause, args) = buildWhereClause(query)
+        val updatedQuery = query.copy(afterSubjectId = lastSeenSubjectId, sort = true)
+        val (whereClause, args) = buildWhereClause(updatedQuery)
         val sql =
             """
-        SELECT *
-        FROM $TEMPLATE_TABLE_NAME         
-            $whereClause
-            ORDER BY $SUBJECT_ID_COLUMN ASC
-            LIMIT ${range.last - range.first} OFFSET ${range.first}        
-        """
+            SELECT A.*
+            FROM $TEMPLATE_TABLE_NAME A
+            JOIN (
+                SELECT distinct  S.subjectId 
+                FROM $SUBJECT_TABLE_NAME S JOIN  $TEMPLATE_TABLE_NAME T
+                ON S.subjectId =  T.subjectId
+                $whereClause
+                LIMIT $pageSize
+            ) B ON A.subjectId = B.subjectId
+            """.trimIndent()
         println(sql)
         println("----")
 
@@ -62,40 +72,41 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         }
         // to achieve the highest performance, we should not use OR in the where clause
         query.subjectId?.let {
-            clauses.add("$SUBJECT_ID_COLUMN = ?")
+            clauses.add("S.$SUBJECT_ID_COLUMN = ?")
             args.add(it)
         }
         query.subjectIds?.takeIf { it.isNotEmpty() }?.let {
-            clauses.add("$SUBJECT_ID_COLUMN IN (${it.joinToString(",") { "?" }})")
+            clauses.add("S.$SUBJECT_ID_COLUMN IN (${it.joinToString(",") { "?" }})")
             args.addAll(it)
         }
         query.afterSubjectId?.let {
-            clauses.add("$SUBJECT_ID_COLUMN > ?")
+            clauses.add("S.$SUBJECT_ID_COLUMN > ?")
             args.add(it)
         }
         query.projectId?.let {
-            clauses.add("$PROJECT_ID_COLUMN = ?")
+            clauses.add("S.$PROJECT_ID_COLUMN = ?")
             args.add(it)
         }
         query.attendantId?.let {
-            clauses.add("$ATTENDANT_ID_COLUMN = ?")
+            clauses.add("S.$ATTENDANT_ID_COLUMN = ?")
             args.add(it.value)
         }
         query.moduleId?.let {
-            clauses.add("$MODULE_ID_COLUMN = ?")
+            clauses.add("S.$MODULE_ID_COLUMN = ?")
             args.add(it.value)
         }
         query.faceSampleFormat?.let {
-            clauses.add("$FORMAT_COLUMN = ?")
+            clauses.add("T.$FORMAT_COLUMN = ?")
             args.add(it)
         }
         query.fingerprintSampleFormat?.let {
-            clauses.add("$FORMAT_COLUMN = ?")
+            clauses.add("T.$FORMAT_COLUMN = ?")
             args.add(it)
         }
 
-        val whereClauseResult =
+        var whereClauseResult =
             if (clauses.isNotEmpty()) "WHERE ${clauses.joinToString(" AND ")}" else ""
+        whereClauseResult += if (query.sort) "ORDER BY S.$SUBJECT_ID_COLUMN ASC" else ""
         return Pair(whereClauseResult, args)
     }
 }

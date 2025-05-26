@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import org.junit.Test
 
@@ -69,7 +70,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildBiometricTemplatesQuery throws if no format provided`() {
         val query = SubjectQuery()
         try {
-            builder.buildBiometricTemplatesQuery(query, 0..10)
+            builder.buildBiometricTemplatesQuery(query, 10, "0")
         } catch (e: IllegalArgumentException) {
             assertThat(e).hasMessageThat().contains("Either fingerprintSampleFormat or faceSampleFormat must be provided")
         }
@@ -77,20 +78,20 @@ class RoomEnrolmentRecordQueryBuilderTest {
 
     @Test
     fun `buildBiometricTemplatesQuery with fingerprintSampleFormat builds correct query`() {
-        val query = SubjectQuery(fingerprintSampleFormat = "formatA")
-        val result = builder.buildBiometricTemplatesQuery(query, 0..10)
-        assertThat(result.sql).contains("WHERE format = ?")
-        assertThat(result.sql).contains("LIMIT 10 OFFSET 0")
-        assertThat(result.argCount).isEqualTo(1)
+        val query = SubjectQuery(fingerprintSampleFormat = "formatA", projectId = "p1", attendantId = "a1".asTokenizableEncrypted())
+        val result = builder.buildBiometricTemplatesQuery(query, 10, null)
+        assertThat(result.sql).contains("format = ?")
+        assertThat(result.sql).contains("LIMIT 10")
+        assertThat(result.argCount).isEqualTo(3)
     }
 
     @Test
     fun `buildBiometricTemplatesQuery with faceSampleFormat builds correct query`() {
-        val query = SubjectQuery(faceSampleFormat = "faceFormat")
-        val result = builder.buildBiometricTemplatesQuery(query, 5..15)
-        assertThat(result.sql).contains("WHERE format = ?")
-        assertThat(result.sql).contains("LIMIT 10 OFFSET 5")
-        assertThat(result.argCount).isEqualTo(1)
+        val query = SubjectQuery(faceSampleFormat = "faceFormat", projectId = "p1", moduleId = "m1".asTokenizableEncrypted())
+        val result = builder.buildBiometricTemplatesQuery(query, 15, null)
+        assertThat(result.sql).contains("format = ?")
+        assertThat(result.sql).contains("LIMIT 15")
+        assertThat(result.argCount).isEqualTo(3)
     }
 
     @Test

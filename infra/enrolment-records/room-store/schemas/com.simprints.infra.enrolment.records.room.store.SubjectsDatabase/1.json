@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "05e0b86dddf236ea3979af62d1633e35",
+    "identityHash": "65ca58968feb7d8c63c2703d53a87b5b",
     "entities": [
       {
         "tableName": "DbBiometricTemplate",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `identifier` INTEGER, `templateData` BLOB NOT NULL, `format` TEXT NOT NULL, `referenceId` TEXT NOT NULL, `modality` INTEGER NOT NULL, `projectId` TEXT NOT NULL, `attendantId` TEXT NOT NULL, `moduleId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `identifier` INTEGER, `templateData` BLOB NOT NULL, `format` TEXT NOT NULL, `referenceId` TEXT NOT NULL, `modality` INTEGER NOT NULL, PRIMARY KEY(`uuid`), FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -48,34 +48,6 @@
             "columnName": "modality",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "projectId",
-            "columnName": "projectId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "attendantId",
-            "columnName": "attendantId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "moduleId",
-            "columnName": "moduleId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "createdAt",
-            "columnName": "createdAt",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "updatedAt",
-            "columnName": "updatedAt",
-            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -95,63 +67,6 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_subjectId` ON `${TABLE_NAME}` (`subjectId`)"
           },
           {
-            "name": "index_DbBiometricTemplate_projectId_attendantId_subjectId",
-            "unique": false,
-            "columnNames": [
-              "projectId",
-              "attendantId",
-              "subjectId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_projectId_attendantId_subjectId` ON `${TABLE_NAME}` (`projectId`, `attendantId`, `subjectId`)"
-          },
-          {
-            "name": "index_DbBiometricTemplate_projectId_attendantId_format_subjectId",
-            "unique": false,
-            "columnNames": [
-              "projectId",
-              "attendantId",
-              "format",
-              "subjectId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_projectId_attendantId_format_subjectId` ON `${TABLE_NAME}` (`projectId`, `attendantId`, `format`, `subjectId`)"
-          },
-          {
-            "name": "index_DbBiometricTemplate_projectId_moduleId_subjectId",
-            "unique": false,
-            "columnNames": [
-              "projectId",
-              "moduleId",
-              "subjectId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_projectId_moduleId_subjectId` ON `${TABLE_NAME}` (`projectId`, `moduleId`, `subjectId`)"
-          },
-          {
-            "name": "index_DbBiometricTemplate_projectId_moduleId_format_subjectId",
-            "unique": false,
-            "columnNames": [
-              "projectId",
-              "moduleId",
-              "format",
-              "subjectId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_projectId_moduleId_format_subjectId` ON `${TABLE_NAME}` (`projectId`, `moduleId`, `format`, `subjectId`)"
-          },
-          {
-            "name": "index_DbBiometricTemplate_projectId_format_subjectId",
-            "unique": false,
-            "columnNames": [
-              "projectId",
-              "format",
-              "subjectId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_projectId_format_subjectId` ON `${TABLE_NAME}` (`projectId`, `format`, `subjectId`)"
-          },
-          {
             "name": "index_DbBiometricTemplate_format_subjectId",
             "unique": false,
             "columnNames": [
@@ -160,43 +75,113 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_format_subjectId` ON `${TABLE_NAME}` (`format`, `subjectId`)"
-          },
+          }
+        ],
+        "foreignKeys": [
           {
-            "name": "index_DbBiometricTemplate_moduleId_subjectId",
-            "unique": false,
-            "columnNames": [
-              "moduleId",
+            "table": "DbSubject",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
               "subjectId"
             ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_moduleId_subjectId` ON `${TABLE_NAME}` (`moduleId`, `subjectId`)"
+            "referencedColumns": [
+              "subjectId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "DbSubject",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`subjectId` TEXT NOT NULL, `projectId` TEXT NOT NULL, `moduleId` TEXT, `attendantId` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`subjectId`))",
+        "fields": [
+          {
+            "fieldPath": "subjectId",
+            "columnName": "subjectId",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
-            "name": "index_DbBiometricTemplate_projectId_subjectId",
+            "fieldPath": "projectId",
+            "columnName": "projectId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moduleId",
+            "columnName": "moduleId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "attendantId",
+            "columnName": "attendantId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "subjectId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_DbSubject_projectId_subjectId",
             "unique": false,
             "columnNames": [
               "projectId",
               "subjectId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_projectId_subjectId` ON `${TABLE_NAME}` (`projectId`, `subjectId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbSubject_projectId_subjectId` ON `${TABLE_NAME}` (`projectId`, `subjectId`)"
           },
           {
-            "name": "index_DbBiometricTemplate_attendantId_subjectId",
+            "name": "index_DbSubject_projectId_moduleId_subjectId",
             "unique": false,
             "columnNames": [
+              "projectId",
+              "moduleId",
+              "subjectId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbSubject_projectId_moduleId_subjectId` ON `${TABLE_NAME}` (`projectId`, `moduleId`, `subjectId`)"
+          },
+          {
+            "name": "index_DbSubject_projectId_attendantId_subjectId",
+            "unique": false,
+            "columnNames": [
+              "projectId",
               "attendantId",
               "subjectId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbBiometricTemplate_attendantId_subjectId` ON `${TABLE_NAME}` (`attendantId`, `subjectId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbSubject_projectId_attendantId_subjectId` ON `${TABLE_NAME}` (`projectId`, `attendantId`, `subjectId`)"
+          },
+          {
+            "name": "index_DbSubject_moduleId",
+            "unique": false,
+            "columnNames": [
+              "moduleId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DbSubject_moduleId` ON `${TABLE_NAME}` (`moduleId`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '05e0b86dddf236ea3979af62d1633e35')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '65ca58968feb7d8c63c2703d53a87b5b')"
     ]
   }
 }

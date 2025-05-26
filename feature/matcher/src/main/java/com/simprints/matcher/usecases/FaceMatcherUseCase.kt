@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.min
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
 
 internal class FaceMatcherUseCase @Inject constructor(
@@ -40,6 +39,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         matchParams: MatchParams,
         project: Project,
     ): Flow<MatcherState> = channelFlow {
+        val startTime = System.currentTimeMillis()
         Simber.i("Initialising matcher", tag = crashReportTag)
         val bioSdk = resolveFaceBioSdk()
 
@@ -64,7 +64,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         send(MatcherState.LoadingStarted(expectedCandidates))
         val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
-        val numConsumers = min(Runtime.getRuntime().availableProcessors(), ranges.size)
+        val numConsumers = 1 // min(Runtime.getRuntime().availableProcessors(), ranges.size)
 
         val resultSet = MatchResultSet<FaceMatchResult.Item>()
         val candidatesChannel = enrolmentRecordRepository
@@ -88,6 +88,8 @@ internal class FaceMatcherUseCase @Inject constructor(
         }
         // Wait for all to complete
         consumerJobs.forEach { it.join() }
+        Simber.i("Matched $loadedCandidates candidates in ${System.currentTimeMillis() - startTime} ms", tag = crashReportTag)
+
         send(MatcherState.Success(resultSet.toList(), loadedCandidates, bioSdk.matcherName))
     }
 
@@ -98,6 +100,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         bioSdk: FaceBioSDK,
     ) {
         for (batch in candidatesChannel) {
+            Simber.i("Matching batch of size ${batch.size}")
             val results = bioSdk.createMatcher(samples).use { matcher ->
                 match(matcher, batch.mapToFaceIdentities())
             }

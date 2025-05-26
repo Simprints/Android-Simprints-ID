@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -15,8 +14,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.models.fromDbToDomain
-import com.simprints.infra.enrolment.records.repository.local.models.fromDomainToDb
+import com.simprints.infra.enrolment.records.repository.local.models.toDomain
+import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
 import com.simprints.infra.logging.Simber
 import io.realm.kotlin.MutableRealm
@@ -29,9 +28,12 @@ import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
+internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     private val realmWrapper: RealmWrapper,
     private val tokenizationProcessor: TokenizationProcessor,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
@@ -54,10 +56,10 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .find()
-            .map { dbSubject -> dbSubject.fromDbToDomain() }
+            .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -77,7 +79,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         )
     }
 
-    override fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -110,7 +112,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 onCandidateLoaded()
                 FingerprintIdentity(
                     subject.subjectId.toString(),
-                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
+                    subject.fingerprintSamples.map(DbFingerprintSample::toDomain),
                 )
             }
     }
@@ -128,7 +130,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 onCandidateLoaded()
                 FaceIdentity(
                     subject.subjectId.toString(),
-                    subject.faceSamples.map(DbFaceSample::fromDbToDomain),
+                    subject.faceSamples.map(DbFaceSample::toDomain),
                 )
             }
     }
@@ -175,14 +177,23 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                     is SubjectAction.Creation -> {
                         val newSubject = action.subject
                             .copy(
-                                moduleId = action.subject.moduleId.tokenizeIfNecessary(TokenKeyType.ModuleId, project),
-                                attendantId = action.subject.attendantId.tokenizeIfNecessary(TokenKeyType.AttendantId, project),
-                            ).fromDomainToDb()
+                                moduleId = tokenizationProcessor.tokenizeIfNecessary(
+                                    action.subject.moduleId,
+                                    TokenKeyType.ModuleId,
+                                    project,
+                                ),
+                                attendantId = tokenizationProcessor.tokenizeIfNecessary(
+                                    action.subject.attendantId,
+                                    TokenKeyType.AttendantId,
+                                    project,
+                                ),
+                            ).toRealmDb()
                         val dbSubject: DbSubject? = realm.findSubject(newSubject.subjectId)
 
                         if (dbSubject != null) {
                             // When updating an existing subject, we must manually delete outdated samples
-                            val fingerprintSampleIds = newSubject.fingerprintSamples.map { it.id }.toSet()
+                            val fingerprintSampleIds =
+                                newSubject.fingerprintSamples.map { it.id }.toSet()
                             dbSubject.fingerprintSamples
                                 .filterNot { it.id in fingerprintSampleIds }
                                 .takeIf { it.isNotEmpty() }
@@ -199,25 +210,32 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                     }
 
                     is SubjectAction.Update -> {
-                        val dbSubject: DbSubject? = realm.findSubject(RealmUUID.from(action.subjectId))
+                        val dbSubject: DbSubject? =
+                            realm.findSubject(RealmUUID.from(action.subjectId))
                         if (dbSubject != null) {
-                            val referencesToDelete = action.referenceIdsToRemove.toSet() // to make lookup O(1)
-                            val faceSamplesMap = dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
-                            val fingerprintSamplesMap = dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
+                            val referencesToDelete =
+                                action.referenceIdsToRemove.toSet() // to make lookup O(1)
+                            val faceSamplesMap =
+                                dbSubject.faceSamples.groupBy { it.referenceId in referencesToDelete }
+                            val fingerprintSamplesMap =
+                                dbSubject.fingerprintSamples.groupBy { it.referenceId in referencesToDelete }
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
-                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.fromDomainToDb() }
+                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
                             dbSubject.fingerprintSamples = (
-                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.fromDomainToDb() }
+                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
                             fingerprintSamplesMap[true]?.forEach { realm.delete(it) }
                             realm.copyToRealm(dbSubject, updatePolicy = UpdatePolicy.ALL)
                         } else {
-                            Simber.i("[SubjectLocalDataSourceImpl] Subject not found for update", tag = REALM_DB)
+                            Simber.i(
+                                "[SubjectLocalDataSourceImpl] Subject not found for update",
+                                tag = REALM_DB,
+                            )
                         }
                     }
 
@@ -230,19 +248,6 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun TokenizableString.tokenizeIfNecessary(
-        tokenKeyType: TokenKeyType,
-        project: Project,
-    ) = when (this) {
-        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-            decrypted = this,
-            tokenKeyType = tokenKeyType,
-            project = project,
-        )
-
-        is TokenizableString.Tokenized -> this
     }
 
     private fun MutableRealm.findSubject(subjectId: RealmUUID): DbSubject? =
@@ -301,5 +306,33 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
         }
         return realmQuery
+    }
+
+    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<Subject>> = channelFlow {
+        var lastId: RealmUUID? = null
+        realmWrapper.readRealm { realm ->
+            launch {
+                val baseQuery = realm.query(DbSubject::class)
+                while (true) {
+                    val pagedQuery = if (lastId != null) {
+                        baseQuery.query("$SUBJECT_ID_FIELD > $0", lastId)
+                    } else {
+                        baseQuery
+                    }
+
+                    val batch = pagedQuery
+                        .sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
+                        .find { it.take(batchSize) }
+                        .map { it.toDomain() }
+
+                    if (batch.isEmpty()) {
+                        close() // close the flow when done
+                        break
+                    }
+                    send(batch)
+                    lastId = RealmUUID.from(batch.last().subjectId)
+                }
+            }
+        }
     }
 }

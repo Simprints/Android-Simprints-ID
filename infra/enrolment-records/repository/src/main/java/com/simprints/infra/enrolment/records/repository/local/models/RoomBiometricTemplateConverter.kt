@@ -20,35 +20,16 @@ internal fun DbBiometricTemplate.toFaceSample(): FaceSample = FaceSample(
     referenceId = referenceId,
 )
 
-internal fun FaceSample.toRoomDb(
-    subjectId: String,
-    projectId: String,
-    attendantId: String,
-    moduleId: String,
-    createdAt: Long?,
-    updatedAt: Long?,
-): DbBiometricTemplate = DbBiometricTemplate(
+internal fun FaceSample.toRoomDb(subjectId: String): DbBiometricTemplate = DbBiometricTemplate(
     uuid = id,
     templateData = template,
     format = format,
     subjectId = subjectId,
     referenceId = referenceId,
     modality = Modality.FACE.id,
-    projectId = projectId,
-    attendantId = attendantId,
-    moduleId = moduleId,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
 )
 
-internal fun FingerprintSample.toRoomDb(
-    subjectId: String,
-    projectId: String,
-    attendantId: String,
-    moduleId: String,
-    createdAt: Long?,
-    updatedAt: Long?,
-) = DbBiometricTemplate(
+internal fun FingerprintSample.toRoomDb(subjectId: String) = DbBiometricTemplate(
     uuid = id,
     identifier = fingerIdentifier.fromDomain().id,
     templateData = template,
@@ -56,9 +37,4 @@ internal fun FingerprintSample.toRoomDb(
     subjectId = subjectId,
     referenceId = referenceId,
     modality = Modality.FINGERPRINT.id,
-    projectId = projectId,
-    attendantId = attendantId,
-    moduleId = moduleId,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
 )
