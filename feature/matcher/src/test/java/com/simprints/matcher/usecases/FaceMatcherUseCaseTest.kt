@@ -54,6 +54,7 @@ internal class FaceMatcherUseCaseTest {
             resolveFaceBioSdk,
             createRangesUseCase,
             testCoroutineRule.testCoroutineDispatcher,
+            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 

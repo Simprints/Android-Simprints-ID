@@ -67,6 +67,7 @@ internal class FingerprintMatcherUseCaseTest {
             configManager,
             createRangesUseCase,
             testCoroutineRule.testCoroutineDispatcher,
+            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 
