@@ -5,6 +5,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +21,7 @@ interface IdentityDataSource {
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
 
-    fun loadFingerprintIdentities(
+    suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -29,7 +30,7 @@ interface IdentityDataSource {
         onCandidateLoaded: () -> Unit,
     ): ReceiveChannel<List<FingerprintIdentity>>
 
-    fun loadFaceIdentities(
+    suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -56,7 +57,9 @@ interface IdentityDataSource {
                 .map { range ->
                     launch {
                         semaphore.withPermit {
+                            Simber.i("Loading range: $range")
                             channel.send(load(range))
+                            Simber.i("Finished loading range: $range")
                         }
                     }
                 }.joinAll()

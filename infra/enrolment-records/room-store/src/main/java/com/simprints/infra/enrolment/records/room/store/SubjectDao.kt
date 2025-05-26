@@ -2,11 +2,13 @@ package com.simprints.infra.enrolment.records.room.store
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.MapColumn
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
+import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate.Companion.SUBJECT_ID_COLUMN
 
 @Dao
 interface SubjectDao {
@@ -32,5 +34,10 @@ interface SubjectDao {
     suspend fun countSubjects(query: SupportSQLiteQuery): Int
 
     @RawQuery
-    suspend fun loadSamples(query: SupportSQLiteQuery): List<DbBiometricTemplate>
+    suspend fun loadSamples(
+        query: SupportSQLiteQuery,
+    ): Map<
+        @MapColumn(SUBJECT_ID_COLUMN) String,
+        List<DbBiometricTemplate>,
+    >
 }

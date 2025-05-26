@@ -24,6 +24,8 @@ import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTempla
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ROOM_RECORDS_DB
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,7 +37,12 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
     private val tokenizationProcessor: TokenizationProcessor,
     private val queryBuilder: RoomEnrolmentRecordQueryBuilder,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
+    companion object {
+        private const val PARALLELISM = 1
+    }
+
     val database: SubjectsDatabase by lazy {
         subjectsDatabaseFactory.get()
     }
@@ -62,15 +69,67 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         subjectDao.countSubjects(queryBuilder.buildCountQuery(query))
     }
 
-    override suspend fun loadFingerprintIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
-        range: IntRange,
+        ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
+        scope: CoroutineScope,
+        onCandidateLoaded: () -> Unit,
+    ): ReceiveChannel<List<FaceIdentity>> {
+        var lastSeenSubjectId: String? = null
+        return loadIdentitiesConcurrently(
+            ranges = ranges,
+            dispatcher = dispatcher,
+            parallelism = PARALLELISM,
+            scope = scope,
+        ) { range ->
+            val identities = loadFaceIdentities(
+                query = query,
+                pageSize = range.last - range.first,
+                lastSeenSubjectId = lastSeenSubjectId,
+                onCandidateLoaded = onCandidateLoaded,
+            )
+            lastSeenSubjectId = identities.lastOrNull()?.subjectId
+            identities
+        }
+    }
+
+    override suspend fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
+        project: Project,
+        scope: CoroutineScope,
+        onCandidateLoaded: () -> Unit,
+    ): ReceiveChannel<List<FingerprintIdentity>> {
+        var lastSeenSubjectId: String? = null
+        return loadIdentitiesConcurrently(
+            ranges = ranges,
+            dispatcher = dispatcher,
+            parallelism = PARALLELISM,
+            scope = scope,
+        ) { range ->
+            val identities = loadFingerprintIdentities(
+                query = query,
+                pageSize = range.last - range.first,
+                lastSeenSubjectId = lastSeenSubjectId,
+                onCandidateLoaded = onCandidateLoaded,
+            )
+            lastSeenSubjectId = identities.lastOrNull()?.subjectId
+            identities
+        }
+    }
+
+    private suspend fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        pageSize: Int,
+        lastSeenSubjectId: String?,
         onCandidateLoaded: () -> Unit,
     ): List<FingerprintIdentity> = loadBiometricIdentities(
         query = query,
-        range = range,
+        pageSize = pageSize,
+        lastSeenSubjectId = lastSeenSubjectId,
         format = query.fingerprintSampleFormat,
         createIdentity = { subjectId, templates ->
             FingerprintIdentity(
@@ -89,15 +148,15 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         onCandidateLoaded = onCandidateLoaded,
     )
 
-    override suspend fun loadFaceIdentities(
+    private suspend fun loadFaceIdentities(
         query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource,
-        project: Project,
+        pageSize: Int,
+        lastSeenSubjectId: String?,
         onCandidateLoaded: () -> Unit,
     ): List<FaceIdentity> = loadBiometricIdentities(
         query = query,
-        range = range,
+        pageSize = pageSize,
+        lastSeenSubjectId = lastSeenSubjectId,
         format = query.faceSampleFormat,
         createIdentity = { subjectId, templates ->
             FaceIdentity(
@@ -155,8 +214,9 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     // Private Helper Methods
     private suspend fun <T> loadBiometricIdentities(
         query: SubjectQuery,
-        range: IntRange,
+        pageSize: Int,
         format: String?,
+        lastSeenSubjectId: String?,
         createIdentity: (subjectId: String, samples: List<DbBiometricTemplate>) -> T,
         onCandidateLoaded: () -> Unit,
     ): List<T> = withContext(dispatcherIO) {
@@ -167,8 +227,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         }
 
         subjectDao
-            .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, range))
-            .groupBy { it.subjectId }
+            .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, pageSize, lastSeenSubjectId))
             .map {
                 onCandidateLoaded()
                 createIdentity(it.key, it.value)

@@ -37,17 +37,22 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
 
     fun buildBiometricTemplatesQuery(
         query: SubjectQuery,
-        range: IntRange,
+        pageSize: Int,
+        lastSeenSubjectId: String? = null,
     ): SimpleSQLiteQuery {
-        val (whereClause, args) = buildWhereClause(query)
+        val updatedQuery = query.copy(afterSubjectId = lastSeenSubjectId, sort = true)
+        val (whereClause, args) = buildWhereClause(updatedQuery)
         val sql =
             """
-        SELECT *
-        FROM $TEMPLATE_TABLE_NAME         
-            $whereClause
-            ORDER BY $SUBJECT_ID_COLUMN ASC
-            LIMIT ${range.last - range.first} OFFSET ${range.first}        
-        """
+            SELECT t.*
+            FROM $TEMPLATE_TABLE_NAME t
+            JOIN (
+                SELECT distinct  subjectId 
+                FROM $TEMPLATE_TABLE_NAME
+                $whereClause
+                LIMIT $pageSize
+            ) s ON t.subjectId = s.subjectId
+            """.trimIndent()
         println(sql)
         println("----")
 
