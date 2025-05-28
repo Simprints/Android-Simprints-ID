@@ -49,6 +49,13 @@ internal val faceConfiguration =
             decisionPolicy = decisionPolicy,
             version = "1.0",
         ),
+        simFace = FaceConfiguration.FaceSdkConfiguration(
+            nbOfImagesToCapture = 2,
+            qualityThreshold = -1f,
+            imageSavingStrategy = FaceConfiguration.ImageSavingStrategy.NEVER,
+            decisionPolicy = decisionPolicy,
+            version = "1.0",
+        ),
     )
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
