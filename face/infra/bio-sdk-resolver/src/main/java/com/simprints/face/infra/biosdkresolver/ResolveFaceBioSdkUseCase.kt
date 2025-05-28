@@ -1,6 +1,7 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.FaceConfiguration
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,7 +11,9 @@ class ResolveFaceBioSdkUseCase @Inject constructor(
     private val rocV1BioSdk: RocV1BioSdk,
     private val rocV3BioSdk: RocV3BioSdk,
 ) {
-    suspend operator fun invoke(): FaceBioSDK {
+    suspend operator fun invoke(bioSdk: FaceConfiguration.BioSdk): FaceBioSDK {
+        // TODO consider SimFace in the resolution
+
         val version = configRepository
             .getProjectConfiguration()
             .face

@@ -9,7 +9,7 @@ class SimFaceSdkTest {
 
     @Test
     fun createMatcher() {
-        bioSdk = SimFaceBioSdk(mockk(), mockk(), mockk())
+        bioSdk = SimFaceBioSdk(mockk(), mockk(), mockk(relaxed = true))
 
         val matcher = bioSdk.createMatcher(emptyList())
 

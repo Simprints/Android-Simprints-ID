@@ -47,7 +47,12 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK!!)
+        if (matchParams.fingerprintSDK == null) {
+            Simber.w("Fingerprint SDK was not provided", tag = crashReportTag)
+            send(MatcherState.Success(emptyList(), 0, ""))
+            return@channelFlow
+        }
+        val bioSdkWrapper = resolveBioSdkWrapper(matchParams.fingerprintSDK)
 
         if (matchParams.probeFingerprintSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), 0, bioSdkWrapper.matcherName))

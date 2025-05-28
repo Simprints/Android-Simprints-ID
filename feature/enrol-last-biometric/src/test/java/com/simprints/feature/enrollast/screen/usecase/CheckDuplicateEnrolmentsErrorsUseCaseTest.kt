@@ -49,9 +49,8 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             projectConfig = mockProjectConfig(),
             steps = listOf(
                 EnrolLastBiometricStepResult.FaceMatchResult(
-                    listOf(
-                        matchResult(LOW_CONFIDENCE),
-                    ),
+                    listOf(matchResult(LOW_CONFIDENCE)),
+                    mockk(),
                 ),
             ),
         )
@@ -80,9 +79,8 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             projectConfig = mockProjectConfig(highConfidence = null),
             steps = listOf(
                 EnrolLastBiometricStepResult.FaceMatchResult(
-                    listOf(
-                        matchResult(HIGH_CONFIDENCE),
-                    ),
+                    listOf(matchResult(HIGH_CONFIDENCE)),
+                    mockk(),
                 ),
             ),
         )
@@ -121,9 +119,8 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
             projectConfig = mockProjectConfig(),
             steps = listOf(
                 EnrolLastBiometricStepResult.FaceMatchResult(
-                    listOf(
-                        matchResult(HIGH_CONFIDENCE),
-                    ),
+                    listOf(matchResult(HIGH_CONFIDENCE)),
+                    mockk(),
                 ),
             ),
         )
@@ -140,7 +137,7 @@ class CheckDuplicateEnrolmentsErrorsUseCaseTest {
         every { fingerprint?.getSdkConfiguration(any())?.decisionPolicy } returns highConfidence?.let {
             DecisionPolicy(0, 0, it)
         }
-        every { face?.decisionPolicy } returns highConfidence?.let { DecisionPolicy(0, 0, it) }
+        every { face?.getSdkConfiguration(any())?.decisionPolicy } returns highConfidence?.let { DecisionPolicy(0, 0, it) }
     }
 
     private fun matchResult(confidence: Float) = MatchResult("subjectId", confidence)
