@@ -10,7 +10,7 @@ androidx_app_compat_version = "1.7.0"
 androidx_fragment_version = "1.8.7"
 androidx_navigation_version = "2.9.0"
 androidx_lifecycle_version = "2.9.0"
-androidx_work_version = "2.10.0"
+androidx_work_version = "2.10.1"
 androidx_room_version = "2.7.1"
 androidx_datastore_version = "1.1.7"
 androidx_camerax_version = "1.4.2"
@@ -37,8 +37,8 @@ play_publisher_version = "3.12.1"
 play_barcode_version = "18.3.1"
 
 firebase_auth_version = "23.2.1"
-firebase_storage_version = "21.0.1"
-firebase_crashlytics_version = "19.4.2"
+firebase_storage_version = "21.0.2"
+firebase_crashlytics_version = "19.4.3"
 firebase_analytics_version = "22.4.0"
 firebase_perf_version = "21.0.5"
 firebase_crashlyticsPlugin_version = "3.0.3"
@@ -52,7 +52,7 @@ okttp_version = "4.12.0"
 jackson_version = "2.13.4"
 chuck_version = "4.1.0"
 
-sqlCipher_version = "4.7.2"
+sqlCipher_version = "4.9.0"
 fuzzywuzzy_version = "1.4.0"
 rootbeer_version = "0.1.1"
 commons_io_version = "2.19.0"
@@ -87,7 +87,7 @@ realm_version = "3.0.0"
 protobuf_plugin_version = "0.9.5"
 deps_graph_version = "0.8.0"
 tink_version = "1.17.0"
-
+desugar_jdk_libsVersion = "2.1.5"
 [libraries]
 
 #Kotlin
@@ -142,6 +142,7 @@ playServices-base = { module = "com.google.android.gms:play-services-base", vers
 playServices-location = { module = "com.google.android.gms:play-services-location", version.ref = "play_location_services_version" }
 playServices-integrity = { module = "com.google.android.play:integrity", version.ref = "play_integrity_version" }
 playServices-barcode = { module = "com.google.android.gms:play-services-mlkit-barcode-scanning", version.ref = "play_barcode_version" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libsVersion" }
 
 #Firebase
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebase_auth_version" }
