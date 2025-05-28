@@ -103,6 +103,7 @@ jobs:
                 face:infra:bio-sdk-resolver
                 face:infra:roc-v1
                 face:infra:roc-v3
+                face:infra:simface
             reportsId: face
 
     fingerprint-unit-tests:
