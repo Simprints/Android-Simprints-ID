@@ -57,17 +57,19 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         .filterIsInstance<FaceMatchResult>()
         .lastOrNull()
         ?.let { faceMatchResult ->
-            projectConfiguration.face?.let { faceConfiguration ->
-                faceMatchResult.results
-                    .maxByOrNull { it.confidence }
-                    ?.let {
-                        AppMatchResult(
-                            guid = it.subjectId,
-                            confidenceScore = it.confidence,
-                            decisionPolicy = faceConfiguration.decisionPolicy,
-                            verificationMatchThreshold = faceConfiguration.verificationMatchThreshold,
-                        )
-                    }
-            }
+            projectConfiguration.face
+                ?.getSdkConfiguration(faceMatchResult.sdk)
+                ?.let { faceConfiguration ->
+                    faceMatchResult.results
+                        .maxByOrNull { it.confidence }
+                        ?.let {
+                            AppMatchResult(
+                                guid = it.subjectId,
+                                confidenceScore = it.confidence,
+                                decisionPolicy = faceConfiguration.decisionPolicy,
+                                verificationMatchThreshold = faceConfiguration.verificationMatchThreshold,
+                            )
+                        }
+                }
         }
 }

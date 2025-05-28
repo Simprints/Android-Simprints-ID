@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -15,6 +16,7 @@ import kotlinx.parcelize.Parcelize
 data class MatchParams(
     val probeReferenceId: String,
     val probeFaceSamples: List<FaceSample> = emptyList(),
+    val faceSDK: FaceConfiguration.BioSdk? = null,
     val probeFingerprintSamples: List<FingerprintSample> = emptyList(),
     val fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
     val flowType: FlowType,

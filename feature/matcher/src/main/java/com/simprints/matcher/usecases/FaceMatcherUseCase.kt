@@ -41,7 +41,11 @@ internal class FaceMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        val bioSdk = resolveFaceBioSdk()
+        if (matchParams.faceSDK == null) {
+            send(MatcherState.Success(emptyList(), 0, ""))
+            return@channelFlow
+        }
+        val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
 
         if (matchParams.probeFaceSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))

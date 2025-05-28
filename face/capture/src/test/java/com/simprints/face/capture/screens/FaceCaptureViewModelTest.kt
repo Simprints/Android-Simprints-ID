@@ -5,12 +5,13 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
-import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
+import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
@@ -100,7 +101,7 @@ class FaceCaptureViewModelTest {
             bitmapToByteArrayUseCase,
             licenseRepository,
             mockk {
-                coEvery { this@mockk().initializer } returns faceBioSdkInitializer
+                coEvery { this@mockk(any()).initializer } returns faceBioSdkInitializer
             },
             saveLicenseCheckEvent,
             isUsingAutoCapture,
@@ -111,7 +112,13 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Save face detections should not be called when image saving strategy set to NEVER`() {
-        coEvery { configManager.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.NEVER
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .face
+                ?.getSdkConfiguration(any())
+                ?.imageSavingStrategy
+        } returns ImageSavingStrategy.NEVER
 
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
@@ -120,8 +127,15 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Save face detections should be called when image saving strategy set to ONLY_GOOD_SCAN`() {
-        coEvery { configManager.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_GOOD_SCAN
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .face
+                ?.getSdkConfiguration(any())
+                ?.imageSavingStrategy
+        } returns ImageSavingStrategy.ONLY_GOOD_SCAN
 
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.SIM_FACE)
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
         coVerify(atLeast = 1) { faceImageUseCase.invoke(any(), any()) }
@@ -129,6 +143,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Save biometric reference creation when flow finishes`() {
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.SIM_FACE)
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
         coVerify(atLeast = 1) {
@@ -174,6 +189,22 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
+    fun `test initFaceBioSdk should not check licence for SIM_FACE`() {
+        // Given
+        every { faceBioSdkInitializer.tryInitWithLicense(any(), any()) } returns true
+
+        // When
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.SIM_FACE)
+
+        // Then
+        coVerify(exactly = 1) { faceBioSdkInitializer.tryInitWithLicense(any(), eq("")) }
+        coVerify(exactly = 0) {
+            licenseRepository.getCachedLicense(any())
+            saveLicenseCheckEvent(any(), any())
+        }
+    }
+
+    @Test
     fun `test initFaceBioSdk should initialize faceBioSdk only once`() {
         // Given
         val license = "license"
@@ -185,9 +216,9 @@ class FaceCaptureViewModelTest {
         coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
-        viewModel.initFaceBioSdk(mockk())
-        viewModel.initFaceBioSdk(mockk())
-        viewModel.initFaceBioSdk(mockk())
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.RANK_ONE)
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.RANK_ONE)
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         coVerify(exactly = 1) { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
@@ -214,7 +245,7 @@ class FaceCaptureViewModelTest {
         coEvery { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns false
 
         // When
-        viewModel.initFaceBioSdk(mockk())
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.RANK_ONE)
         // Then
         viewModel.invalidLicense.assertEventReceived()
         coVerify { licenseRepository.redownloadLicence(any(), any(), any(), any()) }
@@ -243,7 +274,7 @@ class FaceCaptureViewModelTest {
         coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
-        viewModel.initFaceBioSdk(mockk())
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         viewModel.invalidLicense.assertEventNotReceived()
@@ -274,7 +305,7 @@ class FaceCaptureViewModelTest {
         coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
-        viewModel.initFaceBioSdk(mockk())
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         viewModel.invalidLicense.assertEventNotReceived()
@@ -320,7 +351,7 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `test initFaceBioSdk should return error when re-download fails`() {
+    fun `test initFaceBioSdk should return error when licednce re-download fails`() {
         // Given
         val license = "license"
         coEvery {
@@ -338,7 +369,7 @@ class FaceCaptureViewModelTest {
         coJustRun { saveLicenseCheckEvent(Vendor.RankOne, capture(licenseStatusSlot)) }
 
         // When
-        viewModel.initFaceBioSdk(mockk())
+        viewModel.initFaceBioSdk(mockk(), FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         viewModel.invalidLicense.assertEventReceived()

@@ -12,6 +12,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -62,12 +63,18 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .face
+                ?.getSdkConfiguration(any())
+                ?.qualityThreshold
+        } returns QUALITY_THRESHOLD
         coEvery { configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns false
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
-            coEvery { this@mockk.invoke() } returns mockk {
+            coEvery { this@mockk.invoke(any()) } returns mockk {
                 every { detector } returns faceDetector
             }
         }
@@ -84,7 +91,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun `Process fallback image when valid face correctly but not started capture`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
-        viewModel.initCapture(1, 0)
+        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
@@ -97,7 +104,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     fun `Process valid face correctly`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
 
-        viewModel.initCapture(1, 0)
+        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -127,7 +134,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         )
 
         val detections = viewModel.currentDetection.testObserver()
-        viewModel.initCapture(2, 0)
+        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 2, 0)
 
         viewModel.process(frame)
         viewModel.process(frame)
@@ -162,7 +169,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         )
 
         val detections = viewModel.currentDetection.testObserver()
-        viewModel.initCapture(1, 0)
+        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
         viewModel.process(frame)
         viewModel.process(frame)
@@ -182,7 +189,7 @@ internal class LiveFeedbackFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
-        viewModel.initCapture(2, 0)
+        viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 2, 0)
         viewModel.process(frame)
         viewModel.startCapture()
         viewModel.process(frame)

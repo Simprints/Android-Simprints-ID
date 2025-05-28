@@ -1,6 +1,7 @@
 package com.simprints.matcher
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import java.io.Serializable
 
@@ -21,6 +22,7 @@ interface MatchResultItem : Serializable {
 @Keep
 data class FaceMatchResult(
     override val results: List<MatchResultItem>,
+    val sdk: FaceConfiguration.BioSdk,
 ) : MatchResult {
     @Keep
     data class Item(

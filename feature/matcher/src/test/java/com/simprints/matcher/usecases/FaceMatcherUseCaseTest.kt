@@ -6,6 +6,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -48,7 +49,7 @@ internal class FaceMatcherUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { resolveFaceBioSdk().createMatcher(any()) } returns faceMatcher
+        coEvery { resolveFaceBioSdk(any()).createMatcher(any()) } returns faceMatcher
         useCase = FaceMatcherUseCase(
             enrolmentRecordRepository,
             resolveFaceBioSdk,
@@ -94,6 +95,7 @@ internal class FaceMatcherUseCaseTest {
                     probeFaceSamples = listOf(
                         MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                     ),
+                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -140,6 +142,7 @@ internal class FaceMatcherUseCaseTest {
                     probeFaceSamples = listOf(
                         MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                     ),
+                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,

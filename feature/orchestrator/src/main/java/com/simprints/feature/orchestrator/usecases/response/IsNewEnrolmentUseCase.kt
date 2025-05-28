@@ -5,6 +5,7 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
 import javax.inject.Inject
+import kotlin.text.compareTo
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {
     /**
@@ -40,16 +41,18 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
             ?.medium
             ?.toFloat()
             ?.let { threshold -> fingerprintResult.results.all { it.confidence < threshold } }
-    } ?: true
+    } != false
 
     // Missing results and configuration are ignored as "valid" to allow creating new records.
     private fun isNewEnrolmentFaceResult(
         projectConfiguration: ProjectConfiguration,
         faceResult: FaceMatchResult?,
-    ): Boolean = projectConfiguration.face
-        ?.decisionPolicy
-        ?.medium
-        ?.toFloat()
-        ?.let { threshold -> faceResult?.results?.all { it.confidence < threshold } }
-        ?: true
+    ): Boolean = faceResult?.let {
+        projectConfiguration.face
+            ?.getSdkConfiguration(faceResult.sdk)
+            ?.decisionPolicy
+            ?.medium
+            ?.toFloat()
+            ?.let { threshold -> faceResult.results.all { it.confidence < threshold } }
+    } != false
 }

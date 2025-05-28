@@ -2,6 +2,7 @@ package com.simprints.face.infra.biosdkresolver
 
 import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.FaceConfiguration
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -33,7 +34,7 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns null
 
         // When
-        resolveFaceBioSdkUseCase.invoke()
+        resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then: Expect IllegalArgumentException to be thrown
     }
@@ -50,7 +51,7 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns ""
 
         // When
-        resolveFaceBioSdkUseCase.invoke()
+        resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then: Expect IllegalArgumentException to be thrown
     }
@@ -69,7 +70,7 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns rocV3BioSdk.version
 
         // When
-        val result = resolveFaceBioSdkUseCase.invoke()
+        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         assertThat(result).isEqualTo(rocV3BioSdk)
@@ -88,7 +89,7 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns rocV1BioSdk.version
 
         // When
-        val result = resolveFaceBioSdkUseCase.invoke()
+        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         assertThat(result).isEqualTo(rocV1BioSdk)

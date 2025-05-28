@@ -5,21 +5,6 @@ data class FaceConfiguration(
     val rankOne: FaceSdkConfiguration?,
     val simFace: FaceSdkConfiguration?,
 ) {
-    val nbOfImagesToCapture: Int
-        get() = rankOne?.nbOfImagesToCapture!!
-
-    val qualityThreshold: Float
-        get() = rankOne?.qualityThreshold!!
-
-    val imageSavingStrategy: ImageSavingStrategy
-        get() = rankOne?.imageSavingStrategy!!
-
-    val decisionPolicy: DecisionPolicy
-        get() = rankOne?.decisionPolicy!!
-
-    val verificationMatchThreshold: Float?
-        get() = rankOne?.verificationMatchThreshold
-
     data class FaceSdkConfiguration(
         val nbOfImagesToCapture: Int,
         val qualityThreshold: Float,
