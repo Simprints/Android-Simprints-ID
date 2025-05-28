@@ -1,6 +1,6 @@
 package com.simprints.infra.config.store.models
 
-import com.google.common.truth.Truth
+import com.google.common.truth.*
 import org.junit.Test
 
 class FingerprintConfigurationTest {

@@ -39,9 +39,11 @@ message ProtoFaceConfiguration {
 
     repeated ProtoBioSdk allowed_sdks = 5;
     optional ProtoFaceSdkConfiguration rank_one = 6;
+    optional ProtoFaceSdkConfiguration sim_face = 7;
 
     enum ProtoBioSdk {
         RANK_ONE = 0;
+        SIM_FACE = 1;
     }
 
     enum ImageSavingStrategy {

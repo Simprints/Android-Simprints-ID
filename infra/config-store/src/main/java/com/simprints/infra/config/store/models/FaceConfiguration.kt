@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.models
 data class FaceConfiguration(
     val allowedSDKs: List<BioSdk>,
     val rankOne: FaceSdkConfiguration?,
+    val simFace: FaceSdkConfiguration?,
 ) {
     val nbOfImagesToCapture: Int
         get() = rankOne?.nbOfImagesToCapture!!
@@ -29,8 +30,14 @@ data class FaceConfiguration(
         val verificationMatchThreshold: Float? = null,
     )
 
+    fun getSdkConfiguration(sdk: BioSdk): FaceSdkConfiguration? = when (sdk) {
+        BioSdk.RANK_ONE -> rankOne
+        BioSdk.SIM_FACE -> simFace
+    }
+
     enum class BioSdk {
         RANK_ONE,
+        SIM_FACE,
     }
 
     enum class ImageSavingStrategy {
