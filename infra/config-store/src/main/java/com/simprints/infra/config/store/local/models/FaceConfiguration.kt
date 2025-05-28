@@ -7,12 +7,13 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 internal fun FaceConfiguration.toProto(): ProtoFaceConfiguration = ProtoFaceConfiguration
     .newBuilder()
     .addAllAllowedSdks(allowedSDKs.map { it.toProto() })
-    .also {
-        if (rankOne != null) it.rankOne = rankOne.toProto()
-    }.build()
+    .also { if (rankOne != null) it.rankOne = rankOne.toProto() }
+    .also { if (simFace != null) it.simFace = simFace.toProto() }
+    .build()
 
 internal fun FaceConfiguration.BioSdk.toProto() = when (this) {
     FaceConfiguration.BioSdk.RANK_ONE -> ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE
+    FaceConfiguration.BioSdk.SIM_FACE -> ProtoFaceConfiguration.ProtoBioSdk.SIM_FACE
 }
 
 internal fun FaceConfiguration.FaceSdkConfiguration.toProto() = ProtoFaceConfiguration.ProtoFaceSdkConfiguration
@@ -35,12 +36,14 @@ internal fun FaceConfiguration.ImageSavingStrategy.toProto(): ProtoFaceConfigura
 
 internal fun ProtoFaceConfiguration.toDomain(): FaceConfiguration = FaceConfiguration(
     allowedSDKs = allowedSdksList.map { it.toDomain() },
-    if (hasRankOne()) rankOne.toDomain() else null,
+    rankOne = if (hasRankOne()) rankOne.toDomain() else null,
+    simFace = if (hasSimFace()) simFace.toDomain() else null,
 )
 
 @Suppress("SameReturnValue")
 internal fun ProtoFaceConfiguration.ProtoBioSdk.toDomain() = when (this) {
     ProtoFaceConfiguration.ProtoBioSdk.RANK_ONE -> FaceConfiguration.BioSdk.RANK_ONE
+    ProtoFaceConfiguration.ProtoBioSdk.SIM_FACE -> FaceConfiguration.BioSdk.SIM_FACE
     ProtoFaceConfiguration.ProtoBioSdk.UNRECOGNIZED -> FaceConfiguration.BioSdk.RANK_ONE
 }
 
