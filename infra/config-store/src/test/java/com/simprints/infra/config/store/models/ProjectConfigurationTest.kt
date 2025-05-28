@@ -11,9 +11,9 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
 import com.simprints.infra.config.store.testtools.faceConfiguration
+import com.simprints.infra.config.store.testtools.faceSdkConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import com.simprints.infra.config.store.testtools.projectConfiguration
-import com.simprints.infra.config.store.testtools.rankOneConfiguration
 import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test
@@ -271,7 +271,7 @@ class ProjectConfigurationTest {
     fun `isAgeRestricted should return false when all are empty`() {
         // Arrange
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = AgeGroup(0, null))),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = AgeGroup(0, null))),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = AgeGroup(0, null)),
                 nec = null,
@@ -291,7 +291,7 @@ class ProjectConfigurationTest {
         val emptyAgeRange = AgeGroup(0, 0)
 
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = emptyAgeRange)),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = emptyAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = emptyAgeRange),
                 nec = null,
@@ -312,7 +312,7 @@ class ProjectConfigurationTest {
         val secugenSimMatcherAgeRange = AgeGroup(20, 30)
 
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
                 nec = null,
@@ -348,7 +348,7 @@ class ProjectConfigurationTest {
         val secugenSimMatcherAgeRange = AgeGroup(20, 30)
 
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
                 nec = null,
@@ -372,7 +372,7 @@ class ProjectConfigurationTest {
         val secugenSimMatcherAgeRange = AgeGroup(15, 30)
 
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
                 nec = null,
@@ -398,7 +398,7 @@ class ProjectConfigurationTest {
         val secugenSimMatcherAgeRange = AgeGroup(20, 30)
 
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
                 nec = fingerprintConfiguration.nec?.copy(allowedAgeRange = duplicateAgeRange),
@@ -422,7 +422,7 @@ class ProjectConfigurationTest {
         val secugenSimMatcherAgeRange = AgeGroup(20, 30)
 
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
                 nec = null,
@@ -445,7 +445,7 @@ class ProjectConfigurationTest {
         val secugenSimMatcherAgeRange = AgeGroup(20, null)
 
         val projectConfiguration = projectConfiguration.copy(
-            face = faceConfiguration.copy(rankOne = rankOneConfiguration.copy(allowedAgeRange = faceAgeRange)),
+            face = faceConfiguration.copy(rankOne = faceSdkConfiguration.copy(allowedAgeRange = faceAgeRange)),
             fingerprint = fingerprintConfiguration.copy(
                 secugenSimMatcher = fingerprintConfiguration.secugenSimMatcher?.copy(allowedAgeRange = secugenSimMatcherAgeRange),
                 nec = null,

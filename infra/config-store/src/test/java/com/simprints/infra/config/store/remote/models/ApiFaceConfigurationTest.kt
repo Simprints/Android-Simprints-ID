@@ -16,12 +16,18 @@ class ApiFaceConfigurationTest {
     @Test
     fun `should map correctly the model with allowedAgeRange present`() {
         val apiFaceConfigurationWithAgeRange = apiFaceConfiguration.copy(
-            rankOne = apiFaceConfiguration.rankOne.copy(
+            rankOne = apiFaceConfiguration.rankOne?.copy(
+                allowedAgeRange = ApiAllowedAgeRange(10, 20),
+            ),
+            simFace = apiFaceConfiguration.simFace?.copy(
                 allowedAgeRange = ApiAllowedAgeRange(10, 20),
             ),
         )
         val faceConfigurationWithAgeRange = faceConfiguration.copy(
             rankOne = faceConfiguration.rankOne!!.copy(
+                allowedAgeRange = AgeGroup(10, 20),
+            ),
+            simFace = faceConfiguration.simFace!!.copy(
                 allowedAgeRange = AgeGroup(10, 20),
             ),
         )

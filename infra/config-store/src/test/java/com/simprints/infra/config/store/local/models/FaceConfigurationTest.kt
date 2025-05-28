@@ -18,6 +18,7 @@ class FaceConfigurationTest {
         val protoFaceConfigurationWithoutAgeRange = protoFaceConfiguration
             .toBuilder()
             .setRankOne(protoFaceConfiguration.rankOne.toBuilder().clearAllowedAgeRange())
+            .setSimFace(protoFaceConfiguration.simFace.toBuilder().clearAllowedAgeRange())
             .build()
 
         assertThat(protoFaceConfigurationWithoutAgeRange.toDomain()).isEqualTo(faceConfiguration)

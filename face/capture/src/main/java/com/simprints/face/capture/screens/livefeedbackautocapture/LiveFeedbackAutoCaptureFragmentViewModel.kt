@@ -14,6 +14,7 @@ import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,7 +65,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
         capturingState.value = CapturingState.NOT_STARTED // reset view
         isAutoCaptureHeldOff = true
     }
-    
+
     fun startCapture() {
         isAutoCaptureHeldOff = false
     }
@@ -84,8 +85,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
 
         if (!isAutoCaptureHeldOff) {
             currentDetection.postValue(faceDetection)
-            if (faceDetection.status == FaceDetection.Status.VALID
-                && capturingState.value == CapturingState.NOT_STARTED) {
+            if (faceDetection.status == FaceDetection.Status.VALID &&
+                capturingState.value == CapturingState.NOT_STARTED
+            ) {
                 capturingState.postValue(CapturingState.CAPTURING)
                 captureImagingStartTime = captureStartTime.ms
                 autoCaptureImagingTimeoutJob = viewModelScope.launch {
@@ -109,16 +111,17 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     }
 
     fun initCapture(
+        bioSdk: FaceConfiguration.BioSdk,
         samplesToKeep: Int,
         attemptNumber: Int,
     ) {
         this.samplesToKeep = samplesToKeep
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
-            faceDetector = resolveFaceBioSdk().detector
+            faceDetector = resolveFaceBioSdk(bioSdk).detector
 
             val config = configManager.getProjectConfiguration()
-            qualityThreshold = config.face?.qualityThreshold ?: 0f
+            qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
         }
@@ -142,11 +145,13 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
 
     private fun updateUserCapturesWith(faceDetection: FaceDetection) {
         if (userCaptures.count() == samplesToKeep) {
-            userCaptures.indices.minByOrNull { index ->
-                userCaptures[index].face?.quality ?: -1f
-            }?.takeIf { it >= 0 }?.let { worseQualityCaptureIndex ->
-                userCaptures[worseQualityCaptureIndex] = faceDetection
-            }
+            userCaptures.indices
+                .minByOrNull { index ->
+                    userCaptures[index].face?.quality ?: -1f
+                }?.takeIf { it >= 0 }
+                ?.let { worseQualityCaptureIndex ->
+                    userCaptures[worseQualityCaptureIndex] = faceDetection
+                }
         } else {
             userCaptures.add(faceDetection)
         }

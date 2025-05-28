@@ -1,13 +1,14 @@
 package com.simprints.matcher.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -20,15 +21,8 @@ import com.simprints.matcher.usecases.MatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.CapturingSlot
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -99,7 +93,7 @@ internal class MatchViewModelTest {
                     matchResultItems = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = "MatcherName",
-                )
+                ),
             )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
@@ -111,6 +105,7 @@ internal class MatchViewModelTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(getFaceSample()),
+                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -146,7 +141,7 @@ internal class MatchViewModelTest {
                     matchResultItems = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = MATCHER_NAME,
-                )
+                ),
             )
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
@@ -156,6 +151,7 @@ internal class MatchViewModelTest {
             MatchParams(
                 probeReferenceId = "referenceId",
                 probeFaceSamples = listOf(getFaceSample()),
+                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                 flowType = FlowType.ENROL,
                 queryForCandidates = mockk {},
                 biometricDataSource = BiometricDataSource.Simprints,
@@ -173,7 +169,7 @@ internal class MatchViewModelTest {
             ),
         )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
-            FaceMatchResult(responseItems),
+            FaceMatchResult(responseItems, FaceConfiguration.BioSdk.RANK_ONE),
         )
 
         verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
@@ -199,7 +195,7 @@ internal class MatchViewModelTest {
                     matchResultItems = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = MATCHER_NAME,
-                )
+                ),
             )
         }
 

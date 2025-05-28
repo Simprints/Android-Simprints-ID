@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -22,7 +23,7 @@ internal class IsNewEnrolmentUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        every { projectConfiguration.face?.decisionPolicy } returns faceConfidenceDecisionPolicy
+        every { projectConfiguration.face?.getSdkConfiguration((any()))?.decisionPolicy } returns faceConfidenceDecisionPolicy
         every { projectConfiguration.fingerprint?.getSdkConfiguration((any()))?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
 
         useCase = IsNewEnrolmentUseCase()
@@ -49,12 +50,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(
-                    FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
-                        mockk(),
-                    ),
-                ),
+                listOf(FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), mockk())),
             ),
         ).isTrue()
     }
@@ -66,12 +62,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(
-                    FingerprintMatchResult(
-                        listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
-                        mockk(),
-                    ),
-                ),
+                listOf(FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), mockk())),
             ),
         ).isFalse()
     }
@@ -83,9 +74,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
-                ),
+                listOf(FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
             ),
         ).isTrue()
     }
@@ -97,9 +86,7 @@ internal class IsNewEnrolmentUseCaseTest {
         assertThat(
             useCase(
                 projectConfiguration,
-                listOf(
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
-                ),
+                listOf(FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE)),
             ),
         ).isFalse()
     }
@@ -116,7 +103,7 @@ internal class IsNewEnrolmentUseCaseTest {
                         listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
                         mockk(),
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
                 ),
             ),
         ).isTrue()
@@ -134,7 +121,7 @@ internal class IsNewEnrolmentUseCaseTest {
                         listOf(FingerprintMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)),
                         mockk(),
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE))),
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
                 ),
             ),
         ).isFalse()
@@ -152,7 +139,7 @@ internal class IsNewEnrolmentUseCaseTest {
                         listOf(FingerprintMatchResult.Item("", HIGHER_THAN_MEDIUM_SCORE)),
                         mockk(),
                     ),
-                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE))),
+                    FaceMatchResult(listOf(FaceMatchResult.Item("", LOWER_THAN_MEDIUM_SCORE)), FaceConfiguration.BioSdk.RANK_ONE),
                 ),
             ),
         ).isFalse()

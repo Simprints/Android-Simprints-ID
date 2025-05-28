@@ -89,7 +89,7 @@ internal class MatchViewModel @Inject constructor(
 
                     _matchResponse.send(
                         when {
-                            isFaceMatch -> FaceMatchResult(matcherState.matchResultItems)
+                            isFaceMatch -> FaceMatchResult(matcherState.matchResultItems, params.faceSDK!!)
                             else -> FingerprintMatchResult(matcherState.matchResultItems, params.fingerprintSDK!!)
                         },
                     )
