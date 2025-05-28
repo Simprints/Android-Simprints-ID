@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
@@ -8,8 +9,6 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.exceptions.RealmUninitialisedException
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
-import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
@@ -17,6 +16,7 @@ import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRe
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -66,36 +66,32 @@ internal class EnrolmentRecordRepositoryImpl(
                 afterSubjectId = lastUploadedRecord,
             )
         }
-        localDataSource
-            .load(query)
-            .chunked(batchSize)
-            .forEach { subjects ->
-                remoteDataSource.uploadRecords(subjects)
-                prefs.edit().putString(PROGRESS_KEY, subjects.last().subjectId).apply()
-            }
-        prefs.edit().remove(PROGRESS_KEY).apply()
+        localDataSource.load(query).chunked(batchSize).forEach { subjects ->
+            remoteDataSource.uploadRecords(subjects)
+            prefs.edit { putString(PROGRESS_KEY, subjects.last().subjectId) }
+        }
+        prefs.edit { remove(PROGRESS_KEY) }
     }
 
     override suspend fun tokenizeExistingRecords(project: Project) {
         try {
             val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
-            val tokenizedSubjectsCreateAction =
-                localDataSource
-                    .load(query)
-                    .mapNotNull { subject ->
-                        if (subject.projectId != project.id) return@mapNotNull null
-                        val moduleId = tokenizeIfNecessary(
-                            value = subject.moduleId,
-                            tokenKeyType = TokenKeyType.ModuleId,
-                            project = project,
-                        )
-                        val attendantId = tokenizeIfNecessary(
-                            value = subject.attendantId,
-                            tokenKeyType = TokenKeyType.AttendantId,
-                            project = project,
-                        )
-                        return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
-                    }.map(SubjectAction::Creation)
+            val tokenizedSubjectsCreateAction = localDataSource
+                .load(query)
+                .mapNotNull { subject ->
+                    if (subject.projectId != project.id) return@mapNotNull null
+                    val moduleId = tokenizeIfNecessary(
+                        value = subject.moduleId,
+                        tokenKeyType = TokenKeyType.ModuleId,
+                        project = project,
+                    )
+                    val attendantId = tokenizeIfNecessary(
+                        value = subject.attendantId,
+                        tokenKeyType = TokenKeyType.AttendantId,
+                        project = project,
+                    )
+                    return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
+                }.map(SubjectAction::Creation)
             localDataSource.performActions(tokenizedSubjectsCreateAction, project)
         } catch (e: Exception) {
             when (e) {
@@ -123,23 +119,37 @@ internal class EnrolmentRecordRepositoryImpl(
         dataSource: BiometricDataSource,
     ): Int = fromIdentityDataSource(dataSource).count(query, dataSource)
 
-    override suspend fun loadFingerprintIdentities(
+    override fun loadFingerprintIdentities(
         query: SubjectQuery,
-        range: IntRange,
+        ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
+        scope: CoroutineScope,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = fromIdentityDataSource(dataSource)
-        .loadFingerprintIdentities(query, range, dataSource, project, onCandidateLoaded)
+    ) = fromIdentityDataSource(dataSource).loadFingerprintIdentities(
+        query = query,
+        ranges = ranges,
+        dataSource = dataSource,
+        project = project,
+        scope = scope,
+        onCandidateLoaded = onCandidateLoaded,
+    )
 
-    override suspend fun loadFaceIdentities(
+    override fun loadFaceIdentities(
         query: SubjectQuery,
-        range: IntRange,
+        ranges: List<IntRange>,
         dataSource: BiometricDataSource,
         project: Project,
+        scope: CoroutineScope,
         onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = fromIdentityDataSource(dataSource)
-        .loadFaceIdentities(query, range, dataSource, project, onCandidateLoaded)
+    ) = fromIdentityDataSource(dataSource).loadFaceIdentities(
+        query = query,
+        ranges = ranges,
+        dataSource = dataSource,
+        project = project,
+        scope = scope,
+        onCandidateLoaded = onCandidateLoaded,
+    )
 
     private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
         is BiometricDataSource.Simprints -> localDataSource
