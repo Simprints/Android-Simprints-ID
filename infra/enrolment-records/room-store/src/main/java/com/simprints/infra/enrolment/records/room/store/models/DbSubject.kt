@@ -9,13 +9,6 @@ import java.util.UUID
 /**
  * Represents a Subject entry in the local database.
  *
- * Indexes are crucial for query performance, especially for large datasets.
- * The indexes defined here are chosen based on the common query patterns observed
- * in SubjectDao, particularly the frequent use of projectId, filtering by either
- * moduleId or attendantId, and the ordering requirements of the loadSamples query.
- *
- * Note: Indexes speed up read operations (SELECT) but can slightly slow down
- * write operations (INSERT, UPDATE, DELETE) and consume additional storage space.
  */
 @Entity(
     tableName = SUBJECT_TABLE_NAME,
