@@ -1,9 +1,12 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.core.AvailableProcessors
 import javax.inject.Inject
 import kotlin.math.ceil
 
-internal class CreateRangesUseCase @Inject constructor() {
+internal class CreateRangesUseCase @Inject constructor(
+    @AvailableProcessors private val availableProcessors: Int,
+) {
     /**
      * Creates a list of ranges to be used for batch processing.
      * The number of ranges will be a multiple of the available processors to ensure
@@ -12,7 +15,6 @@ internal class CreateRangesUseCase @Inject constructor() {
      */
     operator fun invoke(
         totalCount: Int,
-        availableProcessors: Int = Runtime.getRuntime().availableProcessors()
     ): List<IntRange> {
         if (totalCount <= 0) return emptyList()
 

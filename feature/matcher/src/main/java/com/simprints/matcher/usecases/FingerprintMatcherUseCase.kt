@@ -1,5 +1,6 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.FlowType
@@ -35,6 +36,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
     private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
+    @AvailableProcessors private val availableProcessors: Int,
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
@@ -70,8 +72,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         // However, when using CommCare as data source, loadedCandidates < expectedCandidates
         // as it's count function does not take into account filtering criteria
         val loadedCandidates = AtomicInteger(0)
-        val availableProcessors = Runtime.getRuntime().availableProcessors()
-        val ranges = createRanges(expectedCandidates, availableProcessors)
+        val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
         val numConsumers = min(availableProcessors, ranges.size)
         val channel = enrolmentRecordRepository.loadFingerprintIdentities(

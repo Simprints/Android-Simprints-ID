@@ -7,6 +7,7 @@ import androidx.core.net.toUri
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.DispatcherBG
+import com.simprints.core.AvailableProcessors
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -41,6 +42,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     private val encoder: EncodingUtils,
     private val jsonHelper: JsonHelper,
     private val compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
+    @AvailableProcessors private val availableProcessors: Int,
     @ApplicationContext private val context: Context,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : IdentityDataSource {
@@ -257,8 +259,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
         count
     }
 
-    private val parallelism = Runtime.getRuntime().availableProcessors()
-
     override fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
@@ -269,7 +269,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     ): ReceiveChannel<List<FaceIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         dispatcher = dispatcher,
-        parallelism = parallelism,
+        parallelism = availableProcessors,
         scope = scope,
     ) { range ->
         loadFaceIdentities(
@@ -291,7 +291,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
     ): ReceiveChannel<List<FingerprintIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         dispatcher = dispatcher,
-        parallelism = parallelism,
+        parallelism = availableProcessors,
         scope = scope,
     ) { range ->
         loadFingerprintIdentities(

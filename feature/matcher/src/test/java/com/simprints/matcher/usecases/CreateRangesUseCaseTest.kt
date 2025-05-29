@@ -7,12 +7,14 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class CreateRangesUseCaseTest {
-    private val useCase = CreateRangesUseCase()
 
     @Test
     fun `should create correct ranges when numCandidates equals numConsumers`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 5)
+
         // When
-        val result = useCase(5, 5)
+        val result = useCase(5)
 
         // Then
         assertThat(result).containsExactly(
@@ -26,8 +28,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should create correct ranges when numCandidates is greater than numConsumers`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 3)
+
         // When
-        val result = useCase(10, 3)
+        val result = useCase(10)
 
         // Then
         assertThat(result).containsExactly(
@@ -39,8 +44,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should handle single item`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 4)
+
         // When
-        val result = useCase(1, 4)
+        val result = useCase(1)
 
         // Then
         assertThat(result).containsExactly(0 until 1).inOrder()
@@ -48,8 +56,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should handle totalCount equal to MAX_BATCH_SIZE`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 1)
+
         // When
-        val result = useCase(2000, 1)
+        val result = useCase(2000)
 
         // Then
         assertThat(result).containsExactly(0 until 2000)
@@ -57,8 +68,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should handle batch sizes that are exactly MAX_BATCH_SIZE`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 2)
+
         // When
-        val result = useCase(4000, 2)
+        val result = useCase(4000)
 
         // Then
         assertThat(result).containsExactly(
@@ -69,8 +83,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should create correct ranges when numCandidates is less than numConsumers`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 5)
+
         // When
-        val result = useCase(3, 5)
+        val result = useCase(3)
 
         // Then
         assertThat(result).containsExactly(
@@ -82,8 +99,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should create correct ranges with uneven distribution`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 3)
+
         // When
-        val result = useCase(11, 3)
+        val result = useCase(11)
 
         // Then
         assertThat(result).containsExactly(
@@ -95,8 +115,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should create empty list when numCandidates is zero`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 5)
+
         // When
-        val result = useCase(0, 5)
+        val result = useCase(0)
 
         // Then
         assertThat(result).isEmpty()
@@ -104,8 +127,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should create single range when numConsumers is one`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 1)
+
         // When
-        val result = useCase(10, 1)
+        val result = useCase(10)
 
         // Then
         assertThat(result).containsExactly(0 until 10)
@@ -113,8 +139,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should handle large numbers correctly`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 4)
+
         // When
-        val result = useCase(1000, 4)
+        val result = useCase(1000)
 
         // Then
         assertThat(result).containsExactly(
@@ -127,8 +156,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should handle 2500 candidates with 4 processors`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 4)
+
         // When
-        val result = useCase(2500, 4)
+        val result = useCase(2500)
 
         // Then
         // 4 processors, batches under 2000 each, so 4 total batches
@@ -143,8 +175,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should handle 5000 candidates with 4 processors`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 4)
+
         // When
-        val result = useCase(5000, 4)
+        val result = useCase(5000)
 
         // Then
         // 4 processors, base size approaching MAX_BATCH_SIZE, so still 4 batches
@@ -159,8 +194,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should handle 10000 candidates with 8 processors`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 8)
+
         // When
-        val result = useCase(10000, 8)
+        val result = useCase(10000)
 
         // Then
         // 8 processors, base size = 10000/8 = 1250, remainder = 0
@@ -178,8 +216,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should limit batch size to 2000 for 15000 candidates with 4 processors`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 4)
+
         // When
-        val result = useCase(15000, 4)
+        val result = useCase(15000)
 
         // Then
         // Each processor would get 15000/4 = 3750 items, exceeding MAX_BATCH_SIZE
@@ -199,8 +240,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should limit batch size to 2000 for 20000 candidates with 8 processors`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 8)
+
         // When
-        val result = useCase(20000, 8)
+        val result = useCase(20000)
 
         // Then
         // Each processor would get 20000/8 = 2500, exceeding MAX_BATCH_SIZE
@@ -228,8 +272,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should limit batch size to 2000 for 50000 candidates with 4 processors`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 4)
+
         // When
-        val result = useCase(50000, 4)
+        val result = useCase(50000)
 
         // Then
         // Need ceiling(50000/(4*2000)) = 7 batches per processor = 28 total batches
@@ -269,8 +316,11 @@ class CreateRangesUseCaseTest {
 
     @Test
     fun `should limit batch size to 2000 for 100000 candidates with 8 processors`() {
+        // Given
+        val useCase = CreateRangesUseCase(availableProcessors = 8)
+
         // When
-        val result = useCase(100000, 8)
+        val result = useCase(100000)
 
         // Then
         // Need ceiling(100000/(8*2000)) = 7 batches per processor = 56 total batches

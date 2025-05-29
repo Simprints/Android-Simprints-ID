@@ -207,6 +207,7 @@ class CommCareIdentityDataSourceTest {
             encoder,
             JsonHelper,
             useCase,
+            4,
             context,
             testCoroutineRule.testCoroutineDispatcher,
         )

@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository
 
 import android.content.Context
+import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -45,12 +46,14 @@ class IdentityDataSourceModule {
         encoder: EncodingUtils,
         jsonHelper: JsonHelper,
         compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
+        @AvailableProcessors availableProcessors: Int,
         @ApplicationContext context: Context,
         @DispatcherIO dispatcher: CoroutineDispatcher,
     ): IdentityDataSource = CommCareIdentityDataSource(
         encoder = encoder,
         jsonHelper = jsonHelper,
         compareImplicitTokenizedStringsUseCase = compareImplicitTokenizedStringsUseCase,
+        availableProcessors = availableProcessors,
         context = context,
         dispatcher = dispatcher,
     )
