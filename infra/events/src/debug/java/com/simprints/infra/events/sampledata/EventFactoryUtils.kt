@@ -81,6 +81,7 @@ import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_BIOMETRIC_DATA_SOURCE
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -193,6 +194,7 @@ fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = Enrolm
     DEFAULT_USER_ID,
     DEFAULT_MODULE_ID,
     DEFAULT_METADATA,
+    DEFAULT_BIOMETRIC_DATA_SOURCE,
     projectId,
 )
 
@@ -202,6 +204,7 @@ fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(
     DEFAULT_USER_ID,
     DEFAULT_MODULE_ID,
     DEFAULT_METADATA,
+    DEFAULT_BIOMETRIC_DATA_SOURCE,
 )
 
 fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEvent(
@@ -218,8 +221,9 @@ fun createVerificationCalloutEvent() = VerificationCalloutEvent(
     DEFAULT_PROJECT_ID,
     DEFAULT_USER_ID,
     DEFAULT_MODULE_ID,
-    DEFAULT_METADATA,
     GUID2,
+    DEFAULT_METADATA,
+    DEFAULT_BIOMETRIC_DATA_SOURCE,
 )
 
 fun createFaceCaptureBiometricsEvent() = FaceCaptureBiometricsEvent(

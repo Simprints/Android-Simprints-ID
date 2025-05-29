@@ -24,6 +24,7 @@ data class EnrolmentCalloutEvent(
         userId: TokenizableString,
         moduleId: TokenizableString,
         metadata: String?,
+        biometricDataSource: BiometricDataSource,
         id: String = UUID.randomUUID().toString(),
     ) : this(
         id,
@@ -34,6 +35,7 @@ data class EnrolmentCalloutEvent(
             userId = userId,
             moduleId = moduleId,
             metadata = metadata,
+            biometricDataSource = biometricDataSource,
         ),
         CALLOUT_ENROLMENT,
     )
@@ -58,10 +60,11 @@ data class EnrolmentCalloutEvent(
         val userId: TokenizableString,
         val moduleId: TokenizableString,
         val metadata: String?,
+        val biometricDataSource: BiometricDataSource,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_ENROLMENT,
     ) : EventPayload() {
-        override fun toSafeString(): String = "module: $moduleId, metadata: $metadata"
+        override fun toSafeString(): String = "module: $moduleId, metadata: $metadata, biometricDataSource: $biometricDataSource"
     }
 
     companion object {

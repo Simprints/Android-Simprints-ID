@@ -8,4 +8,5 @@ internal data class ApiIdentificationCallout(
     val userId: String,
     val moduleId: String,
     val metadata: String?,
+    val biometricDataSource: ApiBiometricDataSource,
 ) : ApiCallout(ApiCalloutType.Identification)
