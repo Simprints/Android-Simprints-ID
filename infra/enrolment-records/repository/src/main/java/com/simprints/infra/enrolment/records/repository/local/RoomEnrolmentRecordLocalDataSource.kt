@@ -200,7 +200,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                     Simber.i("[delete] $errorMsg", tag = ROOM_RECORDS_DB)
                     errorMsg
                 }
-                val (whereClause, args) = queryBuilder.buildWhereAndOrderByClause(
+                val (whereClause, args) = queryBuilder.buildWhereClause(
                     query,
                     subjectAlias = "",
                     templateAlias = "",
