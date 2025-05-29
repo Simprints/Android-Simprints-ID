@@ -1,108 +1,48 @@
 package com.simprints.face.infra.biosdkresolver
 
 import com.google.common.truth.Truth.*
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class ResolveFaceBioSdkUseCaseTest {
-    private lateinit var resolveFaceBioSdkUseCase: ResolveFaceBioSdkUseCase
-    private val configRepository: ConfigRepository = mockk()
-    private lateinit var rocV1BioSdk: RocV1BioSdk
-    private lateinit var rocV3BioSdk: RocV3BioSdk
+    @MockK
+    private lateinit var resolveRankOneVersionUseCase: ResolveRankOneVersionUseCase
+
+    @MockK
+    private lateinit var rocBioSdk: RocV1BioSdk
+
+    @MockK
+    private lateinit var resolveSimFaceVersionUseCase: ResolveSimFaceVersionUseCase
+
+    @MockK
     private lateinit var simFaceBioSdk: SimFaceBioSdk
+
+    private lateinit var resolveFaceBioSdkUseCase: ResolveFaceBioSdkUseCase
 
     @Before
     fun setUp() {
-        rocV1BioSdk = RocV1BioSdk(mockk(), mockk())
-        rocV3BioSdk = RocV3BioSdk(mockk(), mockk())
-        simFaceBioSdk = SimFaceBioSdk(mockk(), mockk(), mockk(relaxed = true))
+        MockKAnnotations.init(this, relaxed = true)
 
-        resolveFaceBioSdkUseCase = ResolveFaceBioSdkUseCase(configRepository, rocV1BioSdk, rocV3BioSdk, simFaceBioSdk)
+        coEvery { resolveRankOneVersionUseCase() } returns rocBioSdk
+        coEvery { resolveSimFaceVersionUseCase() } returns simFaceBioSdk
+
+        resolveFaceBioSdkUseCase = ResolveFaceBioSdkUseCase(
+            resolveRankOneVersionUseCase,
+            resolveSimFaceVersionUseCase,
+        )
     }
 
     @Test
     fun `return SimFace SDK when requested`() = runTest {
-        // When
-        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.SIM_FACE)
-
-        // Then
-        assertThat(result).isEqualTo(simFaceBioSdk)
+        assertThat(resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.SIM_FACE)).isEqualTo(simFaceBioSdk)
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `throw exception when RankOne version is null`() = runTest {
-        // Given
-        coEvery {
-            configRepository
-                .getProjectConfiguration()
-                .face
-                ?.rankOne
-                ?.version
-        } returns null
-
-        // When
-        resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
-
-        // Then: Expect IllegalArgumentException to be thrown
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun `throw exception when RankOne version is empty`() = runTest {
-        // Given
-        coEvery {
-            configRepository
-                .getProjectConfiguration()
-                .face
-                ?.rankOne
-                ?.version
-        } returns ""
-
-        // When
-        resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
-
-        // Then: Expect IllegalArgumentException to be thrown
-    }
-
-    // Given that version is valid and matches ROC V3
     @Test
-    fun `return ROC V3 SDK when version is valid and matches ROC V3`() = runTest {
-        // Given
-
-        coEvery {
-            configRepository
-                .getProjectConfiguration()
-                .face
-                ?.rankOne
-                ?.version
-        } returns rocV3BioSdk.version
-
-        // When
-        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
-
-        // Then
-        assertThat(result).isEqualTo(rocV3BioSdk)
-    }
-
-    // Given that version is valid and does not match ROC V3 (should match ROC V1)
-    @Test
-    fun `return ROC V1 SDK when version is valid and does not match ROC V3`() = runTest {
-        // Given
-        coEvery {
-            configRepository
-                .getProjectConfiguration()
-                .face
-                ?.rankOne
-                ?.version
-        } returns rocV1BioSdk.version
-
-        // When
-        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
-
-        // Then
-        assertThat(result).isEqualTo(rocV1BioSdk)
+    fun `return RankOne SDK when requested`() = runTest {
+        assertThat(resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)).isEqualTo(rocBioSdk)
     }
 }
