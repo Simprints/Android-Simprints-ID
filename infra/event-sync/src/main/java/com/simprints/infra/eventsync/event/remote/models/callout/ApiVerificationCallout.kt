@@ -9,4 +9,5 @@ internal data class ApiVerificationCallout(
     val moduleId: String,
     val metadata: String,
     val verifyGuid: String,
+    val biometricDataSource: ApiBiometricDataSource,
 ) : ApiCallout(ApiCalloutType.Verification)

@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_BIOMETRIC_DATA_SOURCE
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -23,6 +24,7 @@ class VerificationCalloutEventTest {
             moduleId = DEFAULT_MODULE_ID,
             verifyGuid = GUID1,
             metadata = DEFAULT_METADATA,
+            biometricDataSource = DEFAULT_BIOMETRIC_DATA_SOURCE,
         )
 
         assertThat(event.id).isNotNull()
@@ -36,6 +38,7 @@ class VerificationCalloutEventTest {
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
             assertThat(verifyGuid).isEqualTo(GUID1)
             assertThat(metadata).isEqualTo(DEFAULT_METADATA)
+            assertThat(biometricDataSource).isEqualTo(DEFAULT_BIOMETRIC_DATA_SOURCE)
         }
     }
 }

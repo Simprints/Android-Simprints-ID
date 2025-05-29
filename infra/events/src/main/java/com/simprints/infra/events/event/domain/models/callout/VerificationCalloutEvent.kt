@@ -25,6 +25,7 @@ data class VerificationCalloutEvent(
         moduleId: TokenizableString,
         verifyGuid: String,
         metadata: String,
+        biometricDataSource: BiometricDataSource,
     ) : this(
         UUID.randomUUID().toString(),
         VerificationCalloutPayload(
@@ -35,6 +36,7 @@ data class VerificationCalloutEvent(
             moduleId = moduleId,
             verifyGuid = verifyGuid,
             metadata = metadata,
+            biometricDataSource = biometricDataSource,
         ),
         CALLOUT_VERIFICATION,
     )
@@ -60,10 +62,11 @@ data class VerificationCalloutEvent(
         val moduleId: TokenizableString,
         val verifyGuid: String,
         val metadata: String,
+        val biometricDataSource: BiometricDataSource,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_VERIFICATION,
     ) : EventPayload() {
-        override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata"
+        override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata, biometricDataSource: $biometricDataSource"
     }
 
     companion object {
