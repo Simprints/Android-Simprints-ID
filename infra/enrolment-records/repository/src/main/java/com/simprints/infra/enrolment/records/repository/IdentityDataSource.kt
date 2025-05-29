@@ -20,7 +20,7 @@ interface IdentityDataSource {
         dataSource: BiometricDataSource = BiometricDataSource.Simprints,
     ): Int
 
-    fun loadFingerprintIdentities(
+    suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -29,7 +29,7 @@ interface IdentityDataSource {
         onCandidateLoaded: () -> Unit,
     ): ReceiveChannel<List<FingerprintIdentity>>
 
-    fun loadFaceIdentities(
+    suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,

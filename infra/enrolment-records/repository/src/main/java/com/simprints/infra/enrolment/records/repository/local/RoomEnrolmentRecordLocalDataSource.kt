@@ -78,7 +78,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Loads face identities in paged ranges.
      */
-    override fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -109,7 +109,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     /**
      * Loads fingerprint identities in paged ranges.
      */
-    override fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -222,7 +222,6 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     ) {
         database.withTransaction {
             actions.forEach { action ->
-                Simber.d("[performActions] Performing action: $action", tag = ROOM_RECORDS_DB)
                 when (action) {
                     is SubjectAction.Creation -> createSubject(action.subject, project)
                     is SubjectAction.Update -> updateSubject(action)

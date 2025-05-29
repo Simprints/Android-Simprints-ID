@@ -31,6 +31,7 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -65,7 +66,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     private val onCandidateLoaded: () -> Unit = {}
     private var localSubjects: MutableList<Subject> = mutableListOf()
 
-    private lateinit var enrolmentRecordLocalDataSource: EnrolmentRecordLocalDataSource
+    private lateinit var enrolmentRecordLocalDataSource: RealmEnrolmentRecordLocalDataSource
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -364,6 +365,19 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `loadAllSubjectsInBatches with no subjects should return empty list and close channel`() = runTest {
+        val batchSize = 10
+
+        every { realmQuery.sort(RealmEnrolmentRecordLocalDataSource.SUBJECT_ID_FIELD, any()) } returns realmQuery
+
+        val channel = enrolmentRecordLocalDataSource.loadAllSubjectsInBatches(batchSize)
+        val result = channel.toList()
+
+        assertThat(result).isEmpty()
     }
 
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()

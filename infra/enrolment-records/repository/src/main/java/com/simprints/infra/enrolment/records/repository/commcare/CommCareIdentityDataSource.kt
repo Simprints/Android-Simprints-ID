@@ -260,7 +260,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
     private val parallelism = Runtime.getRuntime().availableProcessors()
 
-    override fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -282,7 +282,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         )
     }
 
-    override fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
