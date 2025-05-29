@@ -38,95 +38,95 @@ class RoomEnrolmentRecordQueryBuilderTest {
         queryBuilder = RoomEnrolmentRecordQueryBuilder()
     }
 
-    // region buildWhereAndOrderByClause Tests
+    // region buildWhereClause Tests
     @Test
-    fun `buildWhereAndOrderByClause with empty query returns empty clause and args`() {
+    fun `buildWhereClause with empty query returns empty clause and args`() {
         val query = SubjectQuery()
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEmpty()
         assertThat(args).isEmpty()
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with subjectId`() {
+    fun `buildWhereClause with subjectId`() {
         val query = SubjectQuery(subjectId = SUBJECT_ID_1)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE S.$SUBJECT_ID_COLUMN = ?")
         assertThat(args).containsExactly(SUBJECT_ID_1)
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with subjectIds not empty`() {
+    fun `buildWhereClause with subjectIds not empty`() {
         val query = SubjectQuery(subjectIds = listOf(SUBJECT_ID_1, SUBJECT_ID_2))
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE S.$SUBJECT_ID_COLUMN IN (?,?)")
         assertThat(args).containsExactly(SUBJECT_ID_1, SUBJECT_ID_2).inOrder()
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with subjectIds empty`() {
+    fun `buildWhereClause with subjectIds empty`() {
         val query = SubjectQuery(subjectIds = emptyList())
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEmpty()
         assertThat(args).isEmpty()
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with afterSubjectId`() {
+    fun `buildWhereClause with afterSubjectId`() {
         val query = SubjectQuery(afterSubjectId = AFTER_SUBJECT_ID)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE S.$SUBJECT_ID_COLUMN > ?")
         assertThat(args).containsExactly(AFTER_SUBJECT_ID)
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with projectId`() {
+    fun `buildWhereClause with projectId`() {
         val query = SubjectQuery(projectId = PROJECT_ID)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE S.$PROJECT_ID_COLUMN = ?")
         assertThat(args).containsExactly(PROJECT_ID)
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with attendantId`() {
+    fun `buildWhereClause with attendantId`() {
         val query = SubjectQuery(attendantId = ATTENDANT_ID)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE S.$ATTENDANT_ID_COLUMN = ?")
         assertThat(args).containsExactly(ATTENDANT_ID.value)
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with moduleId`() {
+    fun `buildWhereClause with moduleId`() {
         val query = SubjectQuery(moduleId = MODULE_ID)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE S.$MODULE_ID_COLUMN = ?")
         assertThat(args).containsExactly(MODULE_ID.value)
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with faceSampleFormat`() {
+    fun `buildWhereClause with faceSampleFormat`() {
         val query = SubjectQuery(faceSampleFormat = FACE_FORMAT)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE T.$FORMAT_COLUMN = ?")
         assertThat(args).containsExactly(FACE_FORMAT)
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with fingerprintSampleFormat`() {
+    fun `buildWhereClause with fingerprintSampleFormat`() {
         val query = SubjectQuery(fingerprintSampleFormat = FP_FORMAT)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo("WHERE T.$FORMAT_COLUMN = ?")
         assertThat(args).containsExactly(FP_FORMAT)
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with multiple subject fields`() {
+    fun `buildWhereClause with multiple subject fields`() {
         val query = SubjectQuery(
             projectId = PROJECT_ID,
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
         )
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         assertThat(clause).isEqualTo(
             "WHERE S.$PROJECT_ID_COLUMN = ? AND S.$ATTENDANT_ID_COLUMN = ? AND S.$MODULE_ID_COLUMN = ?",
         )
@@ -134,7 +134,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with all parameters and sort`() {
+    fun `buildWhereClause with all parameters`() {
         val query = SubjectQuery(
             subjectId = SUBJECT_ID_1,
             subjectIds = listOf(SUBJECT_ID_2, SUBJECT_ID_3),
@@ -143,11 +143,10 @@ class RoomEnrolmentRecordQueryBuilderTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             fingerprintSampleFormat = FP_FORMAT,
-            sort = true,
         )
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
+        val (clause, args) = queryBuilder.buildWhereClause(query)
         val expectedClause =
-            "WHERE S.$SUBJECT_ID_COLUMN = ? AND S.$SUBJECT_ID_COLUMN IN (?,?) AND S.$SUBJECT_ID_COLUMN > ? AND S.$PROJECT_ID_COLUMN = ? AND S.$ATTENDANT_ID_COLUMN = ? AND S.$MODULE_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ? ORDER BY S.$SUBJECT_ID_COLUMN ASC"
+            "WHERE S.$SUBJECT_ID_COLUMN = ? AND S.$SUBJECT_ID_COLUMN IN (?,?) AND S.$SUBJECT_ID_COLUMN > ? AND S.$PROJECT_ID_COLUMN = ? AND S.$ATTENDANT_ID_COLUMN = ? AND S.$MODULE_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ?"
         assertThat(clause).isEqualTo(expectedClause)
         assertThat(args)
             .containsExactly(
@@ -163,48 +162,24 @@ class RoomEnrolmentRecordQueryBuilderTest {
     }
 
     @Test
-    fun `buildWhereAndOrderByClause with sort true and no other clauses`() {
-        val query = SubjectQuery(sort = true)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
-        assertThat(clause).isEqualTo(" ORDER BY S.$SUBJECT_ID_COLUMN ASC")
-        assertThat(args).isEmpty()
-    }
-
-    @Test
-    fun `buildWhereAndOrderByClause with sort true and other clauses`() {
-        val query = SubjectQuery(projectId = PROJECT_ID, sort = true)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
-        assertThat(clause).isEqualTo("WHERE S.$PROJECT_ID_COLUMN = ? ORDER BY S.$SUBJECT_ID_COLUMN ASC")
-        assertThat(args).containsExactly(PROJECT_ID)
-    }
-
-    @Test
-    fun `buildWhereAndOrderByClause with sort false and clauses`() {
-        val query = SubjectQuery(projectId = PROJECT_ID, sort = false) // sort = false is default
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(query)
-        assertThat(clause).isEqualTo("WHERE S.$PROJECT_ID_COLUMN = ?")
-        assertThat(args).containsExactly(PROJECT_ID)
-    }
-
-    @Test
-    fun `buildWhereAndOrderByClause with custom aliases`() {
-        val query = SubjectQuery(subjectId = SUBJECT_ID_1, fingerprintSampleFormat = FP_FORMAT, sort = true)
-        val (clause, args) = queryBuilder.buildWhereAndOrderByClause(
+    fun `buildWhereClause with custom aliases`() {
+        val query = SubjectQuery(subjectId = SUBJECT_ID_1, fingerprintSampleFormat = FP_FORMAT)
+        val (clause, args) = queryBuilder.buildWhereClause(
             query,
             subjectAlias = "customS.",
             templateAlias = "customT.",
         )
         val expectedClause =
-            "WHERE customS.$SUBJECT_ID_COLUMN = ? AND customT.$FORMAT_COLUMN = ? ORDER BY customS.$SUBJECT_ID_COLUMN ASC"
+            "WHERE customS.$SUBJECT_ID_COLUMN = ? AND customT.$FORMAT_COLUMN = ?"
         assertThat(clause).isEqualTo(expectedClause)
         assertThat(args).containsExactly(SUBJECT_ID_1, FP_FORMAT).inOrder()
     }
 
     @Test
-    fun `buildWhereAndOrderByClause throws error if both fingerprint and face format set`() {
+    fun `buildWhereClause throws error if both fingerprint and face format set`() {
         val query = SubjectQuery(fingerprintSampleFormat = FP_FORMAT, faceSampleFormat = FACE_FORMAT)
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            queryBuilder.buildWhereAndOrderByClause(query)
+            queryBuilder.buildWhereClause(query)
         }
         assertThat(exception.message).isEqualTo("Cannot set both fingerprintSampleFormat and faceSampleFormat")
     }
@@ -218,7 +193,8 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val expectedSql =
             """
             SELECT * FROM DbSubject S
-
+            
+            
             """.trimIndent()
         assertThat(result.sql).isEqualTo(expectedSql)
         assertThat(result.argCount).isEqualTo(0)
@@ -232,6 +208,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
             """
             SELECT * FROM DbSubject S
             WHERE S.projectId = ?
+            
             """.trimIndent()
         assertThat(result.sql).isEqualTo(expectedSql)
         assertThat(result.argCount).isEqualTo(1)
@@ -245,6 +222,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
             """
             SELECT * FROM $SUBJECT_TABLE_NAME S
             WHERE S.$PROJECT_ID_COLUMN = ? AND S.$ATTENDANT_ID_COLUMN = ?
+            
             """.trimIndent()
         assertThat(result.sql).isEqualTo(expectedSql)
         assertThat(result.argCount).isEqualTo(2)
@@ -257,9 +235,10 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val expectedSql =
             """
             SELECT * FROM $SUBJECT_TABLE_NAME S
-             ORDER BY S.$SUBJECT_ID_COLUMN ASC
+            
+            ORDER BY S.$SUBJECT_ID_COLUMN ASC
             """.trimIndent()
-        // Note the space before ORDER due to buildWhereAndOrderByClause
+        // Note the space before ORDER due to buildWhereClause
         assertThat(result.sql).isEqualTo(expectedSql)
         assertThat(result.argCount).isEqualTo(0)
     }
@@ -271,7 +250,8 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val expectedSql =
             """
             SELECT * FROM $SUBJECT_TABLE_NAME S
-            WHERE S.$PROJECT_ID_COLUMN = ? ORDER BY S.$SUBJECT_ID_COLUMN ASC
+            WHERE S.$PROJECT_ID_COLUMN = ?
+            ORDER BY S.$SUBJECT_ID_COLUMN ASC
             """.trimIndent()
         assertThat(result.sql).isEqualTo(expectedSql)
         assertThat(result.argCount).isEqualTo(1)
@@ -321,7 +301,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val result = queryBuilder.buildCountQuery(query)
         assertThat(result.sql).isEqualTo(
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
-                " using($SUBJECT_ID_COLUMN) WHERE T.$FORMAT_COLUMN = ? ",
+                " using($SUBJECT_ID_COLUMN) WHERE T.$FORMAT_COLUMN = ?",
         )
         assertThat(result.argCount).isEqualTo(1)
     }
@@ -331,28 +311,17 @@ class RoomEnrolmentRecordQueryBuilderTest {
         val query = SubjectQuery(faceSampleFormat = FACE_FORMAT, projectId = PROJECT_ID)
         val result = queryBuilder.buildCountQuery(query)
         val expectedSql = "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
-            " using($SUBJECT_ID_COLUMN) WHERE S.$PROJECT_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ? "
+            " using($SUBJECT_ID_COLUMN) WHERE S.$PROJECT_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ?"
         assertThat(result.sql).isEqualTo(expectedSql)
         assertThat(result.argCount).isEqualTo(2)
     }
 
     @Test
-    fun `buildCountQuery with sort true no format`() {
-        val query = SubjectQuery(sort = true)
-        val result = queryBuilder.buildCountQuery(query)
-        // specificFormat == null, whereClause is " ORDER BY S.subjectId ASC"
-        // "... S  ORDER BY S.subjectId ASC"
-        val expectedSql = "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  ORDER BY S.$SUBJECT_ID_COLUMN ASC"
-        assertThat(result.sql).isEqualTo(expectedSql)
-        assertThat(result.argCount).isEqualTo(0)
-    }
-
-    @Test
-    fun `buildCountQuery with fingerprintSampleFormat and sort true`() {
-        val query = SubjectQuery(fingerprintSampleFormat = FP_FORMAT, sort = true)
+    fun `buildCountQuery with fingerprintSampleFormat`() {
+        val query = SubjectQuery(fingerprintSampleFormat = FP_FORMAT)
         val result = queryBuilder.buildCountQuery(query)
         val expectedSql = "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
-            " using($SUBJECT_ID_COLUMN) WHERE T.$FORMAT_COLUMN = ? ORDER BY S.$SUBJECT_ID_COLUMN ASC "
+            " using($SUBJECT_ID_COLUMN) WHERE T.$FORMAT_COLUMN = ?"
         assertThat(result.sql).isEqualTo(expectedSql)
         assertThat(result.argCount).isEqualTo(1)
     }
@@ -361,7 +330,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildCountQuery throws error if both fingerprint and face format set`() {
         val query = SubjectQuery(fingerprintSampleFormat = FP_FORMAT, faceSampleFormat = FACE_FORMAT)
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            queryBuilder.buildCountQuery(query) // This will call buildWhereAndOrderByClause
+            queryBuilder.buildCountQuery(query) // This will call buildWhereClause
         }
         assertThat(exception.message).isEqualTo("Cannot set both fingerprintSampleFormat and faceSampleFormat")
     }
@@ -372,7 +341,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildBiometricTemplatesQuery with fingerprintSampleFormat, no lastSeenId`() {
         val query = SubjectQuery(fingerprintSampleFormat = FP_FORMAT)
         val result = queryBuilder.buildBiometricTemplatesQuery(query, PAGE_SIZE, null)
-        val expectedSubQueryWhereClause = "WHERE T.$FORMAT_COLUMN = ? ORDER BY S.$SUBJECT_ID_COLUMN ASC"
+
         val expectedSql =
             """
             SELECT A.*
@@ -381,7 +350,8 @@ class RoomEnrolmentRecordQueryBuilderTest {
                 SELECT distinct  S.$SUBJECT_ID_COLUMN
                 FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T
                 USING($SUBJECT_ID_COLUMN)
-                $expectedSubQueryWhereClause
+                WHERE T.$FORMAT_COLUMN = ?
+                ORDER BY S.$SUBJECT_ID_COLUMN ASC
                 LIMIT $PAGE_SIZE
             ) B USING($SUBJECT_ID_COLUMN) where A.$FORMAT_COLUMN ='$FP_FORMAT'
             """.trimIndent()
@@ -394,7 +364,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildBiometricTemplatesQuery with faceSampleFormat and lastSeenId`() {
         val query = SubjectQuery(faceSampleFormat = FACE_FORMAT)
         val result = queryBuilder.buildBiometricTemplatesQuery(query, PAGE_SIZE, LAST_SEEN_SUBJECT_ID)
-        val expectedSubQueryWhereClause = "WHERE S.$SUBJECT_ID_COLUMN > ? AND T.$FORMAT_COLUMN = ? ORDER BY S.$SUBJECT_ID_COLUMN ASC"
+
         val expectedSql =
             """
             SELECT A.*
@@ -403,7 +373,8 @@ class RoomEnrolmentRecordQueryBuilderTest {
                 SELECT distinct  S.$SUBJECT_ID_COLUMN
                 FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T
                 USING($SUBJECT_ID_COLUMN)
-                $expectedSubQueryWhereClause
+                WHERE S.$SUBJECT_ID_COLUMN > ? AND T.$FORMAT_COLUMN = ?
+                ORDER BY S.$SUBJECT_ID_COLUMN ASC
                 LIMIT $PAGE_SIZE
             ) B USING($SUBJECT_ID_COLUMN) where A.$FORMAT_COLUMN ='$FACE_FORMAT'
             """.trimIndent()
@@ -416,8 +387,7 @@ class RoomEnrolmentRecordQueryBuilderTest {
     fun `buildBiometricTemplatesQuery with fingerprintFormat, projectId, lastSeenId`() {
         val query = SubjectQuery(fingerprintSampleFormat = FP_FORMAT, projectId = PROJECT_ID)
         val result = queryBuilder.buildBiometricTemplatesQuery(query, PAGE_SIZE, LAST_SEEN_SUBJECT_ID)
-        val expectedSubQueryWhereClause =
-            "WHERE S.$SUBJECT_ID_COLUMN > ? AND S.$PROJECT_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ? ORDER BY S.$SUBJECT_ID_COLUMN ASC"
+
         val expectedSql =
             """
             SELECT A.*
@@ -426,7 +396,8 @@ class RoomEnrolmentRecordQueryBuilderTest {
                 SELECT distinct  S.$SUBJECT_ID_COLUMN
                 FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T
                 USING($SUBJECT_ID_COLUMN)
-                $expectedSubQueryWhereClause
+                WHERE S.$SUBJECT_ID_COLUMN > ? AND S.$PROJECT_ID_COLUMN = ? AND T.$FORMAT_COLUMN = ?
+                ORDER BY S.$SUBJECT_ID_COLUMN ASC
                 LIMIT $PAGE_SIZE
             ) B USING($SUBJECT_ID_COLUMN) where A.$FORMAT_COLUMN ='$FP_FORMAT'
             """.trimIndent()
