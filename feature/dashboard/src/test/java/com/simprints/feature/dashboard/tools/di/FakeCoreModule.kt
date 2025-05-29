@@ -1,6 +1,7 @@
 package com.simprints.feature.dashboard.tools.di
 
 import com.simprints.core.AppScope
+import com.simprints.core.AvailableProcessors
 import com.simprints.core.CoreModule
 import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherBG
@@ -51,6 +52,10 @@ object FakeCoreModule {
     @PackageVersionName
     @Provides
     fun providePackageVersionName(): String = PACKAGE_VERSION_NAME
+
+    @AvailableProcessors
+    @Provides
+    fun provideAvailableProcessors(): Int = 4
 
     @DispatcherIO
     @Provides

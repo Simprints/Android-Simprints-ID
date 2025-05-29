@@ -105,7 +105,8 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
-            .find { it.subList(range.first, range.last) }
+            // subList's second parameter is exclusive, so we need to add 1 to the last index
+            .find { it.subList(range.first, range.last+1) }
             .map { subject ->
                 onCandidateLoaded()
                 FingerprintIdentity(
@@ -123,7 +124,8 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
-            .find { it.subList(range.first, range.last) }
+            // subList's second parameter is exclusive, so we need to add 1 to the last index
+            .find { it.subList(range.first, range.last+1) }
             .map { subject ->
                 onCandidateLoaded()
                 FaceIdentity(

@@ -78,6 +78,10 @@ object CoreModule {
     @Provides
     fun provideLibSimprintsVersionName(): String = com.simprints.libsimprints.BuildConfig.LIBRARY_PACKAGE_VERSION
 
+    @AvailableProcessors
+    @Provides
+    fun provideAvailableProcessors(): Int = Runtime.getRuntime().availableProcessors()
+
     @DispatcherIO
     @Provides
     fun provideDispatcherIo(): CoroutineDispatcher = Dispatchers.IO
@@ -151,6 +155,10 @@ annotation class DispatcherIO
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DispatcherBG
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AvailableProcessors
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
