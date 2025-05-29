@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor

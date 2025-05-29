@@ -16,7 +16,6 @@ enum class IFingerIdentifier(
     LEFT_5TH_FINGER(9),
     ;
 
-    // create from id
     companion object {
         fun fromId(id: Int) = IFingerIdentifier.entries
             .firstOrNull { it.id == id }
@@ -24,7 +23,6 @@ enum class IFingerIdentifier(
     }
 }
 
-// convert to CoreFingerIdentifier
 internal fun IFingerIdentifier.toDomain() = when (this) {
     IFingerIdentifier.RIGHT_5TH_FINGER -> CoreFingerIdentifier.RIGHT_5TH_FINGER
     IFingerIdentifier.RIGHT_4TH_FINGER -> CoreFingerIdentifier.RIGHT_4TH_FINGER
@@ -38,7 +36,6 @@ internal fun IFingerIdentifier.toDomain() = when (this) {
     IFingerIdentifier.LEFT_5TH_FINGER -> CoreFingerIdentifier.LEFT_5TH_FINGER
 }
 
-// convert from CoreFingerIdentifier
 internal fun CoreFingerIdentifier.fromDomain() = when (this) {
     CoreFingerIdentifier.RIGHT_5TH_FINGER -> IFingerIdentifier.RIGHT_5TH_FINGER
     CoreFingerIdentifier.RIGHT_4TH_FINGER -> IFingerIdentifier.RIGHT_4TH_FINGER

@@ -9,37 +9,42 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.PROJECT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_TABLE_NAME
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
+    /**
+     * Builds a query to select subjects based on the provided [SubjectQuery].
+     * The query will be on the `SUBJECT_TABLE_NAME` table and will include filtering criteria
+     * Don't set the format in the [SubjectQuery] for this method instead use [buildBiometricTemplatesQuery].
+     * @param query The [SubjectQuery] containing the filtering criteria.
+     * @return A [SimpleSQLiteQuery] that can be executed against the database.
+     */
     fun buildSubjectQuery(query: SubjectQuery): SimpleSQLiteQuery {
         // require format not to be set for subject query and guid to use the buildBiometricTemplatesQuery instead
         require(query.fingerprintSampleFormat == null && query.faceSampleFormat == null) {
             "Cannot set format for subject query, use buildBiometricTemplatesQuery instead"
         }
-        val (whereClause, args) = buildWhereAndOrderByClause(query)
+        val (whereClause, args) = buildWhereClause(query)
+        val orderByClause = buildOrderByClause(query)
         val sql =
             """
             SELECT * FROM $SUBJECT_TABLE_NAME S
             $whereClause
+            $orderByClause
             """.trimIndent()
-        println(sql)
-        println("----")
         return SimpleSQLiteQuery(sql, args.toTypedArray())
     }
 
     fun buildCountQuery(query: SubjectQuery): SimpleSQLiteQuery {
-        val (whereClause, args) = buildWhereAndOrderByClause(query)
+        val (whereClause, args) = buildWhereClause(query)
         val specificFormat = query.fingerprintSampleFormat ?: query.faceSampleFormat
 
         val sql = if (specificFormat != null) {
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T" +
-                " using(subjectId) $whereClause "
+                " using(subjectId) $whereClause"
         } else {
             "SELECT COUNT(DISTINCT S.$SUBJECT_ID_COLUMN) FROM $SUBJECT_TABLE_NAME S $whereClause"
         }
-        println(sql)
-        println("----")
         return SimpleSQLiteQuery(sql, args.toTypedArray())
     }
 
@@ -54,7 +59,8 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
             "Must set format for biometric templates query, use buildSubjectQuery or buildCountQuery instead"
         }
         val updatedQuery = query.copy(afterSubjectId = lastSeenSubjectId, sort = true)
-        val (whereClause, args) = buildWhereAndOrderByClause(updatedQuery)
+        val (whereClause, args) = buildWhereClause(updatedQuery)
+        val orderByClause = buildOrderByClause(updatedQuery)
         val sql =
             """
             SELECT A.*
@@ -64,23 +70,22 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
                 FROM $SUBJECT_TABLE_NAME S  INNER JOIN  $TEMPLATE_TABLE_NAME T
                 USING(subjectId)
                 $whereClause
+                $orderByClause
                 LIMIT $pageSize
             ) B USING(subjectId) where A.format ='$format'
             """.trimIndent()
-        println(sql)
-        println("----")
         return SimpleSQLiteQuery(sql, args.toTypedArray())
     }
 
-    fun buildWhereAndOrderByClause(
+    fun buildWhereClause(
         query: SubjectQuery,
         subjectAlias: String = "S.", // Default alias for subject table, dot included. Empty string for no alias.
         templateAlias: String = "T.", // Default alias for template table, dot included. Empty string for no alias.
-    ): Pair<String, MutableList<Any?>> {
+    ): Pair<String, List<Any?>> {
         val clauses = mutableListOf<String>()
         val args = mutableListOf<Any?>()
-        if (query.fingerprintSampleFormat != null && query.faceSampleFormat != null) {
-            throw IllegalArgumentException("Cannot set both fingerprintSampleFormat and faceSampleFormat")
+        require(!(query.fingerprintSampleFormat != null && query.faceSampleFormat != null)) {
+            "Cannot set both fingerprintSampleFormat and faceSampleFormat"
         }
         // to achieve the highest performance, we should not use OR in the where clause
         query.subjectId?.let {
@@ -117,9 +122,15 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         }
 
         var whereClauseResult = if (clauses.isNotEmpty()) "WHERE ${clauses.joinToString(" AND ")}" else ""
-        if (query.sort) {
-            whereClauseResult += " ORDER BY ${subjectAlias}$SUBJECT_ID_COLUMN ASC"
-        }
         return Pair(whereClauseResult, args)
+    }
+
+    private fun buildOrderByClause(
+        query: SubjectQuery,
+        subjectAlias: String = "S.",
+    ) = if (query.sort) {
+        "ORDER BY $subjectAlias$SUBJECT_ID_COLUMN ASC"
+    } else {
+        ""
     }
 }
