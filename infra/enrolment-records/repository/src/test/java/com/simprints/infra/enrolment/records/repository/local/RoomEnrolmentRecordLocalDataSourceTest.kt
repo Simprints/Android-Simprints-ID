@@ -32,7 +32,7 @@ import java.util.Date
 import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
-class RoomEnrollmentRecordLocalDataSourceTest {
+class RoomEnrolmentRecordLocalDataSourceTest {
     companion object {
         const val PROJECT_1_ID = "project1"
         const val PROJECT_2_ID = "project2"
@@ -891,7 +891,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
                     query = baseQuery,
                     ranges = listOf(
                         0..1,
-                        1..2,
+                        2..3,
                     ),
                     project = project,
                     dataSource = Simprints,
@@ -902,7 +902,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         val loadedFirstTwo =
             dataSource
                 .loadFingerprintIdentities(
-                    query = baseQuery.copy(), // Copy to ensure new instance to avoid using the last subjectId
+                    query = baseQuery,
                     ranges = listOf(
                         0..2,
                     ),
@@ -915,7 +915,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         val loadedAll =
             dataSource
                 .loadFingerprintIdentities(
-                    query = baseQuery.copy(),
+                    query = baseQuery,
                     ranges = listOf(0..10),
                     project = project,
                     dataSource = Simprints,
@@ -1079,7 +1079,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
                     query = baseQuery,
                     ranges = listOf(
                         0..1,
-                        1..2,
+                        2..3,
                     ),
                     project = project,
                     dataSource = Simprints,
@@ -1090,7 +1090,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
         val loadedFirstTwo =
             dataSource
                 .loadFaceIdentities(
-                    query = baseQuery.copy(),
+                    query = baseQuery,
                     ranges = listOf(
                         0..2,
                     ),
@@ -1102,7 +1102,7 @@ class RoomEnrollmentRecordLocalDataSourceTest {
                 .first()
         val loadedAll = dataSource
             .loadFaceIdentities(
-                query = baseQuery.copy(),
+                query = baseQuery,
                 ranges = listOf(0..10),
                 project = project,
                 dataSource = Simprints,
@@ -1446,23 +1446,20 @@ class RoomEnrollmentRecordLocalDataSourceTest {
     }
 
     @Test
-    fun `load - combined query - attendantId, moduleId, afterSubjectId, subjectIds - should respect all filters`() = runTest {
+    fun `load - combined query - attendantId, moduleId,  subjectIds - should respect all filters`() = runTest {
         // Given
         setupInitialData()
         // Targets: subj-001, subj-002 (P1, A1, M1), subj-003 (P1, A1, M2)
         val targetIds = listOf(
-            subject1P1WithFace.subjectId, // subj-001
             subject2P1WithFinger.subjectId, // subj-002
             subject3P1WithBoth.subjectId, // subj-003
             "subj-nonexistent", // Include a non-existent ID
         )
-        val afterId = subject1P1WithFace.subjectId // subj-001
 
-        // Query: Project 1, Attendant 1, after subj-001, from the targetIds list, sorted
+        // Query: Project 1, Attendant 1,  from the targetIds list, sorted
         val query = SubjectQuery(
             projectId = PROJECT_1_ID,
             attendantId = ATTENDANT_1_ID,
-            afterSubjectId = afterId,
             subjectIds = targetIds,
             sort = true,
         )
