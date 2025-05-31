@@ -9,6 +9,8 @@ import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Compani
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.PROJECT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_ID_COLUMN
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject.Companion.SUBJECT_TABLE_NAME
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ROOM_RECORDS_DB
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
@@ -20,7 +22,7 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
      * @return A [SimpleSQLiteQuery] that can be executed against the database.
      */
     fun buildSubjectQuery(query: SubjectQuery): SimpleSQLiteQuery {
-        // require format not to be set for subject query and guid to use the buildBiometricTemplatesQuery instead
+        // require format not to be set for subject query and guide to use the buildBiometricTemplatesQuery instead
         require(query.fingerprintSampleFormat == null && query.faceSampleFormat == null) {
             "Cannot set format for subject query, use buildBiometricTemplatesQuery instead"
         }
@@ -51,14 +53,13 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
     fun buildBiometricTemplatesQuery(
         query: SubjectQuery,
         pageSize: Int,
-        lastSeenSubjectId: String? = null,
     ): SimpleSQLiteQuery {
         // require format to be set for biometric templates query
         val format = query.fingerprintSampleFormat ?: query.faceSampleFormat
         require(format != null) {
             "Must set format for biometric templates query, use buildSubjectQuery or buildCountQuery instead"
         }
-        val updatedQuery = query.copy(afterSubjectId = lastSeenSubjectId, sort = true)
+        val updatedQuery = query.copy(sort = true)
         val (whereClause, args) = buildWhereClause(updatedQuery)
         val orderByClause = buildOrderByClause(updatedQuery)
         val sql =
@@ -77,7 +78,22 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
         return SimpleSQLiteQuery(sql, args.toTypedArray())
     }
 
-    fun buildWhereClause(
+    fun buildDeleteQuery(query: SubjectQuery): SimpleSQLiteQuery {
+        require(query.faceSampleFormat == null && query.fingerprintSampleFormat == null) {
+            val errorMsg = "faceSampleFormat and fingerprintSampleFormat are not supported for deletion"
+            Simber.i("[delete] $errorMsg", tag = ROOM_RECORDS_DB)
+            errorMsg
+        }
+        val (whereClause, args) = buildWhereClause(
+            query,
+            subjectAlias = "",
+            templateAlias = "",
+        )
+        val sql = "DELETE FROM DbSubject $whereClause"
+        return SimpleSQLiteQuery(sql, args.toTypedArray())
+    }
+
+    private fun buildWhereClause(
         query: SubjectQuery,
         subjectAlias: String = "S.", // Default alias for subject table, dot included. Empty string for no alias.
         templateAlias: String = "T.", // Default alias for template table, dot included. Empty string for no alias.
@@ -88,18 +104,24 @@ internal class RoomEnrolmentRecordQueryBuilder @Inject constructor() {
             "Cannot set both fingerprintSampleFormat and faceSampleFormat"
         }
         // to achieve the highest performance, we should not use OR in the where clause
-        query.subjectId?.let {
-            clauses.add("${subjectAlias}$SUBJECT_ID_COLUMN = ?")
-            args.add(it)
+        // subject id params are mutually exclusive, so only one of them will be set at a time
+        when {
+            query.subjectId != null -> {
+                clauses.add("${subjectAlias}$SUBJECT_ID_COLUMN = ?")
+                args.add(query.subjectId)
+            }
+
+            query.subjectIds?.isNotEmpty() == true -> {
+                clauses.add("${subjectAlias}$SUBJECT_ID_COLUMN IN (${query.subjectIds.joinToString(",") { "?" }})")
+                args.addAll(query.subjectIds)
+            }
+
+            query.afterSubjectId != null -> {
+                clauses.add("${subjectAlias}$SUBJECT_ID_COLUMN > ?")
+                args.add(query.afterSubjectId)
+            }
         }
-        query.subjectIds?.takeIf { it.isNotEmpty() }?.let {
-            clauses.add("${subjectAlias}$SUBJECT_ID_COLUMN IN (${it.joinToString(",") { "?" }})")
-            args.addAll(it)
-        }
-        query.afterSubjectId?.let {
-            clauses.add("${subjectAlias}$SUBJECT_ID_COLUMN > ?")
-            args.add(it)
-        }
+
         query.projectId?.let {
             clauses.add("${subjectAlias}$PROJECT_ID_COLUMN = ?")
             args.add(it)
