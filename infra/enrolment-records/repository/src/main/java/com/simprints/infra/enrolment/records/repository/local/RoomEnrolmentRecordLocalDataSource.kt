@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import androidx.room.withTransaction
-import androidx.sqlite.db.SimpleSQLiteQuery
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
@@ -146,7 +145,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         onCandidateLoaded: () -> Unit,
         scope: CoroutineScope,
     ): ReceiveChannel<List<T>> {
-        var lastSeenSubjectId: String? = null
+        var afterSubjectId: String? = null
         var lastOffset = 0
         return loadIdentitiesConcurrently(
             ranges = ranges,
@@ -159,14 +158,13 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                     "Expected: $lastOffset, Actual: ${range.first}"
             }
             val identities = loadBiometricIdentities(
-                query = query,
+                query = query.copy(afterSubjectId = afterSubjectId), // update query with the last seen subject ID
                 pageSize = range.last - range.first,
-                lastSeenSubjectId = lastSeenSubjectId,
                 format = format,
                 createIdentity = createIdentity,
                 onCandidateLoaded = onCandidateLoaded,
             )
-            lastSeenSubjectId = identities.lastOrNull()?.let {
+            afterSubjectId = identities.lastOrNull()?.let {
                 (it as? FaceIdentity)?.subjectId ?: (it as? FingerprintIdentity)?.subjectId
             }
             lastOffset = range.last
@@ -178,13 +176,12 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         query: SubjectQuery,
         pageSize: Int,
         format: String?,
-        lastSeenSubjectId: String?,
         createIdentity: (subjectId: String, samples: List<DbBiometricTemplate>) -> T,
         onCandidateLoaded: () -> Unit,
     ): List<T> = withContext(dispatcherIO) {
         requireNotNull(format) { "Appropriate sampleFormat is required for loading biometric identities." }
         subjectDao
-            .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, pageSize, lastSeenSubjectId))
+            .loadSamples(queryBuilder.buildBiometricTemplatesQuery(query, pageSize))
             .map { (subjectId, templates) ->
                 onCandidateLoaded()
                 createIdentity(subjectId, templates)
@@ -195,25 +192,14 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         Simber.i("[delete] Deleting subjects with queries: $queries", tag = ROOM_RECORDS_DB)
         database.withTransaction {
             queries.forEach { query ->
-                require(query.faceSampleFormat == null && query.fingerprintSampleFormat == null) {
-                    val errorMsg = "faceSampleFormat and fingerprintSampleFormat are not supported for deletion"
-                    Simber.i("[delete] $errorMsg", tag = ROOM_RECORDS_DB)
-                    errorMsg
-                }
-                val (whereClause, args) = queryBuilder.buildWhereClause(
-                    query,
-                    subjectAlias = "",
-                    templateAlias = "",
-                )
-                val sql = "DELETE FROM DbSubject $whereClause"
-                subjectDao.deleteSubjects(SimpleSQLiteQuery(sql, args.toTypedArray()))
+                subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(query))
             }
         }
     }
 
     override suspend fun deleteAll() {
         Simber.i("[deleteAll] Deleting all subjects.", tag = ROOM_RECORDS_DB)
-        subjectDao.deleteSubjects(SimpleSQLiteQuery("DELETE FROM DbSubject"))
+        subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(SubjectQuery()))
     }
 
     override suspend fun performActions(
