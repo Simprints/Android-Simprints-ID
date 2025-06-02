@@ -304,29 +304,27 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         return realmQuery
     }
 
+    /**
+     * Loads all subjects in batches of the specified size.
+     */
     fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<Subject>> = channelFlow {
-        var lastId: RealmUUID? = null
+        require(batchSize > 0) {
+            "Batch size must be greater than 0"
+        }
         realmWrapper.readRealm { realm ->
             launch {
-                val baseQuery = realm.query(DbSubject::class)
+                var query = realm.query(DbSubject::class).sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
                 while (true) {
-                    val pagedQuery = if (lastId != null) {
-                        baseQuery.query("$SUBJECT_ID_FIELD > $0", lastId)
-                    } else {
-                        baseQuery
-                    }
-
-                    val batch = pagedQuery
-                        .sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
+                    val batch = query
                         .find { it.take(batchSize) }
                         .map { it.toDomain() }
 
                     if (batch.isEmpty()) {
-                        close() // close the flow when done
                         break
                     }
                     send(batch)
-                    lastId = RealmUUID.from(batch.last().subjectId)
+                    // Update the query to fetch the next batch
+                    query = query.query("$SUBJECT_ID_FIELD > $0", RealmUUID.from(batch.last().subjectId))
                 }
             }
         }

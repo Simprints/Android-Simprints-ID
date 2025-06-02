@@ -16,7 +16,7 @@ internal class InsertRecordsDuringMigrationUseCase @Inject constructor(
         subjectAction: SubjectAction.Creation,
         project: Project,
     ) {
-        // if the realm to room migration is in progress, we need to insert the records in the new db
+        // if the realm to room migration is in progress, we need to insert the records in the new db too
         if (realmToRoomMigrationFlagsStore.isMigrationInProgress()) {
             roomEnrolmentRecordLocalDataSource.performActions(actions = listOf(subjectAction), project)
             Simber.i(

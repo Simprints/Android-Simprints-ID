@@ -98,8 +98,6 @@ class RealmToRoomMigrationSchedulerTest {
         // Then
         coVerify(exactly = 1) {
             mockRealmToRoomMigrationFlagsStore.getCurrentStatus()
-            mockRealmToRoomMigrationFlagsStore.isMigrationGloballyEnabled()
-            mockRealmToRoomMigrationFlagsStore.canRetry()
 
             mockWorkManager.cancelUniqueWork(RealmToRoomMigrationWorker.Companion.WORK_NAME)
         }

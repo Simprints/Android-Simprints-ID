@@ -30,6 +30,7 @@ internal class AnalyticsPropertyLogWriter(
                 params.putString(EXCEPTION_MESSAGE_PARAM, it.message)
             }
             analytics.logEvent(tag, params)
+            return
         }
         val originalTag = tag.removePrefix(Simber.USER_PROPERTY_TAG)
 

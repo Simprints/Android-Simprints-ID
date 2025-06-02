@@ -44,7 +44,7 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
         project = configRepo.getProject()
         crashlyticsLog("[RealmToRoomMigrationWorker] MigrationWorker started.")
         try {
-            showProgressNotification() // Todo this shows sync in progress notification  and should be changed to migration in progress
+            showProgressNotification()
             // 1. Check if down sync is in progress to retry latter (no need to increase the retry count)
             if (realmToRoomMigrationFlagsStore.isDownSyncInProgress()) {
                 realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.NOT_STARTED)
