@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
@@ -63,7 +62,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -92,7 +91,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         return channel
     }
 
-    override fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,

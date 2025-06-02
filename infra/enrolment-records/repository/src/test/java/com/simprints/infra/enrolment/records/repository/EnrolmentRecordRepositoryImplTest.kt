@@ -15,7 +15,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAct
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
-import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsDuringMigrationUseCase
+import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,7 +69,7 @@ class EnrolmentRecordRepositoryImplTest {
     }
     private lateinit var repository: EnrolmentRecordRepositoryImpl
     private val project = mockk<Project>()
-    private val insertRecordsDuringMigration = mockk<InsertRecordsDuringMigrationUseCase>()
+    private val insertRecordsDuringMigration = mockk<InsertRecordsInRoomDuringMigrationUseCase>()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -85,7 +85,8 @@ class EnrolmentRecordRepositoryImplTest {
             tokenizationProcessor = tokenizationProcessor,
             dispatcher = UnconfinedTestDispatcher(),
             batchSize = BATCH_SIZE,
-            insertRecordsDuringMigration = insertRecordsDuringMigration,
+            insertRecordsInRoomDuringMigration = insertRecordsDuringMigration,
+            flagsStore = mockk(relaxed = true),
         )
     }
 

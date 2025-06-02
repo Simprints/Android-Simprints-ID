@@ -9,19 +9,19 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
-class InsertRecordsDuringMigrationUseCaseTest {
+class InsertRecordsInRoomDuringMigrationUseCaseTest {
     @MockK
     private lateinit var realmToRoomMigrationFlagsStore: RealmToRoomMigrationFlagsStore
 
     @MockK
     private lateinit var roomEnrolmentRecordLocalDataSource: RoomEnrolmentRecordLocalDataSource
 
-    private lateinit var insertRecordsDuringMigrationUseCase: InsertRecordsDuringMigrationUseCase
+    private lateinit var insertRecordsInRoomDuringMigrationUseCase: InsertRecordsInRoomDuringMigrationUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        insertRecordsDuringMigrationUseCase = InsertRecordsDuringMigrationUseCase(
+        insertRecordsInRoomDuringMigrationUseCase = InsertRecordsInRoomDuringMigrationUseCase(
             realmToRoomMigrationFlagsStore,
             roomEnrolmentRecordLocalDataSource,
         )
@@ -35,7 +35,7 @@ class InsertRecordsDuringMigrationUseCaseTest {
         coEvery { realmToRoomMigrationFlagsStore.isMigrationInProgress() } returns true
         coJustRun { roomEnrolmentRecordLocalDataSource.performActions(any(), any()) }
 
-        insertRecordsDuringMigrationUseCase.invoke(subjectAction, project)
+        insertRecordsInRoomDuringMigrationUseCase.invoke(subjectAction, project)
 
         coVerify { roomEnrolmentRecordLocalDataSource.performActions(actions = listOf(subjectAction), project = project) }
     }
@@ -47,7 +47,7 @@ class InsertRecordsDuringMigrationUseCaseTest {
 
         coEvery { realmToRoomMigrationFlagsStore.isMigrationInProgress() } returns false
 
-        insertRecordsDuringMigrationUseCase.invoke(subjectAction, project)
+        insertRecordsInRoomDuringMigrationUseCase.invoke(subjectAction, project)
 
         coVerify(exactly = 0) { roomEnrolmentRecordLocalDataSource.performActions(any(), any()) }
     }

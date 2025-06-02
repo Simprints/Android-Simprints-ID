@@ -8,7 +8,7 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 // Should be completely removed when all users are migrated to Room
-internal class InsertRecordsDuringMigrationUseCase @Inject constructor(
+internal class InsertRecordsInRoomDuringMigrationUseCase @Inject constructor(
     private val realmToRoomMigrationFlagsStore: RealmToRoomMigrationFlagsStore,
     private val roomEnrolmentRecordLocalDataSource: RoomEnrolmentRecordLocalDataSource,
 ) {
@@ -20,7 +20,7 @@ internal class InsertRecordsDuringMigrationUseCase @Inject constructor(
         if (realmToRoomMigrationFlagsStore.isMigrationInProgress()) {
             roomEnrolmentRecordLocalDataSource.performActions(actions = listOf(subjectAction), project)
             Simber.i(
-                "[InsertRecordsDuringMigrationUseCase] Inserted subject ${subjectAction.subject.subjectId} enrolled during migration",
+                "[InsertRecordsInRoomDuringMigrationUseCase] Inserted subject ${subjectAction.subject.subjectId} enrolled during migration",
                 tag = REALM_DB_MIGRATION,
             )
         }
