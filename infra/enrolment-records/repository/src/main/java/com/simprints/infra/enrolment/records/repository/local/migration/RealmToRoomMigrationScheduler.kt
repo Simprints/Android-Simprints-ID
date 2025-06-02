@@ -3,7 +3,6 @@ package com.simprints.infra.enrolment.records.repository.local.migration
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB_MIGRATION
@@ -20,37 +19,28 @@ class RealmToRoomMigrationScheduler @Inject constructor(
     suspend fun scheduleMigrationWorkerIfNeeded() {
         val currentStatus = realmToRoomMigrationFlagsStore.getCurrentStatus()
         log("Current migration status for scheduling: $currentStatus")
-
-        if (!realmToRoomMigrationFlagsStore.isMigrationGloballyEnabled() ||
-            !realmToRoomMigrationFlagsStore.canRetry() ||
-            currentStatus == MigrationStatus.COMPLETED
-        ) {
-            log(" Worker not scheduled. Migration is disabled, max retries reached or already completed.")
-            workManager.cancelUniqueWork(RealmToRoomMigrationWorker.Companion.WORK_NAME)
+        if (currentStatus == MigrationStatus.COMPLETED) {
+            log("Worker not scheduled. Migration already completed.")
+            workManager.cancelUniqueWork(RealmToRoomMigrationWorker.WORK_NAME)
             return
         }
-
-        when (currentStatus) {
-            MigrationStatus.FAILED -> {
-                log("Migration status is FAILED and can retry. Scheduling worker.")
-                enqueueMigrationWork()
-            }
-            MigrationStatus.NOT_STARTED,
-            MigrationStatus.IN_PROGRESS,
-            -> { // If app was killed during these states
-                log("Migration status is $currentStatus. Scheduling worker to start.")
-                enqueueMigrationWork()
-            }
-            else -> {
-                // No action needed for COMPLETED or any other state
-            }
+        if (!realmToRoomMigrationFlagsStore.isMigrationGloballyEnabled()) {
+            log("Worker not scheduled. Migration is globally disabled.")
+            workManager.cancelUniqueWork(RealmToRoomMigrationWorker.WORK_NAME)
+            return
         }
+        if (!realmToRoomMigrationFlagsStore.canRetry()) {
+            log("Worker not scheduled. Max retries reached.")
+            workManager.cancelUniqueWork(RealmToRoomMigrationWorker.WORK_NAME)
+            return
+        }
+        log("Scheduling RealmToRoomMigrationWorker...")
+        enqueueMigrationWork()
     }
 
     private fun enqueueMigrationWork() {
         val constraints = Constraints
             .Builder()
-            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             .setRequiresStorageNotLow(true)
             .setRequiresBatteryNotLow(true)
             .build()
