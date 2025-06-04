@@ -66,7 +66,6 @@ internal class FingerprintMatcherUseCaseTest {
             resolveBioSdkWrapperUseCase,
             configManager,
             createRangesUseCase,
-            4,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
