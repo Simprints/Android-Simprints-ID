@@ -54,7 +54,6 @@ internal class FaceMatcherUseCaseTest {
             enrolmentRecordRepository,
             resolveFaceBioSdk,
             createRangesUseCase,
-            4,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
