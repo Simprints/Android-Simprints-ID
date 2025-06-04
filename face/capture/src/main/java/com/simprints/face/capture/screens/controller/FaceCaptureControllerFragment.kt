@@ -71,7 +71,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             findNavController().finishWithResult(this, result)
         }
 
-        viewModel.setupCapture(args.samplesToCapture)
+        viewModel.setupCapture(args.params.samplesToCapture)
         initFaceBioSdk()
         viewModel.recaptureEvent.observe(
             viewLifecycleOwner,
@@ -131,7 +131,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
                     R.id.facePreparationFragment
                 } else {
                     R.id.faceLiveFeedbackFragment
-                }
+                },
             )
             graph?.let {
                 internalNavController?.setGraph(graph, null)
@@ -147,6 +147,6 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
                 InvalidFaceLicenseAlert.toAlertArgs(),
             )
         }
-        viewModel.initFaceBioSdk(requireActivity())
+        viewModel.initFaceBioSdk(requireActivity(), args.params.faceSDK)
     }
 }

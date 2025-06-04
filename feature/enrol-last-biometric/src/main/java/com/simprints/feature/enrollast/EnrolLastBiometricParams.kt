@@ -3,6 +3,7 @@ package com.simprints.feature.enrollast
 import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import kotlinx.parcelize.Parcelize
@@ -34,6 +35,7 @@ sealed class EnrolLastBiometricStepResult : Parcelable {
     @Parcelize
     data class FaceMatchResult(
         val results: List<MatchResult>,
+        val sdk: FaceConfiguration.BioSdk,
     ) : EnrolLastBiometricStepResult()
 
     @Keep

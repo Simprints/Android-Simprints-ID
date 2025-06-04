@@ -2,6 +2,7 @@ package com.simprints.face.infra.biosdkresolver
 
 import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.FaceConfiguration
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -12,17 +13,28 @@ class ResolveFaceBioSdkUseCaseTest {
     private val configRepository: ConfigRepository = mockk()
     private lateinit var rocV1BioSdk: RocV1BioSdk
     private lateinit var rocV3BioSdk: RocV3BioSdk
+    private lateinit var simFaceBioSdk: SimFaceBioSdk
 
     @Before
     fun setUp() {
         rocV1BioSdk = RocV1BioSdk(mockk(), mockk())
         rocV3BioSdk = RocV3BioSdk(mockk(), mockk())
-        resolveFaceBioSdkUseCase =
-            ResolveFaceBioSdkUseCase(configRepository, rocV1BioSdk, rocV3BioSdk)
+        simFaceBioSdk = SimFaceBioSdk(mockk(), mockk(), mockk(relaxed = true))
+
+        resolveFaceBioSdkUseCase = ResolveFaceBioSdkUseCase(configRepository, rocV1BioSdk, rocV3BioSdk, simFaceBioSdk)
+    }
+
+    @Test
+    fun `return SimFace SDK when requested`() = runTest {
+        // When
+        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.SIM_FACE)
+
+        // Then
+        assertThat(result).isEqualTo(simFaceBioSdk)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `throw exception when version is null`() = runTest {
+    fun `throw exception when RankOne version is null`() = runTest {
         // Given
         coEvery {
             configRepository
@@ -33,13 +45,13 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns null
 
         // When
-        resolveFaceBioSdkUseCase.invoke()
+        resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then: Expect IllegalArgumentException to be thrown
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `throw exception when version is empty`() = runTest {
+    fun `throw exception when RankOne version is empty`() = runTest {
         // Given
         coEvery {
             configRepository
@@ -50,7 +62,7 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns ""
 
         // When
-        resolveFaceBioSdkUseCase.invoke()
+        resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then: Expect IllegalArgumentException to be thrown
     }
@@ -69,7 +81,7 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns rocV3BioSdk.version
 
         // When
-        val result = resolveFaceBioSdkUseCase.invoke()
+        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         assertThat(result).isEqualTo(rocV3BioSdk)
@@ -88,7 +100,7 @@ class ResolveFaceBioSdkUseCaseTest {
         } returns rocV1BioSdk.version
 
         // When
-        val result = resolveFaceBioSdkUseCase.invoke()
+        val result = resolveFaceBioSdkUseCase.invoke(FaceConfiguration.BioSdk.RANK_ONE)
 
         // Then
         assertThat(result).isEqualTo(rocV1BioSdk)
