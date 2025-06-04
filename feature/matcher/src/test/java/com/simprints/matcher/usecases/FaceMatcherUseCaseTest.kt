@@ -56,7 +56,6 @@ internal class FaceMatcherUseCaseTest {
             createRangesUseCase,
             4,
             testCoroutineRule.testCoroutineDispatcher,
-            testCoroutineRule.testCoroutineDispatcher,
         )
     }
 

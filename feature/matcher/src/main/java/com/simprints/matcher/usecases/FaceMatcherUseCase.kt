@@ -2,7 +2,6 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
-import com.simprints.core.DispatcherIO
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
@@ -19,7 +18,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
@@ -32,7 +30,6 @@ internal class FaceMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @AvailableProcessors private val availableProcessors: Int,
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
@@ -99,7 +96,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         // Wait for all to complete
         consumerJobs.forEach { it.join() }
         send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
-    }.flowOn(dispatcherIO)
+    }
 
     suspend fun consumeAndMatch(
         candidatesChannel: ReceiveChannel<List<DomainFaceIdentity>>,
