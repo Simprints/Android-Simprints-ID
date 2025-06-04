@@ -207,6 +207,7 @@ class CommCareIdentityDataSourceTest {
             encoder,
             JsonHelper,
             useCase,
+            4,
             context,
             testCoroutineRule.testCoroutineDispatcher,
         )
@@ -647,7 +648,7 @@ class CommCareIdentityDataSourceTest {
 
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
-        val range = 0..expectedFingerprintIdentities.size
+        val range = expectedFingerprintIdentities.indices
         val actualIdentities = mutableListOf<FingerprintIdentity>()
         dataSource
             .loadFingerprintIdentities(

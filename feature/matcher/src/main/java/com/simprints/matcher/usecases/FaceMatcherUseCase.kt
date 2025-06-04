@@ -1,6 +1,8 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
+import com.simprints.core.DispatcherIO
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
@@ -17,7 +19,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.math.min
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
@@ -26,22 +30,23 @@ internal class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
+    @AvailableProcessors private val availableProcessors: Int,
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
-
-    // When using local DB loadedCandidates = expectedCandidates
-    // However, when using CommCare as data source, loadedCandidates < expectedCandidates
-    // as it's count function does not take into account filtering criteria
-    // This var is not thread safe
-    var loadedCandidates = 0
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        val bioSdk = resolveFaceBioSdk()
+        if (matchParams.faceSDK == null) {
+            Simber.w("Face SDK was not provided", tag = crashReportTag)
+            send(MatcherState.Success(emptyList(), 0, ""))
+            return@channelFlow
+        }
+        val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
 
         if (matchParams.probeFaceSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
@@ -59,12 +64,17 @@ internal class FaceMatcherUseCase @Inject constructor(
             send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
             return@channelFlow
         }
-        loadedCandidates = 0
+
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
+
+        // When using local DB loadedCandidates = expectedCandidates
+        // However, when using CommCare as data source, loadedCandidates < expectedCandidates
+        // as it's count function does not take into account filtering criteria
+        val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
-        val numConsumers = min(Runtime.getRuntime().availableProcessors(), ranges.size)
+        val numConsumers = min(availableProcessors, ranges.size)
 
         val resultSet = MatchResultSet<FaceMatchResult.Item>()
         val candidatesChannel = enrolmentRecordRepository
@@ -75,7 +85,7 @@ internal class FaceMatcherUseCase @Inject constructor(
                 project = project,
                 scope = this,
                 onCandidateLoaded = {
-                    loadedCandidates++
+                    loadedCandidates.incrementAndGet()
                     this.trySend(MatcherState.CandidateLoaded)
                 },
             )
@@ -88,8 +98,8 @@ internal class FaceMatcherUseCase @Inject constructor(
         }
         // Wait for all to complete
         consumerJobs.forEach { it.join() }
-        send(MatcherState.Success(resultSet.toList(), loadedCandidates, bioSdk.matcherName))
-    }
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
+    }.flowOn(dispatcherIO)
 
     suspend fun consumeAndMatch(
         candidatesChannel: ReceiveChannel<List<DomainFaceIdentity>>,

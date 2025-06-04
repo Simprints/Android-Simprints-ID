@@ -45,6 +45,7 @@ internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
 
             is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
                 result.results.map { MatchResult(it.subjectId, it.confidence) },
+                result.sdk,
             )
 
             else -> null

@@ -53,7 +53,7 @@ class BuildSubjectUseCaseTest {
                 listOf(
                     EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null),
                     EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList(), mockk()),
-                    EnrolLastBiometricStepResult.FaceMatchResult(emptyList()),
+                    EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), mockk()),
                 ),
             ),
         )
@@ -117,7 +117,7 @@ class BuildSubjectUseCaseTest {
         val result = useCase(
             createParams(
                 listOf(
-                    EnrolLastBiometricStepResult.FaceMatchResult(emptyList()),
+                    EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), mockk()),
                     EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("first")),
                     EnrolLastBiometricStepResult.FaceCaptureResult(REFERENCE_ID, mockFaceResultsList("second")),
                 ),

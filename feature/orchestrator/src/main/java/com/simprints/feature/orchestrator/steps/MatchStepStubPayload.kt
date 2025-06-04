@@ -3,6 +3,7 @@ package com.simprints.feature.orchestrator.steps
 import android.os.Parcelable
 import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowType
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -22,6 +23,7 @@ internal data class MatchStepStubPayload(
     val subjectQuery: SubjectQuery,
     val biometricDataSource: BiometricDataSource,
     val fingerprintSDK: FingerprintConfiguration.BioSdk?,
+    val faceSDK: FaceConfiguration.BioSdk?,
 ) : Parcelable {
     fun toFaceStepArgs(
         referenceId: String,
@@ -29,6 +31,7 @@ internal data class MatchStepStubPayload(
     ) = MatchContract.getArgs(
         referenceId = referenceId,
         faceSamples = samples,
+        faceSDK = faceSDK,
         flowType = flowType,
         subjectQuery = subjectQuery,
         biometricDataSource = biometricDataSource,
@@ -54,6 +57,7 @@ internal data class MatchStepStubPayload(
             subjectQuery: SubjectQuery,
             biometricDataSource: BiometricDataSource,
             fingerprintSDK: FingerprintConfiguration.BioSdk? = null,
-        ) = bundleOf(STUB_KEY to MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, fingerprintSDK))
+            faceSDK: FaceConfiguration.BioSdk? = null,
+        ) = bundleOf(STUB_KEY to MatchStepStubPayload(flowType, subjectQuery, biometricDataSource, fingerprintSDK, faceSDK))
     }
 }

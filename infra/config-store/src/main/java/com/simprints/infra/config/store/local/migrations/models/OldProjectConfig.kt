@@ -114,6 +114,7 @@ internal data class OldProjectConfig(
                     ?: DecisionPolicy(0, 0, 0),
                 version = DEFAULT_FACE_SDK_VERSION,
             ),
+            simFace = null,
         )
     }
 

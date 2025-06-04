@@ -13,6 +13,7 @@ import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
@@ -82,6 +83,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     fun initCapture(
+        bioSdk: FaceConfiguration.BioSdk,
         samplesToCapture: Int,
         attemptNumber: Int,
     ) {
@@ -90,10 +92,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
         viewModelScope.launch {
-            faceDetector = resolveFaceBioSdk().detector
+            faceDetector = resolveFaceBioSdk(bioSdk).detector
 
             val config = configManager.getProjectConfiguration()
-            qualityThreshold = config.face?.qualityThreshold ?: 0f
+            qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
         }
     }
