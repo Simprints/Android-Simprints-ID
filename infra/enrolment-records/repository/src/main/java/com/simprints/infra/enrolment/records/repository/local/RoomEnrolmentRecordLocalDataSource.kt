@@ -286,8 +286,11 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 subjectDao.insertBiometricSamples(templatesToAdd)
             }
         } else {
-            Simber.i(
+            Simber.e(
                 "[updateSubject] Subject ${action.subjectId} not found for update",
+                IllegalStateException(
+                    "Subject ${action.subjectId} not found for update",
+                ),
                 tag = ROOM_RECORDS_DB,
             )
         }
