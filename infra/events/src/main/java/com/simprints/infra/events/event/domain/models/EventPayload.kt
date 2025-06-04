@@ -31,11 +31,16 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3.ConfirmationCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3.EnrolmentCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3.EnrolmentLastBiometricsCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3.IdentificationCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3.VerificationCalloutPayload
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent.EventDownSyncRequestPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
@@ -54,11 +59,16 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = IdentificationCallbackPayload::class, name = EventType.CALLBACK_IDENTIFICATION_KEY),
     JsonSubTypes.Type(value = RefusalCallbackPayload::class, name = EventType.CALLBACK_REFUSAL_KEY),
     JsonSubTypes.Type(value = VerificationCallbackPayload::class, name = EventType.CALLBACK_VERIFICATION_KEY),
-    JsonSubTypes.Type(value = ConfirmationCalloutPayload::class, name = EventType.CALLOUT_CONFIRMATION_KEY),
-    JsonSubTypes.Type(value = EnrolmentCalloutPayload::class, name = EventType.CALLOUT_ENROLMENT_KEY),
-    JsonSubTypes.Type(value = EnrolmentLastBiometricsCalloutPayload::class, name = EventType.CALLOUT_LAST_BIOMETRICS_KEY),
-    JsonSubTypes.Type(value = IdentificationCalloutPayload::class, name = EventType.CALLOUT_IDENTIFICATION_KEY),
-    JsonSubTypes.Type(value = VerificationCalloutPayload::class, name = EventType.CALLOUT_VERIFICATION_KEY),
+    JsonSubTypes.Type(value = ConfirmationCalloutEventV2.ConfirmationCalloutPayload::class, name = EventType.CALLOUT_CONFIRMATION_KEY),
+    JsonSubTypes.Type(value = ConfirmationCalloutEventV3.ConfirmationCalloutPayload::class, name = EventType.CALLOUT_CONFIRMATION_V3_KEY),
+    JsonSubTypes.Type(value = EnrolmentCalloutEventV2.EnrolmentCalloutPayload::class, name = EventType.CALLOUT_ENROLMENT_KEY),
+    JsonSubTypes.Type(value = EnrolmentCalloutEventV3.EnrolmentCalloutPayload::class, name = EventType.CALLOUT_ENROLMENT_V3_KEY),
+    JsonSubTypes.Type(value = EnrolmentLastBiometricsCalloutEventV2.EnrolmentLastBiometricsCalloutPayload::class, name = EventType.CALLOUT_LAST_BIOMETRICS_KEY),
+    JsonSubTypes.Type(value = EnrolmentLastBiometricsCalloutEventV3.EnrolmentLastBiometricsCalloutPayload::class, name = EventType.CALLOUT_LAST_BIOMETRICS_V3_KEY),
+    JsonSubTypes.Type(value = IdentificationCalloutEventV2.IdentificationCalloutPayload::class, name = EventType.CALLOUT_IDENTIFICATION_KEY),
+    JsonSubTypes.Type(value = IdentificationCalloutEventV3.IdentificationCalloutPayload::class, name = EventType.CALLOUT_IDENTIFICATION_V3_KEY),
+    JsonSubTypes.Type(value = VerificationCalloutEventV2.VerificationCalloutPayload::class, name = EventType.CALLOUT_VERIFICATION_KEY),
+    JsonSubTypes.Type(value = VerificationCalloutEventV3.VerificationCalloutPayload::class, name = EventType.CALLOUT_VERIFICATION_V3_KEY),
     JsonSubTypes.Type(value = FaceCaptureConfirmationPayload::class, name = EventType.FACE_CAPTURE_CONFIRMATION_KEY),
     JsonSubTypes.Type(value = FaceCapturePayload::class, name = EventType.FACE_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceCaptureBiometricsPayload::class, name = EventType.FACE_CAPTURE_BIOMETRICS_KEY),

@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS_V3
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -36,5 +37,22 @@ class EnrolmentLastBiometricsCalloutEventV3Test {
             assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
             assertThat(metadata).isEqualTo(DEFAULT_METADATA)
         }
+    }
+
+    @Test
+    fun getTokenizableFields_returnsMapWithAttendantAndModuleId() {
+        val event = EnrolmentLastBiometricsCalloutEventV3(
+            createdAt = CREATED_AT,
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID,
+            moduleId = DEFAULT_MODULE_ID,
+            metadata = DEFAULT_METADATA,
+            sessionId = GUID1,
+        )
+        val tokenizableFields = event.getTokenizableFields()
+
+        assertThat(tokenizableFields).hasSize(2)
+        assertThat(tokenizableFields[TokenKeyType.AttendantId]).isEqualTo(DEFAULT_USER_ID)
+        assertThat(tokenizableFields[TokenKeyType.ModuleId]).isEqualTo(DEFAULT_MODULE_ID)
     }
 }
