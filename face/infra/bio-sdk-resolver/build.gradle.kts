@@ -10,5 +10,6 @@ dependencies {
     implementation(project(":face:infra:base-bio-sdk"))
     implementation(project(":face:infra:roc-v1"))
     api(project(":face:infra:roc-v3"))
-    implementation(project(":face:infra:simface"))
+
+    debugImplementation(project(":face:infra:simface"))
 }
