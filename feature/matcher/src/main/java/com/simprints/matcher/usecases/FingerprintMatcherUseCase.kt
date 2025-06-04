@@ -1,6 +1,8 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
+import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
@@ -22,7 +24,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.math.min
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity as DomainFingerprintIdentity
@@ -32,15 +36,11 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
     private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
+    @AvailableProcessors private val availableProcessors: Int,
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
-
-    // When using local DB loadedCandidates = expectedCandidates
-    // However, when using CommCare as data source, loadedCandidates < expectedCandidates
-    // as it's count function does not take into account filtering criteria
-    // This var is not thread safe
-    var loadedCandidates = 0
 
     override suspend operator fun invoke(
         matchParams: MatchParams,
@@ -72,10 +72,14 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
-        loadedCandidates = 0
+
+        // When using local DB loadedCandidates = expectedCandidates
+        // However, when using CommCare as data source, loadedCandidates < expectedCandidates
+        // as it's count function does not take into account filtering criteria
+        val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
-        val numConsumers = min(Runtime.getRuntime().availableProcessors(), ranges.size)
+        val numConsumers = min(availableProcessors, ranges.size)
         val channel = enrolmentRecordRepository.loadFingerprintIdentities(
             query = queryWithSupportedFormat,
             ranges = ranges,
@@ -83,7 +87,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             scope = this,
             project = project,
         ) {
-            loadedCandidates++
+            loadedCandidates.incrementAndGet()
             trySend(MatcherState.CandidateLoaded)
         }
 
@@ -99,8 +103,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         consumerJobs.forEach { it.join() }
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
-        send(MatcherState.Success(resultSet.toList(), loadedCandidates, bioSdkWrapper.matcherName))
-    }
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdkWrapper.matcherName))
+    }.flowOn(dispatcherIO)
 
     private suspend fun consumeAndMatch(
         channel: ReceiveChannel<List<DomainFingerprintIdentity>>,
