@@ -6,7 +6,7 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
 internal object ActionFactory {
-    fun getFlowRequest(extras: Map<String, Any> = emptyMap()) = ActionRequest.EnrolActionRequest(
+    fun getEnrolRequest(extras: Map<String, Any> = emptyMap()) = ActionRequest.EnrolActionRequest(
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_ENROL,
@@ -22,7 +22,56 @@ internal object ActionFactory {
         metadata = "",
     )
 
-    fun getFolowUpRequest() = ActionRequest.ConfirmIdentityActionRequest(
+    fun getIdentifyRequest(extras: Map<String, Any> = emptyMap()) = ActionRequest.IdentifyActionRequest(
+        actionIdentifier = ActionRequestIdentifier(
+            packageName = "com.simprints.id",
+            actionName = ActionConstants.ACTION_IDENTIFY,
+            callerPackageName = "",
+            contractVersion = 1,
+            timestampMs = 0L,
+        ),
+        projectId = MOCK_PROJECT_ID,
+        userId = MOCK_USER_ID,
+        moduleId = MOCK_MODULE_ID,
+        unknownExtras = extras,
+        biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
+        metadata = "",
+    )
+
+    fun getVerifyRequest(extras: Map<String, Any> = emptyMap()) = ActionRequest.VerifyActionRequest(
+        actionIdentifier = ActionRequestIdentifier(
+            packageName = "com.simprints.id",
+            actionName = ActionConstants.ACTION_VERIFY,
+            callerPackageName = "",
+            contractVersion = 1,
+            timestampMs = 0L,
+        ),
+        projectId = MOCK_PROJECT_ID,
+        userId = MOCK_USER_ID,
+        moduleId = MOCK_MODULE_ID,
+        unknownExtras = extras,
+        biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
+        metadata = "",
+        verifyGuid = MOCK_GUID
+    )
+
+    fun getEnrolLastRequest() = ActionRequest.EnrolLastBiometricActionRequest(
+        actionIdentifier = ActionRequestIdentifier(
+            packageName = "com.simprints.id",
+            actionName = ActionConstants.ACTION_ENROL_LAST_BIOMETRICS,
+            callerPackageName = "",
+            contractVersion = 1,
+            timestampMs = 0L,
+        ),
+        projectId = MOCK_PROJECT_ID,
+        userId = MOCK_USER_ID,
+        moduleId = MOCK_MODULE_ID,
+        sessionId = "sessionId",
+        metadata = "",
+        unknownExtras = emptyMap(),
+    )
+
+    fun getConfirmationRequest() = ActionRequest.ConfirmIdentityActionRequest(
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
@@ -42,4 +91,5 @@ internal object ActionFactory {
     val MOCK_MODULE_ID = "moduleId".asTokenizableRaw()
     const val MOCK_PROJECT_ID = "projectId"
     private const val MOCK_BIOMETRIC_DATA_SOURCE = ""
+    private const val MOCK_GUID = "123e4567-e89b-12d3-a456-426614174000"
 }

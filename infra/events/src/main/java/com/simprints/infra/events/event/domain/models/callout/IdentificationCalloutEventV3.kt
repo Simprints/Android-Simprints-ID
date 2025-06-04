@@ -7,13 +7,13 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION_V3
 import java.util.UUID
 
 @Keep
-data class EnrolmentCalloutEvent(
+data class IdentificationCalloutEventV3(
     override val id: String = UUID.randomUUID().toString(),
-    override val payload: EnrolmentCalloutPayload,
+    override val payload: IdentificationCalloutPayload,
     override val type: EventType,
     override var scopeId: String? = null,
     override var projectId: String? = null,
@@ -25,10 +25,9 @@ data class EnrolmentCalloutEvent(
         moduleId: TokenizableString,
         metadata: String?,
         biometricDataSource: BiometricDataSource,
-        id: String = UUID.randomUUID().toString(),
     ) : this(
-        id,
-        EnrolmentCalloutPayload(
+        UUID.randomUUID().toString(),
+        IdentificationCalloutPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
             projectId = projectId,
@@ -37,7 +36,7 @@ data class EnrolmentCalloutEvent(
             metadata = metadata,
             biometricDataSource = biometricDataSource,
         ),
-        CALLOUT_ENROLMENT,
+        CALLOUT_IDENTIFICATION_V3,
     )
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(
@@ -53,7 +52,7 @@ data class EnrolmentCalloutEvent(
     )
 
     @Keep
-    data class EnrolmentCalloutPayload(
+    data class IdentificationCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
@@ -62,12 +61,12 @@ data class EnrolmentCalloutEvent(
         val metadata: String?,
         val biometricDataSource: BiometricDataSource,
         override val endedAt: Timestamp? = null,
-        override val type: EventType = CALLOUT_ENROLMENT,
+        override val type: EventType = CALLOUT_IDENTIFICATION_V3,
     ) : EventPayload() {
-        override fun toSafeString(): String = "module: $moduleId, metadata: $metadata, biometricDataSource: $biometricDataSource"
+        override fun toSafeString(): String = "module ID: $moduleId, metadata: $metadata, biometricDataSource: $biometricDataSource"
     }
 
     companion object {
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }

@@ -7,11 +7,11 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS_V3
 import java.util.UUID
 
 @Keep
-data class EnrolmentLastBiometricsCalloutEvent(
+data class EnrolmentLastBiometricsCalloutEventV3(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: EnrolmentLastBiometricsCalloutPayload,
     override val type: EventType,
@@ -36,7 +36,7 @@ data class EnrolmentLastBiometricsCalloutEvent(
             metadata = metadata,
             sessionId = sessionId,
         ),
-        CALLOUT_LAST_BIOMETRICS,
+        CALLOUT_LAST_BIOMETRICS_V3,
     )
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(
@@ -61,12 +61,12 @@ data class EnrolmentLastBiometricsCalloutEvent(
         val metadata: String?,
         val sessionId: String,
         override val endedAt: Timestamp? = null,
-        override val type: EventType = CALLOUT_LAST_BIOMETRICS,
+        override val type: EventType = CALLOUT_LAST_BIOMETRICS_V3,
     ) : EventPayload() {
         override fun toSafeString(): String = "metadata: $metadata, session ID: $sessionId"
     }
 
     companion object {
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }

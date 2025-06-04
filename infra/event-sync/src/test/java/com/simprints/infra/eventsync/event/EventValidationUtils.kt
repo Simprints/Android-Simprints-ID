@@ -143,7 +143,7 @@ fun verifyCallbackErrorApiModel(json: JSONObject) {
 }
 
 fun validateCalloutEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "Callout", 2)
+    validateCommonParams(json, "Callout", 3)
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
         with(getJSONObject("callout")) {
@@ -178,7 +178,8 @@ fun verifyCalloutVerificationApiModel(json: JSONObject) {
     assertThat(json.getString("moduleId")).isNotNull()
     assertThat(json.getString("verifyGuid")).isNotNull()
     assertThat(json.getString("metadata")).isNotNull()
-    assertThat(json.length()).isEqualTo(6)
+    assertThat(json.getString("biometricDataSource")).isNotNull()
+    assertThat(json.length()).isEqualTo(7)
 }
 
 fun verifyCalloutIdentificationApiModel(json: JSONObject) {
@@ -187,7 +188,8 @@ fun verifyCalloutIdentificationApiModel(json: JSONObject) {
     assertThat(json.getString("userId")).isNotNull()
     assertThat(json.getString("moduleId")).isNotNull()
     assertThat(json.getString("metadata")).isNotNull()
-    assertThat(json.length()).isEqualTo(5)
+    assertThat(json.getString("biometricDataSource")).isNotNull()
+    assertThat(json.length()).isEqualTo(6)
 }
 
 fun verifyCalloutEnrolmentApiModel(json: JSONObject) {
@@ -196,7 +198,8 @@ fun verifyCalloutEnrolmentApiModel(json: JSONObject) {
     assertThat(json.getString("userId")).isNotNull()
     assertThat(json.getString("moduleId")).isNotNull()
     assertThat(json.getString("metadata")).isNotNull()
-    assertThat(json.length()).isEqualTo(5)
+    assertThat(json.getString("biometricDataSource")).isNotNull()
+    assertThat(json.length()).isEqualTo(6)
 }
 
 fun verifyCalloutConfirmationApiModel(json: JSONObject) {

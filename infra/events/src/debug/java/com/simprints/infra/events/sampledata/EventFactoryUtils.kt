@@ -59,11 +59,11 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
@@ -181,14 +181,14 @@ fun createVerificationCallbackEventV2() = VerificationCallbackEvent(
     CallbackComparisonScore(GUID1, 1, MEDIUM),
 )
 
-fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(
+fun createConfirmationCalloutEvent() = ConfirmationCalloutEventV3(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
     GUID1,
     GUID2,
 )
 
-fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(
+fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEventV3(
     CREATED_AT,
     projectId,
     DEFAULT_USER_ID,
@@ -198,7 +198,7 @@ fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = Enrolm
     projectId,
 )
 
-fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(
+fun createIdentificationCalloutEvent() = IdentificationCalloutEventV3(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
     DEFAULT_USER_ID,
@@ -207,7 +207,7 @@ fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(
     DEFAULT_BIOMETRIC_DATA_SOURCE,
 )
 
-fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEvent(
+fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEventV3(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
     DEFAULT_USER_ID,
@@ -216,7 +216,7 @@ fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCallout
     GUID2,
 )
 
-fun createVerificationCalloutEvent() = VerificationCalloutEvent(
+fun createVerificationCalloutEvent() = VerificationCalloutEventV3(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
     DEFAULT_USER_ID,

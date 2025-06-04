@@ -7,13 +7,13 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION_V3
 import java.util.UUID
 
 @Keep
-data class IdentificationCalloutEvent(
+data class VerificationCalloutEventV3(
     override val id: String = UUID.randomUUID().toString(),
-    override val payload: IdentificationCalloutPayload,
+    override val payload: VerificationCalloutPayload,
     override val type: EventType,
     override var scopeId: String? = null,
     override var projectId: String? = null,
@@ -23,20 +23,22 @@ data class IdentificationCalloutEvent(
         projectId: String,
         userId: TokenizableString,
         moduleId: TokenizableString,
-        metadata: String?,
+        verifyGuid: String,
+        metadata: String,
         biometricDataSource: BiometricDataSource,
     ) : this(
         UUID.randomUUID().toString(),
-        IdentificationCalloutPayload(
+        VerificationCalloutPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
             projectId = projectId,
             userId = userId,
             moduleId = moduleId,
+            verifyGuid = verifyGuid,
             metadata = metadata,
             biometricDataSource = biometricDataSource,
         ),
-        CALLOUT_IDENTIFICATION,
+        CALLOUT_VERIFICATION_V3,
     )
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(
@@ -52,21 +54,22 @@ data class IdentificationCalloutEvent(
     )
 
     @Keep
-    data class IdentificationCalloutPayload(
+    data class VerificationCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val userId: TokenizableString,
         val moduleId: TokenizableString,
-        val metadata: String?,
+        val verifyGuid: String,
+        val metadata: String,
         val biometricDataSource: BiometricDataSource,
         override val endedAt: Timestamp? = null,
-        override val type: EventType = CALLOUT_IDENTIFICATION,
+        override val type: EventType = CALLOUT_VERIFICATION_V3,
     ) : EventPayload() {
-        override fun toSafeString(): String = "module ID: $moduleId, metadata: $metadata, biometricDataSource: $biometricDataSource"
+        override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata, biometricDataSource: $biometricDataSource"
     }
 
     companion object {
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }
