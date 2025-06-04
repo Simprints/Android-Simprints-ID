@@ -2,7 +2,6 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
-import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
@@ -24,7 +23,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
@@ -38,7 +36,6 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val createRanges: CreateRangesUseCase,
     @AvailableProcessors private val availableProcessors: Int,
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
 
@@ -104,7 +101,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
         send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdkWrapper.matcherName))
-    }.flowOn(dispatcherIO)
+    }
 
     private suspend fun consumeAndMatch(
         channel: ReceiveChannel<List<DomainFingerprintIdentity>>,

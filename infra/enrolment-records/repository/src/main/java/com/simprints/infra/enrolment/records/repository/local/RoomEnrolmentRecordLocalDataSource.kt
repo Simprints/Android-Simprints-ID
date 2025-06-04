@@ -43,9 +43,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
-        // only one concurrent operation is allowed as we use the last seen subject ID to load biometric identities
-        // and we need to ensure that the next operation starts after the previous one finishes
-        private const val CHANNEL_CAPACITY = 3
+        // Although batches are processed sequentially, we use a small channel capacity to prevent blocking and reduce the risk of out-of-memory errors.
+        private const val CHANNEL_CAPACITY = 4
     }
 
     private val database: SubjectsDatabase by lazy { subjectsDatabaseFactory.get() }
@@ -272,7 +271,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                     action.faceSamplesToAdd.isNotEmpty() ||
                     action.fingerprintSamplesToAdd.isNotEmpty(),
             ) {
-                val errorMsg = "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
+                val errorMsg =
+                    "Cannot delete all samples for subject ${action.subjectId} without adding new ones"
                 Simber.i("[updateSubject] $errorMsg", tag = ROOM_RECORDS_DB)
                 errorMsg
             }

@@ -6,8 +6,8 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.simprints.core.DispatcherBG
 import com.simprints.core.AvailableProcessors
+import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -33,7 +33,13 @@ import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import javax.inject.Inject
@@ -56,24 +62,25 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
-        .filter { erce ->
-            erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
-        }.map {
-            FingerprintIdentity(
-                it.payload.subjectId,
-                it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
-                    fingerprintReference.templates.map { fingerprintTemplate ->
-                        FingerprintSample(
-                            fingerIdentifier = fingerprintTemplate.finger,
-                            template = encoder.base64ToBytes(fingerprintTemplate.template),
-                            format = fingerprintReference.format,
-                            referenceId = fingerprintReference.id,
-                        )
-                    }
-                },
-            )
-        }
+    ): List<FingerprintIdentity> =
+        loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
+            .filter { erce ->
+                erce.payload.biometricReferences.any { it is FingerprintReference && it.format == query.fingerprintSampleFormat }
+            }.map {
+                FingerprintIdentity(
+                    it.payload.subjectId,
+                    it.payload.biometricReferences.filterIsInstance<FingerprintReference>().flatMap { fingerprintReference ->
+                        fingerprintReference.templates.map { fingerprintTemplate ->
+                            FingerprintSample(
+                                fingerIdentifier = fingerprintTemplate.finger,
+                                template = encoder.base64ToBytes(fingerprintTemplate.template),
+                                format = fingerprintReference.format,
+                                referenceId = fingerprintReference.id,
+                            )
+                        }
+                    },
+                )
+            }
 
     private fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
@@ -100,9 +107,10 @@ internal class CommCareIdentityDataSource @Inject constructor(
                     if (caseMetadataCursor.moveToPosition(range.first)) {
                         do {
                             caseMetadataCursor.getString(caseMetadataCursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
-                                enrolmentRecordCreationEvents.addAll(
-                                    loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
-                                ).also { onCandidateLoaded() }
+                                enrolmentRecordCreationEvents
+                                    .addAll(
+                                        loadEnrolmentRecordCreationEvents(caseId, callerPackageName, query, project),
+                                    ).also { onCandidateLoaded() }
                             }
                         } while (caseMetadataCursor.moveToNext() && caseMetadataCursor.position <= range.last)
                     }
@@ -159,7 +167,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
             .query(caseDataUri, null, null, null, null)
             ?.use { caseDataCursor ->
                 val subjectActions = getSubjectActionsValue(caseDataCursor)
-                Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
                 coSyncEnrolmentRecordEvents?.events?.filterIsInstance<EnrolmentRecordCreationEvent>()?.filter { event ->
@@ -268,8 +275,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
         onCandidateLoaded: () -> Unit,
     ): ReceiveChannel<List<FaceIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
-        dispatcher = dispatcher,
-        parallelism = availableProcessors,
         scope = scope,
     ) { range ->
         loadFaceIdentities(
@@ -290,8 +295,6 @@ internal class CommCareIdentityDataSource @Inject constructor(
         onCandidateLoaded: () -> Unit,
     ): ReceiveChannel<List<FingerprintIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
-        dispatcher = dispatcher,
-        parallelism = availableProcessors,
         scope = scope,
     ) { range ->
         loadFingerprintIdentities(
@@ -303,11 +306,31 @@ internal class CommCareIdentityDataSource @Inject constructor(
         )
     }
 
+    fun <T> loadIdentitiesConcurrently(
+        ranges: List<IntRange>,
+        scope: CoroutineScope,
+        load: suspend (IntRange) -> List<T>,
+    ): ReceiveChannel<List<T>> {
+        val channel = Channel<List<T>>(availableProcessors)
+        val semaphore = Semaphore(availableProcessors)
+        scope.launch(dispatcher) {
+            ranges
+                .map { range ->
+                    async(dispatcher) {
+                        semaphore.withPermit {
+                            channel.send(load(range))
+                        }
+                    }
+                }.joinAll()
+            channel.close()
+        }
+        return channel
+    }
+
     companion object {
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"
-
         const val ARG_CASE_ID = "caseId"
     }
 }
