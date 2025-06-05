@@ -24,10 +24,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,6 +74,12 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
     private lateinit var faceDetector: FaceDetector
 
+    // TODO sample every 10th analysed images and display it in a debug window
+    private val frameCounter = AtomicInteger(0)
+    private val rawBitmapFlow = MutableSharedFlow<Bitmap>(replay = 0)
+    private val _displayBitmapFlow = MutableStateFlow<Bitmap?>(null)
+    val displayBitmapFlow: StateFlow<Bitmap?> = _displayBitmapFlow.asStateFlow()
+
     suspend fun initAutoCapture() {
         val config = configRepository.getProjectConfiguration()
         isAutoCapture = isUsingAutoCaptureUseCase(config)
@@ -89,6 +102,21 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
             displayCameraFlashControls.postValue(config.experimental().displayCameraFlashToggle)
         }
+        // TODO sample every 10th analysed images and display it in a debug window
+        rawBitmapFlow
+            .onEach { bitmap ->
+                when (val count = frameCounter.getAndAdd(1)) {
+                    10 -> frameCounter.set(0) // reset on 10
+                    0 -> {
+                        _displayBitmapFlow.value?.recycle() // Recycle the previous bitmap if any
+                        _displayBitmapFlow.value = bitmap.copy(bitmap.config!!, false) // Update the display flow
+                    }
+
+                    else -> {
+                        Simber.d("Skipping $count-th frame", tag = FACE_CAPTURE)
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun holdOffAutoCapture() {
@@ -115,6 +143,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * @param croppedBitmap is the camera frame
      */
     fun process(croppedBitmap: Bitmap) {
+        Simber.d("process ${croppedBitmap.width}x${croppedBitmap.height}", tag = FACE_CAPTURE)
+
+        viewModelScope.launch { rawBitmapFlow.emit(croppedBitmap) }
+
         val captureStartTime = timeHelper.now()
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
