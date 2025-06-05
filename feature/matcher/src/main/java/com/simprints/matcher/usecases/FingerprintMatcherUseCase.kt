@@ -23,7 +23,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity as DomainFingerprintIdentity
@@ -82,9 +81,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             project = project,
         ) {
             loadedCandidates.incrementAndGet()
-            runBlocking {
-                this@channelFlow.send(MatcherState.CandidateLoaded)
-            }
+            this@channelFlow.send(MatcherState.CandidateLoaded)
         }
 
         val resultSet = MatchResultSet<FingerprintMatchResult.Item>()

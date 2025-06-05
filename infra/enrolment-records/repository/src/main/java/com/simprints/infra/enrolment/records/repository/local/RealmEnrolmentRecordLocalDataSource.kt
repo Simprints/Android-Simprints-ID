@@ -66,7 +66,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FaceIdentity>> {
         val channel = Channel<List<FaceIdentity>>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
@@ -95,7 +95,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FingerprintIdentity>> {
         val channel = Channel<List<FingerprintIdentity>>(CHANNEL_CAPACITY)
         scope.launch(dispatcherIO) {
@@ -122,7 +122,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         query: SubjectQuery,
         range: IntRange,
         mapper: (DbSubject) -> T,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): List<T> = realmWrapper.readRealm { realm ->
         realm
             .query(DbSubject::class)

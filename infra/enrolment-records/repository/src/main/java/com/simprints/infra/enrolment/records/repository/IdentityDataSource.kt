@@ -20,7 +20,7 @@ interface IdentityDataSource {
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FingerprintIdentity>>
 
     fun loadFaceIdentities(
@@ -29,7 +29,7 @@ interface IdentityDataSource {
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FaceIdentity>>
 
     /**

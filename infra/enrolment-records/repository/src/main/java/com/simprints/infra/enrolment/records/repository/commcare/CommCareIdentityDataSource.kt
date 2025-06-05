@@ -56,12 +56,12 @@ internal class CommCareIdentityDataSource @Inject constructor(
 
     private fun getCaseDataUri(packageName: String): Uri = "content://$packageName.case/casedb/data".toUri()
 
-    private fun loadFingerprintIdentities(
+    private suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
         project: Project,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): List<FingerprintIdentity> =
         loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
             .filter { erce ->
@@ -82,12 +82,12 @@ internal class CommCareIdentityDataSource @Inject constructor(
                 )
             }
 
-    private fun loadEnrolmentRecordCreationEvents(
+    private suspend fun loadEnrolmentRecordCreationEvents(
         range: IntRange,
         callerPackageName: String,
         query: SubjectQuery,
         project: Project,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): List<EnrolmentRecordCreationEvent> {
         val enrolmentRecordCreationEvents: MutableList<EnrolmentRecordCreationEvent> = mutableListOf()
         try {
@@ -130,12 +130,12 @@ internal class CommCareIdentityDataSource @Inject constructor(
         }
     }
 
-    private fun loadFaceIdentities(
+    private suspend fun loadFaceIdentities(
         query: SubjectQuery,
         range: IntRange,
         dataSource: BiometricDataSource,
         project: Project,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): List<FaceIdentity> = loadEnrolmentRecordCreationEvents(range, dataSource.callerPackageName(), query, project, onCandidateLoaded)
         .filter { erce ->
             erce.payload.biometricReferences.any { it is FaceReference && it.format == query.faceSampleFormat }
@@ -167,6 +167,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
             .query(caseDataUri, null, null, null, null)
             ?.use { caseDataCursor ->
                 val subjectActions = getSubjectActionsValue(caseDataCursor)
+                Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
                 coSyncEnrolmentRecordEvents?.events?.filterIsInstance<EnrolmentRecordCreationEvent>()?.filter { event ->
@@ -272,7 +273,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FaceIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         scope = scope,
@@ -292,7 +293,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FingerprintIdentity>> = loadIdentitiesConcurrently(
         ranges = ranges,
         scope = scope,
@@ -316,7 +317,7 @@ internal class CommCareIdentityDataSource @Inject constructor(
         scope.launch(dispatcher) {
             ranges
                 .map { range ->
-                    async(dispatcher) {
+                    async {
                         semaphore.withPermit {
                             channel.send(load(range))
                         }
