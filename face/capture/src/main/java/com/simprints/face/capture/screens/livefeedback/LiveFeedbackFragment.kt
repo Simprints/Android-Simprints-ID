@@ -21,7 +21,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extentions.hasPermission
@@ -187,6 +189,19 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                         currentFragment = this,
                         directions = LiveFeedbackFragmentDirections.actionFaceLiveFeedbackFragmentToFaceConfirmationFragment(),
                     )
+                }
+            }
+        }
+
+        // TODO sample every 10th analysed images and display it in a debug window
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                Simber.d("Observing bitmap flow", tag = FACE_CAPTURE)
+                vm.displayBitmapFlow.collect { bitmap ->
+                    Simber.d("bitmap: ${bitmap != null}", tag = FACE_CAPTURE)
+                    if (bitmap != null) {
+                        binding.debugPreview.setImageBitmap(bitmap)
+                    }
                 }
             }
         }
