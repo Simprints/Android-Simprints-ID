@@ -18,6 +18,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +44,7 @@ class ProjectRealmMigrationTest {
     private lateinit var realmQuery: RealmQuery<DbProject>
 
     private lateinit var blockCapture: CapturingSlot<(MutableRealm) -> Any>
-    private lateinit var readBlockCapture: CapturingSlot<(Realm) -> Any>
+    private lateinit var readBlockCapture: CapturingSlot<suspend (Realm) -> Any>
 
     private lateinit var projectRealmMigration: ProjectRealmMigration
 
@@ -56,7 +57,7 @@ class ProjectRealmMigrationTest {
 
         every { realm.query<DbProject>(any(), any(), any()) } returns realmQuery
         coEvery { realmWrapper.readRealm(capture(readBlockCapture)) } answers {
-            readBlockCapture.captured.invoke(realm)
+            runBlocking { readBlockCapture.captured.invoke(realm) }
         }
         coEvery { realmWrapper.writeRealm(capture(blockCapture)) } answers {
             blockCapture.captured.invoke(mutableRealm)

@@ -1,8 +1,6 @@
 package com.simprints.matcher.usecases
 
-import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
-import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
@@ -25,10 +23,8 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import kotlin.math.min
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity as DomainFingerprintIdentity
 
 internal class FingerprintMatcherUseCase @Inject constructor(
@@ -36,9 +32,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private val resolveBioSdkWrapper: ResolveBioSdkWrapperUseCase,
     private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
-    @AvailableProcessors private val availableProcessors: Int,
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FINGER_MATCHING
 
@@ -79,7 +73,6 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
         // if number of ranges less than the number of cores then use the number of ranges
-        val numConsumers = min(availableProcessors, ranges.size)
         val channel = enrolmentRecordRepository.loadFingerprintIdentities(
             query = queryWithSupportedFormat,
             ranges = ranges,
@@ -88,23 +81,16 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             project = project,
         ) {
             loadedCandidates.incrementAndGet()
-            trySend(MatcherState.CandidateLoaded)
+            this@channelFlow.send(MatcherState.CandidateLoaded)
         }
 
         val resultSet = MatchResultSet<FingerprintMatchResult.Item>()
 
-        // Start Consumers in BG thread
-        val consumerJobs = List(numConsumers) {
-            launch(dispatcherBG) {
-                consumeAndMatch(channel, samples, resultSet, bioSdkWrapper, matchParams)
-            }
-        }
-        // Wait for all to complete
-        consumerJobs.forEach { it.join() }
+        consumeAndMatch(channel, samples, resultSet, bioSdkWrapper, matchParams)
 
         Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
         send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdkWrapper.matcherName))
-    }.flowOn(dispatcherIO)
+    }.flowOn(dispatcherBG)
 
     private suspend fun consumeAndMatch(
         channel: ReceiveChannel<List<DomainFingerprintIdentity>>,

@@ -7,7 +7,7 @@ interface RealmWrapper {
     /**
      * Returns read-only Realm instance for data fetching.
      */
-    suspend fun <R> readRealm(block: (Realm) -> R): R
+    suspend fun <R> readRealm(block: suspend (Realm) -> R): R
 
     /**
      * Executes provided block with a writable Realm instance ensuring

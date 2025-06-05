@@ -1,8 +1,6 @@
 package com.simprints.matcher.usecases
 
-import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherBG
-import com.simprints.core.DispatcherIO
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
@@ -20,19 +18,15 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import kotlin.math.min
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
 
 internal class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
-    @AvailableProcessors private val availableProcessors: Int,
     @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
-    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
@@ -73,9 +67,6 @@ internal class FaceMatcherUseCase @Inject constructor(
         // as it's count function does not take into account filtering criteria
         val loadedCandidates = AtomicInteger(0)
         val ranges = createRanges(expectedCandidates)
-        // if number of ranges less than the number of cores then use the number of ranges
-        val numConsumers = min(availableProcessors, ranges.size)
-
         val resultSet = MatchResultSet<FaceMatchResult.Item>()
         val candidatesChannel = enrolmentRecordRepository
             .loadFaceIdentities(
@@ -84,22 +75,14 @@ internal class FaceMatcherUseCase @Inject constructor(
                 dataSource = matchParams.biometricDataSource,
                 project = project,
                 scope = this,
-                onCandidateLoaded = {
-                    loadedCandidates.incrementAndGet()
-                    this.trySend(MatcherState.CandidateLoaded)
-                },
-            )
-
-        // Start Consumers in BG thread
-        val consumerJobs = List(numConsumers) {
-            launch(dispatcherBG) {
-                consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
+            ) {
+                loadedCandidates.incrementAndGet()
+                this@channelFlow.send(MatcherState.CandidateLoaded)
             }
-        }
-        // Wait for all to complete
-        consumerJobs.forEach { it.join() }
+
+        consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
         send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
-    }.flowOn(dispatcherIO)
+    }.flowOn(dispatcherBG)
 
     suspend fun consumeAndMatch(
         candidatesChannel: ReceiveChannel<List<DomainFaceIdentity>>,
