@@ -5,7 +5,6 @@ import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepositoryImpl.Companion.BATCH_SIZE
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSourceImpl
