@@ -56,6 +56,8 @@ internal class SimAfisMatcher @Inject constructor(
     ): List<MatchResult> {
         val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
 
+        println("Matching ${simAfisCandidates.size} candidates using all ${jniLibAfis.getNbCores()} cores")
+
         val results = jniLibAfis.identify(
             probe.toSimAfisPerson(),
             simAfisCandidates,

@@ -85,7 +85,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FaceIdentity>> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
@@ -116,7 +116,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): ReceiveChannel<List<FingerprintIdentity>> = loadBiometricIdentitiesPaged(
         query = query,
         ranges = ranges,
@@ -144,7 +144,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         ranges: List<IntRange>,
         format: String,
         createIdentity: (String, List<DbBiometricTemplate>) -> T,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
         scope: CoroutineScope,
     ): ReceiveChannel<List<T>> {
         var afterSubjectId: String? = null
@@ -180,7 +180,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         pageSize: Int,
         format: String?,
         createIdentity: (subjectId: String, samples: List<DbBiometricTemplate>) -> T,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ): List<T> = withContext(dispatcherIO) {
         requireNotNull(format) { "Appropriate sampleFormat is required for loading biometric identities." }
         subjectDao

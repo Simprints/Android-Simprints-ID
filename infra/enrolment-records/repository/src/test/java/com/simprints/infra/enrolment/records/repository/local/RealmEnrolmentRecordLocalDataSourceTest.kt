@@ -31,6 +31,7 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -60,9 +61,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     @MockK
     private lateinit var project: Project
 
-    private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
+    private lateinit var blockCapture: CapturingSlot<suspend (Realm) -> Any>
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
-    private val onCandidateLoaded: () -> Unit = {}
+    private val onCandidateLoaded: suspend () -> Unit = {}
     private var localSubjects: MutableList<Subject> = mutableListOf()
 
     private lateinit var enrolmentRecordLocalDataSource: EnrolmentRecordLocalDataSource
@@ -83,7 +84,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
         blockCapture = slot()
         coEvery { realmWrapperMock.readRealm(capture(blockCapture)) } answers {
-            blockCapture.captured.invoke(realm)
+            runBlocking { blockCapture.captured.invoke(realm) }
         }
         mutableBlockCapture = slot()
         coEvery { realmWrapperMock.writeRealm(capture(mutableBlockCapture)) } answers {

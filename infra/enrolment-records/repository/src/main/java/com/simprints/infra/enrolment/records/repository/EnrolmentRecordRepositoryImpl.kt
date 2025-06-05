@@ -109,7 +109,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ) = fromIdentityDataSource(dataSource).loadFingerprintIdentities(
         query = query,
         ranges = ranges,
@@ -125,7 +125,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
+        onCandidateLoaded: suspend () -> Unit,
     ) = fromIdentityDataSource(dataSource).loadFaceIdentities(
         query = query,
         ranges = ranges,

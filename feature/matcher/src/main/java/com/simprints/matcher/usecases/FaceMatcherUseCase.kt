@@ -18,7 +18,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
@@ -78,13 +77,10 @@ internal class FaceMatcherUseCase @Inject constructor(
                 scope = this,
                 onCandidateLoaded = {
                     loadedCandidates.incrementAndGet()
-                    runBlocking {
-                        this@channelFlow.send(MatcherState.CandidateLoaded)
-                    }
+                    this@channelFlow.send(MatcherState.CandidateLoaded)
                 },
             )
         consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
-
         send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
     }.flowOn(dispatcherBG)
 
