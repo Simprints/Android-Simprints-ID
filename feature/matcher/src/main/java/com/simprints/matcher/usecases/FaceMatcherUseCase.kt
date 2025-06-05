@@ -75,11 +75,11 @@ internal class FaceMatcherUseCase @Inject constructor(
                 dataSource = matchParams.biometricDataSource,
                 project = project,
                 scope = this,
-                onCandidateLoaded = {
-                    loadedCandidates.incrementAndGet()
-                    this@channelFlow.send(MatcherState.CandidateLoaded)
-                },
-            )
+            ) {
+                loadedCandidates.incrementAndGet()
+                this@channelFlow.send(MatcherState.CandidateLoaded)
+            }
+
         consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
         send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
     }.flowOn(dispatcherBG)

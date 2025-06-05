@@ -18,6 +18,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -125,10 +126,14 @@ internal class FaceMatcherUseCaseTest {
         )
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any(), any()) } coAnswers {
+        every {
+            enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any(), any())
+        } answers {
             // Call the onCandidateLoaded callback (5th parameter)
-            val onCandidateLoaded = arg<() -> Unit>(5)
-            onCandidateLoaded()
+            val onCandidateLoaded: suspend () -> Unit = arg(5)
+            runBlocking {
+                onCandidateLoaded()
+            }
 
             // Return the face identities
             createTestChannel(faceIdentities)
