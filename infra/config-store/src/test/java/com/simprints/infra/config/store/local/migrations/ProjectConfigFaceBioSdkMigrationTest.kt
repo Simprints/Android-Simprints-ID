@@ -76,6 +76,23 @@ class ProjectConfigFaceBioSdkMigrationTest {
     }
 
     @Test
+    fun `should not migrate if face has simface config and allowedSdks is not empty`() = runTest {
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .setFace(
+                ProtoFaceConfiguration
+                    .newBuilder()
+                    .setSimFace(
+                        ProtoFaceConfiguration.ProtoFaceSdkConfiguration.newBuilder().build(),
+                    ).addAllowedSdks(ProtoFaceConfiguration.ProtoBioSdk.SIM_FACE)
+                    .build(),
+            ).build()
+        val shouldMigrate = ProjectConfigFaceBioSdkMigration().shouldMigrate(currentData)
+
+        assertThat(shouldMigrate).isFalse()
+    }
+
+    @Test
     fun `should create rankone with value of the old face configuration`() = runTest {
         val imageSavingStrategy = ProtoFaceConfiguration.ImageSavingStrategy.NEVER
         val nbOfImagesToCapture = 2
