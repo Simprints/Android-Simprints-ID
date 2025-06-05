@@ -1,7 +1,7 @@
 package com.simprints.feature.logincheck
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.jraska.livedata.test
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
@@ -17,14 +17,12 @@ import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCas
 import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -74,6 +72,9 @@ internal class LoginCheckViewModelTest {
     @MockK
     lateinit var updateStoredUserIdUseCase: UpdateStoredUserIdUseCase
 
+    @MockK
+    lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
+
     private lateinit var viewModel: LoginCheckViewModel
 
     @Before
@@ -93,6 +94,7 @@ internal class LoginCheckViewModelTest {
             updateSessionScopePayloadUseCase,
             updateProjectStateUseCase,
             updateStoredUserIdUseCase,
+            realmToRoomMigrationScheduler,
         )
     }
 

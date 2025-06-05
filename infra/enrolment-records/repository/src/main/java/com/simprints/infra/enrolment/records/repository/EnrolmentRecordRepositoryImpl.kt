@@ -12,8 +12,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
+import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,6 +30,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     private val selectEnrolmentRecordLocalDataSource: SelectEnrolmentRecordLocalDataSourceUseCase,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
     @EnrolmentBatchSize private val batchSize: Int,
+    private val insertRecordsInRoomDuringMigration: InsertRecordsInRoomDuringMigrationUseCase,
 ) : EnrolmentRecordRepository {
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
@@ -37,8 +38,6 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         private const val PREF_FILE_NAME = "UPLOAD_ENROLMENT_RECORDS_PROGRESS"
         private const val PROGRESS_KEY = "PROGRESS"
     }
-
-    private val localDataSource: EnrolmentRecordLocalDataSource by lazy { selectEnrolmentRecordLocalDataSource() }
 
     override suspend fun uploadRecords(subjectIds: List<String>) = withContext(dispatcher) {
         val lastUploadedRecord = prefs.getString(PROGRESS_KEY, null)
@@ -50,17 +49,20 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
                 afterSubjectId = lastUploadedRecord,
             )
         }
-        localDataSource.load(query).chunked(batchSize).forEach { subjects ->
-            remoteDataSource.uploadRecords(subjects)
-            prefs.edit { putString(PROGRESS_KEY, subjects.last().subjectId) }
-        }
+        selectEnrolmentRecordLocalDataSource()
+            .load(query)
+            .chunked(batchSize)
+            .forEach { subjects ->
+                remoteDataSource.uploadRecords(subjects)
+                prefs.edit { putString(PROGRESS_KEY, subjects.last().subjectId) }
+            }
         prefs.edit { remove(PROGRESS_KEY) }
     }
 
     override suspend fun tokenizeExistingRecords(project: Project) {
         try {
             val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
-            val tokenizedSubjectsCreateAction = localDataSource
+            val tokenizedSubjectsCreateAction = selectEnrolmentRecordLocalDataSource()
                 .load(query)
                 .mapNotNull { subject ->
                     if (subject.projectId != project.id) return@mapNotNull null
@@ -76,7 +78,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
                     )
                     return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
                 }.map(SubjectAction::Creation)
-            localDataSource.performActions(tokenizedSubjectsCreateAction, project)
+            selectEnrolmentRecordLocalDataSource().performActions(tokenizedSubjectsCreateAction, project)
         } catch (e: Exception) {
             when (e) {
                 is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
@@ -103,7 +105,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         dataSource: BiometricDataSource,
     ): Int = fromIdentityDataSource(dataSource).count(query, dataSource)
 
-    override fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -119,7 +121,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         onCandidateLoaded = onCandidateLoaded,
     )
 
-    override fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -135,19 +137,22 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         onCandidateLoaded = onCandidateLoaded,
     )
 
-    private fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
-        is BiometricDataSource.Simprints -> localDataSource
+    private suspend fun fromIdentityDataSource(dataSource: BiometricDataSource) = when (dataSource) {
+        is BiometricDataSource.Simprints -> selectEnrolmentRecordLocalDataSource()
         is BiometricDataSource.CommCare -> commCareDataSource
     }
 
-    override suspend fun load(query: SubjectQuery): List<Subject> = localDataSource.load(query)
+    override suspend fun load(query: SubjectQuery): List<Subject> = selectEnrolmentRecordLocalDataSource().load(query)
 
-    override suspend fun delete(queries: List<SubjectQuery>) = localDataSource.delete(queries)
+    override suspend fun delete(queries: List<SubjectQuery>) = selectEnrolmentRecordLocalDataSource().delete(queries)
 
-    override suspend fun deleteAll() = localDataSource.deleteAll()
+    override suspend fun deleteAll() = selectEnrolmentRecordLocalDataSource().deleteAll()
 
     override suspend fun performActions(
         actions: List<SubjectAction>,
         project: Project,
-    ) = localDataSource.performActions(actions, project)
+    ) {
+        insertRecordsInRoomDuringMigration(actions, project)
+        selectEnrolmentRecordLocalDataSource().performActions(actions, project)
+    }
 }

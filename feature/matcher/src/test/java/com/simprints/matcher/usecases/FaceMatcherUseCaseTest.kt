@@ -126,7 +126,7 @@ internal class FaceMatcherUseCaseTest {
         )
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        every {
+        coEvery {
             enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any(), any())
         } answers {
             // Call the onCandidateLoaded callback (5th parameter)

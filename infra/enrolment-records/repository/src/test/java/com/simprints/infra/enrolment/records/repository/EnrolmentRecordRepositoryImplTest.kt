@@ -15,6 +15,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAct
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
+import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,13 +69,14 @@ class EnrolmentRecordRepositoryImplTest {
     }
     private lateinit var repository: EnrolmentRecordRepositoryImpl
     private val project = mockk<Project>()
+    private val insertRecordsDuringMigration = mockk<InsertRecordsInRoomDuringMigrationUseCase>()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         every { prefsEditor.putString(any(), any()) } returns prefsEditor
         every { prefsEditor.remove(any()) } returns prefsEditor
-        every { selectEnrolmentRecordLocalDataSource() } returns localDataSource
+        coEvery { selectEnrolmentRecordLocalDataSource() } returns localDataSource
         repository = EnrolmentRecordRepositoryImpl(
             context = ctx,
             remoteDataSource = remoteDataSource,
@@ -83,6 +85,7 @@ class EnrolmentRecordRepositoryImplTest {
             tokenizationProcessor = tokenizationProcessor,
             dispatcher = UnconfinedTestDispatcher(),
             batchSize = BATCH_SIZE,
+            insertRecordsInRoomDuringMigration = insertRecordsDuringMigration,
         )
     }
 
@@ -392,7 +395,12 @@ class EnrolmentRecordRepositoryImplTest {
 
         assert(faceIdentities == expectedFaceIdentities)
         coVerify(exactly = 1) {
-            localDataSource.loadFaceIdentities(expectedSubjectQuery, expectedRange, any(), project,this@runTest,
+            localDataSource.loadFaceIdentities(
+                expectedSubjectQuery,
+                expectedRange,
+                any(),
+                project,
+                this@runTest,
                 onCandidateLoaded,
             )
         }
@@ -441,7 +449,7 @@ class EnrolmentRecordRepositoryImplTest {
         }
     }
 
-    fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<List<T>> {
+    private fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<List<T>> {
         val channel = Channel<List<T>>(lists.size)
         runBlocking {
             for (list in lists) {
@@ -450,5 +458,18 @@ class EnrolmentRecordRepositoryImplTest {
             channel.close()
         }
         return channel
+    }
+
+    @Test
+    fun `performActions should forward the subject creation calls to the insertRecordsDuringMigration`() = runTest {
+        val actions = listOf<SubjectAction>(
+            mockk<SubjectAction.Creation>(),
+            mockk<SubjectAction.Deletion>(),
+            mockk<SubjectAction.Update>(),
+            mockk<SubjectAction.Creation>(),
+        )
+        coJustRun { insertRecordsDuringMigration.invoke(any(), any()) }
+        repository.performActions(actions, mockk())
+        coVerify { insertRecordsDuringMigration.invoke(any(), any()) }
     }
 }
