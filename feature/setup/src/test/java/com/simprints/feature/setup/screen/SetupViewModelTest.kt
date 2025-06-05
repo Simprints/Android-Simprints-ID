@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
@@ -153,7 +154,10 @@ class SetupViewModelTest {
                 every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
                 every { nec?.version } returns "1"
             }
-            every { face?.rankOne?.version } returns "1"
+            every { face } returns mockk {
+                every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
+                every { rankOne?.version } returns "1"
+            }
         }
         every {
             licenseRepository.getLicenseStates(any(), any(), any(), any())
@@ -180,7 +184,10 @@ class SetupViewModelTest {
                     every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
                     every { nec?.version } returns null
                 }
-                every { face?.rankOne } returns null
+                every { face } returns mockk {
+                    every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
+                    every { rankOne?.version } returns null
+                }
             }
         }
         every {
@@ -200,7 +207,16 @@ class SetupViewModelTest {
         // Given
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
-                every { modalities } returns emptyList()
+                every { modalities } returns listOf(
+                    GeneralConfiguration.Modality.FINGERPRINT,
+                    GeneralConfiguration.Modality.FACE,
+                )
+                every { fingerprint } returns mockk {
+                    every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER)
+                }
+                every { face } returns mockk {
+                    every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.SIM_FACE)
+                }
             }
         }
 
@@ -225,7 +241,10 @@ class SetupViewModelTest {
                 every { allowedSDKs } returns listOf(FingerprintConfiguration.BioSdk.NEC)
                 every { nec?.version } returns ""
             }
-            every { face?.rankOne?.version } returns ""
+            every { face } returns mockk {
+                every { allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
+                every { rankOne?.version } returns ""
+            }
         }
         coJustRun { saveLicenseCheckEvent(Vendor.RankOne, LicenseStatus.MISSING) }
         every {

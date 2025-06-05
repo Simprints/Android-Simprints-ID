@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -108,7 +109,7 @@ internal class SetupViewModel @Inject constructor(
 private val ProjectConfiguration.requiredLicenses: List<Pair<Vendor, LicenseVersion>>
     get() = general.modalities.mapNotNull {
         when {
-            it == GeneralConfiguration.Modality.FACE -> {
+            it == GeneralConfiguration.Modality.FACE && shouldIncludeRankOne() -> {
                 Vendor.RankOne to LicenseVersion(face?.rankOne?.version.orEmpty())
             }
 
@@ -121,3 +122,5 @@ private val ProjectConfiguration.requiredLicenses: List<Pair<Vendor, LicenseVers
     }
 
 private fun ProjectConfiguration.shouldIncludeNec() = fingerprint?.allowedSDKs?.contains(FingerprintConfiguration.BioSdk.NEC) == true
+
+private fun ProjectConfiguration.shouldIncludeRankOne() = face?.allowedSDKs?.contains(FaceConfiguration.BioSdk.RANK_ONE) == true
