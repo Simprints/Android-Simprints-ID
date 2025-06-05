@@ -15,16 +15,16 @@
         android:layout_height="36dp"
         android:layout_margin="@dimen/margin_large"
         android:background="@drawable/feedback_instructions_outline"
+        android:gravity="center"
+        android:includeFontPadding="false"
         android:paddingHorizontal="@dimen/padding_default"
         android:paddingVertical="0dp"
-        android:includeFontPadding="false"
-        android:gravity="center"
         android:text="@string/face_capture_instructions_title"
         android:textColor="@color/feedback_instructions_text"
         app:backgroundTint="@null"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.camera.view.PreviewView
         android:id="@+id/face_capture_camera"
@@ -47,8 +47,8 @@
         app:dcp_max="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintHeight_percent="@dimen/capture_target_size_percent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="@dimen/capture_target_size_percent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
@@ -101,5 +101,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/debugPreview"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:scaleType="fitXY"
+        android:background="#70ff"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
