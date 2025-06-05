@@ -29,7 +29,7 @@ class InsertRecordsInRoomDuringMigrationUseCaseTest {
 
     @Test
     fun `invoke should call performActions when migration is in progress`() = runBlocking {
-        val subjectAction = mockk<SubjectAction.Creation>(relaxed = true)
+        val subjectAction = listOf<SubjectAction>(mockk<SubjectAction.Creation>(relaxed = true))
         val project = mockk<Project>()
 
         coEvery { realmToRoomMigrationFlagsStore.isMigrationInProgress() } returns true
@@ -37,12 +37,12 @@ class InsertRecordsInRoomDuringMigrationUseCaseTest {
 
         insertRecordsInRoomDuringMigrationUseCase.invoke(subjectAction, project)
 
-        coVerify { roomEnrolmentRecordLocalDataSource.performActions(actions = listOf(subjectAction), project = project) }
+        coVerify { roomEnrolmentRecordLocalDataSource.performActions(actions = subjectAction, project = project) }
     }
 
     @Test
     fun `invoke should not call performActions when migration is not in progress`() = runBlocking {
-        val subjectAction = mockk<SubjectAction.Creation>()
+        val subjectAction = listOf<SubjectAction>(mockk<SubjectAction.Creation>())
         val project = mockk<Project>()
 
         coEvery { realmToRoomMigrationFlagsStore.isMigrationInProgress() } returns false

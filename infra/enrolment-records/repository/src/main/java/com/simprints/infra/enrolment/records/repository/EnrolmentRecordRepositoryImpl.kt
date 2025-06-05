@@ -14,9 +14,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAct
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
-import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
-import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,7 +31,6 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
     @EnrolmentBatchSize private val batchSize: Int,
     private val insertRecordsInRoomDuringMigration: InsertRecordsInRoomDuringMigrationUseCase,
-    private val flagsStore: RealmToRoomMigrationFlagsStore,
 ) : EnrolmentRecordRepository {
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
@@ -155,23 +152,7 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         actions: List<SubjectAction>,
         project: Project,
     ) {
-        logUpdatesDuringMigration(actions)
-        actions.filterIsInstance<SubjectAction.Creation>().forEach {
-            insertRecordsInRoomDuringMigration(it, project)
-        }
+        insertRecordsInRoomDuringMigration(actions, project)
         selectEnrolmentRecordLocalDataSource().performActions(actions, project)
-    }
-
-    private suspend fun logUpdatesDuringMigration(actions: List<SubjectAction>) {
-        // if actions contains any updates or deletes and the migration is in progress, log them as an error
-        if (flagsStore.isMigrationInProgress() && actions.any { it is SubjectAction.Update || it is SubjectAction.Deletion }) {
-            Simber.e(
-                "[EnrolmentRecordRepositoryImpl] Actions during migration: ${actions.joinToString(", ")}",
-                IllegalStateException(
-                    "Actions during migration are not allowed. Please ensure that the migration is complete before performing updates or deletions.",
-                ),
-                tag = LoggingConstants.CrashReportTag.REALM_DB_MIGRATION,
-            )
-        }
     }
 }

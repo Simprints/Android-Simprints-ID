@@ -86,7 +86,6 @@ class EnrolmentRecordRepositoryImplTest {
             dispatcher = UnconfinedTestDispatcher(),
             batchSize = BATCH_SIZE,
             insertRecordsInRoomDuringMigration = insertRecordsDuringMigration,
-            flagsStore = mockk(relaxed = true),
         )
     }
 
@@ -471,6 +470,6 @@ class EnrolmentRecordRepositoryImplTest {
         )
         coJustRun { insertRecordsDuringMigration.invoke(any(), any()) }
         repository.performActions(actions, mockk())
-        coVerify(exactly = 2) { insertRecordsDuringMigration.invoke(any(), any()) }
+        coVerify { insertRecordsDuringMigration.invoke(any(), any()) }
     }
 }
