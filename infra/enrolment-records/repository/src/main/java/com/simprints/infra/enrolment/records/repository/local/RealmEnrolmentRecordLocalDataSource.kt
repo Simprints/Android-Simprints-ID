@@ -1,13 +1,10 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
-import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
-import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
@@ -15,8 +12,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Fingerprin
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.models.fromDbToDomain
-import com.simprints.infra.enrolment.records.repository.local.models.fromDomainToDb
+import com.simprints.infra.enrolment.records.repository.local.models.toDomain
+import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
 import com.simprints.infra.logging.Simber
 import io.realm.kotlin.MutableRealm
@@ -28,13 +25,17 @@ import io.realm.kotlin.query.find
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
-internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
+@Singleton
+internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
     private val realmWrapper: RealmWrapper,
     private val tokenizationProcessor: TokenizationProcessor,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
@@ -46,7 +47,9 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         const val FINGERPRINT_SAMPLES_FIELD = "fingerprintSamples"
         const val FACE_SAMPLES_FIELD = "faceSamples"
         const val FORMAT_FIELD = "format"
-        const val PARALLELISM = 1
+
+        // Although batches are processed sequentially, we use a small channel capacity to prevent blocking and reduce the risk of out-of-memory errors.
+        const val CHANNEL_CAPACITY = 4
     }
 
     override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
@@ -54,7 +57,7 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             .find()
-            .map { dbSubject -> dbSubject.fromDbToDomain() }
+            .map { dbSubject -> dbSubject.toDomain() }
     }
 
     override fun loadFaceIdentities(
@@ -63,18 +66,27 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
-    ): ReceiveChannel<List<FaceIdentity>> = loadIdentitiesConcurrently(
-        ranges = ranges,
-        dispatcher = dispatcher,
-        parallelism = PARALLELISM,
-        scope = scope,
-    ) { range ->
-        loadFaceIdentities(
-            query = query,
-            range = range,
-            onCandidateLoaded = onCandidateLoaded,
-        )
+        onCandidateLoaded: suspend () -> Unit,
+    ): ReceiveChannel<List<FaceIdentity>> {
+        val channel = Channel<List<FaceIdentity>>(CHANNEL_CAPACITY)
+        scope.launch(dispatcherIO) {
+            ranges.forEach { range ->
+                val identities = loadIdentitiesRange(
+                    query = query,
+                    range = range,
+                    mapper = { dbSubject ->
+                        FaceIdentity(
+                            subjectId = dbSubject.subjectId.toString(),
+                            faces = dbSubject.faceSamples.map { it.toDomain() },
+                        )
+                    },
+                    onCandidateLoaded = onCandidateLoaded,
+                )
+                channel.send(identities)
+            }
+            channel.close()
+        }
+        return channel
     }
 
     override fun loadFingerprintIdentities(
@@ -83,55 +95,43 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
         dataSource: BiometricDataSource,
         project: Project,
         scope: CoroutineScope,
-        onCandidateLoaded: () -> Unit,
-    ): ReceiveChannel<List<FingerprintIdentity>> = loadIdentitiesConcurrently(
-        ranges = ranges,
-        dispatcher = dispatcher,
-        parallelism = PARALLELISM,
-        scope = scope,
-    ) { range ->
-        loadFingerprintIdentities(
-            query = query,
-            range = range,
-            onCandidateLoaded = onCandidateLoaded,
-        )
-    }
-
-    private suspend fun loadFingerprintIdentities(
-        query: SubjectQuery,
-        range: IntRange,
-        onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
-        realm
-            .query(DbSubject::class)
-            .buildRealmQueryForSubject(query)
-            // subList's second parameter is exclusive, so we need to add 1 to the last index
-            .find { it.subList(range.first, range.last+1) }
-            .map { subject ->
-                onCandidateLoaded()
-                FingerprintIdentity(
-                    subject.subjectId.toString(),
-                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
+        onCandidateLoaded: suspend () -> Unit,
+    ): ReceiveChannel<List<FingerprintIdentity>> {
+        val channel = Channel<List<FingerprintIdentity>>(CHANNEL_CAPACITY)
+        scope.launch(dispatcherIO) {
+            ranges.forEach { range ->
+                val identities = loadIdentitiesRange(
+                    query = query,
+                    range = range,
+                    mapper = { dbSubject ->
+                        FingerprintIdentity(
+                            subjectId = dbSubject.subjectId.toString(),
+                            fingerprints = dbSubject.fingerprintSamples.map { it.toDomain() },
+                        )
+                    },
+                    onCandidateLoaded = onCandidateLoaded,
                 )
+                channel.send(identities)
             }
+            channel.close()
+        }
+        return channel
     }
 
-    private suspend fun loadFaceIdentities(
+    private suspend fun <T> loadIdentitiesRange(
         query: SubjectQuery,
         range: IntRange,
-        onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
+        mapper: (DbSubject) -> T,
+        onCandidateLoaded: suspend () -> Unit,
+    ): List<T> = realmWrapper.readRealm { realm ->
         realm
             .query(DbSubject::class)
             .buildRealmQueryForSubject(query)
             // subList's second parameter is exclusive, so we need to add 1 to the last index
-            .find { it.subList(range.first, range.last+1) }
-            .map { subject ->
+            .find { it.subList(range.first, range.last + 1) }
+            .map { dbSubject ->
                 onCandidateLoaded()
-                FaceIdentity(
-                    subject.subjectId.toString(),
-                    subject.faceSamples.map(DbFaceSample::fromDbToDomain),
-                )
+                mapper(dbSubject)
             }
     }
 
@@ -177,9 +177,18 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                     is SubjectAction.Creation -> {
                         val newSubject = action.subject
                             .copy(
-                                moduleId = action.subject.moduleId.tokenizeIfNecessary(TokenKeyType.ModuleId, project),
-                                attendantId = action.subject.attendantId.tokenizeIfNecessary(TokenKeyType.AttendantId, project),
-                            ).fromDomainToDb()
+                                moduleId =
+                                    tokenizationProcessor.tokenizeIfNecessary(
+                                        action.subject.moduleId,
+                                        TokenKeyType.ModuleId,
+                                        project,
+                                    ),
+                                attendantId = tokenizationProcessor.tokenizeIfNecessary(
+                                    action.subject.attendantId,
+                                    TokenKeyType.AttendantId,
+                                    project,
+                                ),
+                            ).toRealmDb()
                         val dbSubject: DbSubject? = realm.findSubject(newSubject.subjectId)
 
                         if (dbSubject != null) {
@@ -209,10 +218,10 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
 
                             // Append new samples to the list of samples that remain after removing
                             dbSubject.faceSamples = (
-                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.fromDomainToDb() }
+                                faceSamplesMap[false].orEmpty() + action.faceSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
                             dbSubject.fingerprintSamples = (
-                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.fromDomainToDb() }
+                                fingerprintSamplesMap[false].orEmpty() + action.fingerprintSamplesToAdd.map { it.toRealmDb() }
                             ).toRealmList()
 
                             faceSamplesMap[true]?.forEach { realm.delete(it) }
@@ -232,19 +241,6 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun TokenizableString.tokenizeIfNecessary(
-        tokenKeyType: TokenKeyType,
-        project: Project,
-    ) = when (this) {
-        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-            decrypted = this,
-            tokenKeyType = tokenKeyType,
-            project = project,
-        )
-
-        is TokenizableString.Tokenized -> this
     }
 
     private fun MutableRealm.findSubject(subjectId: RealmUUID): DbSubject? =

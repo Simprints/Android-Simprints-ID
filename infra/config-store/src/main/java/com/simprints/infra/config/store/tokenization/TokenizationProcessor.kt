@@ -50,7 +50,7 @@ class TokenizationProcessor @Inject constructor(
         encrypted: TokenizableString.Tokenized,
         tokenKeyType: TokenKeyType,
         project: Project,
-        logError: Boolean = true
+        logError: Boolean = true,
     ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return encrypted
         return try {
@@ -61,5 +61,19 @@ class TokenizationProcessor @Inject constructor(
             }
             encrypted
         }
+    }
+
+    fun tokenizeIfNecessary(
+        tokenizableString: TokenizableString,
+        tokenKeyType: TokenKeyType,
+        project: Project,
+    ) = when (tokenizableString) {
+        is TokenizableString.Raw -> encrypt(
+            decrypted = tokenizableString,
+            tokenKeyType = tokenKeyType,
+            project = project,
+        )
+
+        is TokenizableString.Tokenized -> tokenizableString
     }
 }
