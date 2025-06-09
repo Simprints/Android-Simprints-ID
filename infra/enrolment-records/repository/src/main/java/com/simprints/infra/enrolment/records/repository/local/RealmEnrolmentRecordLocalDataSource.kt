@@ -27,6 +27,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -60,7 +62,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             .map { dbSubject -> dbSubject.toDomain() }
     }
 
-    override fun loadFaceIdentities(
+    override suspend fun loadFaceIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -89,7 +91,7 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
         return channel
     }
 
-    override fun loadFingerprintIdentities(
+    override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
         dataSource: BiometricDataSource,
@@ -299,5 +301,31 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
         }
         return realmQuery
+    }
+
+    /**
+     * Loads all subjects in batches of the specified size.
+     */
+    fun loadAllSubjectsInBatches(batchSize: Int): Flow<List<Subject>> = channelFlow {
+        require(batchSize > 0) {
+            "Batch size must be greater than 0"
+        }
+        realmWrapper.readRealm { realm ->
+            launch {
+                var query = realm.query(DbSubject::class).sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
+                while (true) {
+                    val batch = query
+                        .find { it.take(batchSize) }
+                        .map { it.toDomain() }
+
+                    if (batch.isEmpty()) {
+                        break
+                    }
+                    send(batch)
+                    // Update the query to fetch the next batch
+                    query = query.query("$SUBJECT_ID_FIELD > $0", RealmUUID.from(batch.last().subjectId))
+                }
+            }
+        }
     }
 }

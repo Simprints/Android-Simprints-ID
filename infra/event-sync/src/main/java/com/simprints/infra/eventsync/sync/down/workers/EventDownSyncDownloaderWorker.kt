@@ -10,6 +10,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -45,6 +46,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private val eventRepository: EventRepository,
     private val configRepository: ConfigRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    private val realmToRoomMigrationFlagsStore: RealmToRoomMigrationFlagsStore,
 ) : SimCoroutineWorker(context, params),
     WorkerProgressCountReporter {
     override val tag: String = "EventDownSyncDownloader"
@@ -65,6 +67,12 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private suspend fun getDownSyncOperation() = eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
+        // Check if the migration is in progress before starting the sync
+        if (realmToRoomMigrationFlagsStore.isMigrationInProgress()) {
+            // this will make the worker retry in 5 minutes
+            return@withContext Result.retry()
+        }
+        realmToRoomMigrationFlagsStore.setDownSyncInProgress(true)
         crashlyticsLog("Started")
         showProgressNotification()
         try {
@@ -91,6 +99,8 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
             )
         } catch (t: Throwable) {
             handleSyncException(t)
+        } finally {
+            realmToRoomMigrationFlagsStore.setDownSyncInProgress(false)
         }
     }
 
