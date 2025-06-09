@@ -1,5 +1,6 @@
 package com.simprints.face.infra.biosdkresolver
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import javax.inject.Inject
 
 /**
