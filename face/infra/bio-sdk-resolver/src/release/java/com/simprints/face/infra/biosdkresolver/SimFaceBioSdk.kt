@@ -1,8 +1,12 @@
 package com.simprints.face.infra.biosdkresolver
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.face.infra.basebiosdk.detection.FaceDetector
+import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Class interfaces in the different build types must be identical for it to work,
