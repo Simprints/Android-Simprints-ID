@@ -41,7 +41,7 @@ firebase_storage_version = "21.0.2"
 firebase_crashlytics_version = "19.4.3"
 firebase_analytics_version = "22.4.0"
 firebase_perf_version = "21.0.5"
-firebase_crashlyticsPlugin_version = "3.0.3"
+firebase_crashlyticsPlugin_version = "3.0.4"
 firebase_perfPlugin_version = "1.4.2"
 firebase_distrtibutionPlugin_version = "5.0.0"
 
