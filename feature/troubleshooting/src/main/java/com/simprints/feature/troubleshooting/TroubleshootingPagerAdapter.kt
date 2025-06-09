@@ -6,6 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.simprints.feature.troubleshooting.intents.IntentLogFragment
 import com.simprints.feature.troubleshooting.networking.NetworkingLogFragment
 import com.simprints.feature.troubleshooting.overview.OverviewFragment
+import com.simprints.feature.troubleshooting.recordsmigration.RealmToRoomRecordsMigrationFragment
 import com.simprints.feature.troubleshooting.workers.WorkerLogFragment
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
@@ -25,5 +26,6 @@ internal class TroubleshootingPagerAdapter(
         Intents("Intents", { IntentLogFragment() }),
         Network("Network", { NetworkingLogFragment() }),
         Workers("Workers", { WorkerLogFragment() }),
+        RealmToRoom("Realm to Room Migration", { RealmToRoomRecordsMigrationFragment() }),
     }
 }

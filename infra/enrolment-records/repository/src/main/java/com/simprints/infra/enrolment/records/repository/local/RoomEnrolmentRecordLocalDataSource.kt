@@ -28,6 +28,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject as DomainSubject
@@ -218,6 +219,33 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun getLocalDBInfo(): String {
+        //  return the data base name and version and number of subjects
+        return withContext(dispatcherIO) {
+            val dbVersion = database.openHelper.readableDatabase.version
+            val dbPath = database.openHelper.readableDatabase.path
+            val dbSize = getTotalRoomDbSizeBytes(dbPath!!)
+
+            val subjectCount = subjectDao.countSubjects(queryBuilder.buildCountQuery(SubjectQuery()))
+            "Room DB Info:\n" +
+                "Database Name: ${database.openHelper.databaseName}\n" +
+                "Database Version: $dbVersion\n" +
+                "Database Path: $dbPath\n" +
+                "Database Size: ${dbSize / 1024} KB\n" +
+                "Number of Subjects: $subjectCount"
+        }
+    }
+
+    private fun getTotalRoomDbSizeBytes(fullDbPath: String): Long {
+        val baseFile = File(fullDbPath)
+        val walFile = File("$fullDbPath-wal")
+        val shmFile = File("$fullDbPath-shm")
+
+        return listOf(baseFile, walFile, shmFile)
+            .filter { it.exists() }
+            .sumOf { it.length() }
     }
 
     private suspend fun createSubject(

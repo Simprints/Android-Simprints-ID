@@ -1446,6 +1446,18 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     }
 
     @Test
+    fun `getLocalDBInfo returns formatted db info string`() = runTest {
+        // Given
+        setupInitialData()
+        // When
+        val result = dataSource.getLocalDBInfo()
+        // Then
+        assertThat(result).contains("Database Name: db-subjects")
+        assertThat(result).contains("Database Version: 1")
+        assertThat(result).contains("Number of Subjects: 6")
+    }
+
+    @Test
     fun `load - combined query - attendantId, moduleId,  subjectIds - should respect all filters`() = runTest {
         // Given
         setupInitialData()
