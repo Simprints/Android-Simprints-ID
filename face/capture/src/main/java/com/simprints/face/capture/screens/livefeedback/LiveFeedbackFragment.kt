@@ -123,7 +123,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         val imageAnalyzer = ImageAnalysis
             .Builder()
             .setTargetResolution(targetResolution)
-            .setOutputImageRotationEnabled(true)
+            // .setOutputImageRotationEnabled(true)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
         val cropAnalyzer = CropToTargetOverlayAnalyzer(binding.captureOverlay, ::analyze)
