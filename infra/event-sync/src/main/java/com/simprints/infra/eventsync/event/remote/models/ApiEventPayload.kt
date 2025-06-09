@@ -1,8 +1,6 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AgeGroupSelectionEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload
@@ -91,7 +89,6 @@ import com.simprints.infra.events.event.domain.models.face.FaceOnboardingComplet
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayload
 import com.simprints.infra.eventsync.event.remote.models.downsync.ApiEventDownSyncRequestPayload
@@ -102,40 +99,6 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceFallbackCap
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceOnboardingCompletePayload
 import com.simprints.infra.eventsync.event.remote.models.upsync.ApiEventUpSyncRequestPayload
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
-@JsonSubTypes(
-    JsonSubTypes.Type(value = ApiFaceCaptureConfirmationPayload::class, name = Companion.FACE_CAPTURE_CONFIRMATION_KEY),
-    JsonSubTypes.Type(value = ApiFaceCapturePayload::class, name = Companion.FACE_CAPTURE_KEY),
-    JsonSubTypes.Type(value = ApiFaceCaptureBiometricsPayload::class, name = Companion.FACE_CAPTURE_BIOMETRICS_KEY),
-    JsonSubTypes.Type(value = ApiFaceFallbackCapturePayload::class, name = Companion.FACE_FALLBACK_CAPTURE_KEY),
-    JsonSubTypes.Type(value = ApiFaceOnboardingCompletePayload::class, name = Companion.FACE_ONBOARDING_COMPLETE_KEY),
-    JsonSubTypes.Type(value = ApiAlertScreenPayload::class, name = Companion.ALERT_SCREEN_KEY),
-    JsonSubTypes.Type(value = ApiAuthenticationPayload::class, name = Companion.AUTHENTICATION_KEY),
-    JsonSubTypes.Type(value = ApiAuthorizationPayload::class, name = Companion.AUTHORIZATION_KEY),
-    JsonSubTypes.Type(value = ApiCandidateReadPayload::class, name = Companion.CANDIDATE_READ_KEY),
-    JsonSubTypes.Type(value = ApiCompletionCheckPayload::class, name = Companion.COMPLETION_CHECK_KEY),
-    JsonSubTypes.Type(value = ApiConnectivitySnapshotPayload::class, name = Companion.CONNECTIVITY_SNAPSHOT_KEY),
-    JsonSubTypes.Type(value = ApiConsentPayload::class, name = Companion.CONSENT_KEY),
-    JsonSubTypes.Type(value = ApiEnrolmentPayloadV4::class, name = Companion.ENROLMENT_KEY),
-    JsonSubTypes.Type(value = ApiFingerprintCapturePayload::class, name = Companion.FINGERPRINT_CAPTURE_KEY),
-    JsonSubTypes.Type(value = ApiFingerprintCaptureBiometricsPayload::class, name = Companion.FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
-    JsonSubTypes.Type(value = ApiGuidSelectionPayload::class, name = Companion.GUID_SELECTION_KEY),
-    JsonSubTypes.Type(value = ApiIntentParsingPayload::class, name = Companion.INTENT_PARSING_KEY),
-    JsonSubTypes.Type(value = ApiInvalidIntentPayload::class, name = Companion.INVALID_INTENT_KEY),
-    JsonSubTypes.Type(value = ApiOneToManyMatchPayload::class, name = Companion.ONE_TO_MANY_MATCH_KEY),
-    JsonSubTypes.Type(value = ApiOneToOneMatchPayload::class, name = Companion.ONE_TO_ONE_MATCH_KEY),
-    JsonSubTypes.Type(value = ApiPersonCreationPayload::class, name = Companion.PERSON_CREATION_KEY),
-    JsonSubTypes.Type(value = ApiRefusalPayload::class, name = Companion.REFUSAL_KEY),
-    JsonSubTypes.Type(value = ApiScannerConnectionPayload::class, name = Companion.SCANNER_CONNECTION_KEY),
-    JsonSubTypes.Type(value = ApiScannerFirmwareUpdatePayload::class, name = Companion.SCANNER_FIRMWARE_UPDATE_KEY),
-    JsonSubTypes.Type(value = ApiSuspiciousIntentPayload::class, name = Companion.SUSPICIOUS_INTENT_KEY),
-    JsonSubTypes.Type(value = ApiVero2InfoSnapshotPayload::class, name = Companion.VERO_2_INFO_SNAPSHOT_KEY),
-    JsonSubTypes.Type(value = ApiCallbackPayload::class, name = Companion.CALLOUT_KEY),
-    JsonSubTypes.Type(value = ApiCalloutPayload::class, name = Companion.CALLBACK_KEY),
-    JsonSubTypes.Type(value = ApiEventDownSyncRequestPayload::class, name = Companion.EVENT_DOWN_SYNC_REQUEST_KEY),
-    JsonSubTypes.Type(value = ApiEventUpSyncRequestPayload::class, name = Companion.EVENT_UP_SYNC_REQUEST_KEY),
-    JsonSubTypes.Type(value = ApiBiometricReferenceCreationPayload::class, name = Companion.BIOMETRIC_REFERENCE_CREATION_KEY),
-)
 @Keep
 internal abstract class ApiEventPayload(
     open val startTime: ApiTimestamp,
