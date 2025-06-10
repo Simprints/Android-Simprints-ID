@@ -9,6 +9,7 @@ import com.simprints.infra.sync.config.testtools.project
 import com.simprints.infra.sync.config.testtools.projectConfiguration
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
 import com.simprints.infra.sync.config.usecase.RescheduleWorkersIfConfigChangedUseCase
+import com.simprints.infra.sync.config.usecase.ResetLocalRecordsIfConfigChangedUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -37,6 +38,9 @@ class ProjectConfigDownSyncWorkerTest {
     @MockK
     private lateinit var rescheduleWorkersIfConfigChangedUseCase: RescheduleWorkersIfConfigChangedUseCase
 
+    @MockK
+    private lateinit var resetLocalRecordsIfConfigChangedUseCase: ResetLocalRecordsIfConfigChangedUseCase
+
     private lateinit var projectConfigDownSyncWorker: ProjectConfigDownSyncWorker
 
     @Before
@@ -50,6 +54,7 @@ class ProjectConfigDownSyncWorkerTest {
             configManager = configManager,
             handleProjectState = handleProjectStateUseCase,
             rescheduleWorkersIfConfigChanged = rescheduleWorkersIfConfigChangedUseCase,
+            resetLocalRecordsIfConfigChanged = resetLocalRecordsIfConfigChangedUseCase,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -85,6 +90,7 @@ class ProjectConfigDownSyncWorkerTest {
         coVerify {
             handleProjectStateUseCase.invoke(any())
             rescheduleWorkersIfConfigChangedUseCase.invoke(any(), any())
+            resetLocalRecordsIfConfigChangedUseCase.invoke(any(), any())
         }
     }
 
