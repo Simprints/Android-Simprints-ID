@@ -5,6 +5,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
 
 interface IdentityDataSource {
     suspend fun count(
@@ -14,17 +16,24 @@ interface IdentityDataSource {
 
     suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
         project: Project,
-        onCandidateLoaded: () -> Unit,
-    ): List<FingerprintIdentity>
+        scope: CoroutineScope,
+        onCandidateLoaded: suspend () -> Unit,
+    ): ReceiveChannel<List<FingerprintIdentity>>
 
     suspend fun loadFaceIdentities(
         query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
+        ranges: List<IntRange>,
+        dataSource: BiometricDataSource,
         project: Project,
-        onCandidateLoaded: () -> Unit,
-    ): List<FaceIdentity>
+        scope: CoroutineScope,
+        onCandidateLoaded: suspend () -> Unit,
+    ): ReceiveChannel<List<FaceIdentity>>
+
+    /**
+     * Loads identities concurrently using the provided dispatcher and parallelism level.
+     *
+     */
 }

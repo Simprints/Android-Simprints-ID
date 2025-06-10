@@ -16,7 +16,6 @@ dependencies {
     api(libs.testing.fragment)
     api(libs.testing.androidX.ext.junit)
     api(libs.testing.androidX.runner)
-    api(libs.testing.androidX.navigation)
 
     api(libs.testing.navigation)
     api(libs.testing.hilt)

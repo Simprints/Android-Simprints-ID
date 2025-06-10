@@ -26,7 +26,7 @@ apply {
 }
 
 tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory)
 }
 /*
 Run tests in parallel to speed up tests

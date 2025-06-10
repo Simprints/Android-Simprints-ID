@@ -4,29 +4,29 @@ import com.simprints.core.DispatcherBG
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
+import com.simprints.face.infra.biosdkresolver.FaceBioSDK
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.MatcherUseCase.MatcherState
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity as DomainFaceIdentity
 
 internal class FaceMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val createRanges: CreateRangesUseCase,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcherBG: CoroutineDispatcher,
 ) : MatcherUseCase {
     override val crashReportTag = LoggingConstants.CrashReportTag.FACE_MATCHING
 
@@ -35,7 +35,12 @@ internal class FaceMatcherUseCase @Inject constructor(
         project: Project,
     ): Flow<MatcherState> = channelFlow {
         Simber.i("Initialising matcher", tag = crashReportTag)
-        val bioSdk = resolveFaceBioSdk()
+        if (matchParams.faceSDK == null) {
+            Simber.w("Face SDK was not provided", tag = crashReportTag)
+            send(MatcherState.Success(emptyList(), 0, ""))
+            return@channelFlow
+        }
+        val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
 
         if (matchParams.probeFaceSamples.isEmpty()) {
             send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
@@ -56,63 +61,66 @@ internal class FaceMatcherUseCase @Inject constructor(
 
         Simber.i("Matching candidates", tag = crashReportTag)
         send(MatcherState.LoadingStarted(expectedCandidates))
+
         // When using local DB loadedCandidates = expectedCandidates
         // However, when using CommCare as data source, loadedCandidates < expectedCandidates
         // as it's count function does not take into account filtering criteria
-        var loadedCandidates = 0
-        val resultItems = coroutineScope {
+        val loadedCandidates = AtomicInteger(0)
+        val ranges = createRanges(expectedCandidates)
+        val resultSet = MatchResultSet<FaceMatchResult.Item>()
+        val candidatesChannel = enrolmentRecordRepository
+            .loadFaceIdentities(
+                query = queryWithSupportedFormat,
+                ranges = ranges,
+                dataSource = matchParams.biometricDataSource,
+                project = project,
+                scope = this,
+            ) {
+                loadedCandidates.incrementAndGet()
+                this@channelFlow.send(MatcherState.CandidateLoaded)
+            }
 
-            createRanges(expectedCandidates)
-                .map { range ->
-                    async(dispatcher) {
-                        val batchCandidates = getCandidates(
-                            queryWithSupportedFormat,
-                            range,
-                            project = project,
-                            dataSource = matchParams.biometricDataSource,
-                        ) {
-                            // When a candidate is loaded
-                            loadedCandidates++
-                            trySend(MatcherState.CandidateLoaded)
-                        }
-                        bioSdk.createMatcher(samples).use { match(it, batchCandidates) }
-                    }
-                }.awaitAll()
-                .reduce { acc, subSet -> acc.addAll(subSet) }
-                .toList()
+        consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
+    }.flowOn(dispatcherBG)
+
+    suspend fun consumeAndMatch(
+        candidatesChannel: ReceiveChannel<List<DomainFaceIdentity>>,
+        samples: List<FaceSample>,
+        resultSet: MatchResultSet<FaceMatchResult.Item>,
+        bioSdk: FaceBioSDK,
+    ) {
+        for (batch in candidatesChannel) {
+            val results = bioSdk.createMatcher(samples).use { matcher ->
+                match(matcher, batch.mapToFaceIdentities())
+            }
+            resultSet.addAll(results)
         }
-
-        Simber.i("Matched $loadedCandidates candidates", tag = crashReportTag)
-
-        send(MatcherState.Success(resultItems, loadedCandidates, bioSdk.matcherName))
     }
 
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes.map { FaceSample(it.faceId, it.template) }
 
-    private suspend fun getCandidates(
-        query: SubjectQuery,
-        range: IntRange,
-        dataSource: BiometricDataSource = BiometricDataSource.Simprints,
-        project: Project,
-        onCandidateLoaded: () -> Unit,
-    ) = enrolmentRecordRepository
-        .loadFaceIdentities(query, range, dataSource, project, onCandidateLoaded)
-        .map {
-            FaceIdentity(
-                it.subjectId,
-                it.faces.map { face -> FaceSample(face.id, face.template) },
-            )
-        }
-
     private suspend fun match(
         matcher: FaceMatcher,
-        batchCandidates: List<FaceIdentity>
+        batchCandidates: List<FaceIdentity>,
     ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, candidate ->
         acc.add(
             FaceMatchResult.Item(
                 candidate.subjectId,
                 matcher.getHighestComparisonScoreForCandidate(candidate),
             ),
+        )
+    }
+
+    private fun List<DomainFaceIdentity>.mapToFaceIdentities(): List<FaceIdentity> = map {
+        FaceIdentity(
+            it.subjectId,
+            it.faces.map {
+                FaceSample(
+                    it.referenceId,
+                    it.template,
+                )
+            },
         )
     }
 }

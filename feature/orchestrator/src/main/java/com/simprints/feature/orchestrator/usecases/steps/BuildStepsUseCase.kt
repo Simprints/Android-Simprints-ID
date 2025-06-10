@@ -367,9 +367,10 @@ internal class BuildStepsUseCase @Inject constructor(
         return capturingModalitiesForFlowType(projectConfiguration, flowType)
             .flatMap { modality ->
                 buildCaptureStepsForModality(modality, projectConfiguration, ageGroup, flowType)
-            }.takeIf { it.isNotEmpty() } ?: projectConfiguration.general.modalities.flatMap { modality ->
-            buildCaptureStepsForModality(modality, projectConfiguration, ageGroup, flowType)
-        }
+            }.takeIf { it.isNotEmpty() }
+            ?: projectConfiguration.general.modalities.flatMap { modality ->
+                buildCaptureStepsForModality(modality, projectConfiguration, ageGroup, flowType)
+            }
     }
 
     /**
@@ -412,15 +413,16 @@ internal class BuildStepsUseCase @Inject constructor(
         }
 
         Modality.FACE -> {
-            determineFaceSDKs(projectConfiguration, ageGroup).map {
-                // Face bio SDK is currently ignored until we add a second one
+            determineFaceSDKs(projectConfiguration, ageGroup).map { bioSDK ->
+                val sdkConfiguration = projectConfiguration.face?.getSdkConfiguration(bioSDK)
+
                 // TODO: samplesToCapture can be read directly from FaceCapture
-                val samplesToCapture = projectConfiguration.face?.nbOfImagesToCapture ?: 0
+                val samplesToCapture = sdkConfiguration?.nbOfImagesToCapture ?: 0
                 Step(
                     id = StepId.FACE_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
                     destinationId = FaceCaptureContract.DESTINATION,
-                    payload = FaceCaptureContract.getArgs(samplesToCapture),
+                    payload = FaceCaptureContract.getArgs(samplesToCapture, bioSDK),
                 )
             }
         }
@@ -460,26 +462,27 @@ internal class BuildStepsUseCase @Inject constructor(
                     navigationActionId = R.id.action_orchestratorFragment_to_matcher,
                     destinationId = MatchContract.DESTINATION,
                     payload = MatchStepStubPayload.asBundle(
-                        flowType,
-                        subjectQuery,
-                        biometricDataSource,
-                        bioSDK,
+                        flowType = flowType,
+                        subjectQuery = subjectQuery,
+                        biometricDataSource = biometricDataSource,
+                        fingerprintSDK = bioSDK,
                     ),
                 )
             }
         }
 
         Modality.FACE -> {
-            determineFaceSDKs(projectConfiguration, ageGroup).map {
+            determineFaceSDKs(projectConfiguration, ageGroup).map { bioSDK ->
                 // Face bio SDK is currently ignored until we add a second one
                 Step(
                     id = StepId.FACE_MATCHER,
                     navigationActionId = R.id.action_orchestratorFragment_to_matcher,
                     destinationId = MatchContract.DESTINATION,
                     payload = MatchStepStubPayload.asBundle(
-                        flowType,
-                        subjectQuery,
-                        biometricDataSource,
+                        flowType = flowType,
+                        subjectQuery = subjectQuery,
+                        biometricDataSource = biometricDataSource,
+                        faceSDK = bioSDK,
                     ),
                 )
             }
@@ -587,6 +590,13 @@ internal class BuildStepsUseCase @Inject constructor(
                         ?.contains(ageGroup) == true
                 ) {
                     sdks.add(FaceConfiguration.BioSdk.RANK_ONE)
+                }
+                if (projectConfiguration.face
+                        ?.simFace
+                        ?.allowedAgeRange
+                        ?.contains(ageGroup) == true
+                ) {
+                    sdks.add(FaceConfiguration.BioSdk.SIM_FACE)
                 }
             }
         }

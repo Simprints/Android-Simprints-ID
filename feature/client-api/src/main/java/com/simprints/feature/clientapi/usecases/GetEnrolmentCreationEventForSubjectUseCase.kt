@@ -14,6 +14,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
@@ -36,7 +37,11 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
             .load(SubjectQuery(projectId = projectId, subjectId = subjectId))
             .firstOrNull()
             ?.fromSubjectToEnrolmentCreationEvent()
-            ?: return null
+
+        if (recordCreationEvent == null) {
+            Simber.e("Couldn't find enrolment for subjectActions", IllegalStateException("No enrolment record found for subjectId: $subjectId"))
+            return null
+        }
 
         return jsonHelper.toJson(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)), coSyncSerializationModule)
     }

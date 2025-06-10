@@ -32,8 +32,8 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.face.capture.screens.livefeedback.CropToTargetOverlayAnalyzer
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,7 +93,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         // Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
             if (view != null) {
-                vm.initCapture(mainVm.samplesToCapture, mainVm.attemptNumber)
+                vm.initCapture(mainVm.bioSDK, mainVm.samplesToCapture, mainVm.attemptNumber)
             }
         }
 

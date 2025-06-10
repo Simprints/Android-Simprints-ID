@@ -14,6 +14,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_DATUM_ID
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource.Companion.COLUMN_VALUE
+import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -24,6 +25,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.Before
@@ -160,6 +162,8 @@ class CommCareIdentityDataSourceTest {
     @MockK
     lateinit var project: Project
 
+    private val commCareBiometricDataSource = BiometricDataSource.CommCare("")
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -203,6 +207,7 @@ class CommCareIdentityDataSourceTest {
             encoder,
             JsonHelper,
             useCase,
+            4,
             context,
             testCoroutineRule.testCoroutineDispatcher,
         )
@@ -230,7 +235,19 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -280,7 +297,18 @@ class CommCareIdentityDataSourceTest {
             subjectId = "b26c91bc-b307-4131-80c3-55090ba5dbf2",
         )
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = dataSource.loadFaceIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FaceIdentity>()
+        dataSource
+            .loadFaceIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -322,7 +350,18 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "NEC_1_5"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -369,7 +408,18 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(faceSampleFormat = templateFormat)
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = dataSource.loadFaceIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FaceIdentity>()
+        dataSource
+            .loadFaceIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -408,7 +458,18 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
         val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -451,7 +512,18 @@ class CommCareIdentityDataSourceTest {
         val templateFormat = "ROC_1_23"
         val query = SubjectQuery(faceSampleFormat = templateFormat)
         val range = 0..expectedFaceIdentities.size
-        val actualIdentities = dataSource.loadFaceIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FaceIdentity>()
+        dataSource
+            .loadFaceIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -496,7 +568,18 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..0
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertTrue(actualIdentities.isEmpty())
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -517,7 +600,18 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 2..3
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertTrue(actualIdentities.isEmpty())
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -554,8 +648,19 @@ class CommCareIdentityDataSourceTest {
 
         val templateFormat = "ISO_19794_2"
         val query = SubjectQuery(fingerprintSampleFormat = templateFormat)
-        val range = 0..expectedFingerprintIdentities.size
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val range = expectedFingerprintIdentities.indices
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(1, actualIdentities.size)
         val areContentsEqual =
@@ -587,7 +692,18 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -616,7 +732,18 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -649,7 +776,18 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -669,7 +807,18 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
@@ -694,7 +843,18 @@ class CommCareIdentityDataSourceTest {
 
         val query = SubjectQuery()
         val range = 0..2
-        val actualIdentities = dataSource.loadFingerprintIdentities(query, range, project = project) {}
+        val actualIdentities = mutableListOf<FingerprintIdentity>()
+        dataSource
+            .loadFingerprintIdentities(
+                query = query,
+                ranges = listOf(range),
+                project = project,
+                dataSource = commCareBiometricDataSource,
+                scope = this,
+                onCandidateLoaded = {},
+            ).consumeEach {
+                actualIdentities.addAll(it)
+            }
 
         assertEquals(0, actualIdentities.size)
         coVerify { mockContentResolver.query(mockMetadataUri, any(), any(), any(), any()) }
