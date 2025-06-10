@@ -12,6 +12,7 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialValidati
 import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.model.ExternalCredentialResponse
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
+import com.simprints.feature.externalcredential.screens.select.LayoutConfig
 import com.simprints.infra.external.credential.store.model.ExternalCredential
 import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
 import com.simprints.infra.logging.Simber
@@ -22,7 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ExternalCredentialViewModel @Inject constructor(
-    private val externalCredentialRepository: ExternalCredentialRepository
+    private val externalCredentialRepository: ExternalCredentialRepository,
+    val layoutRepository: LayoutRepository,
 ) : ViewModel() {
 
     private var subjectId: String? = null
@@ -36,6 +38,10 @@ internal class ExternalCredentialViewModel @Inject constructor(
         get() = _externalCredentialResult
     private val _externalCredentialResult = MutableLiveData<ExternalCredentialValidation?>()
 
+    val layoutConfigLiveData: LiveData<LayoutConfig>
+        get() = _layoutConfigLiveData
+    private val _layoutConfigLiveData = MutableLiveData<LayoutConfig>(layoutRepository.getConfig())
+
     val recaptureEvent: LiveData<LiveDataEvent>
         get() = _recaptureEvent
     private val _recaptureEvent = MutableLiveData<LiveDataEvent>()
@@ -43,6 +49,10 @@ internal class ExternalCredentialViewModel @Inject constructor(
     val exitFormEvent: LiveData<LiveDataEvent>
         get() = _exitFormEvent
     private val _exitFormEvent = MutableLiveData<LiveDataEvent>()
+
+    init {
+        layoutRepository.onConfigUpdated = { _layoutConfigLiveData.postValue(it) }
+    }
 
     fun setConfig(params: ExternalCredentialParams) {
         subjectId = params.subjectId

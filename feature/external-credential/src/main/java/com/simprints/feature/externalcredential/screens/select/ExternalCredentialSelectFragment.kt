@@ -8,6 +8,9 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.TextView
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -31,6 +34,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
     private var dialog: Dialog? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initObservers()
         initListeners()
     }
 
@@ -40,28 +44,90 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         super.onDestroyView()
     }
 
+    private fun initObservers() {
+        viewModel.layoutConfigLiveData.observe(viewLifecycleOwner) { config ->
+            with(binding) {
+                (getView(scanQrTextGrid, scanQrText) as? TextView)?.text = config.uiText.qrText
+                (getView(anyDocGrid, anyDoc) as? TextView)?.text = config.uiText.anyDocText
+                (getView(ghanaIdTextGrid, ghanaIdText) as? TextView)?.text = config.uiText.ghanaCardText
+                (getView(nhisCardTextGrid, nhisCardText) as? TextView)?.text = config.uiText.nhisCardText
+
+                externalCredentialTitle?.text = config.screenTitle
+
+                (getView(topTitleGrid, topTitle) as? TextView)?.text = config.topTitle
+                (getView(bottomTitleGrid, bottomTitle) as? TextView)?.text = config.bottomTitle
+
+                getView(topTitleGrid, topTitle)?.isVisible = config.isTopTitleVisible
+                getView(bottomTitleGrid, bottomTitle)?.isVisible = config.isBottomTitleVisible
+                getView(dividerGrid, divider)?.isVisible = config.isBottomTitleVisible
+
+                layoutOption1?.isVisible = config.layoutStyle == LayoutStyle.Grid
+                layoutOption2?.isVisible = config.layoutStyle == LayoutStyle.Vertical
+            }
+        }
+    }
+
     private fun initListeners() {
-        binding.scanQrCard.setOnClickListener {
+        getscanQrCard()?.setOnClickListener {
             findNavController().navigateSafely(
                 this,
                 ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialQrScanner(),
             )
         }
-        binding.scanOcrGhanaIdCard.setOnClickListener {
+        getscanOcrGhanaIdCard()?.setOnClickListener {
             startOcr(OcrDocument.GhanaIdCard)
         }
-        binding.scanOcrGhanaNHISCard.setOnClickListener {
+        getscanOcrGhanaNHISCard()?.setOnClickListener {
             startOcr(OcrDocument.GhanaNHISCard)
         }
-        binding.scanOcrAny.setOnClickListener {
+        getscanOcrAny()?.setOnClickListener {
             displayExternalCredentialIdDialog()
         }
         binding.skipExternalCredentialScan.setOnClickListener {
             viewModel.skipScanning()
         }
+        binding.externalCredentialTitle?.setOnClickListener {
+            openLayoutConfigDialog()
+        }
 
     }
 
+    private fun getView(gridId: View?, verticalId: View?): View? {
+        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
+        return if(currentConfig.layoutStyle == LayoutStyle.Grid) gridId else verticalId
+    }
+
+    private fun getscanQrCard(): View? {
+        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
+        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanQrCardGrid else binding.scanQrCard
+    }
+
+    private fun getscanOcrGhanaIdCard(): View? {
+        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
+        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanOcrGhanaIdCardGrid else binding.scanOcrGhanaIdCard
+    }
+
+    private fun getscanOcrGhanaNHISCard(): View? {
+        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
+        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanOcrGhanaNHISCardGrid else binding.scanOcrGhanaNHISCard
+    }
+
+    private fun getscanOcrAny(): View? {
+        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
+        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanOcrAnyGrid else binding.scanOcrAny
+    }
+
+    private fun openLayoutConfigDialog() {
+        val currentConfig = viewModel.layoutConfigLiveData.value ?: return
+
+        LayoutConfigBottomSheetDialog(
+            context = requireContext(),
+            initialConfig = currentConfig,
+            onDismissed = {
+                viewModel.layoutRepository.setConfig(it)
+            }
+        ).show()
+    }
     private fun startOcr(ocrDocument: OcrDocument) {
         findNavController().navigateSafely(
             this,
@@ -101,7 +167,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
         editText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == IME_ACTION_DONE) {
-                if(button.isEnabled) {
+                if (button.isEnabled) {
                     button.performClick()
                 }
                 true
