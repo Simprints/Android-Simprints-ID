@@ -8,8 +8,8 @@ import javax.inject.Singleton
 
 private var config =    LayoutConfig(
     layoutStyle = LayoutStyle.Grid,
-    screenTitle = "Scan external credential",
-    topTitle = "Freestyle",
+    screenTitle = "Scan patient document",
+    topTitle = "Custom",
     bottomTitle = "Predefined",
     isTopTitleVisible = true,
     isBottomTitleVisible = true,
