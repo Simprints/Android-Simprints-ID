@@ -170,7 +170,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
         matchResult.results.firstOrNull()?.confidence?.let { confidence ->
             val decisionPolicy = when (matchResult) {
-                is FaceMatchResult -> config.face?.decisionPolicy
+                is FaceMatchResult -> config.face?.getSdkConfiguration(matchResult.sdk)?.decisionPolicy
                 is FingerprintMatchResult -> config.fingerprint?.getSdkConfiguration(matchResult.sdk)?.decisionPolicy
                 else -> null
             } ?: return null
