@@ -39,10 +39,15 @@ object LoggingConstants {
         SETTINGS,
         ALERT,
         REALM_DB,
+        ROOM_RECORDS_DB,
         DB_CORRUPTION,
         ENROLMENT,
         APP_SCOPE_ERROR,
         ORCHESTRATION,
         MIGRATION,
+        REALM_DB_MIGRATION,
     }
+
+    // Tags eligible for Firebase Analytics logging
+    val firebaseLoggableTags = setOf<String>(CrashReportTag.REALM_DB_MIGRATION.name)
 }

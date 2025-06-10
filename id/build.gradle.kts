@@ -1,3 +1,5 @@
+import common.SdkVersions
+
 plugins {
     id("simprints.android.application")
     id("simprints.ci.deploy")
@@ -9,6 +11,12 @@ android {
 
     defaultConfig {
         ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+    }
+
+    compileOptions {
+        sourceCompatibility = SdkVersions.JAVA_TARGET
+        targetCompatibility = SdkVersions.JAVA_TARGET
+        isCoreLibraryDesugaringEnabled = true
     }
 
     buildTypes {
@@ -29,10 +37,13 @@ dependencies {
     implementation(project(":infra:core"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:sync"))
+    implementation(project(":infra:enrolment-records:repository"))
 
     implementation(project(":feature:orchestrator"))
     implementation(project(":feature:dashboard"))
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

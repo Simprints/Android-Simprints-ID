@@ -76,7 +76,7 @@ class BuildStepsUseCaseTest {
         every { projectConfiguration.fingerprint?.getSdkConfiguration(NEC) } returns nec
 
         every { projectConfiguration.face?.allowedSDKs } returns listOf(FaceConfiguration.BioSdk.RANK_ONE)
-        every { projectConfiguration.face?.nbOfImagesToCapture } returns 3
+        every { projectConfiguration.face?.rankOne?.nbOfImagesToCapture } returns 3
         every { projectConfiguration.face?.rankOne?.allowedAgeRange } returns null
 
         return projectConfiguration
@@ -695,6 +695,32 @@ class BuildStepsUseCaseTest {
             StepId.FACE_CAPTURE,
             StepId.FINGERPRINT_MATCHER,
             StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER,
+        )
+    }
+
+    @Test
+    fun `build capture and match steps with all SDKs - verify action - returns expected steps`() {
+        val projectConfiguration = mockCommonProjectConfiguration()
+        val ageGroup = AgeGroup(18, 60)
+        every { secugenSimMatcher.allowedAgeRange } returns ageGroup
+        every { nec.allowedAgeRange } returns ageGroup
+        every { projectConfiguration.face?.rankOne?.allowedAgeRange } returns ageGroup
+        every { projectConfiguration.face?.simFace?.allowedAgeRange } returns ageGroup
+
+        val action = mockk<ActionRequest.VerifyActionRequest>(relaxed = true)
+
+        val steps = useCase.buildCaptureAndMatchStepsForAgeGroup(action, projectConfiguration, ageGroup)
+
+        assertStepOrder(
+            steps,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FINGERPRINT_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.FACE_CAPTURE,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FINGERPRINT_MATCHER,
+            StepId.FACE_MATCHER,
             StepId.FACE_MATCHER,
         )
     }

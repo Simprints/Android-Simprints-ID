@@ -8,6 +8,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
@@ -39,11 +40,11 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
     fun `maps FaceMatchResult correctly`() {
         val result = useCase(
             listOf(
-                FaceMatchResult(emptyList()),
+                FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE),
             ),
         )
 
-        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FaceMatchResult(emptyList()))
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FaceMatchResult(emptyList(), FaceConfiguration.BioSdk.RANK_ONE))
     }
 
     @Test

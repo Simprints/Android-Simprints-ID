@@ -69,17 +69,20 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
     ) = results.filterIsInstance<FaceMatchResult>().lastOrNull()?.let { faceMatchResult ->
-        projectConfiguration.face?.decisionPolicy?.let { faceDecisionPolicy ->
-            val matches = faceMatchResult.results
-            val goodResults = matches
-                .filter { it.confidence >= faceDecisionPolicy.low }
-                .sortedByDescending { it.confidence }
-            // Attempt to include only high confidence matches
-            goodResults
-                .filter { it.confidence >= faceDecisionPolicy.high }
-                .ifEmpty { goodResults }
-                .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
-                .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
-        }
+        projectConfiguration.face
+            ?.getSdkConfiguration(faceMatchResult.sdk)
+            ?.decisionPolicy
+            ?.let { faceDecisionPolicy ->
+                val matches = faceMatchResult.results
+                val goodResults = matches
+                    .filter { it.confidence >= faceDecisionPolicy.low }
+                    .sortedByDescending { it.confidence }
+                // Attempt to include only high confidence matches
+                goodResults
+                    .filter { it.confidence >= faceDecisionPolicy.high }
+                    .ifEmpty { goodResults }
+                    .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
+                    .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
+            }
     } ?: emptyList()
 }

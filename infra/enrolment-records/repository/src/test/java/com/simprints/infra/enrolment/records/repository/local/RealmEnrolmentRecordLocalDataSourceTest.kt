@@ -1,6 +1,6 @@
 package com.simprints.infra.enrolment.records.repository.local
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -13,33 +13,34 @@ import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbSubject
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
+import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSourceImpl.Companion.FACE_SAMPLES_FIELD
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSourceImpl.Companion.FINGERPRINT_SAMPLES_FIELD
-import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLocalDataSourceImpl.Companion.FORMAT_FIELD
-import com.simprints.infra.enrolment.records.repository.local.models.fromDbToDomain
-import com.simprints.infra.enrolment.records.repository.local.models.fromDomainToDb
-import io.mockk.CapturingSlot
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FACE_SAMPLES_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FINGERPRINT_SAMPLES_FIELD
+import com.simprints.infra.enrolment.records.repository.local.RealmEnrolmentRecordLocalDataSource.Companion.FORMAT_FIELD
+import com.simprints.infra.enrolment.records.repository.local.models.toDomain
+import com.simprints.infra.enrolment.records.repository.local.models.toRealmDb
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 import kotlin.random.Random
 
-class EnrolmentRecordLocalDataSourceImplTest {
+class RealmEnrolmentRecordLocalDataSourceTest {
     @MockK
     private lateinit var realm: Realm
 
@@ -61,13 +62,14 @@ class EnrolmentRecordLocalDataSourceImplTest {
     @MockK
     private lateinit var project: Project
 
-    private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
+    private lateinit var blockCapture: CapturingSlot<suspend (Realm) -> Any>
     private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
-    private val onCandidateLoaded: () -> Unit = {}
+    private val onCandidateLoaded: suspend () -> Unit = {}
     private var localSubjects: MutableList<Subject> = mutableListOf()
 
-    private lateinit var enrolmentRecordLocalDataSource: EnrolmentRecordLocalDataSource
+    private lateinit var enrolmentRecordLocalDataSource: RealmEnrolmentRecordLocalDataSource
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -77,13 +79,13 @@ class EnrolmentRecordLocalDataSourceImplTest {
         every { mutableRealm.delete(any()) } answers { localSubjects.clear() }
         every { mutableRealm.deleteAll() } answers { localSubjects.clear() }
         every { mutableRealm.copyToRealm(capture(insertedSubject), any()) } answers {
-            localSubjects.add(insertedSubject.captured.fromDbToDomain())
+            localSubjects.add(insertedSubject.captured.toDomain())
             insertedSubject.captured
         }
 
         blockCapture = slot()
         coEvery { realmWrapperMock.readRealm(capture(blockCapture)) } answers {
-            blockCapture.captured.invoke(realm)
+            runBlocking { blockCapture.captured.invoke(realm) }
         }
         mutableBlockCapture = slot()
         coEvery { realmWrapperMock.writeRealm(capture(mutableBlockCapture)) } answers {
@@ -99,9 +101,10 @@ class EnrolmentRecordLocalDataSourceImplTest {
         every { realmQuery.query(any(), any()) } returns realmQuery
         every { realmQuery.first() } returns realmSingleQuery
 
-        enrolmentRecordLocalDataSource = EnrolmentRecordLocalDataSourceImpl(
+        enrolmentRecordLocalDataSource = RealmEnrolmentRecordLocalDataSource(
             realmWrapperMock,
             tokenizationProcessor,
+            UnconfinedTestDispatcher(),
         )
     }
 
@@ -132,16 +135,18 @@ class EnrolmentRecordLocalDataSourceImplTest {
     @Test
     fun givenValidSerializableQueryForFingerprints_loadIsCalled() = runTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
-        val fakePerson = savedPersons[0].fromDomainToDb()
+        val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = enrolmentRecordLocalDataSource
+        val people = mutableListOf<FingerprintIdentity>()
+        enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
+                this,
                 onCandidateLoaded,
-            ).toList()
+            ).consumeEach { people.addAll(it) }
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
@@ -155,11 +160,12 @@ class EnrolmentRecordLocalDataSourceImplTest {
         enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(fingerprintSampleFormat = format),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
+                this,
                 onCandidateLoaded,
-            ).toList()
+            ).consumeEach { }
 
         verify {
             realmQuery.query(
@@ -176,12 +182,12 @@ class EnrolmentRecordLocalDataSourceImplTest {
         enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(
                 SubjectQuery(faceSampleFormat = format),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
+                this,
                 onCandidateLoaded,
-            ).toList()
-
+            ).consumeEach { }
         verify {
             realmQuery.query(
                 "ANY ${FACE_SAMPLES_FIELD}.${FORMAT_FIELD} == $0",
@@ -193,17 +199,20 @@ class EnrolmentRecordLocalDataSourceImplTest {
     @Test
     fun givenValidSerializableQueryForFace_loadIsCalled() = runTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
-        val fakePerson = savedPersons[0].fromDomainToDb()
+        val fakePerson = savedPersons[0].toRealmDb()
 
-        val people = enrolmentRecordLocalDataSource
+        val people = mutableListOf<FaceIdentity>()
+        enrolmentRecordLocalDataSource
             .loadFaceIdentities(
                 SubjectQuery(),
-                IntRange(0, 20),
+                listOf(IntRange(0, 20)),
                 BiometricDataSource.Simprints,
                 project,
+                this,
                 onCandidateLoaded,
-            ).toList()
-
+            ).consumeEach {
+                people.addAll(it)
+            }
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
         }
@@ -217,29 +226,29 @@ class EnrolmentRecordLocalDataSourceImplTest {
         val people = enrolmentRecordLocalDataSource.load(SubjectQuery()).toList()
 
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
-            assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
+            assertThat(dbSubject.deepEquals(subject.toRealmDb())).isTrue()
         }
     }
 
     @Test
     fun givenManyPeopleSaved_loadByUserIdShouldReturnTheRightPeople() = runTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
-        val fakePerson = savedPersons[0].fromDomainToDb()
+        val fakePerson = savedPersons[0].toRealmDb()
 
         val people = enrolmentRecordLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId)).toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
-            assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
+            assertThat(dbSubject.deepEquals(subject.toRealmDb())).isTrue()
         }
     }
 
     @Test
     fun givenManyPeopleSaved_loadByModuleIdShouldReturnTheRightPeople() = runTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
-        val fakePerson = savedPersons[0].fromDomainToDb()
+        val fakePerson = savedPersons[0].toRealmDb()
 
         val people = enrolmentRecordLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId.asTokenizableEncrypted())).toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
-            assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
+            assertThat(dbSubject.deepEquals(subject.toRealmDb())).isTrue()
         }
     }
 
@@ -249,7 +258,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
         every { realmSingleQuery.find() } returns null
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
+            listOf(SubjectAction.Creation(subject.toDomain())),
             project,
         )
         val peopleCount = enrolmentRecordLocalDataSource.count()
@@ -266,11 +275,11 @@ class EnrolmentRecordLocalDataSourceImplTest {
                 fingerprintSamples = listOf(
                     getRandomFingerprintSample("fingerToDelete"),
                 ),
-            ).fromDomainToDb()
+            ).toRealmDb()
         val subject = getFakePerson()
 
         enrolmentRecordLocalDataSource.performActions(
-            listOf(SubjectAction.Creation(subject.fromDbToDomain())),
+            listOf(SubjectAction.Creation(subject.toDomain())),
             project,
         )
 
@@ -294,7 +303,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
                 getRandomFingerprintSample(referenceId = "fingerToDelete"),
                 getRandomFingerprintSample(),
             ),
-        ).fromDomainToDb()
+        ).toRealmDb()
 
         enrolmentRecordLocalDataSource.performActions(
             listOf(
@@ -359,9 +368,22 @@ class EnrolmentRecordLocalDataSourceImplTest {
         assertThat(peopleCount).isEqualTo(0)
     }
 
-    private fun getFakePerson(): DbSubject = getRandomSubject().fromDomainToDb()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `loadAllSubjectsInBatches with no subjects should return empty list and close channel`() = runTest {
+        val batchSize = 10
 
-    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also { localSubjects.add(it.fromDbToDomain()) }
+        every { realmQuery.sort(RealmEnrolmentRecordLocalDataSource.SUBJECT_ID_FIELD, any()) } returns realmQuery
+
+        val channel = enrolmentRecordLocalDataSource.loadAllSubjectsInBatches(batchSize)
+        val result = channel.toList()
+
+        assertThat(result).isEmpty()
+    }
+
+    private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()
+
+    private fun saveFakePerson(fakeSubject: DbSubject): DbSubject = fakeSubject.also { localSubjects.add(it.toDomain()) }
 
     private fun saveFakePeople(subjects: List<Subject>): List<Subject> = subjects.toMutableList().also { localSubjects.addAll(it) }
 

@@ -6,6 +6,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
@@ -17,6 +18,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -48,7 +50,7 @@ internal class FaceMatcherUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { resolveFaceBioSdk().createMatcher(any()) } returns faceMatcher
+        coEvery { resolveFaceBioSdk(any()).createMatcher(any()) } returns faceMatcher
         useCase = FaceMatcherUseCase(
             enrolmentRecordRepository,
             resolveFaceBioSdk,
@@ -94,6 +96,7 @@ internal class FaceMatcherUseCaseTest {
                     probeFaceSamples = listOf(
                         MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                     ),
+                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -123,13 +126,17 @@ internal class FaceMatcherUseCaseTest {
         )
         coEvery { enrolmentRecordRepository.count(any(), any()) } returns 1
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any()) } coAnswers {
+        coEvery {
+            enrolmentRecordRepository.loadFaceIdentities(any(), any(), any(), any(), any(), any())
+        } answers {
             // Call the onCandidateLoaded callback (5th parameter)
-            val onCandidateLoaded = arg<() -> Unit>(4)
-            onCandidateLoaded()
+            val onCandidateLoaded: suspend () -> Unit = arg(5)
+            runBlocking {
+                onCandidateLoaded()
+            }
 
             // Return the face identities
-            faceIdentities
+            createTestChannel(faceIdentities)
         }
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any()) } returns 42f
 
@@ -140,6 +147,7 @@ internal class FaceMatcherUseCaseTest {
                     probeFaceSamples = listOf(
                         MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3)),
                     ),
+                    faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
                     flowType = FlowType.VERIFY,
                     queryForCandidates = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,

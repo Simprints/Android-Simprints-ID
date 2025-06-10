@@ -13,18 +13,20 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
-import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
+import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
 import com.simprints.infra.license.SaveLicenseCheckEventUseCase
 import com.simprints.infra.license.determineLicenseStatus
 import com.simprints.infra.license.models.License
+import com.simprints.infra.license.models.License.Companion.NO_LICENSE
 import com.simprints.infra.license.models.LicenseState
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
@@ -59,6 +61,7 @@ internal class FaceCaptureViewModel @Inject constructor(
     var attemptNumber: Int = 0
     var samplesToCapture = 1
     var initialised = false
+    lateinit var bioSDK: FaceConfiguration.BioSdk
 
     var shouldCheckCameraPermissions = AtomicBoolean(true)
 
@@ -92,58 +95,64 @@ internal class FaceCaptureViewModel @Inject constructor(
         this.samplesToCapture = samplesToCapture
     }
 
-    fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
+    fun initFaceBioSdk(
+        activity: Activity,
+        sdk: FaceConfiguration.BioSdk,
+    ) = viewModelScope.launch {
         if (initialised) {
             Simber.i("Face bio SDK already initialised", tag = FACE_CAPTURE)
             return@launch
         }
+        this@FaceCaptureViewModel.bioSDK = sdk
 
         Simber.i("Starting face capture flow", tag = FACE_CAPTURE)
+        if (sdk == FaceConfiguration.BioSdk.RANK_ONE) {
+            val licenseVendor = Vendor.RankOne
+            val license = licenseRepository.getCachedLicense(licenseVendor)
+            var licenseStatus = license.determineLicenseStatus()
+            if (licenseStatus == LicenseStatus.VALID) {
+                licenseStatus = initialize(activity, license!!)
+            }
 
-        val licenseVendor = Vendor.RankOne
-        val license = licenseRepository.getCachedLicense(licenseVendor)
-        var licenseStatus = license.determineLicenseStatus()
-        if (licenseStatus == LicenseStatus.VALID) {
-            licenseStatus = initialize(activity, license!!)
+            // In some cases license is invalidated on initialisation attempt
+            if (licenseStatus != LicenseStatus.VALID) {
+                Simber.i("Face license is $licenseStatus - attempting download", tag = LICENSE)
+                licenseStatus = refreshLicenceAndRetry(
+                    activity,
+                    licenseVendor,
+                    LicenseVersion(
+                        configManager
+                            .getProjectConfiguration()
+                            .face
+                            ?.rankOne
+                            ?.version
+                            .orEmpty(),
+                    ),
+                )
+            }
+            // Still invalid after attempted refresh
+            if (licenseStatus != LicenseStatus.VALID) {
+                Simber.i("Face license is $licenseStatus", tag = LICENSE)
+                licenseRepository.deleteCachedLicense(Vendor.RankOne)
+                _invalidLicense.send()
+            }
+            saveLicenseCheckEvent(licenseVendor, licenseStatus)
+        } else {
+            initialize(activity, NO_LICENSE)
         }
-
-        // In some cases license is invalidated on initialisation attempt
-        if (licenseStatus != LicenseStatus.VALID) {
-            Simber.i("Face license is $licenseStatus - attempting download", tag = LICENSE)
-            licenseStatus = refreshLicenceAndRetry(
-                activity,
-                licenseVendor,
-                LicenseVersion(
-                    configManager
-                        .getProjectConfiguration()
-                        .face
-                        ?.rankOne
-                        ?.version
-                        .orEmpty(),
-                ),
-            )
-        }
-        // Still invalid after attempted refresh
-        if (licenseStatus != LicenseStatus.VALID) {
-            Simber.i("Face license is $licenseStatus", tag = LICENSE)
-            licenseRepository.deleteCachedLicense(Vendor.RankOne)
-            _invalidLicense.send()
-        }
-        saveLicenseCheckEvent(licenseVendor, licenseStatus)
     }
 
     fun setupAutoCapture() = viewModelScope.launch {
         _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
     }
 
-    fun shouldShowInstructionsScreen(): Boolean =
-        shouldShowInstructions()
+    fun shouldShowInstructionsScreen(): Boolean = shouldShowInstructions()
 
     private suspend fun initialize(
         activity: Activity,
         license: License,
     ): LicenseStatus {
-        val initializer = resolveFaceBioSdk().initializer
+        val initializer = resolveFaceBioSdk(bioSDK).initializer
         if (!initializer.tryInitWithLicense(activity, license.data)) {
             // License is valid but the SDK failed to initialize
             // This is should reported as an error
@@ -173,8 +182,8 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun flowFinished() {
         Simber.i("Finishing capture flow", tag = FACE_CAPTURE)
         viewModelScope.launch {
-            val projectConfiguration = configManager.getProjectConfiguration()
-            if (projectConfiguration.face?.imageSavingStrategy?.shouldSaveImage() == true) {
+            val faceConfiguration = configManager.getProjectConfiguration().face?.getSdkConfiguration(bioSDK)
+            if (faceConfiguration?.imageSavingStrategy?.shouldSaveImage() == true) {
                 saveFaceDetections()
             }
 

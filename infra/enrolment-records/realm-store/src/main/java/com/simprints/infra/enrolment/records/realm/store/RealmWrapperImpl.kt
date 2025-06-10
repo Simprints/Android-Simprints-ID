@@ -86,7 +86,7 @@ class RealmWrapperImpl @Inject constructor(
     /**
      * Executes provided block ensuring a valid Realm instance is used and closed.
      */
-    override suspend fun <R> readRealm(block: (Realm) -> R): R = withContext(dispatcher) { block(getRealm()) }
+    override suspend fun <R> readRealm(block: suspend (Realm) -> R): R = withContext(dispatcher) { block(getRealm()) }
 
     /**
      * Executes provided block in a transaction ensuring a valid Realm instance is used and closed.

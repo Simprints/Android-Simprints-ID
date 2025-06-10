@@ -23,6 +23,7 @@ import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCas
 import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -50,6 +51,7 @@ class LoginCheckViewModel @Inject internal constructor(
     private val updateDatabaseCountsInCurrentSession: UpdateSessionScopePayloadUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
     private val updateStoredUserId: UpdateStoredUserIdUseCase,
+    private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
 ) : ViewModel() {
     private var cachedRequest: ActionRequest? = null
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
@@ -148,7 +150,9 @@ class LoginCheckViewModel @Inject internal constructor(
             async { addAuthorizationEvent(actionRequest, true) },
             async { extractParametersForCrashReport(actionRequest) },
         )
-
+        // Schedule Realm-to-Room migration after successful login, if needed.
+        // This avoids down-syncing data into Realm then migrate to room instead set Room  immediately the active db.
+        realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
         startBackgroundSync()
         _proceedWithAction.send(actionRequest)
     }
