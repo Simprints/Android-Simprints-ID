@@ -233,7 +233,7 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
     private fun renderCardEmptyCredential() {
         val textColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_red_dark)
         binding.externalCredentialText.text = "???"
-        binding.textSubjectId.text = "Cannot read credential\nRescan or enter manually"
+        binding.textSubjectId.text = "Cannot read personal identifier\nRescan or enter manually"
         binding.textSubjectId.setTextColor(textColor)
         binding.iconExternalCredential.setImageResource(R.drawable.ic_warning)
         // [MS-953] For some reason this is the only resolved way to make the icon red

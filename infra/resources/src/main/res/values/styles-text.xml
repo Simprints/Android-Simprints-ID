@@ -132,6 +132,10 @@
         <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline4</item>
     </style>
 
+    <style name="Text.Headline4.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
     <!-- H5 variants -->
 
     <style name="Text.Headline5" parent="Widget.MaterialComponents.TextView">

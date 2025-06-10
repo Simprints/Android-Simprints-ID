@@ -7,7 +7,10 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -84,14 +87,46 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
             displayExternalCredentialIdDialog()
         }
         binding.skipExternalCredentialScan.setOnClickListener {
-            viewModel.skipScanning()
+            displayExternalCredentialPreviewDialog(
+                onConfirm = {
+                    dialog?.dismiss()
+                    dialog = null
+                    viewModel.skipScanning()
+                },
+                onCancel = {
+                    dialog?.dismiss()
+                    dialog = null
+                }
+            )
+
         }
         binding.externalCredentialTitle?.setOnClickListener {
             openLayoutConfigDialog()
         }
 
     }
+    private fun displayExternalCredentialPreviewDialog(
+        onConfirm: () -> Unit,
+        onCancel: () -> Unit
+    ) {
+        dialog?.dismiss()
+        dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.dialog_skip_scan_confirm, null)
+        val cancelButton = view.findViewById<Button>(R.id.buttonCancel)
+        val confirmButton = view.findViewById<Button>(R.id.buttonSkip)
 
+        confirmButton.setOnClickListener { onConfirm() }
+        cancelButton.setOnClickListener { onCancel() }
+
+        dialog?.setContentView(view)
+        dialog?.setCancelable(false)
+        dialog?.show()
+        (dialog as? BottomSheetDialog)?.apply {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.isDraggable = false
+        }
+
+    }
     private fun getView(gridId: View?, verticalId: View?): View? {
         val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
         return if(currentConfig.layoutStyle == LayoutStyle.Grid) gridId else verticalId
@@ -141,6 +176,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
 
 
     private fun displayExternalCredentialIdDialog() {
+        dialog?.dismiss()
         dialog = BottomSheetDialog(requireContext())
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val view = layoutInflater.inflate(R.layout.dialog_enter_id, null)

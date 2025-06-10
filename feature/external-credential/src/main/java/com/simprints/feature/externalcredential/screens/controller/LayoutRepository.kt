@@ -6,12 +6,12 @@ import com.simprints.feature.externalcredential.screens.select.UiText
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private var config =    LayoutConfig(
+private var config = LayoutConfig(
     layoutStyle = LayoutStyle.Grid,
     screenTitle = "Scan patient document",
     topTitle = "Custom",
-    bottomTitle = "Predefined",
-    isTopTitleVisible = true,
+    bottomTitle = "National ID card",
+    isTopTitleVisible = false,
     isBottomTitleVisible = true,
     uiText = UiText(
         qrText = "Scar QR",

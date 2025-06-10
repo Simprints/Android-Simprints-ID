@@ -34,7 +34,7 @@ internal class ExternalCredentialQrConfirmationFragment : Fragment(R.layout.frag
                 externalCredentialSmallIcon.isVisible = true
                 externalCredentialLargeIcon.setImageResource(R.drawable.onboarding_straight)
                 externalCredentialLargeIcon.setColorFilter(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
-                externalCredentialStatusTitle.text = "QR Code linked to subject"
+                externalCredentialStatusTitle.text = "QR Code scanned"
             }
 
             ExternalCredentialResult.ENROL_DUPLICATE_FOUND -> {
@@ -50,7 +50,7 @@ internal class ExternalCredentialQrConfirmationFragment : Fragment(R.layout.frag
                 externalCredentialSmallIcon.isVisible = true
                 externalCredentialLargeIcon.setImageResource(R.drawable.onboarding_straight)
                 externalCredentialLargeIcon.setColorFilter(ContextCompat.getColor(requireContext(), IDR.color.simprints_black))
-                externalCredentialStatusTitle.text = "Subject found"
+                externalCredentialStatusTitle.text = "Patient found"
             }
             ExternalCredentialResult.SEARCH_NOT_FOUND -> {
                 externalCredentialSmallIcon.isVisible = false
@@ -58,7 +58,7 @@ internal class ExternalCredentialQrConfirmationFragment : Fragment(R.layout.frag
                 externalCredentialLargeIcon.setImageResource(R.drawable.ic_warning)
                 // [MS-964] For some reason this is the only resolved way to make the icon red
                 externalCredentialLargeIcon.setColorFilter(ContextCompat.getColor(requireContext(), IDR.color.simprints_red_dark))
-                externalCredentialStatusTitle.text = "No subject linked to QR code"
+                externalCredentialStatusTitle.text = "No patient linked to QR code"
                 confirmationBtn.text = "Search 1:N"
             }
 

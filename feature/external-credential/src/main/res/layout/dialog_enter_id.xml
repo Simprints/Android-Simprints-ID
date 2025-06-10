@@ -40,7 +40,7 @@
             style="@style/Text.Subtitle2.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="'Search and Verify' requires and external credential ID. Enter the name of the fields that is going to be used as a personal identifier. Make sure to avoid any personally-identifiable data." />
+            android:text="Enter a Personal Identifier field on the document to scan. This does not have to be exact.\nExample: 'Name', 'Document number'" />
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -52,7 +52,7 @@
             android:id="@+id/ocrDocumentId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Document field"
+            android:hint="Personal Identifier"
             android:inputType="textNoSuggestions" />
 
         <requestFocus />
