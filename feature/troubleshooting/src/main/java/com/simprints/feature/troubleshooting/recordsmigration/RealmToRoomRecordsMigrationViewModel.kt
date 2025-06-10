@@ -29,7 +29,7 @@ internal class RealmToRoomRecordsMigrationViewModel @Inject constructor(
                         body = flagStore.getStoreStateAsString(),
                     ),
                     TroubleshootingItemViewData(
-                        title = "local db info",
+                        title = "Local db info",
                         body = enrolmentRecordRepository.getLocalDBInfo(),
                     ),
                 ),

@@ -26,6 +26,6 @@ internal class TroubleshootingPagerAdapter(
         Intents("Intents", { IntentLogFragment() }),
         Network("Network", { NetworkingLogFragment() }),
         Workers("Workers", { WorkerLogFragment() }),
-        RealmToRoom("Realm to Room Migration", { RealmToRoomRecordsMigrationFragment() }),
+        RealmToRoom("Migration", { RealmToRoomRecordsMigrationFragment() }),
     }
 }

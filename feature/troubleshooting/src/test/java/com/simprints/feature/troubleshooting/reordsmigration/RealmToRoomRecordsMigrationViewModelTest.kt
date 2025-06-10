@@ -55,7 +55,7 @@ class RealmToRoomRecordsMigrationViewModelTest {
         assertThat(logs[0].title).isEqualTo("Realm to Room migration flags:")
         assertThat(logs[0].body).isEqualTo(mockFlagState)
 
-        assertThat(logs[1].title).isEqualTo("local db info")
+        assertThat(logs[1].title).isEqualTo("Local db info")
         assertThat(logs[1].body).isEqualTo(mockDbInfo)
     }
 }
