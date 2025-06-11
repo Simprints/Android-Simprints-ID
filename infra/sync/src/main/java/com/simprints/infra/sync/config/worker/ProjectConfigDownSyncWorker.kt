@@ -9,6 +9,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.sync.config.usecase.HandleProjectStateUseCase
 import com.simprints.infra.sync.config.usecase.RescheduleWorkersIfConfigChangedUseCase
+import com.simprints.infra.sync.config.usecase.ResetLocalRecordsIfConfigChangedUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,6 +23,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
     private val configManager: ConfigManager,
     private val handleProjectState: HandleProjectStateUseCase,
     private val rescheduleWorkersIfConfigChanged: RescheduleWorkersIfConfigChangedUseCase,
+    private val resetLocalRecordsIfConfigChanged: ResetLocalRecordsIfConfigChangedUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
     override val tag = "ProjectConfigDownSync"
@@ -40,7 +42,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
                 val (project, config) = configManager.refreshProject(projectId)
                 handleProjectState(project.state)
                 rescheduleWorkersIfConfigChanged(oldConfig, config)
-
+                resetLocalRecordsIfConfigChanged(oldConfig, config)
                 success()
             }
         } catch (t: Throwable) {
