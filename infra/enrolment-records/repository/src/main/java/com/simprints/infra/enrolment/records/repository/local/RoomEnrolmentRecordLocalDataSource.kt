@@ -1,5 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.local
 
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import androidx.room.withTransaction
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.face.FaceSample
@@ -227,15 +229,29 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             val dbVersion = database.openHelper.readableDatabase.version
             val dbPath = database.openHelper.readableDatabase.path
             val dbSize = getTotalRoomDbSizeBytes(dbPath!!)
-
+            val isDBEncrypted = isDBEncrypted(dbPath)
             val subjectCount = subjectDao.countSubjects(queryBuilder.buildCountQuery(SubjectQuery()))
             "Room DB Info:\n" +
                 "Database Name: ${database.openHelper.databaseName}\n" +
                 "Database Version: $dbVersion\n" +
                 "Database Path: $dbPath\n" +
                 "Database Size: ${dbSize / 1024} KB\n" +
+                "Is Encrypted: $isDBEncrypted\n" +
                 "Number of Subjects: $subjectCount"
         }
+    }
+
+    private fun isDBEncrypted(fullDbPath: String): Boolean = try {
+        SQLiteDatabase.openDatabase(fullDbPath, null, SQLiteDatabase.OPEN_READONLY).use { db ->
+            db.rawQuery("PRAGMA schema_version;", null).use { cursor ->
+                cursor.moveToFirst()
+                // If we can read the schema version, it's not encrypted
+                false
+            }
+        }
+    } catch (_: SQLiteException) {
+        // Exception likely means the DB is encrypted
+        true
     }
 
     private fun getTotalRoomDbSizeBytes(fullDbPath: String): Long {

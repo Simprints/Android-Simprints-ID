@@ -1454,6 +1454,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         // Then
         assertThat(result).contains("Database Name: db-subjects")
         assertThat(result).contains("Database Version: 1")
+        assertThat(result).contains("Is Encrypted: false") // db not encrypted in tests
         assertThat(result).contains("Number of Subjects: 6")
     }
 
