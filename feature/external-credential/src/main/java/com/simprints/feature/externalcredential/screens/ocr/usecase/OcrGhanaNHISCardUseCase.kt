@@ -1,5 +1,6 @@
 package com.simprints.feature.externalcredential.screens.ocr.usecase
 
+import androidx.core.text.isDigitsOnly
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.Text.TextBlock
 import com.simprints.feature.externalcredential.screens.ocr.model.OcrId
@@ -10,12 +11,35 @@ internal class OcrGhanaNHISCardUseCase @Inject constructor(
     private val ocrFuzzySearchUseCase: OcrFuzzySearchUseCase,
 ) {
 
+    private val MEMBERSHIP_ID_LENGTH = 8
+
     operator fun invoke(ocrResult: Text): Map<OcrId, String?> {
+        val ocrCredentialIdFuzzy =
+            OcrId.FuzzySearch(fieldOnTheDocument = "MEMBERSHIP NO.", name = "membership", isExternalCredentialId = true)
+        return when (val exactMatch = findViaExactMatch(ocrResult)) {
+            null -> findWithFuzzySearch(ocrResult, ocrCredentialIdFuzzy)
+            else -> {
+                val ocrCredentialIdPattern = OcrId.Pattern(regex = "", fieldOnTheDocument = "MEMBERSHIP NO.", isExternalCredentialId = true)
+                mapOf(ocrCredentialIdPattern to exactMatch)
+            }
+        }
+
+    }
+
+    private fun findViaExactMatch(ocrResult: Text): String? {
+        val match = ocrResult.textBlocks.flatMap { it.lines }.map {
+            it.elements.joinToString { e -> e.text }.trim().replace(" ", "").replaceCharactersWithDigits()
+        }.firstOrNull {
+            it.isDigitsOnly() && it.length == MEMBERSHIP_ID_LENGTH
+        }
+        return match
+    }
+
+    private fun findWithFuzzySearch(ocrResult: Text, ocrCredentialId: OcrId.FuzzySearch): Map<OcrId, String?> {
         val fieldIds = listOf(
             OcrId.FuzzySearch(fieldOnTheDocument = "NAME", name = "name"), // Looking for 'NAME' value
             OcrId.FuzzySearch(fieldOnTheDocument = "DATE OF BIRTH", name = "birth"), // Looking for 'NAME' value
-            OcrId.FuzzySearch(fieldOnTheDocument = "MEMBERSHIP NO.", name = "membership", isExternalCredentialId = true)
-        )
+        ) + ocrCredentialId
         val filteredTextBlocks = filterTextBlocks(ocrResult)
         val fuzzySearchResult = ocrFuzzySearchUseCase(filteredTextBlocks, fieldIds)
         return fuzzySearchResult.mapValues {

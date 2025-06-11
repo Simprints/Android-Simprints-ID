@@ -20,7 +20,10 @@ private val charSubstitutions = mapOf(
     'G' to '6',
     'g' to '9',
     'q' to '9',
-    'T' to '7'
+    'T' to '7',
+    '|' to '1',
+    '/' to '7',
+    '\\' to '1',
 )
 
 fun String?.replaceCharactersWithDigits() = charSubstitutions.entries
