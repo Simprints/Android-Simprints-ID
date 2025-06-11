@@ -94,6 +94,7 @@ class RealmToRoomMigrationWorkerTest {
         // Given
         coEvery { realmToRoomMigrationFlagsStore.isDownSyncInProgress() } returns false
         coEvery { realmDataSource.count(any()) } returns 3 // Total subjects
+        coEvery { roomDataSource.count(any()) } returns 3
         coEvery {
             realmDataSource.loadAllSubjectsInBatches(any())
         } returns flowOf(mockSubjectsBatch1, mockSubjectsBatch2)
@@ -144,7 +145,6 @@ class RealmToRoomMigrationWorkerTest {
         assertThat(result).isEqualTo(Result.failure())
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `doWork should fail and increment retry count when migration fails in processRecords`() = runTest {
         val mockSubjectsBatch1 = listOf<Subject>(mockk(), mockk())
@@ -164,6 +164,29 @@ class RealmToRoomMigrationWorkerTest {
         coVerify { realmToRoomMigrationFlagsStore.incrementRetryCount() }
         coVerify { realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.FAILED) }
         coVerify { roomDataSource.deleteAll() }
+        assertThat(result).isEqualTo(Result.failure())
+    }
+
+    @Test
+    fun `doWork should fail and increment retry count when migration fails in validateRealmToRoomMigration`() = runTest {
+        val mockSubjectsBatch1 = listOf<Subject>(mockk(), mockk())
+        val mockSubjectsBatch2 = listOf<Subject>(mockk())
+
+        // Given
+        coEvery { realmToRoomMigrationFlagsStore.isDownSyncInProgress() } returns false
+        coEvery { realmDataSource.count(any()) } returns 3 // Total subjects
+        coEvery { roomDataSource.count(any()) } returns 0 // Simulate failure in validation
+        coEvery {
+            realmDataSource.loadAllSubjectsInBatches(any())
+        } returns flowOf(mockSubjectsBatch1, mockSubjectsBatch2)
+        coEvery { roomDataSource.performActions(any(), any()) } just Runs
+
+        // When
+        val result = worker.doWork()
+
+        // Then
+        coVerify { realmToRoomMigrationFlagsStore.updateStatus(MigrationStatus.FAILED) }
+        coVerify { realmToRoomMigrationFlagsStore.incrementRetryCount() }
         assertThat(result).isEqualTo(Result.failure())
     }
 }
