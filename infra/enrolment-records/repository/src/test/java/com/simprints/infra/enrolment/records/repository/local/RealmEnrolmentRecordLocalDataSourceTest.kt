@@ -31,8 +31,8 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -379,6 +379,20 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val result = channel.toList()
 
         assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `getLocalDBInfo returns formatted db info string`() = runTest {
+        // Given
+        saveFakePeople(getRandomPeople(6))
+        every { realm.configuration.name } returns "db-subjects"
+        every { realm.configuration.schemaVersion } returns 1L
+        // When
+        val result = enrolmentRecordLocalDataSource.getLocalDBInfo()
+        // Then
+        assertThat(result).contains("Database Name: db-subjects")
+        assertThat(result).contains("Database Version: 1")
+        assertThat(result).contains("Number of Subjects: 6")
     }
 
     private fun getFakePerson(): DbSubject = getRandomSubject().toRealmDb()

@@ -17,4 +17,6 @@ interface EnrolmentRecordLocalDataSource : IdentityDataSource {
         actions: List<SubjectAction>,
         project: Project,
     )
+
+    suspend fun getLocalDBInfo(): String
 }

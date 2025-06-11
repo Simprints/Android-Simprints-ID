@@ -30,6 +30,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -243,6 +244,23 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun getLocalDBInfo() = realmWrapper.readRealm { realm ->
+        val dbName = realm.configuration.name
+        val dbVersion = realm.configuration.schemaVersion
+        val subjectCount = realm
+            .query(DbSubject::class)
+            .count()
+            .find()
+            .toInt()
+        val dbSize = File(realm.configuration.path).length() / (1024.0)
+        "Realm DB Info:\n" +
+            "Database Name: ${dbName}\n" +
+            "Database Version: $dbVersion\n" +
+            "Database Path: ${realm.configuration.path}\n" +
+            "Database Size: $dbSize KB\n" +
+            "Number of Subjects: $subjectCount"
     }
 
     private fun MutableRealm.findSubject(subjectId: RealmUUID): DbSubject? =

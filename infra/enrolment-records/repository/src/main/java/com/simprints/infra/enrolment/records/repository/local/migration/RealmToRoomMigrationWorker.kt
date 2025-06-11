@@ -85,6 +85,8 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
     override val notificationDescription = IDR.string.notification_migration_description
 
     private suspend fun processRecords() {
+        // log realm db info
+        crashlyticsLog("[RealmToRoomMigrationWorker] ${realmDataSource.getLocalDBInfo()}")
         var index = 0
         realmDataSource
             .loadAllSubjectsInBatches(BATCH_SIZE)
@@ -100,5 +102,7 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
                     throw e
                 }
             }
+        // log room db info
+        crashlyticsLog("[RealmToRoomMigrationWorker] ${roomDataSource.getLocalDBInfo()}")
     }
 }
