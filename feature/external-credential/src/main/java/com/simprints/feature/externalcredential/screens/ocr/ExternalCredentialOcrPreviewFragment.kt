@@ -2,9 +2,12 @@ package com.simprints.feature.externalcredential.screens.ocr
 
 import android.app.Dialog
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -16,6 +19,7 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
@@ -61,6 +65,8 @@ class ExternalCredentialOcrPreviewFragment :
     private lateinit var cameraExecutor: ExecutorService
     private var imageCapture: ImageCapture? = null
     private var dialog: Dialog? = null
+    private var cameraControl: androidx.camera.core.CameraControl? = null
+    private var torchEnabled = false
 
     @Inject
     @DispatcherIO
@@ -80,12 +86,47 @@ class ExternalCredentialOcrPreviewFragment :
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             flowViewModel.recapture()
         }
+        binding.buttonFlash.setOnClickListener {
+            cameraControl?.enableTorch(!torchEnabled)
+            torchEnabled = !torchEnabled
+            renderTorchIcon(torchEnabled)
+        }
+        renderTorchIcon(torchEnabled)
+    }
+
+    override fun onPause() {
+        turnTorchOff()
+        super.onPause()
     }
 
     override fun onDestroy() {
         deleteCachedPhoto(ocrViewModel.imageFileName)
         dialog?.dismiss()
         super.onDestroy()
+    }
+
+    private fun createRoundRippleBackground(colorResId: Int): RippleDrawable {
+        val baseColor = ResourcesCompat.getColor(resources, colorResId, null)
+        val shape = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(baseColor)
+        }
+
+        val rippleColor = ColorStateList.valueOf(
+            ResourcesCompat.getColor(resources, android.R.color.darker_gray, null)
+        )
+
+        return RippleDrawable(rippleColor, shape, null)
+    }
+
+    private fun renderTorchIcon(isTorchEnabled: Boolean) {
+        binding.buttonFlash.setImageResource(
+            if (isTorchEnabled) R.drawable.ic_flashlight_on_24_white else R.drawable.ic_flashlight_on_24_grey
+        )
+        val bgColor = if (isTorchEnabled)
+            com.simprints.infra.resources.R.color.simprints_orange
+        else com.simprints.infra.resources.R.color.simprints_off_white
+        binding.buttonFlash.background = createRoundRippleBackground(bgColor)
     }
 
     private fun validateArgs() {
@@ -131,6 +172,7 @@ class ExternalCredentialOcrPreviewFragment :
         ocrViewModel.stateLiveData.observe(
             viewLifecycleOwner,
             LiveDataEventWithContentObserver { state ->
+                binding.buttonFlash.isVisible = state is OcrPreviewState.Initial || state is OcrPreviewState.Error
                 when (state) {
                     is OcrPreviewState.Error -> renderErrorState(state)
                     OcrPreviewState.Loading -> renderLoadingState(isLoading = true)
@@ -221,9 +263,10 @@ class ExternalCredentialOcrPreviewFragment :
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
+                val camera = cameraProvider.bindToLifecycle(
                     viewLifecycleOwner, cameraSelector, preview, imageCapture
                 )
+                cameraControl = camera.cameraControl
             } catch (e: Exception) {
                 Simber.e("Camera binding failed in OCR", e)
             }
@@ -245,11 +288,13 @@ class ExternalCredentialOcrPreviewFragment :
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
+                    turnTorchOff()
                     ocrViewModel.setLoadingState(isLoading = false)
                     Simber.e("Photo capture failed: ${exc.message}", exc)
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    turnTorchOff()
                     val absolutePath = photoFile.absolutePath
                     val ocrPreprocessData = OcrPreprocessData(
                         previewViewWidthPx = binding.preview.width,
@@ -278,5 +323,11 @@ class ExternalCredentialOcrPreviewFragment :
         } else {
             Simber.w("Cached photo not found: ${photoFile.absolutePath}")
         }
+    }
+
+    private fun turnTorchOff() {
+        cameraControl?.enableTorch(false)
+        torchEnabled = false
+        renderTorchIcon(false)
     }
 }
