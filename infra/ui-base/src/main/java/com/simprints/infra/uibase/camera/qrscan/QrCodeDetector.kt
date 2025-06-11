@@ -25,9 +25,11 @@ class QrCodeDetector @Inject constructor() {
             .build(),
     )
 
-    suspend fun detectInImage(rawImage: RawImage): String? = try {
+    suspend fun detectInImage(rawImage: RawImage): String? = detectInImage(InputImage.fromMediaImage(rawImage.image, rawImage.rotationDegrees))
+
+    suspend fun detectInImage(image: InputImage): String? = try {
         scanner
-            .process(InputImage.fromMediaImage(rawImage.image, rawImage.rotationDegrees))
+            .process(image)
             .awaitTask()
             ?.firstOrNull { !it.rawValue.isNullOrEmpty() }
             ?.rawValue

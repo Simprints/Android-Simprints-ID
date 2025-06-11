@@ -1,10 +1,12 @@
 package com.simprints.feature.externalcredential.screens.qr
 
 import android.Manifest.permission.CAMERA
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -51,9 +53,7 @@ internal class ExternalCredentialQrScannerFragment : Fragment(R.layout.fragment_
                         // TODO [MS-964] Handle error properly
                         Toast.makeText(requireActivity(), "No camera", Toast.LENGTH_LONG).show()
                     }.collectLatest { qrCode ->
-                        if (qrCode.isNotEmpty()) {
-                            viewModel.validateExternalCredential(credentialId = qrCode)
-                        }
+                        processQrCodeScan(qrCode)
                     }
             }
         }
@@ -70,7 +70,9 @@ internal class ExternalCredentialQrScannerFragment : Fragment(R.layout.fragment_
         }
 
         if (requireActivity().hasPermission(CAMERA)) {
-            startCamera()
+            binding.qrScannerPreview.post {
+                startCamera()
+            }
         }
 
 
@@ -79,8 +81,71 @@ internal class ExternalCredentialQrScannerFragment : Fragment(R.layout.fragment_
         }
     }
 
+    private fun processQrCodeScan(qrCode: String?) = with(binding) {
+        when (qrCode.isNullOrEmpty()) {
+            true -> {
+                qrPreviewCard.isVisible = false
+                buttonScan.text = "No QR code detected"
+                buttonScan.setBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        com.simprints.infra.resources.R.color.simprints_off_white
+                    )
+                )
+                buttonScan.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        com.simprints.infra.resources.R.color.simprints_text_grey_light
+                    )
+                )
+                buttonScan.setOnClickListener {}
+            }
+
+            false -> {
+                qrPreviewCard.isVisible = true
+                qrPreviewText.text = qrCode
+                buttonScan.text = "CONTINUE"
+                buttonScan.setBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        com.simprints.infra.resources.R.color.simprints_blue
+                    )
+                )
+                buttonScan.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        com.simprints.infra.resources.R.color.simprints_text_white
+                    )
+                )
+                buttonScan.setOnClickListener { viewModel.validateExternalCredential(credentialId = qrCode) }
+            }
+        }
+    }
+
     private fun startCamera() {
         binding.qrScannerAim.isVisible = true
+        qrCodeAnalyzer.getOrientation = { resources.configuration.orientation }
+        qrCodeAnalyzer.getViewSize = {
+            if (binding.qrScannerPreview.width == 0 || binding.qrScannerPreview.height == 0) {
+                null to null
+            } else {
+                binding.qrScannerPreview.width to binding.qrScannerPreview.height
+            }
+        }
+        qrCodeAnalyzer.getRect = {
+            val isDrawn = binding.qrScannerAim.isShown &&
+                binding.qrScannerAim.width > 0 &&
+                binding.qrScannerAim.height > 0
+            if (isDrawn) {
+                Rect(
+                    binding.qrScannerAim.left,
+                    binding.qrScannerAim.top,
+                    binding.qrScannerAim.right,
+                    binding.qrScannerAim.bottom
+                )
+            } else null
+        }
+
         cameraHelper.startCamera(
             viewLifecycleOwner,
             binding.qrScannerPreview,
