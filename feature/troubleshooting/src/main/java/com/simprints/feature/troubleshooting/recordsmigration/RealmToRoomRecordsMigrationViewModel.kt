@@ -32,6 +32,12 @@ internal class RealmToRoomRecordsMigrationViewModel @Inject constructor(
                         title = "Local db info",
                         body = enrolmentRecordRepository.getLocalDBInfo(),
                     ),
+                    TroubleshootingItemViewData(
+                        title = "Generate a migration failure report",
+                        body = "To delete the new db files and generate a migration failure report.\n " +
+                            "click details button.",
+                        navigationId = "delete_realm_files_and_generate_report",
+                    ),
                 ),
             )
         }
