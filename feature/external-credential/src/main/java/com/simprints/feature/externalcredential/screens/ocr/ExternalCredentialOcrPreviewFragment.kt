@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.ocr
 
 import android.app.Dialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -86,6 +87,7 @@ class ExternalCredentialOcrPreviewFragment :
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             flowViewModel.recapture()
         }
+        binding.buttonFlash.isVisible = requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)
         binding.buttonFlash.setOnClickListener {
             cameraControl?.enableTorch(!torchEnabled)
             torchEnabled = !torchEnabled

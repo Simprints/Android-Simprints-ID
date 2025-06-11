@@ -71,20 +71,31 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
     }
 
     private fun initListeners() {
-        getscanQrCard()?.setOnClickListener {
-            findNavController().navigateSafely(
-                this,
-                ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialQrScanner(),
-            )
+        listOf(binding.scanQrCardGrid, binding.scanQrCard).forEach {
+            it?.setOnClickListener {
+                findNavController().navigateSafely(
+                    this,
+                    ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialQrScanner(),
+                )
+            }
         }
-        getscanOcrGhanaIdCard()?.setOnClickListener {
-            startOcr(OcrDocument.GhanaIdCard)
-        }
-        getscanOcrGhanaNHISCard()?.setOnClickListener {
-            startOcr(OcrDocument.GhanaNHISCard)
-        }
-        getscanOcrAny()?.setOnClickListener {
-            displayExternalCredentialIdDialog()
+        with(binding) {
+
+            listOf(scanOcrGhanaIdCardGrid, scanOcrGhanaIdCard).forEach {
+                it?.setOnClickListener {
+                    startOcr(OcrDocument.GhanaIdCard)
+                }
+            }
+            listOf(scanOcrGhanaNHISCardGrid, scanOcrGhanaNHISCard).forEach {
+                it?.setOnClickListener {
+                    startOcr(OcrDocument.GhanaNHISCard)
+                }
+            }
+            listOf(binding.scanOcrAnyGrid, scanOcrAny).forEach {
+                it?.setOnClickListener {
+                    displayExternalCredentialIdDialog()
+                }
+            }
         }
         binding.skipExternalCredentialScan.setOnClickListener {
             displayExternalCredentialPreviewDialog(
@@ -105,6 +116,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         }
 
     }
+
     private fun displayExternalCredentialPreviewDialog(
         onConfirm: () -> Unit,
         onCancel: () -> Unit
@@ -127,29 +139,10 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
         }
 
     }
+
     private fun getView(gridId: View?, verticalId: View?): View? {
         val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
-        return if(currentConfig.layoutStyle == LayoutStyle.Grid) gridId else verticalId
-    }
-
-    private fun getscanQrCard(): View? {
-        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
-        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanQrCardGrid else binding.scanQrCard
-    }
-
-    private fun getscanOcrGhanaIdCard(): View? {
-        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
-        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanOcrGhanaIdCardGrid else binding.scanOcrGhanaIdCard
-    }
-
-    private fun getscanOcrGhanaNHISCard(): View? {
-        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
-        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanOcrGhanaNHISCardGrid else binding.scanOcrGhanaNHISCard
-    }
-
-    private fun getscanOcrAny(): View? {
-        val currentConfig = viewModel.layoutConfigLiveData.value ?: return null
-        return if(currentConfig.layoutStyle == LayoutStyle.Grid) binding.scanOcrAnyGrid else binding.scanOcrAny
+        return if (currentConfig.layoutStyle == LayoutStyle.Grid) gridId else verticalId
     }
 
     private fun openLayoutConfigDialog() {
@@ -163,6 +156,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
             }
         ).show()
     }
+
     private fun startOcr(ocrDocument: OcrDocument) {
         findNavController().navigateSafely(
             this,
