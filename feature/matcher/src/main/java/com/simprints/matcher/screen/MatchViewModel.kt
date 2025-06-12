@@ -80,6 +80,7 @@ internal class MatchViewModel @Inject constructor(
                         matcherState.totalCandidates,
                         matcherState.matcherName,
                         matcherState.matchResultItems,
+                        matcherState.matchBatches,
                     )
 
                     setMatchState(matcherState.totalCandidates, matcherState.matchResultItems)
