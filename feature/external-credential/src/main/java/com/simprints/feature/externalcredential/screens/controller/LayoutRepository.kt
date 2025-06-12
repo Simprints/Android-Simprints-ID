@@ -16,8 +16,8 @@ private var config = LayoutConfig(
     uiText = UiText(
         qrText = "Scar QR",
         anyDocText = "Any document",
-        ghanaCardText = "\uD83C\uDDEC\uD83C\uDDED Ghana ID Card",
-        nhisCardText = "\uD83C\uDFE5 Ghana NHIS Card",
+        ghanaCardText = "\uD83C\uDDEC\uD83C\uDDED ID Card",
+        nhisCardText = "\uD83C\uDFE5 NHIS Card",
     )
 )
 

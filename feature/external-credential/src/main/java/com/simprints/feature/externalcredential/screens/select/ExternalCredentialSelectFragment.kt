@@ -2,6 +2,7 @@ package com.simprints.feature.externalcredential.screens.select
 
 import android.app.Dialog
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -13,6 +14,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -60,9 +62,20 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                 (getView(topTitleGrid, topTitle) as? TextView)?.text = config.topTitle
                 (getView(bottomTitleGrid, bottomTitle) as? TextView)?.text = config.bottomTitle
 
-                getView(topTitleGrid, topTitle)?.isVisible = config.isTopTitleVisible
-                getView(bottomTitleGrid, bottomTitle)?.isVisible = config.isBottomTitleVisible
-                getView(dividerGrid, divider)?.isVisible = config.isBottomTitleVisible
+                when (resources.configuration.orientation) {
+                    Configuration.ORIENTATION_PORTRAIT -> {
+                        getView(topTitleGrid, topTitle)?.isVisible = config.isTopTitleVisible
+                        getView(bottomTitleGrid, bottomTitle)?.isVisible = config.isBottomTitleVisible
+                        getView(dividerGrid, divider)?.isVisible = config.isBottomTitleVisible
+                    }
+
+                    else -> {
+                        // Only hiding views in the horizontal landscape so that items stay in one row
+                        getView(topTitleGrid, topTitle)?.isInvisible = !config.isTopTitleVisible
+                        getView(bottomTitleGrid, bottomTitle)?.isInvisible = !config.isBottomTitleVisible
+                        getView(dividerGrid, divider)?.isInvisible = !config.isBottomTitleVisible
+                    }
+                }
 
                 layoutOption1?.isVisible = config.layoutStyle == LayoutStyle.Grid
                 layoutOption2?.isVisible = config.layoutStyle == LayoutStyle.Vertical
@@ -111,8 +124,10 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
             )
 
         }
-        binding.externalCredentialTitle?.setOnClickListener {
-            openLayoutConfigDialog()
+        listOf(binding.externalCredentialTitle, binding.devDialogToggle).forEach {
+            it?.setOnClickListener {
+                openLayoutConfigDialog()
+            }
         }
 
     }
