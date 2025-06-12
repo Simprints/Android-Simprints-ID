@@ -1,6 +1,5 @@
 package com.simprints.infra.enrolment.records.repository.local
 
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
@@ -8,6 +7,7 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource.Simprints
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
@@ -16,9 +16,8 @@ import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQue
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -55,8 +54,11 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
+    @MockK(relaxed = true)
+    lateinit var timeHelper: TimeHelper
+
     private val subjectDatabaseFactory = SubjectsDatabaseFactory(
-        ApplicationProvider.getApplicationContext<Context>(),
+        ApplicationProvider.getApplicationContext(),
         mockk {
             every { getLocalDbKeyOrThrow(any()) } returns LocalDbKey("any", byteArrayOf(1, 2, 3))
         },
@@ -181,7 +183,10 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
     @Before
     fun setUp() {
+        MockKAnnotations.init(this)
+
         dataSource = RoomEnrolmentRecordLocalDataSource(
+            timeHelper,
             subjectDatabaseFactory,
             mockk {
                 every { tokenizeIfNecessary(any(), any(), any()) } answers {
@@ -204,7 +209,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         }
     }
 
-    val initialData = listOf(
+    private val initialData = listOf(
         SubjectAction.Creation(subject1P1WithFace),
         SubjectAction.Creation(subject2P1WithFinger),
         SubjectAction.Creation(subject3P1WithBoth),
@@ -797,6 +802,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         // When - Query P1 for ISO
         val loadedP1Iso = dataSource
             .loadFingerprintIdentities(
@@ -811,6 +817,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         // When - Query P2 for NEC
         val loadedP2Nec = dataSource
             .loadFingerprintIdentities(
@@ -825,6 +832,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
 
         // Then - P1 NEC
         assertThat(loadedP1Nec).hasSize(1)
@@ -912,6 +920,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                     onCandidateLoaded = mockCallback,
                 ).toList()
                 .first()
+                .identities
         val loadedAll =
             dataSource
                 .loadFingerprintIdentities(
@@ -923,12 +932,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                     onCandidateLoaded = mockCallback,
                 ).toList()
                 .first()
+                .identities
 
         // Then
         assertThat(loadedRanges).hasSize(2)
-        assertThat(loadedRanges[0][0].subjectId).isEqualTo(subject2P1WithFinger.subjectId)
-        assertThat(loadedRanges[1]).hasSize(1)
-        assertThat(loadedRanges[1][0].subjectId).isEqualTo(subject5P1WithNec.subjectId)
+        assertThat(loadedRanges[0].identities[0].subjectId).isEqualTo(subject2P1WithFinger.subjectId)
+        assertThat(loadedRanges[1].identities).hasSize(1)
+        assertThat(loadedRanges[1].identities[0].subjectId).isEqualTo(subject5P1WithNec.subjectId)
         assertThat(loadedFirstTwo).hasSize(2)
         assertThat(loadedFirstTwo.map { it.subjectId })
             .containsExactly(subject2P1WithFinger.subjectId, subject5P1WithNec.subjectId)
@@ -962,6 +972,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
 
         // Then
         assertThat(loadedIdentities).isEmpty()
@@ -1007,6 +1018,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         val loadedP1Roc3 = dataSource
             .loadFaceIdentities(
                 query = SubjectQuery(projectId = PROJECT_1_ID, faceSampleFormat = ROC_3_FORMAT),
@@ -1017,6 +1029,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         val loadedP2Roc1 = dataSource
             .loadFaceIdentities(
                 query = SubjectQuery(projectId = PROJECT_2_ID, faceSampleFormat = ROC_1_FORMAT),
@@ -1027,6 +1040,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
 
         // Then - P1 ROC_1
         assertThat(loadedP1Roc1).hasSize(1)
@@ -1100,6 +1114,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                     onCandidateLoaded = mockCallback,
                 ).toList()
                 .first()
+                .identities
         val loadedAll = dataSource
             .loadFaceIdentities(
                 query = baseQuery,
@@ -1110,12 +1125,13 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
 
         // Then
         assertThat(loadedRanges).hasSize(2) // Two ranges loaded
-        assertThat(loadedRanges[0][0].subjectId).isEqualTo(subject1P1WithFace.subjectId)
-        assertThat(loadedRanges[1]).hasSize(1)
-        assertThat(loadedRanges[1][0].subjectId).isEqualTo(subject5P1WithRoc1.subjectId)
+        assertThat(loadedRanges[0].identities[0].subjectId).isEqualTo(subject1P1WithFace.subjectId)
+        assertThat(loadedRanges[1].identities).hasSize(1)
+        assertThat(loadedRanges[1].identities[0].subjectId).isEqualTo(subject5P1WithRoc1.subjectId)
         assertThat(loadedFirstTwo).hasSize(2)
         assertThat(loadedFirstTwo.map { it.subjectId })
             .containsExactly(subject1P1WithFace.subjectId, subject5P1WithRoc1.subjectId)
@@ -1149,6 +1165,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
 
         // Then
         assertThat(loadedIdentities).isEmpty()
@@ -1195,6 +1212,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         val loadedP1A1M2Roc3 = dataSource
             .loadFaceIdentities(
                 queryP1A1M2Roc3,
@@ -1207,6 +1225,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         val loadedP1A1M1Roc3Empty =
             dataSource
                 .loadFaceIdentities(
@@ -1220,6 +1239,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                     onCandidateLoaded = mockCallback,
                 ).toList()
                 .first()
+                .identities
 
         // Then
         assertThat(loadedP1A1M1Roc1).hasSize(1)
@@ -1283,6 +1303,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         val loadedP1A1M3Nec = dataSource
             .loadFingerprintIdentities(
                 queryP1A1M3Nec,
@@ -1295,6 +1316,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         val loadedP1A1M2Iso = dataSource
             .loadFingerprintIdentities(
                 queryP1A1M2Iso,
@@ -1307,6 +1329,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
         val loadedP1A2M1NecEmpty = dataSource
             .loadFingerprintIdentities(
                 queryP1A2M1NecEmpty,
@@ -1319,6 +1342,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 onCandidateLoaded = mockCallback,
             ).toList()
             .first()
+            .identities
 
         // Then
         assertThat(loadedP1A1M1Nec).hasSize(1)

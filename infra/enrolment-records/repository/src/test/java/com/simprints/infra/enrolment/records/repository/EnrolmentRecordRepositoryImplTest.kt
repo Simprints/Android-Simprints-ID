@@ -3,12 +3,14 @@ package com.simprints.infra.enrolment.records.repository
 import android.content.SharedPreferences
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
@@ -307,7 +309,7 @@ class EnrolmentRecordRepositoryImplTest {
                 scope = this,
                 onCandidateLoaded = onCandidateLoaded,
             ).consumeEach {
-                fingerprintIdentities.addAll(it)
+                fingerprintIdentities.addAll(it.identities)
             }
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
@@ -348,7 +350,7 @@ class EnrolmentRecordRepositoryImplTest {
                 scope = this,
                 onCandidateLoaded = onCandidateLoaded,
             ).consumeEach {
-                fingerprintIdentities.addAll(it)
+                fingerprintIdentities.addAll(it.identities)
             }
 
         assert(fingerprintIdentities == expectedFingerprintIdentities)
@@ -390,7 +392,7 @@ class EnrolmentRecordRepositoryImplTest {
                 scope = this,
                 onCandidateLoaded = onCandidateLoaded,
             ).consumeEach {
-                faceIdentities.addAll(it)
+                faceIdentities.addAll(it.identities)
             }
 
         assert(faceIdentities == expectedFaceIdentities)
@@ -433,7 +435,7 @@ class EnrolmentRecordRepositoryImplTest {
                 scope = this,
                 onCandidateLoaded = onCandidateLoaded,
             ).consumeEach {
-                faceIdentities.addAll(it)
+                faceIdentities.addAll(it.identities)
             }
 
         assert(faceIdentities == expectedFaceIdentities)
@@ -449,11 +451,18 @@ class EnrolmentRecordRepositoryImplTest {
         }
     }
 
-    private fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<List<T>> {
-        val channel = Channel<List<T>>(lists.size)
+    private fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<IdentityBatch<T>> {
+        val channel = Channel<IdentityBatch<T>>(lists.size)
         runBlocking {
+            var time = 0L
             for (list in lists) {
-                channel.send(list)
+                channel.send(
+                    IdentityBatch(
+                        identities = list,
+                        loadingStartTime = Timestamp(time++),
+                        loadingEndTime = Timestamp(time++),
+                    )
+                )
             }
             channel.close()
         }
@@ -462,7 +471,7 @@ class EnrolmentRecordRepositoryImplTest {
 
     @Test
     fun `performActions should forward the subject creation calls to the insertRecordsDuringMigration`() = runTest {
-        val actions = listOf<SubjectAction>(
+        val actions = listOf(
             mockk<SubjectAction.Creation>(),
             mockk<SubjectAction.Deletion>(),
             mockk<SubjectAction.Update>(),

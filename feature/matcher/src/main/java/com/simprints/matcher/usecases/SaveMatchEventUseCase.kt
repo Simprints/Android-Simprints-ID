@@ -11,6 +11,7 @@ import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.infra.events.session.SessionEventRepository
+import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +31,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         candidatesCount: Int,
         matcherName: String,
         results: List<MatchResultItem>,
+        batches: List<MatchBatchInfo>,
     ) {
         sessionCoroutineScope.launch {
             val matchEntries = results.map { MatchEntry(it.subjectId, it.confidence) }
@@ -52,6 +54,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
                     candidatesCount,
                     matchEntries,
                     matchParams.probeReferenceId,
+                    batches,
                 )
             }
             eventRepository.addOrUpdateEvent(event)
@@ -96,6 +99,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         candidatesCount: Int,
         matchEntries: List<MatchEntry>,
         biometricReferenceId: String,
+        batches: List<MatchBatchInfo>,
     ) = OneToManyMatchEvent(
         createdAt = startTime,
         endTime = endTime,
@@ -106,6 +110,15 @@ internal class SaveMatchEventUseCase @Inject constructor(
         matcher = matcherName,
         result = matchEntries,
         probeBiometricReferenceId = biometricReferenceId,
+        batches = batches.map {
+            OneToManyMatchEvent.OneToManyMatchPayload.OneToManyBatch(
+                loadingStartTime = it.loadingStartTime,
+                loadingEndTime = it.loadingEndTime,
+                comparingStartTime = it.comparingStartTime,
+                comparingEndTime = it.comparingEndTime,
+                count = it.count,
+            )
+        },
     )
 
     private fun SubjectQuery.parseQueryAsCoreMatchPoolType(): OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType = when {
