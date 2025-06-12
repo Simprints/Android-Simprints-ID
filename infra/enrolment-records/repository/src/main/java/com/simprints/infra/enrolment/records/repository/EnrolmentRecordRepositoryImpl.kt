@@ -1,6 +1,5 @@
 package com.simprints.infra.enrolment.records.repository
 
-import android.content.Context
 import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -16,14 +15,13 @@ import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRec
 import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.logging.Simber
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class EnrolmentRecordRepositoryImpl @Inject constructor(
-    @ApplicationContext context: Context,
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
     @CommCareDataSource private val commCareDataSource: IdentityDataSource,
     private val tokenizationProcessor: TokenizationProcessor,
@@ -31,8 +29,9 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
     @EnrolmentBatchSize private val batchSize: Int,
     private val insertRecordsInRoomDuringMigration: InsertRecordsInRoomDuringMigrationUseCase,
+    securityManager: SecurityManager,
 ) : EnrolmentRecordRepository {
-    private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
+    private val prefs = securityManager.buildEncryptedSharedPreferences(PREF_FILE_NAME)
 
     companion object {
         private const val PREF_FILE_NAME = "UPLOAD_ENROLMENT_RECORDS_PROGRESS"
