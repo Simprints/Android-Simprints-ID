@@ -75,4 +75,19 @@ class RealmToRoomMigrationFlagsStore @Inject constructor(
         }
         Simber.i("[RealmToRoomMigrationFlagsStore] Down sync status updated to: $isInProgress", tag = REALM_DB_MIGRATION)
     }
+
+    /**
+     * Returns a string representation of the current migration-related key-value pairs.
+     */
+    suspend fun getStoreStateAsString(): String = mutex.withLock {
+        val status = prefs.getString(KEY_MIGRATION_STATUS, MigrationStatus.NOT_STARTED.name)
+        val retries = prefs.getInt(KEY_MIGRATION_RETRIES, 0)
+        val downSync = prefs.getBoolean(KEY_DOWN_SYNC_STATUS, false)
+
+        """
+        $KEY_MIGRATION_STATUS: $status
+        $KEY_MIGRATION_RETRIES: $retries
+        $KEY_DOWN_SYNC_STATUS: $downSync
+        """.trimIndent()
+    }
 }

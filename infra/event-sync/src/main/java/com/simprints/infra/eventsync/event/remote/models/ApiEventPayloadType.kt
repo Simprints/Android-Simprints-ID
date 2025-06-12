@@ -48,144 +48,40 @@ import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAP
 
 @Keep
 internal enum class ApiEventPayloadType {
-    // a constant key is required to serialise/deserialize
-    // ApiEventPayload correctly with Jackson (see annotation in ApiEventPayload).
-    // Add a key in the companion object for each enum value
-
-    // key added: CALLOUT_KEY
     Callout,
-
-    // key added: CALLBACK_KEY
     Callback,
-
-    // key added: AUTHENTICATION_KEY
     Authentication,
-
-    // key added: CONSENT_KEY
     Consent,
-
-    // key added: ENROLMENT_KEY
     Enrolment,
-
-    // key added: AUTHORIZATION_KEY
     Authorization,
-
-    // key added: FINGERPRINT_CAPTURE_KEY
     FingerprintCapture,
-
-    // key added: FINGERPRINT_CAPTURE_BIOMETRICS_KEY
     FingerprintCaptureBiometrics,
-
-    // key added: ONE_TO_ONE_MATCH_KEY
     OneToOneMatch,
-
-    // key added: ONE_TO_MANY_MATCH_KEY
     OneToManyMatch,
-
-    // key added: PERSON_CREATION_KEY
     PersonCreation,
-
-    // key added: ALERT_SCREEN_KEY
     AlertScreen,
-
-    // key added: GUID_SELECTION_KEY
     GuidSelection,
-
-    // key added: CONNECTIVITY_SNAPSHOT_KEY
     ConnectivitySnapshot,
-
-    // key added: REFUSAL_KEY
     Refusal,
-
-    // key added: CANDIDATE_READ_KEY
     CandidateRead,
-
-    // key added: SCANNER_CONNECTION_KEY
     ScannerConnection,
-
-    // key added: VERO_2_INFO_SNAPSHOT_KEY
     Vero2InfoSnapshot,
-
-    // key added: SCANNER_FIRMWARE_UPDATE_KEY
     ScannerFirmwareUpdate,
-
-    // key added: INVALID_INTENT_KEY
     InvalidIntent,
-
-    // key added: SUSPICIOUS_INTENT_KEY
     SuspiciousIntent,
-
-    // key added: INTENT_PARSING_KEY
     IntentParsing,
-
-    // key added: COMPLETION_CHECK_KEY
     CompletionCheck,
-
-    // key added: FACE_ONBOARDING_COMPLETE_KEY
     FaceOnboardingComplete,
-
-    // key added: FACE_FALLBACK_CAPTURE_KEY
     FaceFallbackCapture,
-
-    // key added: FACE_CAPTURE_KEY
     FaceCapture,
-
-    // key added: FACE_CAPTURE_BIOMETRICS_KEY
     FaceCaptureBiometrics,
-
-    // key added: FACE_CAPTURE_CONFIRMATION_KEY
     FaceCaptureConfirmation,
-
-    // key added: EVENT_DOWN_SYNC_REQUEST_KEY
     EventDownSyncRequest,
-
-    // key added: EVENT_UP_SYNC_REQUEST_KEY
     EventUpSyncRequest,
-
-    // key added: LICENSE_CHECK_KEY
     LicenseCheck,
-
-    // key added: AGE_GROUP_SELECTION_KEY
     AgeGroupSelection,
-
-    // key added: BIOMETRIC_REFERENCE_CREATION_KEY
     BiometricReferenceCreation,
-
     ;
-
-    companion object {
-        const val CALLOUT_KEY = "Callout"
-        const val CALLBACK_KEY = "Callback"
-        const val AUTHENTICATION_KEY = "Authentication"
-        const val CONSENT_KEY = "Consent"
-        const val ENROLMENT_KEY = "Enrolment"
-        const val AUTHORIZATION_KEY = "Authorization"
-        const val FINGERPRINT_CAPTURE_KEY = "FingerprintCapture"
-        const val ONE_TO_ONE_MATCH_KEY = "OneToOneMatch"
-        const val ONE_TO_MANY_MATCH_KEY = "OneToManyMatch"
-        const val PERSON_CREATION_KEY = "PersonCreation"
-        const val ALERT_SCREEN_KEY = "AlertScreen"
-        const val GUID_SELECTION_KEY = "GuidSelection"
-        const val CONNECTIVITY_SNAPSHOT_KEY = "ConnectivitySnapshot"
-        const val REFUSAL_KEY = "Refusal"
-        const val CANDIDATE_READ_KEY = "CandidateRead"
-        const val SCANNER_CONNECTION_KEY = "ScannerConnection"
-        const val VERO_2_INFO_SNAPSHOT_KEY = "Vero2InfoSnapshot"
-        const val SCANNER_FIRMWARE_UPDATE_KEY = "ScannerFirmwareUpdate"
-        const val INVALID_INTENT_KEY = "InvalidIntent"
-        const val SUSPICIOUS_INTENT_KEY = "SuspiciousIntent"
-        const val INTENT_PARSING_KEY = "IntentParsing"
-        const val COMPLETION_CHECK_KEY = "CompletionCheck"
-        const val FACE_ONBOARDING_COMPLETE_KEY = "FaceOnboardingComplete"
-        const val FACE_FALLBACK_CAPTURE_KEY = "FaceFallbackCapture"
-        const val FACE_CAPTURE_KEY = "FaceCapture"
-        const val FACE_CAPTURE_CONFIRMATION_KEY = "FaceCaptureConfirmation"
-        const val FACE_CAPTURE_BIOMETRICS_KEY = "FaceCaptureBiometrics"
-        const val FINGERPRINT_CAPTURE_BIOMETRICS_KEY = "FingerprintCaptureBiometrics"
-        const val EVENT_DOWN_SYNC_REQUEST_KEY = "EventDownSyncRequest"
-        const val EVENT_UP_SYNC_REQUEST_KEY = "EventUpSyncRequest"
-        const val BIOMETRIC_REFERENCE_CREATION_KEY = "BiometricReferenceCreation"
-    }
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {

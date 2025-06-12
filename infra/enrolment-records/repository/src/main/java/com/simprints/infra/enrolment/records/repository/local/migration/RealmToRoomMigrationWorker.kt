@@ -85,6 +85,8 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
     override val notificationDescription = IDR.string.notification_migration_description
 
     private suspend fun processRecords() {
+        // log realm db info
+        crashlyticsLog("[RealmToRoomMigrationWorker] ${realmDataSource.getLocalDBInfo()}")
         var index = 0
         realmDataSource
             .loadAllSubjectsInBatches(BATCH_SIZE)
@@ -100,5 +102,19 @@ internal class RealmToRoomMigrationWorker @AssistedInject constructor(
                     throw e
                 }
             }
+        validateRealmToRoomMigration()
+        // log room db info
+        crashlyticsLog("[RealmToRoomMigrationWorker] ${roomDataSource.getLocalDBInfo()}")
+    }
+
+    private suspend fun validateRealmToRoomMigration() {
+        val realmCount = realmDataSource.count(SubjectQuery())
+        val roomCount = roomDataSource.count(SubjectQuery())
+        if (realmCount != roomCount) {
+            throw IllegalStateException(
+                "Migration validation failed: Realm count ($realmCount) does not match Room count ($roomCount).",
+            )
+        }
+        crashlyticsLog("[RealmToRoomMigrationWorker] Migration validation successful: $realmCount records in both databases.")
     }
 }

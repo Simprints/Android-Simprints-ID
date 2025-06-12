@@ -105,6 +105,8 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         dataSource: BiometricDataSource,
     ): Int = fromIdentityDataSource(dataSource).count(query, dataSource)
 
+    override suspend fun getLocalDBInfo(): String = selectEnrolmentRecordLocalDataSource().getLocalDBInfo()
+
     override suspend fun loadFingerprintIdentities(
         query: SubjectQuery,
         ranges: List<IntRange>,
