@@ -14,6 +14,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchBatchInfo
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
@@ -23,6 +24,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -32,6 +34,7 @@ import org.junit.Test
 import java.util.UUID
 import kotlin.random.Random
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class MatchViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -58,7 +61,6 @@ internal class MatchViewModelTest {
     lateinit var configManager: ConfigManager
 
     private lateinit var cb1: CapturingSlot<(Int) -> Unit>
-    private val totalCandidates = 384
     private lateinit var viewModel: MatchViewModel
 
     @Before
@@ -93,10 +95,11 @@ internal class MatchViewModelTest {
                     matchResultItems = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = "MatcherName",
+                    matchBatches = emptyList()
                 ),
             )
         }
-        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any(), any()) }
 
         assertThat(viewModel.isInitialized).isFalse()
 
@@ -133,6 +136,23 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 20f),
             FaceMatchResult.Item("1", 10f),
         )
+        val batches = listOf(
+            MatchBatchInfo(
+                loadingStartTime = Timestamp(0L),
+                loadingEndTime = Timestamp(1000L),
+                comparingStartTime = Timestamp(2000L),
+                comparingEndTime = Timestamp(3000L),
+                count = 3,
+            ),
+            MatchBatchInfo(
+                loadingStartTime = Timestamp(4000L),
+                loadingEndTime = Timestamp(5000L),
+                comparingStartTime = Timestamp(6000L),
+                comparingEndTime = Timestamp(7000L),
+                count = 4,
+            ),
+        )
+
         coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
             emit(MatcherUseCase.MatcherState.CandidateLoaded)
@@ -141,10 +161,11 @@ internal class MatchViewModelTest {
                     matchResultItems = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = MATCHER_NAME,
+                    matchBatches = batches,
                 ),
             )
         }
-        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any(), any()) }
 
         val states = viewModel.matchState.test()
         viewModel.setupMatch(
@@ -172,7 +193,15 @@ internal class MatchViewModelTest {
             FaceMatchResult(responseItems, FaceConfiguration.BioSdk.RANK_ONE),
         )
 
-        verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
+        verify { saveMatchEvent.invoke(
+            any(),
+            any(),
+            any(),
+            eq(7),
+            eq(MATCHER_NAME),
+            any(),
+            withArg { list -> assertThat(list.size).isEqualTo(batches.size) }
+        ) }
     }
 
     @Test
@@ -186,6 +215,22 @@ internal class MatchViewModelTest {
             FingerprintMatchResult.Item("1", 20f),
             FingerprintMatchResult.Item("1", 10f),
         )
+        val batches = listOf(
+            MatchBatchInfo(
+                loadingStartTime = Timestamp(0L),
+                loadingEndTime = Timestamp(1000L),
+                comparingStartTime = Timestamp(2000L),
+                comparingEndTime = Timestamp(3000L),
+                count = 3,
+            ),
+            MatchBatchInfo(
+                loadingStartTime = Timestamp(4000L),
+                loadingEndTime = Timestamp(5000L),
+                comparingStartTime = Timestamp(6000L),
+                comparingEndTime = Timestamp(7000L),
+                count = 4,
+            ),
+        )
 
         coEvery { fingerprintMatcherUseCase.invoke(any(), any()) } returns flow {
             emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
@@ -195,11 +240,12 @@ internal class MatchViewModelTest {
                     matchResultItems = responseItems,
                     totalCandidates = responseItems.size,
                     matcherName = MATCHER_NAME,
+                    matchBatches = batches,
                 ),
             )
         }
 
-        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any(), any()) }
 
         val states = viewModel.matchState.test()
 
@@ -228,7 +274,15 @@ internal class MatchViewModelTest {
             FingerprintMatchResult(responseItems, SECUGEN_SIM_MATCHER),
         )
 
-        verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
+        verify { saveMatchEvent.invoke(
+            any(),
+            any(),
+            any(),
+            eq(7),
+            eq(MATCHER_NAME),
+            any(),
+            withArg { list -> assertThat(list.size).isEqualTo(batches.size) }
+        ) }
     }
 
     private fun getFaceSample(): MatchParams.FaceSample = MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))

@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
@@ -38,6 +39,7 @@ class IdentityDataSourceModule {
     @CommCareDataSource
     @Provides
     fun provideCommCareIdentityDataSource(
+        timeHelper: TimeHelper,
         encoder: EncodingUtils,
         jsonHelper: JsonHelper,
         compareImplicitTokenizedStringsUseCase: CompareImplicitTokenizedStringsUseCase,
@@ -45,6 +47,7 @@ class IdentityDataSourceModule {
         @ApplicationContext context: Context,
         @DispatcherIO dispatcher: CoroutineDispatcher,
     ): IdentityDataSource = CommCareIdentityDataSource(
+        timeHelper = timeHelper,
         encoder = encoder,
         jsonHelper = jsonHelper,
         compareImplicitTokenizedStringsUseCase = compareImplicitTokenizedStringsUseCase,
