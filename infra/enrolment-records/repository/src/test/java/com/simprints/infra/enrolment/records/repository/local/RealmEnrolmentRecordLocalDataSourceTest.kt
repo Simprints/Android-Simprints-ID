@@ -267,13 +267,15 @@ class RealmEnrolmentRecordLocalDataSourceTest {
 
     @Test
     fun performSubjectCreationAction_deletesOldSamples() = runTest {
+        val faceReferenceId = "faceToDelete"
+        val fingerReferenceId = "fingerToDelete"
         every { realmSingleQuery.find() } returns getRandomSubject()
             .copy(
                 faceSamples = listOf(
-                    getRandomFaceSample("faceToDelete"),
+                    getRandomFaceSample(referenceId = faceReferenceId),
                 ),
                 fingerprintSamples = listOf(
-                    getRandomFingerprintSample("fingerToDelete"),
+                    getRandomFingerprintSample(referenceId = fingerReferenceId),
                 ),
             ).toRealmDb()
         val subject = getFakePerson()
@@ -284,8 +286,8 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         )
 
         verify {
-            mutableRealm.delete(withArg<DbFaceSample> { it.id == "faceToDelete" })
-            mutableRealm.delete(withArg<DbFingerprintSample> { it.id == "faceToDelete" })
+            mutableRealm.delete(match<DbFaceSample> { it.referenceId == faceReferenceId })
+            mutableRealm.delete(match<DbFingerprintSample> { it.referenceId == fingerReferenceId })
         }
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
@@ -294,13 +296,15 @@ class RealmEnrolmentRecordLocalDataSourceTest {
     @Test
     fun performSubjectUpdateAction() = runTest {
         val subject = getFakePerson()
+        val faceReferenceId = "faceToDelete"
+        val fingerReferenceId = "fingerToDelete"
         every { realmSingleQuery.find() } returns getRandomSubject(
             faceSamples = listOf(
-                getRandomFaceSample(referenceId = "faceToDelete"),
+                getRandomFaceSample(referenceId = faceReferenceId),
                 getRandomFaceSample(),
             ),
             fingerprintSamples = listOf(
-                getRandomFingerprintSample(referenceId = "fingerToDelete"),
+                getRandomFingerprintSample(referenceId = fingerReferenceId),
                 getRandomFingerprintSample(),
             ),
         ).toRealmDb()
@@ -311,7 +315,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                     subject.subjectId.toString(),
                     faceSamplesToAdd = listOf(getRandomFaceSample()),
                     fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
-                    referenceIdsToRemove = listOf("faceToDelete", "fingerToDelete"),
+                    referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
                 ),
             ),
             project,
@@ -319,15 +323,15 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
         verify {
-            mutableRealm.delete(withArg<DbFaceSample> { it.id == "faceToDelete" })
-            mutableRealm.delete(withArg<DbFingerprintSample> { it.id == "faceToDelete" })
+            mutableRealm.delete(match<DbFaceSample> { it.referenceId == faceReferenceId })
+            mutableRealm.delete(match<DbFingerprintSample> { it.referenceId == fingerReferenceId })
             mutableRealm.copyToRealm(
-                withArg<DbSubject> {
+                match<DbSubject> {
                     // one old + one new
                     it.faceSamples.size == 2 &&
-                        it.fingerprintSamples.size == 2 &&
-                        it.faceSamples.none { it.referenceId == "faceToDelete" } &&
-                        it.fingerprintSamples.none { it.referenceId == "fingerToDelete" }
+                    it.fingerprintSamples.size == 2 &&
+                    it.faceSamples.none { sample -> sample.referenceId == faceReferenceId } &&
+                    it.fingerprintSamples.none { sample -> sample.referenceId == fingerReferenceId }
                 },
                 any(),
             )
@@ -368,7 +372,6 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         assertThat(peopleCount).isEqualTo(0)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `loadAllSubjectsInBatches with no subjects should return empty list and close channel`() = runTest {
         val batchSize = 10
