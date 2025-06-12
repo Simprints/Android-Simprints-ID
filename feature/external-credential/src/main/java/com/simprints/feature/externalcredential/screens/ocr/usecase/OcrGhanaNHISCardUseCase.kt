@@ -28,11 +28,22 @@ internal class OcrGhanaNHISCardUseCase @Inject constructor(
 
     private fun findViaExactMatch(ocrResult: Text): String? {
         val match = ocrResult.textBlocks.flatMap { it.lines }.map {
-            it.elements.joinToString { e -> e.text }.trim().replace(" ", "").replaceCharactersWithDigits()
+            it.elements.joinToString { e -> e.text }.trim().replace(" ", "")
         }.firstOrNull {
-            it.isDigitsOnly() && it.length == MEMBERSHIP_ID_LENGTH
+            val isExactMatch = it.isDigitsOnly() && it.length == MEMBERSHIP_ID_LENGTH
+            val isPartialMatch =
+                it.isMostlyDigits(thresholdPercentage = 0.8) && it.replaceCharactersWithDigits().length == MEMBERSHIP_ID_LENGTH
+            return@firstOrNull isExactMatch || isPartialMatch
         }
         return match
+    }
+
+    private fun String.isMostlyDigits(thresholdPercentage: Double = 0.8): Boolean {
+        if (isEmpty()) return false
+
+        val digitCount = count { it.isDigit() }
+        val percentage = digitCount.toDouble() / length
+        return percentage >= thresholdPercentage
     }
 
     private fun findWithFuzzySearch(ocrResult: Text, ocrCredentialId: OcrId.FuzzySearch): Map<OcrId, String?> {
