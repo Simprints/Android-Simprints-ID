@@ -7,11 +7,11 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION_V3
 import java.util.UUID
 
 @Keep
-data class ConfirmationCalloutEvent(
+data class ConfirmationCalloutEventV3(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: ConfirmationCalloutPayload,
     override val type: EventType,
@@ -26,7 +26,7 @@ data class ConfirmationCalloutEvent(
     ) : this(
         UUID.randomUUID().toString(),
         ConfirmationCalloutPayload(createdAt, EVENT_VERSION, projectId, selectedGuid, sessionId),
-        CALLOUT_CONFIRMATION,
+        CALLOUT_CONFIRMATION_V3,
     )
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
@@ -41,12 +41,12 @@ data class ConfirmationCalloutEvent(
         val selectedGuid: String,
         val sessionId: String,
         override val endedAt: Timestamp? = null,
-        override val type: EventType = CALLOUT_CONFIRMATION,
+        override val type: EventType = CALLOUT_CONFIRMATION_V3,
     ) : EventPayload() {
         override fun toSafeString(): String = "guid: $selectedGuid, session ID: $sessionId"
     }
 
     companion object {
-        const val EVENT_VERSION = 2
+        const val EVENT_VERSION = 3
     }
 }

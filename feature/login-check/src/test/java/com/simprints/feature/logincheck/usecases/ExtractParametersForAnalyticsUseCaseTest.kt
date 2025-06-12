@@ -29,7 +29,7 @@ internal class ExtractParametersForAnalyticsUseCaseTest {
 
     @Test
     fun `Logs analytics keys in flow actions`() = runTest {
-        useCase(ActionFactory.getFlowRequest())
+        useCase(ActionFactory.getIdentifyRequest())
 
         verify {
             Simber.setUserProperty(any(), ActionFactory.MOCK_USER_ID.toString())
@@ -41,7 +41,7 @@ internal class ExtractParametersForAnalyticsUseCaseTest {
 
     @Test
     fun `Does not log analytics keys in follow up actions`() = runTest {
-        useCase(ActionFactory.getFolowUpRequest())
+        useCase(ActionFactory.getConfirmationRequest())
 
         verify(exactly = 0) {
             Simber.setUserProperty(any(), any())

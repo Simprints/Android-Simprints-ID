@@ -5,11 +5,12 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.BiometricDataSource
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -52,18 +53,33 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
         val startTime = timeHelper.now()
         val event = with(request) {
             when (this) {
-                is ActionRequest.EnrolActionRequest -> EnrolmentCalloutEvent(startTime, projectId, userId, moduleId, metadata)
-                is ActionRequest.IdentifyActionRequest -> IdentificationCalloutEvent(startTime, projectId, userId, moduleId, metadata)
-                is ActionRequest.VerifyActionRequest -> VerificationCalloutEvent(
+                is ActionRequest.EnrolActionRequest -> EnrolmentCalloutEventV3(
+                    startTime,
+                    projectId,
+                    userId,
+                    moduleId,
+                    metadata,
+                    BiometricDataSource.fromString(biometricDataSource),
+                )
+                is ActionRequest.IdentifyActionRequest -> IdentificationCalloutEventV3(
+                    startTime,
+                    projectId,
+                    userId,
+                    moduleId,
+                    metadata,
+                    BiometricDataSource.fromString(biometricDataSource),
+                )
+                is ActionRequest.VerifyActionRequest -> VerificationCalloutEventV3(
                     startTime,
                     projectId,
                     userId,
                     moduleId,
                     verifyGuid,
                     metadata,
+                    BiometricDataSource.fromString(biometricDataSource),
                 )
-                is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEvent(startTime, projectId, selectedGuid, sessionId)
-                is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEvent(
+                is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEventV3(startTime, projectId, selectedGuid, sessionId)
+                is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEventV3(
                     startTime,
                     projectId,
                     userId,

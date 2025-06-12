@@ -142,26 +142,41 @@ fun verifyCallbackErrorApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(2)
 }
 
-fun validateCalloutEventApiModel(json: JSONObject) {
+fun validateCalloutEventApiModelV2(json: JSONObject) {
     validateCommonParams(json, "Callout", 2)
     with(json.getJSONObject("payload")) {
         validateTimestamp(getJSONObject("startTime"))
         with(getJSONObject("callout")) {
             when (ApiCalloutType.valueOf(getString("type"))) {
-                ApiCalloutType.Confirmation -> verifyCalloutConfirmationApiModel(this)
-                ApiCalloutType.Enrolment -> verifyCalloutEnrolmentApiModel(this)
-                ApiCalloutType.Identification -> verifyCalloutIdentificationApiModel(this)
-                ApiCalloutType.Verification -> verifyCalloutVerificationApiModel(this)
-                ApiCalloutType.EnrolmentLastBiometrics -> verifyCalloutLastEnrolmentBiometricsApiModel(
-                    this,
-                )
+                ApiCalloutType.Confirmation -> verifyCalloutConfirmationApiModelV2(this)
+                ApiCalloutType.Enrolment -> verifyCalloutEnrolmentApiModelV2(this)
+                ApiCalloutType.Identification -> verifyCalloutIdentificationApiModelV2(this)
+                ApiCalloutType.Verification -> verifyCalloutVerificationApiModelV2(this)
+                ApiCalloutType.EnrolmentLastBiometrics -> verifyCalloutLastEnrolmentBiometricsApiModelV2(this)
             }
         }
         assertThat(length()).isEqualTo(2)
     }
 }
 
-fun verifyCalloutLastEnrolmentBiometricsApiModel(json: JSONObject) {
+fun validateCalloutEventApiModelV3(json: JSONObject) {
+    validateCommonParams(json, "Callout", 3)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        with(getJSONObject("callout")) {
+            when (ApiCalloutType.valueOf(getString("type"))) {
+                ApiCalloutType.Confirmation -> verifyCalloutConfirmationApiModelV3(this)
+                ApiCalloutType.Enrolment -> verifyCalloutEnrolmentApiModelV3(this)
+                ApiCalloutType.Identification -> verifyCalloutIdentificationApiModelV3(this)
+                ApiCalloutType.Verification -> verifyCalloutVerificationApiModelV3(this)
+                ApiCalloutType.EnrolmentLastBiometrics -> verifyCalloutLastEnrolmentBiometricsApiModelV3(this)
+            }
+        }
+        assertThat(length()).isEqualTo(2)
+    }
+}
+
+fun verifyCalloutLastEnrolmentBiometricsApiModelV2(json: JSONObject) {
     assertThat(json.getString("type")).isEqualTo("EnrolmentLastBiometrics")
     assertThat(json.getString("projectId")).isNotNull()
     assertThat(json.getString("userId")).isNotNull()
@@ -171,7 +186,17 @@ fun verifyCalloutLastEnrolmentBiometricsApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(6)
 }
 
-fun verifyCalloutVerificationApiModel(json: JSONObject) {
+fun verifyCalloutLastEnrolmentBiometricsApiModelV3(json: JSONObject) {
+    assertThat(json.getString("type")).isEqualTo("EnrolmentLastBiometrics")
+    assertThat(json.getString("projectId")).isNotNull()
+    assertThat(json.getString("userId")).isNotNull()
+    assertThat(json.getString("moduleId")).isNotNull()
+    assertThat(json.getString("metadata")).isNotNull()
+    assertThat(json.getString("sessionId")).isNotNull()
+    assertThat(json.length()).isEqualTo(6)
+}
+
+fun verifyCalloutVerificationApiModelV2(json: JSONObject) {
     assertThat(json.getString("type")).isEqualTo("Verification")
     assertThat(json.getString("projectId")).isNotNull()
     assertThat(json.getString("userId")).isNotNull()
@@ -181,7 +206,18 @@ fun verifyCalloutVerificationApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(6)
 }
 
-fun verifyCalloutIdentificationApiModel(json: JSONObject) {
+fun verifyCalloutVerificationApiModelV3(json: JSONObject) {
+    assertThat(json.getString("type")).isEqualTo("Verification")
+    assertThat(json.getString("projectId")).isNotNull()
+    assertThat(json.getString("userId")).isNotNull()
+    assertThat(json.getString("moduleId")).isNotNull()
+    assertThat(json.getString("verifyGuid")).isNotNull()
+    assertThat(json.getString("metadata")).isNotNull()
+    assertThat(json.getString("biometricDataSource")).isNotNull()
+    assertThat(json.length()).isEqualTo(7)
+}
+
+fun verifyCalloutIdentificationApiModelV2(json: JSONObject) {
     assertThat(json.getString("type")).isEqualTo("Identification")
     assertThat(json.getString("projectId")).isNotNull()
     assertThat(json.getString("userId")).isNotNull()
@@ -190,7 +226,17 @@ fun verifyCalloutIdentificationApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(5)
 }
 
-fun verifyCalloutEnrolmentApiModel(json: JSONObject) {
+fun verifyCalloutIdentificationApiModelV3(json: JSONObject) {
+    assertThat(json.getString("type")).isEqualTo("Identification")
+    assertThat(json.getString("projectId")).isNotNull()
+    assertThat(json.getString("userId")).isNotNull()
+    assertThat(json.getString("moduleId")).isNotNull()
+    assertThat(json.getString("metadata")).isNotNull()
+    assertThat(json.getString("biometricDataSource")).isNotNull()
+    assertThat(json.length()).isEqualTo(6)
+}
+
+fun verifyCalloutEnrolmentApiModelV2(json: JSONObject) {
     assertThat(json.getString("type")).isEqualTo("Enrolment")
     assertThat(json.getString("projectId")).isNotNull()
     assertThat(json.getString("userId")).isNotNull()
@@ -199,7 +245,24 @@ fun verifyCalloutEnrolmentApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(5)
 }
 
-fun verifyCalloutConfirmationApiModel(json: JSONObject) {
+fun verifyCalloutEnrolmentApiModelV3(json: JSONObject) {
+    assertThat(json.getString("type")).isEqualTo("Enrolment")
+    assertThat(json.getString("projectId")).isNotNull()
+    assertThat(json.getString("userId")).isNotNull()
+    assertThat(json.getString("moduleId")).isNotNull()
+    assertThat(json.getString("metadata")).isNotNull()
+    assertThat(json.getString("biometricDataSource")).isNotNull()
+    assertThat(json.length()).isEqualTo(6)
+}
+
+fun verifyCalloutConfirmationApiModelV2(json: JSONObject) {
+    assertThat(json.getString("type")).isEqualTo("Confirmation")
+    assertThat(json.getString("selectedGuid")).isNotNull()
+    assertThat(json.getString("sessionId")).isNotNull()
+    assertThat(json.length()).isEqualTo(3)
+}
+
+fun verifyCalloutConfirmationApiModelV3(json: JSONObject) {
     assertThat(json.getString("type")).isEqualTo("Confirmation")
     assertThat(json.getString("selectedGuid")).isNotNull()
     assertThat(json.getString("sessionId")).isNotNull()

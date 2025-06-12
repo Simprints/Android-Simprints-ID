@@ -7,13 +7,14 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
 import java.util.UUID
 
 @Keep
-data class VerificationCalloutEvent(
+@Deprecated("Replaced by v3 in 2025.2.0")
+data class IdentificationCalloutEventV2(
     override val id: String = UUID.randomUUID().toString(),
-    override val payload: VerificationCalloutPayload,
+    override val payload: IdentificationCalloutPayload,
     override val type: EventType,
     override var scopeId: String? = null,
     override var projectId: String? = null,
@@ -23,20 +24,18 @@ data class VerificationCalloutEvent(
         projectId: String,
         userId: TokenizableString,
         moduleId: TokenizableString,
-        verifyGuid: String,
-        metadata: String,
+        metadata: String?,
     ) : this(
         UUID.randomUUID().toString(),
-        VerificationCalloutPayload(
+        IdentificationCalloutPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
             projectId = projectId,
             userId = userId,
             moduleId = moduleId,
-            verifyGuid = verifyGuid,
             metadata = metadata,
         ),
-        CALLOUT_VERIFICATION,
+        CALLOUT_IDENTIFICATION,
     )
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = mapOf(
@@ -52,18 +51,17 @@ data class VerificationCalloutEvent(
     )
 
     @Keep
-    data class VerificationCalloutPayload(
+    data class IdentificationCalloutPayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val userId: TokenizableString,
         val moduleId: TokenizableString,
-        val verifyGuid: String,
-        val metadata: String,
+        val metadata: String?,
         override val endedAt: Timestamp? = null,
-        override val type: EventType = CALLOUT_VERIFICATION,
+        override val type: EventType = CALLOUT_IDENTIFICATION,
     ) : EventPayload() {
-        override fun toSafeString(): String = "module ID: $moduleId, guid: $verifyGuid, metadata: $metadata"
+        override fun toSafeString(): String = "module ID: $moduleId, metadata: $metadata"
     }
 
     companion object {
