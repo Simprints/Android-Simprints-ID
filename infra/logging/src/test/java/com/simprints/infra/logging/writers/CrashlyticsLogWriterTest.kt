@@ -67,7 +67,7 @@ class CrashlyticsLogWriterTest {
         verify {
             crashMock.recordException(
                 withArg {
-                    it is Exception && it.message.contentEquals("Test Message")
+                    assert(it is Exception && it.message?.contains("Test Message") == true)
                 },
             )
         }
@@ -84,7 +84,7 @@ class CrashlyticsLogWriterTest {
         Simber.w("Test Message", custException)
 
         verify {
-            crashMock.log(withArg { it.contains("Test Message") })
+            crashMock.log(withArg { assert(it.contains("Test Message")) })
         }
         verify {
             crashMock.recordException(custException)
@@ -102,7 +102,7 @@ class CrashlyticsLogWriterTest {
         Simber.e("Test Message", custException)
 
         verify {
-            crashMock.log(withArg { it.contains("Test Message") })
+            crashMock.log(withArg { assert(it.contains("Test Message")) })
         }
         verify {
             crashMock.recordException(custException)
