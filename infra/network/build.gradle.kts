@@ -19,6 +19,7 @@ android {
 dependencies {
     implementation(project(":infra:logging"))
     implementation(project(":infra:logging-persistent"))
+    implementation(project(":infra:security"))
 
     debugImplementation(libs.chuck.debug) {
         exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
@@ -47,7 +48,6 @@ dependencies {
 
     testImplementation(libs.testing.mockwebserver)
     testImplementation(libs.chuck.release)
-
 }
 
 configurations {
