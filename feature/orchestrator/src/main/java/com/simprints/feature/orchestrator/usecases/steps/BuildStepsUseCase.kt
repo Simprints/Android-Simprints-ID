@@ -172,28 +172,30 @@ internal class BuildStepsUseCase @Inject constructor(
     ): List<Step> {
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
 
-        return listOf(
-            buildCaptureSteps(
+        val captureSteps = buildCaptureSteps(
+            projectConfiguration,
+            FlowType.ENROL,
+            resolvedAgeGroup,
+        )
+        val externalCredentialStep = when {
+            captureSteps.isEmpty() -> emptyList()
+            else -> buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.ENROL)
+        }
+        val matcherSteps = if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
+            buildMatcherSteps(
                 projectConfiguration,
                 FlowType.ENROL,
                 resolvedAgeGroup,
-            ),
-            buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.ENROL),
-            if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
-                buildMatcherSteps(
-                    projectConfiguration,
-                    FlowType.ENROL,
-                    resolvedAgeGroup,
-                    buildMatcherSubjectQuery(projectConfiguration, action),
-                    BiometricDataSource.fromString(
-                        action.biometricDataSource,
-                        action.actionIdentifier.callerPackageName,
-                    ),
-                )
-            } else {
-                emptyList()
-            },
-        ).flatten()
+                buildMatcherSubjectQuery(projectConfiguration, action),
+                BiometricDataSource.fromString(
+                    action.biometricDataSource,
+                    action.actionIdentifier.callerPackageName,
+                ),
+            )
+        } else {
+            emptyList()
+        }
+        return captureSteps + externalCredentialStep + matcherSteps
     }
 
     private fun buildCaptureAndMatchStepsForIdentify(
@@ -204,25 +206,26 @@ internal class BuildStepsUseCase @Inject constructor(
         enrolmentSubjectId: String
     ): List<Step> {
         val resolvedAgeGroup = ageGroup ?: ageGroupFromSubjectAge(action, projectConfiguration)
-
-        return listOf(
-            buildCaptureSteps(
-                projectConfiguration,
-                FlowType.IDENTIFY,
-                resolvedAgeGroup,
+        val captureSteps = buildCaptureSteps(
+            projectConfiguration,
+            FlowType.IDENTIFY,
+            resolvedAgeGroup,
+        )
+        val externalCredentialStep = when {
+            captureSteps.isEmpty() -> emptyList()
+            else -> buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.IDENTIFY)
+        }
+        val matcherSteps = buildMatcherSteps(
+            projectConfiguration,
+            FlowType.IDENTIFY,
+            resolvedAgeGroup,
+            subjectQuery,
+            BiometricDataSource.fromString(
+                action.biometricDataSource,
+                action.actionIdentifier.callerPackageName,
             ),
-            buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.IDENTIFY),
-            buildMatcherSteps(
-                projectConfiguration,
-                FlowType.IDENTIFY,
-                resolvedAgeGroup,
-                subjectQuery,
-                BiometricDataSource.fromString(
-                    action.biometricDataSource,
-                    action.actionIdentifier.callerPackageName,
-                ),
-            ),
-        ).flatten()
+        )
+        return captureSteps + externalCredentialStep + matcherSteps
     }
 
     private fun buildCaptureAndMatchStepsForVerify(
