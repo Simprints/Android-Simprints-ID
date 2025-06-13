@@ -1,6 +1,7 @@
 package com.simprints.feature.externalcredential.screens.ocr
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -29,7 +30,7 @@ import com.simprints.feature.externalcredential.screens.ocr.view.OcrBlockAdapter
 import com.simprints.feature.externalcredential.screens.ocr.view.OcrBlockItem
 import com.simprints.feature.externalcredential.screens.ocr.view.ZoomController
 import com.simprints.feature.externalcredential.screens.ocr.viewmodel.OcrScanViewModel
-import com.simprints.feature.externalcredential.screens.select.OcrLayoutConfig
+import com.simprints.feature.externalcredential.screens.select.ExternalCredentialPreviewLayoutConfig
 import com.simprints.feature.externalcredential.screens.select.OcrLayoutConfigBottomSheetDialog
 import com.simprints.infra.external.credential.store.model.ExternalCredential
 import com.simprints.infra.logging.Simber
@@ -44,6 +45,7 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
     private val ocrScanViewModel: OcrScanViewModel by viewModels()
     private val binding by viewBinding(FragmentExternalCredentialOcrScanBinding::bind)
     private val zoomController: ZoomController by lazy { ZoomController(binding.imageCardPreview, zoomFactor = 3.0f) }
+    private var dialog: Dialog? = null
     private var isEditingCredential = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,6 +57,12 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         initObservers()
         initListeners()
         requireActivity().hideKeyboard()
+    }
+
+    override fun onDestroy() {
+        dialog?.dismiss()
+        dialog = null
+        super.onDestroy()
     }
 
     private fun getOcrImage(path: String): Bitmap? =
@@ -120,14 +128,16 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         val currentConfig = flowViewModel.ocrLayoutConfigLiveData.value ?: return
 
         flowViewModel.externalCredentialResultDetails.value?.result?.let {
-            OcrLayoutConfigBottomSheetDialog(
+            dialog = OcrLayoutConfigBottomSheetDialog(
                 context = requireContext(),
                 initialConfig = currentConfig,
                 currentExternalCredentialResult = it,
                 onDismissed = { message, externalCredentialResult ->
                     flowViewModel.ocrLayoutRepository.updateUserMessage(message, externalCredentialResult)
+                    dialog = null
                 }
-            ).show()
+            )
+            dialog?.show()
         }
     }
 
@@ -161,7 +171,7 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         }
     }
 
-    private fun renderCard(details: ExternalCredentialValidation?, config: OcrLayoutConfig) {
+    private fun renderCard(details: ExternalCredentialValidation?, config: ExternalCredentialPreviewLayoutConfig) {
         details?.let {
             val result = details.result
             val credential = details.credential
@@ -229,9 +239,10 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         binding.buttonConfirm.setText(IDR.string.face_capture_finish_button)
     }
 
-    private fun renderCardDuplicateFound(config: OcrLayoutConfig) {
+    private fun renderCardDuplicateFound(config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_red_dark)
-        binding.textSubjectId.text = config.userMessages[ExternalCredentialResult.ENROL_DUPLICATE_FOUND] ?: "This credential is already enroled!"
+        binding.textSubjectId.text =
+            config.userMessages[ExternalCredentialResult.ENROL_DUPLICATE_FOUND] ?: "This credential is already enroled!"
         binding.textSubjectId.setTextColor(textColor)
         binding.iconExternalCredential.setImageResource(R.drawable.ic_warning)
         // [MS-953] For some reason this is the only resolved way to make the icon red
@@ -240,7 +251,7 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         binding.buttonConfirm.setText(IDR.string.face_capture_finish_button)
     }
 
-    private fun renderCardSearchFound(credential: ExternalCredential, config: OcrLayoutConfig) {
+    private fun renderCardSearchFound(credential: ExternalCredential, config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_text_grey)
         binding.textSubjectId.setTextColor(textColor)
         binding.textSubjectId.text = config.userMessages[ExternalCredentialResult.SEARCH_FOUND] ?: "Subject Found"
@@ -250,9 +261,10 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         binding.buttonConfirm.setText(IDR.string.face_capture_finish_button)
     }
 
-    private fun renderCardSearchNotFound(config: OcrLayoutConfig) {
+    private fun renderCardSearchNotFound(config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_red_dark)
-        binding.textSubjectId.text = config.userMessages[ExternalCredentialResult.SEARCH_NOT_FOUND] ?: "No subject found for this credential"
+        binding.textSubjectId.text =
+            config.userMessages[ExternalCredentialResult.SEARCH_NOT_FOUND] ?: "No subject found for this credential"
         binding.textSubjectId.setTextColor(textColor)
         binding.iconExternalCredential.setImageResource(R.drawable.ic_warning)
         // [MS-953] For some reason this is the only resolved way to make the icon red
@@ -261,7 +273,7 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         binding.buttonConfirm.text = "Search 1:N"
     }
 
-    private fun renderCardEmptyCredential(config: OcrLayoutConfig) {
+    private fun renderCardEmptyCredential(config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_red_dark)
         binding.externalCredentialText.text = "???"
         binding.textSubjectId.text =

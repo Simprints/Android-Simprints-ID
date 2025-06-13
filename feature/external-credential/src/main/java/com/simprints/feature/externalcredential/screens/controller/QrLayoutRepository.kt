@@ -5,33 +5,33 @@ import com.simprints.feature.externalcredential.screens.select.ExternalCredentia
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private var ocrConfig = ExternalCredentialPreviewLayoutConfig(
+private var qrConfig = ExternalCredentialPreviewLayoutConfig(
     userMessages = ExternalCredentialResult.entries.associateWith { cardState ->
         when (cardState) {
-            ExternalCredentialResult.ENROL_OK -> ""
-            ExternalCredentialResult.ENROL_DUPLICATE_FOUND -> "This document belongs to another patient!"
+            ExternalCredentialResult.ENROL_OK -> "QR Code scanned"
+            ExternalCredentialResult.ENROL_DUPLICATE_FOUND -> "This QR belongs to another patient!"
             ExternalCredentialResult.SEARCH_FOUND -> "Patient found"
-            ExternalCredentialResult.SEARCH_NOT_FOUND -> "No patient found for this document"
-            ExternalCredentialResult.CREDENTIAL_EMPTY -> "Cannot read personal identifier\nRescan or enter manually"
+            ExternalCredentialResult.SEARCH_NOT_FOUND -> "No patient found for this QR"
+            ExternalCredentialResult.CREDENTIAL_EMPTY -> "Cannot process QR code data"
         }
     }.toMutableMap()
 )
 
 @Singleton
-class OcrLayoutRepository @Inject constructor() {
+class QrLayoutRepository @Inject constructor() {
     var onConfigUpdated: (ExternalCredentialPreviewLayoutConfig) -> Unit = {}
-    fun getConfig(): ExternalCredentialPreviewLayoutConfig = ocrConfig
+    fun getConfig(): ExternalCredentialPreviewLayoutConfig = qrConfig
     fun updateUserMessage(message: String, externalCredentialResult: ExternalCredentialResult) {
-        ocrConfig = ocrConfig.copy(
-            userMessages = ocrConfig.userMessages.toMutableMap().apply {
+        qrConfig = qrConfig.copy(
+            userMessages = qrConfig.userMessages.toMutableMap().apply {
                 this[externalCredentialResult] = message
             }
         )
-        onConfigUpdated(ocrConfig)
+        onConfigUpdated(qrConfig)
     }
 
     fun setConfig(newConfig: ExternalCredentialPreviewLayoutConfig) {
-        ocrConfig = newConfig
-        onConfigUpdated(ocrConfig)
+        qrConfig = newConfig
+        onConfigUpdated(qrConfig)
     }
 }

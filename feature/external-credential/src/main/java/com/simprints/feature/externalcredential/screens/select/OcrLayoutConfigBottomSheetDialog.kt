@@ -17,7 +17,7 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialResult
 
 class OcrLayoutConfigBottomSheetDialog(
     context: Context,
-    private val initialConfig: OcrLayoutConfig,
+    private val initialConfig: ExternalCredentialPreviewLayoutConfig,
     private val currentExternalCredentialResult: ExternalCredentialResult,
     private val onDismissed: (String, ExternalCredentialResult) -> Unit = { _, _ -> }
 ) : BottomSheetDialog(context) {
@@ -50,7 +50,7 @@ class OcrLayoutConfigBottomSheetDialog(
         behavior.isDraggable = false
     }
 
-    private fun renderCard(currentExternalCredentialResult: ExternalCredentialResult, config: OcrLayoutConfig) {
+    private fun renderCard(currentExternalCredentialResult: ExternalCredentialResult, config: ExternalCredentialPreviewLayoutConfig) {
         when (currentExternalCredentialResult) {
             ExternalCredentialResult.ENROL_OK -> renderCardEnrolOk()
             ExternalCredentialResult.ENROL_DUPLICATE_FOUND -> renderCardDuplicateFound(config)
@@ -66,7 +66,7 @@ class OcrLayoutConfigBottomSheetDialog(
         v_confirmCredentialCheckbox.isVisible = true
     }
 
-    private fun renderCardDuplicateFound(config: OcrLayoutConfig) {
+    private fun renderCardDuplicateFound(config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(context, com.simprints.infra.resources.R.color.simprints_red_dark)
         val text = config.userMessages[ExternalCredentialResult.ENROL_DUPLICATE_FOUND] ?: "This credential is already enroled!"
         v_textSubjectId.text = text
@@ -78,7 +78,7 @@ class OcrLayoutConfigBottomSheetDialog(
         v_userMessage.setText(text)
     }
 
-    private fun renderCardSearchFound(config: OcrLayoutConfig) {
+    private fun renderCardSearchFound(config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(context, com.simprints.infra.resources.R.color.simprints_text_grey)
         v_textSubjectId.setTextColor(textColor)
         val text = config.userMessages[ExternalCredentialResult.SEARCH_FOUND] ?: "Subject Found"
@@ -89,7 +89,7 @@ class OcrLayoutConfigBottomSheetDialog(
         v_userMessage.setText(text)
     }
 
-    private fun renderCardSearchNotFound(config: OcrLayoutConfig) {
+    private fun renderCardSearchNotFound(config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(context, com.simprints.infra.resources.R.color.simprints_red_dark)
         val text = config.userMessages[ExternalCredentialResult.SEARCH_NOT_FOUND] ?: "No subject found for this credential"
         v_textSubjectId.text = text
@@ -101,7 +101,7 @@ class OcrLayoutConfigBottomSheetDialog(
         v_userMessage.setText(text)
     }
 
-    private fun renderCardEmptyCredential(config: OcrLayoutConfig) {
+    private fun renderCardEmptyCredential(config: ExternalCredentialPreviewLayoutConfig) {
         val textColor = ContextCompat.getColor(context, com.simprints.infra.resources.R.color.simprints_red_dark)
         v_externalCredentialText.text = "???"
         val text = config.userMessages[ExternalCredentialResult.CREDENTIAL_EMPTY] ?: "Cannot read personal identifier\nRescan or enter manually"

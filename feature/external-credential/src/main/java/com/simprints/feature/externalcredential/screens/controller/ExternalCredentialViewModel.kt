@@ -13,7 +13,7 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.model.ExternalCredentialResponse
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
 import com.simprints.feature.externalcredential.screens.select.LayoutConfig
-import com.simprints.feature.externalcredential.screens.select.OcrLayoutConfig
+import com.simprints.feature.externalcredential.screens.select.ExternalCredentialPreviewLayoutConfig
 import com.simprints.infra.external.credential.store.model.ExternalCredential
 import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
 import com.simprints.infra.logging.Simber
@@ -27,6 +27,7 @@ internal class ExternalCredentialViewModel @Inject constructor(
     private val externalCredentialRepository: ExternalCredentialRepository,
     val layoutRepository: LayoutRepository,
     val ocrLayoutRepository: OcrLayoutRepository,
+    val qrLayoutRepository: QrLayoutRepository,
 ) : ViewModel() {
 
     private var subjectId: String? = null
@@ -44,9 +45,13 @@ internal class ExternalCredentialViewModel @Inject constructor(
         get() = _layoutConfigLiveData
     private val _layoutConfigLiveData = MutableLiveData<LayoutConfig>(layoutRepository.getConfig())
 
-    val ocrLayoutConfigLiveData: LiveData<OcrLayoutConfig>
+    val ocrLayoutConfigLiveData: LiveData<ExternalCredentialPreviewLayoutConfig>
         get() = _ocrLayoutConfigLiveData
     private val _ocrLayoutConfigLiveData = MutableLiveData(ocrLayoutRepository.getConfig())
+
+    val qrLayoutConfigLiveData: LiveData<ExternalCredentialPreviewLayoutConfig>
+        get() = _qrLayoutConfigLiveData
+    private val _qrLayoutConfigLiveData = MutableLiveData(qrLayoutRepository.getConfig())
 
     val recaptureEvent: LiveData<LiveDataEvent>
         get() = _recaptureEvent
@@ -59,6 +64,7 @@ internal class ExternalCredentialViewModel @Inject constructor(
     init {
         layoutRepository.onConfigUpdated = { _layoutConfigLiveData.postValue(it) }
         ocrLayoutRepository.onConfigUpdated = { _ocrLayoutConfigLiveData.postValue(it) }
+        qrLayoutRepository.onConfigUpdated = { _qrLayoutConfigLiveData.postValue(it) }
     }
 
     fun setConfig(params: ExternalCredentialParams) {

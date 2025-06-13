@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:orientation="vertical">
+
     <androidx.cardview.widget.CardView
         android:id="@+id/scannedIdCard"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="false"
@@ -127,8 +128,8 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_marginHorizontal="16dp"
         android:layout_height="1dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="6dp"
         android:background="@color/simprints_grey_light" />
@@ -136,20 +137,20 @@
     <TextView
         style="@style/Text.Headline5.Bold"
         android:layout_width="match_parent"
-        android:layout_marginHorizontal="16dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:text="User message"
         android:textColor="@color/simprints_blue" />
 
     <EditText
         android:id="@+id/userMessage"
         style="@style/Text.Body1"
-        android:layout_marginHorizontal="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        tools:text="Subject ID\n4fc3-aac1-db53-33a1"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Subject ID\n4fc3-aac1-db53-33a1" />
 </LinearLayout>
