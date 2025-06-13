@@ -270,7 +270,7 @@ class ExternalCredentialOcrScanFragment : Fragment(R.layout.fragment_external_cr
         // [MS-953] For some reason this is the only resolved way to make the icon red
         binding.iconExternalCredential.setColorFilter(textColor)
         binding.confirmCredentialCheckbox.isVisible = false
-        binding.buttonConfirm.text = "Search 1:N"
+        binding.buttonConfirm.text = "Search biometrically"
     }
 
     private fun renderCardEmptyCredential(config: ExternalCredentialPreviewLayoutConfig) {

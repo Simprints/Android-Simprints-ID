@@ -48,14 +48,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
-                    android:text="Search &amp; Verify has low score" />
+                    android:text="This takes longer than expected" />
 
                 <TextView
                     style="@style/Text.Subtitle2.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
-                    android:text="Using 1:N biometric search" />
+                    android:text="Using biometric search" />
             </LinearLayout>
         </LinearLayout>
 
