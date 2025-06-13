@@ -47,9 +47,10 @@ internal class SelectSubjectViewModel @Inject constructor(
         if (authStore.isProjectIdSignedIn(projectId)) {
             sessionCoroutineScope.launch {
                 val isSubjectIdSaved = saveSelectionEvent(subjectId)
-                val currentCredential = externalCredentialRepository.findBySubjectId(subjectId)
+                val currentCredentials = externalCredentialRepository.findBySubjectId(subjectId)
+                // [MS-953] Only displaying 'Save External Credential' if no other external credentials match given External Credential ID
                 val shouldDisplaySaveCredentialDialog = externalCredentialId != null
-                    && (currentCredential == null || currentCredential.data != externalCredentialId)
+                    && (currentCredentials.all { it.data != externalCredentialId })
                 _confirmIdentitySaveResultLiveData.send(
                     SubjectIdSaveResult(
                         isSubjectIdSaved = isSubjectIdSaved,

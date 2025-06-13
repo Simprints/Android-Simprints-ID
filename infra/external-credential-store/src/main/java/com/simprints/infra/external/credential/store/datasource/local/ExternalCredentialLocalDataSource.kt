@@ -24,13 +24,12 @@ class ExternalCredentialLocalDataSource @Inject constructor(
                 ?.fromDb()
         }
 
-    suspend fun findBySubjectId(subjectId: String): ExternalCredential? =
+    suspend fun findBySubjectId(subjectId: String): List<ExternalCredential> =
         realmWrapper.readRealm { realm ->
             return@readRealm realm
                 .query(ExternalCredentialRealm::class, "subjectId == $0", subjectId)
-                .first()
                 .find()
-                ?.fromDb()
+                .map { it.fromDb() }
         }
 
     suspend fun deleteByCredential(credential: String) = realmWrapper.writeRealm { realm ->

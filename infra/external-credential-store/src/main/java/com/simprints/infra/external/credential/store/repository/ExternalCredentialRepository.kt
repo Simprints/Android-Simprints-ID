@@ -27,7 +27,7 @@ class ExternalCredentialRepository @Inject constructor(
             return@withContext localDataSource.findByCredential(credential)
         }
 
-    suspend fun findBySubjectId(subjectId: String): ExternalCredential? = withContext(dispatcher) {
+    suspend fun findBySubjectId(subjectId: String): List<ExternalCredential> = withContext(dispatcher) {
         return@withContext localDataSource.findBySubjectId(subjectId)
     }
 }
