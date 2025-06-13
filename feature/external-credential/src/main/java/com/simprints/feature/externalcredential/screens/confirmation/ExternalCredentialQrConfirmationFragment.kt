@@ -73,7 +73,7 @@ internal class ExternalCredentialQrConfirmationFragment : Fragment(R.layout.frag
                 // [MS-964] For some reason this is the only resolved way to make the icon red
                 externalCredentialLargeIcon.setColorFilter(ContextCompat.getColor(requireContext(), IDR.color.simprints_red_dark))
                 externalCredentialStatusTitle.text = config.userMessages[result.result] ?: "No patient linked to QR code"
-                confirmationBtn.text = "Search 1:N"
+                confirmationBtn.text = "Search biometrically"
             }
 
             ExternalCredentialResult.CREDENTIAL_EMPTY -> {
