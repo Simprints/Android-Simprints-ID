@@ -49,7 +49,6 @@ internal class BuildStepsUseCase @Inject constructor(
         cachedExternalCredentialResponse: ExternalCredentialResponse?
     ) = when (action) {
         is ActionRequest.EnrolActionRequest -> listOf(
-            buildExternalCredentialStepIfNeeded(enrolmentSubjectId, projectConfiguration, FlowType.ENROL),
             buildSetupStep(),
             buildAgeSelectionStepIfNeeded(action, projectConfiguration),
             buildConsentStepIfNeeded(ConsentType.ENROL, projectConfiguration),
