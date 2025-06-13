@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <androidx.cardview.widget.CardView
+        android:id="@+id/scannedIdCard"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:cardUseCompatPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/margin_large">
+
+            <TextView
+                style="@style/Text.Subtitle2.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="External Credential" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/externalCredentialText"
+                    style="@style/Text.Headline5.Bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_large"
+                    app:layout_constraintEnd_toStartOf="@+id/iconEditCredential"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="GHA-123456789-0" />
+
+                <EditText
+                    android:id="@+id/externalCredentialEditText"
+                    style="@style/Text.Headline5.Bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_large"
+                    android:backgroundTint="@color/simprints_blue"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:hint="External Credential ID"
+                    android:inputType="textNoSuggestions"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@+id/iconEditCredential"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="LabelFor"
+                    tools:text="GHA-123456789-0" />
+
+                <ImageView
+                    android:id="@+id/iconEditCredential"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackground"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_edit"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/simprints_text_grey" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_large" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iconExternalCredential"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_checked_green_large" />
+
+                <Space
+                    android:layout_width="@dimen/margin_default"
+                    android:layout_height="0dp" />
+
+                <TextView
+                    android:id="@+id/textSubjectId"
+                    style="@style/Text.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    tools:text="Subject ID\n4fc3-aac1-db53-33a1" />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/confirmCredentialCheckbox"
+                style="@style/Text.Body2.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/simprints_blue"
+                android:checked="false"
+                android:paddingStart="@dimen/margin_default"
+                android:text="I confirm that the external credential is scanned correctly"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="6dp"
+        android:background="@color/simprints_grey_light" />
+
+    <TextView
+        style="@style/Text.Headline5.Bold"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_height="wrap_content"
+        android:text="User message"
+        android:textColor="@color/simprints_blue" />
+
+    <EditText
+        android:id="@+id/userMessage"
+        style="@style/Text.Body1"
+        android:layout_marginHorizontal="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:text="Subject ID\n4fc3-aac1-db53-33a1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</LinearLayout>

@@ -13,6 +13,7 @@ import com.simprints.feature.externalcredential.model.ExternalCredentialParams
 import com.simprints.feature.externalcredential.model.ExternalCredentialResponse
 import com.simprints.feature.externalcredential.model.ExternalCredentialResult
 import com.simprints.feature.externalcredential.screens.select.LayoutConfig
+import com.simprints.feature.externalcredential.screens.select.OcrLayoutConfig
 import com.simprints.infra.external.credential.store.model.ExternalCredential
 import com.simprints.infra.external.credential.store.repository.ExternalCredentialRepository
 import com.simprints.infra.logging.Simber
@@ -25,6 +26,7 @@ import javax.inject.Inject
 internal class ExternalCredentialViewModel @Inject constructor(
     private val externalCredentialRepository: ExternalCredentialRepository,
     val layoutRepository: LayoutRepository,
+    val ocrLayoutRepository: OcrLayoutRepository,
 ) : ViewModel() {
 
     private var subjectId: String? = null
@@ -42,6 +44,10 @@ internal class ExternalCredentialViewModel @Inject constructor(
         get() = _layoutConfigLiveData
     private val _layoutConfigLiveData = MutableLiveData<LayoutConfig>(layoutRepository.getConfig())
 
+    val ocrLayoutConfigLiveData: LiveData<OcrLayoutConfig>
+        get() = _ocrLayoutConfigLiveData
+    private val _ocrLayoutConfigLiveData = MutableLiveData(ocrLayoutRepository.getConfig())
+
     val recaptureEvent: LiveData<LiveDataEvent>
         get() = _recaptureEvent
     private val _recaptureEvent = MutableLiveData<LiveDataEvent>()
@@ -52,6 +58,7 @@ internal class ExternalCredentialViewModel @Inject constructor(
 
     init {
         layoutRepository.onConfigUpdated = { _layoutConfigLiveData.postValue(it) }
+        ocrLayoutRepository.onConfigUpdated = { _ocrLayoutConfigLiveData.postValue(it) }
     }
 
     fun setConfig(params: ExternalCredentialParams) {

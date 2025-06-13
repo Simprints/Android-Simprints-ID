@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:fillViewport="true"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,8 +31,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                app:strokeColor="@color/simprints_blue"
-                app:cardUseCompatPadding="true">
+                app:cardUseCompatPadding="true"
+                app:strokeColor="@color/simprints_blue">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -58,7 +58,8 @@
                         android:id="@+id/grid_1"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
                         android:background="@color/simprints_grey_disabled"
                         app:layout_constraintBottom_toTopOf="@+id/guideline_hor"
                         app:layout_constraintEnd_toStartOf="@+id/guideline_ver"
@@ -70,37 +71,38 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:layout_marginStart="8dp"
+                        android:layout_marginBottom="8dp"
                         android:background="@color/simprints_grey_disabled"
                         app:layout_constraintBottom_toTopOf="@+id/guideline_hor"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/guideline_ver"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <LinearLayout
+                    <View
+                        android:id="@+id/grid_3"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@color/simprints_grey_disabled"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/guideline_ver"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/guideline_hor">
+                        app:layout_constraintTop_toBottomOf="@+id/guideline_hor" />
 
-                        <View
-                            android:id="@+id/grid_3"
-                            android:layout_width="match_parent"
-                            android:layout_height="16dp"
-                            android:background="@color/simprints_grey_disabled" />
+                    <View
+                        android:id="@+id/grid_4"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/simprints_grey_disabled"
+                        app:layout_constraintStart_toEndOf="@+id/guideline_ver"
+                        app:layout_constraintTop_toBottomOf="@+id/guideline_hor"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
 
-                        <Space
-                            android:layout_width="0dp"
-                            android:layout_height="8dp" />
-
-                        <View
-                            android:id="@+id/grid_4"
-                            android:layout_width="match_parent"
-                            android:layout_height="16dp"
-                            android:background="@color/simprints_grey_disabled" />
-                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -172,7 +174,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Titles"
-            android:textColor="@color/simprints_blue"/>
+            android:textColor="@color/simprints_blue" />
 
 
         <TextView
@@ -180,14 +182,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Screen top title"
-            android:textColor="@color/simprints_blue"
-            />
+            android:textColor="@color/simprints_blue" />
 
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/topScreenTitleEdit"
@@ -239,8 +239,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/topTitleEdit"
@@ -298,8 +297,8 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Text.Headline5"
                 android:id="@+id/bottomTitleEdit"
+                style="@style/Text.Headline5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
@@ -350,9 +349,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:cardUseCompatPadding="true"
                 android:paddingHorizontal="@dimen/margin_large"
                 android:paddingVertical="@dimen/margin_default"
+                app:cardUseCompatPadding="true"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
@@ -448,9 +447,9 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            app:cardUseCompatPadding="true"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
+            app:cardUseCompatPadding="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -497,7 +496,6 @@
             android:layout_height="wrap_content"
             android:text="Ghana NHIS Card"
             android:textColor="@color/simprints_blue" />
-
 
 
         <com.google.android.material.card.MaterialCardView
