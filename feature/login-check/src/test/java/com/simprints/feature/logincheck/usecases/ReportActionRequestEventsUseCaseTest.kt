@@ -67,8 +67,8 @@ internal class ReportActionRequestEventsUseCaseTest {
         // When
         useCase.invoke(ActionFactory.getIdentifyRequest(extras = mapOf("key" to "value")))
         // Then
-        coVerify {
-            sessionEventRepository.addOrUpdateEvent(withArg { it is SuspiciousIntentEvent })
+        coVerify(exactly = 1) {
+            sessionEventRepository.addOrUpdateEvent(withArg { assert(it is SuspiciousIntentEvent) })
         }
     }
 
@@ -77,38 +77,35 @@ internal class ReportActionRequestEventsUseCaseTest {
         // When
         useCase.invoke(ActionFactory.getIdentifyRequest(extras = emptyMap()))
         // Then
-        coVerify { sessionEventRepository.addOrUpdateEvent(withArg { it !is SuspiciousIntentEvent }) }
+        coVerify(exactly = 0) {
+            sessionEventRepository.addOrUpdateEvent(withArg { assert(it is SuspiciousIntentEvent) })
+        }
     }
 
     @Test
     fun `Adds all required events for enrol action`() = runTest {
         useCase(ActionFactory.getEnrolRequest())
 
-        coVerify {
-            sessionEventRepository.addOrUpdateEvent(withArg { it is ConnectivitySnapshotEvent })
-            sessionEventRepository.addOrUpdateEvent(withArg { it is EnrolmentCalloutEventV3 })
-            recentUserActivityManager.updateRecentUserActivity(any())
-        }
+        coVerify(exactly = 1) { sessionEventRepository.addOrUpdateEvent(withArg { assert(it is ConnectivitySnapshotEvent) }) }
+        coVerify(exactly = 1) { sessionEventRepository.addOrUpdateEvent(withArg { assert(it is EnrolmentCalloutEventV3) }) }
+        coVerify(exactly = 1) { recentUserActivityManager.updateRecentUserActivity(any()) }
     }
 
     @Test
     fun `Adds all required events for confirmation action`() = runTest {
         useCase(ActionFactory.getConfirmationRequest())
 
-        coVerify {
-            sessionEventRepository.addOrUpdateEvent(withArg { it is EnrolmentCalloutEventV3 })
-            sessionEventRepository.addOrUpdateEvent(withArg { it is ConfirmationCalloutEventV3 })
-            recentUserActivityManager.updateRecentUserActivity(any())
-            sessionEventRepository.addOrUpdateEvent(withArg { it !is ConnectivitySnapshotEvent })
-        }
+        coVerify(exactly = 0) { sessionEventRepository.addOrUpdateEvent(withArg { assert(it is ConnectivitySnapshotEvent) }) }
+        coVerify(exactly = 1) { sessionEventRepository.addOrUpdateEvent(withArg { assert(it is ConfirmationCalloutEventV3) }) }
+        coVerify(exactly = 1) { recentUserActivityManager.updateRecentUserActivity(any()) }
     }
 
     @Test
     fun `Adds callout for identify action`() = runTest {
         useCase(ActionFactory.getIdentifyRequest())
 
-        coVerify {
-            sessionEventRepository.addOrUpdateEvent(withArg { it is IdentificationCalloutEventV3 })
+        coVerify(exactly = 1) {
+            sessionEventRepository.addOrUpdateEvent(withArg { assert(it is IdentificationCalloutEventV3) })
         }
     }
 
@@ -116,8 +113,8 @@ internal class ReportActionRequestEventsUseCaseTest {
     fun `Adds callout for verify action`() = runTest {
         useCase(ActionFactory.getVerifyRequest())
 
-        coVerify {
-            sessionEventRepository.addOrUpdateEvent(withArg { it is VerificationCalloutEventV3 })
+        coVerify(exactly = 1) {
+            sessionEventRepository.addOrUpdateEvent(withArg { assert(it is VerificationCalloutEventV3) })
         }
     }
 
@@ -125,8 +122,8 @@ internal class ReportActionRequestEventsUseCaseTest {
     fun `Adds callout for enrol last action`() = runTest {
         useCase(ActionFactory.getEnrolLastRequest())
 
-        coVerify {
-            sessionEventRepository.addOrUpdateEvent(withArg { it is EnrolmentLastBiometricsCalloutEventV3 })
+        coVerify(exactly = 1) {
+            sessionEventRepository.addOrUpdateEvent(withArg { assert(it is EnrolmentLastBiometricsCalloutEventV3) })
         }
     }
 
