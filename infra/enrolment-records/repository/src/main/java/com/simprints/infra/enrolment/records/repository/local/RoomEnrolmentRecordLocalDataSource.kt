@@ -159,7 +159,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                     }
                     val identities = loadBiometricIdentities(
                         query = query.copy(afterSubjectId = afterSubjectId), // update query with the last seen subject ID
-                        pageSize = range.last - range.first,
+                        pageSize = range.last - range.first + 1,
                         format = format,
                         createIdentity = createIdentity,
                         onCandidateLoaded = onCandidateLoaded,
