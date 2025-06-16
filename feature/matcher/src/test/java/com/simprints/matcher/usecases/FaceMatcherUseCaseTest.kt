@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
 import com.simprints.infra.config.store.models.FaceConfiguration
@@ -32,6 +33,9 @@ internal class FaceMatcherUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @MockK
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
@@ -52,6 +56,7 @@ internal class FaceMatcherUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         coEvery { resolveFaceBioSdk(any()).createMatcher(any()) } returns faceMatcher
         useCase = FaceMatcherUseCase(
+            timeHelper,
             enrolmentRecordRepository,
             resolveFaceBioSdk,
             createRangesUseCase,
@@ -81,6 +86,7 @@ internal class FaceMatcherUseCaseTest {
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
+                matchBatches = emptyList(),
             ),
         )
     }
@@ -111,6 +117,7 @@ internal class FaceMatcherUseCaseTest {
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
+                matchBatches = emptyList(),
             ),
         )
     }
@@ -157,14 +164,18 @@ internal class FaceMatcherUseCaseTest {
 
         coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any()) }
 
-        assertThat(results).containsExactly(
-            MatcherUseCase.MatcherState.LoadingStarted(totalCandidates),
-            MatcherUseCase.MatcherState.CandidateLoaded,
-            MatcherUseCase.MatcherState.Success(
-                matchResultItems = listOf(FaceMatchResult.Item("subjectId", 42f)),
-                totalCandidates = totalCandidates,
-                matcherName = "",
-            ),
-        )
+        // Check results with matchBatches verification by size
+        assertThat(results.size).isEqualTo(3)
+        assertThat(results[0]).isInstanceOf(MatcherUseCase.MatcherState.LoadingStarted::class.java)
+        assertThat(results[1]).isInstanceOf(MatcherUseCase.MatcherState.CandidateLoaded::class.java)
+
+        val successState = results[2] as MatcherUseCase.MatcherState.Success
+        assertThat(successState.matchResultItems).containsExactly(FaceMatchResult.Item("subjectId", 42f))
+        assertThat(successState.totalCandidates).isEqualTo(totalCandidates)
+        assertThat(successState.matcherName).isEqualTo("")
+
+        // Verify only the size of matchBatches instead of exact content
+        assertThat(successState.matchBatches).hasSize(1)
+        assertThat(successState.matchBatches[0].count).isEqualTo(faceIdentities.size)
     }
 }

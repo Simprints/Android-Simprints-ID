@@ -5,6 +5,8 @@ import com.google.common.truth.Truth.*
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
@@ -13,6 +15,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.repository.domain.models.IdentityBatch
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
 import com.simprints.matcher.MatchParams
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -33,6 +36,9 @@ internal class FingerprintMatcherUseCaseTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
 
     @MockK
     lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -62,6 +68,7 @@ internal class FingerprintMatcherUseCaseTest {
         } returns listOf(SECUGEN_SIM_MATCHER)
 
         useCase = FingerprintMatcherUseCase(
+            timeHelper,
             enrolmentRecordRepository,
             resolveBioSdkWrapperUseCase,
             configManager,
@@ -92,6 +99,7 @@ internal class FingerprintMatcherUseCaseTest {
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
+                matchBatches = emptyList(),
             ),
         )
     }
@@ -129,6 +137,7 @@ internal class FingerprintMatcherUseCaseTest {
                 matchResultItems = emptyList(),
                 totalCandidates = 0,
                 matcherName = "",
+                matchBatches = emptyList(),
             ),
         )
     }
@@ -192,11 +201,18 @@ internal class FingerprintMatcherUseCaseTest {
     private fun fingerprintSample(finger: IFingerIdentifier) = FingerprintSample(finger, byteArrayOf(1), "format", "referenceId")
 }
 
-fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<List<T>> {
-    val channel = Channel<List<T>>(lists.size)
+fun <T> createTestChannel(vararg lists: List<T>): ReceiveChannel<IdentityBatch<T>> {
+    val channel = Channel<IdentityBatch<T>>(lists.size)
     runBlocking {
+        var time = 0L
         for (list in lists) {
-            channel.send(list)
+            channel.send(
+                IdentityBatch(
+                    identities = list,
+                    loadingStartTime = Timestamp(time++),
+                    loadingEndTime = Timestamp(time++),
+                )
+            )
         }
         channel.close()
     }

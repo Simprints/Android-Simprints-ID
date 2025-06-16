@@ -6,6 +6,7 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.RealmWrapper
@@ -41,6 +42,9 @@ import java.util.UUID
 import kotlin.random.Random
 
 class RealmEnrolmentRecordLocalDataSourceTest {
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
     @MockK
     private lateinit var realm: Realm
 
@@ -102,6 +106,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         every { realmQuery.first() } returns realmSingleQuery
 
         enrolmentRecordLocalDataSource = RealmEnrolmentRecordLocalDataSource(
+            timeHelper,
             realmWrapperMock,
             tokenizationProcessor,
             UnconfinedTestDispatcher(),
@@ -146,7 +151,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 project,
                 this,
                 onCandidateLoaded,
-            ).consumeEach { people.addAll(it) }
+            ).consumeEach { people.addAll(it.identities) }
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)
@@ -211,7 +216,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                 this,
                 onCandidateLoaded,
             ).consumeEach {
-                people.addAll(it)
+                people.addAll(it.identities)
             }
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.subjectId)

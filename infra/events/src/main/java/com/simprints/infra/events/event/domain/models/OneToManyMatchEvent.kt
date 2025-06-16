@@ -24,6 +24,7 @@ data class OneToManyMatchEvent(
         matcher: String,
         result: List<MatchEntry>?,
         probeBiometricReferenceId: String,
+        batches: List<OneToManyMatchPayload.OneToManyBatch>? = null,
     ) : this(
         id = UUID.randomUUID().toString(),
         payload = OneToManyMatchPayload.OneToManyMatchPayloadV3(
@@ -34,6 +35,7 @@ data class OneToManyMatchEvent(
             matcher = matcher,
             result = result,
             probeBiometricReferenceId = probeBiometricReferenceId,
+            batches = batches,
         ),
         type = ONE_TO_MANY_MATCH,
     )
@@ -89,6 +91,7 @@ data class OneToManyMatchEvent(
             override val matcher: String,
             override val result: List<MatchEntry>?,
             val probeBiometricReferenceId: String,
+            val batches: List<OneToManyBatch>? = null,
         ) : OneToManyMatchPayload(createdAt, eventVersion, endedAt, pool, matcher, result)
 
         @Keep
@@ -103,6 +106,15 @@ data class OneToManyMatchEvent(
             MODULE,
             PROJECT,
         }
+
+        @Keep
+        data class OneToManyBatch(
+            val loadingStartTime: Timestamp,
+            val loadingEndTime: Timestamp,
+            val comparingStartTime: Timestamp,
+            val comparingEndTime: Timestamp,
+            val count: Int,
+        )
     }
 
     companion object {
