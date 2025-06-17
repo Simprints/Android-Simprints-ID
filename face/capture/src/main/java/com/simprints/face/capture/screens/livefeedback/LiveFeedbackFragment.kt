@@ -171,6 +171,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         val imageAnalyzer = ImageAnalysis
             .Builder()
             .setResolutionSelector(resolutionSelector)
+            // Disabled to receive the rotation information in the image proxy
             .setOutputImageRotationEnabled(true)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
