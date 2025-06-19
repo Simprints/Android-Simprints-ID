@@ -329,6 +329,33 @@
             android:text="Scanner options"
             android:textColor="@color/simprints_blue" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Body1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Date of Birth option"
+                android:textColor="@color/simprints_blue"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/dobCheckbox"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <CheckBox
+                android:id="@+id/dobCheckbox"
+                style="@style/Text.Body2.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/simprints_blue"
+                android:checked="false"
+                android:text="Visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             style="@style/Text.Body1"

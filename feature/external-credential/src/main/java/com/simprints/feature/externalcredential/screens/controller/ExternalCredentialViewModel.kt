@@ -30,7 +30,7 @@ internal class ExternalCredentialViewModel @Inject constructor(
     val qrLayoutRepository: QrLayoutRepository,
 ) : ViewModel() {
 
-    private var subjectId: String? = null
+    var subjectId: String? = null
     private var flowType: FlowType? = null
 
     val externalCredentialSaveResponse: LiveData<LiveDataEventWithContent<Serializable>>
@@ -94,30 +94,34 @@ internal class ExternalCredentialViewModel @Inject constructor(
             ExternalCredentialValidation(ExternalCredential(subjectId = subjectId, data = credentialId), result)
     }
 
-    fun confirmAndFinishFlow(credential: ExternalCredential, imagePath: String?) = viewModelScope.launch {
-        try {
-            val response = when (flowType) {
-                FlowType.ENROL -> {
-                    ExternalCredentialResponse.ExternalCredentialSaveResponse(
-                        subjectId = credential.subjectId!!,
-                        externalCredential = credential.data,
-                        imagePreviewPath = imagePath
-                    )
-                }
+    fun confirmAndFinishFlow(credential: ExternalCredential, imagePath: String?, addCredentialRightNow: Boolean = false) =
+        viewModelScope.launch {
+            try {
+                val response = when (flowType) {
+                    FlowType.ENROL -> {
+                        if (addCredentialRightNow) {
+                            externalCredentialRepository.save(credential)
+                        }
+                        ExternalCredentialResponse.ExternalCredentialSaveResponse(
+                            subjectId = credential.subjectId!!,
+                            externalCredential = credential.data,
+                            imagePreviewPath = imagePath
+                        )
+                    }
 
-                else -> {
-                    ExternalCredentialResponse.ExternalCredentialSearchResponse(
-                        subjectId = credential.subjectId,
-                        externalCredential = credential.data,
-                        imagePreviewPath = imagePath
-                    )
+                    else -> {
+                        ExternalCredentialResponse.ExternalCredentialSearchResponse(
+                            subjectId = credential.subjectId,
+                            externalCredential = credential.data,
+                            imagePreviewPath = imagePath
+                        )
+                    }
                 }
+                _externalCredentialSaveResponse.send(response)
+            } catch (e: Exception) {
+                Simber.e("Unable to finish external credential [$flowType] flow", e)
             }
-            _externalCredentialSaveResponse.send(response)
-        } catch (e: Exception) {
-            Simber.e("Unable to finish external credential [$flowType] flow", e)
         }
-    }
 
     fun recapture() {
         _externalCredentialResult.value = null

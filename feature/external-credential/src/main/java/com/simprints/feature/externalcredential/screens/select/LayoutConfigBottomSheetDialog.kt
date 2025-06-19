@@ -11,7 +11,6 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -19,7 +18,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.simprints.feature.externalcredential.R
-import com.simprints.feature.externalcredential.screens.controller.LayoutRepository
 
 class LayoutConfigBottomSheetDialog(
     context: Context,
@@ -204,6 +202,12 @@ class LayoutConfigBottomSheetDialog(
             listOf("\uD83C\uDFE5 Ghana NHIS Card", "Scan NHIS card"), R.id.nhisCardText, R.id.chipsNhisCardText
         ) { text ->
             config = config.copy(uiText = config.uiText.copy(nhisCardText = text))
+        }
+
+        val dobCheckbox = view.findViewById<CheckBox>(R.id.dobCheckbox)
+        dobCheckbox.isChecked = config.isDobVisible
+        dobCheckbox?.setOnCheckedChangeListener { _, isChecked ->
+            config = config.copy(isDobVisible = isChecked)
         }
     }
 

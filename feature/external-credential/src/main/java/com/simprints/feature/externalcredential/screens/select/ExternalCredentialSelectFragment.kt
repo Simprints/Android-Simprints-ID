@@ -79,6 +79,7 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
 
                 layoutOption1?.isVisible = config.layoutStyle == LayoutStyle.Grid
                 layoutOption2?.isVisible = config.layoutStyle == LayoutStyle.Vertical
+                getView(dobCardGrid, dobCard)?.isVisible = config.isDobVisible
             }
         }
     }
@@ -89,6 +90,15 @@ internal class ExternalCredentialSelectFragment : Fragment(R.layout.fragment_ext
                 findNavController().navigateSafely(
                     this,
                     ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialQrScanner(),
+                )
+            }
+        }
+        listOf(binding.dobCard, binding.dobCardGrid).forEach {
+            it?.setOnClickListener {
+                val subjectId = viewModel.subjectId ?: return@setOnClickListener
+                findNavController().navigateSafely(
+                    this,
+                    ExternalCredentialSelectFragmentDirections.actionExternalCredentialSelectFragmentToExternalCredentialDob(subjectId = subjectId),
                 )
             }
         }

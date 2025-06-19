@@ -5,6 +5,7 @@ data class LayoutConfig(
     val screenTitle: String?,
     val topTitle: String?,
     val isTopTitleVisible: Boolean,
+    val isDobVisible: Boolean,
     val bottomTitle: String?,
     val isBottomTitleVisible: Boolean,
     val uiText: UiText
