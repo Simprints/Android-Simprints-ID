@@ -39,8 +39,7 @@ flowchart TD
     sonarqube --> deploy_prod(Build Production APK)
 
     subgraph Production Environment
-        deploy_prod --> run_app_sweep(Perform App Sweep)
-        run_app_sweep --> google_play_internal(Upload to Internal Track)
+        deploy_prod --> google_play_internal(Upload to Internal Track)
         google_play_internal --> google_play_alpha([Promote to Alpha Track])
         google_play_alpha --> add_release_tag(Add Release Tag)
         google_play_alpha --> google_play_prod_25([Promote 25% to Production])

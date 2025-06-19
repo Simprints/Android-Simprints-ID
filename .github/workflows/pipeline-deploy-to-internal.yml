@@ -18,15 +18,6 @@ jobs:
             build-environment: Internal
             version-name: ${{ needs.get-version.outputs.version-name }}
 
-    run-app-sweep:
-        uses: ./.github/workflows/reusable-app-sweep.yml
-        with:
-            upload-artifact: ${{ needs.build-internal-aab.outputs.build-artifact }}
-            mapping-file: ${{ needs.build-internal-aab.outputs.optional-mapping-file }}
-        secrets: inherit
-        needs:
-            - build-internal-aab
-
     deploy-internal-build:
         uses: ./.github/workflows/reusable-promote-artifact.yml
         secrets: inherit
