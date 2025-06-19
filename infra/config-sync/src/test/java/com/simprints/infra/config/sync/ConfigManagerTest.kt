@@ -1,16 +1,14 @@
 package com.simprints.infra.config.sync
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -44,6 +42,9 @@ class ConfigManagerTest {
     private lateinit var deviceConfiguration: DeviceConfiguration
 
     @MockK
+    private lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
+
+    @MockK
     private lateinit var project: Project
 
     @Before
@@ -53,6 +54,7 @@ class ConfigManagerTest {
             configRepository = configRepository,
             enrolmentRecordRepository = enrolmentRecordRepository,
             configSyncCache = configSyncCache,
+            realmToRoomMigrationScheduler = realmToRoomMigrationScheduler,
         )
     }
 
@@ -64,6 +66,7 @@ class ConfigManagerTest {
         assertThat(refreshedProject).isEqualTo(projectWithConfig)
 
         coVerify { configSyncCache.saveUpdateTime() }
+        coVerify { realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded() }
     }
 
     @Test
@@ -75,9 +78,27 @@ class ConfigManagerTest {
     }
 
     @Test
+    fun `getProject should call the refresh method when cannot get from local`() = runTest {
+        coEvery { configRepository.getProject() } throws NoSuchElementException()
+
+        configManager.getProject(PROJECT_ID)
+        coVerify(exactly = 1) { configRepository.refreshProject(PROJECT_ID) }
+    }
+
+    @Test
     fun `getProjectConfiguration should call the correct method`() = runTest {
         coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
         every { projectConfiguration.projectId } returns PROJECT_ID
+
+        val gottenProjectConfiguration = configManager.getProjectConfiguration()
+        assertThat(gottenProjectConfiguration).isEqualTo(projectConfiguration)
+    }
+
+    @Test
+    fun `getProjectConfiguration return default config if not logged in`() = runTest {
+        every { projectConfiguration.projectId } returns ""
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
+        coEvery { configRepository.refreshProject(any()) } throws Exception()
 
         val gottenProjectConfiguration = configManager.getProjectConfiguration()
         assertThat(gottenProjectConfiguration).isEqualTo(projectConfiguration)
@@ -120,7 +141,7 @@ class ConfigManagerTest {
         configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE)
         coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE) }
     }
-    
+
     @Test
     fun `watchProjectConfiguration should emit values from the local data source`() = runTest {
         val config1 = projectConfiguration.copy(projectId = "project1")

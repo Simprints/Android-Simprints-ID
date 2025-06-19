@@ -1,6 +1,7 @@
 package com.simprints.core
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
 import com.simprints.core.tools.extentions.deviceHardwareId
@@ -134,6 +135,11 @@ object CoreModule {
     ): CoroutineScope = CoroutineScope(
         SupervisorJob() + dispatcherMain + AppCoroutineExceptionHandler(),
     )
+
+    @Provides
+    fun provideWorkManager(
+        @ApplicationContext context: Context,
+    ): WorkManager = WorkManager.getInstance(context)
 }
 
 @Qualifier
