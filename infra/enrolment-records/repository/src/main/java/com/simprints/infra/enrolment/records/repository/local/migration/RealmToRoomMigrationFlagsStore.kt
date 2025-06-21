@@ -90,4 +90,12 @@ class RealmToRoomMigrationFlagsStore @Inject constructor(
         $KEY_DOWN_SYNC_STATUS: $downSync
         """.trimIndent()
     }
+
+    /**
+     * Clears all migration-related keys from the store.
+     */
+    fun clearMigrationFlags() {
+        prefs.edit { clear() }
+        Simber.i("[RealmToRoomMigrationFlagsStore] Migration flags cleared", tag = REALM_DB_MIGRATION)
+    }
 }
