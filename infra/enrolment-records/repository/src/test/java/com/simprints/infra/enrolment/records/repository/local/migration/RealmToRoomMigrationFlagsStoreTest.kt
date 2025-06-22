@@ -300,4 +300,14 @@ class RealmToRoomMigrationFlagsStoreTest {
         verify { editor.putBoolean(RealmToRoomMigrationFlagsStore.KEY_DOWN_SYNC_STATUS, false) }
         verify { editor.apply() }
     }
+
+    @Test
+    fun `clearMigrationFlags should remove all migration-related keys`() {
+        // Given
+        every { editor.clear() } returns editor
+        // When
+        store.clearMigrationFlags()
+        // Then
+        verify { editor.clear() }
+    }
 }
