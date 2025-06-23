@@ -1544,4 +1544,19 @@ class RoomEnrolmentRecordLocalDataSourceTest {
 
         // Then: Exception expected
     }
+
+    @Test
+    fun `delete all - should delete all subjects`() = runTest {
+        // Given
+        setupInitialData()
+        val initialCount = dataSource.count()
+
+        // When
+        dataSource.deleteAll()
+
+        // Then
+        val finalCount = dataSource.count()
+        assertThat(finalCount).isEqualTo(0)
+        assertThat(initialCount).isGreaterThan(0)
+    }
 }

@@ -193,7 +193,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             }
     }
 
-    override suspend fun delete(queries: List<SubjectQuery>) {
+    override suspend fun delete(queries: List<SubjectQuery>): Unit = withContext(dispatcherIO) {
         Simber.i("[delete] Deleting subjects with queries: $queries", tag = ROOM_RECORDS_DB)
         database.withTransaction {
             queries.forEach { query ->
@@ -202,7 +202,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         }
     }
 
-    override suspend fun deleteAll() {
+    override suspend fun deleteAll(): Unit = withContext(dispatcherIO) {
         Simber.i("[deleteAll] Deleting all subjects.", tag = ROOM_RECORDS_DB)
         subjectDao.deleteSubjects(queryBuilder.buildDeleteQuery(SubjectQuery()))
     }
