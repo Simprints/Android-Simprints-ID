@@ -70,7 +70,7 @@ class ResolveRankOneVersionUseCaseTest {
                 .face
                 ?.rankOne
                 ?.version
-        } returns rocV3BioSdk.version
+        } returns rocV3BioSdk.version()
 
         // When
         val result = resolveTheVersionUseCase.invoke()
@@ -89,7 +89,7 @@ class ResolveRankOneVersionUseCaseTest {
                 .face
                 ?.rankOne
                 ?.version
-        } returns rocV1BioSdk.version
+        } returns rocV1BioSdk.version()
 
         // When
         val result = resolveTheVersionUseCase.invoke()

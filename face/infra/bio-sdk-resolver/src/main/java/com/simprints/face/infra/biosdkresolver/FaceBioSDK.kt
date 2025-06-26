@@ -9,9 +9,11 @@ interface FaceBioSDK {
     val initializer: FaceBioSdkInitializer
     val detector: FaceDetector
 
-    val version: String
-    val templateFormat: String
-    val matcherName: String
+    fun version(): String
+
+    fun templateFormat(): String
+
+    fun matcherName(): String
 
     fun createMatcher(probeSamples: List<FaceSample>): FaceMatcher
 }

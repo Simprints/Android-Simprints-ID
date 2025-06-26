@@ -16,6 +16,6 @@ internal class ResolveRankOneVersionUseCase @Inject constructor(
             ?.version
             ?.takeIf { it.isNotBlank() } // Ensures version is not null or empty
         requireNotNull(version) { "FaceBioSDK version is null or empty" }
-        return if (version == rocV3BioSdk.version) rocV3BioSdk else rocV1BioSdk
+        return if (version == rocV3BioSdk.version()) rocV3BioSdk else rocV1BioSdk
     }
 }
