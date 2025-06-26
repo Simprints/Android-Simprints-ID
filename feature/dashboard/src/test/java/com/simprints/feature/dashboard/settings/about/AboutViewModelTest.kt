@@ -203,9 +203,7 @@ class AboutViewModelTest {
             true -> 1
             false -> 0
         }
-        coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(
-            countEventsToUpload,
-        )
+        coEvery { eventSyncManager.countEventsToUpload() } returns flowOf(countEventsToUpload)
         coEvery { configManager.getProjectConfiguration() } returns buildProjectConfigurationMock(
             upSyncKind,
         )

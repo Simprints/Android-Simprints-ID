@@ -101,18 +101,20 @@ class SyncInfoViewModelTest {
         stateLiveData = MutableLiveData<EventSyncState>()
         every { eventSyncManager.getLastSyncState() } returns stateLiveData
         coEvery { configManager.getProject(PROJECT_ID) } returns project
-        viewModel = SyncInfoViewModel(
-            configManager = configManager,
-            connectivityTracker = connectivityTracker,
-            enrolmentRecordRepository = enrolmentRecordRepository,
-            authStore = authStore,
-            imageRepository = imageRepository,
-            eventSyncManager = eventSyncManager,
-            syncOrchestrator = syncOrchestrator,
-            tokenizationProcessor = tokenizationProcessor,
-            recentUserActivityManager = recentUserActivityManager,
-        )
+        viewModel = createViewModel()
     }
+
+    private fun createViewModel() = SyncInfoViewModel(
+        configManager = configManager,
+        connectivityTracker = connectivityTracker,
+        enrolmentRecordRepository = enrolmentRecordRepository,
+        authStore = authStore,
+        imageRepository = imageRepository,
+        eventSyncManager = eventSyncManager,
+        syncOrchestrator = syncOrchestrator,
+        tokenizationProcessor = tokenizationProcessor,
+        recentUserActivityManager = recentUserActivityManager,
+    )
 
     @Test
     fun `should initialize the configuration live data correctly`() = runTest {
@@ -138,10 +140,11 @@ class SyncInfoViewModelTest {
     fun `should initialize the recordsToUpSync live data correctly`() = runTest {
         val number = 10
         coEvery {
-            eventSyncManager.countEventsToUpload(EventType.ENROLMENT_V2)
+            eventSyncManager.countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4))
         } returns flowOf(number)
 
-        viewModel.refreshInformation()
+        // upSync count collected on init, so need to rebuild for mocking to take effect
+        viewModel = createViewModel()
 
         assertThat(viewModel.recordsToUpSync.getOrAwaitValue()).isEqualTo(number)
     }

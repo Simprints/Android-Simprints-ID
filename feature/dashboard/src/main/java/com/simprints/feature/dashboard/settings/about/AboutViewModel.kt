@@ -78,7 +78,7 @@ internal class AboutViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hasEventsToUpload(): Boolean = eventSyncManager.countEventsToUpload(type = null).first() > 0
+    private suspend fun hasEventsToUpload(): Boolean = eventSyncManager.countEventsToUpload().first() > 0
 
     private suspend fun canSyncDataToSimprints(): Boolean = configManager.getProjectConfiguration().canSyncDataToSimprints()
 

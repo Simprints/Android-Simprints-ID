@@ -28,6 +28,7 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
@@ -234,7 +235,7 @@ internal class SyncViewModelTest {
     @Test
     fun `should post a SyncPendingUpload card state if there are records to upload`() {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
-        coEvery { eventSyncManager.countEventsToUpload(any()) }.returns(flowOf(2))
+        coEvery { eventSyncManager.countEventsToUpload(any<List<EventType>>()) }.returns(flowOf(2))
 
         isConnected.value = true
         syncState.value = EventSyncState(

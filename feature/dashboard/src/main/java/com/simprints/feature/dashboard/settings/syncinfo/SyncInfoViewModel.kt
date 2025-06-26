@@ -35,7 +35,6 @@ import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -123,11 +122,11 @@ internal class SyncInfoViewModel @Inject constructor(
         _isReloginRequired.addSource(lastSyncState) { lastSyncStateValue ->
             _isReloginRequired.postValue(lastSyncStateValue.isSyncFailedBecauseReloginRequired())
         }
+        viewModelScope.launch { getRecordsToUpSync() }
     }
 
     fun refreshInformation() {
         _recordsInLocal.postValue(null)
-        _recordsToUpSync.postValue(null)
         _recordsToDownSync.postValue(null)
         _imagesToUpload.postValue(null)
         _moduleCounts.postValue(listOf())
@@ -179,7 +178,6 @@ internal class SyncInfoViewModel @Inject constructor(
         awaitAll(
             async { _configuration.postValue(configManager.getProjectConfiguration()) },
             async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
-            async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
             async { _recordsToDownSync.postValue(fetchRecordsToCreateAndDeleteCount()) },
             async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
             async { _moduleCounts.postValue(getModuleCounts(projectId)) },
@@ -207,10 +205,9 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private suspend fun getRecordsInLocal(projectId: String): Int = enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
 
-    private suspend fun getRecordsToUpSync(): Int = eventSyncManager
-        .countEventsToUpload(EventType.ENROLMENT_V2)
-        .firstOrNull()
-        ?: 0
+    private suspend fun getRecordsToUpSync() = eventSyncManager
+        .countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4))
+        .collect { _recordsToUpSync.postValue(it) }
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
         if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {

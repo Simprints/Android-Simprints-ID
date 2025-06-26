@@ -27,6 +27,7 @@ import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -61,7 +62,11 @@ internal class EventSyncManagerImpl @Inject constructor(
 
     override fun getAllWorkerTag(): String = TAG_SUBJECTS_SYNC_ALL_WORKERS
 
-    override suspend fun countEventsToUpload(type: EventType?): Flow<Int> = eventRepository.observeEventCount(type)
+    override suspend fun countEventsToUpload(): Flow<Int> = eventRepository.observeEventCount(null)
+
+    override suspend fun countEventsToUpload(types: List<EventType>): Flow<Int> = combine(
+        types.map { eventRepository.observeEventCount(it) },
+    ) { it.sum() }
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
         val projectConfig = configRepository.getProjectConfiguration()
