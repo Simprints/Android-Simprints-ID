@@ -43,19 +43,19 @@ internal class FaceMatcherUseCase @Inject constructor(
         val bioSdk = resolveFaceBioSdk(matchParams.faceSDK)
 
         if (matchParams.probeFaceSamples.isEmpty()) {
-            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
+            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = bioSdk.templateFormat,
+            faceSampleFormat = bioSdk.templateFormat(),
         )
         val expectedCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat,
             dataSource = matchParams.biometricDataSource,
         )
         if (expectedCandidates == 0) {
-            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName))
+            send(MatcherState.Success(emptyList(), 0, bioSdk.matcherName()))
             return@channelFlow
         }
 
@@ -81,7 +81,7 @@ internal class FaceMatcherUseCase @Inject constructor(
             }
 
         consumeAndMatch(candidatesChannel, samples, resultSet, bioSdk)
-        send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName))
+        send(MatcherState.Success(resultSet.toList(), loadedCandidates.get(), bioSdk.matcherName()))
     }.flowOn(dispatcherBG)
 
     suspend fun consumeAndMatch(
