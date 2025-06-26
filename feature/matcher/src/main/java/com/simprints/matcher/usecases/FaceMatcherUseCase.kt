@@ -48,7 +48,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
         val queryWithSupportedFormat = matchParams.queryForCandidates.copy(
-            faceSampleFormat = bioSdk.templateFormat,
+            faceSampleFormat = bioSdk.templateFormat(),
         )
         val expectedCandidates = enrolmentRecordRepository.count(
             queryWithSupportedFormat,

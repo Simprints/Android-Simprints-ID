@@ -15,7 +15,9 @@ class RocV3BioSdk @Inject constructor(
     override val detector: RocV3Detector,
 ) : FaceBioSDK {
     override val version: String = "3.1"
-    override val templateFormat: String = RANK_ONE_TEMPLATE_FORMAT_3_1
+
+    override fun templateFormat(): String = RANK_ONE_TEMPLATE_FORMAT_3_1
+
     override val matcherName: String = "RANK_ONE"
 
     override fun createMatcher(probeSamples: List<FaceSample>): FaceMatcher = RocV3Matcher(probeSamples)

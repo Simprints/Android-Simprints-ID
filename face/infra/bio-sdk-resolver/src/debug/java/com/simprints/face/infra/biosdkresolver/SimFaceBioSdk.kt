@@ -16,7 +16,9 @@ class SimFaceBioSdk @Inject constructor(
     private val simFace: SimFace,
 ) : FaceBioSDK {
     override val version: String = "1"
-    override val templateFormat: String = simFace.getTemplateVersion()
+
+    override fun templateFormat(): String = simFace.getTemplateVersion()
+
     override val matcherName: String = "SIM_FACE"
 
     override fun createMatcher(probeSamples: List<FaceSample>): FaceMatcher = SimFaceMatcher(simFace, probeSamples)
