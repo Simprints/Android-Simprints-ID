@@ -1,9 +1,9 @@
 package com.simprints.face.infra.simface.detection
 
 import android.graphics.Bitmap
+import com.simprints.biometrics.simface.SimFace
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
-import com.simprints.simface.core.SimFace
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 

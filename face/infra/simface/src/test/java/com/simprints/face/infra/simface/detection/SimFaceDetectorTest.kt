@@ -2,8 +2,8 @@ package com.simprints.face.infra.simface.detection
 
 import android.graphics.Bitmap
 import com.google.common.truth.Truth.*
-import com.simprints.simface.core.SimFace
-import com.simprints.simface.data.FaceDetection
+import com.simprints.biometrics.simface.SimFace
+import com.simprints.biometrics.simface.data.FaceDetection
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
