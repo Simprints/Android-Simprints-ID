@@ -1,9 +1,9 @@
 package com.simprints.face.infra.simface.matching
 
+import com.simprints.biometrics.simface.SimFace
 import com.simprints.face.infra.basebiosdk.matching.FaceIdentity
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
-import com.simprints.simface.core.SimFace
 
 class SimFaceMatcher(
     private val simFace: SimFace,

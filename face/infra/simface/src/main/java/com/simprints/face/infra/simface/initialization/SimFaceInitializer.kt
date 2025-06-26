@@ -2,9 +2,9 @@ package com.simprints.face.infra.simface.initialization
 
 import android.app.Activity
 import android.content.Context
+import com.simprints.biometrics.simface.SimFace
+import com.simprints.biometrics.simface.SimFaceConfig
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
-import com.simprints.simface.core.SimFace
-import com.simprints.simface.core.SimFaceConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

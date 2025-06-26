@@ -1,11 +1,11 @@
 package com.simprints.face.infra.biosdkresolver
 
+import com.simprints.biometrics.simface.SimFace
 import com.simprints.face.infra.basebiosdk.matching.FaceMatcher
 import com.simprints.face.infra.basebiosdk.matching.FaceSample
 import com.simprints.face.infra.simface.detection.SimFaceDetector
 import com.simprints.face.infra.simface.initialization.SimFaceInitializer
 import com.simprints.face.infra.simface.matching.SimFaceMatcher
-import com.simprints.simface.core.SimFace
 import javax.inject.Inject
 import javax.inject.Singleton
 
