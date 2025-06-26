@@ -9,6 +9,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
@@ -113,10 +114,17 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `countEventsToUpload should call event repo`() = runTest {
-        eventSyncManagerImpl.countEventsToUpload(null).toList()
+    fun `countEventsToUpload without types should call event repo`() = runTest {
+        eventSyncManagerImpl.countEventsToUpload().toList()
 
-        coVerify { eventRepository.observeEventCount(any()) }
+        coVerify { eventRepository.observeEventCount(null) }
+    }
+
+    @Test
+    fun `countEventsToUpload with types should call event repo per type`() = runTest {
+        eventSyncManagerImpl.countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.EVENT_UP_SYNC_REQUEST)).toList()
+
+        coVerify(exactly = 2) { eventRepository.observeEventCount(any<EventType>()) }
     }
 
     @Test

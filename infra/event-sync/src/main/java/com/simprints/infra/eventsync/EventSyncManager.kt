@@ -18,7 +18,9 @@ interface EventSyncManager {
 
     fun getLastSyncState(): LiveData<EventSyncState>
 
-    suspend fun countEventsToUpload(type: EventType?): Flow<Int>
+    suspend fun countEventsToUpload(): Flow<Int>
+
+    suspend fun countEventsToUpload(types: List<EventType>): Flow<Int>
 
     suspend fun countEventsToDownload(): DownSyncCounts
 
