@@ -61,7 +61,7 @@ class DatabasePersistentLoggerTest {
         coVerify {
             logEntryDao.save(
                 coWithArg {
-                    it.timestampMs == 0L && it.title == "title" && it.body == "body"
+                    assert(it.timestampMs == 0L && it.title == "title" && it.body == "body")
                 },
             )
         }
@@ -75,7 +75,7 @@ class DatabasePersistentLoggerTest {
         coVerify {
             logEntryDao.save(
                 coWithArg {
-                    it.timestampMs == 1L && it.title == "title" && it.body == "body"
+                    assert(it.timestampMs == 1L && it.title == "title" && it.body == "body")
                 },
             )
         }
@@ -89,7 +89,7 @@ class DatabasePersistentLoggerTest {
         coVerify {
             logEntryDao.save(
                 coWithArg {
-                    it.timestampMs == 0L && it.title == "title" && it.body == "body"
+                    assert(it.timestampMs == 0L && it.title == "title" && it.body == "body")
                 },
             )
         }
@@ -103,7 +103,7 @@ class DatabasePersistentLoggerTest {
         coVerify {
             logEntryDao.save(
                 coWithArg {
-                    it.timestampMs == 1L && it.title == "title" && it.body == "body"
+                    assert(it.timestampMs == 1L && it.title == "title" && it.body == "body")
                 },
             )
         }
