@@ -8,5 +8,8 @@ internal open class VerifyRequestExtractor(
 ) : ActionRequestExtractor(extras) {
     fun getVerifyGuid(): String = extras.extractString(Constants.SIMPRINTS_VERIFY_GUID)
 
-    override val expectedKeys = super.keys + listOf(Constants.SIMPRINTS_VERIFY_GUID)
+    override val expectedKeys = super.keys + listOf(
+        Constants.SIMPRINTS_VERIFY_GUID,
+        Constants.SIMPRINTS_BIOMETRIC_DATA_SOURCE,
+    )
 }
