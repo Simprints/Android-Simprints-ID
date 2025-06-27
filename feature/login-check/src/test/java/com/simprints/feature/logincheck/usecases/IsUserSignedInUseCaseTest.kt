@@ -19,7 +19,7 @@ internal class IsUserSignedInUseCaseTest {
 
     private lateinit var useCase: IsUserSignedInUseCase
 
-    private val request = ActionFactory.getFlowRequest()
+    private val request = ActionFactory.getIdentifyRequest()
 
     @Before
     fun setUp() {

@@ -35,7 +35,7 @@ class AddAuthorizationEventUseCaseTest {
     @Test
     fun `Adds not authorised event`() = runTest {
         // When
-        useCase(ActionFactory.getFlowRequest(), false)
+        useCase(ActionFactory.getIdentifyRequest(), false)
         // Then
         coVerify {
             coreEventRepository.addOrUpdateEvent(
@@ -52,7 +52,7 @@ class AddAuthorizationEventUseCaseTest {
     @Test
     fun `Adds authorised event`() = runTest {
         // When
-        useCase(ActionFactory.getFlowRequest(), true)
+        useCase(ActionFactory.getIdentifyRequest(), true)
         // Then
         coVerify {
             coreEventRepository.addOrUpdateEvent(

@@ -19,11 +19,13 @@ import com.simprints.infra.events.sampledata.createBiometricReferenceCreationEve
 import com.simprints.infra.events.sampledata.createCandidateReadEvent
 import com.simprints.infra.events.sampledata.createCompletionCheckEvent
 import com.simprints.infra.events.sampledata.createConfirmationCallbackEvent
-import com.simprints.infra.events.sampledata.createConfirmationCalloutEvent
+import com.simprints.infra.events.sampledata.createConfirmationCalloutEventV2
+import com.simprints.infra.events.sampledata.createConfirmationCalloutEventV3
 import com.simprints.infra.events.sampledata.createConnectivitySnapshotEvent
 import com.simprints.infra.events.sampledata.createConsentEvent
 import com.simprints.infra.events.sampledata.createEnrolmentCallbackEvent
-import com.simprints.infra.events.sampledata.createEnrolmentCalloutEvent
+import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV2
+import com.simprints.infra.events.sampledata.createEnrolmentCalloutEventV3
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
 import com.simprints.infra.events.sampledata.createEnrolmentEventV4
 import com.simprints.infra.events.sampledata.createEventDownSyncRequestEvent
@@ -37,10 +39,12 @@ import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsE
 import com.simprints.infra.events.sampledata.createFingerprintCaptureEvent
 import com.simprints.infra.events.sampledata.createGuidSelectionEvent
 import com.simprints.infra.events.sampledata.createIdentificationCallbackEvent
-import com.simprints.infra.events.sampledata.createIdentificationCalloutEvent
+import com.simprints.infra.events.sampledata.createIdentificationCalloutEventV2
+import com.simprints.infra.events.sampledata.createIdentificationCalloutEventV3
 import com.simprints.infra.events.sampledata.createIntentParsingEvent
 import com.simprints.infra.events.sampledata.createInvalidIntentEvent
-import com.simprints.infra.events.sampledata.createLastBiometricsEnrolmentCalloutEvent
+import com.simprints.infra.events.sampledata.createLastBiometricsEnrolmentCalloutEventV2
+import com.simprints.infra.events.sampledata.createLastBiometricsEnrolmentCalloutEventV3
 import com.simprints.infra.events.sampledata.createLicenseCheckEvent
 import com.simprints.infra.events.sampledata.createOneToManyMatchEvent
 import com.simprints.infra.events.sampledata.createOneToOneMatchEvent
@@ -52,7 +56,8 @@ import com.simprints.infra.events.sampledata.createScannerFirmwareUpdateEvent
 import com.simprints.infra.events.sampledata.createSuspiciousIntentEvent
 import com.simprints.infra.events.sampledata.createVerificationCallbackEventV1
 import com.simprints.infra.events.sampledata.createVerificationCallbackEventV2
-import com.simprints.infra.events.sampledata.createVerificationCalloutEvent
+import com.simprints.infra.events.sampledata.createVerificationCalloutEventV2
+import com.simprints.infra.events.sampledata.createVerificationCalloutEventV3
 import com.simprints.infra.events.sampledata.createVero2InfoSnapshotEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.AgeGroupSelection
@@ -95,7 +100,8 @@ import com.simprints.infra.eventsync.event.validateAuthorizationEventApiModel
 import com.simprints.infra.eventsync.event.validateBiometricReferenceCreationEventApiModel
 import com.simprints.infra.eventsync.event.validateCallbackV1EventApiModel
 import com.simprints.infra.eventsync.event.validateCallbackV2EventApiModel
-import com.simprints.infra.eventsync.event.validateCalloutEventApiModel
+import com.simprints.infra.eventsync.event.validateCalloutEventApiModelV2
+import com.simprints.infra.eventsync.event.validateCalloutEventApiModelV3
 import com.simprints.infra.eventsync.event.validateCandidateReadEventApiModel
 import com.simprints.infra.eventsync.event.validateCommonParams
 import com.simprints.infra.eventsync.event.validateCompletionCheckEventApiModel
@@ -183,48 +189,93 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
-    fun validate_calloutEventForVerificationApiModel() {
-        val event = createVerificationCalloutEvent()
+    fun validate_calloutEventForVerificationApiModelV2() {
+        val event = createVerificationCalloutEventV2()
         val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCalloutEventApiModel(json)
+        validateCalloutEventApiModelV2(json)
     }
 
     @Test
-    fun validate_calloutEventForIdentificationApiModel() {
-        val event = createIdentificationCalloutEvent()
+    fun validate_calloutEventForVerificationApiModelV3() {
+        val event = createVerificationCalloutEventV3()
         val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCalloutEventApiModel(json)
+        validateCalloutEventApiModelV3(json)
     }
 
     @Test
-    fun validate_calloutEventForEnrolLastBiometricsModel() {
-        val event = createLastBiometricsEnrolmentCalloutEvent()
+    fun validate_calloutEventForIdentificationApiModelV2() {
+        val event = createIdentificationCalloutEventV2()
         val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCalloutEventApiModel(json)
+        validateCalloutEventApiModelV2(json)
     }
 
     @Test
-    fun validate_calloutEventForConfirmationApiModel() {
-        val event = createConfirmationCalloutEvent()
+    fun validate_calloutEventForIdentificationApiModelV3() {
+        val event = createIdentificationCalloutEventV3()
         val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCalloutEventApiModel(json)
+        validateCalloutEventApiModelV3(json)
     }
 
     @Test
-    fun validate_calloutEventForEnrolmentApiModel() {
-        val event = createEnrolmentCalloutEvent()
+    fun validate_calloutEventForEnrolLastBiometricsModelV2() {
+        val event = createLastBiometricsEnrolmentCalloutEventV2()
         val apiEvent = useCase(event, project)
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCalloutEventApiModel(json)
+        validateCalloutEventApiModelV2(json)
+    }
+
+    @Test
+    fun validate_calloutEventForEnrolLastBiometricsModelV3() {
+        val event = createLastBiometricsEnrolmentCalloutEventV3()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateCalloutEventApiModelV3(json)
+    }
+
+    @Test
+    fun validate_calloutEventForConfirmationApiModelV2() {
+        val event = createConfirmationCalloutEventV2()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateCalloutEventApiModelV2(json)
+    }
+
+    @Test
+    fun validate_calloutEventForConfirmationApiModelV3() {
+        val event = createConfirmationCalloutEventV3()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateCalloutEventApiModelV3(json)
+    }
+
+    @Test
+    fun validate_calloutEventForEnrolmentApiModelV2() {
+        val event = createEnrolmentCalloutEventV2()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateCalloutEventApiModelV2(json)
+    }
+
+    @Test
+    fun validate_calloutEventForEnrolmentApiModelV3() {
+        val event = createEnrolmentCalloutEventV3()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateCalloutEventApiModelV3(json)
     }
 
     @Test

@@ -26,10 +26,15 @@ import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_IDENTIF
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_REFUSAL
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION_V3
 import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
@@ -75,11 +80,16 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent.IdentificationCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent.ConfirmationCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent.EnrolmentCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV2
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
@@ -90,7 +100,8 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
-import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayload
+import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayloadV2
+import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayloadV3
 import com.simprints.infra.eventsync.event.remote.models.downsync.ApiEventDownSyncRequestPayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureBiometricsPayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConfirmationPayload
@@ -132,11 +143,16 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCaptureEvent.FaceCapturePayload)
     FACE_CAPTURE_CONFIRMATION -> ApiFaceCaptureConfirmationPayload(this as FaceCaptureConfirmationPayload)
     SCANNER_FIRMWARE_UPDATE -> ApiScannerFirmwareUpdatePayload(this as ScannerFirmwareUpdatePayload)
-    CALLOUT_CONFIRMATION -> ApiCalloutPayload(this as ConfirmationCalloutPayload)
-    CALLOUT_IDENTIFICATION -> ApiCalloutPayload(this as IdentificationCalloutPayload)
-    CALLOUT_ENROLMENT -> ApiCalloutPayload(this as EnrolmentCalloutPayload)
-    CALLOUT_VERIFICATION -> ApiCalloutPayload(this as VerificationCalloutPayload)
-    CALLOUT_LAST_BIOMETRICS -> ApiCalloutPayload(this as EnrolmentLastBiometricsCalloutPayload)
+    CALLOUT_CONFIRMATION -> ApiCalloutPayloadV2(this as ConfirmationCalloutEventV2.ConfirmationCalloutPayload)
+    CALLOUT_CONFIRMATION_V3 -> ApiCalloutPayloadV3(this as ConfirmationCalloutEventV3.ConfirmationCalloutPayload)
+    CALLOUT_IDENTIFICATION -> ApiCalloutPayloadV2(this as IdentificationCalloutEventV2.IdentificationCalloutPayload)
+    CALLOUT_IDENTIFICATION_V3 -> ApiCalloutPayloadV3(this as IdentificationCalloutEventV3.IdentificationCalloutPayload)
+    CALLOUT_ENROLMENT -> ApiCalloutPayloadV2(this as EnrolmentCalloutEventV2.EnrolmentCalloutPayload)
+    CALLOUT_ENROLMENT_V3 -> ApiCalloutPayloadV3(this as EnrolmentCalloutEventV3.EnrolmentCalloutPayload)
+    CALLOUT_VERIFICATION -> ApiCalloutPayloadV2(this as VerificationCalloutEventV2.VerificationCalloutPayload)
+    CALLOUT_VERIFICATION_V3 -> ApiCalloutPayloadV3(this as VerificationCalloutEventV3.VerificationCalloutPayload)
+    CALLOUT_LAST_BIOMETRICS -> ApiCalloutPayloadV2(this as EnrolmentLastBiometricsCalloutEventV2.EnrolmentLastBiometricsCalloutPayload)
+    CALLOUT_LAST_BIOMETRICS_V3 -> ApiCalloutPayloadV3(this as EnrolmentLastBiometricsCalloutEventV3.EnrolmentLastBiometricsCalloutPayload)
     CALLBACK_IDENTIFICATION -> ApiCallbackPayload(this as IdentificationCallbackPayload)
     CALLBACK_ENROLMENT -> ApiCallbackPayload(this as EnrolmentCallbackPayload)
     CALLBACK_REFUSAL -> ApiCallbackPayload(this as RefusalCallbackPayload)
