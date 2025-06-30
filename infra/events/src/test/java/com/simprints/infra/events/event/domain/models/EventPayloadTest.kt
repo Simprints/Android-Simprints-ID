@@ -26,11 +26,11 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEventV3
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEventV3
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent.QueryParameters
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
@@ -43,6 +43,7 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_BIOMETRIC_DATA_SOURCE
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -83,15 +84,16 @@ class EventPayloadTest {
             createdAt = CREATED_AT,
             score = CallbackComparisonScore(GUID1, 1, AppMatchConfidence.NONE),
         ),
-        ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2),
-        EnrolmentCalloutEvent(
+        ConfirmationCalloutEventV3(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2),
+        EnrolmentCalloutEventV3(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
             metadata = DEFAULT_METADATA,
+            biometricDataSource = DEFAULT_BIOMETRIC_DATA_SOURCE,
         ),
-        EnrolmentLastBiometricsCalloutEvent(
+        EnrolmentLastBiometricsCalloutEventV3(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
@@ -99,20 +101,22 @@ class EventPayloadTest {
             metadata = DEFAULT_METADATA,
             sessionId = GUID1,
         ),
-        IdentificationCalloutEvent(
+        IdentificationCalloutEventV3(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
             metadata = DEFAULT_METADATA,
+            biometricDataSource = DEFAULT_BIOMETRIC_DATA_SOURCE,
         ),
-        VerificationCalloutEvent(
+        VerificationCalloutEventV3(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
             moduleId = DEFAULT_MODULE_ID,
             verifyGuid = GUID1,
             metadata = DEFAULT_METADATA,
+            biometricDataSource = DEFAULT_BIOMETRIC_DATA_SOURCE,
         ),
         EventDownSyncRequestEvent(
             createdAt = CREATED_AT,

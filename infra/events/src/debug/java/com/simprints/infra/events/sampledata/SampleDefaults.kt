@@ -3,6 +3,7 @@ package com.simprints.infra.events.sampledata
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.events.event.domain.models.callout.BiometricDataSource
 import java.util.UUID
 
 object SampleDefaults {
@@ -14,6 +15,7 @@ object SampleDefaults {
     val DEFAULT_USER_ID = "user_id".asTokenizableRaw()
     val DEFAULT_USER_ID_2 = "user_id_2".asTokenizableRaw()
     const val DEFAULT_METADATA = "DEFAULT_METADATA"
+    val DEFAULT_BIOMETRIC_DATA_SOURCE = BiometricDataSource.SIMPRINTS
 
     val CREATED_AT: Timestamp = Timestamp(1234L)
     val ENDED_AT: Timestamp = Timestamp(4567L)

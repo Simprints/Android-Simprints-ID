@@ -58,7 +58,7 @@ class DbEventTest {
 
     @Test
     fun convert_ConfirmationCalloutEvent() {
-        val original = createConfirmationCalloutEvent()
+        val original = createConfirmationCalloutEventV3()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
@@ -66,7 +66,7 @@ class DbEventTest {
 
     @Test
     fun convert_EnrolmentCalloutEvent() {
-        val original = createEnrolmentCalloutEvent()
+        val original = createEnrolmentCalloutEventV3()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
@@ -74,7 +74,7 @@ class DbEventTest {
 
     @Test
     fun convert_EnrolmentLastBiometricsCalloutEvent() {
-        val original = createLastBiometricsEnrolmentCalloutEvent()
+        val original = createLastBiometricsEnrolmentCalloutEventV3()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
@@ -82,7 +82,7 @@ class DbEventTest {
 
     @Test
     fun convert_IdentificationCalloutEvent() {
-        val original = createIdentificationCalloutEvent()
+        val original = createIdentificationCalloutEventV3()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)
@@ -90,7 +90,7 @@ class DbEventTest {
 
     @Test
     fun convert_VerificationCalloutEvent() {
-        val original = createVerificationCalloutEvent()
+        val original = createVerificationCalloutEventV3()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)

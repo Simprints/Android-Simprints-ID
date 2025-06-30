@@ -14,10 +14,15 @@ import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_IDENTIF
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_REFUSAL
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS_V3
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION_V3
 import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
@@ -103,10 +108,15 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     SCANNER_FIRMWARE_UPDATE -> ApiEventPayloadType.ScannerFirmwareUpdate
     INVALID_INTENT -> ApiEventPayloadType.InvalidIntent
     CALLOUT_CONFIRMATION,
+    CALLOUT_CONFIRMATION_V3,
     CALLOUT_IDENTIFICATION,
+    CALLOUT_IDENTIFICATION_V3,
     CALLOUT_ENROLMENT,
+    CALLOUT_ENROLMENT_V3,
     CALLOUT_VERIFICATION,
+    CALLOUT_VERIFICATION_V3,
     CALLOUT_LAST_BIOMETRICS,
+    CALLOUT_LAST_BIOMETRICS_V3,
     -> ApiEventPayloadType.Callout
 
     CALLBACK_IDENTIFICATION,

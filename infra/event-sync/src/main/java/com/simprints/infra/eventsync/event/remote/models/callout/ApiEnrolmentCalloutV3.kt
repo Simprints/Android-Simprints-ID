@@ -3,9 +3,10 @@ package com.simprints.infra.eventsync.event.remote.models.callout
 import androidx.annotation.Keep
 
 @Keep
-internal data class ApiIdentificationCallout(
+internal data class ApiEnrolmentCalloutV3(
     val projectId: String,
     val userId: String,
     val moduleId: String,
     val metadata: String?,
-) : ApiCallout(ApiCalloutType.Identification)
+    val biometricDataSource: ApiBiometricDataSource,
+) : ApiCallout(ApiCalloutType.Enrolment)

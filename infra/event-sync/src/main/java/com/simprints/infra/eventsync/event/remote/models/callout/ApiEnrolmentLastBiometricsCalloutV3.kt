@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-internal data class ApiEnrolmentLastBiometricsCallout(
+internal data class ApiEnrolmentLastBiometricsCalloutV3(
     val projectId: String,
     val userId: String,
     val moduleId: String,

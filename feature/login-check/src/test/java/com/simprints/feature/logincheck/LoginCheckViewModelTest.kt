@@ -116,7 +116,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Reports action event and extracts analytics for valid action`() = runTest {
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         coVerify {
             reportActionRequestEventsUseCase.invoke(any())
@@ -128,7 +128,7 @@ internal class LoginCheckViewModelTest {
     fun `Triggers alert if mismatched project IDs`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.MISMATCHED_PROJECT_ID
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         viewModel.showAlert
             .test()
@@ -139,7 +139,7 @@ internal class LoginCheckViewModelTest {
     fun `Returns error response if not signed in and followup action`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFolowUpRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getConfirmationRequest())
 
         viewModel.returnLoginNotComplete.test().assertHasValue()
     }
@@ -148,8 +148,8 @@ internal class LoginCheckViewModelTest {
     fun `Returns error response if there are several login attempts`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         viewModel.returnLoginNotComplete.test().assertHasValue()
     }
@@ -158,7 +158,7 @@ internal class LoginCheckViewModelTest {
     fun `Triggers login flow if not signed in and flow action`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         coVerify {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
@@ -166,14 +166,14 @@ internal class LoginCheckViewModelTest {
         }
         viewModel.showLoginFlow
             .test()
-            .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
+            .assertValue { it.peekContent() == ActionFactory.getIdentifyRequest() }
     }
 
     @Test
     fun `Returns error response if login attempt not complete`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.LoginNotCompleted))
 
         viewModel.returnLoginNotComplete.test().assertHasValue()
@@ -194,7 +194,7 @@ internal class LoginCheckViewModelTest {
     fun `Triggers alert if login attempt failed with integrity error`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.IntegrityServiceError))
 
         viewModel.showAlert
@@ -206,7 +206,7 @@ internal class LoginCheckViewModelTest {
     fun `Triggers alert if login attempt failed with missing play services`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.MissingPlayServices))
 
         viewModel.showAlert
@@ -218,7 +218,7 @@ internal class LoginCheckViewModelTest {
     fun `Triggers alert if login attempt failed with outdated play services`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.OutdatedPlayServices))
 
         viewModel.showAlert
@@ -230,7 +230,7 @@ internal class LoginCheckViewModelTest {
     fun `Triggers alert if login attempt failed with missing or outdated play services`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(
             LoginResult(
                 false,
@@ -247,7 +247,7 @@ internal class LoginCheckViewModelTest {
     fun `Triggers alert if login attempt failed with unknown error`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.Unknown))
 
         viewModel.showAlert
@@ -259,7 +259,7 @@ internal class LoginCheckViewModelTest {
     fun `Correctly handles successful login attempt`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
         viewModel.handleLoginResult(LoginResult(true, null))
 
         coVerify { configManager.getProject(any()) }
@@ -269,7 +269,7 @@ internal class LoginCheckViewModelTest {
     fun `Correctly handles signed in users`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         coVerify { configManager.getProject(any()) }
     }
@@ -279,7 +279,7 @@ internal class LoginCheckViewModelTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
         coEvery { configManager.getProject(any()).state } returns ProjectState.PROJECT_PAUSED
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         viewModel.showAlert
             .test()
@@ -291,7 +291,7 @@ internal class LoginCheckViewModelTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
         coEvery { configManager.getProject(any()).state } returns ProjectState.PROJECT_ENDING
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         viewModel.showAlert
             .test()
@@ -303,11 +303,11 @@ internal class LoginCheckViewModelTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
         coEvery { configManager.getProject(any()).state } returns ProjectState.PROJECT_ENDED
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         viewModel.showLoginFlow
             .test()
-            .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
+            .assertValue { it.peekContent() == ActionFactory.getIdentifyRequest() }
     }
 
     @Test
@@ -315,7 +315,7 @@ internal class LoginCheckViewModelTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
         coEvery { configManager.getProject(any()).state } returns ProjectState.RUNNING
 
-        viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
+        viewModel.validateSignInAndProceed(ActionFactory.getIdentifyRequest())
 
         coVerify {
             updateProjectStateUseCase.invoke()
@@ -329,6 +329,6 @@ internal class LoginCheckViewModelTest {
 
         viewModel.proceedWithAction
             .test()
-            .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
+            .assertValue { it.peekContent() == ActionFactory.getIdentifyRequest() }
     }
 }

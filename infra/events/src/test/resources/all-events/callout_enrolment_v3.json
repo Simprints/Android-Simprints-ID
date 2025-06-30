@@ -1,0 +1,26 @@
+{
+  "id": "b2f3e4c5-6789-4fab-cdef-2345678901bc",
+  "type": "CALLOUT_ENROLMENT_V3",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "CALLOUT_ENROLMENT_V3",
+    "eventVersion": 1,
+    "createdAt": 65145678901,
+    "endedAt": 0,
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "userId": {
+      "className": "TokenizableString.Raw",
+      "value": "user1"
+    },
+    "moduleId": {
+      "className": "TokenizableString.Raw",
+      "value": "module1"
+    },
+    "metadata": "test",
+    "biometricDataSource": "SIMPRINTS"
+  }
+}

@@ -34,7 +34,7 @@ class EventMigrationTest {
         EventRoomDatabase::class.java,
     )
 
-    private val allEventTypes = EventType.values()
+    private val allEventTypes = EventType.entries
 
     @Test
     fun `validate all the migrations are successful`() {

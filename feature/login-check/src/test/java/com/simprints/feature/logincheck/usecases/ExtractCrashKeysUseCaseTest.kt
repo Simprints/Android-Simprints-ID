@@ -53,7 +53,7 @@ class ExtractCrashKeysUseCaseTest {
         }
         every { authStore.signedInProjectId } returns "projectId"
 
-        useCase(ActionFactory.getFlowRequest())
+        useCase(ActionFactory.getIdentifyRequest())
 
         verify {
             Simber.setUserProperty(any(), "projectId")
