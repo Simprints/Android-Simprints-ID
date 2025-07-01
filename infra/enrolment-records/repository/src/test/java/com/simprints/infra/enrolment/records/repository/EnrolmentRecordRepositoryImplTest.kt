@@ -1,6 +1,5 @@
 package com.simprints.infra.enrolment.records.repository
 
-import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
@@ -17,6 +16,7 @@ import com.simprints.infra.enrolment.records.repository.local.EnrolmentRecordLoc
 import com.simprints.infra.enrolment.records.repository.local.SelectEnrolmentRecordLocalDataSourceUseCase
 import com.simprints.infra.enrolment.records.repository.local.migration.InsertRecordsInRoomDuringMigrationUseCase
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
+import com.simprints.infra.security.SecurityManager
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -64,8 +64,8 @@ class EnrolmentRecordRepositoryImplTest {
     private val prefs = mockk<SharedPreferences> {
         every { edit() } returns prefsEditor
     }
-    private val ctx = mockk<Context> {
-        every { getSharedPreferences(any(), any()) } returns prefs
+    private val securityManager = mockk<SecurityManager> {
+        every { buildEncryptedSharedPreferences(any()) } returns prefs
     }
     private lateinit var repository: EnrolmentRecordRepositoryImpl
     private val project = mockk<Project>()
@@ -78,7 +78,6 @@ class EnrolmentRecordRepositoryImplTest {
         every { prefsEditor.remove(any()) } returns prefsEditor
         coEvery { selectEnrolmentRecordLocalDataSource() } returns localDataSource
         repository = EnrolmentRecordRepositoryImpl(
-            context = ctx,
             remoteDataSource = remoteDataSource,
             selectEnrolmentRecordLocalDataSource = selectEnrolmentRecordLocalDataSource,
             commCareDataSource = commCareDataSource,
@@ -86,6 +85,7 @@ class EnrolmentRecordRepositoryImplTest {
             dispatcher = UnconfinedTestDispatcher(),
             batchSize = BATCH_SIZE,
             insertRecordsInRoomDuringMigration = insertRecordsDuringMigration,
+            securityManager = securityManager,
         )
     }
 

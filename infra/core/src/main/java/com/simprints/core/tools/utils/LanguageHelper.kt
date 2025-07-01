@@ -3,6 +3,7 @@ package com.simprints.core.tools.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import androidx.core.content.edit
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import java.util.Locale
 
@@ -15,11 +16,9 @@ object LanguageHelper {
 
     lateinit var prefs: SharedPreferences
     var language: String
-        get() {
-            return prefs.getString(SHARED_PREFS_LANGUAGE_KEY, SHARED_PREFS_LANGUAGE_DEFAULT)!!
-        }
+        get() = prefs.getString(SHARED_PREFS_LANGUAGE_KEY, SHARED_PREFS_LANGUAGE_DEFAULT)!!
         set(value) {
-            prefs.edit().putString(SHARED_PREFS_LANGUAGE_KEY, value).apply()
+            prefs.edit { putString(SHARED_PREFS_LANGUAGE_KEY, value) }
         }
 
     fun init(ctx: Context) {
