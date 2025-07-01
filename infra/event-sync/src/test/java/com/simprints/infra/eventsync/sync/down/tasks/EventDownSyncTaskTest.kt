@@ -10,8 +10,8 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction.*
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.downsync.EventDownSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -509,7 +509,7 @@ class EventDownSyncTaskTest {
     }
 
     @Test
-    fun downSync_shouldProcessRecordUpdateEvent_withCreations() = runTest {
+    fun downSync_shouldProcessRecordUpdateEvent_withUpdate() = runTest {
         coEvery { enrolmentRecordRepository.load(any()) } returns listOf(
             Subject(
                 subjectId = "subjectId",
@@ -529,34 +529,9 @@ class EventDownSyncTaskTest {
 
         coVerify {
             enrolmentRecordRepository.performActions(
-                withArg { actions -> actions.all { it is Creation } },
-                any(),
-            )
-        }
-    }
-
-    @Test
-    fun downSync_shouldProcessRecordUpdateEvent_withDeletions() = runTest {
-        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(
-            Subject(
-                subjectId = "subjectId",
-                projectId = "projectId",
-                attendantId = "moduleId".asTokenizableRaw(),
-                moduleId = "attendantId".asTokenizableRaw(),
-                faceSamples = listOf(
-                    FaceSample(byteArrayOf(), "format", "referenceIdToDelete"),
-                ),
-            ),
-        )
-
-        val event = ENROLMENT_RECORD_UPDATE
-        mockProgressEmission(listOf(event))
-
-        eventDownSyncTask.downSync(this, projectOp, eventScope, project).toList()
-
-        coVerify {
-            enrolmentRecordRepository.performActions(
-                withArg { actions -> actions.all { it is Deletion } },
+                match<List<SubjectAction>> { actions ->
+                    actions.size == 1 && actions.first() is Update
+                },
                 any(),
             )
         }

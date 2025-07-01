@@ -157,7 +157,7 @@ internal class ClientApiViewModelTest {
             deleteSessionEventsIfNeeded(any())
             persistentLogger.log(any(), any(), any(), any())
         }
-        verify { resultMapper.invoke(withArg { it is ActionResponse.EnrolActionResponse }) }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.EnrolActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
     }
 
@@ -172,7 +172,7 @@ internal class ClientApiViewModelTest {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
             persistentLogger.log(any(), any(), any(), any())
         }
-        verify { resultMapper.invoke(withArg { it is ActionResponse.IdentifyActionResponse }) }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.IdentifyActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
     }
 
@@ -188,7 +188,7 @@ internal class ClientApiViewModelTest {
             deleteSessionEventsIfNeeded(any())
             persistentLogger.log(any(), any(), any(), any())
         }
-        verify { resultMapper.invoke(withArg { it is ActionResponse.ConfirmActionResponse }) }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ConfirmActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
     }
 
@@ -205,7 +205,7 @@ internal class ClientApiViewModelTest {
             deleteSessionEventsIfNeeded(any())
             persistentLogger.log(any(), any(), any(), any())
         }
-        verify { resultMapper.invoke(withArg { it is ActionResponse.VerifyActionResponse }) }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.VerifyActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
     }
 
@@ -225,7 +225,7 @@ internal class ClientApiViewModelTest {
             deleteSessionEventsIfNeeded(any())
             persistentLogger.log(any(), any(), any(), any())
         }
-        verify { resultMapper.invoke(withArg { it is ActionResponse.ExitFormActionResponse }) }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ExitFormActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
     }
 
@@ -242,7 +242,7 @@ internal class ClientApiViewModelTest {
             deleteSessionEventsIfNeeded(any())
             persistentLogger.log(any(), any(), any(), any())
         }
-        verify { resultMapper.invoke(withArg { it is ActionResponse.ErrorActionResponse }) }
+        verify { resultMapper.invoke(match<ActionResponse> { it is ActionResponse.ErrorActionResponse }) }
         viewModel.returnResponse.test().assertHasValue()
     }
 
