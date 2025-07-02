@@ -68,6 +68,7 @@ internal class CommCareEventDataSource @Inject constructor(
             }
         } catch (e: Exception) {
             Simber.e("Error while querying CommCare", e)
+            throw e
         }
     }
 
@@ -75,9 +76,11 @@ internal class CommCareEventDataSource @Inject constructor(
         // Access Case Data Listing for the caseId
         val caseDataUri = CASE_DATA_URI.buildUpon().appendPath(caseId).build()
 
-        context.contentResolver
+        val cursor = context.contentResolver
             .query(caseDataUri, null, null, null, null)
-            ?.use { caseDataCursor ->
+        Simber.d("Cursor for caseId $caseId: $cursor", tag = "CommCareSync")
+        if (cursor != null) {
+            cursor.use { caseDataCursor ->
                 val subjectActions = getSubjectActionsValue(caseDataCursor)
                 Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
@@ -87,6 +90,12 @@ internal class CommCareEventDataSource @Inject constructor(
                     ?.filterIsInstance<EnrolmentRecordCreationEvent>()
                     ?.forEach { emit(it) }
             }
+        } else {
+            // If listing returned the caseId but the cursor is null, most likely CommCare
+            // logged out in the middle of sync. Throw an exception to retry the worker
+            // instead of thinking sync is complete (and possibly deleting unsynced subjects).
+            throw IllegalStateException("Cursor for caseId $caseId is null")
+        }
     }
 
     private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
