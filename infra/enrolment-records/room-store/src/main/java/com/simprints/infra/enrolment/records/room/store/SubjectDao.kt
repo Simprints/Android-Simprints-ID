@@ -39,4 +39,7 @@ interface SubjectDao {
 
     @RawQuery
     suspend fun loadSamples(query: SupportSQLiteQuery): Map<@MapColumn(DbSubject.SUBJECT_ID_COLUMN) String, List<DbBiometricTemplate>>
+
+    @Query("SELECT subjectId FROM DbSubject ORDER BY subjectId ASC")
+    suspend fun getAllSubjectIds(): List<String>
 }

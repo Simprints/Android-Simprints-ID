@@ -47,6 +47,8 @@ internal class CommCareEventSyncTask @Inject constructor(
     private val commCareEventDataSource: CommCareEventDataSource,
     private val eventRepository: EventRepository,
 ) {
+    private var subjectIdsPresentInCommCare = mutableSetOf<String>()
+
     fun downSync(
         scope: CoroutineScope,
         operation: EventDownSyncOperation,
@@ -88,14 +90,17 @@ internal class CommCareEventSyncTask @Inject constructor(
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
             emitProgress(lastOperation, count, result.totalCount)
 
+            //Don't trigger if count is 0 because it might be due to CommCare logout
+            if (count > 0) {
+                deleteSubjectsNotInCommCare(project)
+            }
+
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, result.totalCount)
 
             Simber.d("CommCareEventSyncTask finished", tag = "CommCareSync")
-
-            // TODO(milen): delete subjectIds not in the event list
         } catch (t: Throwable) {
-            if (t is SecurityException) {
+            if (t is SecurityException || t is IllegalStateException) {
                 throw t
             }
 
@@ -144,7 +149,7 @@ internal class CommCareEventSyncTask @Inject constructor(
         this.emit(EventDownSyncProgress(lastOperation, count, max))
     }
 
-    //TODO(milen): this common functionality should be extrated
+    //TODO(milen): this common functionality should be extracted
     private suspend fun processBatchedEvents(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
@@ -173,6 +178,11 @@ internal class CommCareEventSyncTask @Inject constructor(
             }.flatten()
 
         enrolmentRecordRepository.performActions(actions, project)
+        actions.forEach { action ->
+            if (action is Creation) {
+                subjectIdsPresentInCommCare.add(action.subject.subjectId)
+            }
+        }
 
         return if (batchOfEventsToProcess.isNotEmpty()) {
             lastOperation.copy(
@@ -195,6 +205,7 @@ internal class CommCareEventSyncTask @Inject constructor(
         }
     }
 
+    //TODO(milen): should we even handle moves in CoSync?
     private suspend fun handleSubjectMoveEvent(
         operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent,
@@ -264,6 +275,16 @@ internal class CommCareEventSyncTask @Inject constructor(
                 referenceIdsToRemove = biometricReferencesRemoved,
             ),
         )
+    }
+
+    private suspend fun deleteSubjectsNotInCommCare(project: Project) {
+        val deleteActions = enrolmentRecordRepository.getAllSubjectIds()
+            .filterNot { subjectIdsPresentInCommCare.contains(it) }
+            .map { Deletion(it) }
+        if (deleteActions.isNotEmpty()) {
+            enrolmentRecordRepository.performActions(deleteActions, project)
+            Simber.i("Deleted ${deleteActions.size} subjects not present in CommCare", tag = "CommCareSync")
+        }
     }
 
     companion object {
