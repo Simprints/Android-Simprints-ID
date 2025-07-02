@@ -38,7 +38,7 @@ internal class BaseUrlProviderImpl @Inject constructor(
         // TODO Delete after there are no users below 2025.3.0
         if (!securePrefs.contains(API_BASE_URL_KEY)) {
             val prefs = context.getSharedPreferences(LEGACY_PREF_FILE_NAME, Context.MODE_PRIVATE)
-            securePrefs.edit(commit = true) { putString(API_BASE_URL_KEY, prefs.getString(API_BASE_URL_KEY, "")) }
+            securePrefs.edit(commit = true) { putString(API_BASE_URL_KEY, prefs.getString(API_BASE_URL_KEY, DEFAULT_BASE_URL)) }
             prefs.edit(commit = true) { clear() }
         }
         return securePrefs
