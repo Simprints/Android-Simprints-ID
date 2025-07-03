@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
@@ -39,23 +38,20 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     private val launchLocationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isLocationPermissionGranted ->
-        if (isLocationPermissionGranted) {
-            viewModel.collectLocation()
-        }
-        viewModel.requestNotificationsPermission()
+        viewModel.locationPermissionCheckDone(isLocationPermissionGranted)
+    }
+
+    private val launchCommCarePermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { _ ->
+        viewModel.commCarePermissionCheckDone()
     }
 
     private val launchNotificationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { _ ->
-        // Do nothing
+        viewModel.notificationPermissionCheckDone()
     }
-
-    // The setup steps are:
-    // 1. Request location permission
-    // 2. Request notification permission
-    // 3. Download required licenses
-    // 4. Return overall setup result
 
     override fun onViewCreated(
         view: View,
@@ -70,21 +66,21 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
             R.id.setupFragment,
             AlertContract.DESTINATION,
         ) { result -> findNavController().finishWithResult(this, result) }
+
         // Request location permission
         viewModel.requestLocationPermission.observe(viewLifecycleOwner) {
-            if (requireActivity().hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                viewModel.collectLocation()
-                viewModel.requestNotificationsPermission()
-            } else {
-                launchLocationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
+            launchLocationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        // Request CommCare permission
+        viewModel.requestCommCarePermission.observe(viewLifecycleOwner) {
+            //TODO(milen): Extract in appropriate place
+            launchCommCarePermissionRequest.launch("org.commcare.dalvik.debug.provider.cases.read")
         }
         // Request notification permission
         viewModel.requestNotificationPermission.observe(viewLifecycleOwner) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 launchNotificationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
-            viewModel.downloadRequiredLicenses()
         }
         // Download required licenses
         observeDownloadLicenseState()

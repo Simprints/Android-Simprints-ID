@@ -7,6 +7,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -16,15 +17,8 @@ import com.simprints.infra.license.models.LicenseState
 import com.simprints.infra.license.models.LicenseVersion
 import com.simprints.infra.license.models.Vendor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -96,48 +90,57 @@ class SetupViewModelTest {
     }
 
     @Test
-    fun `should call locationStore collectLocationInBackground if collectLocation is called`() = runTest {
+    fun `should call locationStore collectLocationInBackground() if location permission is granted`() = runTest {
         // Given
         justRun { locationStore.collectLocationInBackground() }
+        coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
 
         // when
-        viewModel.collectLocation()
+        viewModel.locationPermissionCheckDone(granted = true)
 
         // Then
         verify { locationStore.collectLocationInBackground() }
     }
 
     @Test
-    fun `should request notification permission if collectLocation is disabled`() = runTest {
+    fun `should not call locationStore collectLocationInBackground() if location permission is not granted`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
+        justRun { locationStore.collectLocationInBackground() }
+        coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
 
-        // When
-        viewModel.start()
+        // when
+        viewModel.locationPermissionCheckDone(granted = false)
 
         // Then
-        viewModel.requestNotificationPermission.test().assertHasValue()
+        verify(exactly = 0) { locationStore.collectLocationInBackground() }
     }
 
     @Test
-    fun `should not request notification permission yet if collectLocation is enabled`() = runTest {
+    fun `should request CommCare permission if needed when location permission is granted`() = runTest {
         // Given
-        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns true
+        justRun { locationStore.collectLocationInBackground() }
+        coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
+        //TODO(milen): Mock isCommCareEventDownSyncAllowed() when new config is implemented
 
         // When
-        viewModel.start()
+        viewModel.locationPermissionCheckDone(true)
 
         // Then
-        viewModel.requestNotificationPermission.test().assertNoValue()
+        viewModel.requestCommCarePermission.test().assertHasValue()
     }
 
     @Test
-    fun `should request notification permission on command`() = runTest {
+    fun `should request CommCare permission if needed when location permission is not granted`() = runTest {
+        // Given
+        justRun { locationStore.collectLocationInBackground() }
+        coEvery { configManager.getProjectConfiguration() } returns mockk<ProjectConfiguration>()
+        //TODO(milen): Mock isCommCareEventDownSyncAllowed() when new config is implemented
+
         // When
-        viewModel.requestNotificationsPermission()
+        viewModel.locationPermissionCheckDone(false)
 
         // Then
-        viewModel.requestNotificationPermission.test().assertHasValue()
+        viewModel.requestCommCarePermission.test().assertHasValue()
     }
 
     @Test
@@ -164,7 +167,7 @@ class SetupViewModelTest {
         } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate", "license", LicenseVersion.UNLIMITED))).asFlow()
 
         // When
-        viewModel.downloadRequiredLicenses()
+        viewModel.notificationPermissionCheckDone()
 
         // Then
         verify(exactly = 2) { licenseRepository.getLicenseStates(any(), any(), any(), LicenseVersion("1")) }
@@ -195,7 +198,7 @@ class SetupViewModelTest {
         } returns listOf(LicenseState.FinishedWithSuccess(License("expirationDate", "license", LicenseVersion.UNLIMITED))).asFlow()
 
         // When
-        viewModel.downloadRequiredLicenses()
+        viewModel.notificationPermissionCheckDone()
 
         // Then
         verify(exactly = 2) { licenseRepository.getLicenseStates(any(), any(), any(), any()) }
@@ -221,7 +224,7 @@ class SetupViewModelTest {
         }
 
         // When
-        viewModel.downloadRequiredLicenses()
+        viewModel.notificationPermissionCheckDone()
 
         // Then
         viewModel.overallSetupResult.test().assertValue(true)
@@ -255,7 +258,7 @@ class SetupViewModelTest {
         } returns listOf(LicenseState.FinishedWithError("123")).asFlow()
 
         // When
-        viewModel.downloadRequiredLicenses()
+        viewModel.notificationPermissionCheckDone()
 
         // Then
         coVerify { saveLicenseCheckEvent(Vendor.RankOne, LicenseStatus.MISSING) }
