@@ -33,6 +33,7 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.D
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
+import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests

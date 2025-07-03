@@ -34,10 +34,9 @@ internal class EventSyncCache @Inject constructor(
     }
 
     suspend fun storeLastSuccessfulSyncTime(lastSyncTime: Timestamp?): Unit = withContext(dispatcher) {
-        sharedForLastSyncTime
-            .edit()
-            .putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.ms ?: -1)
-            .apply()
+        sharedForLastSyncTime.edit {
+            putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.ms ?: -1)
+        }
     }
 
     suspend fun readProgress(workerId: String): Int = withContext(dispatcher) {
@@ -48,7 +47,7 @@ internal class EventSyncCache @Inject constructor(
         workerId: String,
         progress: Int,
     ): Unit = withContext(dispatcher) {
-        sharedForProgresses.edit().putInt(workerId, progress).commit()
+        sharedForProgresses.edit(commit = true) { putInt(workerId, progress) }
     }
 
     suspend fun shouldIgnoreMax(): Boolean = withContext(dispatcher) {
@@ -78,8 +77,8 @@ internal class EventSyncCache @Inject constructor(
         // https://issuetracker.google.com/issues/138314232#comment23
         // and https://issuetracker.google.com/issues/169904974
         try {
-            sharedForProgresses.edit().clear().commit()
-            sharedForCounts.edit().clear().commit()
+            sharedForProgresses.edit(commit = true) { clear() }
+            sharedForCounts.edit(commit = true) { clear() }
         } catch (ex: SecurityException) {
             Simber.e("Crashed during event sync cleanup", ex, tag = SYNC)
         }

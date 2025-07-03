@@ -17,7 +17,7 @@ import com.simprints.feature.login.LoginResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
@@ -153,7 +153,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     }
 
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
-        if (!configuration.isEventDownSyncAllowed()) {
+        if (!configuration.isSimprintsEventDownSyncAllowed()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
         }
 
