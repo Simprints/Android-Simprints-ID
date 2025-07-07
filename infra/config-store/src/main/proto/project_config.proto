@@ -192,6 +192,7 @@ message ProtoSynchronizationConfiguration {
     Frequency frequency = 1;
     ProtoUpSynchronizationConfiguration up = 2;
     ProtoDownSynchronizationConfiguration down = 3;
+    ProtoSampleSynchronizationConfiguration samples = 4;
 
     enum Frequency {
         ONLY_PERIODICALLY_UP_SYNC = 0;
@@ -236,10 +237,17 @@ message ProtoUpSynchronizationConfiguration {
     }
 }
 
+message ProtoSampleSynchronizationConfiguration {
+    int32 signedUrlBatchSize = 1;
+}
+
 message ProtoUpSyncBatchSizes {
     int32 sessions = 1;
-    int32 upSyncs = 2;
-    int32 downSyncs = 3;
+    int32 upSyncs = 2; // TODO: remove this field after migration to 2025.3.0
+    int32 downSyncs = 3; // TODO: remove this field after migration to 2025.3.0
+    int32 eventUpSyncs = 4;
+    int32 eventDownSyncs = 5;
+    int32 sampleUpSyncs = 6;
 }
 
 message ProtoDecisionPolicy {

@@ -4,6 +4,7 @@ data class SynchronizationConfiguration(
     val frequency: Frequency,
     val up: UpSynchronizationConfiguration,
     val down: DownSynchronizationConfiguration,
+    val samples: SampleSynchronizationConfiguration,
 ) {
     enum class Frequency {
         ONLY_PERIODICALLY_UP_SYNC,

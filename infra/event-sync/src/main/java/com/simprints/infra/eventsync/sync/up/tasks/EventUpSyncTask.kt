@@ -105,7 +105,7 @@ internal class EventUpSyncTask @Inject constructor(
                 eventScope = eventScope,
                 project = project,
                 eventScopeTypeToUpload = EventScopeType.DOWN_SYNC,
-                batchSize = config.synchronization.up.simprints.batchSizes.downSyncs,
+                batchSize = config.synchronization.up.simprints.batchSizes.eventDownSyncs,
                 createUpSyncContentContent = {
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(eventDownSyncCount = it)
@@ -121,7 +121,7 @@ internal class EventUpSyncTask @Inject constructor(
                 eventScope = eventScope,
                 project = project,
                 eventScopeTypeToUpload = EventScopeType.UP_SYNC,
-                batchSize = config.synchronization.up.simprints.batchSizes.upSyncs,
+                batchSize = config.synchronization.up.simprints.batchSizes.eventUpSyncs,
                 createUpSyncContentContent = {
                     // Only tracking up-sync if there have been ay events in other scopes.
                     EventUpSyncRequestEvent.UpSyncContent(

@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
 import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
+import com.simprints.infra.config.store.local.models.ProtoSampleSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
@@ -35,6 +36,7 @@ import com.simprints.infra.config.store.models.MaxCaptureAttempts
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -336,44 +338,60 @@ internal val protoIdentificationConfiguration = ProtoIdentificationConfiguration
     .build()
 
 internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
-    ApiSynchronizationConfiguration.Frequency.PERIODICALLY,
-    ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration(
-        ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiSimprintsUpSynchronizationConfiguration(
-            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL,
-            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiUpSyncBatchSizes(1, 2, 3),
-            false,
+    frequency = ApiSynchronizationConfiguration.Frequency.PERIODICALLY,
+    up = ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration(
+        simprints = ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiSimprintsUpSynchronizationConfiguration(
+            kind = ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+            batchSizes = ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiUpSyncBatchSizes(
+                sessions = 1,
+                eventUpSyncs = 2,
+                eventDownSyncs = 3,
+                sampleUpSyncs = 4,
+            ),
+            imagesRequireUnmeteredConnection = false,
         ),
-        ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
-            ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE,
+        coSync = ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.ApiCoSyncUpSynchronizationConfiguration(
+            kind = ApiSynchronizationConfiguration.ApiUpSynchronizationConfiguration.UpSynchronizationKind.NONE,
         ),
     ),
-    ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
-        ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration.PartitionType.PROJECT,
-        1,
-        listOf("module1"),
-        "PT24H",
+    down = ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration(
+        partitionType = ApiSynchronizationConfiguration.ApiDownSynchronizationConfiguration.PartitionType.PROJECT,
+        maxNbOfModules = 1,
+        moduleOptions = listOf("module1"),
+        maxAge = "PT24H",
+    ),
+    samples = ApiSynchronizationConfiguration.ApiSampleSynchronizationConfiguration(
+        signedUrlBatchSize = 5,
     ),
 )
 
 internal val simprintsUpSyncConfigurationConfiguration = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-    UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
-    UpSynchronizationConfiguration.UpSyncBatchSizes(1, 2, 3),
-    false,
+    kind = UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+    batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
+        sessions = 1,
+        eventUpSyncs = 2,
+        eventDownSyncs = 3,
+        sampleUpSyncs = 4,
+    ),
+    imagesRequireUnmeteredConnection = false,
 )
 
 internal val synchronizationConfiguration = SynchronizationConfiguration(
-    SynchronizationConfiguration.Frequency.PERIODICALLY,
-    UpSynchronizationConfiguration(
-        simprintsUpSyncConfigurationConfiguration,
-        UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
+    frequency = SynchronizationConfiguration.Frequency.PERIODICALLY,
+    up = UpSynchronizationConfiguration(
+        simprints = simprintsUpSyncConfigurationConfiguration,
+        coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
             UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
         ),
     ),
-    DownSynchronizationConfiguration(
-        DownSynchronizationConfiguration.PartitionType.PROJECT,
-        1,
-        listOf("module1".asTokenizableEncrypted()),
-        "PT24H",
+    down = DownSynchronizationConfiguration(
+        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+        maxNbOfModules = 1,
+        moduleOptions = listOf("module1".asTokenizableEncrypted()),
+        maxAge = "PT24H",
+    ),
+    samples = SampleSynchronizationConfiguration(
+        signedUrlBatchSize = 5,
     ),
 )
 
@@ -391,8 +409,9 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
                         ProtoUpSyncBatchSizes
                             .newBuilder()
                             .setSessions(1)
-                            .setUpSyncs(2)
-                            .setDownSyncs(3)
+                            .setEventUpSyncs(2)
+                            .setEventDownSyncs(3)
+                            .setSampleUpSyncs(4)
                             .build(),
                     ).build(),
             ).setCoSync(
@@ -409,6 +428,11 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .setIsTokenized(true)
             .addModuleOptions("module1")
             .setMaxAge("PT24H")
+            .build(),
+    ).setSamples(
+        ProtoSampleSynchronizationConfiguration
+            .newBuilder()
+            .setSignedUrlBatchSize(5)
             .build(),
     ).build()
 

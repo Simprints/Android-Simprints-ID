@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.models.MaxCaptureAttempts
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -117,6 +118,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
         listOf("module1".asTokenizableEncrypted()),
         "PT24H",
     ),
+    SampleSynchronizationConfiguration(3),
 )
 
 internal val identificationConfiguration =

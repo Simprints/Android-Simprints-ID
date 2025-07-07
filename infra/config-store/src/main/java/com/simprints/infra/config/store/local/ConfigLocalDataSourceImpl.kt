@@ -20,6 +20,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -37,7 +38,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     private val projectDataStore: DataStore<ProtoProject>,
     private val configDataStore: DataStore<ProtoProjectConfiguration>,
     private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>,
-    private val tokenizationProcessor: TokenizationProcessor
+    private val tokenizationProcessor: TokenizationProcessor,
 ) : ConfigLocalDataSource {
     override suspend fun saveProject(project: Project) {
         projectDataStore.updateData { project.toProto() }
@@ -73,8 +74,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
 
-    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> =
-        configDataStore.data.map(ProtoProjectConfiguration::toDomain)
+    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> = configDataStore.data.map(ProtoProjectConfiguration::toDomain)
 
     override suspend fun clearProjectConfiguration() {
         configDataStore.updateData { it.toBuilder().clear().build() }
@@ -82,12 +82,12 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration {
         val config = deviceConfigDataStore.data.first().toDomain()
-        val tokenizedModules = config.selectedModules.map {moduleId ->
-            when(moduleId) {
+        val tokenizedModules = config.selectedModules.map { moduleId ->
+            when (moduleId) {
                 is TokenizableString.Raw -> tokenizationProcessor.encrypt(
                     decrypted = moduleId,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    project = getProject()
+                    project = getProject(),
                 )
                 is TokenizableString.Tokenized -> moduleId
             }
@@ -228,6 +228,9 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         maxNbOfModules = 6,
                         moduleOptions = listOf(),
                         maxAge = DEFAULT_DOWN_SYNC_MAX_AGE,
+                    ),
+                    samples = SampleSynchronizationConfiguration(
+                        signedUrlBatchSize = 1,
                     ),
                 ),
                 custom = null,

@@ -102,9 +102,10 @@ internal class EventUpSyncTaskTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            10,
-            10,
-            10,
+            sessions = 10,
+            eventUpSyncs = 10,
+            eventDownSyncs = 10,
+            sampleUpSyncs = 10,
         )
         coEvery { configManager.refreshProject(any()) } returns projectWithConfig
         every { projectWithConfig.project } returns project
@@ -150,9 +151,10 @@ internal class EventUpSyncTaskTest {
     fun `upload events in batches of provided size`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            2,
-            2,
-            2,
+            sessions = 2,
+            eventUpSyncs = 2,
+            eventDownSyncs = 2,
+            sampleUpSyncs = 2,
         )
 
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
@@ -176,9 +178,10 @@ internal class EventUpSyncTaskTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         val batchSize = 2
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            batchSize,
-            batchSize,
-            batchSize,
+            sessions = batchSize,
+            eventUpSyncs = batchSize,
+            eventDownSyncs = batchSize,
+            sampleUpSyncs = batchSize,
         )
 
         coEvery { eventRepo.getClosedEventScopes(any(), any()) } returns emptyList()
@@ -204,9 +207,10 @@ internal class EventUpSyncTaskTest {
     fun `upload out-of-session events in correct fields`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         every { synchronizationConfiguration.up.simprints.batchSizes } returns UpSynchronizationConfiguration.UpSyncBatchSizes(
-            2,
-            2,
-            2,
+            sessions = 3,
+            eventUpSyncs = 3,
+            eventDownSyncs = 3,
+            sampleUpSyncs = 3,
         )
 
         coEvery { eventRepo.getClosedEventScopesCount(EventScopeType.SESSION) } returns 0

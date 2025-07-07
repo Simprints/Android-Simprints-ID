@@ -19,6 +19,7 @@ import com.simprints.infra.config.store.local.models.ProtoFingerprintConfigurati
 import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
 import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
+import com.simprints.infra.config.store.local.models.ProtoSampleSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
@@ -537,8 +538,9 @@ class ProjectConfigSharedPrefsMigrationTest {
                                     ProtoUpSyncBatchSizes
                                         .newBuilder()
                                         .setSessions(1)
-                                        .setUpSyncs(1)
-                                        .setDownSyncs(1)
+                                        .setEventUpSyncs(1)
+                                        .setEventDownSyncs(1)
+                                        .setSampleUpSyncs(1)
                                         .build(),
                                 ).build(),
                         ).setCoSync(
@@ -555,6 +557,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .addAllModuleOptions(listOf("module1", "module2"))
                         .setMaxAge("PT24H")
                         .build(),
+                ).setSamples(
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()
 
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_NON_NULL_VALUES =
@@ -572,8 +576,9 @@ class ProjectConfigSharedPrefsMigrationTest {
                                     ProtoUpSyncBatchSizes
                                         .newBuilder()
                                         .setSessions(1)
-                                        .setUpSyncs(1)
-                                        .setDownSyncs(1)
+                                        .setEventUpSyncs(1)
+                                        .setEventDownSyncs(1)
+                                        .setSampleUpSyncs(1)
                                         .build(),
                                 ).build(),
                         ).setCoSync(
@@ -590,6 +595,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .addAllModuleOptions(listOf("module1", "module2"))
                         .setMaxAge("PT24H")
                         .build(),
+                ).setSamples(
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()
 
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_EMPTY_VALUES =
@@ -607,8 +614,9 @@ class ProjectConfigSharedPrefsMigrationTest {
                                     ProtoUpSyncBatchSizes
                                         .newBuilder()
                                         .setSessions(1)
-                                        .setUpSyncs(1)
-                                        .setDownSyncs(1)
+                                        .setEventUpSyncs(1)
+                                        .setEventDownSyncs(1)
+                                        .setSampleUpSyncs(1)
                                         .build(),
                                 ).build(),
                         ).setCoSync(
@@ -625,6 +633,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .addAllModuleOptions(listOf("module1", "module2"))
                         .setMaxAge("PT24H")
                         .build(),
+                ).setSamples(
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()
 
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES =
@@ -642,8 +652,9 @@ class ProjectConfigSharedPrefsMigrationTest {
                                     ProtoUpSyncBatchSizes
                                         .newBuilder()
                                         .setSessions(1)
-                                        .setUpSyncs(1)
-                                        .setDownSyncs(1)
+                                        .setEventUpSyncs(1)
+                                        .setEventDownSyncs(1)
+                                        .setSampleUpSyncs(1)
                                         .build(),
                                 ).build(),
                         ).setCoSync(
@@ -660,6 +671,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .addAllModuleOptions(listOf("module1", "module2"))
                         .setMaxAge("PT24H")
                         .build(),
+                ).setSamples(
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()
 
         private val JSON_IDENTIFICATION_CONFIGURATION =

@@ -13,6 +13,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
@@ -227,8 +228,9 @@ internal data class OldProjectConfig(
                 },
                 batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
                     sessions = 1,
-                    upSyncs = 1,
-                    downSyncs = 1,
+                    eventUpSyncs = 1,
+                    eventDownSyncs = 1,
+                    sampleUpSyncs = 1,
                 ),
                 imagesRequireUnmeteredConnection = false,
             ),
@@ -253,6 +255,9 @@ internal data class OldProjectConfig(
             maxNbOfModules = maxNbOfModules.toInt(),
             moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw),
             maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
+        ),
+        samples = SampleSynchronizationConfiguration(
+            signedUrlBatchSize = 5,
         ),
     )
 

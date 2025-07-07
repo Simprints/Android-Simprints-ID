@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.Companion.DEFAULT_DOWN_SYNC_MAX_AGE
+import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 
@@ -12,11 +13,13 @@ internal data class ApiSynchronizationConfiguration(
     val frequency: Frequency,
     val up: ApiUpSynchronizationConfiguration,
     val down: ApiDownSynchronizationConfiguration,
+    val samples: ApiSampleSynchronizationConfiguration,
 ) {
     fun toDomain(): SynchronizationConfiguration = SynchronizationConfiguration(
-        frequency.toDomain(),
-        up.toDomain(),
-        down.toDomain(),
+        frequency = frequency.toDomain(),
+        up = up.toDomain(),
+        down = down.toDomain(),
+        samples = samples.toDomain(),
     )
 
     @Keep
@@ -85,11 +88,12 @@ internal data class ApiSynchronizationConfiguration(
         @Keep
         data class ApiUpSyncBatchSizes(
             val sessions: Int,
-            val upSyncs: Int,
-            val downSyncs: Int,
+            val eventUpSyncs: Int,
+            val eventDownSyncs: Int,
+            val sampleUpSyncs: Int,
         ) {
             fun toDomain(): UpSynchronizationConfiguration.UpSyncBatchSizes =
-                UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, upSyncs, downSyncs)
+                UpSynchronizationConfiguration.UpSyncBatchSizes(sessions, eventUpSyncs, eventDownSyncs, sampleUpSyncs)
         }
     }
 
@@ -120,5 +124,14 @@ internal data class ApiSynchronizationConfiguration(
                 USER -> DownSynchronizationConfiguration.PartitionType.USER
             }
         }
+    }
+
+    @Keep
+    data class ApiSampleSynchronizationConfiguration(
+        val signedUrlBatchSize: Int,
+    ) {
+        fun toDomain() = SampleSynchronizationConfiguration(
+            signedUrlBatchSize = signedUrlBatchSize,
+        )
     }
 }
