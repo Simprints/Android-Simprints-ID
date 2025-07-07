@@ -4,14 +4,14 @@ import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.images.remote.ImageRemoteDataSource
+import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
-    private val remoteDataSource: ImageRemoteDataSource,
+    private val sampleUploader: SampleUploader,
     private val metadataStore: ImageMetadataStore,
 ) : ImageRepository {
     override suspend fun storeImageSecurely(
@@ -34,7 +34,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
             try {
                 localDataSource.decryptImage(imageRef)?.let { stream ->
                     val metadata = metadataStore.getMetadata(imageRef.relativePath)
-                    val uploadResult = remoteDataSource.uploadImage(stream, imageRef, metadata)
+                    val uploadResult = sampleUploader.uploadSample(stream, imageRef, metadata)
                     if (uploadResult.isUploadSuccessful()) {
                         localDataSource.deleteImage(imageRef)
                         metadataStore.deleteMetadata(imageRef.relativePath)

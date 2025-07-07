@@ -1,19 +1,15 @@
 package com.simprints.infra.images
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.images.remote.ImageRemoteDataSource
+import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.images.remote.UploadResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -28,7 +24,7 @@ internal class ImageRepositoryImplTest {
     lateinit var localDataSource: ImageLocalDataSource
 
     @MockK
-    lateinit var remoteDataSource: ImageRemoteDataSource
+    lateinit var sampleUploader: SampleUploader
 
     @MockK
     lateinit var metadataStore: ImageMetadataStore
@@ -38,7 +34,7 @@ internal class ImageRepositoryImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        repository = ImageRepositoryImpl(localDataSource, remoteDataSource, metadataStore)
+        repository = ImageRepositoryImpl(localDataSource, sampleUploader, metadataStore)
         initValidImageMocks()
     }
 
@@ -144,7 +140,7 @@ internal class ImageRepositoryImplTest {
         coJustRun { metadataStore.deleteAllMetadata() }
 
         coEvery {
-            remoteDataSource.uploadImage(mockStream, validImage, emptyMap())
+            sampleUploader.uploadSample(mockStream, validImage, emptyMap())
         } returns UploadResult(
             validImage,
             UploadResult.Status.SUCCESSFUL,
@@ -160,7 +156,7 @@ internal class ImageRepositoryImplTest {
         } returns mockStream
 
         coEvery {
-            remoteDataSource.uploadImage(mockStream, invalidImage, emptyMap())
+            sampleUploader.uploadSample(mockStream, invalidImage, emptyMap())
         } returns UploadResult(
             invalidImage,
             UploadResult.Status.FAILED,

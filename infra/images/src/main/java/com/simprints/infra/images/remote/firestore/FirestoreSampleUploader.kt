@@ -1,20 +1,22 @@
-package com.simprints.infra.images.remote
+package com.simprints.infra.images.remote.firestore
 
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.infra.images.remote.SampleUploader
+import com.simprints.infra.images.remote.UploadResult
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 import javax.inject.Inject
 
-internal class ImageRemoteDataSourceImpl @Inject constructor(
+internal class FirestoreSampleUploader @Inject constructor(
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
-) : ImageRemoteDataSource {
-    override suspend fun uploadImage(
+) : SampleUploader {
+    override suspend fun uploadSample(
         imageStream: FileInputStream,
         imageRef: SecuredImageRef,
         metadata: Map<String, String>,

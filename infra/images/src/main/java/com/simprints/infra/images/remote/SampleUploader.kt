@@ -6,7 +6,7 @@ import java.io.FileInputStream
 /**
  * Interface for remote image file operations
  */
-internal interface ImageRemoteDataSource {
+internal interface SampleUploader {
     /**
      * Uploads an image
      *
@@ -17,7 +17,7 @@ internal interface ImageRemoteDataSource {
      * @return the result of the operation.
      * @see [UploadResult]
      */
-    suspend fun uploadImage(
+    suspend fun uploadSample(
         imageStream: FileInputStream,
         imageRef: SecuredImageRef,
         metadata: Map<String, String>,

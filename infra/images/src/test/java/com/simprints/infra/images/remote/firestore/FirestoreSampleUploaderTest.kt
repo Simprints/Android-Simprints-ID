@@ -1,7 +1,7 @@
-package com.simprints.infra.images.remote
+package com.simprints.infra.images.remote.firestore
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
@@ -23,7 +23,7 @@ import java.io.FileInputStream
 
 @Suppress("DEPRECATION")
 @RunWith(AndroidJUnit4::class)
-class ImageRemoteDataSourceImplTest {
+class FirestoreSampleUploaderTest {
     @MockK
     private lateinit var configManager: ConfigManager
 
@@ -36,7 +36,7 @@ class ImageRemoteDataSourceImplTest {
     @MockK
     private lateinit var mockSecuredImageRef: SecuredImageRef
 
-    private lateinit var remoteDataSource: ImageRemoteDataSourceImpl
+    private lateinit var remoteDataSource: FirestoreSampleUploader
 
     @Before
     fun setup() {
@@ -44,7 +44,7 @@ class ImageRemoteDataSourceImplTest {
 
         every { mockSecuredImageRef.relativePath.parts } returns arrayOf("Test1")
 
-        remoteDataSource = ImageRemoteDataSourceImpl(configManager, authStore)
+        remoteDataSource = FirestoreSampleUploader(configManager, authStore)
 
         // We need to mock statics and global extensions
         mockkStatic(FirebaseStorage::class)
@@ -68,9 +68,9 @@ class ImageRemoteDataSourceImplTest {
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
-        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, emptyMap())
+        val result = remoteDataSource.uploadSample(mockImageStream, mockSecuredImageRef, emptyMap())
 
-        assertThat(result.isUploadSuccessful()).isTrue()
+        Truth.assertThat(result.isUploadSuccessful()).isTrue()
     }
 
     @Test
@@ -83,18 +83,22 @@ class ImageRemoteDataSourceImplTest {
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
-        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, mapOf("key" to "value"))
+        val result = remoteDataSource.uploadSample(
+            mockImageStream,
+            mockSecuredImageRef,
+            mapOf("key" to "value"),
+        )
 
-        assertThat(result.isUploadSuccessful()).isTrue()
+        Truth.assertThat(result.isUploadSuccessful()).isTrue()
     }
 
     @Test
     fun `null project returns failed upload`() = runTest {
         every { authStore.getLegacyAppFallback().options.projectId } returns null
 
-        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, emptyMap())
+        val result = remoteDataSource.uploadSample(mockImageStream, mockSecuredImageRef, emptyMap())
 
-        assertThat(result.isUploadSuccessful()).isFalse()
+        Truth.assertThat(result.isUploadSuccessful()).isFalse()
     }
 
     @Test
@@ -102,9 +106,9 @@ class ImageRemoteDataSourceImplTest {
         coEvery { configManager.getProject(any()).imageBucket } returns ""
         every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
 
-        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef, emptyMap())
+        val result = remoteDataSource.uploadSample(mockImageStream, mockSecuredImageRef, emptyMap())
 
-        assertThat(result.isUploadSuccessful()).isFalse()
+        Truth.assertThat(result.isUploadSuccessful()).isFalse()
     }
 
     private fun setupStorageMock() = mockk<FirebaseStorage>(relaxed = true) {
