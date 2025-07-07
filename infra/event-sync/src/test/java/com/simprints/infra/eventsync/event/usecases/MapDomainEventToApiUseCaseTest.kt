@@ -51,6 +51,7 @@ import com.simprints.infra.events.sampledata.createOneToOneMatchEvent
 import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import com.simprints.infra.events.sampledata.createRefusalCallbackEvent
 import com.simprints.infra.events.sampledata.createRefusalEvent
+import com.simprints.infra.events.sampledata.createSampleUpSyncRequestEvent
 import com.simprints.infra.events.sampledata.createScannerConnectionEvent
 import com.simprints.infra.events.sampledata.createScannerFirmwareUpdateEvent
 import com.simprints.infra.events.sampledata.createSuspiciousIntentEvent
@@ -89,6 +90,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.One
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.OneToOneMatch
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.PersonCreation
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Refusal
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.SampleUpSyncRequest
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ScannerConnection
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.ScannerFirmwareUpdate
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.SuspiciousIntent
@@ -124,6 +126,7 @@ import com.simprints.infra.eventsync.event.validateOneToManyMatchEventApiModel
 import com.simprints.infra.eventsync.event.validateOneToOneMatchEventApiModel
 import com.simprints.infra.eventsync.event.validatePersonCreationEvent
 import com.simprints.infra.eventsync.event.validateRefusalEventApiModel
+import com.simprints.infra.eventsync.event.validateSampleUpSyncRequestEventApiModel
 import com.simprints.infra.eventsync.event.validateScannerConnectionEventApiModel
 import com.simprints.infra.eventsync.event.validateScannerFirmwareUpdateEventApiModel
 import com.simprints.infra.eventsync.event.validateSuspiciousIntentEventApiModel
@@ -567,6 +570,15 @@ internal class MapDomainEventToApiUseCaseTest {
     }
 
     @Test
+    fun validate_SampleUpSyncRequestEventApiModel() {
+        val event = createSampleUpSyncRequestEvent()
+        val apiEvent = useCase(event, project)
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateSampleUpSyncRequestEventApiModel(json)
+    }
+
+    @Test
     fun validate_ageGroupSelectionEventApiModel() {
         val event = createAgeGroupSelectionEvent()
         val apiEvent = useCase(event, project)
@@ -682,6 +694,7 @@ internal class MapDomainEventToApiUseCaseTest {
             FaceCaptureBiometrics -> validate_FaceCaptureBiometricsEventApiModel()
             EventDownSyncRequest -> validate_DownSyncRequestEventApiModel()
             EventUpSyncRequest -> validate_UpSyncRequestEventApiModel()
+            SampleUpSyncRequest -> validate_SampleUpSyncRequestEventApiModel()
             LicenseCheck -> validate_licenseCheckEventApiModel()
             AgeGroupSelection -> validate_ageGroupSelectionEventApiModel()
             BiometricReferenceCreation -> validate_biometricReferenceCreationEventApiModel()

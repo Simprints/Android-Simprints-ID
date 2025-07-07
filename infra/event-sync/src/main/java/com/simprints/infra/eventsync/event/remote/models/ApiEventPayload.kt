@@ -58,6 +58,7 @@ import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATC
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_ONE_MATCH
 import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.infra.events.event.domain.models.EventType.REFUSAL
+import com.simprints.infra.events.event.domain.models.EventType.SAMPLE_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
@@ -98,6 +99,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayloadV2
@@ -108,6 +110,7 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConf
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceFallbackCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceOnboardingCompletePayload
+import com.simprints.infra.eventsync.event.remote.models.samples.ApiEventSampleUpSyncRequestPayload
 import com.simprints.infra.eventsync.event.remote.models.upsync.ApiEventUpSyncRequestPayload
 
 @Keep
@@ -163,6 +166,7 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload = when (this.type) 
     FACE_CAPTURE_BIOMETRICS -> ApiFaceCaptureBiometricsPayload(this as FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload)
     EVENT_DOWN_SYNC_REQUEST -> ApiEventDownSyncRequestPayload(this as EventDownSyncRequestEvent.EventDownSyncRequestPayload)
     EVENT_UP_SYNC_REQUEST -> ApiEventUpSyncRequestPayload(this as EventUpSyncRequestEvent.EventUpSyncRequestPayload)
+    SAMPLE_UP_SYNC_REQUEST -> ApiEventSampleUpSyncRequestPayload(this as SampleUpSyncRequestEvent.SampleUpSyncRequestPayload)
     LICENSE_CHECK -> ApiLicenseCheckEventPayload(this as LicenseCheckEvent.LicenseCheckEventPayload)
     AGE_GROUP_SELECTION -> ApiAgeGroupSelectionPayload(this as AgeGroupSelectionEvent.AgeGroupSelectionPayload)
     BIOMETRIC_REFERENCE_CREATION -> ApiBiometricReferenceCreationPayload(this as BiometricReferenceCreationPayload)

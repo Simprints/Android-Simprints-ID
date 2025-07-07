@@ -691,6 +691,18 @@ fun validateUpSyncRequestEventApiModel(json: JSONObject) {
     }
 }
 
+fun validateSampleUpSyncRequestEventApiModel(json: JSONObject) {
+    validateCommonParams(json, "SampleUpSyncRequest", 0)
+    with(json.getJSONObject("payload")) {
+        validateTimestamp(getJSONObject("startTime"))
+        validateTimestamp(getJSONObject("endTime"))
+        assertThat(getString("requestId")).isNotNull()
+        assertThat(getString("sampleId")).isNotNull()
+        assertThat(getInt("size")).isNotNull()
+        assertThat(getString("errorType")).isNotNull()
+    }
+}
+
 fun validateAgeGroupSelectionEventApiModel(json: JSONObject) {
     validateCommonParams(json, "AgeGroupSelection", 1)
     with(json.getJSONObject("payload")) {

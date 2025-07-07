@@ -1,0 +1,19 @@
+{
+  "id": "c1ed20db-dc70-42c4-8449-725f63c6cf8e",
+  "type": "SAMPLE_UP_SYNC_REQUEST",
+  "labels": {
+    "projectId": "TEST6Oai41ps1pBNrzBL",
+    "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "deviceId": "f2fd8393c0a0be67"
+  },
+  "payload": {
+    "type": "SAMPLE_UP_SYNC_REQUEST",
+    "eventVersion": 0,
+    "createdAt": 221675670,
+    "endedAt": 9141278930,
+    "requestId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
+    "sampleId": "67463998-b9da-4eb5-bdef-8057bcbc1ebe",
+    "size": 100,
+    "errorType": "java.lang.NullPointerException"
+  }
+}

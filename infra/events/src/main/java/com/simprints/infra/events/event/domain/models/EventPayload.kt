@@ -49,6 +49,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
+import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent.SampleUpSyncRequestPayload
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent.EventUpSyncRequestPayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
@@ -63,10 +64,22 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = ConfirmationCalloutEventV3.ConfirmationCalloutPayload::class, name = EventType.CALLOUT_CONFIRMATION_V3_KEY),
     JsonSubTypes.Type(value = EnrolmentCalloutEventV2.EnrolmentCalloutPayload::class, name = EventType.CALLOUT_ENROLMENT_KEY),
     JsonSubTypes.Type(value = EnrolmentCalloutEventV3.EnrolmentCalloutPayload::class, name = EventType.CALLOUT_ENROLMENT_V3_KEY),
-    JsonSubTypes.Type(value = EnrolmentLastBiometricsCalloutEventV2.EnrolmentLastBiometricsCalloutPayload::class, name = EventType.CALLOUT_LAST_BIOMETRICS_KEY),
-    JsonSubTypes.Type(value = EnrolmentLastBiometricsCalloutEventV3.EnrolmentLastBiometricsCalloutPayload::class, name = EventType.CALLOUT_LAST_BIOMETRICS_V3_KEY),
-    JsonSubTypes.Type(value = IdentificationCalloutEventV2.IdentificationCalloutPayload::class, name = EventType.CALLOUT_IDENTIFICATION_KEY),
-    JsonSubTypes.Type(value = IdentificationCalloutEventV3.IdentificationCalloutPayload::class, name = EventType.CALLOUT_IDENTIFICATION_V3_KEY),
+    JsonSubTypes.Type(
+        value = EnrolmentLastBiometricsCalloutEventV2.EnrolmentLastBiometricsCalloutPayload::class,
+        name = EventType.CALLOUT_LAST_BIOMETRICS_KEY,
+    ),
+    JsonSubTypes.Type(
+        value = EnrolmentLastBiometricsCalloutEventV3.EnrolmentLastBiometricsCalloutPayload::class,
+        name = EventType.CALLOUT_LAST_BIOMETRICS_V3_KEY,
+    ),
+    JsonSubTypes.Type(
+        value = IdentificationCalloutEventV2.IdentificationCalloutPayload::class,
+        name = EventType.CALLOUT_IDENTIFICATION_KEY,
+    ),
+    JsonSubTypes.Type(
+        value = IdentificationCalloutEventV3.IdentificationCalloutPayload::class,
+        name = EventType.CALLOUT_IDENTIFICATION_V3_KEY,
+    ),
     JsonSubTypes.Type(value = VerificationCalloutEventV2.VerificationCalloutPayload::class, name = EventType.CALLOUT_VERIFICATION_KEY),
     JsonSubTypes.Type(value = VerificationCalloutEventV3.VerificationCalloutPayload::class, name = EventType.CALLOUT_VERIFICATION_V3_KEY),
     JsonSubTypes.Type(value = FaceCaptureConfirmationPayload::class, name = EventType.FACE_CAPTURE_CONFIRMATION_KEY),
@@ -101,6 +114,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = LicenseCheckEventPayload::class, name = Companion.LICENSE_CHECK_KEY),
     JsonSubTypes.Type(value = AgeGroupSelectionPayload::class, name = Companion.AGE_GROUP_SELECTION_KEY),
     JsonSubTypes.Type(value = BiometricReferenceCreationPayload::class, name = Companion.BIOMETRIC_REFERENCE_CREATION_KEY),
+    JsonSubTypes.Type(value = SampleUpSyncRequestPayload::class, name = Companion.SAMPLE_UP_SYNC_REQUEST),
 )
 abstract class EventPayload {
     abstract val type: EventType
