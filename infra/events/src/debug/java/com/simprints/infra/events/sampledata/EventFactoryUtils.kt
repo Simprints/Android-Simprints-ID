@@ -495,6 +495,7 @@ fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
         sessionCount = 1,
         eventUpSyncCount = 2,
         eventDownSyncCount = 3,
+        sampleUpSyncCount = 4,
     ),
     responseStatus = 200,
     errorType = "OK",

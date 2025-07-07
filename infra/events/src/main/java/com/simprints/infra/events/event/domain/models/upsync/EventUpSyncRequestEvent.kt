@@ -50,7 +50,8 @@ data class EventUpSyncRequestEvent(
         override val type: EventType = EventType.EVENT_UP_SYNC_REQUEST,
     ) : EventPayload() {
         override fun toSafeString(): String = "request ID: $requestId, response: $responseStatus, error: $errorType," +
-            "sessions: ${content.sessionCount}, eventsUp: ${content.eventUpSyncCount}, eventsDown: ${content.eventDownSyncCount}"
+            "sessions: ${content.sessionCount}, eventsUp: ${content.eventUpSyncCount}, " +
+            "eventsDown: ${content.eventDownSyncCount}, samples: ${content.sampleUpSyncCount}"
     }
 
     @Keep
@@ -58,6 +59,7 @@ data class EventUpSyncRequestEvent(
         val sessionCount: Int = 0,
         val eventUpSyncCount: Int = 0,
         val eventDownSyncCount: Int = 0,
+        val sampleUpSyncCount: Int = 0,
     )
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
