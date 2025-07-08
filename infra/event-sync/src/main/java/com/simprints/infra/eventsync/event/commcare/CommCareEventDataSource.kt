@@ -2,8 +2,8 @@ package com.simprints.infra.eventsync.event.commcare
 
 import android.content.Context
 import android.database.Cursor
-import android.net.Uri
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -15,6 +15,7 @@ import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.resources.R as IDR
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +39,7 @@ internal class CommCareEventDataSource @Inject constructor(
     private fun count(): Int {
         var count = 0
         context.contentResolver
-            .query(CASE_METADATA_URI, null, null, null, null)
+            .query(getCaseMetadataUri(), null, null, null, null)
             ?.use { caseMetadataCursor -> count = caseMetadataCursor.count }
         return count
     }
@@ -49,7 +50,7 @@ internal class CommCareEventDataSource @Inject constructor(
             Simber.d("Start listing caseIds", tag = "CommCareSync")
             val caseIds = mutableListOf<String>()
             context.contentResolver
-                .query(CASE_METADATA_URI, arrayOf(COLUMN_CASE_ID), null, null, null)
+                .query(getCaseMetadataUri(), arrayOf(COLUMN_CASE_ID), null, null, null)
                 ?.use { cursor ->
                     while (cursor.moveToNext()) {
                         cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
@@ -74,7 +75,7 @@ internal class CommCareEventDataSource @Inject constructor(
 
     private fun loadEnrolmentRecordCreationEvents(caseId: String): Flow<EnrolmentRecordCreationEvent> = flow {
         // Access Case Data Listing for the caseId
-        val caseDataUri = CASE_DATA_URI.buildUpon().appendPath(caseId).build()
+        val caseDataUri = getCaseDataUri().buildUpon().appendPath(caseId).build()
 
         val cursor = context.contentResolver
             .query(caseDataUri, null, null, null, null)
@@ -124,6 +125,16 @@ internal class CommCareEventDataSource @Inject constructor(
         }
     }
 
+    private fun getPackageName() = PreferenceManager.getDefaultSharedPreferences(context)
+        .getString(
+            context.getString(IDR.string.preference_last_calling_package_name_key),
+            context.getString(IDR.string.default_commcare_package_name)
+        ) ?: context.getString(IDR.string.default_commcare_package_name)
+
+    private fun getCaseMetadataUri() = "content://${getPackageName()}.case/casedb/case".toUri()
+
+    private fun getCaseDataUri() = "content://${getPackageName()}.case/casedb/data".toUri()
+
     private val coSyncSerializationModule = SimpleModule().apply {
         addSerializer(
             TokenizableString::class.java,
@@ -140,12 +151,6 @@ internal class CommCareEventDataSource @Inject constructor(
     }
 
     companion object {
-        // TODO(milen): This is a hardcoded package name. We need to find a way to get the package name dynamically
-        private const val CALLER_PACKAGE_NAME = "org.commcare.dalvik.debug"
-
-        private val CASE_METADATA_URI: Uri = "content://$CALLER_PACKAGE_NAME.case/casedb/case".toUri()
-        private val CASE_DATA_URI: Uri = "content://$CALLER_PACKAGE_NAME.case/casedb/data".toUri()
-
         const val COLUMN_CASE_ID = "case_id"
         const val COLUMN_DATUM_ID = "datum_id"
         const val COLUMN_VALUE = "value"

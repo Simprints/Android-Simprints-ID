@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
@@ -73,8 +74,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         }
         // Request CommCare permission
         viewModel.requestCommCarePermission.observe(viewLifecycleOwner) {
-            //TODO(milen): Extract in appropriate place
-            launchCommCarePermissionRequest.launch("org.commcare.dalvik.debug.provider.cases.read")
+            launchCommCarePermissionRequest.launch("${getLastCallingPackageName()}.provider.cases.read")
         }
         // Request notification permission
         viewModel.requestNotificationPermission.observe(viewLifecycleOwner) {
@@ -88,6 +88,14 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         observeOverallSetupResult()
         // Start the setup process
         viewModel.start()
+    }
+
+    private fun getLastCallingPackageName(): String {
+        return PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .getString(
+                getString(IDR.string.preference_last_calling_package_name_key),
+                getString(IDR.string.default_commcare_package_name),
+            ) ?: getString(IDR.string.default_commcare_package_name)
     }
 
     private fun observeOverallSetupResult() = viewModel.overallSetupResult.observe(viewLifecycleOwner) {
