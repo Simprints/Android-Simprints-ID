@@ -30,7 +30,8 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
-import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
+import com.simprints.infra.eventsync.sync.down.CommCareEventSyncWorkersBuilder
+import com.simprints.infra.eventsync.sync.down.SimprintsEventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -71,10 +72,16 @@ internal class EventSyncMasterWorkerTest {
     lateinit var upSyncWorker: OneTimeWorkRequest
 
     @MockK
-    lateinit var downSyncWorker: OneTimeWorkRequest
+    lateinit var simprintsDownSyncWorker: OneTimeWorkRequest
 
     @MockK
-    lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
+    lateinit var commCareDownSyncWorker: OneTimeWorkRequest
+
+    @MockK
+    lateinit var simprintsDownSyncWorkerBuilder: SimprintsEventDownSyncWorkersBuilder
+
+    @MockK
+    lateinit var commCareDownSyncWorkerBuilder: CommCareEventSyncWorkersBuilder
 
     @MockK
     lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
@@ -123,8 +130,11 @@ internal class EventSyncMasterWorkerTest {
         every { workManager.beginWith(any<OneTimeWorkRequest>()) } returns workContinuation
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { downSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
-            downSyncWorker,
+        coEvery { simprintsDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
+            simprintsDownSyncWorker,
+        )
+        coEvery { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
+            commCareDownSyncWorker,
         )
         coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any(), any()) } returns listOf(upSyncWorker)
         every { eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns startSyncReporterWorker
@@ -140,7 +150,8 @@ internal class EventSyncMasterWorkerTest {
             params = mockk(relaxed = true) {
                 every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
             },
-            downSyncWorkerBuilder = downSyncWorkerBuilder,
+            simprintsDownSyncWorkerBuilder = simprintsDownSyncWorkerBuilder,
+            commCareDownSyncWorkerBuilder = commCareDownSyncWorkerBuilder,
             upSyncWorkerBuilder = upSyncWorkerBuilder,
             configManager = configManager,
             eventSyncCache = eventSyncCache,
@@ -381,11 +392,11 @@ internal class EventSyncMasterWorkerTest {
         uniqueSyncId: String,
     ) {
         val times = if (isPresent) 1 else 0
-        coVerify(exactly = times) { downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
+        coVerify(exactly = times) { simprintsDownSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
         verify(exactly = times) {
             workContinuation.then(
                 match<List<OneTimeWorkRequest>> {
-                    it.contains(downSyncWorker)
+                    it.contains(simprintsDownSyncWorker)
                 },
             )
         }
