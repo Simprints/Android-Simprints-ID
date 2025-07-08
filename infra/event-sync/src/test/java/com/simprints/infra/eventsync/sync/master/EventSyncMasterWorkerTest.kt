@@ -146,7 +146,7 @@ internal class EventSyncMasterWorkerTest {
             params = mockk(relaxed = true) {
                 every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
             },
-            downSyncWorkerBuilder = downSyncWorkerBuilder,
+            simprintsDownSyncWorkerBuilder = downSyncWorkerBuilder,
             upSyncWorkerBuilder = upSyncWorkerBuilder,
             configManager = configManager,
             eventSyncCache = eventSyncCache,
