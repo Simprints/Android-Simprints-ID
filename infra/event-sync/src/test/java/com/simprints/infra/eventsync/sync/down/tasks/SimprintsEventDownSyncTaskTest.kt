@@ -34,7 +34,7 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.D
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.sync.common.SubjectFactory
-import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask.Companion.EVENTS_BATCH_SIZE
+import com.simprints.infra.eventsync.sync.down.tasks.BaseEventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
@@ -50,7 +50,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.UUID
 
-class EventDownSyncTaskTest {
+class SimprintsEventDownSyncTaskTest {
     companion object {
         val ENROLMENT_RECORD_DELETION = EnrolmentRecordDeletionEvent(
             "subjectId",
@@ -123,7 +123,7 @@ class EventDownSyncTaskTest {
 
     private lateinit var downloadEventsChannel: Channel<EnrolmentRecordEvent>
 
-    private lateinit var eventDownSyncTask: EventDownSyncTask
+    private lateinit var eventDownSyncTask: SimprintsEventDownSyncTask
 
     @MockK
     private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
@@ -162,14 +162,14 @@ class EventDownSyncTaskTest {
             encodingUtils = EncodingUtilsImplForTests,
             timeHelper = timeHelper,
         )
-        eventDownSyncTask = EventDownSyncTask(
+        eventDownSyncTask = SimprintsEventDownSyncTask(
             enrolmentRecordRepository,
             eventDownSyncScopeRepository,
             subjectFactory,
             configManager,
             timeHelper,
-            eventRemoteDataSource,
             eventRepository,
+            eventRemoteDataSource,
         )
     }
 

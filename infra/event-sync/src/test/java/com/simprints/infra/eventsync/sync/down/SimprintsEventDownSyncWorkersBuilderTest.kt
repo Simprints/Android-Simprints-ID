@@ -21,9 +21,9 @@ import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.common.TAG_SCHEDULED_AT
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
+import com.simprints.infra.eventsync.sync.down.workers.SimprintsEventDownSyncDownloaderWorker
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -33,7 +33,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class EventDownSyncWorkersBuilderTest {
+class SimprintsEventDownSyncWorkersBuilderTest {
     companion object {
         private val SELECTED_MODULE = listOf("MODULE_1".asTokenizableEncrypted())
     }
@@ -50,7 +50,7 @@ class EventDownSyncWorkersBuilderTest {
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
-    private lateinit var eventDownSyncWorkersBuilder: EventDownSyncWorkersBuilder
+    private lateinit var eventDownSyncWorkersBuilder: SimprintsEventDownSyncWorkersBuilder
 
     @Before
     fun setUp() {
@@ -68,7 +68,7 @@ class EventDownSyncWorkersBuilderTest {
             }
         }
 
-        eventDownSyncWorkersBuilder = EventDownSyncWorkersBuilder(
+        eventDownSyncWorkersBuilder = SimprintsEventDownSyncWorkersBuilder(
             eventDownSyncScopeRepository,
             JsonHelper,
             configManager,
@@ -145,7 +145,7 @@ class EventDownSyncWorkersBuilderTest {
         val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain(uniqueSyncId, "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
         chain
-            .first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+            .first { it.tags.contains(SimprintsEventDownSyncDownloaderWorker::class.qualifiedName) }
             .assertSubjectsDownSyncDownloaderWorkerTagsForPeriodic()
     }
 
@@ -164,7 +164,7 @@ class EventDownSyncWorkersBuilderTest {
         val chain = eventDownSyncWorkersBuilder.buildDownSyncWorkerChain("", "scopeId")
         chain.assertNumberOfDownSyncDownloaderWorkers(1)
         chain
-            .first { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+            .first { it.tags.contains(SimprintsEventDownSyncDownloaderWorker::class.qualifiedName) }
             .assertSubjectsDownSyncDownloaderWorkerTagsForOneTime()
     }
 
@@ -204,7 +204,7 @@ class EventDownSyncWorkersBuilderTest {
         assertThat(tags.firstOrNull { it.contains(TAG_DOWN_MASTER_SYNC_ID) }).isNotNull()
 
     private fun List<WorkRequest>.assertNumberOfDownSyncDownloaderWorkers(count: Int) =
-        assertThat(count { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }).isEqualTo(
+        assertThat(count { it.tags.contains(SimprintsEventDownSyncDownloaderWorker::class.qualifiedName) }).isEqualTo(
             count,
         )
 
@@ -213,7 +213,7 @@ class EventDownSyncWorkersBuilderTest {
         scopeId: String,
     ) {
         val downloaders =
-            filter { it.tags.contains(EventDownSyncDownloaderWorker::class.qualifiedName) }
+            filter { it.tags.contains(SimprintsEventDownSyncDownloaderWorker::class.qualifiedName) }
         val jsonHelper = JsonHelper
         val ops = downSyncScope.operations
         ops.forEach { op ->

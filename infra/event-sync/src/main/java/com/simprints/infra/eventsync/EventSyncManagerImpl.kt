@@ -25,7 +25,7 @@ import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_SCHEDULED_AT
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
-import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
+import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -40,7 +40,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
-    private val downSyncTask: EventDownSyncTask,
+    private val downSyncTask: SimprintsEventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val configRepository: ConfigRepository,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
@@ -101,6 +101,7 @@ internal class EventSyncManagerImpl @Inject constructor(
                 modes = getProjectModes(configRepository.getProjectConfiguration()),
             ),
         )
+        //TODO(milen): Do we need to handle CommCare here? Or maybe upstream?
         downSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
         eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
     }

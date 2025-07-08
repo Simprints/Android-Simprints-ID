@@ -19,12 +19,12 @@ import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
-import com.simprints.infra.eventsync.sync.commcare.CommCareEventSyncWorkersBuilder
+import com.simprints.infra.eventsync.sync.down.CommCareEventSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.getAllSubjectsSyncWorkersInfo
 import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
 import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
-import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
+import com.simprints.infra.eventsync.sync.down.SimprintsEventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -38,9 +38,9 @@ import java.util.UUID
 class EventSyncMasterWorker @AssistedInject internal constructor(
     @Assisted private val appContext: Context,
     @Assisted params: WorkerParameters,
-    private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
+    private val simprintsDownSyncWorkerBuilder: SimprintsEventDownSyncWorkersBuilder,
+    private val commCareDownSyncWorkerBuilder: CommCareEventSyncWorkersBuilder,
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
-    private val commCareSyncWorkerBuilder: CommCareEventSyncWorkersBuilder,
     private val configManager: ConfigManager,
     private val eventSyncCache: EventSyncCache,
     private val eventRepository: EventRepository,
@@ -110,7 +110,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         downSyncWorkerScopeId,
                     )
 
-                    workerChain += downSyncWorkerBuilder
+                    workerChain += simprintsDownSyncWorkerBuilder
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
@@ -121,7 +121,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         downSyncWorkerScopeId,
                     )
 
-                    workerChain += commCareSyncWorkerBuilder
+                    workerChain += commCareDownSyncWorkerBuilder
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
