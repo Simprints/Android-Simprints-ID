@@ -13,13 +13,13 @@ internal data class ApiSynchronizationConfiguration(
     val frequency: Frequency,
     val up: ApiUpSynchronizationConfiguration,
     val down: ApiDownSynchronizationConfiguration,
-    val samples: ApiSampleSynchronizationConfiguration,
+    val sample: ApiSampleSynchronizationConfiguration,
 ) {
     fun toDomain(): SynchronizationConfiguration = SynchronizationConfiguration(
         frequency = frequency.toDomain(),
         up = up.toDomain(),
         down = down.toDomain(),
-        samples = samples.toDomain(),
+        samples = sample.toDomain(),
     )
 
     @Keep

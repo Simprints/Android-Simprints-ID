@@ -360,7 +360,7 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
         moduleOptions = listOf("module1"),
         maxAge = "PT24H",
     ),
-    samples = ApiSynchronizationConfiguration.ApiSampleSynchronizationConfiguration(
+    sample = ApiSynchronizationConfiguration.ApiSampleSynchronizationConfiguration(
         signedUrlBatchSize = 5,
     ),
 )

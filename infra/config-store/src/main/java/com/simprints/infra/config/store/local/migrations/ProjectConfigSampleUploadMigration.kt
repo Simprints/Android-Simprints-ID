@@ -18,11 +18,11 @@ class ProjectConfigSampleUploadMigration @Inject constructor() : DataMigration<P
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData) {
         !synchronization.hasSamples() ||
             synchronization.up.simprints.batchSizes
-                .let { it.eventUpSyncs == 0 || it.eventUpSyncs == 0 }
+                .let { it.eventUpSyncs == 0 || it.eventDownSyncs == 0 }
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
-        Simber.i("Start migration of project configuration sample upload to Datastore", tag = MIGRATION)
+        Simber.i("Start migration of project configuration sample upload", tag = MIGRATION)
 
         val currentSyncConfig = currentData.synchronization
         val currentBatchSizes = currentSyncConfig.up.simprints.batchSizes
