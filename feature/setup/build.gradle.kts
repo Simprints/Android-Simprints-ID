@@ -17,4 +17,5 @@ dependencies {
 
     implementation(libs.playServices.location)
     implementation(libs.workManager.work)
+    implementation(libs.androidX.ui.preference)
 }
