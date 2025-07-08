@@ -18,7 +18,7 @@ object SimberBuilder {
      */
     fun initialize(context: Context) {
         if (BuildConfig.DEBUG) {
-            Logger.setLogWriters(LogcatWriter())
+            Logger.setLogWriters(LogcatWriter(), FileLogWriter(context))
             Logger.setMinSeverity(Severity.Debug)
         } else {
             Logger.setLogWriters(
