@@ -14,6 +14,7 @@ import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEven
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.COMMCARE_SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R as IDR
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
@@ -47,7 +48,7 @@ internal class CommCareEventDataSource @Inject constructor(
     private fun loadEnrolmentRecordCreationEvents(): Flow<EnrolmentRecordCreationEvent> = flow {
         try {
             // First collect all case IDs in a list
-            Simber.d("Start listing caseIds", tag = "CommCareSync")
+            Simber.i("Start listing caseIds", tag = COMMCARE_SYNC)
             val caseIds = mutableListOf<String>()
             context.contentResolver
                 .query(getCaseMetadataUri(), arrayOf(COLUMN_CASE_ID), null, null, null)
@@ -58,10 +59,10 @@ internal class CommCareEventDataSource @Inject constructor(
                         }
                     }
                 }
-            Simber.d("Finished listing caseIds", tag = "CommCareSync")
+            Simber.i("Finished listing caseIds", tag = COMMCARE_SYNC)
 
             // Process case IDs in batches to avoid large pauses
-            val batchSize = 20 // Adjust based on performance testing
+            val batchSize = BATCH_SIZE // Adjust based on performance testing
             caseIds.chunked(batchSize).forEach { batch ->
                 batch.forEach { caseId ->
                     loadEnrolmentRecordCreationEvents(caseId).collect { emit(it) }
@@ -79,7 +80,7 @@ internal class CommCareEventDataSource @Inject constructor(
 
         val cursor = context.contentResolver
             .query(caseDataUri, null, null, null, null)
-        Simber.d("Cursor for caseId $caseId: $cursor", tag = "CommCareSync")
+        Simber.d("Cursor for caseId $caseId: $cursor", tag = COMMCARE_SYNC)
         if (cursor != null) {
             cursor.use { caseDataCursor ->
                 val subjectActions = getSubjectActionsValue(caseDataCursor)
@@ -100,15 +101,15 @@ internal class CommCareEventDataSource @Inject constructor(
     }
 
     private fun getSubjectActionsValue(caseDataCursor: Cursor): String {
-        Simber.d("Start looking for subjectActions", tag = "CommCareSync_extra")
+        Simber.d("Start looking for subjectActions", tag = COMMCARE_SYNC)
         while (caseDataCursor.moveToNext()) {
             val key = caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_DATUM_ID))
             if (key == SIMPRINTS_COSYNC_SUBJECT_ACTIONS) {
-                Simber.d("Found subjectActions", tag = "CommCareSync_extra")
+                Simber.d("Found subjectActions", tag = COMMCARE_SYNC)
                 return caseDataCursor.getString(caseDataCursor.getColumnIndexOrThrow(COLUMN_VALUE))
             }
         }
-        Simber.d("No subjectActions found", tag = "CommCareSync_extra")
+        Simber.d("No subjectActions found", tag = COMMCARE_SYNC)
         return ""
     }
 
@@ -151,8 +152,9 @@ internal class CommCareEventDataSource @Inject constructor(
     }
 
     companion object {
-        const val COLUMN_CASE_ID = "case_id"
-        const val COLUMN_DATUM_ID = "datum_id"
-        const val COLUMN_VALUE = "value"
+        internal const val COLUMN_CASE_ID = "case_id"
+        internal const val COLUMN_DATUM_ID = "datum_id"
+        internal const val COLUMN_VALUE = "value"
+        private const val BATCH_SIZE = 20
     }
 }

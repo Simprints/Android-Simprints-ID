@@ -1,6 +1,5 @@
-package com.simprints.infra.eventsync.sync.commcare.tasks
+package com.simprints.infra.eventsync.sync.down.tasks
 
-import androidx.annotation.VisibleForTesting
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
@@ -20,9 +19,7 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordUpdateEvent
-import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
-import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
@@ -36,18 +33,31 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import java.util.UUID
-import javax.inject.Inject
 
-internal class CommCareEventSyncTask @Inject constructor(
-    private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    private val subjectFactory: SubjectFactory,
-    private val configManager: ConfigManager,
-    private val timeHelper: TimeHelper,
-    private val commCareEventDataSource: CommCareEventDataSource,
-    private val eventRepository: EventRepository,
+internal abstract class BaseEventDownSyncTask(
+    protected val enrolmentRecordRepository: EnrolmentRecordRepository,
+    protected val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+    protected val subjectFactory: SubjectFactory,
+    protected val configManager: ConfigManager,
+    protected val timeHelper: TimeHelper,
+    protected val eventRepository: EventRepository,
 ) {
-    private var subjectIdsPresentInCommCare = mutableSetOf<String>()
+
+    abstract suspend fun fetchEvents(
+        operation: EventDownSyncOperation,
+        scope: CoroutineScope,
+        requestId: String,
+    ): EventFetchResult
+
+    abstract fun shouldRethrowError(throwable: Throwable): Boolean
+
+    abstract suspend fun performPostSyncCleanup(project: Project, count: Int)
+
+    data class EventFetchResult(
+        val eventFlow: Flow<EnrolmentRecordEvent>,
+        val totalCount: Int?,
+        val status: Int? = null,
+    )
 
     fun downSync(
         scope: CoroutineScope,
@@ -62,49 +72,42 @@ internal class CommCareEventSyncTask @Inject constructor(
 
         var firstEventTimestamp: Timestamp? = null
         val requestId = UUID.randomUUID().toString()
-        var result: CommCareEventSyncResult? = null
+        var result: EventFetchResult? = null
         var errorType: String? = null
 
         try {
-            Simber.d("CommCareEventSyncTask started", tag = "CommCareSync")
-            result = commCareEventDataSource.getEvents()
+            result = fetchEvents(operation, scope, requestId)
 
-            result.eventFlow
-                .collect {
-                    batchOfEventsToProcess.add(it)
-                    count++
-                    // We immediately process the first event to initialise a progress
-                    if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
-                        if (count == 1) {
-                            // Track the moment when the first event is received
-                            firstEventTimestamp = timeHelper.now()
-                        }
-
-                        lastOperation =
-                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
-                        emitProgress(lastOperation, count, result.totalCount)
-                        batchOfEventsToProcess.clear()
+            result.eventFlow.collect {
+                batchOfEventsToProcess.add(it)
+                count++
+                // We immediately process the first event to initialise a progress
+                if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
+                    if (count == 1) {
+                        // Track the moment when the first event is received
+                        firstEventTimestamp = timeHelper.now()
                     }
+
+                    lastOperation =
+                        processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
+                    emitProgress(lastOperation, count, result.totalCount)
+                    batchOfEventsToProcess.clear()
                 }
+            }
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
             emitProgress(lastOperation, count, result.totalCount)
 
-            //Don't trigger if count is 0 because it might be due to CommCare logout
-            if (count > 0) {
-                deleteSubjectsNotInCommCare(project)
-            }
+            performPostSyncCleanup(project, count)
 
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, result.totalCount)
-
-            Simber.d("CommCareEventSyncTask finished", tag = "CommCareSync")
         } catch (t: Throwable) {
-            if (t is SecurityException || t is IllegalStateException) {
+            if (shouldRethrowError(t)) {
                 throw t
             }
 
-            Simber.i("CommCare sync error", t, tag = SYNC)
+            Simber.i("Down sync error", t, tag = SYNC)
             errorType = t.javaClass.simpleName
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation, project)
@@ -134,7 +137,7 @@ internal class CommCareEventSyncTask @Inject constructor(
                     msToFirstResponseByte = firstEventTimestamp?.let { it.ms - requestStartTime.ms },
                     eventRead = count,
                     errorType = errorType,
-                    responseStatus = null,
+                    responseStatus = result?.status,
                 ),
             )
         }
@@ -149,8 +152,7 @@ internal class CommCareEventSyncTask @Inject constructor(
         this.emit(EventDownSyncProgress(lastOperation, count, max))
     }
 
-    //TODO(milen): this common functionality should be extracted
-    private suspend fun processBatchedEvents(
+    protected open suspend fun processBatchedEvents(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
         lastOperation: EventDownSyncOperation,
@@ -178,11 +180,9 @@ internal class CommCareEventSyncTask @Inject constructor(
             }.flatten()
 
         enrolmentRecordRepository.performActions(actions, project)
-        actions.forEach { action ->
-            if (action is Creation) {
-                subjectIdsPresentInCommCare.add(action.subject.subjectId)
-            }
-        }
+
+        // Hook for subclasses to perform additional processing after actions are executed
+        onActionsProcessed(actions)
 
         return if (batchOfEventsToProcess.isNotEmpty()) {
             lastOperation.copy(
@@ -195,8 +195,15 @@ internal class CommCareEventSyncTask @Inject constructor(
         }
     }
 
-    @VisibleForTesting
-    fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
+    /**
+     * Hook method called after actions have been processed and executed.
+     * Subclasses can override this to perform additional processing.
+     */
+    protected open suspend fun onActionsProcessed(actions: List<SubjectAction>) {
+        // Default implementation does nothing
+    }
+
+    private fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
         val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
         return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
             listOf(Creation(subject))
@@ -205,7 +212,6 @@ internal class CommCareEventSyncTask @Inject constructor(
         }
     }
 
-    //TODO(milen): should we even handle moves in CoSync?
     private suspend fun handleSubjectMoveEvent(
         operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent,
@@ -275,16 +281,6 @@ internal class CommCareEventSyncTask @Inject constructor(
                 referenceIdsToRemove = biometricReferencesRemoved,
             ),
         )
-    }
-
-    private suspend fun deleteSubjectsNotInCommCare(project: Project) {
-        val deleteActions = enrolmentRecordRepository.getAllSubjectIds()
-            .filterNot { subjectIdsPresentInCommCare.contains(it) }
-            .map { Deletion(it) }
-        if (deleteActions.isNotEmpty()) {
-            enrolmentRecordRepository.performActions(deleteActions, project)
-            Simber.i("Deleted ${deleteActions.size} subjects not present in CommCare", tag = "CommCareSync")
-        }
     }
 
     companion object {
