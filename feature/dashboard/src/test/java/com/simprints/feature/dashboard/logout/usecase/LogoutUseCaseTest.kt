@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.logout.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationFlagsStore
 import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -25,6 +26,9 @@ class LogoutUseCaseTest {
     @MockK
     private lateinit var authManager: AuthManager
 
+    @MockK
+    private lateinit var flagsStore: RealmToRoomMigrationFlagsStore
+
     private lateinit var useCase: LogoutUseCase
 
     @Before
@@ -34,6 +38,7 @@ class LogoutUseCaseTest {
         useCase = LogoutUseCase(
             syncOrchestrator = syncOrchestrator,
             authManager = authManager,
+            flagsStore = flagsStore,
         )
     }
 
@@ -45,6 +50,7 @@ class LogoutUseCaseTest {
             syncOrchestrator.cancelBackgroundWork()
             syncOrchestrator.deleteEventSyncInfo()
             authManager.signOut()
+            flagsStore.clearMigrationFlags()
         }
     }
 }

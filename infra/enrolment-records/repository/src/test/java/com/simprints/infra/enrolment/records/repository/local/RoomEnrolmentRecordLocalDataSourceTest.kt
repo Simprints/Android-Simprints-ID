@@ -890,8 +890,8 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 .loadFingerprintIdentities(
                     query = baseQuery,
                     ranges = listOf(
-                        0..1,
-                        2..3,
+                        0..0,
+                        1..1,
                     ),
                     project = project,
                     dataSource = Simprints,
@@ -904,7 +904,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 .loadFingerprintIdentities(
                     query = baseQuery,
                     ranges = listOf(
-                        0..2,
+                        0..1,
                     ),
                     project = project,
                     dataSource = Simprints,
@@ -1078,8 +1078,8 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 .loadFaceIdentities(
                     query = baseQuery,
                     ranges = listOf(
-                        0..1,
-                        2..3,
+                        0..0,
+                        1..1,
                     ),
                     project = project,
                     dataSource = Simprints,
@@ -1092,7 +1092,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
                 .loadFaceIdentities(
                     query = baseQuery,
                     ranges = listOf(
-                        0..2,
+                        0..1,
                     ),
                     project = project,
                     dataSource = Simprints,
@@ -1543,5 +1543,20 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         dataSource.delete(listOf(queryToDeleteModule1WithFormat)) // This should throw
 
         // Then: Exception expected
+    }
+
+    @Test
+    fun `delete all - should delete all subjects`() = runTest {
+        // Given
+        setupInitialData()
+        val initialCount = dataSource.count()
+
+        // When
+        dataSource.deleteAll()
+
+        // Then
+        val finalCount = dataSource.count()
+        assertThat(finalCount).isEqualTo(0)
+        assertThat(initialCount).isGreaterThan(0)
     }
 }

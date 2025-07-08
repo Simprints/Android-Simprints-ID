@@ -32,7 +32,7 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Fully logs out when project has ended`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(0)
+        coEvery { eventSyncManager.countEventsToUpload() } returns flowOf(0)
 
         useCase(ProjectState.PROJECT_ENDED)
 
@@ -41,7 +41,7 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Logs out when project has ending and no items to upload`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(0)
+        coEvery { eventSyncManager.countEventsToUpload() } returns flowOf(0)
 
         useCase(ProjectState.PROJECT_ENDING)
 
@@ -50,7 +50,7 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Does not logs out when project has ending and has items to upload`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(5)
+        coEvery { eventSyncManager.countEventsToUpload() } returns flowOf(5)
 
         useCase(ProjectState.PROJECT_ENDING)
 
@@ -59,7 +59,7 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Does not logs out when project is running`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(0)
+        coEvery { eventSyncManager.countEventsToUpload() } returns flowOf(0)
 
         useCase(ProjectState.RUNNING)
 

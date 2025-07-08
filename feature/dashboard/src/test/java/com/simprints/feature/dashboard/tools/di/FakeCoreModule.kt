@@ -1,5 +1,7 @@
 package com.simprints.feature.dashboard.tools.di
 
+import android.content.Context
+import androidx.work.WorkManager
 import com.simprints.core.AppScope
 import com.simprints.core.AvailableProcessors
 import com.simprints.core.CoreModule
@@ -17,6 +19,7 @@ import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import io.mockk.mockk
@@ -88,4 +91,9 @@ object FakeCoreModule {
     @Provides
     @Singleton
     fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImplForTests
+
+    @Provides
+    fun provideWorkManager(
+        @ApplicationContext context: Context,
+    ): WorkManager = WorkManager.getInstance(context)
 }

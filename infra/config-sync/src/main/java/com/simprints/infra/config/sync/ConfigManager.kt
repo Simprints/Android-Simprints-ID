@@ -8,6 +8,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
@@ -16,15 +17,17 @@ class ConfigManager @Inject constructor(
     private val configRepository: ConfigRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val configSyncCache: ConfigSyncCache,
+    private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
 ) {
     suspend fun refreshProject(projectId: String): ProjectWithConfig = configRepository.refreshProject(projectId).also {
         enrolmentRecordRepository.tokenizeExistingRecords(it.project)
         configSyncCache.saveUpdateTime()
+        realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
     }
 
     suspend fun getProject(projectId: String): Project = try {
         configRepository.getProject()
-    } catch (e: NoSuchElementException) {
+    } catch (_: NoSuchElementException) {
         refreshProject(projectId).project
     }
 
@@ -35,7 +38,7 @@ class ConfigManager @Inject constructor(
             try {
                 // Try to refresh it with logged in projectId (if any)
                 refreshProject(configRepository.getProject().id).configuration
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // If not logged in the above will fail. However we still depend on the 'default'
                 // configuration to create the session when login is attempted. Possibly in other
                 // places, too.

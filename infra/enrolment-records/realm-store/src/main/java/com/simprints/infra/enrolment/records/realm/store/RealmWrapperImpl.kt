@@ -18,6 +18,8 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,8 +36,9 @@ class RealmWrapperImpl @Inject constructor(
     // https://www.mongodb.com/docs/realm/sdk/kotlin/realm-database/frozen-arch/#thread-safe-realms
     private lateinit var realm: Realm
     private lateinit var config: RealmConfiguration
+    private val mutex = Mutex()
 
-    private fun getRealm(): Realm {
+    private suspend fun getRealm(): Realm {
         if (!this::realm.isInitialized) {
             config = createAndSaveRealmConfig()
             realm = createRealm()
@@ -43,9 +46,9 @@ class RealmWrapperImpl @Inject constructor(
         return realm
     }
 
-    private fun createRealm(): Realm {
+    private suspend fun createRealm(): Realm = mutex.withLock {
         Simber.d("[RealmWrapperImpl] getting new realm instance", tag = REALM_DB)
-        return try {
+        try {
             try {
                 Realm.open(config)
             } catch (ex: IllegalStateException) {

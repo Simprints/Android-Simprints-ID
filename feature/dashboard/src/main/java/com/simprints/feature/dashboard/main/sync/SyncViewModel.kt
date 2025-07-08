@@ -187,7 +187,7 @@ internal class SyncViewModel @Inject constructor(
             _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
         }
         eventSyncManager
-            .countEventsToUpload(EventType.ENROLMENT_V2)
+            .countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4))
             .collect { upSyncCountLiveData.postValue(it) }
     }
 
