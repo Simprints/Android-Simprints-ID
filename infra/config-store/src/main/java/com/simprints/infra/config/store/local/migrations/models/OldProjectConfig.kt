@@ -10,6 +10,7 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -207,12 +208,6 @@ internal data class OldProjectConfig(
     )
 
     private fun synchronizationConfiguration(): SynchronizationConfiguration = SynchronizationConfiguration(
-        frequency = when (downSyncSetting) {
-            "OFF" -> SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
-            "ON" -> SynchronizationConfiguration.Frequency.PERIODICALLY
-            "EXTRA" -> SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
-            else -> SynchronizationConfiguration.Frequency.PERIODICALLY
-        },
         up = UpSynchronizationConfiguration(
             simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
                 kind = if (simprintsSync == null) {
@@ -233,6 +228,12 @@ internal data class OldProjectConfig(
                     sampleUpSyncs = 1,
                 ),
                 imagesRequireUnmeteredConnection = false,
+                frequency = when (downSyncSetting) {
+                    "OFF" -> Frequency.ONLY_PERIODICALLY_UP_SYNC
+                    "ON" -> Frequency.PERIODICALLY
+                    "EXTRA" -> Frequency.PERIODICALLY_AND_ON_SESSION_START
+                    else -> Frequency.PERIODICALLY
+                },
             ),
             coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                 kind = if (coSync == null) {
@@ -249,12 +250,20 @@ internal data class OldProjectConfig(
             ),
         ),
         down = DownSynchronizationConfiguration(
-            partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(
-                if (syncGroup == "GLOBAL") "PROJECT" else syncGroup,
+            simprints = DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
+                partitionType = DownSynchronizationConfiguration.PartitionType.valueOf(
+                    if (syncGroup == "GLOBAL") "PROJECT" else syncGroup,
+                ),
+                maxNbOfModules = maxNbOfModules.toInt(),
+                moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw),
+                maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
+                frequency = when (downSyncSetting) {
+                    "OFF" -> Frequency.ONLY_PERIODICALLY_UP_SYNC
+                    "ON" -> Frequency.PERIODICALLY
+                    "EXTRA" -> Frequency.PERIODICALLY_AND_ON_SESSION_START
+                    else -> Frequency.PERIODICALLY
+                },
             ),
-            maxNbOfModules = maxNbOfModules.toInt(),
-            moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw),
-            maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
         ),
         samples = SampleSynchronizationConfiguration(
             signedUrlBatchSize = 5,

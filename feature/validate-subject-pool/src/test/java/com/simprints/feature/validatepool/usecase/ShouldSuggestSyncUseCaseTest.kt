@@ -45,7 +45,7 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.maxAge
+                .synchronization.down.simprints.maxAge
         } returns "PT24H"
 
         assertThat(usecase()).isTrue()
@@ -58,7 +58,7 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.maxAge
+                .synchronization.down.simprints.maxAge
         } returns "24h0m0s"
 
         assertThat(usecase()).isTrue()
@@ -71,7 +71,7 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.maxAge
+                .synchronization.down.simprints.maxAge
         } returns "PT24H"
 
         assertThat(usecase()).isFalse()

@@ -1,8 +1,10 @@
 package com.simprints.infra.config.store.local.models
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration.PartitionType
+import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration.UpSynchronizationKind
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.testtools.protoSynchronizationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
@@ -22,11 +24,9 @@ class SynchronizationConfigurationTest {
     @Test
     fun `should map correctly the Frequency enums`() {
         val mapping = mapOf(
-            ProtoSynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC to
-                SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC,
-            ProtoSynchronizationConfiguration.Frequency.PERIODICALLY to SynchronizationConfiguration.Frequency.PERIODICALLY,
-            ProtoSynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START to
-                SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START,
+            ProtoSyncFrequency.ONLY_PERIODICALLY_UP_SYNC to Frequency.ONLY_PERIODICALLY_UP_SYNC,
+            ProtoSyncFrequency.PERIODICALLY to Frequency.PERIODICALLY,
+            ProtoSyncFrequency.PERIODICALLY_AND_ON_SESSION_START to Frequency.PERIODICALLY_AND_ON_SESSION_START,
         )
 
         mapping.forEach {
@@ -38,18 +38,10 @@ class SynchronizationConfigurationTest {
     @Test
     fun `should map correctly the UpSynchronizationKind enums`() {
         val mapping = mapOf(
-            ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE
-                to
-                UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
-            ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL
-                to
-                UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
-            ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
-                to
-                UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS,
-            ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
-                to
-                UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS,
+            UpSynchronizationKind.NONE to UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
+            UpSynchronizationKind.ALL to UpSynchronizationConfiguration.UpSynchronizationKind.ALL,
+            UpSynchronizationKind.ONLY_ANALYTICS to UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS,
+            UpSynchronizationKind.ONLY_BIOMETRICS to UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS,
         )
 
         mapping.forEach {
@@ -61,15 +53,9 @@ class SynchronizationConfigurationTest {
     @Test
     fun `should map correctly the PartitionType enums`() {
         val mapping = mapOf(
-            ProtoDownSynchronizationConfiguration.PartitionType.PROJECT
-                to
-                DownSynchronizationConfiguration.PartitionType.PROJECT,
-            ProtoDownSynchronizationConfiguration.PartitionType.MODULE
-                to
-                DownSynchronizationConfiguration.PartitionType.MODULE,
-            ProtoDownSynchronizationConfiguration.PartitionType.USER
-                to
-                DownSynchronizationConfiguration.PartitionType.USER,
+            PartitionType.PROJECT to DownSynchronizationConfiguration.PartitionType.PROJECT,
+            PartitionType.MODULE to DownSynchronizationConfiguration.PartitionType.MODULE,
+            PartitionType.USER to DownSynchronizationConfiguration.PartitionType.USER,
         )
 
         mapping.forEach {

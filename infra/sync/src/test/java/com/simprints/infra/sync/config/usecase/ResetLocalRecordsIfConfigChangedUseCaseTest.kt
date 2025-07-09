@@ -41,14 +41,18 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        simprints = synchronizationConfiguration.down.simprints.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        ),
                     ),
                 ),
             ),
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        simprints = synchronizationConfiguration.down.simprints.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        ),
                     ),
                 ),
             ),
@@ -68,14 +72,18 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                        simprints = synchronizationConfiguration.down.simprints.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                        ),
                     ),
                 ),
             ),
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        simprints = synchronizationConfiguration.down.simprints.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        ),
                     ),
                 ),
             ),

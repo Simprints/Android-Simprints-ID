@@ -1,9 +1,6 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
-import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY
-import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -14,6 +11,7 @@ import com.simprints.infra.config.store.testtools.faceConfiguration
 import com.simprints.infra.config.store.testtools.faceSdkConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
 import com.simprints.infra.config.store.testtools.projectConfiguration
+import com.simprints.infra.config.store.testtools.simprintsDownSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.simprintsUpSyncConfigurationConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test
@@ -174,6 +172,7 @@ class ProjectConfigurationTest {
                             kind = it.key,
                             batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
                             imagesRequireUnmeteredConnection = false,
+                            frequency = Frequency.PERIODICALLY,
                         ),
                     ),
                 ),
@@ -208,15 +207,19 @@ class ProjectConfigurationTest {
     @Test
     fun `isEventDownSyncAllowed should return the correct value`() {
         val values = mapOf(
-            ONLY_PERIODICALLY_UP_SYNC to false,
-            PERIODICALLY to true,
-            PERIODICALLY_AND_ON_SESSION_START to true,
+            Frequency.ONLY_PERIODICALLY_UP_SYNC to false,
+            Frequency.PERIODICALLY to true,
+            Frequency.PERIODICALLY_AND_ON_SESSION_START to true,
         )
 
         values.forEach {
             val config = projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
-                    frequency = it.key,
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                            frequency = it.key,
+                        ),
+                    ),
                 ),
             )
             assertThat(config.isEventDownSyncAllowed()).isEqualTo(it.value)

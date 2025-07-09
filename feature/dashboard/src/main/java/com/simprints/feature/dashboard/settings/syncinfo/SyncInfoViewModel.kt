@@ -198,10 +198,10 @@ internal class SyncInfoViewModel @Inject constructor(
         } == true
 
     private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
-        syncConfiguration.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        syncConfiguration.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
-        synchronizationConfiguration.down.let { it.moduleOptions.isNotEmpty() && isModuleSync(it) }
+        synchronizationConfiguration.down.let { it.simprints.moduleOptions.isNotEmpty() && isModuleSync(it) }
 
     private suspend fun getRecordsInLocal(projectId: String): Int = enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
 

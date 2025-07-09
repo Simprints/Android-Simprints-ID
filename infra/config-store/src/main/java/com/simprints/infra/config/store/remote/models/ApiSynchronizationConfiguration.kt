@@ -4,35 +4,34 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.Companion.DEFAULT_DOWN_SYNC_MAX_AGE
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 
 @Keep
 internal data class ApiSynchronizationConfiguration(
-    val frequency: Frequency,
     val up: ApiUpSynchronizationConfiguration,
     val down: ApiDownSynchronizationConfiguration,
     val sample: ApiSampleSynchronizationConfiguration,
 ) {
     fun toDomain(): SynchronizationConfiguration = SynchronizationConfiguration(
-        frequency = frequency.toDomain(),
         up = up.toDomain(),
         down = down.toDomain(),
         samples = sample.toDomain(),
     )
 
     @Keep
-    enum class Frequency {
+    enum class ApiSynchronizationFrequency {
         ONLY_PERIODICALLY_UP_SYNC,
         PERIODICALLY,
         PERIODICALLY_AND_ON_SESSION_START,
         ;
 
-        fun toDomain(): SynchronizationConfiguration.Frequency = when (this) {
-            ONLY_PERIODICALLY_UP_SYNC -> SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
-            PERIODICALLY -> SynchronizationConfiguration.Frequency.PERIODICALLY
-            PERIODICALLY_AND_ON_SESSION_START -> SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
+        fun toDomain(): Frequency = when (this) {
+            ONLY_PERIODICALLY_UP_SYNC -> Frequency.ONLY_PERIODICALLY_UP_SYNC
+            PERIODICALLY -> Frequency.PERIODICALLY
+            PERIODICALLY_AND_ON_SESSION_START -> Frequency.PERIODICALLY_AND_ON_SESSION_START
         }
     }
 
@@ -51,6 +50,7 @@ internal data class ApiSynchronizationConfiguration(
             val kind: UpSynchronizationKind,
             val batchSizes: ApiUpSyncBatchSizes?,
             val imagesRequireUnmeteredConnection: Boolean?,
+            val frequency: ApiSynchronizationFrequency,
         ) {
             fun toDomain(): UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration =
                 UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
@@ -58,6 +58,7 @@ internal data class ApiSynchronizationConfiguration(
                     batchSizes = batchSizes?.toDomain()
                         ?: UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
                     imagesRequireUnmeteredConnection = imagesRequireUnmeteredConnection ?: false,
+                    frequency = frequency.toDomain(),
                 )
         }
 
@@ -99,16 +100,27 @@ internal data class ApiSynchronizationConfiguration(
 
     @Keep
     data class ApiDownSynchronizationConfiguration(
+        val simprints: ApiSimprintsDownSynchronizationConfiguration,
+    ) {
+        fun toDomain(): DownSynchronizationConfiguration = DownSynchronizationConfiguration(
+            simprints.toDomain(),
+        )
+    }
+
+    @Keep
+    data class ApiSimprintsDownSynchronizationConfiguration(
         val partitionType: PartitionType,
         val maxNbOfModules: Int,
         val moduleOptions: List<String>?,
         val maxAge: String?,
+        val frequency: ApiSynchronizationFrequency,
     ) {
-        fun toDomain(): DownSynchronizationConfiguration = DownSynchronizationConfiguration(
-            partitionType.toDomain(),
-            maxNbOfModules,
-            moduleOptions?.map(String::asTokenizableEncrypted) ?: emptyList(),
-            maxAge ?: DEFAULT_DOWN_SYNC_MAX_AGE,
+        fun toDomain() = DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
+            partitionType = partitionType.toDomain(),
+            maxNbOfModules = maxNbOfModules,
+            moduleOptions = moduleOptions?.map(String::asTokenizableEncrypted) ?: emptyList(),
+            maxAge = maxAge ?: DEFAULT_DOWN_SYNC_MAX_AGE,
+            frequency = frequency.toDomain(),
         )
 
         @Keep

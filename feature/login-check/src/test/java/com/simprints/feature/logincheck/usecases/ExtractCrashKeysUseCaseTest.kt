@@ -2,17 +2,11 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkObject
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -43,7 +37,7 @@ class ExtractCrashKeysUseCaseTest {
     @Test
     fun `Sets values to Simber`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
+            every { synchronization.down.simprints.frequency } returns Frequency.PERIODICALLY
         }
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(

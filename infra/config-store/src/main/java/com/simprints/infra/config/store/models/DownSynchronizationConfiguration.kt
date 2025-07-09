@@ -4,11 +4,16 @@ import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.tokenization.TokenizableString
 
 data class DownSynchronizationConfiguration(
-    val partitionType: PartitionType,
-    val maxNbOfModules: Int,
-    val moduleOptions: List<TokenizableString>,
-    val maxAge: String,
+    val simprints: SimprintsDownSynchronizationConfiguration,
 ) {
+    data class SimprintsDownSynchronizationConfiguration(
+        val partitionType: PartitionType,
+        val maxNbOfModules: Int,
+        val moduleOptions: List<TokenizableString>,
+        val maxAge: String,
+        val frequency: Frequency,
+    )
+
     enum class PartitionType {
         PROJECT,
         MODULE,

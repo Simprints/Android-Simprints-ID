@@ -2,13 +2,14 @@ package com.simprints.feature.dashboard.settings.syncinfo
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
@@ -30,13 +31,8 @@ import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -507,13 +503,13 @@ class SyncInfoViewModelTest {
         partitionType: DownSynchronizationConfiguration.PartitionType,
         modules: List<String> = emptyList(),
     ) = mockk<SynchronizationConfiguration> {
-        every { frequency }.returns(SynchronizationConfiguration.Frequency.PERIODICALLY)
-        every { down }.returns(
-            DownSynchronizationConfiguration(
+        every { down.simprints }.returns(
+            DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
                 partitionType = partitionType,
                 moduleOptions = modules.map(String::asTokenizableRaw),
                 maxNbOfModules = 0,
                 maxAge = "PT24H",
+                frequency = Frequency.PERIODICALLY,
             ),
         )
     }

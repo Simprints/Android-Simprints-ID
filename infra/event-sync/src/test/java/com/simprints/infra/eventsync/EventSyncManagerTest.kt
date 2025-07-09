@@ -84,7 +84,10 @@ internal class EventSyncManagerTest {
         every { timeHelper.now() } returns Timestamp(1)
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
-            every { synchronization.down.partitionType.toDomain() } returns Partitioning.MODULE
+            every {
+                synchronization.down.simprints.partitionType
+                    .toDomain()
+            } returns Partitioning.MODULE
         }
 
         eventSyncManagerImpl = EventSyncManagerImpl(

@@ -2,8 +2,8 @@ package com.simprints.infra.config.store.local.migrations
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration.Companion.ALL_KEYS
@@ -20,6 +20,7 @@ import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
 import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSampleSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoSyncFrequency
 import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoUpSyncBatchSizes
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
@@ -27,11 +28,7 @@ import com.simprints.infra.config.store.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.testtools.protoProjectConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkAll
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -526,7 +523,6 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val PROTO_SYNCHRONIZATION_CONFIGURATION =
             ProtoSynchronizationConfiguration
                 .newBuilder()
-                .setFrequency(ProtoSynchronizationConfiguration.Frequency.PERIODICALLY)
                 .setUp(
                     ProtoUpSynchronizationConfiguration
                         .newBuilder()
@@ -542,7 +538,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
                                         .build(),
-                                ).build(),
+                                ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
                         ).setCoSync(
                             ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
                                 .newBuilder()
@@ -552,11 +549,16 @@ class ProjectConfigSharedPrefsMigrationTest {
                 ).setDown(
                     ProtoDownSynchronizationConfiguration
                         .newBuilder()
-                        .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
-                        .setMaxNbOfModules(5)
-                        .addAllModuleOptions(listOf("module1", "module2"))
-                        .setMaxAge("PT24H")
-                        .build(),
+                        .setSimprints(
+                            ProtoDownSynchronizationConfiguration.ProtoSimprintsDownSynchronizationConfiguration
+                                .newBuilder()
+                                .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
+                                .setMaxNbOfModules(5)
+                                .addAllModuleOptions(listOf("module1", "module2"))
+                                .setMaxAge("PT24H")
+                                .setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
+                        ).build(),
                 ).setSamples(
                     ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()
@@ -564,7 +566,6 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_NON_NULL_VALUES =
             ProtoSynchronizationConfiguration
                 .newBuilder()
-                .setFrequency(ProtoSynchronizationConfiguration.Frequency.PERIODICALLY)
                 .setUp(
                     ProtoUpSynchronizationConfiguration
                         .newBuilder()
@@ -580,7 +581,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
                                         .build(),
-                                ).build(),
+                                ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
                         ).setCoSync(
                             ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
                                 .newBuilder()
@@ -590,11 +592,16 @@ class ProjectConfigSharedPrefsMigrationTest {
                 ).setDown(
                     ProtoDownSynchronizationConfiguration
                         .newBuilder()
-                        .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
-                        .setMaxNbOfModules(5)
-                        .addAllModuleOptions(listOf("module1", "module2"))
-                        .setMaxAge("PT24H")
-                        .build(),
+                        .setSimprints(
+                            ProtoDownSynchronizationConfiguration.ProtoSimprintsDownSynchronizationConfiguration
+                                .newBuilder()
+                                .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
+                                .setMaxNbOfModules(5)
+                                .addAllModuleOptions(listOf("module1", "module2"))
+                                .setMaxAge("PT24H")
+                                .setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
+                        ).build(),
                 ).setSamples(
                     ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()
@@ -602,7 +609,6 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_EMPTY_VALUES =
             ProtoSynchronizationConfiguration
                 .newBuilder()
-                .setFrequency(ProtoSynchronizationConfiguration.Frequency.PERIODICALLY)
                 .setUp(
                     ProtoUpSynchronizationConfiguration
                         .newBuilder()
@@ -618,7 +624,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
                                         .build(),
-                                ).build(),
+                                ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
                         ).setCoSync(
                             ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
                                 .newBuilder()
@@ -628,11 +635,16 @@ class ProjectConfigSharedPrefsMigrationTest {
                 ).setDown(
                     ProtoDownSynchronizationConfiguration
                         .newBuilder()
-                        .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
-                        .setMaxNbOfModules(5)
-                        .addAllModuleOptions(listOf("module1", "module2"))
-                        .setMaxAge("PT24H")
-                        .build(),
+                        .setSimprints(
+                            ProtoDownSynchronizationConfiguration.ProtoSimprintsDownSynchronizationConfiguration
+                                .newBuilder()
+                                .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
+                                .setMaxNbOfModules(5)
+                                .addAllModuleOptions(listOf("module1", "module2"))
+                                .setMaxAge("PT24H")
+                                .setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
+                        ).build(),
                 ).setSamples(
                     ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()
@@ -640,7 +652,6 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES =
             ProtoSynchronizationConfiguration
                 .newBuilder()
-                .setFrequency(ProtoSynchronizationConfiguration.Frequency.PERIODICALLY)
                 .setUp(
                     ProtoUpSynchronizationConfiguration
                         .newBuilder()
@@ -656,7 +667,8 @@ class ProjectConfigSharedPrefsMigrationTest {
                                         .setEventDownSyncs(1)
                                         .setSampleUpSyncs(1)
                                         .build(),
-                                ).build(),
+                                ).setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
                         ).setCoSync(
                             ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
                                 .newBuilder()
@@ -666,11 +678,16 @@ class ProjectConfigSharedPrefsMigrationTest {
                 ).setDown(
                     ProtoDownSynchronizationConfiguration
                         .newBuilder()
-                        .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
-                        .setMaxNbOfModules(5)
-                        .addAllModuleOptions(listOf("module1", "module2"))
-                        .setMaxAge("PT24H")
-                        .build(),
+                        .setSimprints(
+                            ProtoDownSynchronizationConfiguration.ProtoSimprintsDownSynchronizationConfiguration
+                                .newBuilder()
+                                .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
+                                .setMaxNbOfModules(5)
+                                .addAllModuleOptions(listOf("module1", "module2"))
+                                .setMaxAge("PT24H")
+                                .setFrequency(ProtoSyncFrequency.PERIODICALLY)
+                                .build(),
+                        ).build(),
                 ).setSamples(
                     ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
                 ).build()

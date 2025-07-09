@@ -29,8 +29,8 @@ import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectState
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
@@ -262,14 +262,16 @@ internal class SyncViewModel @Inject constructor(
 
     private suspend fun isModuleSelectionRequired() = isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
-    private suspend fun isDownSyncAllowed() = configManager.getProjectConfiguration().synchronization.frequency !=
-        SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+    private suspend fun isDownSyncAllowed() = configManager
+        .getProjectConfiguration()
+        .synchronization.down.simprints.frequency !=
+        Frequency.ONLY_PERIODICALLY_UP_SYNC
 
     private suspend fun isSelectedModulesEmpty() = configManager.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() = configManager
         .getProjectConfiguration()
-        .synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        .synchronization.down.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 }

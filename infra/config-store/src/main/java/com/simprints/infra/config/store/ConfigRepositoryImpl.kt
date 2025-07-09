@@ -99,17 +99,19 @@ internal class ConfigRepositoryImpl @Inject constructor(
         return config.copy(
             synchronization = config.synchronization.copy(
                 down = config.synchronization.down.copy(
-                    moduleOptions = config.synchronization.down.moduleOptions.map { moduleId ->
-                        when (moduleId) {
-                            is TokenizableString.Raw -> tokenizationProcessor.encrypt(
-                                decrypted = moduleId,
-                                tokenKeyType = TokenKeyType.ModuleId,
-                                project = project,
-                            )
+                    simprints = config.synchronization.down.simprints.copy(
+                        moduleOptions = config.synchronization.down.simprints.moduleOptions.map { moduleId ->
+                            when (moduleId) {
+                                is TokenizableString.Raw -> tokenizationProcessor.encrypt(
+                                    decrypted = moduleId,
+                                    tokenKeyType = TokenKeyType.ModuleId,
+                                    project = project,
+                                )
 
-                            is TokenizableString.Tokenized -> moduleId
-                        }
-                    },
+                                is TokenizableString.Tokenized -> moduleId
+                            }
+                        },
+                    ),
                 ),
             ),
         )

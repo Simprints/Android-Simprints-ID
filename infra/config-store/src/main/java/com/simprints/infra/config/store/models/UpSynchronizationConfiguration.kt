@@ -8,6 +8,7 @@ data class UpSynchronizationConfiguration(
         val kind: UpSynchronizationKind,
         val batchSizes: UpSyncBatchSizes,
         val imagesRequireUnmeteredConnection: Boolean,
+        val frequency: Frequency,
     )
 
     data class CoSyncUpSynchronizationConfiguration(

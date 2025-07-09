@@ -16,6 +16,7 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.Companion.DEFAULT_DOWN_SYNC_MAX_AGE
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.Project
@@ -212,22 +213,25 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     poolType = IdentificationConfiguration.PoolType.USER,
                 ),
                 synchronization = SynchronizationConfiguration(
-                    frequency = SynchronizationConfiguration.Frequency.PERIODICALLY,
                     up = UpSynchronizationConfiguration(
                         simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
                             kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
                             batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
                             imagesRequireUnmeteredConnection = false,
+                            frequency = Frequency.PERIODICALLY,
                         ),
                         coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                             kind = UpSynchronizationConfiguration.UpSynchronizationKind.NONE,
                         ),
                     ),
                     down = DownSynchronizationConfiguration(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.USER,
-                        maxNbOfModules = 6,
-                        moduleOptions = listOf(),
-                        maxAge = DEFAULT_DOWN_SYNC_MAX_AGE,
+                        simprints = DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.USER,
+                            maxNbOfModules = 6,
+                            moduleOptions = listOf(),
+                            maxAge = DEFAULT_DOWN_SYNC_MAX_AGE,
+                            frequency = Frequency.PERIODICALLY,
+                        ),
                     ),
                     samples = SampleSynchronizationConfiguration(
                         signedUrlBatchSize = 1,

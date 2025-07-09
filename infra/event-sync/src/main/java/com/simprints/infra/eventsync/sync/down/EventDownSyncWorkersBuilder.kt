@@ -39,7 +39,7 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = projectConfiguration.general.modalities.map { it.toMode() },
             selectedModuleIDs = deviceConfiguration.selectedModules.values(),
-            syncPartitioning = projectConfiguration.synchronization.down.partitionType
+            syncPartitioning = projectConfiguration.synchronization.down.simprints.partitionType
                 .toDomain(),
         )
 
