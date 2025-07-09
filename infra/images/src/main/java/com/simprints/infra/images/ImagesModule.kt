@@ -5,8 +5,6 @@ import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.metadata.database.ImageMetadataDao
 import com.simprints.infra.images.metadata.database.ImageMetadataDatabase
-import com.simprints.infra.images.remote.SampleUploader
-import com.simprints.infra.images.remote.firestore.FirestoreSampleUploader
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,9 +21,6 @@ abstract class ImagesModule {
 
     @Binds
     internal abstract fun bindImageLocalDataSource(impl: ImageLocalDataSourceImpl): ImageLocalDataSource
-
-    @Binds
-    internal abstract fun bindImageRemoteDataSource(impl: FirestoreSampleUploader): SampleUploader
 }
 
 @Module

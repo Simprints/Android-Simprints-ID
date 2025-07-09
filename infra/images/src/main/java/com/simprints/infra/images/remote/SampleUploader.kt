@@ -1,25 +1,12 @@
 package com.simprints.infra.images.remote
 
-import com.simprints.infra.images.model.SecuredImageRef
-import java.io.FileInputStream
-
 /**
  * Interface for remote image file operations
  */
 internal interface SampleUploader {
     /**
-     * Uploads an image
-     *
-     * @param imageStream the image file as a stream
-     * @param imageRef a reference to the image to be uploaded
-     * @param metadata arbitrary key-value pairs to be associated with the image
-     *
-     * @return the result of the operation.
-     * @see [UploadResult]
+     * Uploads all locally stored samples.
+     * On successful upload, the file and the associated metadata are deleted.
      */
-    suspend fun uploadSample(
-        imageStream: FileInputStream,
-        imageRef: SecuredImageRef,
-        metadata: Map<String, String>,
-    ): UploadResult
+    suspend fun uploadAllSamples(projectId: String): Boolean
 }
