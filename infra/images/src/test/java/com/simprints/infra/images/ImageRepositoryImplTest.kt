@@ -7,6 +7,7 @@ import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.images.remote.UploadResult
+import com.simprints.infra.images.usecase.CreateSamplePathUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -29,12 +30,15 @@ internal class ImageRepositoryImplTest {
     @MockK
     lateinit var metadataStore: ImageMetadataStore
 
+    @MockK
+    lateinit var createSamplePathUseCase: CreateSamplePathUseCase
+
     private lateinit var repository: ImageRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        repository = ImageRepositoryImpl(localDataSource, sampleUploader, metadataStore)
+        repository = ImageRepositoryImpl(localDataSource, sampleUploader, metadataStore, createSamplePathUseCase)
         initValidImageMocks()
     }
 

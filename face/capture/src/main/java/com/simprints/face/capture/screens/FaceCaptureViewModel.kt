@@ -14,7 +14,7 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
-import com.simprints.face.capture.usecases.SaveFaceImageUseCase
+import com.simprints.face.capture.usecases.SaveFaceSampleUseCase
 import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.biosdkresolver.ResolveFaceBioSdkUseCase
@@ -47,7 +47,7 @@ import javax.inject.Inject
 internal class FaceCaptureViewModel @Inject constructor(
     private val authStore: AuthStore,
     private val configManager: ConfigManager,
-    private val saveFaceImage: SaveFaceImageUseCase,
+    private val saveFaceImage: SaveFaceSampleUseCase,
     private val eventReporter: SimpleCaptureEventReporter,
     private val bitmapToByteArray: BitmapToByteArrayUseCase,
     private val licenseRepository: LicenseRepository,
