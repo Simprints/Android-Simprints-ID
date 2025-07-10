@@ -16,9 +16,12 @@ internal class ModuleRepositoryImpl @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventSyncManager: EventSyncManager,
 ) : ModuleRepository {
-    override suspend fun getModules(): List<Module> = configManager.getProjectConfiguration().synchronization.down.moduleOptions.map {
-        Module(it, isModuleSelected(it.value))
-    }
+    override suspend fun getModules(): List<Module> = configManager
+        .getProjectConfiguration()
+        .synchronization.down.simprints.moduleOptions
+        .map {
+            Module(it, isModuleSelected(it.value))
+        }
 
     override suspend fun saveModules(modules: List<Module>) {
         setSelectedModules(modules.filter { it.isSelected })
@@ -27,7 +30,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     override suspend fun getMaxNumberOfModules(): Int = configManager
         .getProjectConfiguration()
-        .synchronization.down.maxNbOfModules
+        .synchronization.down.simprints.maxNbOfModules
 
     private suspend fun isModuleSelected(moduleName: String): Boolean = configManager
         .getDeviceConfiguration()

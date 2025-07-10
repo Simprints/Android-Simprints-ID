@@ -18,6 +18,7 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
                 .getProjectConfiguration()
                 .synchronization
                 .down
+                .simprints
                 .maxAge
                 .let(Duration.Companion::parse)
                 .inWholeMilliseconds

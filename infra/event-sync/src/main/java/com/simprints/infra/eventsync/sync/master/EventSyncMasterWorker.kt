@@ -10,9 +10,9 @@ import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
@@ -146,7 +146,7 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
             configManager.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
 
         val isDownSyncConfigEnabled =
-            configuration.synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+            configuration.synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
 
         return !isProjectPaused && isDownSyncConfigEnabled
     }

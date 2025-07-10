@@ -1,8 +1,8 @@
 package com.simprints.infra.eventsync.sync.master
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.core.app.ApplicationProvider.*
+import androidx.test.ext.junit.runners.*
 import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.ListenableWorker.Result.Success
@@ -12,13 +12,14 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.config.store.models.Frequency
+import com.simprints.infra.config.store.models.Frequency.ONLY_PERIODICALLY_UP_SYNC
+import com.simprints.infra.config.store.models.Frequency.PERIODICALLY
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
-import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
@@ -34,16 +35,9 @@ import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
+import io.mockk.impl.annotations.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.spyk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -312,13 +306,13 @@ internal class EventSyncMasterWorkerTest {
 
     private suspend fun getIsEventDownSyncAllowedResult(
         projectState: ProjectState,
-        syncConfig: SynchronizationConfiguration.Frequency,
+        syncConfig: Frequency,
     ): ListenableWorker.Result {
         coEvery { configManager.getProject(any()).state } returns projectState
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { projectId } returns "projectId"
             every { synchronization } returns mockk {
-                every { frequency } returns syncConfig
+                every { down.simprints.frequency } returns syncConfig
                 every { up.simprints.kind } returns NONE
             }
         }
@@ -338,7 +332,7 @@ internal class EventSyncMasterWorkerTest {
     }
 
     private fun canDownSync(should: Boolean) {
-        every { synchronizationConfiguration.frequency } returns if (should) PERIODICALLY else ONLY_PERIODICALLY_UP_SYNC
+        every { synchronizationConfiguration.down.simprints.frequency } returns if (should) PERIODICALLY else ONLY_PERIODICALLY_UP_SYNC
     }
 
     private fun canUpSync(should: Boolean) {

@@ -22,8 +22,8 @@ import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectState
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -103,10 +103,11 @@ internal class SyncViewModelTest {
             every { up.simprints } returns SimprintsUpSynchronizationConfiguration(
                 kind = ALL,
                 batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
-                false,
+                imagesRequireUnmeteredConnection = false,
+                frequency = Frequency.PERIODICALLY_AND_ON_SESSION_START,
             )
-            every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
-            every { down.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+            every { down.simprints.frequency } returns Frequency.PERIODICALLY_AND_ON_SESSION_START
+            every { down.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }
         every { timeHelper.readableBetweenNowAndTime(any()) } returns DATE
         every { authStore.signedInProjectId } returns "projectId"

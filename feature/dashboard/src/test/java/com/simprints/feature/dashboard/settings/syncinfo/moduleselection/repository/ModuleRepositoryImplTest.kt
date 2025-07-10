@@ -46,7 +46,7 @@ class ModuleRepositoryImplTest {
         every { projectConfiguration.synchronization.down } returns downSynchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
-        every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d").map(String::asTokenizableRaw)
+        every { downSynchronizationConfiguration.simprints.moduleOptions } returns listOf("a", "b", "c", "d").map(String::asTokenizableRaw)
         coEvery {
             configManager.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c").map(TokenizableString::Tokenized), "")
@@ -130,7 +130,7 @@ class ModuleRepositoryImplTest {
 
     @Test
     fun shouldFetchMaxNumberOfModulesFromRemoteConfig() = runTest {
-        every { downSynchronizationConfiguration.maxNbOfModules } returns 10
+        every { downSynchronizationConfiguration.simprints.maxNbOfModules } returns 10
 
         assertThat(repository.getMaxNumberOfModules()).isEqualTo(10)
     }

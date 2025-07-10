@@ -17,6 +17,7 @@ internal fun UpSynchronizationConfiguration.SimprintsUpSynchronizationConfigurat
         .setKind(kind.toProto())
         .setBatchSizes(batchSizes.toProto())
         .setImagesRequireUnmeteredConnection(imagesRequireUnmeteredConnection)
+        .setFrequency(frequency.toProto())
         .build()
 
 internal fun UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.toProto() =
@@ -52,9 +53,10 @@ internal fun ProtoUpSynchronizationConfiguration.toDomain() = UpSynchronizationC
 
 internal fun ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.toDomain() =
     UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
-        kind.toDomain(),
-        batchSizes.toDomain(),
-        imagesRequireUnmeteredConnection,
+        kind = kind.toDomain(),
+        batchSizes = batchSizes.toDomain(),
+        imagesRequireUnmeteredConnection = imagesRequireUnmeteredConnection,
+        frequency = frequency.toDomain(),
     )
 
 internal fun ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.toDomain() =

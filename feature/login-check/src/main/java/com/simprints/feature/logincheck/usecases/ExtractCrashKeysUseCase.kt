@@ -19,7 +19,8 @@ internal class ExtractCrashKeysUseCase @Inject constructor(
         Simber.setUserProperty(CrashReportingCustomKeys.MODULE_IDS, deviceConfiguration.selectedModules.toString())
         Simber.setUserProperty(
             CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS,
-            projectConfiguration.synchronization.frequency.toString(),
+            projectConfiguration.synchronization.down.simprints.frequency
+                .toString(),
         )
     }
 }

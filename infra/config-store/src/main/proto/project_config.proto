@@ -189,11 +189,12 @@ message ProtoIdentificationConfiguration {
 }
 
 message ProtoSynchronizationConfiguration {
-    Frequency frequency = 1;
+    Frequency frequency = 1; // TODO: remove this field after migration to 2025.3.0
     ProtoUpSynchronizationConfiguration up = 2;
     ProtoDownSynchronizationConfiguration down = 3;
     ProtoSampleSynchronizationConfiguration samples = 4;
 
+    // TODO: remove this field after migration to 2025.3.0
     enum Frequency {
         ONLY_PERIODICALLY_UP_SYNC = 0;
         PERIODICALLY = 1;
@@ -201,12 +202,28 @@ message ProtoSynchronizationConfiguration {
     }
 }
 
+enum ProtoSyncFrequency {
+    ONLY_PERIODICALLY_UP_SYNC = 0;
+    PERIODICALLY = 1;
+    PERIODICALLY_AND_ON_SESSION_START = 2;
+}
+
 message ProtoDownSynchronizationConfiguration {
-    PartitionType partition_type = 1;
-    int32 max_nb_of_modules = 2;
-    repeated string module_options = 3;
-    bool is_tokenized = 4;
-    string max_age = 5;
+    PartitionType partition_type = 1; // TODO: remove this field after migration to 2025.3.0
+    int32 max_nb_of_modules = 2; // TODO: remove this field after migration to 2025.3.0
+    repeated string module_options = 3; // TODO: remove this field after migration to 2025.3.0
+    bool is_tokenized = 4; // TODO: remove this field after migration to 2025.3.0
+    string max_age = 5; // TODO: remove this field after migration to 2025.3.0
+    ProtoSimprintsDownSynchronizationConfiguration simprints = 6;
+
+    message ProtoSimprintsDownSynchronizationConfiguration {
+        PartitionType partition_type = 1;
+        int32 max_nb_of_modules = 2;
+        repeated string module_options = 3;
+        bool is_tokenized = 4;
+        string max_age = 5;
+        ProtoSyncFrequency frequency = 6;
+    }
 
     enum PartitionType {
         PROJECT = 0;
@@ -223,6 +240,7 @@ message ProtoUpSynchronizationConfiguration {
         UpSynchronizationKind kind = 1;
         ProtoUpSyncBatchSizes batchSizes = 2;
         bool imagesRequireUnmeteredConnection = 3;
+        ProtoSyncFrequency frequency = 4;
     }
 
     message CoSyncUpSynchronizationConfiguration {
