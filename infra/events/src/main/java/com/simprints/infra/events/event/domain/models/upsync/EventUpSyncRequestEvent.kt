@@ -60,7 +60,9 @@ data class EventUpSyncRequestEvent(
         val eventUpSyncCount: Int = 0,
         val eventDownSyncCount: Int = 0,
         val sampleUpSyncCount: Int = 0,
-    )
+    ) {
+        fun hasAny() = sessionCount > 0 || eventUpSyncCount > 0 || eventDownSyncCount > 0 || sampleUpSyncCount > 0
+    }
 
     override fun getTokenizableFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 

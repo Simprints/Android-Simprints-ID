@@ -227,10 +227,10 @@ internal data class OldProjectConfig(
                     )
                 },
                 batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
-                    sessions = 1,
-                    eventUpSyncs = 1,
-                    eventDownSyncs = 1,
-                    sampleUpSyncs = 1,
+                    sessions = DEFAULT_BATCH_SIZE,
+                    eventUpSyncs = DEFAULT_BATCH_SIZE,
+                    eventDownSyncs = DEFAULT_BATCH_SIZE,
+                    sampleUpSyncs = DEFAULT_BATCH_SIZE,
                 ),
                 imagesRequireUnmeteredConnection = false,
             ),
@@ -257,7 +257,7 @@ internal data class OldProjectConfig(
             maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
         ),
         samples = SampleSynchronizationConfiguration(
-            signedUrlBatchSize = 5,
+            signedUrlBatchSize = DEFAULT_BATCH_SIZE,
         ),
     )
 
@@ -272,5 +272,6 @@ internal data class OldProjectConfig(
     companion object {
         private const val DEFAULT_FACE_FRAMES_TO_CAPTURE = 2
         private const val DEFAULT_FACE_SDK_VERSION = "1.23"
+        private const val DEFAULT_BATCH_SIZE = 1
     }
 }

@@ -558,7 +558,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setMaxAge("PT24H")
                         .build(),
                 ).setSamples(
-                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(1).build(),
                 ).build()
 
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_NON_NULL_VALUES =
@@ -596,7 +596,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setMaxAge("PT24H")
                         .build(),
                 ).setSamples(
-                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(1).build(),
                 ).build()
 
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_EMPTY_VALUES =
@@ -634,7 +634,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setMaxAge("PT24H")
                         .build(),
                 ).setSamples(
-                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(1).build(),
                 ).build()
 
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES =
@@ -672,7 +672,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setMaxAge("PT24H")
                         .build(),
                 ).setSamples(
-                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(5).build(),
+                    ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(1).build(),
                 ).build()
 
         private val JSON_IDENTIFICATION_CONFIGURATION =

@@ -274,7 +274,7 @@ internal class EventUpSyncTask @Inject constructor(
         result: EventUpSyncResult,
         content: EventUpSyncRequestEvent.UpSyncContent,
     ) {
-        if (content.sessionCount > 0 || content.eventDownSyncCount > 0 || content.eventUpSyncCount > 0 || content.sampleUpSyncCount > 0) {
+        if (content.hasAny()) {
             eventRepository.addOrUpdateEvent(
                 eventScope,
                 EventUpSyncRequestEvent(

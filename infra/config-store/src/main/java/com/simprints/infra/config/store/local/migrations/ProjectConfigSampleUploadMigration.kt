@@ -16,9 +16,11 @@ class ProjectConfigSampleUploadMigration @Inject constructor() : DataMigration<P
     }
 
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData) {
-        !synchronization.hasSamples() ||
-            synchronization.up.simprints.batchSizes
-                .let { it.eventUpSyncs == 0 || it.eventDownSyncs == 0 }
+        val hasNoSamplesSyncObject = !synchronization.hasSamples()
+        val eventSyncBatchSizeIsEmpty = synchronization.up.simprints.batchSizes
+            .let { it.eventUpSyncs == 0 || it.eventDownSyncs == 0 }
+
+        hasNoSamplesSyncObject || eventSyncBatchSizeIsEmpty
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
@@ -30,7 +32,7 @@ class ProjectConfigSampleUploadMigration @Inject constructor() : DataMigration<P
             .toBuilder()
             .setEventUpSyncs(currentBatchSizes.upSyncs)
             .setEventDownSyncs(currentBatchSizes.downSyncs)
-            .setSampleUpSyncs(1)
+            .setSampleUpSyncs(DEFAULT_BATCH_SIZE)
             .build()
         val upSyncSimprintsConfig = currentSyncConfig.up.simprints
             .toBuilder()
@@ -40,7 +42,7 @@ class ProjectConfigSampleUploadMigration @Inject constructor() : DataMigration<P
             .toBuilder()
             .setSimprints(upSyncSimprintsConfig)
             .build()
-        val samplesConfig = ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(1).build()
+        val samplesConfig = ProtoSampleSynchronizationConfiguration.newBuilder().setSignedUrlBatchSize(DEFAULT_BATCH_SIZE).build()
 
         return currentData
             .toBuilder()
@@ -51,5 +53,9 @@ class ProjectConfigSampleUploadMigration @Inject constructor() : DataMigration<P
                     .setSamples(samplesConfig)
                     .build(),
             ).build()
+    }
+
+    companion object {
+        private const val DEFAULT_BATCH_SIZE = 1
     }
 }
