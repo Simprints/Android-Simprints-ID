@@ -63,7 +63,7 @@ internal class SaveFingerprintSampleUseCase @Inject constructor(
             sampleId = captureEventId,
             fileExtension = fileExtension,
             sampleBytes = imageBytes,
-            metadata = mutableMapOf(
+            optionalMetadata = mutableMapOf(
                 META_KEY_FINGER_ID to finger.name,
                 META_KEY_DPI to dpi.toString(),
             ).apply {

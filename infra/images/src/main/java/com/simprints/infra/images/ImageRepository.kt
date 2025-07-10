@@ -25,7 +25,7 @@ interface ImageRepository {
         sampleId: String,
         fileExtension: String,
         sampleBytes: ByteArray,
-        metadata: Map<String, String> = emptyMap(),
+        optionalMetadata: Map<String, String> = emptyMap(),
     ): SecuredImageRef?
 
     /**

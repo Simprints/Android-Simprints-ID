@@ -24,7 +24,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
         sampleId: String,
         fileExtension: String,
         sampleBytes: ByteArray,
-        metadata: Map<String, String>,
+        optionalMetadata: Map<String, String>,
     ): SecuredImageRef? {
         val logTag = if (modality == GeneralConfiguration.Modality.FACE) FACE_CAPTURE else FINGER_CAPTURE
         val relativePath = createSamplePathUseCase(sessionId, modality, sampleId, fileExtension)
@@ -38,7 +38,14 @@ internal class ImageRepositoryImpl @Inject internal constructor(
                     Simber.i("Saving image failed for captureId $sessionId", tag = logTag)
                 } else {
                     // Only store metadata if the image was stored successfully
-                    metadataStore.storeMetadata(relativePath, metadata)
+                    metadataStore.storeMetadata(relativePath, optionalMetadata)
+                    // Also append mandatory metadata keys
+                    metadataStore.storeMetadata(
+                        relativePath,
+                        mapOf(
+                            META_KEY_FORMAT to fileExtension,
+                        ),
+                    )
                 }
             }
     }
@@ -52,5 +59,9 @@ internal class ImageRepositoryImpl @Inject internal constructor(
         for (image in localDataSource.listImages(null)) {
             localDataSource.deleteImage(image)
         }
+    }
+
+    companion object {
+        private const val META_KEY_FORMAT = "format"
     }
 }

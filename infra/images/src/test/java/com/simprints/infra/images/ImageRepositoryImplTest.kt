@@ -83,7 +83,7 @@ internal class ImageRepositoryImplTest {
             sampleId = "sampleId",
             fileExtension = "jpg",
             sampleBytes = ByteArray(10),
-            metadata = mapOf("k" to "v"),
+            optionalMetadata = mapOf("k" to "v"),
         )
 
         assertThat(imageRef).isNotNull()
@@ -103,7 +103,7 @@ internal class ImageRepositoryImplTest {
             sampleId = "sampleId",
             fileExtension = "jpg",
             sampleBytes = ByteArray(10),
-            metadata = mapOf("k" to "v"),
+            optionalMetadata = mapOf("k" to "v"),
         )
 
         assertThat(imageRef).isNull()
