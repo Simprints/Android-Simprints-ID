@@ -24,6 +24,7 @@ internal data class ApiEventUpSyncRequestPayload(
             domainPayload.content.sessionCount,
             domainPayload.content.eventUpSyncCount,
             domainPayload.content.eventDownSyncCount,
+            domainPayload.content.sampleUpSyncCount,
         ),
         domainPayload.responseStatus,
         domainPayload.errorType,
@@ -34,6 +35,7 @@ internal data class ApiEventUpSyncRequestPayload(
         val sessionCount: Int,
         val eventUpSyncCount: Int,
         val eventDownSyncCount: Int,
+        val sampleUpSyncCount: Int,
     )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = null

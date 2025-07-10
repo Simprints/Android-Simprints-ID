@@ -78,6 +78,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -495,8 +496,18 @@ fun createEventUpSyncRequestEvent() = EventUpSyncRequestEvent(
         sessionCount = 1,
         eventUpSyncCount = 2,
         eventDownSyncCount = 3,
+        sampleUpSyncCount = 4,
     ),
     responseStatus = 200,
+    errorType = "OK",
+)
+
+fun createSampleUpSyncRequestEvent() = SampleUpSyncRequestEvent(
+    createdAt = CREATED_AT,
+    endedAt = ENDED_AT,
+    requestId = GUID1,
+    sampleId = GUID2,
+    size = 100,
     errorType = "OK",
 )
 

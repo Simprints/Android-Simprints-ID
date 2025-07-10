@@ -13,6 +13,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SampleSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
@@ -226,9 +227,10 @@ internal data class OldProjectConfig(
                     )
                 },
                 batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes(
-                    sessions = 1,
-                    upSyncs = 1,
-                    downSyncs = 1,
+                    sessions = DEFAULT_BATCH_SIZE,
+                    eventUpSyncs = DEFAULT_BATCH_SIZE,
+                    eventDownSyncs = DEFAULT_BATCH_SIZE,
+                    sampleUpSyncs = DEFAULT_BATCH_SIZE,
                 ),
                 imagesRequireUnmeteredConnection = false,
             ),
@@ -254,6 +256,9 @@ internal data class OldProjectConfig(
             moduleOptions = moduleIdOptions.split("|").map(String::asTokenizableRaw),
             maxAge = DownSynchronizationConfiguration.DEFAULT_DOWN_SYNC_MAX_AGE,
         ),
+        samples = SampleSynchronizationConfiguration(
+            signedUrlBatchSize = DEFAULT_BATCH_SIZE,
+        ),
     )
 
     private fun parseDecisionPolicy(decisionPolicy: String): DecisionPolicy = with(JSONObject(decisionPolicy)) {
@@ -267,5 +272,6 @@ internal data class OldProjectConfig(
     companion object {
         private const val DEFAULT_FACE_FRAMES_TO_CAPTURE = 2
         private const val DEFAULT_FACE_SDK_VERSION = "1.23"
+        private const val DEFAULT_BATCH_SIZE = 1
     }
 }

@@ -90,7 +90,7 @@ internal class EventUpSyncTask @Inject constructor(
                         events?.let { filterEventsToUpSync(it, config) }
                     }
                 },
-                createUpSyncContentContent = {
+                createUpSyncContent = {
                     isUsefulUpload = it > 0
                     EventUpSyncRequestEvent.UpSyncContent(sessionCount = it)
                 },
@@ -104,10 +104,26 @@ internal class EventUpSyncTask @Inject constructor(
             uploadEventScopeType(
                 eventScope = eventScope,
                 project = project,
+                eventScopeTypeToUpload = EventScopeType.SAMPLE_UP_SYNC,
+                batchSize = config.synchronization.up.simprints.batchSizes.sampleUpSyncs,
+                createUpSyncContent = {
+                    isUsefulUpload = isUsefulUpload || it > 0
+                    EventUpSyncRequestEvent.UpSyncContent(sampleUpSyncCount = it)
+                },
+            ).collect { count ->
+                lastOperation = lastOperation.copy(
+                    lastState = RUNNING,
+                    lastSyncTime = timeHelper.now().ms,
+                )
+                emitProgress(lastOperation, count)
+            }
+            uploadEventScopeType(
+                eventScope = eventScope,
+                project = project,
                 eventScopeTypeToUpload = EventScopeType.DOWN_SYNC,
-                batchSize = config.synchronization.up.simprints.batchSizes.downSyncs,
-                createUpSyncContentContent = {
-                    isUsefulUpload = it > 0
+                batchSize = config.synchronization.up.simprints.batchSizes.eventDownSyncs,
+                createUpSyncContent = {
+                    isUsefulUpload = isUsefulUpload || it > 0
                     EventUpSyncRequestEvent.UpSyncContent(eventDownSyncCount = it)
                 },
             ).collect { count ->
@@ -121,8 +137,8 @@ internal class EventUpSyncTask @Inject constructor(
                 eventScope = eventScope,
                 project = project,
                 eventScopeTypeToUpload = EventScopeType.UP_SYNC,
-                batchSize = config.synchronization.up.simprints.batchSizes.upSyncs,
-                createUpSyncContentContent = {
+                batchSize = config.synchronization.up.simprints.batchSizes.eventUpSyncs,
+                createUpSyncContent = {
                     // Only tracking up-sync if there have been ay events in other scopes.
                     EventUpSyncRequestEvent.UpSyncContent(
                         eventUpSyncCount = if (isUsefulUpload) it else 0,
@@ -170,7 +186,7 @@ internal class EventUpSyncTask @Inject constructor(
         eventScopeTypeToUpload: EventScopeType,
         batchSize: Int,
         eventFilter: (Map<EventScope, List<Event>?>) -> Map<EventScope, List<Event>?> = { it },
-        createUpSyncContentContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
+        createUpSyncContent: (Int) -> EventUpSyncRequestEvent.UpSyncContent,
     ) = flow {
         Simber.d("Uploading event scope - $eventScopeTypeToUpload in batches of $batchSize", tag = SYNC)
 
@@ -204,7 +220,7 @@ internal class EventUpSyncTask @Inject constructor(
                         eventScope = eventScope,
                         startTime = requestStartTime,
                         result = result,
-                        content = createUpSyncContentContent(this.size),
+                        content = createUpSyncContent(this.size),
                     )
                     uploadedScopes.addAll(this.map { it.id })
                 } catch (ex: Exception) {
@@ -221,6 +237,7 @@ internal class EventUpSyncTask @Inject constructor(
         EventScopeType.SESSION -> ApiUploadEventsBody(sessions = this)
         EventScopeType.DOWN_SYNC -> ApiUploadEventsBody(eventDownSyncs = this)
         EventScopeType.UP_SYNC -> ApiUploadEventsBody(eventUpSyncs = this)
+        EventScopeType.SAMPLE_UP_SYNC -> ApiUploadEventsBody(sampleUpSyncs = this)
     }
 
     private fun Map<EventScope, List<Event>?>.getCorruptedScopes() = filterValues { it == null }.keys
@@ -257,7 +274,7 @@ internal class EventUpSyncTask @Inject constructor(
         result: EventUpSyncResult,
         content: EventUpSyncRequestEvent.UpSyncContent,
     ) {
-        if (content.sessionCount > 0 || content.eventDownSyncCount > 0 || content.eventUpSyncCount > 0) {
+        if (content.hasAny()) {
             eventRepository.addOrUpdateEvent(
                 eventScope,
                 EventUpSyncRequestEvent(

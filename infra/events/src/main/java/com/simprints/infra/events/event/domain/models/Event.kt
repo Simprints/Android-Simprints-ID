@@ -49,6 +49,7 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.ONE_TO
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ONE_TO_ONE_MATCH_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.PERSON_CREATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.REFUSAL_KEY
+import com.simprints.infra.events.event.domain.models.EventType.Companion.SAMPLE_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNER_CONNECTION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
@@ -77,6 +78,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestEvent
 
 @JsonTypeInfo(
@@ -134,6 +136,7 @@ import com.simprints.infra.events.event.domain.models.upsync.EventUpSyncRequestE
     JsonSubTypes.Type(value = LicenseCheckEvent::class, name = LICENSE_CHECK_KEY),
     JsonSubTypes.Type(value = AgeGroupSelectionEvent::class, name = AGE_GROUP_SELECTION_KEY),
     JsonSubTypes.Type(value = BiometricReferenceCreationEvent::class, name = BIOMETRIC_REFERENCE_CREATION_KEY),
+    JsonSubTypes.Type(value = SampleUpSyncRequestEvent::class, name = SAMPLE_UP_SYNC_REQUEST),
 )
 abstract class Event {
     abstract val id: String

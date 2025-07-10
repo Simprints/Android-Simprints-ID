@@ -14,6 +14,7 @@ import com.simprints.infra.config.store.local.migrations.ProjectConfigFingerprin
 import com.simprints.infra.config.store.local.migrations.ProjectConfigLedsModeMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigMatchingModalitiesMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigQualityThresholdMigration
+import com.simprints.infra.config.store.local.migrations.ProjectConfigSampleUploadMigration
 import com.simprints.infra.config.store.local.migrations.ProjectConfigSharedPrefsMigration
 import com.simprints.infra.config.store.local.migrations.ProjectRealmMigration
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
@@ -76,6 +77,7 @@ object DataStoreModule {
         projectConfigLedsModeMigration: ProjectConfigLedsModeMigration,
         projectConfigMatchingModalitiesMigration: ProjectConfigMatchingModalitiesMigration,
         projectConfigFaceEmptyVersionMigration: ProjectConfigFaceEmptyVersionMigration,
+        projectConfigSampleUploadMigration: ProjectConfigSampleUploadMigration,
     ): DataStore<ProtoProjectConfiguration> = DataStoreFactory.create(
         serializer = ProjectConfigurationSerializer,
         produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },
@@ -88,6 +90,7 @@ object DataStoreModule {
             projectConfigLedsModeMigration,
             projectConfigMatchingModalitiesMigration,
             projectConfigFaceEmptyVersionMigration,
+            projectConfigSampleUploadMigration,
         ),
     )
 

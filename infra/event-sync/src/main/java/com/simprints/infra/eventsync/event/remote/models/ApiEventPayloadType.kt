@@ -46,6 +46,7 @@ import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATC
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_ONE_MATCH
 import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.infra.events.event.domain.models.EventType.REFUSAL
+import com.simprints.infra.events.event.domain.models.EventType.SAMPLE_UP_SYNC_REQUEST
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
@@ -83,10 +84,10 @@ internal enum class ApiEventPayloadType {
     FaceCaptureConfirmation,
     EventDownSyncRequest,
     EventUpSyncRequest,
+    SampleUpSyncRequest,
     LicenseCheck,
     AgeGroupSelection,
     BiometricReferenceCreation,
-    ;
 }
 
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
@@ -138,6 +139,7 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     FACE_CAPTURE_BIOMETRICS -> ApiEventPayloadType.FaceCaptureBiometrics
     EVENT_DOWN_SYNC_REQUEST -> ApiEventPayloadType.EventDownSyncRequest
     EVENT_UP_SYNC_REQUEST -> ApiEventPayloadType.EventUpSyncRequest
+    SAMPLE_UP_SYNC_REQUEST -> ApiEventPayloadType.SampleUpSyncRequest
     LICENSE_CHECK -> ApiEventPayloadType.LicenseCheck
     AGE_GROUP_SELECTION -> ApiEventPayloadType.AgeGroupSelection
     BIOMETRIC_REFERENCE_CREATION -> ApiEventPayloadType.BiometricReferenceCreation
@@ -172,6 +174,7 @@ internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.FaceCaptureBiometrics -> FACE_CAPTURE_BIOMETRICS
     ApiEventPayloadType.EventDownSyncRequest -> EVENT_DOWN_SYNC_REQUEST
     ApiEventPayloadType.EventUpSyncRequest -> EVENT_UP_SYNC_REQUEST
+    ApiEventPayloadType.SampleUpSyncRequest -> SAMPLE_UP_SYNC_REQUEST
     ApiEventPayloadType.LicenseCheck -> LICENSE_CHECK
     ApiEventPayloadType.AgeGroupSelection -> AGE_GROUP_SELECTION
     ApiEventPayloadType.BiometricReferenceCreation -> BIOMETRIC_REFERENCE_CREATION

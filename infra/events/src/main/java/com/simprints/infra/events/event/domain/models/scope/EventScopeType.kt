@@ -7,4 +7,5 @@ enum class EventScopeType {
     SESSION,
     UP_SYNC,
     DOWN_SYNC,
+    SAMPLE_UP_SYNC,
 }
