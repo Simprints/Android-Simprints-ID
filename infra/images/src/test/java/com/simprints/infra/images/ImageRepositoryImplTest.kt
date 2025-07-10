@@ -7,8 +7,8 @@ import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
-import com.simprints.infra.images.usecase.CreateSamplePathUseCase
 import com.simprints.infra.images.usecase.GetUploaderUseCase
+import com.simprints.infra.images.usecase.SamplePathConvertor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -31,7 +31,7 @@ internal class ImageRepositoryImplTest {
     lateinit var metadataStore: ImageMetadataStore
 
     @MockK
-    lateinit var createSamplePathUseCase: CreateSamplePathUseCase
+    lateinit var samplePathConvertor: SamplePathConvertor
 
     @MockK
     lateinit var getUploaderUseCase: GetUploaderUseCase
@@ -42,14 +42,14 @@ internal class ImageRepositoryImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { createSamplePathUseCase.invoke(any(), any(), any(), any()) } returns Path(VALID_PATH)
+        every { samplePathConvertor.create(any(), any(), any(), any()) } returns Path(VALID_PATH)
         coEvery { sampleUploader.uploadAllSamples(any()) } returns true
         coEvery { getUploaderUseCase.invoke() } returns sampleUploader
 
         repository = ImageRepositoryImpl(
             localDataSource = localDataSource,
             metadataStore = metadataStore,
-            createSamplePathUseCase = createSamplePathUseCase,
+            samplePathConvertor = samplePathConvertor,
             getSampleUploader = getUploaderUseCase,
         )
     }

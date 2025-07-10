@@ -4,8 +4,8 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.images.usecase.CreateSamplePathUseCase
 import com.simprints.infra.images.usecase.GetUploaderUseCase
+import com.simprints.infra.images.usecase.SamplePathConvertor
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
@@ -14,7 +14,7 @@ import javax.inject.Inject
 internal class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val metadataStore: ImageMetadataStore,
-    private val createSamplePathUseCase: CreateSamplePathUseCase,
+    private val samplePathConvertor: SamplePathConvertor,
     private val getSampleUploader: GetUploaderUseCase,
 ) : ImageRepository {
     override suspend fun storeSample(
@@ -27,7 +27,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
         optionalMetadata: Map<String, String>,
     ): SecuredImageRef? {
         val logTag = if (modality == GeneralConfiguration.Modality.FACE) FACE_CAPTURE else FINGER_CAPTURE
-        val relativePath = createSamplePathUseCase(sessionId, modality, sampleId, fileExtension)
+        val relativePath = samplePathConvertor.create(sessionId, modality, sampleId, fileExtension)
 
         Simber.d("Saving $modality sample to ${relativePath.compose()}", tag = logTag)
 
