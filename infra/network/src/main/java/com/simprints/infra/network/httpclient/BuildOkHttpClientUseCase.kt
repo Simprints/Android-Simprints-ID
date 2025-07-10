@@ -88,8 +88,13 @@ internal class BuildOkHttpClientUseCase @Inject constructor(
             if (!currentAuthToken.isNullOrBlank()) {
                 addInterceptor(buildAuthenticationInterceptor(currentAuthToken!!))
             }
-        }.addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
-        .addInterceptor(buildDeviceIdInterceptor(deviceId))
+        }.addNetworkInterceptor(
+            ChuckerInterceptor
+                .Builder(ctx)
+                // Skip sample storage domain to avoid interfering with encrypted file streaming
+                .skipDomains("storage.googleapis.com")
+                .build(),
+        ).addInterceptor(buildDeviceIdInterceptor(deviceId))
         .addInterceptor(buildVersionInterceptor(versionName))
         .addInterceptor(buildGZipInterceptor())
         .apply {
