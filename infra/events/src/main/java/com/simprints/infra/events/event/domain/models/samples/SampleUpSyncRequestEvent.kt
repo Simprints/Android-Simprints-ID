@@ -22,7 +22,7 @@ class SampleUpSyncRequestEvent(
         endedAt: Timestamp,
         requestId: String,
         sampleId: String,
-        size: Int,
+        size: Long,
         errorType: String? = null,
     ) : this(
         UUID.randomUUID().toString(),
@@ -44,7 +44,7 @@ class SampleUpSyncRequestEvent(
         override val endedAt: Timestamp?,
         val requestId: String,
         val sampleId: String,
-        val size: Int,
+        val size: Long,
         val errorType: String?,
         override val eventVersion: Int,
         override val type: EventType = EventType.SAMPLE_UP_SYNC_REQUEST,

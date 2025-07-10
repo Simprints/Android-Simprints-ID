@@ -7,13 +7,13 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.images"
-
 }
 
 dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
+    implementation(project(":infra:events"))
 
     // Firebase
     implementation(libs.firebase.storage)
@@ -22,4 +22,5 @@ dependencies {
     implementation(libs.androidX.security)
     implementation(libs.kotlin.coroutinesPlayServices)
 
+    implementation(libs.retrofit.core)
 }

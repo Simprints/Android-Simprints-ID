@@ -29,7 +29,7 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.IsNoFingerDetectedLimitReachedUseCase
-import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
+import com.simprints.fingerprint.capture.usecase.SaveFingerprintSampleUseCase
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
@@ -72,7 +72,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
-    private val saveImage: SaveImageUseCase,
+    private val saveImage: SaveFingerprintSampleUseCase,
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
     private val addCaptureEvents: AddCaptureEventsUseCase,

@@ -1,6 +1,6 @@
 package com.simprints.infra.images
 
-import com.simprints.infra.images.model.Path
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.images.model.SecuredImageRef
 
 /**
@@ -8,21 +8,24 @@ import com.simprints.infra.images.model.SecuredImageRef
  */
 interface ImageRepository {
     /**
-     * Encrypts and stores an image file locally
+     * Encrypts and stores an sample file locally.
+     * Path of the sample file within the images root folder will
+     * be created based on the session ID, modality and file extension parameters.
      *
-     * @param imageBytes the image, in bytes
+     * @param sampleBytes the sample file to be stored in bytes
      * @param projectId the id of the project
-     * @param relativePath the path of the image within the images root folder, including file name
      * @param metadata arbitrary key-value pairs to be associated with the image
      *
      * @return a reference to the newly stored image, if successful, otherwise null
-     * @see [com.simprints.infra.images.local.ImageLocalDataSource.encryptAndStoreImage]
      */
-    suspend fun storeImageSecurely(
-        imageBytes: ByteArray,
+    suspend fun storeSample(
         projectId: String,
-        relativePath: Path,
-        metadata: Map<String, String> = emptyMap(),
+        sessionId: String,
+        modality: GeneralConfiguration.Modality,
+        sampleId: String,
+        fileExtension: String,
+        sampleBytes: ByteArray,
+        optionalMetadata: Map<String, String> = emptyMap(),
     ): SecuredImageRef?
 
     /**

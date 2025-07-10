@@ -76,7 +76,7 @@ data class Path(
 
     override fun hashCode(): Int = parts.contentHashCode() * 2 + 27
 
-    override fun toString(): String = super.toString()
+    override fun toString(): String = compose()
 
     companion object {
         /**

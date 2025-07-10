@@ -6,7 +6,7 @@ import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
-import com.simprints.face.capture.usecases.SaveFaceImageUseCase
+import com.simprints.face.capture.usecases.SaveFaceSampleUseCase
 import com.simprints.face.capture.usecases.ShouldShowInstructionsScreenUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.initialization.FaceBioSdkInitializer
@@ -54,7 +54,7 @@ class FaceCaptureViewModelTest {
     private lateinit var configManager: ConfigManager
 
     @MockK
-    private lateinit var faceImageUseCase: SaveFaceImageUseCase
+    private lateinit var faceImageUseCase: SaveFaceSampleUseCase
 
     @MockK
     private lateinit var eventReporter: SimpleCaptureEventReporter

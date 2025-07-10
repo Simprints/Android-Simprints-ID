@@ -13,7 +13,7 @@ internal data class ApiEventSampleUpSyncRequestPayload(
     val endTime: ApiTimestamp?,
     val requestId: String,
     val sampleId: String,
-    val size: Int,
+    val size: Long,
     val errorType: String?,
 ) : ApiEventPayload(startTime) {
     constructor(domainPayload: SampleUpSyncRequestEvent.SampleUpSyncRequestPayload) : this(
