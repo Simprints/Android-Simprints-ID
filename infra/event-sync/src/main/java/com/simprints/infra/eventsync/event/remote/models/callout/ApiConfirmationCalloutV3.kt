@@ -6,4 +6,5 @@ import androidx.annotation.Keep
 internal data class ApiConfirmationCalloutV3(
     val selectedGuid: String,
     val sessionId: String,
+    val metadata: String?,
 ) : ApiCallout(ApiCalloutType.Confirmation)

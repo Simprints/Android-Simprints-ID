@@ -58,6 +58,7 @@ internal data class ApiCalloutPayloadV3(
         ApiConfirmationCalloutV3(
             domainPayload.selectedGuid,
             domainPayload.sessionId,
+            domainPayload.metadata,
         ),
     )
 
