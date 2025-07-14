@@ -62,7 +62,13 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     verifyGuid,
                     metadata,
                 )
-                is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEvent(startTime, projectId, selectedGuid, sessionId)
+                is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEvent(
+                    createdAt = startTime,
+                    projectId = projectId,
+                    selectedGuid = selectedGuid,
+                    sessionId = sessionId,
+                    metadata = metadata
+                )
                 is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEvent(
                     startTime,
                     projectId,
