@@ -4,7 +4,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.images.model.Path
 import javax.inject.Inject
 
-internal class SamplePathConvertor @Inject constructor() {
+internal class SamplePathConverter @Inject constructor() {
     fun create(
         sessionId: String,
         modality: GeneralConfiguration.Modality,

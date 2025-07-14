@@ -16,7 +16,7 @@ import com.simprints.infra.images.remote.signedurl.api.ApiSampleUploadUrlRequest
 import com.simprints.infra.images.remote.signedurl.api.SampleUploadApiInterface
 import com.simprints.infra.images.remote.signedurl.api.SampleUploadRequestBody
 import com.simprints.infra.images.usecase.CalculateFileMd5AndSizeUseCase
-import com.simprints.infra.images.usecase.SamplePathConvertor
+import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
@@ -32,7 +32,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
     private val configRepository: ConfigRepository,
     private val localDataSource: ImageLocalDataSource,
     private val metadataStore: ImageMetadataStore,
-    private val samplePathUtil: SamplePathConvertor,
+    private val samplePathUtil: SamplePathConverter,
     private val calculateFileMd5AndSize: CalculateFileMd5AndSizeUseCase,
 ) : SampleUploader {
     override suspend fun uploadAllSamples(projectId: String): Boolean {

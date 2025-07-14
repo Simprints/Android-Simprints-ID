@@ -7,11 +7,11 @@ import org.junit.Before
 import org.junit.Test
 
 class SamplePathConvertorTest {
-    private lateinit var pathUtil: SamplePathConvertor
+    private lateinit var pathUtil: SamplePathConverter
 
     @Before
     fun setUp() {
-        pathUtil = SamplePathConvertor()
+        pathUtil = SamplePathConverter()
     }
 
     @Test
