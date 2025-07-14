@@ -83,7 +83,13 @@ class EventPayloadTest {
             createdAt = CREATED_AT,
             score = CallbackComparisonScore(GUID1, 1, AppMatchConfidence.NONE),
         ),
-        ConfirmationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, GUID1, GUID2),
+        ConfirmationCalloutEvent(
+            createdAt = CREATED_AT,
+            projectId = DEFAULT_PROJECT_ID,
+            selectedGuid = GUID1,
+            sessionId = GUID2,
+            metadata = DEFAULT_METADATA
+        ),
         EnrolmentCalloutEvent(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,

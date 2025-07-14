@@ -181,10 +181,11 @@ fun createVerificationCallbackEventV2() = VerificationCallbackEvent(
 )
 
 fun createConfirmationCalloutEvent() = ConfirmationCalloutEvent(
-    CREATED_AT,
-    DEFAULT_PROJECT_ID,
-    GUID1,
-    GUID2,
+    createdAt = CREATED_AT,
+    projectId = DEFAULT_PROJECT_ID,
+    selectedGuid = GUID1,
+    sessionId = GUID2,
+    metadata = DEFAULT_METADATA,
 )
 
 fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(

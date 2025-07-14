@@ -55,6 +55,7 @@ internal data class ApiCalloutPayload(
         ApiConfirmationCallout(
             domainPayload.selectedGuid,
             domainPayload.sessionId,
+            domainPayload.metadata,
         ),
     )
 
