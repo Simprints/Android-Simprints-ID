@@ -47,7 +47,9 @@ internal class SignedUrlSampleUploaderTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk()
+        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk {
+            every { id } returns "scopeId"
+        }
         coJustRun { eventRepository.closeEventScope(any<EventScope>(), any<EventScopeEndCause>()) }
 
         signedUrlSampleUploader = SignedUrlSampleUploader(
@@ -64,7 +66,6 @@ internal class SignedUrlSampleUploaderTest {
     @Test
     fun `Successfully uploads a single sample to signed url`() = runTest {
         mockBatchSize(1)
-        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk()
         coEvery { localDataSource.listImages(any()) } returns listOf(mockImageRef(SAMPLE_ID))
         coEvery { prepareImageUploadDataUseCase(any()) } returns mockSampleUploadData(SAMPLE_ID)
         coEvery { fetchUploadUrlsPerSampleUseCase(any(), any()) } returns mapOf(SAMPLE_ID to SIGNED_URL)
@@ -90,7 +91,6 @@ internal class SignedUrlSampleUploaderTest {
     @Test
     fun `Successfully uploads a multiple samples in batches`() = runTest {
         mockBatchSize(2)
-        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk()
         coEvery { localDataSource.listImages(any()) } returns List(5) { mockImageRef(SAMPLE_ID) }
         coEvery { prepareImageUploadDataUseCase(any()) } answers {
             val sampleId = (it.invocation.args[0] as SecuredImageRef).relativePath.toString()
@@ -124,7 +124,6 @@ internal class SignedUrlSampleUploaderTest {
     @Test
     fun `Gracefully skips failed upload data collection`() = runTest {
         mockBatchSize(3)
-        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk()
         coEvery { localDataSource.listImages(any()) } returns List(3) { mockImageRef("${SAMPLE_ID}_$it") }
         coEvery { prepareImageUploadDataUseCase(any()) } answers {
             val sampleId = (it.invocation.args[0] as SecuredImageRef).relativePath.toString()
@@ -152,7 +151,6 @@ internal class SignedUrlSampleUploaderTest {
     @Test
     fun `Gracefully skips throwing upload data collection`() = runTest {
         mockBatchSize(3)
-        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk()
         coEvery { localDataSource.listImages(any()) } returns List(3) { mockImageRef("${SAMPLE_ID}_$it") }
         coEvery { prepareImageUploadDataUseCase(any()) } answers {
             val sampleId = (it.invocation.args[0] as SecuredImageRef).relativePath.toString()
@@ -180,7 +178,6 @@ internal class SignedUrlSampleUploaderTest {
     @Test
     fun `Gracefully skips missing url`() = runTest {
         mockBatchSize(3)
-        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk()
         coEvery { localDataSource.listImages(any()) } returns List(3) { mockImageRef("${SAMPLE_ID}_$it") }
         coEvery { prepareImageUploadDataUseCase(any()) } answers {
             val sampleId = (it.invocation.args[0] as SecuredImageRef).relativePath.toString()
@@ -210,7 +207,6 @@ internal class SignedUrlSampleUploaderTest {
     @Test
     fun `Do not delete local data if upload fails`() = runTest {
         mockBatchSize(1)
-        coEvery { eventRepository.createEventScope(any(), any()) } returns mockk()
         coEvery { localDataSource.listImages(any()) } returns listOf(mockImageRef(SAMPLE_ID))
         coEvery { prepareImageUploadDataUseCase(any()) } returns mockSampleUploadData(SAMPLE_ID)
         coEvery { fetchUploadUrlsPerSampleUseCase(any(), any()) } returns mapOf(SAMPLE_ID to SIGNED_URL)

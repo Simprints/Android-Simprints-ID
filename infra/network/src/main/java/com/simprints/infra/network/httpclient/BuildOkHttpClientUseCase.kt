@@ -91,7 +91,10 @@ internal class BuildOkHttpClientUseCase @Inject constructor(
         }.addNetworkInterceptor(
             ChuckerInterceptor
                 .Builder(ctx)
-                // Skip sample storage domain to avoid interfering with encrypted file streaming
+                // Chucker's logging of binary request bodies (e.g., sample uploads) consumes the entire
+                // request input stream. For encrypted sample files, this stream cannot be reset,
+                // leading to an exhausted or closed stream by the time OkHttp processes it.
+                // To prevent interference with sample uploads, we skip the file storage domain entirely.
                 .skipDomains("storage.googleapis.com")
                 .build(),
         ).addInterceptor(buildDeviceIdInterceptor(deviceId))

@@ -9,7 +9,7 @@ import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.remote.signedurl.SampleUploadData
 import com.simprints.infra.images.remote.signedurl.api.SampleUploadApiInterface
 import com.simprints.infra.images.remote.signedurl.api.SampleUploadRequestBody
-import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SAMPLE_UPLOAD
 import com.simprints.infra.logging.Simber
 import java.util.UUID
 import javax.inject.Inject
@@ -68,11 +68,11 @@ internal class UploadSampleWithTrackingUseCase @Inject constructor(
                     null
                 } else {
                     response.errorBody()?.string().also {
-                        Simber.i("Failed to upload image: $it", tag = LoggingConstants.CrashReportTag.SYNC)
+                        Simber.i("Failed to upload image: $it", tag = SAMPLE_UPLOAD)
                     }
                 }
             } catch (e: Exception) {
-                Simber.e("Failed to upload image", e, tag = LoggingConstants.CrashReportTag.SYNC)
+                Simber.e("Failed to upload image", e, tag = SAMPLE_UPLOAD)
                 e.javaClass.simpleName
             }
         }

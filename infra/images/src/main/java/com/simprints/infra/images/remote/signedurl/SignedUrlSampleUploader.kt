@@ -10,7 +10,7 @@ import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.images.remote.signedurl.usecase.FetchUploadUrlsPerSampleUseCase
 import com.simprints.infra.images.remote.signedurl.usecase.PrepareImageUploadDataUseCase
 import com.simprints.infra.images.remote.signedurl.usecase.UploadSampleWithTrackingUseCase
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SAMPLE_UPLOAD
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.isActive
 import javax.inject.Inject
@@ -30,6 +30,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
         val batchSize = getBatchSize()
         val urlRequestScope = eventRepository.createEventScope(type = EventScopeType.SAMPLE_UP_SYNC)
 
+        Simber.i("Starting image upload in batches of $batchSize (Scope ID: ${urlRequestScope.id}")
         val sampleReferenceBatches = localDataSource
             .listImages(projectId)
             // Preparing the file for upload requires reading each of them to calculate md5 and size,
@@ -50,12 +51,15 @@ internal class SignedUrlSampleUploader @Inject constructor(
                     prepareImageUploadData(imageRef).also {
                         if (it == null) {
                             allImagesUploaded = false
-                            Simber.i("Failed to read image file without exception", tag = SYNC)
+                            Simber.i(
+                                "Failed to read image file without exception",
+                                tag = SAMPLE_UPLOAD,
+                            )
                         }
                     }
                 } catch (t: Throwable) {
                     allImagesUploaded = false
-                    Simber.e("Failed to read image file", t, tag = SYNC)
+                    Simber.e("Failed to read image file", t, tag = SAMPLE_UPLOAD)
                     null
                 }
             }
@@ -63,17 +67,20 @@ internal class SignedUrlSampleUploader @Inject constructor(
             // Fetch upload urls for each image
             val sampleIdToUrlMap = fetchUploadUrlsPerSample(projectId, batchUploadData)
 
+            Simber.i("${sampleIdToUrlMap.size} signed URLs fetched")
+
             for (sample in batchUploadData) {
                 if (!coroutineContext.isActive) {
                     // Do not upload next image if coroutine is being cancelled
                     allImagesUploaded = false
                     break
                 }
+                Simber.i("Uploading ${sample.sampleId}")
 
                 val url = sampleIdToUrlMap[sample.sampleId]
                 if (url == null) {
                     allImagesUploaded = false
-                    Simber.i("Failed to fetch sample url", tag = SYNC)
+                    Simber.i("Failed to fetch sample url", tag = SAMPLE_UPLOAD)
                     continue
                 }
 
@@ -82,6 +89,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
                 if (success) {
                     localDataSource.deleteImage(sample.imageRef)
                     metadataStore.deleteMetadata(sample.imageRef.relativePath)
+                    Simber.i("Uploaded ${sample.sampleId} successfully")
                 } else {
                     allImagesUploaded = false
                 }

@@ -1,6 +1,8 @@
 package com.simprints.infra.images.usecase
 
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
+import com.simprints.infra.logging.Simber
 import java.io.IOException
 import java.io.InputStream
 import java.security.DigestInputStream
@@ -38,7 +40,7 @@ internal class CalculateFileMd5AndSizeUseCase @Inject constructor(
             size = size,
         )
     } catch (e: IOException) {
-        e.printStackTrace()
+        Simber.e("Failed to calculate md5 for a sample file", e, tag = SYNC)
         CalculationResult("", 0)
     }
 

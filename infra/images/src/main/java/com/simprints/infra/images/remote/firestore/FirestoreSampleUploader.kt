@@ -9,6 +9,7 @@ import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SAMPLE_UPLOAD
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.tasks.await
@@ -23,40 +24,39 @@ internal class FirestoreSampleUploader @Inject constructor(
 ) : SampleUploader {
     override suspend fun uploadAllSamples(projectId: String): Boolean {
         val firebaseApp = authStore.getLegacyAppFallback()
-        val firebaseProjectName = firebaseApp.options.projectId
-
-        if (!firebaseProjectName.isNullOrBlank()) {
-            var allImagesUploaded = true
-
-            val bucketUrl = configManager.getProject(projectId).imageBucket
-            val rootRef = FirebaseStorage
-                .getInstance(firebaseApp, bucketUrl)
-                .reference
-
-            localDataSource.listImages(projectId).forEach { imageRef ->
-                try {
-                    localDataSource.decryptImage(imageRef)?.let { stream ->
-                        val metadata = metadataStore.getMetadata(imageRef.relativePath)
-                        val uploadSuccessful = uploadSample(rootRef, stream, imageRef, metadata)
-                        if (uploadSuccessful) {
-                            localDataSource.deleteImage(imageRef)
-                            metadataStore.deleteMetadata(imageRef.relativePath)
-                        } else {
-                            allImagesUploaded = false
-                            Simber.i("Failed to upload image without exception", tag = SYNC)
-                        }
-                    }
-                } catch (t: Throwable) {
-                    allImagesUploaded = false
-                    Simber.e("Failed to upload images", t, tag = SYNC)
-                }
-            }
-
-            return allImagesUploaded
-        } else {
-            Simber.i("Firebase projectId is null")
+        if (firebaseApp.options.projectId.isNullOrBlank()) {
+            Simber.i("Firebase projectId is null", tag = SAMPLE_UPLOAD)
             return false
         }
+        var allImagesUploaded = true
+
+        Simber.i("Starting sample upload to Firestore")
+        val bucketUrl = configManager.getProject(projectId).imageBucket
+        val rootRef = FirebaseStorage
+            .getInstance(firebaseApp, bucketUrl)
+            .reference
+
+        localDataSource.listImages(projectId).forEach { imageRef ->
+            Simber.i("Reading sample file: ${imageRef.relativePath.parts.last()}", tag = SAMPLE_UPLOAD)
+            try {
+                localDataSource.decryptImage(imageRef)?.let { stream ->
+                    val metadata = metadataStore.getMetadata(imageRef.relativePath)
+                    val uploadSuccessful = uploadSample(rootRef, stream, imageRef, metadata)
+                    if (uploadSuccessful) {
+                        localDataSource.deleteImage(imageRef)
+                        metadataStore.deleteMetadata(imageRef.relativePath)
+                    } else {
+                        allImagesUploaded = false
+                        Simber.i("Failed to upload image without exception", tag = SAMPLE_UPLOAD)
+                    }
+                }
+            } catch (t: Throwable) {
+                allImagesUploaded = false
+                Simber.e("Failed to upload images", t, tag = SYNC)
+            }
+        }
+
+        return allImagesUploaded
     }
 
     private suspend fun uploadSample(
@@ -68,7 +68,7 @@ internal class FirestoreSampleUploader @Inject constructor(
         val fileRef = imageRef.relativePath.parts
             .fold(rootRef) { ref, pathPart -> ref.child(pathPart) }
 
-        Simber.d("Uploading ${fileRef.path}")
+        Simber.i("Uploading ${fileRef.path.last()}", tag = SAMPLE_UPLOAD)
 
         val uploadTask = if (metadata.isEmpty()) {
             fileRef.putStream(imageStream).await()
