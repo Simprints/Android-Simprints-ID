@@ -1,6 +1,7 @@
 package com.simprints.infra.logging
 
 import android.content.Context
+import android.os.Build
 import co.touchlab.kermit.LogcatWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
@@ -12,21 +13,29 @@ import com.simprints.infra.logging.writers.FileLogWriter
 
 object SimberBuilder {
     /**
-     * Simber needs to be initialized with the application context. It can be initialized multiple
-     * times without issue. Re-initializing Simber uproots and replants all trees.
-     * @param context Application Context
+     * Initializes the Simber logging framework with appropriate writers and severity based on build type.
+     *
+     * - Debug builds use `LogcatWriter` with `Severity.Debug`.
+     * - Release builds use `AnalyticsPropertyLogWriter` and `CrashlyticsLogWriter` with `Severity.Info`.
+     *   - `FileLogWriter` is added for Android versions starting from API26.
      */
     fun initialize(context: Context) {
-        if (BuildConfig.DEBUG) {
-            Logger.setLogWriters(LogcatWriter())
-            Logger.setMinSeverity(Severity.Debug)
-        } else {
-            Logger.setLogWriters(
+        when {
+            BuildConfig.DEBUG -> Logger.setLogWriters(LogcatWriter())
+
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> Logger.setLogWriters(
+                AnalyticsPropertyLogWriter(FirebaseAnalytics.getInstance(context)),
+                CrashlyticsLogWriter(FirebaseCrashlytics.getInstance()),
+                // Skip file logger to avoid crashes on Android 6-7 - https://simprints.atlassian.net/browse/MS-1060
+            )
+
+            else -> Logger.setLogWriters(
                 AnalyticsPropertyLogWriter(FirebaseAnalytics.getInstance(context)),
                 CrashlyticsLogWriter(FirebaseCrashlytics.getInstance()),
                 FileLogWriter(context),
             )
-            Logger.setMinSeverity(Severity.Info)
         }
+
+        Logger.setMinSeverity(if (BuildConfig.DEBUG) Severity.Debug else Severity.Info)
     }
 }
