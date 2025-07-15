@@ -11,6 +11,7 @@ import com.simprints.infra.logging.writers.AnalyticsPropertyLogWriter
 import com.simprints.infra.logging.writers.CrashlyticsLogWriter
 import com.simprints.infra.logging.writers.FileLogWriter
 
+@ExcludedFromGeneratedTestCoverageReports("it is impossible to mockk the build types")
 object SimberBuilder {
     /**
      * Initializes the Simber logging framework with appropriate writers and severity based on build type.
