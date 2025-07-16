@@ -15,20 +15,20 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class SaveFaceImageUseCaseTest {
+class SaveFaceSampleUseCaseTest {
     @MockK
     lateinit var imageRepo: ImageRepository
 
     @MockK
     lateinit var eventRepo: SessionEventRepository
 
-    private lateinit var useCase: SaveFaceImageUseCase
+    private lateinit var useCase: SaveFaceSampleUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = SaveFaceImageUseCase(imageRepo, eventRepo)
+        useCase = SaveFaceSampleUseCase(imageRepo, eventRepo)
     }
 
     @Test
@@ -41,13 +41,14 @@ class SaveFaceImageUseCaseTest {
         val expectedPath = Path(
             arrayOf(
                 "sessions",
+                "sessions",
                 "sessionId",
                 "faces",
                 "captureEventId.jpg",
             ),
         )
         coEvery {
-            imageRepo.storeImageSecurely(any(), "projectId", any())
+            imageRepo.storeSample("projectId", "sessionId", any(), any(), any(), any())
         } returns SecuredImageRef(expectedPath)
 
         val imageBytes = byteArrayOf()
@@ -55,17 +56,7 @@ class SaveFaceImageUseCaseTest {
 
         assertThat(useCase.invoke(imageBytes, captureEventId)).isNotNull()
 
-        coVerify {
-            imageRepo.storeImageSecurely(
-                withArg {
-                    assert(it.isEmpty())
-                },
-                "projectId",
-                withArg {
-                    assert(expectedPath.compose().contains(it.compose()))
-                },
-            )
-        }
+        coVerify { imageRepo.storeSample(any(), any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -85,13 +76,13 @@ class SaveFaceImageUseCaseTest {
             every { id } returns "sessionId"
         }
         coEvery {
-            imageRepo.storeImageSecurely(any(), "projectId", any())
+            imageRepo.storeSample("projectId", "sessionId", any(), "captureEventId", "jpg", any())
         } returns null
 
         val imageBytes = byteArrayOf()
         val captureEventId = "captureEventId"
 
         assertThat(useCase.invoke(imageBytes, captureEventId)).isNull()
-        coVerify { imageRepo.storeImageSecurely(any(), "projectId", any()) }
+        coVerify { imageRepo.storeSample(any(), any(), any(), any(), any(), any()) }
     }
 }

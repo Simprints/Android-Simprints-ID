@@ -1,24 +1,21 @@
 package com.simprints.infra.images
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.images.remote.ImageRemoteDataSource
-import com.simprints.infra.images.remote.UploadResult
+import com.simprints.infra.images.remote.SampleUploader
+import com.simprints.infra.images.usecase.GetUploaderUseCase
+import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.FileInputStream
 
 internal class ImageRepositoryImplTest {
     @get:Rule
@@ -28,87 +25,104 @@ internal class ImageRepositoryImplTest {
     lateinit var localDataSource: ImageLocalDataSource
 
     @MockK
-    lateinit var remoteDataSource: ImageRemoteDataSource
+    lateinit var sampleUploader: SampleUploader
 
     @MockK
     lateinit var metadataStore: ImageMetadataStore
+
+    @MockK
+    lateinit var samplePathConverter: SamplePathConverter
+
+    @MockK
+    lateinit var getUploaderUseCase: GetUploaderUseCase
 
     private lateinit var repository: ImageRepository
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this)
-        repository = ImageRepositoryImpl(localDataSource, remoteDataSource, metadataStore)
-        initValidImageMocks()
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { samplePathConverter.create(any(), any(), any(), any()) } returns Path(VALID_PATH)
+        coEvery { sampleUploader.uploadAllSamples(any()) } returns true
+        coEvery { getUploaderUseCase.invoke() } returns sampleUploader
+
+        repository = ImageRepositoryImpl(
+            localDataSource = localDataSource,
+            metadataStore = metadataStore,
+            samplePathConverter = samplePathConverter,
+            getSampleUploader = getUploaderUseCase,
+        )
     }
 
     @Test
-    fun withEmptyList_shouldConsiderUploadOperationSuccessful() = runTest {
-        coEvery { localDataSource.listImages(PROJECT_ID) } returns emptyList()
-
-        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
-
-        assertThat(successful).isTrue()
-    }
-
-    @Test
-    fun withAllFilesValid_shouldUploadAndDeleteSuccessfully() = runTest {
-        configureLocalImageFiles(includeInvalidFile = false)
-
-        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
-
-        assertThat(successful).isTrue()
-    }
-
-    @Test
-    fun withException_shouldReturnNotSuccessful() = runTest {
-        coEvery {
-            localDataSource.decryptImage(mockThrowingImage())
-        } throws Exception("Cannot decrypt")
-
-        coEvery { localDataSource.listImages(any()) } returns listOf(
-            mockValidImage(),
-            mockThrowingImage(),
+    fun `save sample to local storage`() = runTest {
+        coEvery { localDataSource.encryptAndStoreImage(any(), any(), any()) } returns mockValidImage()
+        val imageRef = repository.storeSample(
+            projectId = PROJECT_ID,
+            sessionId = "sessionId",
+            modality = GeneralConfiguration.Modality.FACE,
+            sampleId = "sampleId",
+            fileExtension = "jpg",
+            sampleBytes = ByteArray(10),
         )
 
-        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
-        assertThat(successful).isFalse()
+        assertThat(imageRef).isNotNull()
+        coVerify {
+            metadataStore.storeMetadata(any(), any())
+            localDataSource.encryptAndStoreImage(any(), any(), any())
+        }
     }
 
     @Test
-    fun withDecryptedAndNotUploadedImage_shouldReturnNotSuccessful() = runTest {
-        initValidImageFailedUploadMocks()
-        configureLocalImageFiles(includeInvalidFile = true)
+    fun `save sample with metadata to local storage`() = runTest {
+        coEvery { localDataSource.encryptAndStoreImage(any(), any(), any()) } returns mockValidImage()
+        val imageRef = repository.storeSample(
+            projectId = PROJECT_ID,
+            sessionId = "sessionId",
+            modality = GeneralConfiguration.Modality.FACE,
+            sampleId = "sampleId",
+            fileExtension = "jpg",
+            sampleBytes = ByteArray(10),
+            optionalMetadata = mapOf("k" to "v"),
+        )
 
-        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
-
-        assertThat(successful).isFalse()
+        assertThat(imageRef).isNotNull()
+        coVerify {
+            metadataStore.storeMetadata(any(), any())
+            localDataSource.encryptAndStoreImage(any(), any(), any())
+        }
     }
 
     @Test
-    fun shouldDeleteAnImageAfterTheUpload() = runTest {
-        configureLocalImageFiles(includeInvalidFile = false)
+    fun `returns null if was not able to save image`() = runTest {
+        coEvery { localDataSource.encryptAndStoreImage(any(), any(), any()) } returns null
+        val imageRef = repository.storeSample(
+            projectId = PROJECT_ID,
+            sessionId = "sessionId",
+            modality = GeneralConfiguration.Modality.FACE,
+            sampleId = "sampleId",
+            fileExtension = "jpg",
+            sampleBytes = ByteArray(10),
+            optionalMetadata = mapOf("k" to "v"),
+        )
 
+        assertThat(imageRef).isNull()
+        coVerify(exactly = 0) {
+            metadataStore.storeMetadata(any(), any())
+        }
+    }
+
+    @Test
+    fun `delegates sample upload to uploader`() = runTest {
         val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
-        coVerify(exactly = 3) { localDataSource.decryptImage(any()) }
-        coVerify(exactly = 3) { localDataSource.deleteImage(any()) }
-        coVerify(exactly = 3) { metadataStore.deleteMetadata(any()) }
         assertThat(successful).isTrue()
+        coVerify { sampleUploader.uploadAllSamples(any()) }
     }
 
     @Test
-    fun shouldDecryptImageBeforeUploading() = runTest {
-        configureLocalImageFiles(numberOfValidFiles = 5, includeInvalidFile = false)
-
-        repository.uploadStoredImagesAndDelete(PROJECT_ID)
-
-        coVerify(exactly = 5) { localDataSource.decryptImage(any()) }
-    }
-
-    @Test
-    fun shouldDeleteStoredImages() = runTest {
-        configureLocalImageFiles(numberOfValidFiles = 5, includeInvalidFile = false)
+    fun `deletes stored images and metadata`() = runTest {
+        configureLocalImageFiles(numberOfValidFiles = 5)
 
         repository.deleteStoredImages()
 
@@ -117,67 +131,18 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun shouldGetImagesCount() = runTest {
-        val nImagesInLocal = 5
-        configureLocalImageFiles(numberOfValidFiles = nImagesInLocal, includeInvalidFile = false)
+    fun `returns number of images to upload`() = runTest {
+        configureLocalImageFiles(numberOfValidFiles = 5)
 
         val imageCount = repository.getNumberOfImagesToUpload(PROJECT_ID)
 
-        assertThat(imageCount).isEqualTo(nImagesInLocal)
+        assertThat(imageCount).isEqualTo(5)
     }
 
-    private fun initValidImageMocks() {
-        val validImage = mockValidImage()
-        val mockStream = mockk<FileInputStream>()
-
-        coEvery {
-            localDataSource.deleteImage(validImage)
-        } returns true
-
-        coEvery {
-            localDataSource.decryptImage(validImage)
-        } returns mockStream
-
-        coJustRun { metadataStore.storeMetadata(any(), any()) }
-        coEvery { metadataStore.getMetadata(any()) } returns emptyMap()
-        coJustRun { metadataStore.deleteMetadata(any()) }
-        coJustRun { metadataStore.deleteAllMetadata() }
-
-        coEvery {
-            remoteDataSource.uploadImage(mockStream, validImage, emptyMap())
-        } returns UploadResult(
-            validImage,
-            UploadResult.Status.SUCCESSFUL,
-        )
-    }
-
-    private fun initValidImageFailedUploadMocks() {
-        val invalidImage = mockInvalidImage()
-        val mockStream = mockk<FileInputStream>()
-
-        coEvery {
-            localDataSource.decryptImage(invalidImage)
-        } returns mockStream
-
-        coEvery {
-            remoteDataSource.uploadImage(mockStream, invalidImage, emptyMap())
-        } returns UploadResult(
-            invalidImage,
-            UploadResult.Status.FAILED,
-        )
-    }
-
-    private fun configureLocalImageFiles(
-        numberOfValidFiles: Int = 3,
-        includeInvalidFile: Boolean,
-    ) {
+    private fun configureLocalImageFiles(numberOfValidFiles: Int) {
         val files = mutableListOf<SecuredImageRef>().apply {
             repeat(numberOfValidFiles) {
                 add(mockValidImage())
-            }
-
-            if (includeInvalidFile) {
-                add(mockInvalidImage())
             }
         }
 
@@ -187,14 +152,8 @@ internal class ImageRepositoryImplTest {
 
     private fun mockValidImage() = SecuredImageRef(Path(VALID_PATH))
 
-    private fun mockInvalidImage() = SecuredImageRef(Path(INVALID_PATH))
-
-    private fun mockThrowingImage() = SecuredImageRef(Path(THROWING_PATH))
-
     companion object {
         private const val VALID_PATH = "valid.txt"
-        private const val INVALID_PATH = "invalid"
-        private const val THROWING_PATH = "throw.exe"
         private const val PROJECT_ID = "projectId"
     }
 }

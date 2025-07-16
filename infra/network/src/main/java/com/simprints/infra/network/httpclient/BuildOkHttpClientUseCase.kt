@@ -88,8 +88,16 @@ internal class BuildOkHttpClientUseCase @Inject constructor(
             if (!currentAuthToken.isNullOrBlank()) {
                 addInterceptor(buildAuthenticationInterceptor(currentAuthToken!!))
             }
-        }.addNetworkInterceptor(ChuckerInterceptor.Builder(ctx).build())
-        .addInterceptor(buildDeviceIdInterceptor(deviceId))
+        }.addNetworkInterceptor(
+            ChuckerInterceptor
+                .Builder(ctx)
+                // Chucker's logging of binary request bodies (e.g., sample uploads) consumes the entire
+                // request input stream. For encrypted sample files, this stream cannot be reset,
+                // leading to an exhausted or closed stream by the time OkHttp processes it.
+                // To prevent interference with sample uploads, we skip the file storage domain entirely.
+                .skipDomains("storage.googleapis.com")
+                .build(),
+        ).addInterceptor(buildDeviceIdInterceptor(deviceId))
         .addInterceptor(buildVersionInterceptor(versionName))
         .addInterceptor(buildGZipInterceptor())
         .apply {
