@@ -95,6 +95,7 @@
         android:elevation="8dp"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_flash"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/capture_feedback_btn"
         app:layout_constraintEnd_toEndOf="parent" />
 

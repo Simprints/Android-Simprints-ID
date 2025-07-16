@@ -50,6 +50,12 @@ data class ExperimentalProjectConfiguration(
             ?.let { it as? Boolean }
             .let { it == true }
 
+    val displayCameraFlashToggle: Boolean
+        get() = customConfig
+            ?.get(CAMERA_FLASH_CONTROLS_ENABLED)
+            ?.let { it as? Boolean }
+            .let { it == true }
+
     companion object {
         internal const val ENABLE_ID_POOL_VALIDATION = "validateIdentificationPool"
         internal const val SINGLE_GOOD_QUALITY_FALLBACK_REQUIRED = "singleQualityFallbackRequired"
@@ -64,5 +70,7 @@ data class ExperimentalProjectConfiguration(
         internal const val FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_MAX = 60_000L
 
         internal const val SAMPLE_UPLOAD_WITH_URL_ENABLED = "sampleUploadWithSignedUrl"
+
+        internal const val CAMERA_FLASH_CONTROLS_ENABLED = "displayCameraFlashToggle"
     }
 }

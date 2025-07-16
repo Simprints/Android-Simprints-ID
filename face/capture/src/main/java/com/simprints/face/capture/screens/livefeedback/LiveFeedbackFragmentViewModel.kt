@@ -51,6 +51,9 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
+
+    val displayCameraFlashControls = MutableLiveData(false)
+
     private lateinit var faceDetector: FaceDetector
 
     /**
@@ -97,6 +100,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             val config = configManager.getProjectConfiguration()
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
+            displayCameraFlashControls.postValue(config.experimental().displayCameraFlashToggle)
         }
     }
 
