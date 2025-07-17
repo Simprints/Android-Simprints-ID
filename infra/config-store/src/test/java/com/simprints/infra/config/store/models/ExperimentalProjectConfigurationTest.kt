@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.*
+import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.CAMERA_FLASH_CONTROLS_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.ENABLE_ID_POOL_VALIDATION
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_ENABLED
 import com.simprints.infra.config.store.models.ExperimentalProjectConfiguration.Companion.FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS
@@ -125,6 +126,22 @@ internal class ExperimentalProjectConfigurationTest {
             mapOf(SAMPLE_UPLOAD_WITH_URL_ENABLED to true) to true,
         ).forEach { (config, result) ->
             assertThat(ExperimentalProjectConfiguration(config).sampleUploadWithSignedUrlEnabled).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `check display camera flash flag correctly`() {
+        mapOf(
+            // Value not present
+            emptyMap<String, Any>() to false,
+            // Value not boolean
+            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to 1) to false,
+            // Value present and FALSE
+            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to false) to false,
+            // Value present and TRUE
+            mapOf(CAMERA_FLASH_CONTROLS_ENABLED to true) to true,
+        ).forEach { (config, result) ->
+            assertThat(ExperimentalProjectConfiguration(config).displayCameraFlashToggle).isEqualTo(result)
         }
     }
 }

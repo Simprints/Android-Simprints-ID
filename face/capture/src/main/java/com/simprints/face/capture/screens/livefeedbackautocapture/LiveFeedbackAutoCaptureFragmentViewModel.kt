@@ -53,6 +53,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
     var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
+
+    val displayCameraFlashControls = MutableLiveData(false)
+
     private var isAutoCaptureHeldOff = true
     private var autoCaptureImagingTimeoutJob: Job? = null
     private var autoCaptureImagingDurationMillis: Long = FACE_AUTO_CAPTURE_IMAGING_DURATION_MILLIS_DEFAULT
@@ -124,6 +127,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModel @Inject constructor(
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis
+            displayCameraFlashControls.postValue(config.experimental().displayCameraFlashToggle)
         }
     }
 

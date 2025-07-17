@@ -9,6 +9,7 @@ import android.provider.Settings
 import android.util.Size
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
@@ -24,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.domain.permission.PermissionStatus
+import com.simprints.core.tools.extentions.hasCameraFlash
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.face.capture.R
@@ -60,6 +62,8 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
 
     private lateinit var screenSize: Size
     private lateinit var targetResolution: Size
+
+    private var cameraControl: CameraControl? = null
 
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -103,6 +107,19 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
                 directions = LiveFeedbackAutoCaptureFragmentDirections.actionFaceLiveFeedbackFragmentToFacePreparationFragment(),
             )
         }
+
+        with(binding.captureFlashButton) {
+            isSelected = false
+            setOnClickListener {
+                val torchEnabled = !binding.captureFlashButton.isSelected
+                toggleTorche(torchEnabled)
+            }
+        }
+    }
+
+    private fun toggleTorche(enabled: Boolean) {
+        cameraControl?.enableTorch(enabled)
+        binding.captureFlashButton.isSelected = enabled
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
@@ -135,12 +152,13 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
         val cameraProvider = ProcessCameraProvider.awaitInstance(requireContext())
         cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
+        val camera = cameraProvider.bindToLifecycle(
             this@LiveFeedbackAutoCaptureFragment,
             DEFAULT_BACK_CAMERA,
             preview,
             imageAnalyzer,
         )
+        cameraControl = camera.cameraControl
         // Attach the view's surface provider to preview use case
         preview.surfaceProvider = binding.faceCaptureCamera.surfaceProvider
     }
@@ -165,6 +183,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
     }
 
     override fun onStop() {
+        toggleTorche(false)
         // Shut down our background executor
         if (::cameraExecutor.isInitialized) {
             cameraExecutor.shutdown()
@@ -173,6 +192,10 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
     }
 
     private fun bindViewModel() {
+        vm.displayCameraFlashControls.observe(viewLifecycleOwner) {
+            binding.captureFlashButton.isVisible = it && requireContext().hasCameraFlash
+        }
+
         vm.currentDetection.observe(viewLifecycleOwner) {
             renderCurrentDetection(it)
         }

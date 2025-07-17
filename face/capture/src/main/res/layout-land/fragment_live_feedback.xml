@@ -15,16 +15,16 @@
         android:layout_height="36dp"
         android:layout_margin="@dimen/margin_large"
         android:background="@drawable/feedback_instructions_outline"
+        android:gravity="center"
+        android:includeFontPadding="false"
         android:paddingHorizontal="@dimen/padding_default"
         android:paddingVertical="0dp"
-        android:includeFontPadding="false"
-        android:gravity="center"
         android:text="@string/face_capture_instructions_title"
         android:textColor="@color/feedback_instructions_text"
         app:backgroundTint="@null"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.camera.view.PreviewView
         android:id="@+id/face_capture_camera"
@@ -47,49 +47,57 @@
         app:dcp_max="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintHeight_percent="@dimen/capture_target_size_percent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="@dimen/capture_target_size_percent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="@dimen/margin_default"
-        android:layout_marginHorizontal="@dimen/margin_default"
-        android:gravity="center|bottom"
-        android:orientation="vertical"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/capture_feedback_btn"
+        style="@style/Text.Headline6.Bold"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/margin_default"
+        android:background="@drawable/feedback_chip_white"
+        android:checkable="true"
+        android:gravity="center"
+        android:padding="@dimen/padding_default"
+        android:text="@string/face_capture_title_previewing"
+        android:textAlignment="center"
+        android:textColor="@color/feedback_chip_text"
+        app:backgroundTint="@null"
+        app:iconGravity="textStart"
+        app:iconTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/capture_progress">
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:id="@+id/capture_feedback_txt_explanation"
-            style="@style/Text.Headline5.White"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_default"
-            android:gravity="center"
-            tools:text="Move closer" />
+    <TextView
+        android:id="@+id/capture_feedback_txt_explanation"
+        style="@style/Text.Headline5.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_default"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/capture_feedback_btn"
+        app:layout_constraintEnd_toEndOf="@id/capture_feedback_btn"
+        app:layout_constraintStart_toStartOf="@id/capture_feedback_btn"
+        tools:text="Move closer" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/capture_feedback_btn"
-            style="@style/Text.Headline6.Bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_default"
-            android:background="@drawable/feedback_chip_white"
-            android:checkable="true"
-            android:gravity="center"
-            android:padding="@dimen/padding_default"
-            android:text="@string/face_capture_title_previewing"
-            android:textAlignment="center"
-            android:textColor="@color/feedback_chip_text"
-            app:backgroundTint="@null"
-            app:iconGravity="textStart"
-            app:iconTint="@null" />
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/capture_flash_button"
+        style="@style/Widget.Simprints.Button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="8dp"
+        android:elevation="8dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_flash"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/capture_feedback_btn"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/capture_feedback_permission_button"

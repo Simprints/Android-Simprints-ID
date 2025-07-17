@@ -28,3 +28,7 @@ val Context.applicationSettingsIntent: Intent
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
         Uri.parse("package:$packageName"),
     )
+
+@ExcludedFromGeneratedTestCoverageReports("UI code")
+val Context.hasCameraFlash: Boolean
+    get() = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)
