@@ -23,7 +23,7 @@ data class ConfirmationCalloutEvent(
         projectId: String,
         selectedGuid: String,
         sessionId: String,
-        metadata: String,
+        metadata: String?,
     ) : this(
         UUID.randomUUID().toString(),
         ConfirmationCalloutPayload(
@@ -48,7 +48,7 @@ data class ConfirmationCalloutEvent(
         val projectId: String,
         val selectedGuid: String,
         val sessionId: String,
-        val metadata: String,
+        val metadata: String?,
         override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_CONFIRMATION,
     ) : EventPayload() {
