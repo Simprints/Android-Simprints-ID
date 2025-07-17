@@ -58,6 +58,7 @@ jobs:
                     rsync -arv test-reports/dashboard/* .  || true
                     rsync -arv test-reports/face/* .  || true
                     rsync -arv test-reports/fingerprint/* .  || true
+                    rsync -arv test-reports/testing-tools/* .  || true
 
             # list all reports for Id module
             -   name: list reports

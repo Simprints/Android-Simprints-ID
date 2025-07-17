@@ -150,3 +150,7 @@ include(
     ":infra:sync",
     ":infra:event-sync",
 )
+// Test modules
+include(
+    ":testing:data-generator",
+)

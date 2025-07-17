@@ -123,7 +123,14 @@ jobs:
                 fingerprint:infra:nec-bio-sdk
                 fingerprint:infra:image-distortion-config
             reportsId: fingerprint
-
+    testing-tools:
+        name: Testing Tools unit tests
+        uses: ./.github/workflows/reusable-run-unit-tests.yml
+        secrets: inherit
+        with:
+            modules: |
+                testing:data-generator
+            reportsId: testing-tools
     sonarqube:
         name: SonarQube
         secrets: inherit
@@ -134,5 +141,6 @@ jobs:
                  feature-unit-tests2,
                  feature-dashboard-unit-tests,
                  face-unit-tests,
-                 fingerprint-unit-tests ]
+                 fingerprint-unit-tests,
+                 testing-tools ]
         uses: ./.github/workflows/reusable-sonar-scan.yml
