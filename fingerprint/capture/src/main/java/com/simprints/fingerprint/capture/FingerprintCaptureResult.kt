@@ -2,20 +2,20 @@ package com.simprints.fingerprint.capture
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.step.StepResult
 import com.simprints.infra.images.model.SecuredImageRef
-import java.io.Serializable
 
 @Keep
 data class FingerprintCaptureResult(
     val referenceId: String,
     var results: List<Item>,
-) : Serializable {
+) : StepResult {
     @Keep
     data class Item(
         val captureEventId: String?,
         val identifier: IFingerIdentifier,
         val sample: Sample?,
-    ) : Serializable
+    ) : StepResult
 
     @Keep
     data class Sample(
@@ -24,5 +24,5 @@ data class FingerprintCaptureResult(
         val templateQualityScore: Int,
         val imageRef: SecuredImageRef?,
         val format: String,
-    ) : Serializable
+    ) : StepResult
 }

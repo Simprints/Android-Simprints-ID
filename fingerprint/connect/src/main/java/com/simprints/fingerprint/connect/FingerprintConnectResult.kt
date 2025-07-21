@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.connect
 
 import androidx.annotation.Keep
-import java.io.Serializable
+import com.simprints.core.domain.step.StepResult
 
 @Keep
 data class FingerprintConnectResult(
     val isSuccess: Boolean,
-) : Serializable
+) : StepResult

@@ -1,13 +1,13 @@
 package com.simprints.feature.exitform
 
 import androidx.annotation.Keep
-import java.io.Serializable
+import com.simprints.core.domain.step.StepResult
 
 @Keep
 data class ExitFormResult(
     val wasSubmitted: Boolean,
     val selectedOption: ExitFormOption? = null,
     val reason: String? = null,
-) : Serializable {
+) : StepResult {
     fun submittedOption() = selectedOption?.takeIf { wasSubmitted }
 }

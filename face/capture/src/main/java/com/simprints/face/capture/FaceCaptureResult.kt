@@ -1,20 +1,20 @@
 package com.simprints.face.capture
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.step.StepResult
 import com.simprints.infra.images.model.SecuredImageRef
-import java.io.Serializable
 
 @Keep
 data class FaceCaptureResult(
     val referenceId: String,
     val results: List<Item>,
-) : Serializable {
+) : StepResult {
     @Keep
     data class Item(
         val captureEventId: String?,
         val index: Int,
         val sample: Sample?,
-    ) : Serializable
+    ) : StepResult
 
     @Keep
     data class Sample(
@@ -22,5 +22,5 @@ data class FaceCaptureResult(
         val template: ByteArray,
         val imageRef: SecuredImageRef?,
         val format: String,
-    ) : Serializable
+    ) : StepResult
 }

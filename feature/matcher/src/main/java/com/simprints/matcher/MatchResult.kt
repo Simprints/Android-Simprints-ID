@@ -1,12 +1,12 @@
 package com.simprints.matcher
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.step.StepResult
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import java.io.Serializable
 
 @Keep
-interface MatchResult : Serializable {
+interface MatchResult : StepResult {
     val results: List<MatchResultItem>
 }
 
@@ -14,7 +14,7 @@ interface MatchResult : Serializable {
  * This is required to bridge different interfaces from moduleApi module.
  */
 @Keep
-interface MatchResultItem : Serializable {
+interface MatchResultItem : StepResult {
     val subjectId: String
     val confidence: Float
 }

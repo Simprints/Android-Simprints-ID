@@ -5,6 +5,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.step.StepResult
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentResult
@@ -22,7 +23,7 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "resultType")
 @JsonSubTypes(
     JsonSubTypes.Type(value = LoginResult::class, name = "LoginResult"),
     JsonSubTypes.Type(value = SetupResult::class, name = "SetupResult"),
@@ -55,7 +56,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ValidateSubjectPoolResult::class, name = "ValidateSubjectPoolResult"),
     JsonSubTypes.Type(value = SelectSubjectAgeGroupResult::class, name = "SelectSubjectAgeGroupResult"),
 )
-abstract class SerializableMixin : Serializable
+abstract class StepResultMixin : StepResult
 
 @Keep
 internal data class Step(
@@ -64,12 +65,12 @@ internal data class Step(
     @IdRes val destinationId: Int,
     var payload: Bundle,
     var status: StepStatus = StepStatus.NOT_STARTED,
-    var result: Serializable? = null,
+    var result: StepResult? = null,
 ) : Serializable {
     // Do not remove.
     // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
     @Suppress("unused")
-    val type: String
+    val resultType: String
         get() = this::class.java.simpleName
 }
 

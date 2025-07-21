@@ -1,9 +1,9 @@
 package com.simprints.feature.validatepool
 
 import androidx.annotation.Keep
-import java.io.Serializable
+import com.simprints.core.domain.step.StepResult
 
 @Keep
 data class ValidateSubjectPoolResult(
     val isValid: Boolean,
-) : Serializable
+) : StepResult

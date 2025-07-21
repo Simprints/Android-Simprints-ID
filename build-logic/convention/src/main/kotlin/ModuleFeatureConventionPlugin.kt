@@ -27,7 +27,6 @@ class ModuleFeatureConventionPlugin : Plugin<Project> {
 
             dependencies {
                 add("implementation", project(":infra:ui-base"))
-                add("implementation", project(":infra:core"))
             }
         }
     }

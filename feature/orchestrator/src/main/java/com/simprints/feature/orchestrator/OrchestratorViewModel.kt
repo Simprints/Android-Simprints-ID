@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.step.StepResult
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
@@ -91,7 +92,7 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
-    fun handleResult(result: Serializable) = viewModelScope.launch {
+    fun handleResult(result: StepResult) = viewModelScope.launch {
         Simber.i("Handling step result: ${result.javaClass.simpleName}", tag = ORCHESTRATION)
         Simber.d(result.toString(), tag = ORCHESTRATION)
 
@@ -196,7 +197,7 @@ internal class OrchestratorViewModel @Inject constructor(
             projectConfiguration,
             actionRequest,
             steps.mapNotNull { it.result },
-            project
+            project,
         )
 
         updateDailyActivity(appResponse)
