@@ -21,14 +21,14 @@ data class FaceReference(
     override val id: String,
     val templates: List<FaceTemplate>,
     val format: String,
-    val metadata: HashMap<String, String>? = null,
+    val metadata: Map<String, String>? = null,
 ) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(
     override val id: String,
     val templates: List<FingerprintTemplate>,
     val format: String,
-    val metadata: HashMap<String, String>? = null,
+    val metadata: Map<String, String>? = null,
 ) : BiometricReference(id, BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType {

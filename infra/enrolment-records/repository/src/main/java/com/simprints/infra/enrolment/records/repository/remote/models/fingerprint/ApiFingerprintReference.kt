@@ -1,6 +1,7 @@
 package com.simprints.infra.enrolment.records.repository.remote.models.fingerprint
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiBiometricReference
@@ -10,6 +11,7 @@ internal data class ApiFingerprintReference(
     val id: String,
     val templates: List<ApiFingerprintTemplate>,
     val format: String,
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
     val metadata: HashMap<String, String>? = null,
 ) : ApiBiometricReference(ApiBiometricReferenceType.FingerprintReference)
 
