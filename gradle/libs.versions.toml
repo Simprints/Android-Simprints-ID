@@ -55,7 +55,7 @@ chuck_version = "4.1.0"
 sqlCipher_version = "4.9.0"
 fuzzywuzzy_version = "1.4.0"
 rootbeer_version = "0.1.1"
-commons_io_version = "2.19.0"
+commons_io_version = "2.20.0"
 kronos_version = "0.0.1-alpha11"
 # Protobuf version is tied to Firebase dependencies and must be checked for compatibility on each update
 protobuf_version = "4.26.1"
