@@ -18,6 +18,9 @@ private const val FINGERPRINT_REFERENCE_KEY = "FingerprintReference"
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
+    // [MS-1076] Annotations should have 'looseHandling' parameter passed to it to allow loose type handling of the nested fields (metadata)
+    // @JsonSubTypes.Type([...], looseHandling = true) once we update to SDK => 25 and Jackson => 2.16.0.
+    // Ref: https://github.com/FasterXML/jackson-databind/issues/3877#issuecomment-1508508854
     JsonSubTypes.Type(value = ApiFaceReference::class, name = FACE_REFERENCE_KEY),
     JsonSubTypes.Type(value = ApiFingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY),
 )
