@@ -41,6 +41,7 @@ import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.toBundle
 import com.simprints.matcher.MatchContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -157,7 +158,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                 findNavController().navigateSafely(
                     currentFragment = this,
                     actionId = R.id.action_orchestratorFragment_to_login,
-                    args = LoginContract.toArgs(request.projectId, request.userId),
+                    args = LoginContract.getParams(request.projectId, request.userId).toBundle(),
                 )
             },
         )
@@ -213,7 +214,11 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             LiveDataEventWithContentObserver { step ->
                 if (step != null) {
                     Simber.i("Executing step: ${step.id}", tag = ORCHESTRATION)
-                    findNavController().navigateSafely(this, step.navigationActionId, step.payload)
+                    findNavController().navigateSafely(
+                        currentFragment = this,
+                        actionId = step.navigationActionId,
+                        args = step.params.toBundle(),
+                    )
                 }
             },
         )

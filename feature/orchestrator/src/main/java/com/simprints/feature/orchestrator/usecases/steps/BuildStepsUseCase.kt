@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.steps
 
-import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowType
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.feature.consent.ConsentContract
@@ -216,7 +215,6 @@ internal class BuildStepsUseCase @Inject constructor(
                         id = StepId.SELECT_SUBJECT_AGE,
                         navigationActionId = R.id.action_orchestratorFragment_to_age_group_selection,
                         destinationId = SelectSubjectAgeGroupContract.DESTINATION,
-                        payload = bundleOf(),
                     ),
                 )
             } else if (projectConfiguration.allowedAgeRanges().none { it.includes(subjectAge) }) {
@@ -232,7 +230,6 @@ internal class BuildStepsUseCase @Inject constructor(
             id = StepId.SETUP,
             navigationActionId = R.id.action_orchestratorFragment_to_setup,
             destinationId = SetupContract.DESTINATION,
-            payload = bundleOf(),
         ),
     )
 
@@ -252,7 +249,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 id = StepId.FETCH_GUID,
                 navigationActionId = R.id.action_orchestratorFragment_to_fetchSubject,
                 destinationId = FetchSubjectContract.DESTINATION,
-                payload = FetchSubjectContract.getArgs(projectId, subjectId),
+                params = FetchSubjectContract.getParams(projectId, subjectId),
             ),
         )
 
@@ -268,7 +265,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 id = StepId.CONSENT,
                 navigationActionId = R.id.action_orchestratorFragment_to_consent,
                 destinationId = ConsentContract.DESTINATION,
-                payload = ConsentContract.getArgs(consentType),
+                params = ConsentContract.getParams(consentType),
             ),
         )
     } else {
@@ -292,7 +289,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.VALIDATE_ID_POOL,
                     navigationActionId = R.id.action_orchestratorFragment_to_validateSubjectPool,
                     destinationId = ValidateSubjectPoolContract.DESTINATION,
-                    payload = ValidateSubjectPoolContract.getArgs(subjectQuery),
+                    params = ValidateSubjectPoolContract.getParams(subjectQuery),
                 ),
             )
 
@@ -359,7 +356,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.FINGERPRINT_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_fingerprintCapture,
                     destinationId = FingerprintCaptureContract.DESTINATION,
-                    payload = FingerprintCaptureContract.getArgs(flowType, fingersToCollect, bioSDK),
+                    params = FingerprintCaptureContract.getParams(flowType, fingersToCollect, bioSDK),
                 )
             }
         }
@@ -374,7 +371,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.FACE_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
                     destinationId = FaceCaptureContract.DESTINATION,
-                    payload = FaceCaptureContract.getArgs(samplesToCapture, bioSDK),
+                    params = FaceCaptureContract.getParams(samplesToCapture, bioSDK),
                 )
             }
         }
@@ -413,7 +410,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.FINGERPRINT_MATCHER,
                     navigationActionId = R.id.action_orchestratorFragment_to_matcher,
                     destinationId = MatchContract.DESTINATION,
-                    payload = MatchStepStubPayload.asBundle(
+                    params = MatchStepStubPayload.getMatchStubParams(
                         flowType = flowType,
                         subjectQuery = subjectQuery,
                         biometricDataSource = biometricDataSource,
@@ -430,7 +427,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.FACE_MATCHER,
                     navigationActionId = R.id.action_orchestratorFragment_to_matcher,
                     destinationId = MatchContract.DESTINATION,
-                    payload = MatchStepStubPayload.asBundle(
+                    params = MatchStepStubPayload.getMatchStubParams(
                         flowType = flowType,
                         subjectQuery = subjectQuery,
                         biometricDataSource = biometricDataSource,
@@ -464,7 +461,7 @@ internal class BuildStepsUseCase @Inject constructor(
                     id = StepId.ENROL_LAST_BIOMETRIC,
                     navigationActionId = R.id.action_orchestratorFragment_to_enrolLast,
                     destinationId = EnrolLastBiometricContract.DESTINATION,
-                    payload = EnrolLastBiometricContract.getArgs(
+                    params = EnrolLastBiometricContract.getParams(
                         projectId = action.projectId,
                         userId = action.userId,
                         moduleId = action.moduleId,
@@ -479,7 +476,7 @@ internal class BuildStepsUseCase @Inject constructor(
             id = StepId.CONFIRM_IDENTITY,
             navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
             destinationId = SelectSubjectContract.DESTINATION,
-            payload = SelectSubjectContract.getArgs(
+            params = SelectSubjectContract.getParams(
                 projectId = action.projectId,
                 subjectId = action.selectedGuid,
             ),

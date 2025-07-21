@@ -6,8 +6,8 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.config.AlertConfiguration
-import com.simprints.feature.alert.screen.AlertFragmentArgs
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.uibase.navigation.toBundle
 import com.simprints.infra.resources.R as IDR
 
 data class AlertConfigurationBuilder(
@@ -40,23 +40,22 @@ data class AlertConfigurationBuilder(
  * appErrorReason - Error code that will be returned in app result if the alert is terminal, default - null
  * eventType - Event type to be logged on alert opening, default - nothing
  * ```
+ * ```
  */
 fun alertConfiguration(block: AlertConfigurationBuilder.() -> Unit) = AlertConfigurationBuilder().apply(block)
 
-fun AlertConfigurationBuilder.toArgs() = AlertFragmentArgs(
-    AlertConfiguration(
-        color = this.color,
-        title = this.title,
-        titleRes = this.titleRes,
-        image = this.image,
-        message = this.message,
-        messageRes = this.messageRes,
-        messageIcon = this.messageIcon,
-        leftButton = this.leftButton,
-        rightButton = this.rightButton,
-        eventType = this.eventType,
-        appErrorReason = this.appErrorReason,
-    ),
+fun AlertConfigurationBuilder.toArgs() = AlertConfiguration(
+    color = this.color,
+    title = this.title,
+    titleRes = this.titleRes,
+    image = this.image,
+    message = this.message,
+    messageRes = this.messageRes,
+    messageIcon = this.messageIcon,
+    leftButton = this.leftButton,
+    rightButton = this.rightButton,
+    eventType = this.eventType,
+    appErrorReason = this.appErrorReason,
 ).toBundle()
 
 data class AlertButtonBuilder(

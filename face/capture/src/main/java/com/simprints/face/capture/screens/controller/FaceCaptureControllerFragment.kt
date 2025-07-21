@@ -7,9 +7,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.face.capture.GraphFaceCaptureInternalDirections
 import com.simprints.face.capture.R
 import com.simprints.face.capture.screens.FaceCaptureViewModel
@@ -22,11 +22,12 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_capture) {
-    private val args: FaceCaptureControllerFragmentArgs by navArgs()
+    private val params: FaceCaptureParams by navigationParams()
 
     private val viewModel: FaceCaptureViewModel by activityViewModels()
 
@@ -71,7 +72,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             findNavController().finishWithResult(this, result)
         }
 
-        viewModel.setupCapture(args.params.samplesToCapture)
+        viewModel.setupCapture(params.samplesToCapture)
         initFaceBioSdk()
         viewModel.recaptureEvent.observe(
             viewLifecycleOwner,
@@ -147,6 +148,6 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
                 InvalidFaceLicenseAlert.toAlertArgs(),
             )
         }
-        viewModel.initFaceBioSdk(requireActivity(), args.params.faceSDK)
+        viewModel.initFaceBioSdk(requireActivity(), params.faceSDK)
     }
 }

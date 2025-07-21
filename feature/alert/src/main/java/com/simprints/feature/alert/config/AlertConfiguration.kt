@@ -1,15 +1,13 @@
 package com.simprints.feature.alert.config
 
-import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.step.StepParams
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
-import kotlinx.parcelize.Parcelize
 
 @Keep
-@Parcelize
 data class AlertConfiguration(
     val color: AlertColor,
     val title: String?,
@@ -22,4 +20,4 @@ data class AlertConfiguration(
     val rightButton: AlertButtonConfig?,
     val eventType: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType?,
     val appErrorReason: AppErrorReason? = null,
-) : Parcelable
+) : StepParams

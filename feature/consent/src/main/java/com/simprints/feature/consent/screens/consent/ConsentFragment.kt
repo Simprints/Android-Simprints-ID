@@ -9,27 +9,28 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.tabs.TabLayout
 import com.simprints.core.livedata.LiveDataEventObserver
+import com.simprints.feature.consent.ConsentParams
 import com.simprints.feature.consent.R
 import com.simprints.feature.consent.databinding.FragmentConsentBinding
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.listeners.OnTabSelectedListener
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
-    private val args by navArgs<ConsentFragmentArgs>()
+    private val args: ConsentParams by navigationParams()
     private val binding by viewBinding(FragmentConsentBinding::bind)
     private val viewModel by viewModels<ConsentViewModel>()
 
@@ -53,7 +54,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
             ExitFormContract.DESTINATION,
         ) { viewModel.handleExitFormResponse(it) }
 
-        viewModel.loadConfiguration(args.consentType)
+        viewModel.loadConfiguration(args.type)
     }
 
     private fun handleClicks() {

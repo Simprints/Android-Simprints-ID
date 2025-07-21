@@ -10,20 +10,21 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.R
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
+import com.simprints.feature.alert.config.AlertConfiguration
 import com.simprints.feature.alert.databinding.FragmentAlertBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ALERT
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
+import com.simprints.infra.uibase.navigation.navigationParams
 import com.simprints.infra.uibase.navigation.setResult
 import com.simprints.infra.uibase.system.Clipboard
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.setTextWithFallbacks
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +32,7 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class AlertFragment : Fragment(R.layout.fragment_alert) {
-    private val args: AlertFragmentArgs by navArgs()
+    private val config: AlertConfiguration by navigationParams()
     private val vm by viewModels<AlertViewModel>()
     private val binding by viewBinding(FragmentAlertBinding::bind)
 
@@ -43,7 +44,6 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         applySystemBarInsets(view)
         Simber.i("AlertFragment started", tag = ORCHESTRATION)
 
-        val config = args.alertConfiguration
         Simber.i("Alert reason: ${config.appErrorReason}", tag = ALERT)
 
         binding.root.setBackgroundColor(
@@ -62,14 +62,15 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
 
         binding.alertImage.setImageResource(config.image)
         binding.alertMessage.setTextWithFallbacks(config.message, config.messageRes)
-        if (config.messageIcon != null) {
-            binding.alertMessage.setCompoundDrawablesWithIntrinsicBounds(config.messageIcon, 0, 0, 0)
+
+        config.messageIcon?.let {
+            binding.alertMessage.setCompoundDrawablesWithIntrinsicBounds(it, 0, 0, 0)
         }
 
         binding.alertLeftButton.setupButton(config.leftButton, config.appErrorReason)
         binding.alertRightButton.isVisible = config.rightButton != null
-        if (config.rightButton != null) {
-            binding.alertRightButton.setupButton(config.rightButton, config.appErrorReason)
+        config.rightButton?.let {
+            binding.alertRightButton.setupButton(it, config.appErrorReason)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {

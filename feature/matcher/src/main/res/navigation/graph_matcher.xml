@@ -10,6 +10,6 @@
         android:label="FaceMatcherFragment">
         <argument
             android:name="params"
-            app:argType="com.simprints.matcher.MatchParams" />
+            app:argType="com.simprints.core.domain.step.StepParams" />
     </fragment>
 </navigation>

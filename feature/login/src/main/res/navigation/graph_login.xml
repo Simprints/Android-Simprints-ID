@@ -11,8 +11,8 @@
         android:label="LoginFormFragment"
         tools:layout="@layout/fragment_login_form">
         <argument
-            android:name="loginParams"
-            app:argType="com.simprints.feature.login.LoginParams" />
+            android:name="params"
+            app:argType="com.simprints.core.domain.step.StepParams" />
 
         <action
             android:id="@+id/action_loginFormFragment_to_loginQrScanner"

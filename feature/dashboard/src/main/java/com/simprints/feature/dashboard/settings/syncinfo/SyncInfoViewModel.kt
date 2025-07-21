@@ -32,6 +32,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.uibase.navigation.toBundle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -158,11 +159,11 @@ internal class SyncInfoViewModel @Inject constructor(
 
     fun login() {
         viewModelScope.launch {
-            val loginArgs = LoginContract.toArgs(
+            val loginArgs = LoginContract.getParams(
                 authStore.signedInProjectId,
                 authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
             )
-            _loginRequestedEventLiveData.send(loginArgs)
+            _loginRequestedEventLiveData.send(loginArgs.toBundle())
         }
     }
 

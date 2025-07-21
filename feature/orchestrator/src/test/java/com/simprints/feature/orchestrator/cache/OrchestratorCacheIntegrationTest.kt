@@ -1,15 +1,16 @@
 package com.simprints.feature.orchestrator.cache
 
 import android.content.SharedPreferences
-import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.face.capture.FaceCaptureParams
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.security.SecurityManager
 import io.mockk.MockKAnnotations
@@ -57,7 +58,6 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.FINGERPRINT_CAPTURE,
                 navigationActionId = 3,
                 destinationId = 4,
-                payload = bundleOf("key" to "value"),
                 status = StepStatus.COMPLETED,
                 result = FingerprintCaptureResult(
                     "",
@@ -74,7 +74,7 @@ class OrchestratorCacheIntegrationTest {
                 id = StepId.FACE_CAPTURE,
                 navigationActionId = 5,
                 destinationId = 6,
-                payload = bundleOf("key" to "value"),
+                params = FaceCaptureParams(3, FaceConfiguration.BioSdk.RANK_ONE),
                 status = StepStatus.COMPLETED,
                 result = null,
             ),
@@ -97,8 +97,6 @@ class OrchestratorCacheIntegrationTest {
         assertThat(actual.destinationId).isEqualTo(expected.destinationId)
         assertThat(actual.status).isEqualTo(expected.status)
         assertThat(actual.result).isEqualTo(expected.result)
-
-        // Direct comparison does not work with bundles due to implementation details
-        assertThat(actual.payload.keySet()).isEqualTo(expected.payload.keySet())
+        assertThat(actual.params).isEqualTo(expected.params)
     }
 }

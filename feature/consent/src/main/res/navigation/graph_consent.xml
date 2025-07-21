@@ -11,8 +11,8 @@
         android:label="ConsentFragment"
         tools:layout="@layout/fragment_consent">
         <argument
-            android:name="consentType"
-            app:argType="com.simprints.feature.consent.ConsentType" />
+            android:name="params"
+            app:argType="com.simprints.core.domain.step.StepParams"/>
 
         <action
             android:id="@+id/action_consentFragment_to_privacyNoticeFragment"

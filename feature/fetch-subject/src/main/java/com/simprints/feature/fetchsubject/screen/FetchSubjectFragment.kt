@@ -5,26 +5,27 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.fetchsubject.FetchSubjectParams
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.fetchsubject.R
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) {
     private val viewModel: FetchSubjectViewModel by viewModels()
-    private val args: FetchSubjectFragmentArgs by navArgs()
+    private val params: FetchSubjectParams by navigationParams()
 
     override fun onViewCreated(
         view: View,
@@ -43,7 +44,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
             state?.getContentIfNotHandled()?.let(::handleFetchState)
         }
 
-        viewModel.onViewCreated(args.projectId, args.subjectId)
+        viewModel.onViewCreated(params.projectId, params.subjectId)
     }
 
     private fun handleAlertResult(alertResult: AlertResult) {
@@ -58,13 +59,13 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
     }
 
     private fun tryFetchSubject() {
-        viewModel.fetchSubject(args.projectId, args.subjectId)
+        viewModel.fetchSubject(params.projectId, params.subjectId)
     }
 
     private fun handleFetchState(state: FetchSubjectState) = when (state) {
         FetchSubjectState.FoundLocal,
         FetchSubjectState.FoundRemote,
-            -> finishWithResult(true)
+        -> finishWithResult(true)
 
         FetchSubjectState.NotFound -> openAlert(FetchSubjectAlerts.subjectNotFoundOnline().toArgs())
         FetchSubjectState.ConnectionError -> openAlert(FetchSubjectAlerts.subjectNotFoundOffline().toArgs())

@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator
 
-import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -8,6 +7,7 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
@@ -195,7 +195,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.FACE_CAPTURE),
             createMockStep(
                 StepId.FACE_MATCHER,
-                MatchStepStubPayload.asBundle(
+                MatchStepStubPayload.getMatchStubParams(
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
@@ -219,7 +219,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.FACE_CAPTURE),
             createMockStep(
                 StepId.FACE_MATCHER,
-                MatchStepStubPayload.asBundle(
+                MatchStepStubPayload.getMatchStubParams(
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
@@ -242,7 +242,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.FINGERPRINT_CAPTURE),
             createMockStep(
                 StepId.FINGERPRINT_MATCHER,
-                MatchStepStubPayload.asBundle(
+                MatchStepStubPayload.getMatchStubParams(
                     FlowType.VERIFY,
                     SubjectQuery(),
                     BiometricDataSource.Simprints,
@@ -264,7 +264,7 @@ internal class OrchestratorViewModelTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(
                 StepId.FINGERPRINT_CAPTURE,
-                FingerprintCaptureContract.getArgs(
+                FingerprintCaptureContract.getParams(
                     flowType = FlowType.VERIFY,
                     fingers = emptyList(),
                     fingerprintSDK = SECUGEN_SIM_MATCHER,
@@ -272,7 +272,7 @@ internal class OrchestratorViewModelTest {
             ),
             createMockStep(
                 StepId.FINGERPRINT_MATCHER,
-                MatchStepStubPayload.asBundle(
+                MatchStepStubPayload.getMatchStubParams(
                     flowType = FlowType.VERIFY,
                     subjectQuery = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -281,7 +281,7 @@ internal class OrchestratorViewModelTest {
             ),
             createMockStep(
                 StepId.FINGERPRINT_CAPTURE,
-                FingerprintCaptureContract.getArgs(
+                FingerprintCaptureContract.getParams(
                     flowType = FlowType.VERIFY,
                     fingers = emptyList(),
                     fingerprintSDK = NEC,
@@ -289,7 +289,7 @@ internal class OrchestratorViewModelTest {
             ),
             createMockStep(
                 StepId.FINGERPRINT_MATCHER,
-                MatchStepStubPayload.asBundle(
+                MatchStepStubPayload.getMatchStubParams(
                     flowType = FlowType.VERIFY,
                     subjectQuery = SubjectQuery(),
                     biometricDataSource = BiometricDataSource.Simprints,
@@ -323,7 +323,7 @@ internal class OrchestratorViewModelTest {
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
-            val params = step.payload.getParcelable<MatchParams>("params")
+            val params = step.params?.let { it as? MatchParams }
             assertThat(params).isNotNull()
             assertThat(params?.fingerprintSDK).isEqualTo(SECUGEN_SIM_MATCHER)
             assertThat(params?.probeFingerprintSamples?.size).isEqualTo(2)
@@ -408,14 +408,11 @@ internal class OrchestratorViewModelTest {
         coEvery { mapRefusalOrErrorResult(any(), any()) } returns null
         val captureStep = createMockStep(StepId.FINGERPRINT_CAPTURE)
         val enrolLastStep = createMockStep(StepId.ENROL_LAST_BIOMETRIC)
-        enrolLastStep.payload.putParcelable(
-            "params",
-            EnrolLastBiometricParams(
-                "projectId",
-                TokenizableString.Tokenized("userId"),
-                TokenizableString.Tokenized("moduleId"),
-                listOf(mockk<EnrolLastBiometricStepResult>()),
-            ),
+        enrolLastStep.params = EnrolLastBiometricParams(
+            "projectId",
+            TokenizableString.Tokenized("userId"),
+            TokenizableString.Tokenized("moduleId"),
+            listOf(mockk<EnrolLastBiometricStepResult>()),
         )
         every { stepsBuilder.build(any(), any()) } returns listOf(
             captureStep,
@@ -430,19 +427,18 @@ internal class OrchestratorViewModelTest {
         viewModel.handleResult(FingerprintCaptureResult("", emptyList()))
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
-            assertThat(step.payload.getParcelable<EnrolLastBiometricParams>("params")?.steps)
-                .containsExactly(mockEnrolLastStep)
+            assertThat(step.params?.let { it as? EnrolLastBiometricParams }?.steps).containsExactly(mockEnrolLastStep)
         }
     }
 
     private fun createMockStep(
         stepId: Int,
-        payload: Bundle = Bundle(),
+        params: StepParams? = null,
     ) = Step(
         id = stepId,
         navigationActionId = 0,
         destinationId = 0,
-        payload = payload,
+        params = params,
         status = StepStatus.NOT_STARTED,
         result = null,
     )
