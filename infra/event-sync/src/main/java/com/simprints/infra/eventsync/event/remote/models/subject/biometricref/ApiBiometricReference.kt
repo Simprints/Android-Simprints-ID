@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.subject.biometricref
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
@@ -16,6 +17,7 @@ import com.simprints.infra.events.event.domain.models.subject.FingerprintReferen
 private const val FACE_REFERENCE_KEY = "FaceReference"
 private const val FINGERPRINT_REFERENCE_KEY = "FingerprintReference"
 
+@ExcludedFromGeneratedTestCoverageReports("API model")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
     // [MS-1076] Annotations should have 'looseHandling' parameter passed to it to allow loose type handling of the nested fields (metadata)

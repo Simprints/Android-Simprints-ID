@@ -2,11 +2,13 @@ package com.simprints.infra.enrolment.records.repository.remote.models.fingerpri
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.repository.remote.models.ApiBiometricReference
 
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("API model")
 internal data class ApiFingerprintReference(
     val id: String,
     val templates: List<ApiFingerprintTemplate>,
