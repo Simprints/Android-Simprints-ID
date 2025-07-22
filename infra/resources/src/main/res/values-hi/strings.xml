@@ -51,7 +51,7 @@
     <string name="enrol_last_biometrics_alert_message_all_param">चेहरा/फ़िंगरप्रिंट</string>
 
     <!-- Exit form -->
-    <string name="exit_form_title">आपने बायोमैट्रिक्स जानकारी क्यों नहीं ली?</string>
+    <string name="exit_form_title">आपने बायोमैट्रिक्स क्यों नहीं ली?</string>
     <string name="exit_form_other_reason_hint">अतिरिक्त जानकारी</string>
     <string name="exit_form_continue_button">बायोमेट्रिक्स कैप्चर करें</string>
     <string name="exit_form_submit_button">सबमिट करें</string>
@@ -172,6 +172,7 @@
     <string name="face_capture_capturing_title">लाइव कैप्चर</string>
     <string name="face_capture_preparation_title">तैयारी</string>
     <string name="face_capture_start_capture">कैप्चर करना प्रारंभ करें</string>
+    <string name="face_capture_instructions_title">निर्देश</string>
     <string name="face_capture_title_previewing">स्कैन करने के लिए तैयार हो रहा है</string>
     <string name="face_capture_title_no_face">चेहरा नहीं दिख रहा</string>
     <string name="face_capture_error_no_face">सुनिश्चित करें कि चेहरा सर्कल फ्रेम में है</string>
@@ -435,6 +436,7 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">समन्वयन प्रगति पर है</string>
+    <string name="notification_migration_description">भंडारण अनुकूलन प्रगति पर है</string>
 
     <!-- Identification pool validation -->
     <string name="id_pool_validation_issue_title">पहचान संबंधी समस्या</string>
