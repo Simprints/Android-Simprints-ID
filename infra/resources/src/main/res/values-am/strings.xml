@@ -175,6 +175,7 @@
     <string name="face_capture_capturing_title">አሁን ላይ(ላይቭ) ማንሳት</string>
     <string name="face_capture_preparation_title">ለማንሳት በዝግጅት ላይ</string>
     <string name="face_capture_start_capture">መያዝ ጀምር</string>
+    <string name="face_capture_instructions_title">መመሪያዎች</string>
     <string name="face_capture_title_previewing">ለማንሳት እየተዘጋጀ</string>
     <string name="face_capture_title_no_face">ምንም ፊት ማግኘት አልቻለም</string>
     <string name="face_capture_error_no_face">ፊቱ ክቡን መሙላቱን ያረጋግጡ</string>
@@ -442,6 +443,7 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">ሲንክ በማድረግ ላይ</string>
+    <string name="notification_migration_description">የማከማቻ ማመቻቸት በሂደት ላይ ነው።</string>
 
     <!-- Identification pool validation -->
     <string name="id_pool_validation_issue_title">የመለየት ችግር</string>
