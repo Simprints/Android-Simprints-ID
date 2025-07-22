@@ -3,9 +3,11 @@ package com.simprints.infra.events.event.domain.models.subject
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
 
+@ExcludedFromGeneratedTestCoverageReports("Domain model")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = FaceReference::class, name = FACE_REFERENCE_KEY),
@@ -17,18 +19,20 @@ sealed class BiometricReference(
     val type: BiometricReferenceType,
 )
 
+@ExcludedFromGeneratedTestCoverageReports("Domain model")
 data class FaceReference(
     override val id: String,
     val templates: List<FaceTemplate>,
     val format: String,
-    val metadata: HashMap<String, String>? = null,
+    val metadata: Map<String, String>? = null,
 ) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
 
+@ExcludedFromGeneratedTestCoverageReports("Domain model")
 data class FingerprintReference(
     override val id: String,
     val templates: List<FingerprintTemplate>,
     val format: String,
-    val metadata: HashMap<String, String>? = null,
+    val metadata: Map<String, String>? = null,
 ) : BiometricReference(id, BiometricReferenceType.FINGERPRINT_REFERENCE)
 
 enum class BiometricReferenceType {
