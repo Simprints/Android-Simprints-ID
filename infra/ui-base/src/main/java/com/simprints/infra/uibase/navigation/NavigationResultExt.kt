@@ -79,9 +79,15 @@ fun <T : Serializable> NavController.handleResult(
     // `getCurrentBackStackEntry` doesn't work in case of recovery from the process death when dialog is opened.
     val currentEntry = getBackStackEntry(currentDestinationId)
 
+    val expectedResultKey = resultName(targetDestinationId)
+    // After config change, current fragment's NavBackStackEntry is recreated.
+    // The result, set by the target fragment on the *previous* NavBackStackEntry's SavedStateHandle,
+    // might be available before ON_RESUME fires for the new entry, or if the initial check for the result was missed.
+    // Therefore, checking SavedStateHandle immediately when (re)registering listener and on ON_RESUME.
+    handleResultFromChild(expectedResultKey, currentEntry, handler)
     val observer = LifecycleEventObserver { _, event ->
         if (event == Lifecycle.Event.ON_RESUME) {
-            handleResultFromChild(targetDestinationId, currentEntry, handler)
+            handleResultFromChild(expectedResultKey, currentEntry, handler)
         }
     }
     currentEntry.lifecycle.addObserver(observer)
@@ -95,12 +101,10 @@ fun <T : Serializable> NavController.handleResult(
 }
 
 private fun <T : Serializable> handleResultFromChild(
-    @IdRes childDestinationId: Int,
+    expectedResultKey: String,
     currentEntry: NavBackStackEntry,
     handler: (T) -> Unit,
 ) {
-    val expectedResultKey = resultName(childDestinationId)
-
     with(currentEntry.savedStateHandle) {
         if (contains(expectedResultKey)) {
             get<T>(expectedResultKey)?.let(handler)
