@@ -172,6 +172,7 @@
     <string name="face_capture_capturing_title">ছবি তুলুন</string>
     <string name="face_capture_preparation_title">প্রস্তু্তি</string>
     <string name="face_capture_start_capture">ক্যাপচার শুরু করুন</string>
+    <string name="face_capture_instructions_title">নির্দেশনা</string>
     <string name="face_capture_title_previewing">স্ক্যান প্রস্তুত হচ্ছে</string>
     <string name="face_capture_title_no_face">মুখ খুঁজে পাওয়া যাচ্ছে না</string>
     <string name="face_capture_error_no_face">ব্যক্তির চেহারা বৃত্তের ভেতর থাকতে হবে</string>
@@ -439,6 +440,7 @@
 
     <!-- Notifications -->
     <string name="notification_sync_description">সিঙ্ক হচ্ছে </string>
+    <string name="notification_migration_description">সঞ্চয়স্থান অপ্টিমাইজেশান চলছে৷</string>
 
     <!-- Identification pool validation -->
     <string name="id_pool_validation_issue_title">সনাক্তকরণ সমস্যা</string>
