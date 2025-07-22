@@ -8,6 +8,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -56,6 +57,8 @@ internal class MatchViewModel @Inject constructor(
             else -> fingerprintMatcher
         }
         val project = configManager.getProject(authStore.signedInProjectId)
+        val decisionPolicy = getDecisionPolicy(params)
+
         candidatesLoaded = 0
         matcherUseCase(params, project).collect { matcherState ->
             when (matcherState) {
@@ -82,7 +85,7 @@ internal class MatchViewModel @Inject constructor(
                         matcherState.matchResultItems,
                     )
 
-                    setMatchState(matcherState.totalCandidates, matcherState.matchResultItems)
+                    setMatchState(matcherState.totalCandidates, matcherState.matchResultItems, decisionPolicy)
 
                     // wait a bit for the user to see the results
                     delay(MATCHING_END_WAIT_TIME_MS)
@@ -98,15 +101,26 @@ internal class MatchViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getDecisionPolicy(params: MatchParams): DecisionPolicy {
+        val config = configManager.getProjectConfiguration()
+        val policy = when {
+            params.faceSDK != null -> config.face?.getSdkConfiguration(params.faceSDK)?.decisionPolicy
+            params.fingerprintSDK != null -> config.fingerprint?.getSdkConfiguration(params.fingerprintSDK)?.decisionPolicy
+            else -> null
+        }
+        return policy ?: fallbackDecisionPolicy()
+    }
+
     private fun setMatchState(
         candidatesMatched: Int,
         results: List<MatchResultItem>,
+        decisionPolicy: DecisionPolicy,
     ) {
-        val veryGoodMatches = results.count { VERY_GOOD_MATCH_THRESHOLD <= it.confidence }
+        val veryGoodMatches = results.count { decisionPolicy.high <= it.confidence }
         val goodMatches =
-            results.count { GOOD_MATCH_THRESHOLD <= it.confidence && it.confidence < VERY_GOOD_MATCH_THRESHOLD }
+            results.count { decisionPolicy.medium <= it.confidence && it.confidence < decisionPolicy.high }
         val fairMatches =
-            results.count { FAIR_MATCH_THRESHOLD <= it.confidence && it.confidence < GOOD_MATCH_THRESHOLD }
+            results.count { decisionPolicy.low <= it.confidence && it.confidence < decisionPolicy.medium }
 
         _matchState.postValue(
             MatchState.Finished(
@@ -148,10 +162,18 @@ internal class MatchViewModel @Inject constructor(
 
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
+
+    // Old hardcoded values that could be used to if there is no SDK configuration for the given SDK
+    private fun fallbackDecisionPolicy() = DecisionPolicy(
+        low = FAIR_MATCH_THRESHOLD,
+        medium = GOOD_MATCH_THRESHOLD,
+        high = VERY_GOOD_MATCH_THRESHOLD,
+    )
+
     companion object {
-        private const val VERY_GOOD_MATCH_THRESHOLD = 50.0
-        private const val GOOD_MATCH_THRESHOLD = 35.0
-        private const val FAIR_MATCH_THRESHOLD = 20.0
+        private const val VERY_GOOD_MATCH_THRESHOLD = 50
+        private const val GOOD_MATCH_THRESHOLD = 35
+        private const val FAIR_MATCH_THRESHOLD = 20
         private const val MATCHING_END_WAIT_TIME_MS = 1000L
     }
 }

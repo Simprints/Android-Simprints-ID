@@ -8,6 +8,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER
 import com.simprints.infra.config.sync.ConfigManager
@@ -124,6 +125,14 @@ internal class MatchViewModelTest {
 
     @Test
     fun `Handle face match request correctly`() = runTest {
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .face
+                ?.getSdkConfiguration(any())
+                ?.decisionPolicy
+        } returns DecisionPolicy(20, 35, 50)
+
         val responseItems = listOf(
             FaceMatchResult.Item("1", 90f),
             FaceMatchResult.Item("1", 80f),
@@ -177,14 +186,22 @@ internal class MatchViewModelTest {
 
     @Test
     fun `Handle fingerprint match request correctly`() = runTest {
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .fingerprint
+                ?.getSdkConfiguration(any())
+                ?.decisionPolicy
+        } returns DecisionPolicy(200, 350, 500)
+
         val responseItems = listOf(
-            FingerprintMatchResult.Item("1", 90f),
-            FingerprintMatchResult.Item("1", 80f),
-            FingerprintMatchResult.Item("1", 55f),
-            FingerprintMatchResult.Item("1", 40f),
-            FingerprintMatchResult.Item("1", 36f),
-            FingerprintMatchResult.Item("1", 20f),
-            FingerprintMatchResult.Item("1", 10f),
+            FingerprintMatchResult.Item("1", 900f),
+            FingerprintMatchResult.Item("1", 800f),
+            FingerprintMatchResult.Item("1", 550f),
+            FingerprintMatchResult.Item("1", 400f),
+            FingerprintMatchResult.Item("1", 360f),
+            FingerprintMatchResult.Item("1", 200f),
+            FingerprintMatchResult.Item("1", 100f),
         )
 
         coEvery { fingerprintMatcherUseCase.invoke(any(), any()) } returns flow {
@@ -229,6 +246,54 @@ internal class MatchViewModelTest {
         )
 
         verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
+    }
+
+    @Test
+    fun `Handle missing decision policy`() = runTest {
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .face
+                ?.getSdkConfiguration(any())
+                ?.decisionPolicy
+        } returns null
+
+        val responseItems = listOf(
+            FaceMatchResult.Item("1", 90f),
+            FaceMatchResult.Item("1", 10f),
+        )
+        coEvery { faceMatcherUseCase.invoke(any(), any()) } returns flow {
+            emit(MatcherUseCase.MatcherState.LoadingStarted(responseItems.size))
+            emit(
+                MatcherUseCase.MatcherState.Success(
+                    matchResultItems = responseItems,
+                    totalCandidates = responseItems.size,
+                    matcherName = MATCHER_NAME,
+                ),
+            )
+        }
+
+        val states = viewModel.matchState.test()
+        viewModel.setupMatch(
+            MatchParams(
+                probeReferenceId = "referenceId",
+                probeFaceSamples = listOf(getFaceSample()),
+                faceSDK = FaceConfiguration.BioSdk.RANK_ONE,
+                flowType = FlowType.ENROL,
+                queryForCandidates = mockk {},
+                biometricDataSource = BiometricDataSource.Simprints,
+            ),
+        )
+        // Waiting for the ::delay in viewModel::setupMatch
+        advanceUntilIdle()
+
+        assertThat(states.valueHistory()).isEqualTo(
+            listOf(
+                MatchViewModel.MatchState.NotStarted,
+                MatchViewModel.MatchState.LoadingCandidates(responseItems.size, 0),
+                MatchViewModel.MatchState.Finished(2, 2, 1, 0, 0),
+            ),
+        )
     }
 
     private fun getFaceSample(): MatchParams.FaceSample = MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
