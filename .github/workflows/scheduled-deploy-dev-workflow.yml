@@ -1,0 +1,24 @@
+name: "[Manual][Scheduled] Periodic Dev Deploy Workflow"
+
+
+on:
+    workflow_call: # For testing purposes
+    schedule:
+        -   cron: '0 18 * * 4' # End of day on Thursday
+
+concurrency:
+    group: deploy-main-workflow
+    cancel-in-progress: true
+
+jobs:
+    check-recent-merges:
+        uses: ./.github/workflows/reusable-check-recent-merges.yml
+        secrets: inherit
+        with:
+            days-ago: ${{ vars.DEV_UPLOAD_DAYS_AGO }}
+
+    deploy-to-dev:
+        needs: check-recent-merges
+        if: needs.check-recent-merges.outputs.has-recent-merges == 'true'
+        uses: ./.github/workflows/pipeline-deploy-to-dev.yml
+        secrets: inherit
