@@ -10,7 +10,7 @@ jobs:
         steps:
             -   name: Trigger upload workflow in automation repository
                 env:
-                    AUTOMATION_REPO_ACCESS_TOKEN: ${{ secrets.AUTOMATION_REPO_ACCESS_TOKEN }}
+                    AUTOMATION_REPO_ACCESS_TOKEN: ${{ secrets.GH_PACKAGE_TOKEN }}
                     OWNER_AND_REPO: "Simprints/SID-e2e-tests"
                     WORKFLOW_FILE_NAME: "flow-apk-upload.yml"
                 run: |
