@@ -80,7 +80,9 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     mapper = { dbSubject ->
                         FaceIdentity(
                             subjectId = dbSubject.subjectId.toString(),
-                            faces = dbSubject.faceSamples.map { it.toDomain() },
+                            faces = dbSubject.faceSamples
+                                .filter { it.format == query.faceSampleFormat }
+                                .map { it.toDomain() },
                         )
                     },
                     onCandidateLoaded = onCandidateLoaded,
@@ -109,7 +111,9 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
                     mapper = { dbSubject ->
                         FingerprintIdentity(
                             subjectId = dbSubject.subjectId.toString(),
-                            fingerprints = dbSubject.fingerprintSamples.map { it.toDomain() },
+                            fingerprints = dbSubject.fingerprintSamples
+                                .filter { it.format == query.fingerprintSampleFormat }
+                                .map { it.toDomain() },
                         )
                     },
                     onCandidateLoaded = onCandidateLoaded,

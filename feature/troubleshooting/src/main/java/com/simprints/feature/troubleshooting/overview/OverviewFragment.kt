@@ -1,9 +1,11 @@
 package com.simprints.feature.troubleshooting.overview
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.simprints.feature.troubleshooting.R
@@ -68,6 +70,9 @@ internal class OverviewFragment : Fragment(R.layout.fragment_troubleshooting_ove
         binding.troubleshootOverviewPing.setOnClickListener {
             viewModel.pingServer()
         }
+
+        // Log export is only Available starting from Android 8
+        binding.troubleshootOverviewExportLogsBlock.isVisible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         binding.troubleshootOverviewExportLogs.setOnClickListener { v ->
             viewModel.exportLogs()
         }
