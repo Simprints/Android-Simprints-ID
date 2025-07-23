@@ -1,9 +1,9 @@
 package com.simprints.feature.selectsubject
 
 import androidx.annotation.Keep
-import java.io.Serializable
+import com.simprints.core.domain.step.StepResult
 
 @Keep
 data class SelectSubjectResult(
     val success: Boolean,
-) : Serializable
+) : StepResult

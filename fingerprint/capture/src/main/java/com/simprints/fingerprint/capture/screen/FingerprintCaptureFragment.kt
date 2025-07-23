@@ -14,7 +14,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventObserver
@@ -27,6 +26,7 @@ import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.fingerprint.capture.FingerprintCaptureParams
 import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
@@ -44,11 +44,13 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTUR
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.navigation.toBundle
 import com.simprints.infra.uibase.system.Vibrate
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.Serializable
@@ -57,7 +59,7 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerprint_capture) {
-    private val args: FingerprintCaptureFragmentArgs by navArgs()
+    private val params: FingerprintCaptureParams by navigationParams()
     private val binding by viewBinding(FragmentFingerprintCaptureBinding::bind)
     private val vm: FingerprintCaptureViewModel by viewModels()
 
@@ -123,14 +125,14 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
 
         vm.handleOnViewCreated(
-            args.params.fingerprintsToCapture,
-            args.params.fingerprintSDK,
+            params.fingerprintsToCapture,
+            params.fingerprintSDK,
         )
         initUI()
     }
 
     private fun initUI() {
-        initToolbar(args.params.flowType)
+        initToolbar(params.flowType)
         initMissingFingerButton()
         initViewPagerManager()
         initScanButton()
@@ -305,7 +307,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             findNavController().navigateSafely(
                 this,
                 R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
-                FingerprintConnectContract.getArgs(args.params.fingerprintSDK),
+                FingerprintConnectContract.getParams(params.fingerprintSDK).toBundle(),
             )
         } catch (e: Exception) {
             Simber.i("Error launching scanner connection screen", e, tag = FINGER_CAPTURE)
@@ -317,7 +319,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         vm.handleOnResume()
         observeFingerprintScanStatus(
             viewLifecycleOwner.lifecycleScope,
-            args.params.fingerprintSDK,
+            params.fingerprintSDK,
         )
         val color = vm.stateLiveData.value
             ?.currentCaptureState()

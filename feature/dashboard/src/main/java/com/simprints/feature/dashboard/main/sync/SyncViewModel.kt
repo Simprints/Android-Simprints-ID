@@ -40,6 +40,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.sync.SyncOrchestrator
+import com.simprints.infra.uibase.navigation.toBundle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -125,12 +126,12 @@ internal class SyncViewModel @Inject constructor(
 
     fun login() {
         viewModelScope.launch {
-            val loginArgs = LoginContract.toArgs(
+            val loginArgs = LoginContract.getParams(
                 authStore.signedInProjectId,
                 authStore.signedInUserId
                     ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
             )
-            _loginRequestedEventLiveData.send(loginArgs)
+            _loginRequestedEventLiveData.send(loginArgs.toBundle())
         }
     }
 

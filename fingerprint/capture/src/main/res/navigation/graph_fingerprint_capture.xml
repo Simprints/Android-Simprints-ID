@@ -11,7 +11,7 @@
 
         <argument
             android:name="params"
-            app:argType="com.simprints.fingerprint.capture.FingerprintCaptureParams" />
+            app:argType="com.simprints.core.domain.step.StepParams" />
 
         <action
             android:id="@+id/action_fingerprintCaptureFragment_to_graphConnectScanner"

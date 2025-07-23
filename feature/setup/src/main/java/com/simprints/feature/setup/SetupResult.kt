@@ -1,9 +1,9 @@
 package com.simprints.feature.setup
 
 import androidx.annotation.Keep
-import java.io.Serializable
+import com.simprints.core.domain.step.StepResult
 
 @Keep
 data class SetupResult(
     val isSuccess: Boolean,
-) : Serializable
+) : StepResult

@@ -13,9 +13,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.feature.login.LoginError
+import com.simprints.feature.login.LoginParams
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentLoginFormBinding
@@ -42,10 +42,11 @@ import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChec
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LOGIN
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -53,7 +54,7 @@ import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
-    private val args by navArgs<LoginFormFragmentArgs>()
+    private val params: LoginParams by navigationParams()
     private val binding by viewBinding(FragmentLoginFormBinding::bind)
     private val viewModel by viewModels<LoginFormViewModel>()
 
@@ -89,7 +90,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             viewLifecycleOwner,
             R.id.loginFormFragment,
             R.id.loginQrScanner,
-        ) { viewModel.handleQrResult(args.loginParams.projectId, it) }
+        ) { viewModel.handleQrResult(params.projectId, it) }
 
         initUi()
         observeUiState()
@@ -99,8 +100,8 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     }
 
     private fun initUi() {
-        binding.loginUserId.setText(args.loginParams.userId.value)
-        binding.loginProjectId.setText(args.loginParams.projectId)
+        binding.loginUserId.setText(params.userId.value)
+        binding.loginProjectId.setText(params.projectId)
 
         binding.loginChangeUrlButton.setOnClickListener {
             Simber.i("Change URL button clicked", tag = LOGIN)
@@ -114,7 +115,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         binding.loginButtonSignIn.setOnClickListener {
             Simber.i("Login button clicked", tag = LOGIN)
             viewModel.signInClicked(
-                args.loginParams,
+                params,
                 binding.loginProjectId.text.toString(),
                 binding.loginProjectSecret.text.toString(),
             )

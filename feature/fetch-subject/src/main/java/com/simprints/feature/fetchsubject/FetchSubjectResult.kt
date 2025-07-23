@@ -1,10 +1,10 @@
 package com.simprints.feature.fetchsubject
 
 import androidx.annotation.Keep
-import java.io.Serializable
+import com.simprints.core.domain.step.StepResult
 
 @Keep
 data class FetchSubjectResult(
     val found: Boolean,
     val wasOnline: Boolean = false,
-) : Serializable
+) : StepResult

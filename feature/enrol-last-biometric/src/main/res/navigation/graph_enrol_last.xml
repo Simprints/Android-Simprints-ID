@@ -15,7 +15,7 @@
 
         <argument
             android:name="params"
-            app:argType="com.simprints.feature.enrollast.EnrolLastBiometricParams" />
+            app:argType="com.simprints.core.domain.step.StepParams"/>
 
         <action
             android:id="@+id/action_enrolLastBiometricFragment_to_errorFragment"

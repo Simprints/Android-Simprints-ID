@@ -10,7 +10,7 @@
         android:label="FaceCaptureController">
         <argument
             android:name="params"
-            app:argType="com.simprints.face.capture.FaceCaptureParams" />
+            app:argType="com.simprints.core.domain.step.StepParams"/>
     </fragment>
 
     <include app:graph="@navigation/graph_alert" />

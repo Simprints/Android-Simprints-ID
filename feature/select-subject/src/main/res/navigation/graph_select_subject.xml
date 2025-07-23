@@ -12,12 +12,8 @@
         tools:layout="@layout/fragment_select_subject">
 
         <argument
-            android:name="projectId"
-            app:argType="string" />
-
-        <argument
-            android:name="subjectId"
-            app:argType="string" />
+            android:name="params"
+            app:argType="com.simprints.core.domain.step.StepParams" />
     </fragment>
 
 </navigation>

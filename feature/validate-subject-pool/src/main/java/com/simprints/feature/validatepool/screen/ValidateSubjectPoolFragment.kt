@@ -7,15 +7,16 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.validatepool.R
+import com.simprints.feature.validatepool.ValidateSubjectPoolFragmentParams
 import com.simprints.feature.validatepool.ValidateSubjectPoolResult
 import com.simprints.feature.validatepool.databinding.FragmentValidateSubjectPoolBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -24,7 +25,7 @@ import com.simprints.infra.resources.R as IDR
 internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate_subject_pool) {
     private val viewModel: ValidateSubjectPoolViewModel by viewModels()
     private val binding by viewBinding(FragmentValidateSubjectPoolBinding::bind)
-    private val args: ValidateSubjectPoolFragmentArgs by navArgs()
+    private val params: ValidateSubjectPoolFragmentParams by navigationParams()
 
     override fun onViewCreated(
         view: View,
@@ -38,9 +39,9 @@ internal class ValidateSubjectPoolFragment : Fragment(R.layout.fragment_validate
 
         binding.validationActionsClose.setOnClickListener { finishWithResult(false) }
         binding.validationActionsContinue.setOnClickListener { finishWithResult(true) }
-        binding.validationActionsSync.setOnClickListener { viewModel.syncAndRetry(args.subjectQuery) }
+        binding.validationActionsSync.setOnClickListener { viewModel.syncAndRetry(params.subjectQuery) }
 
-        viewModel.checkIdentificationPool(args.subjectQuery)
+        viewModel.checkIdentificationPool(params.subjectQuery)
     }
 
     private fun renderState(state: ValidateSubjectPoolState) = when (state) {

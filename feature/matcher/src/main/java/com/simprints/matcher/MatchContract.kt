@@ -5,12 +5,11 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
-import com.simprints.matcher.screen.MatchFragmentArgs
 
 object MatchContract {
     val DESTINATION = R.id.matcherFragment
 
-    fun getArgs(
+    fun getParams(
         referenceId: String = "",
         fingerprintSamples: List<MatchParams.FingerprintSample> = emptyList(),
         faceSamples: List<MatchParams.FaceSample> = emptyList(),
@@ -19,16 +18,14 @@ object MatchContract {
         flowType: FlowType,
         subjectQuery: SubjectQuery,
         biometricDataSource: BiometricDataSource,
-    ) = MatchFragmentArgs(
-        MatchParams(
-            referenceId,
-            faceSamples,
-            faceSDK,
-            fingerprintSamples,
-            fingerprintSDK,
-            flowType,
-            subjectQuery,
-            biometricDataSource,
-        ),
-    ).toBundle()
+    ) = MatchParams(
+        referenceId,
+        faceSamples,
+        faceSDK,
+        fingerprintSamples,
+        fingerprintSDK,
+        flowType,
+        subjectQuery,
+        biometricDataSource,
+    )
 }

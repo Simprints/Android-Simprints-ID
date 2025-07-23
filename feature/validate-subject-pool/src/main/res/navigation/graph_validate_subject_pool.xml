@@ -12,8 +12,8 @@
         tools:layout="@layout/fragment_validate_subject_pool">
 
         <argument
-            android:name="subjectQuery"
-            app:argType="com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery" />
+            android:name="params"
+            app:argType="com.simprints.core.domain.step.StepParams" />
 
     </fragment>
 

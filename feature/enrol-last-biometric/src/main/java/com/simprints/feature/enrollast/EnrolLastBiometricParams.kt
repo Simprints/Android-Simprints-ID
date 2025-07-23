@@ -1,52 +1,45 @@
 package com.simprints.feature.enrollast
 
-import android.os.Parcelable
 import androidx.annotation.Keep
+import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import kotlinx.parcelize.Parcelize
 
 @Keep
-@Parcelize
 data class EnrolLastBiometricParams(
     val projectId: String,
     val userId: TokenizableString,
     val moduleId: TokenizableString,
     val steps: List<EnrolLastBiometricStepResult>,
-) : Parcelable
+) : StepParams
 
-sealed class EnrolLastBiometricStepResult : Parcelable {
+sealed class EnrolLastBiometricStepResult : StepParams {
     @Keep
-    @Parcelize
     data class EnrolLastBiometricsResult(
         val subjectId: String?,
     ) : EnrolLastBiometricStepResult()
 
     @Keep
-    @Parcelize
     data class FingerprintMatchResult(
         val results: List<MatchResult>,
         val sdk: FingerprintConfiguration.BioSdk,
     ) : EnrolLastBiometricStepResult()
 
     @Keep
-    @Parcelize
     data class FaceMatchResult(
         val results: List<MatchResult>,
         val sdk: FaceConfiguration.BioSdk,
     ) : EnrolLastBiometricStepResult()
 
     @Keep
-    @Parcelize
     data class FingerprintCaptureResult(
         val referenceId: String,
         val results: List<FingerTemplateCaptureResult>,
     ) : EnrolLastBiometricStepResult()
 
     @Keep
-    @Parcelize
     data class FaceCaptureResult(
         val referenceId: String,
         val results: List<FaceTemplateCaptureResult>,
@@ -54,20 +47,18 @@ sealed class EnrolLastBiometricStepResult : Parcelable {
 }
 
 @Keep
-@Parcelize
 data class MatchResult(
     val subjectId: String,
     val confidenceScore: Float,
-) : Parcelable
+) : StepParams
 
 @Keep
-@Parcelize
 data class FingerTemplateCaptureResult(
     val finger: Finger,
     val template: ByteArray,
     val templateQualityScore: Int,
     val format: String,
-) : Parcelable {
+) : StepParams {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -92,11 +83,10 @@ data class FingerTemplateCaptureResult(
 }
 
 @Keep
-@Parcelize
 data class FaceTemplateCaptureResult(
     val template: ByteArray,
     val format: String,
-) : Parcelable {
+) : StepParams {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

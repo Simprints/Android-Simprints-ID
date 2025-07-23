@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelStore
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
@@ -79,6 +80,7 @@ fun testNavController(
     startDestination: Int? = null,
 ): TestNavHostController {
     val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+    navController.setViewModelStore(ViewModelStore())
     navController.setGraph(graph)
     startDestination?.also { navController.setCurrentDestination(it) }
     return navController

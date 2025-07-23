@@ -9,7 +9,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.extentions.applicationSettingsIntent
@@ -17,9 +16,11 @@ import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.matcher.MatchParams
 import com.simprints.matcher.R
 import com.simprints.matcher.databinding.FragmentMatcherBinding
 import com.simprints.matcher.screen.MatchViewModel.MatchState
@@ -30,18 +31,18 @@ import com.simprints.infra.resources.R as IDR
 internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private val viewModel: MatchViewModel by viewModels()
     private val binding by viewBinding(FragmentMatcherBinding::bind)
-    private val args by navArgs<MatchFragmentArgs>()
+    private val params: MatchParams by navigationParams()
 
     private val permissionCall = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        val status = args.params.biometricDataSource
+        val status = params.biometricDataSource
             .permissionName()
             ?.let { requireActivity().permissionFromResult(it, granted) }
             ?: PermissionStatus.Granted
 
         when (status) {
-            PermissionStatus.Granted -> viewModel.setupMatch(args.params)
+            PermissionStatus.Granted -> viewModel.setupMatch(params)
             PermissionStatus.Denied -> viewModel.noPermission(neverAskAgain = false)
             PermissionStatus.DeniedNeverAskAgain -> viewModel.noPermission(neverAskAgain = true)
         }
@@ -53,14 +54,14 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     ) {
         super.onViewCreated(view, savedInstanceState)
         applySystemBarInsets(view)
-        Simber.i("MatchFragment started (isFace=${args.params.isFaceMatch()})", tag = ORCHESTRATION)
+        Simber.i("MatchFragment started (isFace=${params.isFaceMatch()})", tag = ORCHESTRATION)
 
         observeViewModel()
     }
 
     override fun onResume() {
         super.onResume()
-        val requiredPermissionName = args.params.biometricDataSource
+        val requiredPermissionName = params.biometricDataSource
             .permissionName()
             ?.takeUnless { requireActivity().hasPermission(it) }
 
@@ -71,14 +72,17 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
             if (requiredPermissionName != null) {
                 permissionCall.launch(requiredPermissionName)
             } else {
-                viewModel.setupMatch(args.params)
+                viewModel.setupMatch(params)
             }
         } else {
             viewModel.shouldCheckPermission = true
         }
     }
 
-    private fun setIdentificationProgress(progress: Int, animate: Boolean) = requireActivity().runOnUiThread {
+    private fun setIdentificationProgress(
+        progress: Int,
+        animate: Boolean,
+    ) = requireActivity().runOnUiThread {
         if (animate) {
             ObjectAnimator
                 .ofInt(binding.faceMatchProgress, "progress", binding.faceMatchProgress.progress, progress)
@@ -120,7 +124,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private fun renderLoadingCandidates(state: MatchState.LoadingCandidates) {
         binding.faceMatchPermissionRequestButton.isVisible = false
         binding.apply {
-            val text = if(state.total  > 0) {
+            val text = if (state.total > 0) {
                 getString(IDR.string.matcher_loading_candidates) + " (${state.loaded}/${state.total})"
             } else {
                 getString(IDR.string.matcher_loading_candidates)
@@ -203,7 +207,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private fun renderNoPermission(state: MatchState.NoPermission) = with(binding) {
         faceMatchMessage.setText(IDR.string.matcher_missing_access_permission)
 
-        val name = args.params.biometricDataSource.permissionName()
+        val name = params.biometricDataSource.permissionName()
         faceMatchPermissionRequestButton.isVisible = name != null
 
         faceMatchPermissionRequestButton.setOnClickListener {

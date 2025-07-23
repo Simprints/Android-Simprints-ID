@@ -25,7 +25,14 @@ internal class MapRefusalOrErrorResultUseCase @Inject constructor(
         result: Serializable,
         projectConfiguration: ProjectConfiguration,
     ): AppResponse? = when (result) {
-        is ExitFormResult -> AppRefusalResponse.fromResult(result)
+        is ExitFormResult -> AppRefusalResponse(
+            result
+                .submittedOption()
+                ?.answer
+                ?.name
+                .orEmpty(),
+            result.reason.orEmpty(),
+        )
 
         is FetchSubjectResult -> result.takeUnless { it.found }?.let {
             AppErrorResponse(

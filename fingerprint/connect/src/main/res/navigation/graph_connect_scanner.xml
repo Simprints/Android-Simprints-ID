@@ -11,7 +11,7 @@
 
         <argument
             android:name="params"
-            app:argType="com.simprints.fingerprint.connect.FingerprintConnectParams" />
+            app:argType="com.simprints.core.domain.step.StepParams" />
 
 
     </fragment>

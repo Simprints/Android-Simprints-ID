@@ -13,7 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.domain.permission.worstPermissionStatus
@@ -25,6 +24,7 @@ import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
@@ -40,6 +40,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
 import com.simprints.infra.uibase.system.Vibrate
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -48,7 +49,7 @@ import com.simprints.infra.resources.R as IDR
 internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_connect_scanner_controller) {
     private var shouldRequestPermissions = true
 
-    private val args: ConnectScannerControllerFragmentArgs by navArgs()
+    private val params: FingerprintConnectParams by navigationParams()
     private val activityViewModel: ConnectScannerViewModel by activityViewModels()
     private val fragmentViewModel: ConnectScannerControllerViewModel by viewModels()
 
@@ -101,7 +102,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
             ?: shouldRequestPermissions
 
         if (!fragmentViewModel.isInitialized) {
-            activityViewModel.init(args.params)
+            activityViewModel.init(params)
             fragmentViewModel.isInitialized = true
         }
 
@@ -164,7 +165,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                         R.id.otaFragment,
                         OtaFragmentArgs(
                             OtaFragmentParams(
-                                args.params.fingerprintSDK,
+                                params.fingerprintSDK,
                                 screen.availableOtas,
                             ),
                         ).toBundle(),

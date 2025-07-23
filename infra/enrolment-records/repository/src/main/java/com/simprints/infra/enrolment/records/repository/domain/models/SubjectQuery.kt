@@ -1,8 +1,8 @@
 package com.simprints.infra.enrolment.records.repository.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.step.StepParams
 import com.simprints.core.domain.tokenization.TokenizableString
-import java.io.Serializable
 
 @Keep
 data class SubjectQuery(
@@ -17,4 +17,4 @@ data class SubjectQuery(
     val sort: Boolean = false,
     val afterSubjectId: String? = null,
     val metadata: String? = null,
-) : Serializable
+) : StepParams

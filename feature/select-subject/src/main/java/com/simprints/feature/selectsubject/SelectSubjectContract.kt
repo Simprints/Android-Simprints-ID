@@ -1,12 +1,10 @@
 package com.simprints.feature.selectsubject
 
-import com.simprints.feature.selectsubject.screen.SelectSubjectFragmentArgs
-
 object SelectSubjectContract {
     val DESTINATION = R.id.selectSubjectFragment
 
-    fun getArgs(
+    fun getParams(
         projectId: String,
         subjectId: String,
-    ) = SelectSubjectFragmentArgs(projectId, subjectId).toBundle()
+    ) = SelectSubjectParams(projectId, subjectId)
 }

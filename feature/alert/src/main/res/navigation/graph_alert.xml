@@ -11,8 +11,8 @@
         android:label="AlertFragment"
         tools:layout="@layout/fragment_alert">
         <argument
-            android:name="alertConfiguration"
-            app:argType="com.simprints.feature.alert.config.AlertConfiguration" />
+            android:name="param"
+            app:argType="com.simprints.core.domain.step.StepParams" />
     </fragment>
 
 </navigation>

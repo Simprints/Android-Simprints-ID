@@ -1,15 +1,19 @@
 package com.simprints.feature.orchestrator.cache
 
-import android.os.Bundle
 import androidx.core.content.edit
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.step.StepParams
+import com.simprints.core.domain.step.StepResult
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.feature.orchestrator.steps.SerializableMixin
 import com.simprints.feature.orchestrator.steps.Step
+import com.simprints.feature.orchestrator.steps.StepParamsMixin
+import com.simprints.feature.orchestrator.steps.StepResultMixin
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.security.SecurityManager
-import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,7 +25,8 @@ internal class OrchestratorCache @Inject constructor(
     private val prefs = securityManager.buildEncryptedSharedPreferences(ORCHESTRATION_CACHE)
 
     private fun List<Step>.asJsonArray(jsonHelper: JsonHelper): String = with(jsonHelper) {
-        addMixin(Serializable::class.java, SerializableMixin::class.java)
+        addMixin(StepParams::class.java, StepParamsMixin::class.java)
+        addMixin(StepResult::class.java, StepResultMixin::class.java)
         return@with joinToString(separator = ",") {
             jsonHelper.toJson(it, module = stepsModule)
         }.let { "[$it]" }
@@ -36,7 +41,8 @@ internal class OrchestratorCache @Inject constructor(
         get() = prefs
             .getString(KEY_STEPS, null)
             ?.let { jsonArray ->
-                jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
+                jsonHelper.addMixin(StepParams::class.java, StepParamsMixin::class.java)
+                jsonHelper.addMixin(StepResult::class.java, StepResultMixin::class.java)
                 jsonHelper.fromJson(
                     json = jsonArray,
                     module = stepsModule,
@@ -68,8 +74,8 @@ internal class OrchestratorCache @Inject constructor(
         private const val KEY_AGE_GROUP = "age_group"
 
         private val stepsModule = SimpleModule().apply {
-            addSerializer(Bundle::class.java, BundleSerializer())
-            addDeserializer(Bundle::class.java, BundleDeserializer())
+            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
+            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
         }
     }
 }

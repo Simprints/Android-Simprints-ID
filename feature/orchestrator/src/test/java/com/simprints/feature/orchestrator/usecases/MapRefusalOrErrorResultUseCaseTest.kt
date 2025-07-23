@@ -3,6 +3,7 @@ package com.simprints.feature.orchestrator.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.alert.AlertResult
+import com.simprints.feature.exitform.ExitFormOption
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.selectagegroup.SelectSubjectAgeGroupResult
@@ -85,5 +86,19 @@ class MapRefusalOrErrorResultUseCaseTest {
         assertThat(
             useCase(SelectSubjectAgeGroupResult(ageGroupNotSupported), projectConfiguration),
         ).isInstanceOf(AppErrorResponse::class.java)
+    }
+
+    @Test
+    fun `Maps exit form result to appropriate response`() = runTest {
+        val projectConfiguration = mockk<ProjectConfiguration>(relaxed = true)
+        mapOf(
+            ExitFormResult(true, null, null) to AppRefusalResponse("", ""),
+            ExitFormResult(true, null, "reason") to AppRefusalResponse("", "reason"),
+            ExitFormResult(true, ExitFormOption.AppNotWorking, "") to AppRefusalResponse("APP_NOT_WORKING", ""),
+        ).forEach { (result, expected) ->
+            val actual = useCase(result, projectConfiguration)
+
+            assertThat(actual).isEqualTo(expected)
+        }
     }
 }

@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
@@ -15,6 +14,7 @@ import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.R
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType
@@ -25,17 +25,18 @@ import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.navigationParams
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_last) {
     private val viewModel: EnrolLastBiometricViewModel by viewModels()
-    private val args: EnrolLastBiometricFragmentArgs by navArgs()
+    private val params: EnrolLastBiometricParams by navigationParams()
 
     override fun onViewCreated(
         view: View,
@@ -52,7 +53,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         ) { finishWithSubjectId(null) }
 
         viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { finishWithResult(it) })
-        viewModel.onViewCreated(args.params)
+        viewModel.onViewCreated(params)
     }
 
     private fun finishWithResult(result: EnrolLastState) = when (result) {
