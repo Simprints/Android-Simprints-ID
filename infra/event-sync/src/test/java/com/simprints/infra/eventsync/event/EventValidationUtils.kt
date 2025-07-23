@@ -259,14 +259,16 @@ fun verifyCalloutConfirmationApiModelV2(json: JSONObject) {
     assertThat(json.getString("type")).isEqualTo("Confirmation")
     assertThat(json.getString("selectedGuid")).isNotNull()
     assertThat(json.getString("sessionId")).isNotNull()
-    assertThat(json.length()).isEqualTo(3)
+    assertThat(json.getString("metadata")).isNotNull()
+    assertThat(json.length()).isEqualTo(4)
 }
 
 fun verifyCalloutConfirmationApiModelV3(json: JSONObject) {
     assertThat(json.getString("type")).isEqualTo("Confirmation")
     assertThat(json.getString("selectedGuid")).isNotNull()
     assertThat(json.getString("sessionId")).isNotNull()
-    assertThat(json.length()).isEqualTo(3)
+    assertThat(json.getString("metadata")).isNotNull()
+    assertThat(json.length()).isEqualTo(4)
 }
 
 fun validateAlertScreenEventApiModel(json: JSONObject) {

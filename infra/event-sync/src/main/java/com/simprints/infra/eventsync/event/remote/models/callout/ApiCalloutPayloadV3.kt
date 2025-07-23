@@ -26,7 +26,7 @@ internal data class ApiCalloutPayloadV3(
             domainPayload.userId.value,
             domainPayload.moduleId.value,
             domainPayload.metadata,
-            domainPayload.biometricDataSource.fromDomainToApi()
+            domainPayload.biometricDataSource.fromDomainToApi(),
         ),
     )
 
@@ -37,7 +37,7 @@ internal data class ApiCalloutPayloadV3(
             domainPayload.userId.value,
             domainPayload.moduleId.value,
             domainPayload.metadata,
-            domainPayload.biometricDataSource.fromDomainToApi()
+            domainPayload.biometricDataSource.fromDomainToApi(),
         ),
     )
 
@@ -49,7 +49,7 @@ internal data class ApiCalloutPayloadV3(
             domainPayload.moduleId.value,
             domainPayload.metadata,
             domainPayload.verifyGuid,
-            domainPayload.biometricDataSource.fromDomainToApi()
+            domainPayload.biometricDataSource.fromDomainToApi(),
         ),
     )
 
@@ -58,6 +58,7 @@ internal data class ApiCalloutPayloadV3(
         ApiConfirmationCalloutV3(
             domainPayload.selectedGuid,
             domainPayload.sessionId,
+            domainPayload.metadata,
         ),
     )
 

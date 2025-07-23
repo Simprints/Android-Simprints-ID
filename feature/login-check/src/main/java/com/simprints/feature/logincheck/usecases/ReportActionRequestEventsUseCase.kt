@@ -78,7 +78,13 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                     metadata,
                     BiometricDataSource.fromString(biometricDataSource),
                 )
-                is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEventV3(startTime, projectId, selectedGuid, sessionId)
+                is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEventV3(
+                    startTime,
+                    projectId,
+                    selectedGuid,
+                    sessionId,
+                    metadata,
+                )
                 is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEventV3(
                     startTime,
                     projectId,
