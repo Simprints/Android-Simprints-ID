@@ -4,6 +4,9 @@ import android.text.format.DateUtils.FORMAT_SHOW_DATE
 import android.text.format.DateUtils.MINUTE_IN_MILLIS
 import android.text.format.DateUtils.getRelativeTimeSpanString
 import com.lyft.kronos.KronosClock
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
@@ -58,5 +61,16 @@ class KronosTimeHelperImpl @Inject constructor(
         set(Calendar.MILLISECOND, 0)
 
         timeInMillis
+    }
+
+    override fun watchOncePerMinute(): Flow<Unit> = flow {
+        while (true) {
+            emit(Unit)
+            delay(ONE_MINUTE_IN_MILLIS)
+        }
+    }
+
+    private companion object {
+        private const val ONE_MINUTE_IN_MILLIS = 60 * 1000L
     }
 }

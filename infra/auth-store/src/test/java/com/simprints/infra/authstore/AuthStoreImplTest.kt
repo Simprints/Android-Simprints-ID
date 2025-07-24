@@ -11,6 +11,8 @@ import com.simprints.infra.authstore.network.SimApiClientFactory
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import io.mockk.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -127,6 +129,41 @@ class AuthStoreImplTest {
         val receivedClient = loginManagerManagerImpl.buildClient(SimRemoteInterface::class)
 
         assertThat(receivedClient).isEqualTo(SIM_API_CLIENT)
+    }
+
+    @Test
+    fun `watchSignedInProjectId should return flow with initial project id value`() = runTest {
+        val expectedFlow = MutableStateFlow("initial-project-id")
+        every { loginInfoStore.watchSignedInProjectId() } returns expectedFlow
+
+        val flow = loginManagerManagerImpl.watchSignedInProjectId()
+        val initialValue = flow.first()
+
+        assertThat(initialValue).isEqualTo("initial-project-id")
+        verify(exactly = 1) { loginInfoStore.watchSignedInProjectId() }
+    }
+
+    @Test
+    fun `watchSignedInProjectId should return flow with empty string when project id is empty`() = runTest {
+        val expectedFlow = MutableStateFlow("")
+        every { loginInfoStore.watchSignedInProjectId() } returns expectedFlow
+
+        val flow = loginManagerManagerImpl.watchSignedInProjectId()
+        val initialValue = flow.first()
+
+        assertThat(initialValue).isEqualTo("")
+        verify(exactly = 1) { loginInfoStore.watchSignedInProjectId() }
+    }
+
+    @Test
+    fun `watchSignedInProjectId should listen to the logged in project id values`() = runTest {
+        val expectedValues = MutableStateFlow("project1").apply { emit("project2") }
+        every { loginInfoStore.watchSignedInProjectId() } returns expectedValues
+
+        val receivedFlow = loginManagerManagerImpl.watchSignedInProjectId()
+
+        assertThat(receivedFlow).isEqualTo(expectedValues)
+        verify(exactly = 1) { loginInfoStore.watchSignedInProjectId() }
     }
 
     companion object {

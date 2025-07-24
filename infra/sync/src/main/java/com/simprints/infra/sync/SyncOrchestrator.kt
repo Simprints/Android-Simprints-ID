@@ -21,6 +21,12 @@ interface SyncOrchestrator {
 
     fun stopEventSync()
 
+    fun startImageSync()
+
+    fun stopImageSync()
+
+    fun observeImageSyncStatus(): Flow<ImageSyncStatus>
+
     /**
      * Fully reschedule the background worker.
      * Should be used in when the configuration that affects scheduling has changed.

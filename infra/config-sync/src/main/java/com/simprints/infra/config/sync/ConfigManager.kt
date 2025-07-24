@@ -10,6 +10,8 @@ import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
@@ -19,10 +21,19 @@ class ConfigManager @Inject constructor(
     private val configSyncCache: ConfigSyncCache,
     private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
 ) {
-    suspend fun refreshProject(projectId: String): ProjectWithConfig = configRepository.refreshProject(projectId).also {
-        enrolmentRecordRepository.tokenizeExistingRecords(it.project)
-        configSyncCache.saveUpdateTime()
-        realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
+    private val ifProjectRefreshingFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    suspend fun refreshProject(projectId: String): ProjectWithConfig {
+        ifProjectRefreshingFlow.tryEmit(true)
+        try {
+            return configRepository.refreshProject(projectId).also {
+                enrolmentRecordRepository.tokenizeExistingRecords(it.project)
+                configSyncCache.saveUpdateTime()
+                realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
+            }
+        } finally {
+            ifProjectRefreshingFlow.tryEmit(false)
+        }
     }
 
     suspend fun getProject(projectId: String): Project = try {
@@ -49,11 +60,17 @@ class ConfigManager @Inject constructor(
         }
     }
 
+    fun watchIfProjectRefreshing(): Flow<Boolean> = ifProjectRefreshingFlow.asStateFlow()
+
     fun watchProjectConfiguration(): Flow<ProjectConfiguration> = configRepository
         .watchProjectConfiguration()
         .onStart { getProjectConfiguration() } // to invoke download if empty
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration = configRepository.getDeviceConfiguration()
+
+    fun watchDeviceConfiguration(): Flow<DeviceConfiguration> = configRepository
+        .watchDeviceConfiguration()
+        .onStart { getDeviceConfiguration() }
 
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
         configRepository.updateDeviceConfiguration(update)

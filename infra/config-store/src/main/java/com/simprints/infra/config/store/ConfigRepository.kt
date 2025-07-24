@@ -21,6 +21,8 @@ interface ConfigRepository {
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration
 
+    fun watchDeviceConfiguration(): Flow<DeviceConfiguration>
+
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
 
     suspend fun clearData()

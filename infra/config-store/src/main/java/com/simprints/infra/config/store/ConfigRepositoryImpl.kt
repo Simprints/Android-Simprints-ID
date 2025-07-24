@@ -71,6 +71,8 @@ internal class ConfigRepositoryImpl @Inject constructor(
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration = localDataSource.getDeviceConfiguration()
 
+    override fun watchDeviceConfiguration(): Flow<DeviceConfiguration> = localDataSource.watchDeviceConfiguration()
+
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
         localDataSource.updateDeviceConfiguration(update)
 
