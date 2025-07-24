@@ -85,8 +85,7 @@ internal class EventSyncManagerTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every {
-                synchronization.down.simprints.partitionType
-                    .toDomain()
+                synchronization.down.simprints?.partitionType?.toDomain()
             } returns Partitioning.MODULE
         }
 
@@ -97,7 +96,7 @@ internal class EventSyncManagerTest {
             eventRepository = eventRepository,
             upSyncScopeRepo = eventUpSyncScopeRepository,
             eventSyncCache = eventSyncCache,
-            downSyncTask = downSyncTask,
+            simprintsDownSyncTask = downSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
             configRepository = configRepository,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,

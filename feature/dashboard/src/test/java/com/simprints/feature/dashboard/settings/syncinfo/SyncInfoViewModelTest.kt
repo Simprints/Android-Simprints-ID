@@ -14,7 +14,6 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -203,13 +202,6 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should initialize the recordsToDownSync live data to the count otherwise`() = runTest {
-        //TODO(milen): temp, remove when new config is implemented
-        mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
-        val projectConfiguration = mockk<ProjectConfiguration>()
-        every { projectConfiguration.isSimprintsEventDownSyncAllowed() } returns true
-        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
-
-
         val module1 = "module1".asTokenizableEncrypted()
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(module1)
@@ -331,26 +323,32 @@ class SyncInfoViewModelTest {
         // Not module sync
         assertThat(
             viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
-                createMockDownSyncConfig(
+                createMockSimprintsDownSyncConfig(
                     partitionType = DownSynchronizationConfiguration.PartitionType.USER,
-                ),
+                ).down.simprints,
             ),
         ).isFalse()
         // Module sync + no modules
         assertThat(
             viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
-                createMockDownSyncConfig(
+                createMockSimprintsDownSyncConfig(
                     partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                ),
+                ).down.simprints,
+            ),
+        ).isFalse()
+        // CommCare sync
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
+                createMockCommCareDownSyncConfig().down.simprints,
             ),
         ).isFalse()
         // Module sync + has modules
         assertThat(
             viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
-                createMockDownSyncConfig(
+                createMockSimprintsDownSyncConfig(
                     partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                     modules = listOf("module"),
-                ),
+                ).down.simprints,
             ),
         ).isTrue()
     }
@@ -358,7 +356,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `emit correct sync availability when connection status changes`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { synchronization } returns createMockDownSyncConfig(
+            every { synchronization } returns createMockSimprintsDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                 modules = listOf("module"),
             )
@@ -376,7 +374,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `emit correct sync availability when sync status changes`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { synchronization } returns createMockDownSyncConfig(
+            every { synchronization } returns createMockSimprintsDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                 modules = listOf("module"),
             )
@@ -421,7 +419,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `emit correct sync availability when non-module config`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { synchronization } returns createMockDownSyncConfig(
+            every { synchronization } returns createMockSimprintsDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.USER,
             )
         }
@@ -435,7 +433,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `emit correct sync availability when module config without modules`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
-            every { synchronization } returns createMockDownSyncConfig(
+            every { synchronization } returns createMockSimprintsDownSyncConfig(
                 partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                 modules = emptyList(),
             )
@@ -445,6 +443,18 @@ class SyncInfoViewModelTest {
         stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList(), emptyList())
 
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
+    }
+
+    @Test
+    fun `emit correct sync availability when CommCare sync`() = runTest {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns createMockCommCareDownSyncConfig()
+        }
+        viewModel.refreshInformation()
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList(), emptyList())
+
+        connectionLiveData.value = false
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
     }
 
     @Test
@@ -507,7 +517,7 @@ class SyncInfoViewModelTest {
         verify(exactly = 0) { syncOrchestrator.startEventSync() }
     }
 
-    private fun createMockDownSyncConfig(
+    private fun createMockSimprintsDownSyncConfig(
         partitionType: DownSynchronizationConfiguration.PartitionType,
         modules: List<String> = emptyList(),
     ) = mockk<SynchronizationConfiguration> {
@@ -520,5 +530,11 @@ class SyncInfoViewModelTest {
                 frequency = Frequency.PERIODICALLY,
             ),
         )
+        every { down.commCare }.returns(null)
+    }
+
+    private fun createMockCommCareDownSyncConfig() = mockk<SynchronizationConfiguration> {
+        every { down.simprints }.returns(null)
+        every { down.commCare }.returns(DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration)
     }
 }

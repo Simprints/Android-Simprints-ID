@@ -14,8 +14,8 @@ import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.uibase.view.applySystemBarInsets
@@ -75,7 +75,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun observeUI() {
         viewModel.configuration.observe(viewLifecycleOwner) {
-            enableModuleSelectionButtonAndTabsIfNecessary(it.synchronization)
+            enableModuleSelectionButtonAndTabsIfNecessary(it.synchronization.down.simprints)
             setupRecordsCountCards(it)
         }
         viewModel.recordsInLocal.observe(viewLifecycleOwner) {
@@ -142,8 +142,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         )
     }
 
-    private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
-        if (viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
+    private fun enableModuleSelectionButtonAndTabsIfNecessary(simprintsDownSyncConfig: SimprintsDownSynchronizationConfiguration?) {
+        if (viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(simprintsDownSyncConfig)) {
             binding.moduleSelectionButton.visibility = View.VISIBLE
             binding.modulesTabHost.visibility = View.VISIBLE
         } else {

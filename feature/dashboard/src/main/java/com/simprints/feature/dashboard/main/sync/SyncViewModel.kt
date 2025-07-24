@@ -261,18 +261,20 @@ internal class SyncViewModel @Inject constructor(
         else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
     }
 
-    private suspend fun isModuleSelectionRequired() = isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
+    private suspend fun isModuleSelectionRequired() = isSimprintsDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
-    private suspend fun isDownSyncAllowed() = configManager
+    // Simprints downsync is allowed if down.simprints is not null and its frequency is not ONLY_PERIODICALLY_UP_SYNC
+    private suspend fun isSimprintsDownSyncAllowed() = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.frequency !=
-        Frequency.ONLY_PERIODICALLY_UP_SYNC
+        .synchronization.down.simprints?.let {
+            it.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
+        } ?: false
 
     private suspend fun isSelectedModulesEmpty() = configManager.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        .synchronization.down.simprints?.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 }

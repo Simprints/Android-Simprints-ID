@@ -180,7 +180,7 @@ class AboutViewModelTest {
             every { poolType } returns POOL_TYPE
         }
         every { synchronization } returns mockk {
-            every { down.simprints.partitionType } returns PARTITION_TYPE
+            every { down.simprints?.partitionType } returns PARTITION_TYPE
             every { up.simprints.kind } returns upSyncKind
         }
     }

@@ -5,7 +5,6 @@ import androidx.work.Constraints
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
-import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -23,7 +22,7 @@ import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownload
 import java.util.concurrent.TimeUnit
 
 internal abstract class BaseEventDownSyncWorkersBuilder(
-    private val downSyncScopeRepository: EventDownSyncScopeRepository,
+    protected val downSyncScopeRepository: EventDownSyncScopeRepository,
     protected val jsonHelper: JsonHelper,
     protected val configManager: ConfigManager,
 ) {
@@ -32,26 +31,12 @@ internal abstract class BaseEventDownSyncWorkersBuilder(
 
     abstract fun getDownSyncWorkerConstraints(): Constraints
 
-    suspend fun buildDownSyncWorkerChain(
+    abstract suspend fun buildDownSyncWorkerChain(
         uniqueSyncId: String,
         uniqueDownSyncId: String,
-    ): List<OneTimeWorkRequest> {
-        val projectConfiguration = configManager.getProjectConfiguration()
-        val deviceConfiguration = configManager.getDeviceConfiguration()
+    ): List<OneTimeWorkRequest>
 
-        val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            modes = projectConfiguration.general.modalities.map { it.toMode() },
-            selectedModuleIDs = deviceConfiguration.selectedModules.values(),
-            syncPartitioning = projectConfiguration.synchronization.down.simprints.partitionType
-                .toDomain(),
-        )
-
-        return downSyncScope.operations.map {
-            buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it)
-        }
-    }
-
-    private fun buildDownSyncWorkers(
+    protected fun buildDownSyncWorkers(
         uniqueSyncID: String,
         uniqueDownSyncID: String,
         downSyncOperation: EventDownSyncOperation,

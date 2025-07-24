@@ -100,10 +100,12 @@ internal data class ApiSynchronizationConfiguration(
 
     @Keep
     data class ApiDownSynchronizationConfiguration(
-        val simprints: ApiSimprintsDownSynchronizationConfiguration,
+        val simprints: ApiSimprintsDownSynchronizationConfiguration?,
+        val commcare: ApiCommCareDownSynchronizationConfiguration?,
     ) {
         fun toDomain(): DownSynchronizationConfiguration = DownSynchronizationConfiguration(
-            simprints.toDomain(),
+            simprints?.toDomain(),
+            commcare?.toDomain(),
         )
     }
 
@@ -136,6 +138,11 @@ internal data class ApiSynchronizationConfiguration(
                 USER -> DownSynchronizationConfiguration.PartitionType.USER
             }
         }
+    }
+
+    @Keep
+    class ApiCommCareDownSynchronizationConfiguration {
+        fun toDomain() = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
     }
 
     @Keep
