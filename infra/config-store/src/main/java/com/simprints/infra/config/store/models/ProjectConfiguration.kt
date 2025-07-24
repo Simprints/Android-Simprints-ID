@@ -37,11 +37,11 @@ fun ProjectConfiguration.canSyncBiometricDataToSimprints(): Boolean =
 fun ProjectConfiguration.canSyncAnalyticsDataToSimprints(): Boolean =
     synchronization.up.simprints.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 
-// TODO(milen): temp
-fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean = false
-// synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+fun ProjectConfiguration.isSimprintsEventDownSyncAllowed(): Boolean =
+    synchronization.down.simprints != null &&
+    synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
 
-fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = true
+fun ProjectConfiguration.isCommCareEventDownSyncAllowed(): Boolean = synchronization.down.commCare != null
 
 fun ProjectConfiguration.imagesUploadRequiresUnmeteredConnection(): Boolean = synchronization.up.simprints.imagesRequireUnmeteredConnection
 

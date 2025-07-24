@@ -235,10 +235,10 @@ internal class EventSyncMasterWorkerTest {
             eventSyncCache.clearProgresses()
             eventRepository.createEventScope(EventScopeType.DOWN_SYNC, any())
         }
-        //TODO(milen): temp, fix when new config is implemented
-//        assertUpSyncWorkerPresence(false, uniqueSyncId)
-//        assertDownSyncWorkerPresence(true, uniqueSyncId)
-//        assertWorkerChainBuild(true, uniqueSyncId)
+
+        assertUpSyncWorkerPresence(false, uniqueSyncId)
+        assertDownSyncWorkerPresence(true, uniqueSyncId)
+        assertWorkerChainBuild(true, uniqueSyncId)
     }
 
     @Test
@@ -260,10 +260,10 @@ internal class EventSyncMasterWorkerTest {
 
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
         coVerify(exactly = 2) { eventRepository.createEventScope(any(), any()) }
-        //TODO(milen): temp, fix when new config is implemented
-//        assertUpSyncWorkerPresence(true, uniqueSyncId)
-//        assertDownSyncWorkerPresence(true, uniqueSyncId)
-//        assertWorkerChainBuild(true, uniqueSyncId)
+
+        assertUpSyncWorkerPresence(true, uniqueSyncId)
+        assertDownSyncWorkerPresence(true, uniqueSyncId)
+        assertWorkerChainBuild(true, uniqueSyncId)
     }
 
     @Test
@@ -325,8 +325,9 @@ internal class EventSyncMasterWorkerTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { projectId } returns "projectId"
             every { synchronization } returns mockk {
-                every { down.simprints.frequency } returns syncConfig
+                every { down.simprints?.frequency } returns syncConfig
                 every { up.simprints.kind } returns NONE
+                every { down.commCare } returns null
             }
         }
         return masterWorker.doWork()
@@ -345,7 +346,8 @@ internal class EventSyncMasterWorkerTest {
     }
 
     private fun canDownSync(should: Boolean) {
-        every { synchronizationConfiguration.down.simprints.frequency } returns if (should) PERIODICALLY else ONLY_PERIODICALLY_UP_SYNC
+        every { synchronizationConfiguration.down.simprints?.frequency } returns if (should) PERIODICALLY else ONLY_PERIODICALLY_UP_SYNC
+        every { synchronizationConfiguration.down.commCare } returns null
     }
 
     private fun canUpSync(should: Boolean) {

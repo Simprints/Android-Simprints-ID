@@ -12,7 +12,7 @@ internal class StartBackgroundSyncUseCase @Inject constructor(
     suspend operator fun invoke() {
         val frequency = configManager
             .getProjectConfiguration()
-            .synchronization.down.simprints.frequency
+            .synchronization.down.simprints?.frequency
 
         syncOrchestrator.scheduleBackgroundWork(
             withDelay = frequency != Frequency.PERIODICALLY_AND_ON_SESSION_START,

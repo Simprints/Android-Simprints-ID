@@ -78,7 +78,7 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     @Test
     fun builder_forProjectDownSync_shouldReturnTheRightWorkers() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
@@ -97,7 +97,7 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     @Test
     fun builder_forUserDownSync_shouldReturnTheRightWorkers() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.USER
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.USER
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
@@ -115,7 +115,7 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     @Test
     fun builder_forModuleDownSync_shouldReturnTheRightWorkers() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
@@ -133,7 +133,7 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     @Test
     fun builder_periodicDownSyncWorkers_shouldHaveTheRightTags() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FACE),
@@ -152,7 +152,7 @@ class SimprintsEventDownSyncWorkersBuilderTest {
     @Test
     fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),

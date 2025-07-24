@@ -33,7 +33,7 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configManager
                 .getProjectConfiguration()
-                .synchronization.down.simprints.frequency
+                .synchronization.down.simprints?.frequency
         } returns
             Frequency.PERIODICALLY
 
@@ -47,7 +47,7 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configManager
                 .getProjectConfiguration()
-                .synchronization.down.simprints.frequency
+                .synchronization.down.simprints?.frequency
         } returns
             Frequency.PERIODICALLY_AND_ON_SESSION_START
 
@@ -61,7 +61,7 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configManager
                 .getProjectConfiguration()
-                .synchronization.down.simprints.frequency
+                .synchronization.down.simprints?.frequency
         } returns
             Frequency.PERIODICALLY
 

@@ -85,8 +85,7 @@ internal class EventSyncManagerTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every {
-                synchronization.down.simprints.partitionType
-                    .toDomain()
+                synchronization.down.simprints?.partitionType?.toDomain()
             } returns Partitioning.MODULE
         }
 

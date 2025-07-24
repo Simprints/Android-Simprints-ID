@@ -69,13 +69,18 @@ internal class EventSyncManagerImpl @Inject constructor(
     ) { it.sum() }
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
+        //TODO(milen): Handle CommCare here, or maybe upstream?
         val projectConfig = configRepository.getProjectConfiguration()
+        if (projectConfig.synchronization.down.simprints == null) {
+            return DownSyncCounts(count = 0, isLowerBound = false)
+        }
         val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = getProjectModes(projectConfig),
             selectedModuleIDs = deviceConfig.selectedModules.values(),
-            syncPartitioning = projectConfig.synchronization.down.simprints.partitionType
+            //TODO(milen): Handle CommCare here, or maybe upstream?
+            syncPartitioning = projectConfig.synchronization.down.simprints!!.partitionType
                 .toDomain(),
         )
 
