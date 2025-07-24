@@ -31,9 +31,13 @@ interface ImageRepository {
     /**
      * Uploads all images stored locally for the project and deletes if the upload has been successful
      *
+     * @param progressCallback optional callback to report current and max item counts of progress
      * @return true if all images have been successfully uploaded and deleted from the device
      */
-    suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean
+    suspend fun uploadStoredImagesAndDelete(
+        projectId: String,
+        progressCallback: (suspend (Int, Int) -> Unit)? = null
+    ): Boolean
 
     /**
      * Deletes all images stored on the device

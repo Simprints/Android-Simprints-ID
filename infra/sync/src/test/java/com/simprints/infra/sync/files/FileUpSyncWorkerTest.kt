@@ -5,6 +5,8 @@ import com.google.common.truth.Truth
 import com.simprints.fingerprint.infra.imagedistortionconfig.ImageDistortionConfigRepo
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.sync.ImageSyncTimestampProvider
+import com.simprints.infra.sync.SyncConstants
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.coEvery
@@ -33,11 +35,14 @@ class FileUpSyncWorkerTest {
     @MockK
     private lateinit var authStore: AuthStore
 
+    @MockK
+    private lateinit var imageSyncTimestampProvider: ImageSyncTimestampProvider
+
     private lateinit var fileUpSyncWorker: FileUpSyncWorker
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this)
+        MockKAnnotations.init(this, relaxUnitFun = true)
         every { authStore.signedInProjectId } returns PROJECT_ID
 
         fileUpSyncWorker = FileUpSyncWorker(
@@ -46,6 +51,7 @@ class FileUpSyncWorkerTest {
             imageRepository,
             imageDistortionConfigRepo,
             authStore,
+            imageSyncTimestampProvider,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -62,13 +68,14 @@ class FileUpSyncWorkerTest {
         Truth.assertThat(Result.retry()).isEqualTo(result)
         coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
         coVerify(exactly = 0) { imageRepository.uploadStoredImagesAndDelete(any()) }
+        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
     }
 
     @Test
     fun `doWork returns success when uploadStoredImagesAndDelete succeeds`() = runBlocking {
         // Given
         coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
-        coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID) } returns true
+        coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } returns true
 
         // When
         val result = fileUpSyncWorker.doWork()
@@ -76,14 +83,15 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.success()).isEqualTo(result)
         coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
-        coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID) }
+        coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
+        coVerify(exactly = 1) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
     }
 
     @Test
     fun `doWork returns retry when uploadStoredImagesAndDelete fails`() = runBlocking {
         // Given
         coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
-        coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID) } returns false
+        coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } returns false
 
         // When
         val result = fileUpSyncWorker.doWork()
@@ -91,7 +99,8 @@ class FileUpSyncWorkerTest {
         // Then
         Truth.assertThat(Result.retry()).isEqualTo(result)
         coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
-        coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID) }
+        coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
+        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
     }
 
     @Test
@@ -106,5 +115,57 @@ class FileUpSyncWorkerTest {
         Truth.assertThat(Result.retry()).isEqualTo(result)
         coVerify(exactly = 1) { imageDistortionConfigRepo.uploadPendingConfigs() }
         coVerify(exactly = 0) { imageRepository.uploadStoredImagesAndDelete(any()) }
+        coVerify(exactly = 0) { imageSyncTimestampProvider.saveImageSyncCompletionTimestampNow() }
+    }
+
+    @Test
+    fun `doWork calls progress callback during image upload`() = runBlocking {
+        // Given
+        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
+        var progressCallbackReceived: (suspend (Int, Int) -> Unit)? = null
+        coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } coAnswers {
+            progressCallbackReceived = secondArg<suspend (Int, Int) -> Unit>()
+            true
+        }
+
+        // When
+        fileUpSyncWorker.doWork()
+
+        // Then
+        coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
+        Truth.assertThat(progressCallbackReceived).isNotNull()
+    }
+
+    @Test
+    fun `doWork progress callback receives correct progress values`() = runBlocking {
+        // Given
+        coEvery { imageDistortionConfigRepo.uploadPendingConfigs() } returns true
+        val progressValues = mutableListOf<Pair<Int, Int>>()
+        coEvery { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) } coAnswers {
+            val progressCallback = secondArg<suspend (Int, Int) -> Unit>()
+            progressCallback(2, 10)
+            progressCallback(5, 10)
+            progressCallback(10, 10)
+            true
+        }
+        val mockWorker = spyk(fileUpSyncWorker) {
+            coEvery { setProgress(any()) } coAnswers {
+                val workData = firstArg<androidx.work.Data>()
+                val current = workData.getInt(SyncConstants.PROGRESS_CURRENT, -1)
+                val max = workData.getInt(SyncConstants.PROGRESS_MAX, -1)
+                progressValues.add(current to max)
+            }
+        }
+
+        // When
+        mockWorker.doWork()
+
+        // Then
+        coVerify(exactly = 1) { imageRepository.uploadStoredImagesAndDelete(PROJECT_ID, any()) }
+        Truth.assertThat(progressValues).containsExactly(
+            2 to 10,
+            5 to 10,
+            10 to 10,
+        ).inOrder()
     }
 }
