@@ -1,6 +1,8 @@
 package com.simprints.infra.eventsync.sync.down
 
 import androidx.work.Constraints
+import androidx.work.OneTimeWorkRequest
+import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -23,4 +25,21 @@ internal class CommCareEventSyncWorkersBuilder @Inject constructor(
     override fun getDownSyncWorkerConstraints() = Constraints
         .Builder()
         .build()
+
+    override suspend fun buildDownSyncWorkerChain(
+        uniqueSyncId: String,
+        uniqueDownSyncId: String,
+    ): List<OneTimeWorkRequest> {
+        val projectConfiguration = configManager.getProjectConfiguration()
+
+        val downSyncScope = downSyncScopeRepository.getDownSyncScope(
+            modes = projectConfiguration.general.modalities.map { it.toMode() },
+            selectedModuleIDs = emptyList(),
+            syncPartitioning = Partitioning.GLOBAL,
+        )
+
+        return downSyncScope.operations.map { downSyncOperation ->
+            buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, downSyncOperation)
+        }
+    }
 }
