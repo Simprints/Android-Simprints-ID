@@ -17,7 +17,7 @@ interface SyncOrchestrator {
 
     fun cancelEventSync()
 
-    fun startEventSync()
+    fun startEventSync(isDownSyncAllowed: Boolean = true)
 
     fun stopEventSync()
 

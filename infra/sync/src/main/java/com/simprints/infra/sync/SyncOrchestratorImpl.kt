@@ -126,10 +126,11 @@ internal class SyncOrchestratorImpl @Inject constructor(
         stopEventSync()
     }
 
-    override fun startEventSync() {
+    override fun startEventSync(isDownSyncAllowed: Boolean) {
         workManager.startWorker<EventSyncMasterWorker>(
             SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME,
             tags = eventSyncManager.getOneTimeWorkTags(),
+            inputData = workDataOf(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED to isDownSyncAllowed),
         )
     }
 

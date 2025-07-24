@@ -1,5 +1,6 @@
 package com.simprints.infra.sync
 
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
@@ -10,6 +11,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.DEVICE_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
@@ -18,6 +20,8 @@ import com.simprints.infra.sync.SyncConstants.FILE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.FIRMWARE_UPDATE_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
+import com.simprints.infra.sync.SyncConstants.PROGRESS_CURRENT
+import com.simprints.infra.sync.SyncConstants.PROGRESS_MAX
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
@@ -33,6 +37,8 @@ import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -61,6 +67,9 @@ class SyncOrchestratorImplTest {
 
     @MockK
     private lateinit var cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase
+
+    @MockK
+    private lateinit var imageSyncTimestampProvider: ImageSyncTimestampProvider
 
     private lateinit var syncOrchestrator: SyncOrchestratorImpl
 
@@ -262,12 +271,30 @@ class SyncOrchestratorImplTest {
     }
 
     @Test
+    fun `start event sync worker with correct input data`() = runTest {
+        every { eventSyncManager.getOneTimeWorkTags() } returns listOf("tag1", "tag2")
+
+        syncOrchestrator.startEventSync(isDownSyncAllowed = false)
+
+        verify {
+            workManager.enqueueUniqueWork(
+                EVENT_SYNC_WORK_NAME_ONE_TIME,
+                any(),
+                match<OneTimeWorkRequest> {
+                    !it.workSpec.input.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true)
+                },
+            )
+        }
+    }
+
+    @Test
     fun `stop event sync worker cancels correct worker`() = runTest {
         every { eventSyncManager.getAllWorkerTag() } returns "syncWorkers"
 
         syncOrchestrator.cancelEventSync()
 
         verify {
+            workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME)
             workManager.cancelUniqueWork(EVENT_SYNC_WORK_NAME_ONE_TIME)
             workManager.cancelAllWorkByTag("syncWorkers")
         }
@@ -284,6 +311,81 @@ class SyncOrchestratorImplTest {
                 any(),
             )
         }
+    }
+
+    @Test
+    fun `start image sync re-starts image worker`() = runTest {
+        syncOrchestrator.startImageSync()
+
+        verify {
+            workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
+            workManager.enqueueUniqueWork(
+                FILE_UP_SYNC_WORK_NAME,
+                any(),
+                any<OneTimeWorkRequest>(),
+            )
+        }
+    }
+
+    @Test
+    fun `stop image sync cancels image worker`() = runTest {
+        syncOrchestrator.stopImageSync()
+
+        verify {
+            workManager.cancelUniqueWork(FILE_UP_SYNC_WORK_NAME)
+        }
+    }
+
+    @Test
+    fun `observe image sync status returns syncing when worker is running`() = runTest {
+        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.RUNNING))
+        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
+        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 30L
+
+        val status = syncOrchestrator.observeImageSyncStatus().first()
+
+        assertThat(status.isSyncing).isTrue()
+        assertThat(status.secondsSinceLastUpdate).isEqualTo(30L)
+    }
+
+    @Test
+    fun `observe image sync status returns not syncing when worker is cancelled`() = runTest {
+        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.CANCELLED))
+        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
+        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 120L
+
+        val status = syncOrchestrator.observeImageSyncStatus().first()
+
+        assertThat(status.isSyncing).isFalse()
+        assertThat(status.secondsSinceLastUpdate).isEqualTo(120L)
+    }
+
+    @Test
+    fun `observe image sync status includes progress when available`() = runTest {
+        val workInfo1 = createWorkInfoWithProgress(WorkInfo.State.RUNNING, current = 5, max = 10)
+        val workInfo2 = createWorkInfoWithProgress(WorkInfo.State.RUNNING)
+        val workInfoFlow = flowOf(workInfo1, workInfo2)
+        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
+        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 0L
+
+        val status1 = syncOrchestrator.observeImageSyncStatus().first()
+        assertThat(status1.progress).isEqualTo(5 to 10)
+
+        val status2 = syncOrchestrator.observeImageSyncStatus().drop(1).first()
+        assertThat(status2.progress).isEqualTo(null)
+    }
+
+    @Test
+    fun `observe image sync status returns syncing momentarily when worker succeeds quickly`() = runTest {
+        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.SUCCEEDED))
+        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
+        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 0L
+
+        val status1 = syncOrchestrator.observeImageSyncStatus().first()
+        assertThat(status1.isSyncing).isTrue()
+
+        val status2 = syncOrchestrator.observeImageSyncStatus().drop(1).first()
+        assertThat(status2.isSyncing).isFalse()
     }
 
     @Test
@@ -311,7 +413,10 @@ class SyncOrchestratorImplTest {
     @Test
     fun `delegates sync info deletion`() = runTest {
         syncOrchestrator.deleteEventSyncInfo()
-        coVerify { eventSyncManager.deleteSyncInfo() }
+        coVerify {
+            eventSyncManager.deleteSyncInfo()
+            imageSyncTimestampProvider.clearTimestamp()
+        }
     }
 
     @Test
@@ -363,6 +468,7 @@ class SyncOrchestratorImplTest {
         eventSyncManager,
         shouldScheduleFirmwareUpdate,
         cleanupDeprecatedWorkers,
+        imageSyncTimestampProvider,
         CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
     )
 
@@ -371,6 +477,18 @@ class SyncOrchestratorImplTest {
     private fun createWorkInfo(state: WorkInfo.State) = listOf(
         WorkInfo(UUID.randomUUID(), state, emptySet()),
     )
+
+    private fun createWorkInfoWithProgress(state: WorkInfo.State, current: Int? = null, max: Int? = null): List<WorkInfo> {
+        val workInfo = mockk<WorkInfo> {
+            every { this@mockk.state } returns state
+            every { progress } returns Data.Builder()
+                .apply {
+                    current?.let { putInt(PROGRESS_CURRENT, current) }
+                    max?.let { putInt(PROGRESS_MAX, max) }
+                }.build()
+        }
+        return listOf(workInfo)
+    }
 
     companion object {
         private const val INSTRUCTION_ID = "id"
