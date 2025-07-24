@@ -73,3 +73,20 @@ fun ProjectConfiguration.sortedUniqueAgeGroups(): List<AgeGroup> {
 fun ProjectConfiguration.isAgeRestricted() = allowedAgeRanges().any { !it.isEmpty() }
 
 fun ProjectConfiguration.experimental(): ExperimentalProjectConfiguration = ExperimentalProjectConfiguration(custom)
+
+// module sync
+
+fun ProjectConfiguration.isProjectWithModuleSync(): Boolean =
+    synchronization.down.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+
+fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
+    synchronization.up.simprints.frequency == Frequency.ONLY_PERIODICALLY_UP_SYNC
+
+fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean =
+    isProjectWithModuleSync() && isProjectWithPeriodicallyUpSync()
+
+fun ProjectConfiguration.areModuleOptionsEmpty(): Boolean =
+    synchronization.down.simprints.moduleOptions.isEmpty()
+
+fun ProjectConfiguration.isMissingModulesToChooseFrom(): Boolean =
+    isProjectWithModuleSync() && areModuleOptionsEmpty()
