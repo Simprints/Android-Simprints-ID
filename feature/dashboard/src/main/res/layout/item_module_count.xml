@@ -3,25 +3,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp">
+
+    <ImageView
+        android:id="@+id/moduleItemIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:contentDescription="@string/sync_info_item_default"
+        android:padding="4dp"
+        android:src="@drawable/ic_module"
+        app:tint="@color/simprints_text_grey" />
 
     <TextView
         android:id="@+id/moduleNameText"
-        style="@style/Text.Body2.Secondary"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_weight="1"
-        tools:text="Module A" />
+        android:layout_gravity="start"
+        android:layout_weight="0.85"
+        android:padding="4dp"
+        tools:text="Module1" />
 
     <TextView
         android:id="@+id/moduleCountText"
-        style="@style/Text.Body2.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:gravity="end"
-        android:padding="5dp"
-        tools:text="10" />
+        style="@style/Text.Body1.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="7dp"
+        android:layout_weight="0.15"
+        android:gravity="end|center_vertical"
+        tools:text="39"
+        android:textSize="16sp" />
+
 
 </LinearLayout>

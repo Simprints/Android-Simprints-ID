@@ -56,6 +56,9 @@
             android:id="@+id/action_mainFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
+            android:id="@+id/action_mainFragment_to_syncInfoFragment"
+            app:destination="@id/syncInfoFragment" />
+        <action
             android:id="@+id/action_mainFragment_to_moduleSelectionFragment"
             app:destination="@id/moduleSelectionFragment" />
         <action

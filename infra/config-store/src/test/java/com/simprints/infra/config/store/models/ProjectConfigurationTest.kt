@@ -7,6 +7,7 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.testtools.faceConfiguration
 import com.simprints.infra.config.store.testtools.faceSdkConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration
@@ -462,5 +463,191 @@ class ProjectConfigurationTest {
         )
 
         assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `isProjectWithModuleSync should return true when partition type is MODULE`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithModuleSync()).isTrue()
+    }
+
+    @Test
+    fun `isProjectWithModuleSync should return false when partition type is not MODULE`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithModuleSync()).isFalse()
+    }
+
+    @Test
+    fun `isProjectWithPeriodicallyUpSync should return true when frequency is ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithPeriodicallyUpSync()).isTrue()
+    }
+
+    @Test
+    fun `isProjectWithPeriodicallyUpSync should return false when frequency is not ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.PERIODICALLY,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isProjectWithPeriodicallyUpSync()).isFalse()
+    }
+
+    @Test
+    fun `isModuleSelectionAvailable should return true when project has MODULE and ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                    ),
+                ),
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isModuleSelectionAvailable()).isTrue()
+    }
+
+    @Test
+    fun `isModuleSelectionAvailable should return false when partition type is not MODULE`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                    ),
+                ),
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isModuleSelectionAvailable()).isFalse()
+    }
+
+    @Test
+    fun `isModuleSelectionAvailable should return false when frequency is not ONLY_PERIODICALLY_UP_SYNC`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                    ),
+                ),
+                up = synchronizationConfiguration.up.copy(
+                    simprints = simprintsUpSyncConfigurationConfiguration.copy(
+                        frequency = Frequency.PERIODICALLY,
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isModuleSelectionAvailable()).isFalse()
+    }
+
+    @Test
+    fun `areModuleOptionsEmpty should return true when moduleOptions is empty`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        moduleOptions = emptyList(),
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.areModuleOptionsEmpty()).isTrue()
+    }
+
+    @Test
+    fun `areModuleOptionsEmpty should return false when moduleOptions is not empty`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        moduleOptions = listOf("module1".asTokenizableEncrypted()),
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.areModuleOptionsEmpty()).isFalse()
+    }
+
+    @Test
+    fun `isMissingModulesToChooseFrom should return true when project has module sync and empty module options`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        moduleOptions = emptyList(),
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isMissingModulesToChooseFrom()).isTrue()
+    }
+
+    @Test
+    fun `isMissingModulesToChooseFrom should return false when project has module sync but non-empty module options`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        moduleOptions = listOf("module1".asTokenizableEncrypted()),
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isMissingModulesToChooseFrom()).isFalse()
+    }
+
+    @Test
+    fun `isMissingModulesToChooseFrom should return false when project has non-module sync and empty module options`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
+                        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                        moduleOptions = listOf(),
+                    ),
+                ),
+            ),
+        )
+        assertThat(config.isMissingModulesToChooseFrom()).isFalse()
     }
 }

@@ -10,6 +10,8 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -269,5 +271,53 @@ class LoginInfoStoreTest {
         loginInfoStoreImpl.clearCachedTokenClaims()
 
         verify(exactly = 4) { secureEditor.remove(any()) }
+    }
+
+    @Test
+    fun `watchSignedInProjectId should return flow with initial project id value`() = runTest {
+        loginInfoStoreImpl.signedInProjectId = "initial-project-id"
+
+        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+        val initialValue = flow.first()
+
+        assertThat(initialValue).isEqualTo("initial-project-id")
+    }
+
+    @Test
+    fun `watchSignedInProjectId should return flow with empty string when project id is empty`() = runTest {
+        loginInfoStoreImpl.signedInProjectId = ""
+
+        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+        val initialValue = flow.first()
+
+        assertThat(initialValue).isEqualTo("")
+    }
+
+    @Test
+    fun `watchSignedInProjectId should emit new values when signedInProjectId is updated`() = runTest {
+        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+        loginInfoStoreImpl.signedInProjectId = "initial-project-id"
+        val initialValue = flow.first()
+
+        assertThat(initialValue).isEqualTo("initial-project-id")
+
+        loginInfoStoreImpl.signedInProjectId = "updated-project-id"
+
+        val updatedValue = flow.first()
+        assertThat(updatedValue).isEqualTo("updated-project-id")
+    }
+
+    @Test
+    fun `watchSignedInProjectId should emit empty string when credentials are cleared`() = runTest {
+        loginInfoStoreImpl.signedInProjectId = "project-id"
+        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+        val initialValue = flow.first()
+
+        assertThat(initialValue).isEqualTo("project-id")
+
+        loginInfoStoreImpl.cleanCredentials()
+
+        val clearedValue = flow.first()
+        assertThat(clearedValue).isEqualTo("")
     }
 }

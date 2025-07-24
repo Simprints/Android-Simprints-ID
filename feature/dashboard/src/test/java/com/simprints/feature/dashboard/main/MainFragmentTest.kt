@@ -13,7 +13,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.main.dailyactivity.DailyActivityViewModel
 import com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsViewModel
-import com.simprints.feature.dashboard.main.sync.SyncViewModel
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue
@@ -47,10 +46,6 @@ class MainFragmentTest {
     @BindValue
     @JvmField
     internal val dailyActivityViewModel = mockk<DailyActivityViewModel>(relaxed = true)
-
-    @BindValue
-    @JvmField
-    internal val syncViewModel = mockk<SyncViewModel>(relaxed = true)
 
     private val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 

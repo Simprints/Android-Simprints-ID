@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FragmentContainerView">
+        <attr name="isSyncInfoToolbarVisible" format="boolean" />
+        <attr name="isSyncInfoStatusHeaderVisible" format="boolean" />
+        <attr name="isSyncInfoStatusHeaderSettingsButtonVisible" format="boolean" />
+        <attr name="areSyncInfoSectionHeadersVisible" format="boolean" />
+        <attr name="isSyncInfoImageSyncVisible" format="boolean" />
+        <attr name="isSyncInfoRecordsImagesCombined" format="boolean" />
+        <attr name="isSyncInfoLogoutOnComplete" format="boolean" />
+        <attr name="isSyncInfoModuleListVisible" format="boolean" />
+    </declare-styleable>
+</resources>

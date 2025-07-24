@@ -23,6 +23,7 @@ import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -321,5 +322,32 @@ class ConfigLocalDataSourceImplTest {
         assertThat(emittedConfigs[1]).isEqualTo(config3)
         assertThat(emittedConfigs[2]).isEqualTo(config4)
         job.cancel()
+    }
+
+    @Test
+    fun `watchDeviceConfiguration should emit updated values when configuration changes`() = runTest {
+        configLocalDataSourceImpl.saveProject(project)
+
+        val config1 = DeviceConfiguration("en", listOf(), "instruction1")
+        val config2 = DeviceConfiguration("fr", listOf("module1".asTokenizableEncrypted()), "instruction2")
+
+        configLocalDataSourceImpl.updateDeviceConfiguration { config1 }
+
+        val result1 = configLocalDataSourceImpl.watchDeviceConfiguration().first()
+
+        assertThat(result1).isEqualTo(config1)
+
+        configLocalDataSourceImpl.updateDeviceConfiguration { config2 }
+
+        val result2 = configLocalDataSourceImpl.watchDeviceConfiguration().first()
+
+        assertThat(result2).isEqualTo(config2)
+    }
+
+    @Test
+    fun `watchDeviceConfiguration should emit default configuration initially`() = runTest {
+        val result = configLocalDataSourceImpl.watchDeviceConfiguration().first()
+
+        assertThat(result).isEqualTo(ConfigLocalDataSourceImpl.defaultDeviceConfiguration.toDomain())
     }
 }

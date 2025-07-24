@@ -17,9 +17,15 @@ interface SyncOrchestrator {
 
     fun cancelEventSync()
 
-    fun startEventSync()
+    fun startEventSync(isDownSyncAllowed: Boolean = true)
 
     fun stopEventSync()
+
+    fun startImageSync()
+
+    fun stopImageSync()
+
+    fun observeImageSyncStatus(): Flow<ImageSyncStatus>
 
     /**
      * Fully reschedule the background worker.
