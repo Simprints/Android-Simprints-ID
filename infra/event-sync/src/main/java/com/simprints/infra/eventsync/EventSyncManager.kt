@@ -16,13 +16,13 @@ interface EventSyncManager {
 
     suspend fun getLastSyncTime(): Timestamp?
 
-    fun getLastSyncState(): LiveData<EventSyncState>
+    fun getLastSyncState(useDefaultValue: Boolean = false): LiveData<EventSyncState>
 
     suspend fun countEventsToUpload(): Flow<Int>
 
     suspend fun countEventsToUpload(types: List<EventType>): Flow<Int>
 
-    suspend fun countEventsToDownload(): DownSyncCounts
+    suspend fun countEventsToDownload(maxCacheAgeMillis: Long = 0): DownSyncCounts
 
     suspend fun downSyncSubject(
         projectId: String,

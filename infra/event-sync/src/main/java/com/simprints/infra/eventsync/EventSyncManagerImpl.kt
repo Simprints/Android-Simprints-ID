@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
@@ -46,7 +47,15 @@ internal class EventSyncManagerImpl @Inject constructor(
 ) : EventSyncManager {
     override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
 
-    override fun getLastSyncState(): LiveData<EventSyncState> = eventSyncStateProcessor.getLastSyncState()
+    override fun getLastSyncState(useDefaultValue: Boolean): LiveData<EventSyncState> =
+        MediatorLiveData<EventSyncState>().apply {
+            if (useDefaultValue) {
+                value = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
+            }
+            addSource(eventSyncStateProcessor.getLastSyncState()) { lastSyncState ->
+                value = lastSyncState
+            }
+        }
 
     override fun getPeriodicWorkTags(): List<String> = listOf(
         MASTER_SYNC_SCHEDULERS,
@@ -68,7 +77,18 @@ internal class EventSyncManagerImpl @Inject constructor(
         types.map { eventRepository.observeEventCount(it) },
     ) { it.sum() }
 
-    override suspend fun countEventsToDownload(): DownSyncCounts {
+    private var cachedEventCountToDownload: DownSyncCounts? = null
+    private var cachedEventCountToDownloadTimestamp: Long = 0
+
+    override suspend fun countEventsToDownload(maxCacheAgeMillis: Long): DownSyncCounts {
+        val timeNowMs = timeHelper.now().ms
+        cachedEventCountToDownload?.takeIf {
+            timeNowMs - cachedEventCountToDownloadTimestamp < maxCacheAgeMillis
+        }?.let {
+            return it
+        }.also {
+            cachedEventCountToDownloadTimestamp = timeNowMs
+        }
         val projectConfig = configRepository.getProjectConfiguration()
         val deviceConfig = configRepository.getDeviceConfiguration()
 
@@ -85,7 +105,9 @@ internal class EventSyncManagerImpl @Inject constructor(
         return DownSyncCounts(
             count = counts.sumOf { it.count },
             isLowerBound = counts.any { it.isLowerBound },
-        )
+        ).also {
+            cachedEventCountToDownload = it
+        }
     }
 
     override suspend fun downSyncSubject(

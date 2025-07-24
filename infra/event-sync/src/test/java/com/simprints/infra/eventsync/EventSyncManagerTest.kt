@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync
 
+import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.Partitioning
@@ -17,6 +18,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
+import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
@@ -117,6 +119,25 @@ internal class EventSyncManagerTest {
     }
 
     @Test
+    fun `getLastSyncState with useDefaultValue true should return an immediate default value`() = runTest {
+        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+        val defaultValue = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
+
+        val result = eventSyncManagerImpl.getLastSyncState(true).value
+
+        assertThat(result).isEqualTo(defaultValue)
+    }
+
+    @Test
+    fun `getLastSyncState with useDefaultValue false and no data emission should return null value`() = runTest {
+        every { eventSyncStateProcessor.getLastSyncState() } returns MutableLiveData(null)
+
+        val result = eventSyncManagerImpl.getLastSyncState(false).value
+
+        assertThat(result).isEqualTo(null)
+    }
+
+    @Test
     fun `countEventsToUpload without types should call event repo`() = runTest {
         eventSyncManagerImpl.countEventsToUpload().toList()
 
@@ -131,7 +152,7 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `getDownSyncCounts correctly counts sync events`() = runTest {
+    fun `countEventsToDownload correctly counts sync events`() = runTest {
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
         } returns SampleSyncScopes.modulesDownSyncScope
@@ -147,6 +168,39 @@ internal class EventSyncManagerTest {
         val result = eventSyncManagerImpl.countEventsToDownload()
 
         assertThat(result).isEqualTo(DownSyncCounts(26, isLowerBound = true))
+    }
+
+    @Test
+    fun `countEventsToDownload uses cache when within max age`() = runTest {
+        every { timeHelper.now() } returnsMany listOf(Timestamp(1000), Timestamp(5000))
+        coEvery {
+            eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
+        } returns SampleSyncScopes.modulesDownSyncScope
+        coEvery { eventRemoteDataSource.count(any()) } returns EventCount(10, false)
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID)
+        }
+
+        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
+        eventSyncManagerImpl.countEventsToDownload(2000) // cache hit
+
+        coVerify(exactly = 2) { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) }
+    }
+
+    @Test
+    fun `countEventsToDownload bypasses cache when exceeds max age`() = runTest {
+        every { timeHelper.now() } returnsMany listOf(Timestamp(1000), Timestamp(2000))
+        coEvery {
+            eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
+        } returns SampleSyncScopes.modulesDownSyncScope
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID)
+        }
+
+        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
+        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
+
+        coVerify(exactly = 1) { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) }
     }
 
     @Test
