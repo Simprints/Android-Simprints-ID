@@ -14,11 +14,16 @@ internal class ShouldSuggestSyncUseCase @Inject constructor(
     suspend operator fun invoke(): Boolean = syncManager
         .getLastSyncTime()
         ?.let {
-            val thresholdMs = configRepository
+            val simprintsDownSyncConfig = configRepository
                 .getProjectConfiguration()
                 .synchronization
                 .down
                 .simprints
+            if (simprintsDownSyncConfig == null) {
+                return@let false
+            }
+
+            val thresholdMs = simprintsDownSyncConfig
                 .maxAge
                 .let(Duration.Companion::parse)
                 .inWholeMilliseconds

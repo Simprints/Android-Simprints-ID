@@ -325,7 +325,7 @@ class SyncInfoViewModelTest {
             viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
                 createMockDownSyncConfig(
                     partitionType = DownSynchronizationConfiguration.PartitionType.USER,
-                ),
+                ).down.simprints,
             ),
         ).isFalse()
         // Module sync + no modules
@@ -333,7 +333,7 @@ class SyncInfoViewModelTest {
             viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(
                 createMockDownSyncConfig(
                     partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                ),
+                ).down.simprints,
             ),
         ).isFalse()
         // Module sync + has modules
@@ -342,7 +342,7 @@ class SyncInfoViewModelTest {
                 createMockDownSyncConfig(
                     partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                     modules = listOf("module"),
-                ),
+                ).down.simprints,
             ),
         ).isTrue()
     }
@@ -512,5 +512,6 @@ class SyncInfoViewModelTest {
                 frequency = Frequency.PERIODICALLY,
             ),
         )
+        every { down.commCare }.returns(null)
     }
 }

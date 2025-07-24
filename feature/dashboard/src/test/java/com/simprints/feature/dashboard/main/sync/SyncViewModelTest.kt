@@ -106,8 +106,8 @@ internal class SyncViewModelTest {
                 imagesRequireUnmeteredConnection = false,
                 frequency = Frequency.PERIODICALLY_AND_ON_SESSION_START,
             )
-            every { down.simprints.frequency } returns Frequency.PERIODICALLY_AND_ON_SESSION_START
-            every { down.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+            every { down.simprints?.frequency } returns Frequency.PERIODICALLY_AND_ON_SESSION_START
+            every { down.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }
         every { timeHelper.readableBetweenNowAndTime(any()) } returns DATE
         every { authStore.signedInProjectId } returns "projectId"

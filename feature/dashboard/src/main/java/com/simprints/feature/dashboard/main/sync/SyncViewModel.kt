@@ -32,7 +32,7 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
@@ -185,7 +185,7 @@ internal class SyncViewModel @Inject constructor(
             }
         }
         configManager.getProjectConfiguration().also { configuration ->
-            _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
+            _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isSimprintsEventDownSyncAllowed())
         }
         eventSyncManager
             .countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4))
@@ -261,18 +261,20 @@ internal class SyncViewModel @Inject constructor(
         else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
     }
 
-    private suspend fun isModuleSelectionRequired() = isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
+    private suspend fun isModuleSelectionRequired() = isSimprintsDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
-    private suspend fun isDownSyncAllowed() = configManager
+    // Simprints downsync is allowed if down.simprints is not null and its frequency is not ONLY_PERIODICALLY_UP_SYNC
+    private suspend fun isSimprintsDownSyncAllowed() = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.frequency !=
-        Frequency.ONLY_PERIODICALLY_UP_SYNC
+        .synchronization.down.simprints?.let {
+            it.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
+        } ?: false
 
     private suspend fun isSelectedModulesEmpty() = configManager.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        .synchronization.down.simprints?.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 }
