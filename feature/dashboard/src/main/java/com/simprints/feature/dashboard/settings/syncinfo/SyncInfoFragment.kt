@@ -1,39 +1,53 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
+import android.animation.ObjectAnimator
+import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.provider.Settings
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ProgressBar
+import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import kotlinx.coroutines.launch
+import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
+import com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
 import com.simprints.feature.login.LoginContract
-import com.simprints.feature.login.LoginResult
-import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.handleResult
-import com.simprints.infra.uibase.navigation.navigateSafely
+import com.simprints.infra.uibase.navigation.toBundle
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
-    companion object {
-        private const val TOTAL_RECORDS_INDEX = 0
-    }
-
     private val viewModel: SyncInfoViewModel by viewModels()
     private val binding by viewBinding(FragmentSyncInfoBinding::bind)
     private val moduleCountAdapter by lazy { ModuleCountAdapter() }
+
+    private var syncInfoConfig: SyncInfoFragmentConfig = SyncInfoFragmentConfig()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        syncInfoConfig =
+            (container?.parent as? ConfigurableSyncInfoFragmentContainer)?.syncInfoFragmentConfig
+                ?: SyncInfoFragmentConfig()
+        viewModel.isPreLogoutUpSync = syncInfoConfig.isSyncInfoLogoutOnComplete
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     override fun onViewCreated(
         view: View,
@@ -43,151 +57,350 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         applySystemBarInsets(view)
 
         binding.selectedModulesView.adapter = moduleCountAdapter
+
         setupClickListeners()
         observeUI()
 
-        findNavController().handleResult<LoginResult>(
+        findNavController().handleResult(
             viewLifecycleOwner,
-            R.id.syncInfoFragment,
+            getCurrentDestinationId(),
             LoginContract.DESTINATION,
-        ) { result -> viewModel.handleLoginResult(result) }
+            viewModel::handleLoginResult,
+        )
     }
 
     private fun setupClickListeners() {
-        binding.moduleSelectionButton.setOnClickListener {
-            findNavController().navigateSafely(this, SyncInfoFragmentDirections.actionSyncInfoFragmentToModuleSelectionFragment())
+        binding.buttonSelectModules.setOnClickListener {
+            findNavController().navigate(R.id.moduleSelectionFragment)
+        }
+        binding.textEventSyncInstructionsNoModules.setOnClickListener {
+            findNavController().navigate(R.id.moduleSelectionFragment)
+        }
+        binding.syncSettingsButton.setOnClickListener {
+            findNavController().navigate(R.id.syncInfoFragment)
         }
         binding.syncInfoToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
-        binding.syncInfoToolbar.setOnMenuItemClickListener {
-            viewModel.refreshInformation()
-            true
-        }
-        binding.syncButton.setOnClickListener {
-            viewModel.forceSync()
-            updateSyncButton(isSyncInProgress = true)
-        }
         binding.syncReloginRequiredLoginButton.setOnClickListener {
-            viewModel.login()
+            viewModel.requestNavigationToLogin()
+        }
+        binding.buttonSyncRecordsNow.setOnClickListener {
+            viewModel.forceEventSync()
+        }
+        binding.buttonSyncImagesNow.setOnClickListener {
+            viewModel.toggleImageSync()
+        }
+        binding.textEventSyncInstructionsOffline.setOnClickListener {
+            startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
+        }
+        binding.textImageSyncInstructionsOffline.setOnClickListener {
+            startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
+        }
+        binding.textEventSyncInstructionsDefault.showInfoPopupOnClick(getString(IDR.string.sync_info_details_event_sync_default))
+        binding.textImageSyncInstructionsDefault.showInfoPopupOnClick(getString(IDR.string.sync_info_details_image_sync_default))
+        binding.textModuleSyncInstructions.showInfoPopupOnClick(getString(IDR.string.sync_info_details_module_selection))
+    }
+
+    private fun View.showInfoPopupOnClick(message: String) {
+        setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setMessage(message)
+                .setPositiveButton(IDR.string.sync_info_details_ok) { di, _ -> di.dismiss() }
+                .create()
+                .show()
         }
     }
 
     private fun observeUI() {
-        viewModel.configuration.observe(viewLifecycleOwner) {
-            enableModuleSelectionButtonAndTabsIfNecessary(it.synchronization)
-            setupRecordsCountCards(it)
-        }
-        viewModel.recordsInLocal.observe(viewLifecycleOwner) {
-            binding.totalRecordsCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
-        }
-
-        viewModel.recordsToUpSync.observe(viewLifecycleOwner) {
-            binding.recordsToUploadCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.recordsToUploadCount, binding.recordsToUploadProgress)
-        }
-
-        viewModel.imagesToUpload.observe(viewLifecycleOwner) {
-            binding.imagesToUploadCount.text = it?.toString() ?: ""
-            setProgressBar(it, binding.imagesToUploadCount, binding.imagesToUploadProgress)
-        }
-
-        viewModel.recordsToDownSync.observe(viewLifecycleOwner) {
-            binding.recordsToDownloadCount.text = it?.let {
-                if (it.isLowerBound) "${it.count}+" else "${it.count}"
-            } ?: ""
-            setProgressBar(it?.count, binding.recordsToDownloadCount, binding.recordsToDownloadProgress)
-        }
-
-        viewModel.moduleCounts.observe(viewLifecycleOwner) {
-            updateModuleCounts(it)
-        }
-        viewModel.lastSyncState.observe(viewLifecycleOwner) {
-            viewModel.fetchSyncInformationIfNeeded(it)
-            val isRunning = it.isSyncRunning()
-            updateSyncButton(isRunning)
-        }
-        viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
-            binding.syncButton.isEnabled = it
-        }
-        viewModel.isReloginRequired.observe(viewLifecycleOwner) { reloginRequired ->
-            if (reloginRequired) {
-                binding.syncReloginRequiredSection.visibility = View.VISIBLE
-                binding.syncButton.visibility = View.GONE
-            } else {
-                binding.syncReloginRequiredSection.visibility = View.GONE
-                binding.syncButton.visibility = View.VISIBLE
+        renderSyncInfo(SyncInfo(), syncInfoConfig)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                renderSyncInfo(SyncInfo(), syncInfoConfig)
+                viewModel.syncInfoLiveData.observe(viewLifecycleOwner) { syncInfo ->
+                    renderSyncInfo(syncInfo, syncInfoConfig)
+                }
             }
         }
-        viewModel.loginRequestedEventLiveData.observe(
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.logoutEventLiveData.observe(viewLifecycleOwner) { logoutIfNotNull ->
+                    logoutIfNotNull?.let {
+                        viewModel.logout()
+                    }
+                }
+            }
+        }
+
+        viewModel.loginNavigationEventLiveData.observe(
             viewLifecycleOwner,
-            LiveDataEventWithContentObserver { loginArgs ->
-                findNavController().navigateSafely(
-                    this,
-                    R.id.action_syncInfoFragment_to_login,
-                    loginArgs,
+            { loginParams ->
+                findNavController().navigate(com.simprints.feature.login.R.id.graph_login, loginParams.toBundle())
+            },
+        )
+    }
+
+    private fun renderSyncInfo(syncInfo: SyncInfo, config: SyncInfoFragmentConfig) {
+        // App toolbar
+        binding.appBarLayout.visibility = if (config.isSyncInfoToolbarVisible) View.VISIBLE else View.GONE
+
+        // Config loading progress bar
+        binding.progressConfigRefresh.visibility = if (syncInfo.isConfigurationLoadingProgressBarVisible) View.VISIBLE else View.INVISIBLE
+
+        // Sync info header
+        binding.syncStatusHeader.visibility = if (config.isSyncInfoStatusHeaderVisible) View.VISIBLE else View.GONE
+        binding.syncSettingsButton.visibility = if (config.isSyncInfoStatusHeaderSettingsButtonVisible) View.VISIBLE else View.GONE
+
+        // Section separators
+        binding.headerRecordSync.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
+        binding.sectionDivider1.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
+        binding.headerImageSync.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
+        binding.sectionDivider2.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
+        binding.headerModuleSelection.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
+        binding.sectionFooter.visibility = if (config.areSyncInfoSectionHeadersVisible) View.GONE else View.VISIBLE
+
+        // Re-login section
+        binding.syncReLoginRequiredSection.visibility = if (syncInfo.isLoginPromptSectionVisible) View.VISIBLE else View.GONE
+
+        // Records section
+        renderRecordsSection(syncInfo.syncInfoSectionRecords, config)
+
+        // Images section
+        binding.layoutImagesSync.visibility = if (config.isSyncInfoImageSyncVisible) View.VISIBLE else View.GONE
+        renderImagesSection(syncInfo.syncInfoSectionImages)
+
+        // Modules section
+        renderModulesSection(syncInfo.syncInfoSectionModules, config)
+    }
+
+    private fun renderRecordsSection(records: SyncInfoSectionRecords, config: SyncInfoFragmentConfig) {
+        // Counter - total records
+        binding.totalRecordsCount.visibility = if (records.counterTotalRecords.isBlank()) View.GONE else View.VISIBLE
+        binding.totalRecordsCount.text = records.counterTotalRecords
+        binding.totalRecordsProgress.visibility = if (records.counterTotalRecords.isBlank()) View.VISIBLE else View.GONE
+
+        // Counter - records to upload
+        binding.layoutRecordsToDownload.visibility = if (records.isCounterRecordsToDownloadVisible) View.VISIBLE else View.GONE
+        binding.recordsToUploadCount.visibility = if (records.counterRecordsToUpload.isBlank()) View.GONE else View.VISIBLE
+        binding.recordsToUploadCount.text = records.counterRecordsToUpload
+        binding.recordsToUploadProgress.visibility = if (records.counterRecordsToUpload.isBlank()) View.VISIBLE else View.GONE
+
+        // Counter - records to download
+        binding.recordsToDownloadCount.visibility = if (records.counterRecordsToDownload.isBlank()) View.GONE else View.VISIBLE
+        binding.recordsToDownloadCount.text = records.counterRecordsToDownload
+        binding.recordsToDownloadProgress.visibility = if (records.counterRecordsToDownload.isBlank()) View.VISIBLE else View.GONE
+
+        // Counter - images to upload (may be combined with records)
+        binding.layoutComboImageCounter.visibility = if (config.isSyncInfoRecordsImagesCombined) View.VISIBLE else View.GONE
+        binding.comboImagesToUploadCount.visibility = if (records.counterImagesToUpload.isBlank()) View.GONE else View.VISIBLE
+        binding.comboImagesToUploadCount.text = records.counterImagesToUpload
+        binding.comboImagesToUploadProgress.visibility = if (records.counterImagesToUpload.isBlank()) View.VISIBLE else View.GONE
+
+        // Instructions
+        binding.textEventSyncInstructionsDefault.visibility = if (records.isInstructionDefaultVisible) View.VISIBLE else View.GONE
+        binding.textEventSyncInstructionsOffline.visibility = if (records.isInstructionOfflineVisible) View.VISIBLE else View.GONE
+        binding.textEventSyncInstructionsNoModules.visibility = if (records.isInstructionNoModulesVisible) View.VISIBLE else View.GONE
+        binding.textEventSyncInstructionsError.visibility = if (records.isInstructionErrorVisible) View.VISIBLE else View.GONE
+        records.instructionPopupErrorInfo.configureErrorPopup()
+
+        // Progress
+        binding.layoutEventSyncProgress.visibility = if (records.isProgressVisible) View.VISIBLE else View.INVISIBLE
+        renderProgress(
+            records.progress,
+            binding.eventSyncProgressBar,
+            binding.textEventSyncProgress,
+            IDR.string.sync_info_item_record_or_event,
+            IDR.string.sync_info_item_image,
+        )
+        binding.eventSyncProgressBar.setPulseAnimation(isEnabled = records.isProgressVisible)
+
+        // Sync button
+        val isSyncButtonVisible = !config.isSyncInfoLogoutOnComplete || records.isSyncButtonVisible
+        binding.buttonSyncRecordsNow.visibility = if (isSyncButtonVisible) View.VISIBLE else View.GONE
+        binding.buttonSyncRecordsNow.isEnabled = records.isSyncButtonEnabled
+        binding.buttonSyncRecordsNow.text = getString(
+            when {
+                records.isSyncButtonForRetry -> IDR.string.sync_info_button_try_again
+                records.isProgressVisible -> IDR.string.sync_info_button_records_syncing
+                else -> IDR.string.sync_info_button_sync_records
+            }
+        )
+
+        // Footer
+        val isFooterSyncInProgressVisible = config.isSyncInfoLogoutOnComplete && records.isFooterSyncInProgressVisible
+        binding.textFooterRecordSyncInProgress.visibility = if (isFooterSyncInProgressVisible) View.VISIBLE else View.GONE
+        binding.textFooterRecordLoggingOut.visibility = if (records.isFooterReadyToLogOutVisible) View.VISIBLE else View.GONE
+        binding.textFooterRecordSyncIncomplete.visibility = if (records.isFooterSyncIncompleteVisible) View.VISIBLE else View.GONE
+        binding.textFooterRecordLastSyncedWhen.visibility = if (records.isFooterLastSyncTimeVisible) View.VISIBLE else View.GONE
+        binding.textFooterRecordLastSyncedWhen.text = formatLastSyncTime(records.footerLastSyncMinutesAgo)
+    }
+
+    private fun SyncInfoError.configureErrorPopup() {
+        binding.textEventSyncInstructionsError.showInfoPopupOnClick(
+            when {
+                isTooManyRequests -> getString(
+                    IDR.string.sync_info_details_too_many_modules
                 )
-            },
+
+                isBackendMaintenance && backendMaintenanceEstimatedOutage > 0 -> getString(
+                    IDR.string.error_backend_maintenance_with_time_message,
+                    TimeUtils.getFormattedEstimatedOutage(backendMaintenanceEstimatedOutage),
+                )
+
+                isBackendMaintenance -> getString(
+                    IDR.string.error_backend_maintenance_message
+                )
+
+                else -> getString(
+                    IDR.string.sync_info_details_error
+                )
+            }
         )
     }
 
-    private fun updateSyncButton(isSyncInProgress: Boolean) {
-        binding.syncButton.text = getString(
-            if (isSyncInProgress) {
-                IDR.string.dashboard_sync_info_sync_in_progress
-            } else {
-                IDR.string.dashboard_sync_info_sync_now_button
-            },
+    private fun renderImagesSection(images: SyncInfoSectionImages) {
+        // Counter - images to upload
+        binding.imagesToUploadCount.visibility = if (images.counterImagesToUpload.isBlank()) View.GONE else View.VISIBLE
+        binding.imagesToUploadCount.text = images.counterImagesToUpload
+        binding.imagesToUploadProgress.visibility = if (images.counterImagesToUpload.isBlank()) View.VISIBLE else View.GONE
+
+        // Handle instruction visibility
+        binding.textImageSyncInstructionsDefault.visibility = if (images.isInstructionDefaultVisible) View.VISIBLE else View.GONE
+        binding.textImageSyncInstructionsOffline.visibility = if (images.isInstructionOfflineVisible) View.VISIBLE else View.GONE
+
+        // Progress
+        binding.layoutImageSyncProgress.visibility = if (images.isProgressVisible) View.VISIBLE else View.INVISIBLE
+        renderProgress(images.progress, binding.imageSyncProgressBar, binding.textImageSyncProgress, IDR.string.sync_info_item_image)
+        binding.imageSyncProgressBar.setPulseAnimation(isEnabled = images.isProgressVisible)
+
+        // Sync button
+        binding.buttonSyncImagesNow.isEnabled = images.isSyncButtonEnabled
+        binding.buttonSyncImagesNow.text = getString(
+            when {
+                images.isProgressVisible -> IDR.string.sync_info_button_images_sync_stop
+                else -> IDR.string.sync_info_button_sync_images
+            }
         )
+        binding.buttonSyncImagesNow.backgroundTintList = ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_enabled), // enabled
+                intArrayOf(-android.R.attr.state_enabled) // disabled
+            ),
+            intArrayOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    if (images.isProgressVisible) {
+                        IDR.color.simprints_red_dark
+                    } else {
+                        IDR.color.simprints_orange
+                    }
+                ),
+                ContextCompat.getColor(requireContext(), IDR.color.simprints_grey_disabled),
+            ),
+        )
+
+        // Footer
+        binding.textFooterImageLastSyncedWhen.visibility = if (images.isFooterLastSyncTimeVisible) View.VISIBLE else View.INVISIBLE
+        binding.textFooterImageLastSyncedWhen.text = formatLastSyncTime(images.footerLastSyncMinutesAgo)
     }
 
-    private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
-        if (viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
-            binding.moduleSelectionButton.visibility = View.VISIBLE
-            binding.modulesTabHost.visibility = View.VISIBLE
-        } else {
-            binding.moduleSelectionButton.visibility = View.GONE
-            binding.modulesTabHost.visibility = View.GONE
+    private fun renderModulesSection(modules: SyncInfoSectionModules, config: SyncInfoFragmentConfig) {
+        val isModuleSectionVisible =
+            modules.isSectionAvailable && (config.isSyncInfoModuleListVisible || modules.moduleCounts.isEmpty())
+        binding.layoutModuleSelection.visibility = if (isModuleSectionVisible) View.VISIBLE else View.GONE
+        binding.selectedModulesView.visibility = if (config.isSyncInfoModuleListVisible) View.VISIBLE else View.GONE
+
+        val moduleCountsForAdapter = modules.moduleCounts.map { syncInfoModuleCount ->
+            ModuleCount(
+                name = if (syncInfoModuleCount.isTotal) {
+                    getString(IDR.string.sync_info_total_records)
+                } else {
+                    syncInfoModuleCount.name
+                },
+                count = syncInfoModuleCount.count.toIntOrNull() ?: 0
+            )
+        }
+
+        moduleCountAdapter.submitList(moduleCountsForAdapter)
+
+        // RecyclerView height fix (wrong height may be caused by ConstraintLayout in parent views)
+        binding.selectedModulesView.post {
+            val itemHeight = resources.getDimensionPixelSize(R.dimen.module_item_height)
+            val itemCount = moduleCountsForAdapter.size.coerceAtMost(MAX_MODULE_LIST_HEIGHT_ITEMS)
+            binding.selectedModulesView.apply {
+                layoutParams = layoutParams.apply {
+                    height = itemHeight * itemCount
+                }
+            }
         }
     }
 
-    private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
-        if (!configuration.isEventDownSyncAllowed()) {
-            binding.recordsToDownloadCardView.visibility = View.GONE
-        }
-
-        if (!configuration.canSyncDataToSimprints()) {
-            binding.recordsToUploadCardView.visibility = View.GONE
-            binding.imagesToUploadCardView.visibility = View.GONE
-        }
-    }
-
-    private fun setProgressBar(
-        value: Int?,
-        tv: TextView,
-        pb: ProgressBar,
+    private fun renderProgress(
+        progress: SyncInfoProgress,
+        progressBar: com.google.android.material.progressindicator.LinearProgressIndicator,
+        textView: TextView,
+        vararg itemNameResIDs: Int,
     ) {
-        if (value == null) {
-            pb.visibility = View.VISIBLE
-            tv.visibility = View.GONE
-        } else {
-            pb.visibility = View.GONE
-            tv.visibility = View.VISIBLE
-        }
+        progressBar.progress = progress.progressBarPercentage
+        val progressText = progress.progressParts
+            .mapIndexed { index, (isPending, isDone, areNumbersVisible, currentNumber, totalNumber) ->
+                val itemName = getString(itemNameResIDs.getOrNull(index) ?: IDR.string.sync_info_item_default)
+                when {
+                    isPending -> getString(IDR.string.sync_info_progress_pending, itemName)
+                    isDone -> getString(IDR.string.sync_info_progress_complete, itemName)
+                    !areNumbersVisible -> getString(IDR.string.sync_info_progress_ongoing_no_counters, itemName)
+                    else -> getString(IDR.string.sync_info_progress_ongoing, itemName, currentNumber, totalNumber)
+                }
+            }.joinToString(separator = "\n")
+
+        textView.text = progressText
     }
 
-    private fun updateModuleCounts(moduleCounts: List<ModuleCount>) {
-        val moduleCountsArray = ArrayList<ModuleCount>().apply {
-            addAll(moduleCounts)
+    private fun formatLastSyncTime(minutesAgo: Int): String =
+        when {
+            minutesAgo < 0 -> getString(IDR.string.sync_info_footer_time_none)
+            minutesAgo == 0 -> getString(IDR.string.sync_info_footer_time_now)
+            minutesAgo == 1 -> getString(IDR.string.sync_info_footer_time_1_minute)
+            minutesAgo < 60 -> getString(IDR.string.sync_info_footer_time_minutes, minutesAgo)
+            minutesAgo < 2 * 60 -> getString(IDR.string.sync_info_footer_time_1_hour)
+            minutesAgo < 24 * 60 -> getString(IDR.string.sync_info_footer_time_hours, minutesAgo / 60)
+            minutesAgo < 2 * 24 * 60 -> getString(IDR.string.sync_info_footer_time_1_day)
+            else -> getString(IDR.string.sync_info_footer_time_days, minutesAgo / 60 / 24)
         }
 
-        val totalRecordsEntry = ModuleCount(
-            getString(IDR.string.dashboard_sync_info_total_records),
-            moduleCounts.sumOf { it.count },
-        )
-        moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
-
-        moduleCountAdapter.submitList(moduleCountsArray)
+    private fun View.setPulseAnimation(isEnabled: Boolean) {
+        (tag as? ObjectAnimator?)?.run {
+            cancel()
+            tag = null
+        }
+        if (!isEnabled) return
+        val progressBarPulseAnimator = ObjectAnimator.ofFloat(
+            this,
+            View.ALPHA,
+            PULSE_ANIMATION_ALPHA_FULL, PULSE_ANIMATION_ALPHA_INTERMEDIATE, PULSE_ANIMATION_ALPHA_MIN,
+        ).apply {
+            duration = PULSE_ANIMATION_DURATION_MILLIS
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+            interpolator = AccelerateDecelerateInterpolator()
+            start()
+        }
+        tag = progressBarPulseAnimator
     }
+
+    private fun getCurrentDestinationId() =
+        parentFragment?.takeIf { !syncInfoConfig.isSyncInfoToolbarVisible }?.id // parent if this isn't standalone
+            ?: id
+
+    private companion object {
+        private const val PULSE_ANIMATION_ALPHA_FULL = 1.0f
+        private const val PULSE_ANIMATION_ALPHA_INTERMEDIATE = 0.9f
+        private const val PULSE_ANIMATION_ALPHA_MIN = 0.6f
+
+        private const val PULSE_ANIMATION_DURATION_MILLIS = 2000L
+
+        private const val MAX_MODULE_LIST_HEIGHT_ITEMS = 5
+    }
+
 }

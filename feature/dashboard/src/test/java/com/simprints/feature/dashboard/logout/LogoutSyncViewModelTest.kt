@@ -1,18 +1,31 @@
 package com.simprints.feature.dashboard.logout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.coVerify
+import io.mockk.verify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -24,6 +37,15 @@ internal class LogoutSyncViewModelTest {
     @MockK
     lateinit var configManager: ConfigManager
 
+    @MockK
+    lateinit var eventSyncManager: EventSyncManager
+
+    @MockK
+    lateinit var syncOrchestrator: SyncOrchestrator
+
+    @MockK
+    lateinit var authStore: AuthStore
+
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -33,18 +55,17 @@ internal class LogoutSyncViewModelTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
+        // Setup default behavior for logoutUseCase
+        every { logoutUseCase() } returns Unit
     }
 
     @Test
     fun `should logout correctly`() {
-        val viewModel = LogoutSyncViewModel(
-            configManager = configManager,
-            logoutUseCase = logoutUseCase,
-        )
+        val viewModel = createViewModel()
 
         viewModel.logout()
 
-        coVerify(exactly = 1) { logoutUseCase.invoke() }
+        verify(exactly = 1) { logoutUseCase() }
     }
 
     @Test
@@ -55,11 +76,135 @@ internal class LogoutSyncViewModelTest {
                 every { settingsPassword } returns config
             }
         }
-        val viewModel = LogoutSyncViewModel(
-            configManager = configManager,
-            logoutUseCase = logoutUseCase,
-        )
+        val viewModel = createViewModel()
         val resultConfig = viewModel.settingsLocked.getOrAwaitValue()
         assertThat(resultConfig.peekContent()).isEqualTo(config)
     }
+
+    @Test
+    fun `logoutEventLiveData should emit momentarily when user is signed out`() {
+        every { authStore.watchSignedInProjectId() } returns MutableStateFlow("")
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.logoutEventLiveData.getOrAwaitValue()
+        assertThat(result).isEqualTo(Unit)
+    }
+
+    @Test
+    fun `logoutEventLiveData should not emit when user is signed in`() {
+        every { authStore.watchSignedInProjectId() } returns MutableStateFlow("userId123")
+
+        val viewModel = createViewModel()
+
+        assertThat(viewModel.logoutEventLiveData.value).isNull()
+    }
+
+    @Test
+    fun `isLogoutWithoutSyncVisibleLiveData should return true when sync is not completed`() {
+        val eventSyncState = mockk<EventSyncState> {
+            every { isSyncCompleted() } returns false
+        }
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
+        val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
+        val deviceConfig = mockk<DeviceConfiguration> {
+            every { selectedModules } returns listOf(mockk())
+        }
+
+        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = false)
+        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `isLogoutWithoutSyncVisibleLiveData should return true when image sync is running`() {
+        val eventSyncState = mockk<EventSyncState> {
+            every { isSyncCompleted() } returns true
+        }
+        val imageSyncStatus = ImageSyncStatus(isSyncing = true, progress = null, secondsSinceLastUpdate = null)
+        val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
+        val deviceConfig = mockk<DeviceConfiguration> {
+            every { selectedModules } returns listOf(mockk())
+        }
+
+        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = false)
+        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `isLogoutWithoutSyncVisibleLiveData should return true when module selection is required`() {
+        val eventSyncState = mockk<EventSyncState> {
+            every { isSyncCompleted() } returns true
+        }
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
+        val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
+        val deviceConfig = mockk<DeviceConfiguration> {
+            every { selectedModules } returns emptyList()
+        }
+
+        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = true)
+        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `isLogoutWithoutSyncVisibleLiveData should return false when conditions for logout are met`() {
+        val eventSyncState = mockk<EventSyncState> {
+            every { isSyncCompleted() } returns true
+        }
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
+        val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
+        val deviceConfig = mockk<DeviceConfiguration> {
+            every { selectedModules } returns listOf(mockk())
+        }
+
+        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = false)
+        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
+
+        val viewModel = createViewModel()
+
+        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue()
+        assertThat(result).isFalse()
+    }
+
+    private fun mockProjectConfigExtension(projectConfig: ProjectConfiguration, isModuleSelectionAvailable: Boolean) {
+        mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
+        every { projectConfig.isModuleSelectionAvailable() } returns isModuleSelectionAvailable
+    }
+
+    private fun setupSyncMocks(
+        eventSyncState: EventSyncState,
+        imageSyncStatus: ImageSyncStatus,
+        projectConfig: ProjectConfiguration,
+        deviceConfig: DeviceConfiguration
+    ) {
+        mockkStatic("androidx.lifecycle.FlowLiveDataConversions")
+        val eventSyncLiveData = mockk<LiveData<EventSyncState>>(relaxed = true)
+        every { eventSyncLiveData.asFlow() } returns flowOf(eventSyncState)
+        every { eventSyncManager.getLastSyncState(useDefaultValue = true) } returns eventSyncLiveData
+        every { syncOrchestrator.observeImageSyncStatus() } returns flowOf(imageSyncStatus)
+        every { configManager.watchProjectConfiguration() } returns flowOf(projectConfig)
+        every { configManager.watchDeviceConfiguration() } returns flowOf(deviceConfig)
+    }
+
+    private fun createViewModel() = LogoutSyncViewModel(
+        configManager = configManager,
+        eventSyncManager = eventSyncManager,
+        syncOrchestrator = syncOrchestrator,
+        authStore = authStore,
+        logoutUseCase = logoutUseCase,
+    )
 }
