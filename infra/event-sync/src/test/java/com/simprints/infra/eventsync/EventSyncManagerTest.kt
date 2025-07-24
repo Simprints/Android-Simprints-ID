@@ -171,7 +171,7 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `countEventsToDownload uses cache when within max age`() = runTest {
+    fun `countEventsToDownload bypasses cache when within max age`() = runTest {
         every { timeHelper.now() } returnsMany listOf(Timestamp(1000), Timestamp(5000))
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
@@ -182,13 +182,13 @@ internal class EventSyncManagerTest {
         }
 
         eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
-        eventSyncManagerImpl.countEventsToDownload(2000) // cache hit
+        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
 
         coVerify(exactly = 2) { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) }
     }
 
     @Test
-    fun `countEventsToDownload bypasses cache when exceeds max age`() = runTest {
+    fun `countEventsToDownload uses cache when exceeds max age`() = runTest {
         every { timeHelper.now() } returnsMany listOf(Timestamp(1000), Timestamp(2000))
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
@@ -198,7 +198,7 @@ internal class EventSyncManagerTest {
         }
 
         eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
-        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
+        eventSyncManagerImpl.countEventsToDownload(2000) // cache hit
 
         coVerify(exactly = 1) { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) }
     }
