@@ -1,0 +1,23 @@
+# Calls upload workflow in the automated test repository
+name: "[Reusable] Trigger APK upload to LambdaTest"
+
+on:
+    workflow_call:
+
+jobs:
+    trigger_other_workflow:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Trigger upload workflow in automation repository
+                env:
+                    AUTOMATION_REPO_ACCESS_TOKEN: ${{ secrets.GH_PACKAGE_TOKEN }}
+                    OWNER_AND_REPO: "Simprints/SID-e2e-tests"
+                    WORKFLOW_FILE_NAME: "flow-apk-upload.yml"
+                run: |
+                    curl -L \
+                      -X POST \
+                      -H "Accept: application/vnd.github+json" \
+                      -H "Authorization: Bearer $AUTOMATION_REPO_ACCESS_TOKEN" \
+                      -H "X-GitHub-Api-Version: 2022-11-28" \
+                      "https://api.github.com/repos/$OWNER_AND_REPO/actions/workflows/$WORKFLOW_FILE_NAME/dispatches" \
+                      -d '{"ref":"main"}'
