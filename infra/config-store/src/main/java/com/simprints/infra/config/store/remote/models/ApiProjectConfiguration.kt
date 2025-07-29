@@ -14,6 +14,7 @@ internal data class ApiProjectConfiguration(
     val consent: ApiConsentConfiguration,
     val identification: ApiIdentificationConfiguration,
     val synchronization: ApiSynchronizationConfiguration,
+    val searchAndVerify: ApiSearchAndVerifyConfiguration?,
     val custom: Map<String, Any>?,
 ) {
     fun toDomain(): ProjectConfiguration = ProjectConfiguration(

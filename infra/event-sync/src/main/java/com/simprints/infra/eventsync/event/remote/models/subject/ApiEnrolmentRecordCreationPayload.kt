@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.ApiBiometricReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fromApiToDomain
@@ -16,6 +17,7 @@ internal data class ApiEnrolmentRecordCreationPayload(
     val moduleId: String,
     val attendantId: String,
     val biometricReferences: List<ApiBiometricReference>?,
+    val externalCredential: ApiExternalCredential?,
 ) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation)
 
 internal fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(

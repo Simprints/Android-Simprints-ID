@@ -10,6 +10,7 @@ data class ProjectConfiguration(
     val consent: ConsentConfiguration,
     val identification: IdentificationConfiguration,
     val synchronization: SynchronizationConfiguration,
+    val searchAndVerify: SearchAndVerifyConfiguration?,
     val custom: Map<String, Any>?,
 )
 

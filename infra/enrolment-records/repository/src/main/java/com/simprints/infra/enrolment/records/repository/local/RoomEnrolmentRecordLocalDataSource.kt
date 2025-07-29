@@ -289,6 +289,10 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             val dbFaces = samples.map { it.toRoomDb(subject.subjectId) }
             subjectDao.insertBiometricSamples(dbFaces)
         }
+        subject.externalCredentials.takeIf { it.isNotEmpty() }?.let { credentials ->
+            val dbExternalCredentials = credentials.map { it.toRoomDb() }
+            subjectDao.insertExternalCredentials(dbExternalCredentials)
+        }
     }
 
     private suspend fun updateSubject(action: SubjectAction.Update) {
