@@ -12,6 +12,7 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailed
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedBackendMaintenance
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedCommCarePermissionMissing
 import com.simprints.feature.dashboard.views.SyncCardState.SyncHasNoModules
 import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
 import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
@@ -114,13 +115,13 @@ internal class SyncViewModelTest {
     }
 
     @Test
-    fun `should initialize the live data syncToBFSIDAllowed correctly`() {
+    fun `should initialize the live data isAnySyncAllowed correctly`() {
         syncState.postValue(EventSyncState("", 0, 0, listOf(), listOf(), listOf()))
         isConnected.postValue(true)
 
         val viewModel = initViewModel()
 
-        assertThat(viewModel.syncToBFSIDAllowed.value).isEqualTo(true)
+        assertThat(viewModel.isAnySyncAllowed.value).isEqualTo(true)
     }
 
     @Test
@@ -443,6 +444,28 @@ internal class SyncViewModelTest {
     }
 
     @Test
+    fun `should post a SyncFailedCommCarePermissionMissing card state if the sync fails because of missing CommCare permission`() {
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
+        isConnected.value = true
+        syncState.value = EventSyncState(
+            "",
+            10,
+            40,
+            listOf(),
+            listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseCommCarePermissionMissing = true),
+                ),
+            ),
+            listOf(),
+        )
+        val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
+
+        assertThat(syncCardLiveData).isEqualTo(SyncFailedCommCarePermissionMissing(DATE))
+    }
+
+    @Test
     fun `should post a SyncTryAgain card state if the sync fails because of another thing`() {
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
@@ -488,6 +511,112 @@ internal class SyncViewModelTest {
 
         assertThat(signOutEvent).isNotNull()
         coVerify(exactly = 1) { logoutUseCase.invoke() }
+    }
+
+    @Test
+    fun `isAnySyncAllowed should be true when canSyncDataToSimprints is true and others are false`() {
+        setupSyncConfiguration(
+            canSyncDataToSimprints = true,
+            isSimprintsEventDownSyncAllowed = false,
+            isCommCareEventDownSyncAllowed = false
+        )
+
+        val viewModel = initViewModel()
+
+        assertThat(viewModel.isAnySyncAllowed.value).isTrue()
+    }
+
+    @Test
+    fun `isAnySyncAllowed should be true when isSimprintsEventDownSyncAllowed is true and others are false`() {
+        setupSyncConfiguration(
+            canSyncDataToSimprints = false,
+            isSimprintsEventDownSyncAllowed = true,
+            isCommCareEventDownSyncAllowed = false
+        )
+
+        val viewModel = initViewModel()
+
+        assertThat(viewModel.isAnySyncAllowed.value).isTrue()
+    }
+
+    @Test
+    fun `isAnySyncAllowed should be true when isCommCareEventDownSyncAllowed is true and others are false`() {
+        setupSyncConfiguration(
+            canSyncDataToSimprints = false,
+            isSimprintsEventDownSyncAllowed = false,
+            isCommCareEventDownSyncAllowed = true
+        )
+
+        val viewModel = initViewModel()
+
+        assertThat(viewModel.isAnySyncAllowed.value).isTrue()
+    }
+
+    @Test
+    fun `isAnySyncAllowed should be true when multiple sync options are enabled`() {
+        setupSyncConfiguration(
+            canSyncDataToSimprints = true,
+            isSimprintsEventDownSyncAllowed = true,
+            isCommCareEventDownSyncAllowed = false
+        )
+
+        val viewModel = initViewModel()
+
+        assertThat(viewModel.isAnySyncAllowed.value).isTrue()
+    }
+
+    @Test
+    fun `isAnySyncAllowed should be true when all sync options are enabled`() {
+        setupSyncConfiguration(
+            canSyncDataToSimprints = true,
+            isSimprintsEventDownSyncAllowed = true,
+            isCommCareEventDownSyncAllowed = true
+        )
+
+        val viewModel = initViewModel()
+
+        assertThat(viewModel.isAnySyncAllowed.value).isTrue()
+    }
+
+    @Test
+    fun `isAnySyncAllowed should be false when all sync options are disabled`() {
+        setupSyncConfiguration(
+            canSyncDataToSimprints = false,
+            isSimprintsEventDownSyncAllowed = false,
+            isCommCareEventDownSyncAllowed = false
+        )
+
+        val viewModel = initViewModel()
+
+        assertThat(viewModel.isAnySyncAllowed.value).isFalse()
+    }
+
+    private fun setupSyncConfiguration(
+        canSyncDataToSimprints: Boolean,
+        isSimprintsEventDownSyncAllowed: Boolean,
+        isCommCareEventDownSyncAllowed: Boolean
+    ) {
+        val upSyncKind = if (canSyncDataToSimprints) ALL else UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+        val downSimprintsConfig = if (isSimprintsEventDownSyncAllowed) {
+            mockk<DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration> {
+                every { frequency } returns Frequency.PERIODICALLY_AND_ON_SESSION_START
+                every { partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
+            }
+        } else null
+        val downCommCareConfig = if (isCommCareEventDownSyncAllowed) {
+            mockk<DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration>()
+        } else null
+
+        coEvery { configManager.getProjectConfiguration().synchronization } returns mockk {
+            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(
+                kind = upSyncKind,
+                batchSizes = UpSynchronizationConfiguration.UpSyncBatchSizes.default(),
+                imagesRequireUnmeteredConnection = false,
+                frequency = Frequency.PERIODICALLY_AND_ON_SESSION_START,
+            )
+            every { down.simprints } returns downSimprintsConfig
+            every { down.commCare } returns downCommCareConfig
+        }
     }
 
     private fun initViewModel(): SyncViewModel = SyncViewModel(

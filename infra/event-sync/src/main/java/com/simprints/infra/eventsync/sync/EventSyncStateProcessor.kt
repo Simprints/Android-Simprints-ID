@@ -18,6 +18,7 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProvider
 import com.simprints.infra.eventsync.sync.common.didFailBecauseBackendMaintenance
 import com.simprints.infra.eventsync.sync.common.didFailBecauseCloudIntegration
+import com.simprints.infra.eventsync.sync.common.didFailBecauseCommCarePermissionMissing
 import com.simprints.infra.eventsync.sync.common.didFailBecauseReloginRequired
 import com.simprints.infra.eventsync.sync.common.didFailBecauseTooManyRequests
 import com.simprints.infra.eventsync.sync.common.filterByTags
@@ -133,12 +134,13 @@ internal class EventSyncStateProcessor @Inject constructor(
         }
 
     private fun WorkInfo.toEventSyncWorkerState(): EventSyncWorkerState = fromWorkInfo(
-        state,
-        didFailBecauseReloginRequired(),
-        didFailBecauseCloudIntegration(),
-        didFailBecauseBackendMaintenance(),
-        didFailBecauseTooManyRequests(),
-        getEstimatedOutageTime(),
+        state = state,
+        failedBecauseReloginRequired = didFailBecauseReloginRequired(),
+        failedBecauseCloudIntegration = didFailBecauseCloudIntegration(),
+        failedBecauseBackendMaintenance = didFailBecauseBackendMaintenance(),
+        failedBecauseTooManyRequest = didFailBecauseTooManyRequests(),
+        failedBecauseCommCarePermissionMissing = didFailBecauseCommCarePermissionMissing(),
+        estimatedOutage = getEstimatedOutageTime(),
     )
 
     private suspend fun calculateProgressForDownSync(workInfos: List<WorkInfo>): Int {

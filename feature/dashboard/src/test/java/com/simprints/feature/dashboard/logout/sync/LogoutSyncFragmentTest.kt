@@ -465,7 +465,7 @@ internal class LogoutSyncFragmentTest {
     }
 
     private fun mockSyncToBFSIDAllowed(allowed: Boolean) {
-        every { syncViewModel.syncToBFSIDAllowed } returns mockk {
+        every { syncViewModel.isAnySyncAllowed } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<Boolean>>().onChanged(allowed)
             }
