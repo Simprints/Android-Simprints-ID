@@ -27,6 +27,7 @@ internal class SyncCardView : MaterialCardView {
     var onSelectNoModulesButtonClick: () -> Unit = {}
     var onOfflineButtonClick: () -> Unit = {}
     var onLoginButtonClick: () -> Unit = {}
+    var onSettingsButtonClick: () -> Unit = {}
     private val binding = LayoutCardSyncBinding.inflate(LayoutInflater.from(context), this)
 
     init {
@@ -41,6 +42,7 @@ internal class SyncCardView : MaterialCardView {
             is SyncCardState.SyncFailed -> prepareSyncFailedStateView()
             is SyncCardState.SyncFailedReloginRequired -> prepareSyncFailedBecauseReloginRequired()
             is SyncCardState.SyncFailedBackendMaintenance -> prepareSyncFailedBecauseBackendMaintenanceView(state)
+            is SyncCardState.SyncFailedCommCarePermissionMissing -> prepareSyncFailedBecauseCommCarePermissionMissingView()
             is SyncCardState.SyncTooManyRequests -> prepareSyncTooManyRequestsView()
             is SyncCardState.SyncTryAgain -> prepareTryAgainStateView()
             is SyncCardState.SyncHasNoModules -> prepareNoModulesStateView()
@@ -60,6 +62,7 @@ internal class SyncCardView : MaterialCardView {
         binding.syncCardProgress.visibility = View.GONE
         binding.syncCardTryAgain.visibility = View.GONE
         binding.syncCardReloginRequired.visibility = View.GONE
+        binding.syncCardCommcarePermissionMissing.visibility = View.GONE
     }
 
     private fun prepareSyncDefaultStateView(itemsToSync: Int = 0) {
@@ -98,6 +101,11 @@ internal class SyncCardView : MaterialCardView {
             } else {
                 resources.getString(R.string.error_backend_maintenance_message)
             }
+    }
+
+    private fun prepareSyncFailedBecauseCommCarePermissionMissingView() {
+        binding.syncCardCommcarePermissionMissing.visibility = View.VISIBLE
+        binding.syncCardCommcarePermissionMissingButton.setOnClickListener { onSettingsButtonClick() }
     }
 
     private fun prepareSyncTooManyRequestsView() {

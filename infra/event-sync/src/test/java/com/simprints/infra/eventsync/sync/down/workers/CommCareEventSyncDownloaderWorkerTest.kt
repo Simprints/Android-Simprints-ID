@@ -15,7 +15,7 @@ import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_PERMISSION_REQUIRED
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING
 import com.simprints.infra.eventsync.sync.down.tasks.CommCareEventSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
@@ -151,7 +151,7 @@ internal class CommCareEventSyncDownloaderWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.failure(
                 workDataOf(
-                    OUTPUT_FAILED_BECAUSE_PERMISSION_REQUIRED to true,
+                    OUTPUT_FAILED_BECAUSE_COMMCARE_PERMISSION_MISSING to true,
                 ),
             ),
         )
