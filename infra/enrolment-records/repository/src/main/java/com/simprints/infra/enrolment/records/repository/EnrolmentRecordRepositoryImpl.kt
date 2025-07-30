@@ -91,6 +91,16 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Sync CommCare case cache with the current state of cases in CommCare.
+     * This method should be called after syncing from CommCare to ensure that cases
+     * no longer present in CommCare are removed from the cache.
+     * @param currentCommCareCaseIds Set of case IDs currently present in CommCare
+     */
+    suspend fun syncCommCareCaseCache(currentCommCareCaseIds: Set<String>) {
+        commCareSyncService.syncDeletedCases(currentCommCareCaseIds)
+    }
+
     private fun tokenizeIfNecessary(
         value: TokenizableString,
         tokenKeyType: TokenKeyType,

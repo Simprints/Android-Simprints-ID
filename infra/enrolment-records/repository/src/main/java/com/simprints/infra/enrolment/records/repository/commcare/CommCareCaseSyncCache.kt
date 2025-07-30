@@ -118,6 +118,20 @@ internal class CommCareCaseSyncCache @Inject constructor(
     }
 
     /**
+     * Get case sync information by subject ID
+     * @param subjectId The subject ID to search for
+     * @return CommCareCaseSyncInfo if found, null otherwise
+     */
+    suspend fun getCaseSyncInfoBySubjectId(subjectId: String): CommCareCaseSyncInfo? = withContext(dispatcher) {
+        try {
+            getAllCaseSyncInfo().values.find { it.subjectId == subjectId }
+        } catch (e: Exception) {
+            Simber.e("Failed to get CommCare case sync info for subjectId: $subjectId", e, tag = SYNC)
+            null
+        }
+    }
+
+    /**
      * Clear all stored case sync information
      */
     suspend fun clearAllCaseSyncInfo(): Unit = withContext(dispatcher) {

@@ -235,4 +235,42 @@ class CommCareCaseSyncCacheTest {
             editor.commit()
         }
     }
+
+    @Test
+    fun `getCaseSyncInfoBySubjectId should return case info for matching subject`() = runTest {
+        // Given
+        val caseId = "case123"
+        val subjectId = "subject456"
+        val expectedInfo = CommCareCaseSyncInfo(caseId, subjectId, 999L)
+        val existingMap = mapOf(
+            caseId to expectedInfo,
+            "case456" to CommCareCaseSyncInfo("case456", "subject789", 111L)
+        )
+        
+        every { sharedPrefs.getString(CommCareCaseSyncCache.CASE_SYNC_INFO_KEY, null) } returns "{\"case123\":{},\"case456\":{}}"
+        every { jsonHelper.fromJson<Map<String, CommCareCaseSyncInfo>>(any(), any()) } returns existingMap
+
+        // When
+        val result = cache.getCaseSyncInfoBySubjectId(subjectId)
+
+        // Then
+        assertEquals(expectedInfo, result)
+    }
+
+    @Test
+    fun `getCaseSyncInfoBySubjectId should return null if no matching subject found`() = runTest {
+        // Given
+        val existingMap = mapOf(
+            "case123" to CommCareCaseSyncInfo("case123", "subject456", 999L)
+        )
+        
+        every { sharedPrefs.getString(CommCareCaseSyncCache.CASE_SYNC_INFO_KEY, null) } returns "{\"case123\":{}}"
+        every { jsonHelper.fromJson<Map<String, CommCareCaseSyncInfo>>(any(), any()) } returns existingMap
+
+        // When
+        val result = cache.getCaseSyncInfoBySubjectId("nonexistent")
+
+        // Then
+        assertNull(result)
+    }
 }
