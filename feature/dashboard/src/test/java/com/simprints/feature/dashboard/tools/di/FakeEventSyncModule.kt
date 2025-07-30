@@ -17,5 +17,5 @@ import javax.inject.Singleton
 object FakeEventSyncModule {
     @Provides
     @Singleton
-    fun provideEventSyncManager(): EventSyncManager = mockk()
+    fun provideEventSyncManager(): EventSyncManager = mockk(relaxed = true)
 }
