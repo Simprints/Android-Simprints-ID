@@ -3,10 +3,12 @@ package com.simprints.infra.enrolment.records.repository
 import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.realm.store.exceptions.RealmUninitialisedException
+import com.simprints.infra.enrolment.records.repository.commcare.CommCareSyncService
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
@@ -19,6 +21,7 @@ import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
+import org.json.JSONException
 import javax.inject.Inject
 
 internal class EnrolmentRecordRepositoryImpl @Inject constructor(
@@ -29,6 +32,8 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
     @EnrolmentBatchSize private val batchSize: Int,
     private val insertRecordsInRoomDuringMigration: InsertRecordsInRoomDuringMigrationUseCase,
+    private val commCareSyncService: com.simprints.infra.enrolment.records.repository.commcare.CommCareSyncService,
+    private val jsonHelper: JsonHelper,
     securityManager: SecurityManager,
 ) : EnrolmentRecordRepository {
     private val prefs = securityManager.buildEncryptedSharedPreferences(PREF_FILE_NAME)
@@ -155,5 +160,23 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
     ) {
         insertRecordsInRoomDuringMigration(actions, project)
         selectEnrolmentRecordLocalDataSource().performActions(actions, project)
+        
+        // Track CommCare case information for actions that involve CommCare data
+        commCareSyncService.processSubjectActionsWithCaseTracking(
+            actions = actions,
+            project = project,
+            caseIdExtractor = ::extractCaseIdFromMetadata
+        )
+    }
+
+    /**
+     * Extract caseId from subject metadata (similar to CommCareIdentityDataSource.attemptExtractingCaseId)
+     */
+    private fun extractCaseIdFromMetadata(metadata: String?): String? = metadata?.takeUnless { it.isEmpty() }?.let {
+        try {
+            jsonHelper.fromJson<Map<String, Any>>(it)["caseId"] as? String
+        } catch (_: JSONException) {
+            null
+        }
     }
 }
