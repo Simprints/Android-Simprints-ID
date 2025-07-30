@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteException
 import com.simprints.core.DispatcherIO
 import com.simprints.core.NonCancellableIO
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.events.BuildConfig
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.EventScope
@@ -172,6 +173,23 @@ internal open class EventLocalDataSource @Inject constructor(
     suspend fun deleteAll() = useRoom(writingContext) {
         scopeDao.deleteAll()
         eventDao.deleteAll()
+    }
+
+    suspend fun executeRawEventInsertions(rawSqlInsertStatements: List<String>) = useRoom(writingContext) {
+        // this method should only be used in debug builds for testing purposes
+        check(BuildConfig.DEBUG) { "executeRawEventInsertions should only be used in debug builds for testing purposes" }
+
+        val sqliteDb = eventDatabaseFactory.get().openHelper.writableDatabase
+        sqliteDb.beginTransaction()
+        try {
+            rawSqlInsertStatements.forEach {
+                sqliteDb.execSQL(it)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        sqliteDb.setTransactionSuccessful()
+        sqliteDb.endTransaction()
     }
 
     companion object {
