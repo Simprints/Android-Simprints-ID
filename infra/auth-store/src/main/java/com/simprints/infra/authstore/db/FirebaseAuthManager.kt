@@ -2,12 +2,12 @@ package com.simprints.infra.authstore.db
 
 import android.content.Context
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.initialize
+import com.google.firebase.initialize
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.authstore.domain.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.infra.authstore.domain.LoginInfoStore
@@ -113,7 +113,7 @@ internal class FirebaseAuthManager @Inject constructor(
                 getFirebaseOptions(token),
                 CORE_BACKEND_PROJECT,
             )
-        } catch (ex: IllegalStateException) {
+        } catch (_: IllegalStateException) {
             // IllegalStateException = FirebaseApp name coreBackendFirebaseProject already exists!
             // We re-initialize because they might be signing into a different project.
             tryToDeleteCoreApp()
