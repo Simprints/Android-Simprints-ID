@@ -13,4 +13,11 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:events"))
     implementation(project(":feature:exit-form"))
+
+    implementation(libs.androidX.cameraX.core)
+    implementation(libs.androidX.cameraX.lifecycle)
+    implementation(libs.androidX.cameraX.view)
+
+    implementation(libs.mlkit.entity.extraction)
+    implementation(libs.mlkit.text.recognition)
 }
