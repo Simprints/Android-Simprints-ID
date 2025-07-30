@@ -26,3 +26,9 @@ jobs:
         with:
             build-environment: dev
             upload-artifact: ${{ needs.build-dev-apk.outputs.build-artifact }}
+
+    trigger-lt-upload:
+        uses: ./.github/workflows/reusable-lambdatest-upload.yml
+        secrets: inherit
+        needs:
+            - deploy-to-firebase
