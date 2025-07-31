@@ -15,7 +15,7 @@ jobs:
         uses: ./.github/workflows/reusable-check-recent-merges.yml
         secrets: inherit
         with:
-            days-ago: ${{ vars.DEV_UPLOAD_DAYS_AGO }}
+            days-ago: ${{ fromJSON(vars.DEV_UPLOAD_DAYS_AGO) }}
 
     deploy-to-dev:
         needs: check-recent-merges
