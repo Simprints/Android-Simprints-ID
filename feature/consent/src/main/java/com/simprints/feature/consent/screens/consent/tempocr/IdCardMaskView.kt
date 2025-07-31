@@ -17,9 +17,11 @@ class IdCardMaskView @JvmOverloads constructor(
 
     var horizontalPaddingDp: Float = 16f
 
-    private val backgroundPaint = Paint().apply {
-        color = "#88000000".toColorInt()
-    }
+    var backgroundColor = "#88000000"
+        set(value) {
+            field = value
+            invalidate()
+        }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -30,6 +32,9 @@ class IdCardMaskView @JvmOverloads constructor(
             addRoundRect(rect, horizontalPaddingDp, horizontalPaddingDp, Path.Direction.CCW)
         }
 
-        canvas.drawPath(path, backgroundPaint)
+        val bg = Paint().apply {
+            color = backgroundColor.toColorInt()
+        }
+        canvas.drawPath(path, bg)
     }
 }

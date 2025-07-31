@@ -8,7 +8,6 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -37,6 +36,9 @@ import com.simprints.feature.consent.screens.consent.tempocr.BuildAnalyzerUseCas
 import com.simprints.feature.consent.screens.consent.tempocr.CropBitmapUseCase
 import com.simprints.feature.consent.screens.consent.tempocr.NormalizeBitmapToPreviewUseCase
 import com.simprints.feature.consent.screens.consent.tempocr.OcrBoxMapperUseCase
+import com.simprints.feature.consent.screens.consent.tempocr.OcrState
+import com.simprints.feature.consent.screens.consent.tempocr.OcrUIModel
+import com.simprints.feature.consent.screens.consent.tempocr.OcrViewModel
 import com.simprints.feature.consent.screens.consent.tempocr.PerformOcrUseCase
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
@@ -59,6 +61,7 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.getValue
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -68,6 +71,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
     private lateinit var imageAnalysis: ImageAnalysis
     private var imageCapture: ImageCapture? = null
     private var cameraControl: androidx.camera.core.CameraControl? = null
+    private val viewModel by viewModels<OcrViewModel>()
 
     @Inject
     @DispatcherIO
@@ -89,9 +93,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
     lateinit var ocrBoxMapperUseCase: OcrBoxMapperUseCase
 
     private var overlay: View? = null
-    private var ocrJob: Job? = null
 
-    private var isAutocaptureRunning = false
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -104,87 +106,121 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
         binding.buttonCapture.setOnClickListener {
-            setAutocaptureState(isRunning = !isAutocaptureRunning, 5)
-            binding.buttonCapture.text = if (isAutocaptureRunning) "Stop" else "Start"
+            when (viewModel.uiModelState.value) {
+                is OcrUIModel.ScanningInProgress -> viewModel.stopOcr()
+                else -> viewModel.startOcr()
+            }
+        }
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.uiModelState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                OcrUIModel.NotScanning -> renderNotScanning()
+                is OcrUIModel.ScanningInProgress -> renderScanningInProgress(state)
+                is OcrUIModel.Success -> renderSuccessScan(state)
+            }
+        }
+        viewModel.ocrState.observe(viewLifecycleOwner) { state ->
+            if (state == null) return@observe
+            when (state) {
+                is OcrState.Running -> startOcr(state)
+                OcrState.Stopped -> finishOcr()
+            }
         }
     }
 
-    override fun onDestroy() {
-        setAutocaptureState(isRunning = false)
-        overlay = null
-        ocrJob?.cancel()
-        super.onDestroy()
+    private fun finishOcr() {
+        imageAnalysis.clearAnalyzer()
+        removeOCRBoundingBox()
     }
 
-    private fun setAutocaptureState(isRunning: Boolean, everyNthFrame: Int = 5) {
-        isAutocaptureRunning = isRunning
-        if (isRunning) {
-            buildAnalyzerUseCase(everyNthFrame) { bitmap: Bitmap, rotationDegrees: Int ->
-                ocrJob = lifecycleScope.launch(ioDispatcher) {
-                    val (previewWidth, previewHeight) = withContext(Dispatchers.Main) {
-                        binding.preview.width to binding.preview.height
-                    }
-                    val cutoutRect = withContext(Dispatchers.Main) {
-                        getBoundsRelativeTo(parent = binding.preview, child = binding.viewfinderOverlay)
-                    }
-                    val normalizedBitmap = normalizeBitmapToPreviewUseCase(
-                        inputBitmap = bitmap,
-                        rotationDegrees = rotationDegrees,
-                        previewViewWidth = previewWidth,
-                        previewViewHeight = previewHeight
-                    )
-                    val cropped = cropBitmapUseCase(bitmap = normalizedBitmap, cutoutRect = cutoutRect)
-                    val ocrResult = performOcrUseCase(cropped) { readoutString ->
-                        with(readoutString.trim().replace(" ", "")) {
-                            isDigitsOnly() && length == 8
-                        } // NHIS membership
-                    }
-
-                    if (!isActive || ocrJob?.isActive == false) return@launch
+    private fun startOcr(state: OcrState.Running) {
+        buildAnalyzerUseCase(everyNthFrame = state.everyNthFrame) { bitmap: Bitmap, rotationDegrees: Int ->
+            lifecycleScope.launch(ioDispatcher) {
+                val (previewWidth, previewHeight) = withContext(Dispatchers.Main) {
+                    binding.preview.width to binding.preview.height
+                }
+                val cutoutRect = withContext(Dispatchers.Main) {
+                    getBoundsRelativeTo(parent = binding.preview, child = binding.viewfinderOverlay)
+                }
+                val normalizedBitmap = normalizeBitmapToPreviewUseCase(
+                    inputBitmap = bitmap,
+                    rotationDegrees = rotationDegrees,
+                    previewViewWidth = previewWidth,
+                    previewViewHeight = previewHeight
+                )
+                val cropped = cropBitmapUseCase(bitmap = normalizedBitmap, cutoutRect = cutoutRect)
+                val ocrResult = performOcrUseCase(cropped) { readoutString ->
+                    with(readoutString.trim().replace(" ", "")) {
+                        isDigitsOnly() && length == 8
+                    } // NHIS membership
+                }
+                if (ocrResult != null) {
                     withContext(Dispatchers.Main) {
-                        if (ocrResult == null) {
-                            binding.ocrText.text = ""
-                            overlay?.let { binding.root.removeView(it) }
-                        } else {
-                            overlay?.let { binding.root.removeView(it) }
-                            val location = IntArray(2)
-                            binding.cardViewLayout.getLocationInWindow(location)
-                            val statusBarHeight = resources.getIdentifier("status_bar_height", "dimen", "android")
-                                .takeIf { it > 0 }
-                                ?.let { resources.getDimensionPixelSize(it) } ?: 0
-                            val screenRect = ocrBoxMapperUseCase(ocrResult.boundingBox, location[0], location[1] - statusBarHeight)
-                            overlay = object : View(context) {
-                                override fun onDraw(canvas: Canvas) {
-                                    super.onDraw(canvas)
-                                    val paint = Paint().apply {
-                                        color = Color.RED
-                                        style = Paint.Style.STROKE
-                                        strokeWidth = 4f
-                                    }
-                                    canvas.drawRect(screenRect, paint)
-                                }
-                            }
-                            overlay?.layoutParams = FrameLayout.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT
-                            )
-                            if (ocrJob?.isActive ?: false) {
-                                binding.root.addView(overlay)
-                                binding.ocrText.text = ocrResult.text.trim().replace(" ", "")
-                            }
-                        }
+                        val normalizedText = ocrResult.text.trim().replace(" ", "")
+                        viewModel.addOcrReadout(text = normalizedText, ocrResult.boundingBox)
                     }
                 }
-            }.also {
-                imageAnalysis.setAnalyzer(cameraExecutor, it)
             }
-        } else {
-            ocrJob?.cancel()
-            imageAnalysis.clearAnalyzer()
-            binding.ocrText.text = ""
-            overlay?.let { binding.root.removeView(it) }
+        }.also {
+            imageAnalysis.setAnalyzer(cameraExecutor, it)
         }
     }
+
+    private fun renderNotScanning() {
+        binding.buttonCapture.text = "Start"
+        binding.viewfinderMask.backgroundColor = "#88000000"
+    }
+
+    private fun renderSuccessScan(state: OcrUIModel.Success) {
+        renderNotScanning()
+        binding.ocrText.text = "${state.readoutValue} (Done in ${state.totalFramesProcessed} reads)"
+        viewModel.stopOcr()
+    }
+
+    private fun renderScanningInProgress(state: OcrUIModel.ScanningInProgress) {
+        binding.buttonCapture.text = "Stop"
+        binding.viewfinderMask.backgroundColor = "#88aaaaaa"
+        binding.ocrText.text = "${state.readoutValue} (${state.successfulReadouts}/${state.totalReadoutsRequired} reads)"
+        drawOCRBoundingBox(state.rawBox)
+    }
+
+    private fun removeOCRBoundingBox() {
+        overlay?.let { binding.root.removeView(it) }
+        overlay = null
+    }
+
+    private fun drawOCRBoundingBox(boundingBox: Rect) = {
+        overlay?.let { binding.root.removeView(it) }
+        val location = IntArray(2)
+        binding.cardViewLayout.getLocationInWindow(location)
+        val statusBarHeight = resources.getIdentifier("status_bar_height", "dimen", "android")
+            .takeIf { it > 0 }
+            ?.let { resources.getDimensionPixelSize(it) } ?: 0
+        val screenRect = ocrBoxMapperUseCase(boundingBox, location[0], location[1] - statusBarHeight)
+
+        overlay = object : View(context) {
+            override fun onDraw(canvas: Canvas) {
+                super.onDraw(canvas)
+                val paint = Paint().apply {
+                    color = Color.RED
+                    style = Paint.Style.STROKE
+                    strokeWidth = 4f
+                }
+                canvas.drawRect(screenRect, paint)
+            }
+        }.apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+
+        binding.root.addView(overlay)
+    }
+
 
     private fun getBoundsRelativeTo(parent: View, child: View): Rect {
         val childLocation = IntArray(2)

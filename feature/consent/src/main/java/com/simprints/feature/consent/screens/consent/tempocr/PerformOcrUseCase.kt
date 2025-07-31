@@ -22,8 +22,6 @@ class PerformOcrUseCase @Inject constructor() {
         val image = InputImage.fromBitmap(bitmap, 0)
         return try {
             val result = Tasks.await(recognizer.process(image))?: return null
-            val allTexts = result.textBlocks.flatMap { it.lines }.flatMap { it.elements }.map { it.text }
-            Simber.e(allTexts.toString(), NullPointerException())
             result.textBlocks
                 .flatMap { it.lines }
                 .firstOrNull { selector(it.text) }
