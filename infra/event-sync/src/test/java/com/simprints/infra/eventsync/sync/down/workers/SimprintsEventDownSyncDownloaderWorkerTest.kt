@@ -22,11 +22,11 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_M
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
-import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
+import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.INPUT_EVENT_DOWN_SYNC_SCOPE_ID
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
+import com.simprints.infra.eventsync.sync.down.workers.BaseEventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -44,12 +44,12 @@ import org.junit.runner.RunWith
 import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
-internal class EventDownSyncDownloaderWorkerTest {
+internal class SimprintsEventDownSyncDownloaderWorkerTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var downSyncTask: EventDownSyncTask
+    lateinit var downSyncTask: SimprintsEventDownSyncTask
 
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -66,7 +66,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     @MockK
     lateinit var configRepository: ConfigRepository
 
-    private lateinit var eventDownSyncDownloaderWorker: EventDownSyncDownloaderWorker
+    private lateinit var eventDownSyncDownloaderWorker: SimprintsEventDownSyncDownloaderWorker
 
     @MockK lateinit var migrationFlagsStore: RealmToRoomMigrationFlagsStore
 
@@ -74,7 +74,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        eventDownSyncDownloaderWorker = EventDownSyncDownloaderWorker(
+        eventDownSyncDownloaderWorker = SimprintsEventDownSyncDownloaderWorker(
             mockk(relaxed = true),
             mockk(relaxed = true) {
                 every { inputData } returns workDataOf(
@@ -82,13 +82,13 @@ internal class EventDownSyncDownloaderWorkerTest {
                     INPUT_EVENT_DOWN_SYNC_SCOPE_ID to "eventScopeId",
                 )
             },
-            downSyncTask,
             eventDownSyncScopeRepository,
             syncCache,
             JsonHelper,
             eventRepository,
             configRepository,
             testCoroutineRule.testCoroutineDispatcher,
+            downSyncTask,
             migrationFlagsStore,
         )
     }

@@ -271,7 +271,7 @@
     <string name="dashboard_sync_card_no_modules_message">Maaloo moojuula sinkii gootuu filadhu</string>
     <string name="dashboard_sync_card_no_modules_button">Moojula</string>
     <string name="dashboard_sync_card_offline_message">Maaloo gara mijeessaa internetii keetii deebi\'i</string>
-    <string name="dashboard_sync_card_offline_button">Mijeessaa</string>
+    <string name="dashboard_sync_card_settings_button">Mijeessaa</string>
     <string name="dashboard_sync_card_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
     <string name="dashboard_sync_card_records_uploaded">Galmeewwan hundi olkaa\'aman</string>
     <string name="dashboard_sync_card_try_again_button">Irra deebi\'ii yaali</string>

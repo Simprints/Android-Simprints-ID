@@ -47,7 +47,7 @@ class EventUpSyncWorkersBuilderTest {
     @Test
     fun builder_forProjectUpSync_shouldReturnTheRightWorkers() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventUpSyncScopeRepository.getUpSyncScope()
         } returns SampleSyncScopes.projectUpSyncScope
@@ -62,7 +62,7 @@ class EventUpSyncWorkersBuilderTest {
     @Test
     fun builder_periodicUpSyncWorkers_shouldHaveTheRightTags() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FACE)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventUpSyncScopeRepository.getUpSyncScope()
         } returns SampleSyncScopes.projectUpSyncScope
@@ -78,7 +78,7 @@ class EventUpSyncWorkersBuilderTest {
     @Test
     fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() = runTest {
         every { generalConfiguration.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        every { downSyncConfiguration.simprints.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
+        every { downSyncConfiguration.simprints?.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventUpSyncScopeRepository.getUpSyncScope()
         } returns SampleSyncScopes.projectUpSyncScope

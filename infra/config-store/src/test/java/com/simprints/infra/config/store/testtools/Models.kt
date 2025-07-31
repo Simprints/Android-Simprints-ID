@@ -364,6 +364,7 @@ internal val apiSynchronizationConfiguration = ApiSynchronizationConfiguration(
             maxAge = "PT24H",
             frequency = ApiSynchronizationConfiguration.ApiSynchronizationFrequency.PERIODICALLY,
         ),
+        commcare = null,
     ),
     sample = ApiSynchronizationConfiguration.ApiSampleSynchronizationConfiguration(
         signedUrlBatchSize = 5,
@@ -399,6 +400,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     ),
     down = DownSynchronizationConfiguration(
         simprints = simprintsDownSyncConfigurationConfiguration,
+        commCare = null,
     ),
     samples = SampleSynchronizationConfiguration(
         signedUrlBatchSize = 5,

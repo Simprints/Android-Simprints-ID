@@ -329,7 +329,7 @@
     <string name="dashboard_sync_card_no_modules_message">ሲንክ ለማድረግ ሞጁል ይምረጡ</string>
     <string name="dashboard_sync_card_no_modules_button">ሞጁሎች</string>
     <string name="dashboard_sync_card_offline_message">የስልኩ ሴቲንግ በመግባት የሞባይል ዳታ ያብሩ</string>
-    <string name="dashboard_sync_card_offline_button">ማስተካከያ</string>
+    <string name="dashboard_sync_card_settings_button">ማስተካከያ</string>
     <string name="dashboard_sync_card_too_many_modules_message">ብዙ ሞጁሎች ወርደዋል</string>
     <string name="dashboard_sync_card_relogin_required">ሲንክ ለማድረግ በቅድሚያ  log in ይደረግ</string>
 

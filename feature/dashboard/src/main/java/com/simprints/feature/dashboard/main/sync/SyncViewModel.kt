@@ -24,6 +24,7 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
 import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedCommCarePermissionMissing
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
@@ -32,7 +33,8 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
@@ -63,9 +65,9 @@ internal class SyncViewModel @Inject constructor(
         private const val MAX_TIME_BEFORE_SYNC_AGAIN = 5 * ONE_MINUTE
     }
 
-    val syncToBFSIDAllowed: LiveData<Boolean>
-        get() = _syncToBFSIDAllowed
-    private val _syncToBFSIDAllowed = MutableLiveData<Boolean>()
+    val isAnySyncAllowed: LiveData<Boolean>
+        get() = _isAnySyncAllowed
+    private val _isAnySyncAllowed = MutableLiveData<Boolean>()
 
     val syncCardLiveData: LiveData<SyncCardState>
         get() = _syncCardLiveData
@@ -117,6 +119,14 @@ internal class SyncViewModel @Inject constructor(
 
         startInitialSyncIfRequired()
         load()
+    }
+
+    fun onResume() {
+        // If last state was failed because CommCare permission is missing -
+        // try to sync again to check if it was given
+        if (syncCardLiveData.value is SyncFailedCommCarePermissionMissing) {
+            sync()
+        }
     }
 
     fun sync() {
@@ -185,7 +195,11 @@ internal class SyncViewModel @Inject constructor(
             }
         }
         configManager.getProjectConfiguration().also { configuration ->
-            _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
+            _isAnySyncAllowed.postValue(
+                configuration.canSyncDataToSimprints() ||
+                configuration.isSimprintsEventDownSyncAllowed() ||
+                configuration.isCommCareEventDownSyncAllowed()
+            )
         }
         eventSyncManager
             .countEventsToUpload(listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4))
@@ -256,23 +270,28 @@ internal class SyncViewModel @Inject constructor(
             lastTimeSyncSucceed(),
             syncState.getEstimatedBackendMaintenanceOutage(),
         )
+        syncState.isSyncFailedBecauseCommCarePermissionIsMissing() -> SyncFailedCommCarePermissionMissing(
+            lastTimeSyncSucceed(),
+        )
 
         syncState.isSyncFailed() -> SyncTryAgain(lastTimeSyncSucceed())
         else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
     }
 
-    private suspend fun isModuleSelectionRequired() = isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
+    private suspend fun isModuleSelectionRequired() = isSimprintsDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
-    private suspend fun isDownSyncAllowed() = configManager
+    // Simprints downsync is allowed if down.simprints is not null and its frequency is not ONLY_PERIODICALLY_UP_SYNC
+    private suspend fun isSimprintsDownSyncAllowed() = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.frequency !=
-        Frequency.ONLY_PERIODICALLY_UP_SYNC
+        .synchronization.down.simprints?.let {
+            it.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
+        } ?: false
 
     private suspend fun isSelectedModulesEmpty() = configManager.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        .synchronization.down.simprints?.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 }

@@ -329,7 +329,7 @@
     <string name="dashboard_sync_card_no_modules_message">সিঙ্ক করতে মডিউল নির্বাচন করুন</string>
     <string name="dashboard_sync_card_no_modules_button">মডিউল সমূহ</string>
     <string name="dashboard_sync_card_offline_message">সেটিংস্‌ থেকে ইন্টারনেট সংযোগ চালু করুন</string>
-    <string name="dashboard_sync_card_offline_button">স্ক্যানার যোগ করুন</string>
+    <string name="dashboard_sync_card_settings_button">স্ক্যানার যোগ করুন</string>
     <string name="dashboard_sync_card_too_many_modules_message">অনেক বেশি মডিউল ডাউনলোড করা হয়েছে </string>
     <string name="dashboard_sync_card_relogin_required">সিঙ্ক করতে পুনরায় লগইন করুন </string>
 

@@ -3,6 +3,7 @@ package com.simprints.feature.orchestrator
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import androidx.preference.PreferenceManager
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
@@ -13,8 +14,10 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.infra.resources.R as IDR
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.core.content.edit
 
 @AndroidEntryPoint
 internal class OrchestratorActivity : BaseActivity() {
@@ -63,6 +66,13 @@ internal class OrchestratorActivity : BaseActivity() {
                 // Some co-sync functionality depends on the exact package name of the caller app,
                 // e.g. to switch content providers of debug and release variants of the caller app
                 extras.putString(ClientApiConstants.CALLER_PACKAGE_NAME, callingPackage)
+                PreferenceManager.getDefaultSharedPreferences(this)
+                    .edit {
+                        putString(
+                            getString(IDR.string.preference_last_calling_package_name_key),
+                            callingPackage
+                        )
+                    }
 
                 findNavController(R.id.orchestrationHost).setGraph(
                     R.navigation.graph_orchestration,

@@ -45,7 +45,7 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints.maxAge
+                .synchronization.down.simprints?.maxAge
         } returns "PT24H"
 
         assertThat(usecase()).isTrue()
@@ -58,7 +58,7 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints.maxAge
+                .synchronization.down.simprints?.maxAge
         } returns "24h0m0s"
 
         assertThat(usecase()).isTrue()
@@ -71,8 +71,21 @@ class ShouldSuggestSyncUseCaseTest {
         coEvery {
             configRepository
                 .getProjectConfiguration()
-                .synchronization.down.simprints.maxAge
+                .synchronization.down.simprints?.maxAge
         } returns "PT24H"
+
+        assertThat(usecase()).isFalse()
+    }
+
+    @Test
+    fun `returns false if not Simprints sync`() = runTest {
+        coEvery { syncManager.getLastSyncTime() } returns Timestamp(0)
+        coEvery { timeHelper.msBetweenNowAndTime(any()) } returns HOUR_MS
+        coEvery {
+            configRepository
+                .getProjectConfiguration()
+                .synchronization.down.simprints
+        } returns null
 
         assertThat(usecase()).isFalse()
     }
