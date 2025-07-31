@@ -8,5 +8,5 @@ internal interface SampleUploader {
      * Uploads all locally stored samples.
      * On successful upload, the file and the associated metadata are deleted.
      */
-    suspend fun uploadAllSamples(projectId: String): Boolean
+    suspend fun uploadAllSamples(projectId: String, progressCallback: (suspend (Int, Int) -> Unit)? = null): Boolean
 }

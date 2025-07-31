@@ -5,6 +5,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KClass
 
 interface AuthStore {
@@ -12,6 +13,8 @@ interface AuthStore {
     var signedInProjectId: String
 
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
+
+    fun watchSignedInProjectId(): StateFlow<String>
 
     fun cleanCredentials()
 

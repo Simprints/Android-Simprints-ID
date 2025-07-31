@@ -96,7 +96,8 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         ).also { Simber.d("Scheduled ${it.size} up workers", tag = tag) }
                 }
 
-                if (configuration.isEventDownSyncAllowed()) {
+                val isDownSyncAllowedInWorker = inputData.getBoolean(IS_DOWN_SYNC_ALLOWED, true)
+                if (configuration.isEventDownSyncAllowed() && isDownSyncAllowedInWorker) {
                     eventRepository.createEventScope(
                         EventScopeType.DOWN_SYNC,
                         downSyncWorkerScopeId,
@@ -161,5 +162,6 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
 
     companion object {
         const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
+        const val IS_DOWN_SYNC_ALLOWED = "IS_DOWN_SYNC_ALLOWED"
     }
 }

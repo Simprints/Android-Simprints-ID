@@ -52,7 +52,11 @@ internal class ImageRepositoryImpl @Inject internal constructor(
 
     override suspend fun getNumberOfImagesToUpload(projectId: String): Int = localDataSource.listImages(projectId).count()
 
-    override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean = getSampleUploader().uploadAllSamples(projectId)
+    override suspend fun uploadStoredImagesAndDelete(
+        projectId: String,
+        progressCallback: (suspend (Int, Int) -> Unit)?,
+    ): Boolean =
+        getSampleUploader().uploadAllSamples(projectId, progressCallback)
 
     override suspend fun deleteStoredImages() {
         metadataStore.deleteAllMetadata()
