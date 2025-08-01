@@ -8,6 +8,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.repository.commcare.CommCareCaseRepository
 import com.simprints.infra.enrolment.records.repository.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.repository.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.repository.domain.models.FingerprintIdentity
@@ -42,6 +43,7 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     private val subjectsDatabaseFactory: SubjectsDatabaseFactory,
     private val tokenizationProcessor: TokenizationProcessor,
     private val queryBuilder: RoomEnrolmentRecordQueryBuilder,
+    private val commCareCaseRepository: CommCareCaseRepository,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
 ) : EnrolmentRecordLocalDataSource {
     companion object {
@@ -328,5 +330,13 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
     private suspend fun deleteSubject(subjectId: String) {
         Simber.d("[deleteSubject] Deleting subject: $subjectId", tag = ROOM_RECORDS_DB)
         subjectDao.deleteSubject(subjectId)
+        
+        // Also delete the CommCare case tracking record when a subject is deleted
+        try {
+            commCareCaseRepository.deleteCaseBySubjectId(subjectId)
+            Simber.d("[deleteSubject] Deleted CommCare case tracking for subject: $subjectId", tag = ROOM_RECORDS_DB)
+        } catch (e: Exception) {
+            Simber.w("[deleteSubject] Failed to delete CommCare case tracking for subject: $subjectId", e, tag = ROOM_RECORDS_DB)
+        }
     }
 }
