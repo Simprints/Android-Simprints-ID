@@ -14,6 +14,7 @@ import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEven
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.COMMCARE_SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R as IDR
@@ -21,10 +22,13 @@ import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 internal class CommCareEventDataSource @Inject constructor(
     private val jsonHelper: JsonHelper,
+    private val eventSyncCache: EventSyncCache,
     @ApplicationContext private val context: Context,
 ) {
     fun getEvents(): CommCareEventSyncResult {
@@ -51,9 +55,21 @@ internal class CommCareEventDataSource @Inject constructor(
             Simber.i("Start listing caseIds", tag = COMMCARE_SYNC)
             val caseIds = mutableListOf<String>()
             context.contentResolver
-                .query(getCaseMetadataUri(), arrayOf(COLUMN_CASE_ID), null, null, null)
+                .query(getCaseMetadataUri(), arrayOf(COLUMN_CASE_ID, COLUMN_LAST_MODIFIED), null, null, null)
                 ?.use { cursor ->
                     while (cursor.moveToNext()) {
+                        var lastSuccessfulSyncTime = eventSyncCache.readLastSuccessfulSyncTime()?.ms ?: 0L
+                        // Nullify the milliseconds because CommCare's last modified time does not include milliseconds
+                        lastSuccessfulSyncTime = lastSuccessfulSyncTime / 1000 * 1000
+
+                        // Get last modified time to ensure we only process cases modified since the last sync
+                        val lastModifiedString = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_MODIFIED))
+                        val lastModified = parseCommCareDateToMillis(lastModifiedString)
+                        if (lastModified > 0L && lastModified < lastSuccessfulSyncTime) {
+                            Simber.d("Skipping caseId due to last modified time: $lastModified before last successful sync: $lastSuccessfulSyncTime", tag = COMMCARE_SYNC)
+                            continue // Skip cases not modified since last sync
+                        }
+
                         cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CASE_ID))?.let { caseId ->
                             caseIds.add(caseId)
                         }
@@ -136,6 +152,16 @@ internal class CommCareEventDataSource @Inject constructor(
 
     private fun getCaseDataUri() = "content://${getPackageName()}.case/casedb/data".toUri()
 
+    private fun parseCommCareDateToMillis(dateString: String): Long {
+        val format = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.getDefault())
+        return try {
+            format.parse(dateString)?.time ?: 0L
+        } catch (e: Exception) {
+            Simber.e("Error parsing date: $dateString", e, tag = COMMCARE_SYNC)
+            0L
+        }
+    }
+
     private val coSyncSerializationModule = SimpleModule().apply {
         addSerializer(
             TokenizableString::class.java,
@@ -153,8 +179,9 @@ internal class CommCareEventDataSource @Inject constructor(
 
     companion object {
         internal const val COLUMN_CASE_ID = "case_id"
+        internal const val COLUMN_LAST_MODIFIED = "last_modified"
         internal const val COLUMN_DATUM_ID = "datum_id"
         internal const val COLUMN_VALUE = "value"
-        private const val BATCH_SIZE = 20
+        internal const val BATCH_SIZE = 20
     }
 }
