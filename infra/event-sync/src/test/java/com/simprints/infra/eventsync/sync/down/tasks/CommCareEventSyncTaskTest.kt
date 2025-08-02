@@ -322,42 +322,14 @@ class CommCareEventSyncTaskTest {
     }
 
     @Test
-    fun downSync_shouldTrackSubjectIdsAndDeleteSubjectsNotInCommCare() = runTest {
-        val creationEvent = ENROLMENT_RECORD_CREATION
-        mockCommCareDataSource(listOf(creationEvent))
-
-        // Mock existing subjects in the repository
-        coEvery { enrolmentRecordRepository.getAllSubjectIds() } returns listOf("subjectId", "subjectNotInCommCare")
+    fun downSync_shouldCallOnEventsProcessedOnDataSource() = runTest {
+        val eventsToDownload = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_DELETION)
+        mockCommCareDataSource(eventsToDownload)
 
         commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
 
-        // Verify that subjects not in CommCare are deleted
-        coVerify {
-            enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
-                    actions.any { it is Deletion && it.subjectId == "subjectNotInCommCare" }
-                },
-                project,
-            )
-        }
-    }
-
-    @Test
-    fun downSync_shouldNotDeleteSubjectsIfNoEventsProcessed() = runTest {
-        mockCommCareDataSource(emptyList())
-        coEvery { enrolmentRecordRepository.getAllSubjectIds() } returns listOf("existingSubject")
-
-        commCareEventSyncTask.downSync(this, projectOp, eventScope, project).toList()
-
-        // Verify that no deletion actions are performed when no events are processed
-        coVerify(exactly = 0) {
-            enrolmentRecordRepository.performActions(
-                match<List<SubjectAction>> { actions ->
-                    actions.any { it is Deletion }
-                },
-                project,
-            )
-        }
+        coVerify { commCareEventDataSource.onEventsProcessed(listOf(ENROLMENT_RECORD_CREATION)) }
+        coVerify { commCareEventDataSource.onEventsProcessed(listOf(ENROLMENT_RECORD_DELETION)) }
     }
 
     @Test
