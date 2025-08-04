@@ -1,5 +1,6 @@
 package com.simprints.infra.config.store.local
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -21,13 +22,14 @@ import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -43,6 +45,12 @@ class ConfigLocalDataSourceImplTest {
         private const val LANGUAGE = "en"
         private const val PRIVACY_NOTICE = "privacy"
     }
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     private val testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private val testProjectDataStore = DataStoreFactory.create(
@@ -60,7 +68,6 @@ class ConfigLocalDataSourceImplTest {
 
     private val tokenizationProcessor = mockk<TokenizationProcessor>(relaxed = true)
 
-
     private lateinit var configLocalDataSourceImpl: ConfigLocalDataSourceImpl
 
     @Before
@@ -72,7 +79,7 @@ class ConfigLocalDataSourceImplTest {
             testProjectDataStore,
             testProjectConfigDataStore,
             testDeviceConfigDataStore,
-            tokenizationProcessor
+            tokenizationProcessor,
         )
     }
 
@@ -82,9 +89,7 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `should throw a NoSuchElementException when there is no project`() = runTest(
-        UnconfinedTestDispatcher(),
-    ) {
+    fun `should throw a NoSuchElementException when there is no project`() = runTest {
         assertThrows<NoSuchElementException> {
             configLocalDataSourceImpl.getProject()
         }
