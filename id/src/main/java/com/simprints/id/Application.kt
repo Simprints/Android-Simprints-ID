@@ -10,6 +10,7 @@ import com.simprints.core.tools.extentions.deviceHardwareId
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.eventsync.BuildConfig.DB_ENCRYPTION
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.APPLICATION
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
@@ -31,7 +32,8 @@ open class Application :
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
 
-    @Inject lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
+    @Inject
+    lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
 
     @AppScope
     @Inject
@@ -45,10 +47,22 @@ open class Application :
 
     override fun onCreate() {
         super.onCreate()
+        Simber.i("Application created", tag = APPLICATION)
         initApplication()
     }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        Simber.i("Low memory", tag = APPLICATION)
+    }
+
+    override fun onTrimMemory(level: Int) {
+        Simber.i("Trim memory: $level", tag = APPLICATION)
+        super.onTrimMemory(level)
+    }
+
     override fun onTerminate() {
+        Simber.i("Application terminated", tag = APPLICATION)
         super.onTerminate()
         appScope.cancel()
     }
