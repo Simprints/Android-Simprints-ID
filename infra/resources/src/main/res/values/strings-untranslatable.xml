@@ -6,5 +6,8 @@
     <string name="dashboard_request_login_simprints_version" translatable="false">Simprints ID: %1$s</string>
     <string name="notification_sync_title" translatable="false">Simprints</string>
 
+    <string name="preference_last_calling_package_name_key" translatable="false">preference_last_calling_package_name_key</string>
+    <string name="default_commcare_package_name" translatable="false">org.commcare.dalvik</string>
+
 </resources>
 

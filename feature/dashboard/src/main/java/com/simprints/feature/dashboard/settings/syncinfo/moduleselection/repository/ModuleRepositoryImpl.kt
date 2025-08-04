@@ -18,10 +18,10 @@ internal class ModuleRepositoryImpl @Inject constructor(
 ) : ModuleRepository {
     override suspend fun getModules(): List<Module> = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.moduleOptions
-        .map {
+        .synchronization.down.simprints?.moduleOptions
+        ?.map {
             Module(it, isModuleSelected(it.value))
-        }
+        } ?: emptyList()
 
     override suspend fun saveModules(modules: List<Module>) {
         setSelectedModules(modules.filter { it.isSelected })
@@ -30,7 +30,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     override suspend fun getMaxNumberOfModules(): Int = configManager
         .getProjectConfiguration()
-        .synchronization.down.simprints.maxNbOfModules
+        .synchronization.down.simprints?.maxNbOfModules ?: 0
 
     private suspend fun isModuleSelected(moduleName: String): Boolean = configManager
         .getDeviceConfiguration()

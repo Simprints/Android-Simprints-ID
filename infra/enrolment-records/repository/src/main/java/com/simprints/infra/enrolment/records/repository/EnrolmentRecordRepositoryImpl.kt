@@ -145,6 +145,8 @@ internal class EnrolmentRecordRepositoryImpl @Inject constructor(
 
     override suspend fun load(query: SubjectQuery): List<Subject> = selectEnrolmentRecordLocalDataSource().load(query)
 
+    override suspend fun getAllSubjectIds(): List<String> = selectEnrolmentRecordLocalDataSource().getAllSubjectIds()
+
     override suspend fun delete(queries: List<SubjectQuery>) = selectEnrolmentRecordLocalDataSource().delete(queries)
 
     override suspend fun deleteAll() = selectEnrolmentRecordLocalDataSource().deleteAll()
