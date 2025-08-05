@@ -9,6 +9,7 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.models.FaceTarget
 import com.simprints.face.capture.models.SymmetricTarget
+import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
@@ -35,6 +36,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val eventReporter: SimpleCaptureEventReporter,
     private val timeHelper: TimeHelper,
+    private val isUsingAutoCaptureUseCase: IsUsingAutoCaptureUseCase,
 ) : ViewModel() {
     private var attemptNumber: Int = 1
     private var samplesToCapture: Int = 1
@@ -57,7 +59,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     val displayCameraFlashControls = MutableLiveData(false)
 
-    private var isAutoCapture: Boolean = false
+    var isAutoCapture: Boolean = false
 
     private var captureImagingStartTime: Long = 0
     private var isAutoCaptureHeldOff = true
@@ -77,7 +79,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
             faceDetector = resolveFaceBioSdk(bioSdk).detector
 
             val config = configManager.getProjectConfiguration()
-            isAutoCapture = config.experimental().faceAutoCaptureEnabled
+            isAutoCapture = isUsingAutoCaptureUseCase(config)
+
             qualityThreshold = config.face?.getSdkConfiguration(bioSdk)?.qualityThreshold ?: 0f
             singleQualityFallbackCaptureRequired = config.experimental().singleQualityFallbackRequired
             autoCaptureImagingDurationMillis = config.experimental().faceAutoCaptureImagingDurationMillis

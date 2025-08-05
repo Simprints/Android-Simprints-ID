@@ -17,6 +17,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -92,13 +93,22 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         bindViewModel()
         binding.captureProgress.max = 1 // normalized progress
 
-        binding.captureFeedbackBtn.setOnClickListener { vm.startCapture() }
+        binding.captureFeedbackBtn.setOnClickListener {
+            vm.startCapture()
+            if (vm.isAutoCapture) {
+                binding.captureFeedbackBtn.isClickable = false
+            }
+        }
 
         // Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
             if (view != null) {
                 vm.initCapture(mainVm.bioSDK, mainVm.samplesToCapture, mainVm.attemptNumber)
             }
+        }
+        if (vm.isAutoCapture) {
+            vm.holdOffAutoCapture()
+            binding.captureFeedbackBtn.isClickable = true
         }
 
         binding.captureInstructionsBtn.setOnClickListener {
@@ -251,8 +261,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderCapturingNotStarted() {
         binding.apply {
+            if (vm.isAutoCapture) {
+                captureFeedbackBtn.setText(IDR.string.face_capture_start_capture)
+                captureFeedbackBtn.isChecked = true
+            } else {
+                captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
+            }
+
             captureOverlay.drawSemiTransparentTarget()
-            captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
         }
@@ -272,7 +288,12 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderValidFace() {
         binding.apply {
-            captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+            if (vm.isAutoCapture) {
+                captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
+            } else {
+                captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+            }
+
             captureFeedbackTxtExplanation.text = null
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
@@ -389,7 +410,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     }
 
     private fun toggleCaptureButtons(valid: Boolean) {
-        binding.captureFeedbackBtn.isClickable = valid
+        if (!vm.isAutoCapture) {
+            binding.captureFeedbackBtn.isClickable = valid
+        }
     }
 
     private fun renderNoPermission(shouldOpenSettings: Boolean) {
@@ -403,7 +426,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     requireActivity().startActivity(
                         Intent(
                             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.parse("package:${requireActivity().packageName}"),
+                            "package:${requireActivity().packageName}".toUri(),
                         ),
                     )
                 } else {

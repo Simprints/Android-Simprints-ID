@@ -8,6 +8,7 @@ import com.google.common.truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
@@ -55,6 +56,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
+    @MockK
+    private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
+
     private lateinit var viewModel: LiveFeedbackFragmentViewModel
 
     @Before
@@ -68,9 +72,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
                 ?.getSdkConfiguration(any())
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
-        coEvery {
-            configManager.getProjectConfiguration().experimental().faceAutoCaptureEnabled
-        } returns true
+        every { isUsingAutoCapture.invoke(any()) } returns true
         coEvery {
             configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired
         } returns false
@@ -87,6 +89,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
             configManager,
             eventReporter,
             timeHelper,
+            isUsingAutoCapture,
         )
     }
 
