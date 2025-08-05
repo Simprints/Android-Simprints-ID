@@ -33,6 +33,7 @@ import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.face.capture.screens.livefeedback.CropToTargetOverlayAnalyzer
+import com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragmentViewModel
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.view.applySystemBarInsets
@@ -57,7 +58,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
 
     private val mainVm: FaceCaptureViewModel by activityViewModels()
 
-    private val vm: LiveFeedbackAutoCaptureFragmentViewModel by viewModels()
+    private val vm: LiveFeedbackFragmentViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
     private lateinit var screenSize: Size
@@ -127,7 +128,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
         if (::cameraExecutor.isInitialized && !cameraExecutor.isShutdown) {
             return@launch
         }
-        vm.holdOffCapture()
+        vm.holdOffAutoCapture()
         binding.captureFeedbackBtn.isClickable = true
 
         // Initialize our background executor
@@ -202,11 +203,11 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
 
         vm.capturingState.observe(viewLifecycleOwner) {
             @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA") when (it) {
-                LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
+                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
 
-                LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
+                LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
 
-                LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED -> {
+                LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
                         currentFragment = this,
@@ -379,7 +380,7 @@ internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live
                 progressColor,
             )
 
-            captureProgress.value = vm.getAutoCaptureImagingProgressNormalized()
+            captureProgress.value = vm.getNormalizedProgress()
         }
     }
 

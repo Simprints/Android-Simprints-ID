@@ -1,10 +1,10 @@
-package com.simprints.face.capture.screens.livefeedbackautocapture
+package com.simprints.face.capture.screens.livefeedback
 
 import android.graphics.Bitmap
 import android.graphics.Rect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
@@ -17,13 +17,8 @@ import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -60,7 +55,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
-    private lateinit var viewModel: LiveFeedbackAutoCaptureFragmentViewModel
+    private lateinit var viewModel: LiveFeedbackFragmentViewModel
 
     @Before
     fun setUp() {
@@ -73,7 +68,12 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
                 ?.getSdkConfiguration(any())
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
-        coEvery { configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns false
+        coEvery {
+            configManager.getProjectConfiguration().experimental().faceAutoCaptureEnabled
+        } returns true
+        coEvery {
+            configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired
+        } returns false
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
         val resolveFaceBioSdkUseCase = mockk<ResolveFaceBioSdkUseCase> {
@@ -82,7 +82,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
             }
         }
 
-        viewModel = LiveFeedbackAutoCaptureFragmentViewModel(
+        viewModel = LiveFeedbackFragmentViewModel(
             resolveFaceBioSdkUseCase,
             configManager,
             eventReporter,
@@ -99,10 +99,12 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.process(frame)
 
-        assertThat(currentDetection.observedValues)
+        Truth
+            .assertThat(currentDetection.observedValues)
             .isEmpty()
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
     }
 
     @Test
@@ -113,13 +115,15 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
-        viewModel.holdOffCapture()
+        viewModel.holdOffAutoCapture()
         viewModel.process(frame)
 
-        assertThat(currentDetection.observedValues)
+        Truth
+            .assertThat(currentDetection.observedValues)
             .isEmpty()
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
     }
 
     @Test
@@ -132,10 +136,12 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.startCapture()
         viewModel.process(frame)
 
-        assertThat(currentDetection.observedValues.last()?.status)
+        Truth
+            .assertThat(currentDetection.observedValues.last()?.status)
             .isEqualTo(FaceDetection.Status.BAD_QUALITY)
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
     }
 
     @Test
@@ -148,9 +154,10 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.startCapture()
         viewModel.process(frame)
 
-        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+        Truth.assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
     }
 
     @Test
@@ -162,12 +169,13 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
-        viewModel.holdOffCapture()
+        viewModel.holdOffAutoCapture()
         viewModel.process(frame)
 
-        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+        Truth.assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
     }
 
     @Test
@@ -184,13 +192,18 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.process(frame)
         viewModel.process(frame)
 
-        assertThat(currentDetection.observedValues.first()?.status)
+        Truth
+            .assertThat(currentDetection.observedValues.first()?.status)
             .isEqualTo(FaceDetection.Status.BAD_QUALITY)
-        assertThat(capturingState.observedValues.first())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
-        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+        Truth
+            .assertThat(capturingState.observedValues.first())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
+        Truth
+            .assertThat(currentDetection.observedValues.last()?.hasValidStatus())
+            .isEqualTo(true)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
     }
 
     @Test
@@ -203,7 +216,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.process(frame)
 
         val currentDetection = viewModel.currentDetection.testObserver()
-        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
+        Truth.assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
 
         coVerify { eventReporter.addFallbackCaptureEvent(any(), any()) }
     }
@@ -218,7 +231,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS + 1)
 
         val currentDetection = viewModel.currentDetection.testObserver()
-        assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
+        Truth.assertThat(currentDetection.observedValues.last()?.hasValidStatus()).isEqualTo(true)
 
         coVerify { eventReporter.addCaptureEvents(any(), any(), any(), any()) }
     }
@@ -253,12 +266,12 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.process(frame)
 
         detections.observedValues.let {
-            assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
-            assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.TOOCLOSE)
-            assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.OFFYAW)
-            assertThat(it[3]?.status).isEqualTo(FaceDetection.Status.OFFROLL)
-            assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
-            assertThat(it[5]?.status).isEqualTo(FaceDetection.Status.NOFACE)
+            Truth.assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
+            Truth.assertThat(it[1]?.status).isEqualTo(FaceDetection.Status.TOOCLOSE)
+            Truth.assertThat(it[2]?.status).isEqualTo(FaceDetection.Status.OFFYAW)
+            Truth.assertThat(it[3]?.status).isEqualTo(FaceDetection.Status.OFFROLL)
+            Truth.assertThat(it[4]?.status).isEqualTo(FaceDetection.Status.BAD_QUALITY)
+            Truth.assertThat(it[5]?.status).isEqualTo(FaceDetection.Status.NOFACE)
         }
 
         coVerify(exactly = 0) { eventReporter.addCaptureEvents(any(), any(), any()) }
@@ -269,7 +282,9 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         val validFace: Face = getFace()
         val badQuality: Face = getFace(quality = -2f)
 
-        coEvery { configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns true
+        coEvery {
+            configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired
+        } returns true
 
         every { faceDetector.analyze(frame) } returnsMany listOf(
             badQuality, // not a fallback image due to bad quality
@@ -289,8 +304,8 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         detections.observedValues.let {
             // fallback image frame wasn't observed during preparation delay
-            assertThat(it[0]?.hasValidStatus()).isEqualTo(true)
-            assertThat(it[1]?.hasValidStatus()).isEqualTo(true)
+            Truth.assertThat(it[0]?.hasValidStatus()).isEqualTo(true)
+            Truth.assertThat(it[1]?.hasValidStatus()).isEqualTo(true)
         }
     }
 
@@ -298,7 +313,10 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
     fun `Use default imaging duration when not configured`() = runTest {
         coEvery { faceDetector.analyze(frame) } returns getFace()
         coEvery {
-            configManager.getProjectConfiguration().experimental().faceAutoCaptureImagingDurationMillis
+            configManager
+                .getProjectConfiguration()
+                .experimental()
+                .faceAutoCaptureImagingDurationMillis
         } returns AUTO_CAPTURE_IMAGING_DURATION_MS
         val capturingState = viewModel.capturingState.testObserver()
 
@@ -306,31 +324,40 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         viewModel.startCapture()
         viewModel.process(frame)
         advanceTimeBy(AUTO_CAPTURE_IMAGING_DURATION_MS)
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
 
         advanceTimeBy(1)
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
     }
 
     @Test
     fun `Use custom imaging duration when provided in config`() = runTest {
-        val configDuration = 5000
+        val configDuration = 5000L
         coEvery { faceDetector.analyze(frame) } returns getFace()
-        coEvery { configManager.getProjectConfiguration().custom } returns mapOf("faceAutoCaptureImagingDurationMillis" to configDuration)
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .experimental()
+                .faceAutoCaptureImagingDurationMillis
+        } returns configDuration
         val capturingState = viewModel.capturingState.testObserver()
 
         viewModel.initCapture(FaceConfiguration.BioSdk.SIM_FACE, 1, 0)
         viewModel.startCapture()
         viewModel.process(frame)
-        advanceTimeBy(configDuration.toLong())
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
+        advanceTimeBy(configDuration / 2)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
 
-        advanceTimeBy(1)
-        assertThat(capturingState.observedValues.last())
-            .isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
+        advanceTimeBy(configDuration / 2)
+        Truth
+            .assertThat(capturingState.observedValues.last())
+            .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
     }
 
     @Test
@@ -351,33 +378,37 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
 
         currentDetectionObserver.observedValues.let {
             // 1st frame wasn't observed during preparation delay
-            assertThat(it[0]?.hasValidStatus()).isEqualTo(true)
-            assertThat(it[1]?.hasValidStatus()).isEqualTo(true)
+            Truth.assertThat(it[0]?.hasValidStatus()).isEqualTo(true)
+            Truth.assertThat(it[1]?.hasValidStatus()).isEqualTo(true)
         }
 
         capturingStateObserver.observedValues.let {
-            assertThat(it[0]).isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.NOT_STARTED)
-            assertThat(it[1]).isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.CAPTURING)
-            assertThat(it[2]).isEqualTo(LiveFeedbackAutoCaptureFragmentViewModel.CapturingState.FINISHED)
+            Truth
+                .assertThat(it[0])
+                .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED)
+            Truth
+                .assertThat(it[1])
+                .isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.CAPTURING)
+            Truth.assertThat(it[2]).isEqualTo(LiveFeedbackFragmentViewModel.CapturingState.FINISHED)
         }
 
-        assertThat(viewModel.userCaptures.size).isEqualTo(samplesToKeep)
+        Truth.assertThat(viewModel.userCaptures.size).isEqualTo(samplesToKeep)
         viewModel.userCaptures.let {
             with(it[0]) {
-                assertThat(hasValidStatus()).isEqualTo(true)
-                assertThat(face).isEqualTo(validFace)
-                assertThat(isFallback).isEqualTo(false)
+                Truth.assertThat(hasValidStatus()).isEqualTo(true)
+                Truth.assertThat(face).isEqualTo(validFace)
+                Truth.assertThat(isFallback).isEqualTo(false)
             }
 
-            assertThat(it[1].isFallback).isEqualTo(false)
+            Truth.assertThat(it[1].isFallback).isEqualTo(false)
         }
 
         with(viewModel.sortedQualifyingCaptures) {
-            assertThat(size).isEqualTo(samplesToKeep)
-            assertThat(get(0).face).isEqualTo(validFace)
-            assertThat(get(0).isFallback).isEqualTo(false)
-            assertThat(get(1).face).isEqualTo(validFace)
-            assertThat(get(1).isFallback).isEqualTo(false)
+            Truth.assertThat(size).isEqualTo(samplesToKeep)
+            Truth.assertThat(get(0).face).isEqualTo(validFace)
+            Truth.assertThat(get(0).isFallback).isEqualTo(false)
+            Truth.assertThat(get(1).face).isEqualTo(validFace)
+            Truth.assertThat(get(1).isFallback).isEqualTo(false)
         }
 
         coVerify { eventReporter.addFallbackCaptureEvent(any(), any()) }
@@ -389,7 +420,7 @@ internal class LiveFeedbackAutoCaptureFragmentViewModelTest {
         quality: Float = 1f,
         yaw: Float = 0f,
         roll: Float = 0f,
-    ) = Face(100, 100, rect, yaw, roll, quality, Random.nextBytes(20), "format")
+    ) = Face(100, 100, rect, yaw, roll, quality, Random.Default.nextBytes(20), "format")
 
     companion object {
         private const val QUALITY_THRESHOLD = -1f
