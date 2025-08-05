@@ -9,6 +9,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -101,6 +102,7 @@ internal class EventSyncManagerImpl @Inject constructor(
             ),
         )
         downSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
+        eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
     }
 
     private fun getProjectModes(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities.map { it.toMode() }
