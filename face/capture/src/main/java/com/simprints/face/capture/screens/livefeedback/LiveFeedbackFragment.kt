@@ -90,9 +90,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
+        binding.captureProgress.max = 1 // normalized progress
 
         binding.captureFeedbackBtn.setOnClickListener { vm.startCapture() }
-        binding.captureProgress.max = mainVm.samplesToCapture
 
         // Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
@@ -384,7 +384,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 progressColor,
             )
 
-            captureProgress.value = vm.userCaptures.size.toFloat()
+            captureProgress.value = vm.getNormalizedProgress()
         }
     }
 
