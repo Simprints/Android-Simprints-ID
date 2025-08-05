@@ -21,7 +21,7 @@
         android:id="@+id/faceLiveFeedbackFragment"
         android:name="com.simprints.face.capture.screens.livefeedbackautocapture.LiveFeedbackAutoCaptureFragment"
         android:label="FaceDetectionAutoCaptureFragment"
-        tools:layout="@layout/fragment_live_feedback_auto_capture">
+        tools:layout="@layout/fragment_live_feedback">
         <action
             android:id="@+id/action_faceLiveFeedbackFragment_to_faceConfirmationFragment"
             app:destination="@id/faceConfirmationFragment"

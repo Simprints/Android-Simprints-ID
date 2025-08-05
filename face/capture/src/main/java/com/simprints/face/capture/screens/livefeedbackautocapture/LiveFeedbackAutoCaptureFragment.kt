@@ -29,7 +29,7 @@ import com.simprints.core.tools.extentions.hasCameraFlash
 import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.face.capture.R
-import com.simprints.face.capture.databinding.FragmentLiveFeedbackAutoCaptureBinding
+import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.face.capture.screens.livefeedback.CropToTargetOverlayAnalyzer
@@ -51,14 +51,14 @@ import com.simprints.infra.resources.R as IDR
  * [com.simprints.face.capture.screens.confirmation.ConfirmationFragment]
  */
 @AndroidEntryPoint
-internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live_feedback_auto_capture) {
+internal class LiveFeedbackAutoCaptureFragment : Fragment(R.layout.fragment_live_feedback) {
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
 
     private val mainVm: FaceCaptureViewModel by activityViewModels()
 
     private val vm: LiveFeedbackAutoCaptureFragmentViewModel by viewModels()
-    private val binding by viewBinding(FragmentLiveFeedbackAutoCaptureBinding::bind)
+    private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
     private lateinit var screenSize: Size
     private lateinit var targetResolution: Size
