@@ -260,21 +260,21 @@
     <string name="dashboard_project_card_scanner_used">Iskaanarii hojii irra oole: %1$s</string>
     <string name="dashboard_project_card_current_user">Fayyadamaa Mosaajii</string>
 
-    <!-- Dashboard - Sync card -->
-    <string name="dashboard_sync_card_title">Haala siinkii</string>
-    <string name="dashboard_sync_card_complete">Siinkiin xumureera</string>
-    <string name="dashboard_sync_card_incomplete">Siinkiin hin xumuramne</string>
-    <string name="dashboard_sync_card_connecting">Walqunnamaa jira</string>
-    <string name="dashboard_sync_card_progress">Siink gochaa jira…%1$s</string>
-    <string name="dashboard_sync_card_sync_button">Amma Siink godhi</string>
-    <string name="dashboard_sync_card_failed_message">Siinkiin hin milkoofne, supparvaayzara kee qunnami</string>
-    <string name="dashboard_sync_card_no_modules_message">Maaloo moojuula sinkii gootuu filadhu</string>
-    <string name="dashboard_sync_card_no_modules_button">Moojula</string>
-    <string name="dashboard_sync_card_offline_message">Maaloo gara mijeessaa internetii keetii deebi\'i</string>
-    <string name="dashboard_sync_card_offline_button">Mijeessaa</string>
-    <string name="dashboard_sync_card_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
-    <string name="dashboard_sync_card_records_uploaded">Galmeewwan hundi olkaa\'aman</string>
-    <string name="dashboard_sync_card_try_again_button">Irra deebi\'ii yaali</string>
+    <!-- Sync Info -->
+    <string name="sync_info_header_title">Haala siinkii</string>
+    <string name="sync_info_complete">Siinkiin xumureera</string>
+    <string name="sync_info_incomplete">Siinkiin hin xumuramne</string>
+    <string name="sync_info_connecting">Walqunnamaa jira</string>
+    <string name="sync_info_progress">Siink gochaa jira…%1$s</string>
+    <string name="sync_info_sync_button">Amma Siink godhi</string>
+    <string name="sync_info_details_error">Siinkiin hin milkoofne, supparvaayzara kee qunnami</string>
+    <string name="sync_info_no_modules_message">Maaloo moojuula sinkii gootuu filadhu</string>
+    <string name="sync_info_no_modules_button">Moojula</string>
+    <string name="sync_info_offline_message">Maaloo gara mijeessaa internetii keetii deebi\'i</string>
+    <string name="sync_info_header_settings_button"><font fgcolor='#FF7C00'><u>Mijeessaa</u></font></string>
+    <string name="sync_info_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
+    <string name="sync_info_records_uploaded">Galmeewwan hundi olkaa\'aman</string>
+    <string name="sync_info_button_try_again">Irra deebi\'ii yaali</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">Hojii guyyaa guyyaa:%1$s</string>
@@ -309,19 +309,18 @@
     <string name="dashboard_preference_summary_settings_fingers">Quba ashaaraan isaa fuudhuu barbaaddu filadhu</string>
     <string name="dashboard_preference_summary_sync_information">Bal\'inaan siinkirrattii</string>
 
-    <!-- Dashboard - Sync info -->
-    <string name="dashboard_sync_info_title">Odeffannoo Siinkii</string>
-    <string name="dashboard_sync_info_select_modules_button">Moojuliiwwan filadhu</string>
-    <string name="dashboard_sync_info_records_to_upload">Barreeffama olfe\'aa</string>
-    <string name="dashboard_sync_info_records_to_download">Barreeffama gad-buussuf</string>
-    <string name="dashboard_sync_info_records_to_delete">Barreeffama haquuf</string>
-    <string name="dashboard_sync_info_total_records_on_device">Barreeffama waliigalaa meeshaarra</string>
-    <string name="dashboard_sync_info_selected_modules">Moojuula filatamee</string>
-    <string name="dashboard_sync_info_unselected_modules">Moojuulaa hin filatamne</string>
-    <string name="dashboard_sync_info_total_records">Barreeffama waliigalaa</string>
-    <string name="dashboard_sync_info_images_to_upload">Suuraalee olkaa\'uuf</string>
-    <string name="dashboard_sync_info_sync_now_button">Amma Siink godhi</string>
-    <string name="dashboard_sync_info_sync_in_progress">Siink gochaa jira</string>
+    <!-- Sync info -->
+    <string name="sync_info_total_records">Barreeffama waliigalaa</string>
+    <string name="sync_info_title">Odeffannoo Siinkii</string>
+    <string name="sync_info_button_select_modules">Moojuliiwwan filadhu</string>
+    <string name="sync_info_records_to_up_sync">Barreeffama olfe\'aa</string>
+    <string name="sync_info_records_to_download_or_delete">Barreeffama gad-buussuf</string>
+    <string name="sync_info_records_to_delete">Barreeffama haquuf</string>
+    <string name="sync_info_records_on_device">Barreeffama waliigalaa meeshaarra</string>
+    <string name="sync_info_section_module_selection">Moojuula filatamee</string>
+    <string name="sync_info_images_to_up_sync">Suuraalee olkaa\'uuf</string>
+    <string name="sync_info_button_records_syncing">Siink gochaa jira</string>
+
     <!-- Dashboard - Module selection -->
     <string name="dashboard_select_modules_no_modules">Filannoo dogoggoraa. Maaloo, yoo xiqqaate moodula tokko filadhu</string>
     <string name="dashboard_select_modules_too_many_modules">Filannoo dogoggoraa. Maaloo, %1$d moojulii ol hin filatiin.</string>

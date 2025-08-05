@@ -138,6 +138,24 @@ class FirestoreSampleUploaderTest {
         assertThat(remoteDataSource.uploadAllSamples(PROJECT_ID)).isFalse()
     }
 
+    @Test
+    fun `progress callback receives correct index counter values during upload`() = runTest {
+        setupProjectConfig()
+        setupStorageMock()
+        configureLocalImageFiles(numberOfValidFiles = 3)
+        val progressUpdates = mutableListOf<Pair<Int, Int>>()
+        val progressCallback: suspend (Int, Int) -> Unit = { current, total ->
+            progressUpdates.add(current to total)
+        }
+
+        assertThat(remoteDataSource.uploadAllSamples(PROJECT_ID, progressCallback)).isTrue()
+
+        assertThat(progressUpdates).hasSize(3)
+        assertThat(progressUpdates[0]).isEqualTo(0 to 3)
+        assertThat(progressUpdates[1]).isEqualTo(1 to 3)
+        assertThat(progressUpdates[2]).isEqualTo(2 to 3)
+    }
+
     private fun setupProjectConfig() {
         coEvery { configManager.getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
         every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"

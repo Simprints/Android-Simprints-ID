@@ -42,7 +42,7 @@ object FakeCoreModule {
 
     @Provides
     @Singleton
-    fun provideTimeHelper(): TimeHelper = mockk()
+    fun provideTimeHelper(): TimeHelper = mockk(relaxed = true)
 
     @Provides
     @Singleton
@@ -95,5 +95,5 @@ object FakeCoreModule {
     @Provides
     fun provideWorkManager(
         @ApplicationContext context: Context,
-    ): WorkManager = WorkManager.getInstance(context)
+    ): WorkManager = mockk(relaxed = true)
 }
