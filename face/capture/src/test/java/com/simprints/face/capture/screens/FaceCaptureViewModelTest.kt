@@ -1,7 +1,7 @@
 package com.simprints.face.capture.screens
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
@@ -25,16 +25,9 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
 import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
+import io.mockk.impl.annotations.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
@@ -72,9 +65,6 @@ class FaceCaptureViewModelTest {
     private lateinit var saveLicenseCheckEvent: SaveLicenseCheckEventUseCase
 
     @MockK
-    private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
-
-    @MockK
     private lateinit var shouldShowInstructionsScreen: ShouldShowInstructionsScreenUseCase
 
     private lateinit var viewModel: FaceCaptureViewModel
@@ -104,7 +94,6 @@ class FaceCaptureViewModelTest {
                 coEvery { this@mockk(any()).initializer } returns faceBioSdkInitializer
             },
             saveLicenseCheckEvent,
-            isUsingAutoCapture,
             shouldShowInstructionsScreen,
             "deviceId",
         )
@@ -312,30 +301,6 @@ class FaceCaptureViewModelTest {
         coVerify { licenseRepository.redownloadLicence(any(), any(), Vendor.RankOne, any()) }
         coVerify(exactly = 2) { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
         assertThat(licenseStatusSlot.captured).isEqualTo(LicenseStatus.VALID)
-    }
-
-    @Test
-    fun `auto-capture should be enabled if it is used according to its use case`() {
-        // Given
-        coEvery { isUsingAutoCapture() } returns true
-
-        // When
-        viewModel.setupAutoCapture()
-
-        // Then
-        assertThat(viewModel.isAutoCaptureEnabled.getOrAwaitValue()).isTrue()
-    }
-
-    @Test
-    fun `auto-capture should be disabled if it is not used according to its use case`() {
-        // Given
-        coEvery { isUsingAutoCapture() } returns false
-
-        // When
-        viewModel.setupAutoCapture()
-
-        // Then
-        assertThat(viewModel.isAutoCaptureEnabled.getOrAwaitValue()).isFalse()
     }
 
     @Test

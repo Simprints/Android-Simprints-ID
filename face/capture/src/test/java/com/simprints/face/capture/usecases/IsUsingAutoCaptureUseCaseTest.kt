@@ -3,13 +3,10 @@ package com.simprints.face.capture.usecases
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.experimental
-import com.simprints.infra.config.sync.ConfigManager
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -17,9 +14,8 @@ import org.junit.Before
 import org.junit.Test
 
 class IsUsingAutoCaptureUseCaseTest {
-
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var projectConfiguration: ProjectConfiguration
 
     @MockK
     private lateinit var context: Context
@@ -35,11 +31,14 @@ class IsUsingAutoCaptureUseCaseTest {
         mockkStatic(PreferenceManager::class)
         every { PreferenceManager.getDefaultSharedPreferences(context) } returns sharedPreferences
 
-        isUsingAutoCapture = IsUsingAutoCaptureUseCase(configManager, context)
+        isUsingAutoCapture = IsUsingAutoCaptureUseCase(context)
     }
 
-    private fun setupParams(featureEnabled: Boolean, preferenceEnabled: Boolean) {
-        coEvery { configManager.getProjectConfiguration().experimental().faceAutoCaptureEnabled } returns featureEnabled
+    private fun setupParams(
+        featureEnabled: Boolean,
+        preferenceEnabled: Boolean,
+    ) {
+        coEvery { projectConfiguration.experimental().faceAutoCaptureEnabled } returns featureEnabled
         every { sharedPreferences.getBoolean("preference_enable_face_auto_capture", true) } returns preferenceEnabled
     }
 
@@ -49,7 +48,7 @@ class IsUsingAutoCaptureUseCaseTest {
         setupParams(featureEnabled = true, preferenceEnabled = true)
 
         // When
-        val result = isUsingAutoCapture()
+        val result = isUsingAutoCapture(projectConfiguration)
 
         // Then
         assertTrue(result)
@@ -61,7 +60,7 @@ class IsUsingAutoCaptureUseCaseTest {
         setupParams(featureEnabled = true, preferenceEnabled = false)
 
         // When
-        val result = isUsingAutoCapture()
+        val result = isUsingAutoCapture(projectConfiguration)
 
         // Then
         assertFalse(result)
@@ -73,7 +72,7 @@ class IsUsingAutoCaptureUseCaseTest {
         setupParams(featureEnabled = false, preferenceEnabled = true)
 
         // When
-        val result = isUsingAutoCapture()
+        val result = isUsingAutoCapture(projectConfiguration)
 
         // Then
         assertFalse(result)
@@ -85,7 +84,7 @@ class IsUsingAutoCaptureUseCaseTest {
         setupParams(featureEnabled = false, preferenceEnabled = false)
 
         // When
-        val result = isUsingAutoCapture()
+        val result = isUsingAutoCapture(projectConfiguration)
 
         // Then
         assertFalse(result)

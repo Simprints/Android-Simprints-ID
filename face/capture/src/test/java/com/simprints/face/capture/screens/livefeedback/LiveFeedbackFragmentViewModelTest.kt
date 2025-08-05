@@ -3,11 +3,12 @@ package com.simprints.face.capture.screens.livefeedback
 import android.graphics.Bitmap
 import android.graphics.Rect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import androidx.test.ext.junit.runners.*
+import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.usecases.IsUsingAutoCaptureUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.face.infra.basebiosdk.detection.Face
 import com.simprints.face.infra.basebiosdk.detection.FaceDetector
@@ -17,13 +18,8 @@ import com.simprints.infra.config.store.models.experimental
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -57,6 +53,8 @@ internal class LiveFeedbackFragmentViewModelTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
+    @MockK
+    private lateinit var isUsingAutoCapture: IsUsingAutoCaptureUseCase
     private lateinit var viewModel: LiveFeedbackFragmentViewModel
 
     @Before
@@ -70,6 +68,7 @@ internal class LiveFeedbackFragmentViewModelTest {
                 ?.getSdkConfiguration(any())
                 ?.qualityThreshold
         } returns QUALITY_THRESHOLD
+        every { isUsingAutoCapture.invoke(any()) } returns false
         coEvery { configManager.getProjectConfiguration().experimental().singleQualityFallbackRequired } returns false
         every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { previewFrame.recycle() }
@@ -84,6 +83,7 @@ internal class LiveFeedbackFragmentViewModelTest {
             configManager,
             eventReporter,
             timeHelper,
+            isUsingAutoCapture,
         )
     }
 
