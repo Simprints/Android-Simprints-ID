@@ -12,8 +12,10 @@ import com.simprints.infra.enrolment.records.repository.local.migration.RealmToR
 import com.simprints.infra.eventsync.BuildConfig.DB_ENCRYPTION
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.APPLICATION
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.VERSION_HISTORY
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
+import com.simprints.infra.logging.usecases.UpdateAndGetVersionHistoryUseCase
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +36,8 @@ open class Application :
 
     @Inject
     lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
+
+    private val getVersionNames = UpdateAndGetVersionHistoryUseCase()
 
     @AppScope
     @Inject
@@ -76,6 +80,8 @@ open class Application :
     open fun initApplication() {
         SimberBuilder.initialize(this)
         Simber.setUserProperty(DEVICE_ID, deviceHardwareId)
+        Simber.setUserProperty(VERSION_HISTORY, getVersionNames(this, BuildConfig.VERSION_NAME))
+
         appScope.launch {
             realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             syncOrchestrator.cleanupWorkers()
