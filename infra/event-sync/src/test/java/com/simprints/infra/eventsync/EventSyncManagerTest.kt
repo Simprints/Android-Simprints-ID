@@ -157,6 +157,7 @@ internal class EventSyncManagerTest {
         eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId")
 
         coVerify { downSyncTask.downSync(any(), any(), eventScope, any()) }
+        coVerify { eventRepository.closeEventScope(eventScope, any()) }
     }
 
     @Test
