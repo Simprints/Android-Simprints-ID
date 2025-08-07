@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.kermit.io)
 
     testImplementation(libs.testing.junit)
+    testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.robolectric.core)
     testImplementation(libs.testing.coroutines)
