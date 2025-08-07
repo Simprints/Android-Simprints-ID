@@ -10,6 +10,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
@@ -39,6 +40,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
+    private val commCareSyncCache: CommCareSyncCache,
     private val simprintsDownSyncTask: SimprintsEventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val configRepository: ConfigRepository,
@@ -128,6 +130,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         upSyncScopeRepo.deleteAll()
         eventSyncCache.clearProgresses()
         eventSyncCache.storeLastSuccessfulSyncTime(null)
+        commCareSyncCache.clearAllSyncedCases()
     }
 
     override suspend fun resetDownSyncInfo() {
