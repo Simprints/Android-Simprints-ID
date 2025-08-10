@@ -19,14 +19,16 @@ data class EnrolmentRecordCreationEvent(
         moduleId: TokenizableString,
         attendantId: TokenizableString,
         biometricReferences: List<BiometricReference>,
+        externalCredential: ExternalCredential?,
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentRecordCreationPayload(
-            subjectId,
-            projectId,
-            moduleId,
-            attendantId,
-            biometricReferences,
+            subjectId = subjectId,
+            projectId = projectId,
+            moduleId = moduleId,
+            attendantId = attendantId,
+            biometricReferences = biometricReferences,
+            externalCredential = externalCredential,
         ),
     )
 

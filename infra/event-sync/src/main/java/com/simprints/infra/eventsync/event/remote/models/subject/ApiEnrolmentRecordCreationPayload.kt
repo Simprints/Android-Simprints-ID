@@ -21,9 +21,10 @@ internal data class ApiEnrolmentRecordCreationPayload(
 ) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation)
 
 internal fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
-    subjectId,
-    projectId,
-    moduleId.asTokenizableEncrypted(),
-    attendantId.asTokenizableEncrypted(),
-    biometricReferences?.map { it.fromApiToDomain() } ?: emptyList(),
+    subjectId = subjectId,
+    projectId = projectId,
+    moduleId = moduleId.asTokenizableEncrypted(),
+    attendantId = attendantId.asTokenizableEncrypted(),
+    biometricReferences = biometricReferences?.map { it.fromApiToDomain() } ?: emptyList(),
+    externalCredential = externalCredential?.fromApiToDomain(subjectId)
 )

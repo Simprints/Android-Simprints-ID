@@ -73,6 +73,7 @@ internal data class ApiCalloutPayloadV2(
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
         TokenKeyType.AttendantId -> "callout.userId"
         TokenKeyType.ModuleId -> "callout.moduleId"
+        TokenKeyType.ExternalCredential -> "callout.externalCredential"
         TokenKeyType.Unknown -> null
     }
 }

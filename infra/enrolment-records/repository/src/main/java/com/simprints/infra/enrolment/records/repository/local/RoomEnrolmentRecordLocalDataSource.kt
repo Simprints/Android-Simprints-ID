@@ -318,6 +318,9 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             if (templatesToAdd.isNotEmpty()) {
                 subjectDao.insertBiometricSamples(templatesToAdd)
             }
+            if (action.externalCredentialsToAdd.isNotEmpty()) {
+                subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDb() })
+            }
         } else {
             Simber.e(
                 "[updateSubject] Subject ${action.subjectId} not found for update",
