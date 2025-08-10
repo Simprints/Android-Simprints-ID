@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -32,6 +33,7 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
+            externalCredential = payload.externalCredential,
         )
     }
 
@@ -43,6 +45,7 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
+            externalCredential = null,
         )
     }
 
@@ -70,6 +73,7 @@ class SubjectFactory @Inject constructor(
         moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResult?,
         faceResponse: FaceCaptureResult?,
+        externalCredential: ExternalCredential?,
     ): Subject {
         val subjectId = UUID.randomUUID().toString()
         return buildSubject(
@@ -80,6 +84,7 @@ class SubjectFactory @Inject constructor(
             createdAt = Date(timeHelper.now().ms),
             fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
             faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
+            externalCredential = externalCredential,
         )
     }
 
@@ -92,6 +97,7 @@ class SubjectFactory @Inject constructor(
         updatedAt: Date? = null,
         fingerprintSamples: List<FingerprintSample> = emptyList(),
         faceSamples: List<FaceSample> = emptyList(),
+        externalCredential: ExternalCredential? = null,
     ) = Subject(
         subjectId = subjectId,
         projectId = projectId,
@@ -101,6 +107,7 @@ class SubjectFactory @Inject constructor(
         updatedAt = updatedAt,
         fingerprintSamples = fingerprintSamples,
         faceSamples = faceSamples,
+        externalCredentials = externalCredential?.let {  listOf(it) } ?: emptyList()
     )
 
     private fun extractFingerprintSamples(fingerprintResponse: FingerprintCaptureResult) =

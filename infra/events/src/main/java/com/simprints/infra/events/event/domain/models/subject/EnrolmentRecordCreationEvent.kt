@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
@@ -9,6 +10,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import java.util.UUID
 
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 data class EnrolmentRecordCreationEvent(
     override val id: String,
     val payload: EnrolmentRecordCreationPayload,

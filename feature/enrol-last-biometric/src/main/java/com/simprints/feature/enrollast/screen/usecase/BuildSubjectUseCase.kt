@@ -1,5 +1,6 @@
 package com.simprints.feature.enrollast.screen.usecase
 
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -31,7 +32,13 @@ internal class BuildSubjectUseCase @Inject constructor(
         faceSamples = getFaceCaptureResult(params.steps)
             ?.let { result -> result.results.map { faceSample(result.referenceId, it) } }
             .orEmpty(),
+        externalCredential = getExternalCredentialResult(params.steps)
     )
+
+    // TODO [CORE-3421] When an external credential can be extracted from the UI-level steps, extract it here
+    private fun getExternalCredentialResult(steps: List<EnrolLastBiometricStepResult>): ExternalCredential? {
+        return null
+    }
 
     private fun getFingerprintCaptureResult(steps: List<EnrolLastBiometricStepResult>) = steps
         .filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>()

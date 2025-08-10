@@ -1,10 +1,12 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV4
 
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class ApiEnrolmentPayloadV4(
     override val startTime: ApiTimestamp,
     val subjectId: String,

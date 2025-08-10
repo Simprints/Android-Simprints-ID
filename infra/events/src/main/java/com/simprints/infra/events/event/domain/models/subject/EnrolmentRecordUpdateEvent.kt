@@ -1,10 +1,12 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.externalcredential.ExternalCredential
 import java.util.UUID
 
 @Keep
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 data class EnrolmentRecordUpdateEvent(
     override val id: String,
     val payload: EnrolmentRecordUpdatePayload,
