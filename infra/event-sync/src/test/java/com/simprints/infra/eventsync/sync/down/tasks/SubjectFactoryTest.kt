@@ -1,9 +1,12 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -61,6 +64,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
+            externalCredential = null
         )
         val result = factory.buildSubjectFromCreationPayload(payload)
         val expected = Subject(
@@ -177,6 +181,7 @@ class SubjectFactoryTest {
                     templates = listOf(FaceTemplate(template = BASE_64_BYTES.toString())),
                 ),
             ),
+            externalCredentialAdded = EXTERNAL_CREDENTIAL
         )
         val result = factory.buildSubjectFromUpdatePayload(subject, payload)
 
@@ -326,6 +331,8 @@ class SubjectFactoryTest {
         private const val REFERENCE_ID = "fpRefId"
         private const val REFERENCE_FORMAT = "NEC_1"
         private const val TEMPLATE_NAME = "template"
+        private val EXTERNAL_CREDENTIAL_VALUE = "value".asTokenizableEncrypted()
+        private val EXTERNAL_CREDENTIAL_TYPE = ExternalCredentialType.NHISCard
         private val IDENTIFIER = IFingerIdentifier.LEFT_THUMB
         private const val QUALITY = 10
         private val FINGERPRINT_REFERENCE = FingerprintReference(
@@ -342,6 +349,11 @@ class SubjectFactoryTest {
             id = REFERENCE_ID,
             templates = listOf(FaceTemplate(TEMPLATE_NAME)),
             format = REFERENCE_FORMAT,
+        )
+        private val EXTERNAL_CREDENTIAL = ExternalCredential(
+            value = EXTERNAL_CREDENTIAL_VALUE,
+            subjectId = SUBJECT_ID,
+            type = EXTERNAL_CREDENTIAL_TYPE
         )
     }
 }

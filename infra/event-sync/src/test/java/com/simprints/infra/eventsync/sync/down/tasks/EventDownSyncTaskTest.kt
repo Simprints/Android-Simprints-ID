@@ -1,7 +1,10 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
@@ -58,11 +61,16 @@ class EventDownSyncTaskTest {
             "attendantId",
         )
         val ENROLMENT_RECORD_CREATION = EnrolmentRecordCreationEvent(
-            "subjectId",
-            "projectId",
-            "moduleId".asTokenizableRaw(),
-            "attendantId".asTokenizableRaw(),
-            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            subjectId = "subjectId",
+            projectId = "projectId",
+            moduleId = "moduleId".asTokenizableRaw(),
+            attendantId = "attendantId".asTokenizableRaw(),
+            biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            externalCredential = ExternalCredential(
+                value = "value".asTokenizableEncrypted(),
+                subjectId = "subjectId",
+                type = ExternalCredentialType.NHISCard
+            ),
         )
         val ENROLMENT_RECORD_MOVE_MODULE = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
@@ -110,9 +118,14 @@ class EventDownSyncTaskTest {
             ),
         )
         val ENROLMENT_RECORD_UPDATE = EnrolmentRecordUpdateEvent(
-            "subjectId",
-            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
-            listOf("referenceIdToDelete"),
+            subjectId = "subjectId",
+            biometricReferencesAdded = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+            biometricReferencesRemoved = listOf("referenceIdToDelete"),
+            externalCredentialAdded = ExternalCredential(
+                value = "value".asTokenizableEncrypted(),
+                subjectId = "subjectId",
+                type = ExternalCredentialType.NHISCard
+            )
         )
     }
 

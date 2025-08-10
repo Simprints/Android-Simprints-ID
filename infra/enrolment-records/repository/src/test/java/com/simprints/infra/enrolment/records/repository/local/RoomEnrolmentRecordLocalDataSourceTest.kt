@@ -334,6 +334,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(faceSample2),
             fingerprintSamplesToAdd = listOf(fingerprintSample1),
             referenceIdsToRemove = listOf(),
+            externalCredentialsToAdd = listOf(),
         )
 
         // When
@@ -365,6 +366,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(), // Explicitly empty as in original
             fingerprintSamplesToAdd = listOf(), // Explicitly empty as in original
             referenceIdsToRemove = listOf(faceSample2.referenceId),
+            externalCredentialsToAdd = listOf(),
         )
 
         // When
@@ -394,6 +396,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(),
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(fingerprintSample2.referenceId),
+            externalCredentialsToAdd = listOf(),
         )
 
         // When
@@ -422,6 +425,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(),
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(faceSample1.referenceId),
+            externalCredentialsToAdd = listOf(),
         )
 
         // When
@@ -445,6 +449,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(),
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(fingerprintSample1.referenceId),
+            externalCredentialsToAdd = listOf(),
         )
 
         // When
@@ -464,6 +469,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(faceSample1, faceSample2),
             fingerprintSamplesToAdd = listOf(fingerprintSample1),
             referenceIdsToRemove = listOf(),
+            externalCredentialsToAdd = listOf(),
         )
 
         // When
@@ -493,6 +499,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(faceSample1), // Try to add samples
             fingerprintSamplesToAdd = listOf(),
             referenceIdsToRemove = listOf(),
+            externalCredentialsToAdd = listOf(),
         )
 
         // When
@@ -601,6 +608,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
             faceSamplesToAdd = listOf(),
             fingerprintSamplesToAdd = listOf(fingerprintSample1),
             referenceIdsToRemove = listOf(),
+            externalCredentialsToAdd = listOf(),
         )
         dataSource.performActions(listOf(updateAction), project)
         loadedSubject =

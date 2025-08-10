@@ -316,6 +316,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                     faceSamplesToAdd = listOf(getRandomFaceSample()),
                     fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
+                    externalCredentialsToAdd = listOf(),
                 ),
             ),
             project,
