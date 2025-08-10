@@ -49,7 +49,14 @@ internal class CreateEnrolResponseUseCaseTest {
     @Test
     fun `Converts correct results to response`() = runTest {
         every {
-            subjectFactory.buildSubjectFromCaptureResults(any(), any(), any(), any(), any())
+            subjectFactory.buildSubjectFromCaptureResults(
+                projectId = any(),
+                attendantId = any(),
+                moduleId = any(),
+                fingerprintResponse = any(),
+                faceResponse = any(),
+                externalCredential = any()
+            )
         } returns mockk { every { subjectId } returns "guid" }
 
         assertThat(
@@ -68,7 +75,14 @@ internal class CreateEnrolResponseUseCaseTest {
     @Test
     fun `Returns error if no valid response`() = runTest {
         every {
-            subjectFactory.buildSubjectFromCaptureResults(any(), any(), any(), null, null)
+            subjectFactory.buildSubjectFromCaptureResults(
+                projectId = any(),
+                attendantId = any(),
+                moduleId = any(),
+                fingerprintResponse = null,
+                faceResponse = null,
+                externalCredential = null
+            )
         } throws MissingCaptureException()
 
         assertThat(useCase(action, emptyList(), project)).isInstanceOf(AppErrorResponse::class.java)

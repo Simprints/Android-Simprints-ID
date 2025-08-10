@@ -245,6 +245,7 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                 ),
             ),
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL)
         )
 
         val result = factory.buildSubjectFromCaptureResults(
@@ -282,6 +283,7 @@ class SubjectFactoryTest {
                     ),
                 ),
             ),
+            externalCredential = EXTERNAL_CREDENTIAL
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -308,6 +310,7 @@ class SubjectFactoryTest {
                     referenceId = REFERENCE_ID,
                 ),
             ),
+            externalCredentials = listOf(EXTERNAL_CREDENTIAL)
         )
 
         val result = factory.buildSubject(
@@ -317,6 +320,7 @@ class SubjectFactoryTest {
             moduleId = expected.moduleId,
             fingerprintSamples = expected.fingerprintSamples,
             faceSamples = expected.faceSamples,
+            externalCredential = expected.externalCredentials.first()
         )
         assertThat(result).isEqualTo(expected)
     }
