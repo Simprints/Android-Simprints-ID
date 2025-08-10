@@ -3,6 +3,8 @@ package com.simprints.infra.enrolment.records.repository.local
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -65,6 +67,14 @@ class RoomEnrolmentRecordLocalDataSourceTest {
     // --- Test Data ---
     private val date = Date() // Use a fixed date for consistent timestamps in tests
 
+    // External credentials
+    private val externalCredential = ExternalCredential(
+        value = "value".asTokenizableEncrypted(),
+        subjectId = "subjectId",
+        type = ExternalCredentialType.NHISCard
+    )
+
+
     // Samples defined first
     private val faceSample1 = FaceSample(
         template = byteArrayOf(1, 2, 3),
@@ -116,6 +126,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         fingerprintSamples = emptyList(),
         createdAt = date,
         updatedAt = date,
+        externalCredentials = listOf(getExternalCredential("subj-001"))
     )
     private val subject2P1WithFinger = Subject(
         subjectId = "subj-002",
@@ -126,6 +137,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         fingerprintSamples = listOf(fingerprintSample1),
         createdAt = date,
         updatedAt = date,
+        externalCredentials = listOf(getExternalCredential("subj-002"))
     )
     private val subject3P1WithBoth = Subject(
         subjectId = "subj-003",
@@ -134,6 +146,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         moduleId = MODULE_2_ID,
         faceSamples = listOf(faceSample2),
         fingerprintSamples = listOf(fingerprintSample2),
+        externalCredentials = listOf(getExternalCredential("subj-003"))
     )
     private val subject4P2WithBoth = Subject(
         subjectId = "subj-004",
@@ -144,6 +157,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         fingerprintSamples = listOf(fingerprintSample3),
         createdAt = date,
         updatedAt = date,
+        externalCredentials = listOf(getExternalCredential("subj-004"))
     )
     private val subject5P2WithFace = Subject(
         // Added subject
@@ -155,6 +169,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         fingerprintSamples = emptyList(),
         createdAt = Date(date.time + 1000), // Slightly different time
         updatedAt = Date(date.time + 1000),
+        externalCredentials = listOf(getExternalCredential("subj-005"))
     )
     private val subject6P2WithFinger = Subject(
         // Added subject
@@ -166,6 +181,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         fingerprintSamples = listOf(fingerprintSample3.copy(id = UUID.randomUUID().toString())),
         createdAt = Date(date.time + 2000), // Different time
         updatedAt = Date(date.time + 2000),
+        externalCredentials = listOf(getExternalCredential("subj-006"))
     )
     private val subjectInvalidNoSamples = Subject(
         subjectId = "subj-invalid",
@@ -174,6 +190,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         moduleId = MODULE_1_ID,
         createdAt = date,
         updatedAt = date,
+        externalCredentials = listOf(getExternalCredential("subj-invalid"))
     )
 
     private val project: Project = mockk()
@@ -211,6 +228,12 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         SubjectAction.Creation(subject4P2WithBoth),
         SubjectAction.Creation(subject5P2WithFace),
         SubjectAction.Creation(subject6P2WithFinger),
+    )
+
+    private fun getExternalCredential(subjectId: String) = ExternalCredential(
+        value = "value".asTokenizableEncrypted(),
+        subjectId = subjectId,
+        type = ExternalCredentialType.NHISCard
     )
 
     private suspend fun setupInitialData() {
