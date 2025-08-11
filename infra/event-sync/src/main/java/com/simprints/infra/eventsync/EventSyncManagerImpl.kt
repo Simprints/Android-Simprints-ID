@@ -86,9 +86,9 @@ internal class EventSyncManagerImpl @Inject constructor(
             timeNowMs - cachedEventCountToDownloadTimestamp < maxCacheAgeMillis
         }?.let {
             return it
-        }.also {
-            cachedEventCountToDownloadTimestamp = timeNowMs
         }
+        cachedEventCountToDownloadTimestamp = timeNowMs
+
         val projectConfig = configRepository.getProjectConfiguration()
         val deviceConfig = configRepository.getDeviceConfiguration()
 
