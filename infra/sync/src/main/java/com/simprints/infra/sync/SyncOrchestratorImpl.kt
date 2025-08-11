@@ -164,6 +164,13 @@ internal class SyncOrchestratorImpl @Inject constructor(
             }
     }
 
+    /**
+     * Converts the flow of WorkInfo in the receiver into a flow of WorkInfo paired to whether sync is ongoing or not.
+     *
+     * Whether sync is ongoing or not - is calculated from the WorkInfo.
+     * A special case is handled for a job that succeeds promptly: a "pulse" of positive sync is emitted additionally.
+     * This allows immediately succeeding syncs to be detected in the return flow.
+     */
     private fun Flow<List<WorkInfo>>.associateWithIfSyncing() = transformLatest { workInfos ->
         val isJustUpdated = imageSyncTimestampProvider.getSecondsSinceLastImageSync() == 0L
         when {
