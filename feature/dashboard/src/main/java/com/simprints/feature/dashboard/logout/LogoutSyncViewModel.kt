@@ -10,7 +10,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.sync.SyncOrchestrator
@@ -39,12 +38,8 @@ internal class LogoutSyncViewModel @Inject constructor(
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> = combine(
         eventSyncManager.getLastSyncState(useDefaultValue = true).asFlow(),
         syncOrchestrator.observeImageSyncStatus(),
-        configManager.watchProjectConfiguration(),
-        configManager.watchDeviceConfiguration(),
-    ) { eventSyncState, imageSyncStatus, projectConfig, deviceConfig ->
-        val isModuleSelectionRequired =
-            projectConfig.isModuleSelectionAvailable() && deviceConfig.selectedModules.isEmpty()
-        !eventSyncState.isSyncCompleted() || imageSyncStatus.isSyncing || isModuleSelectionRequired
+    ) { eventSyncState, imageSyncStatus ->
+        !eventSyncState.isSyncCompleted() || imageSyncStatus.isSyncing
     }.debounce(timeoutMillis = ANTI_JITTER_DELAY_MILLIS).asLiveData()
 
     val settingsLocked: LiveData<LiveDataEventWithContent<SettingsPasswordConfig>>

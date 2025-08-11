@@ -6,10 +6,8 @@ import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
@@ -107,12 +105,8 @@ internal class LogoutSyncViewModelTest {
         }
         val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
         val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
-        val deviceConfig = mockk<DeviceConfiguration> {
-            every { selectedModules } returns listOf(mockk())
-        }
 
-        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = false)
-        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
+        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig)
 
         val viewModel = createViewModel()
 
@@ -127,32 +121,8 @@ internal class LogoutSyncViewModelTest {
         }
         val imageSyncStatus = ImageSyncStatus(isSyncing = true, progress = null, secondsSinceLastUpdate = null)
         val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
-        val deviceConfig = mockk<DeviceConfiguration> {
-            every { selectedModules } returns listOf(mockk())
-        }
 
-        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = false)
-        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
-
-        val viewModel = createViewModel()
-
-        val result = viewModel.isLogoutWithoutSyncVisibleLiveData.getOrAwaitValue()
-        assertThat(result).isTrue()
-    }
-
-    @Test
-    fun `isLogoutWithoutSyncVisibleLiveData should return true when module selection is required`() {
-        val eventSyncState = mockk<EventSyncState> {
-            every { isSyncCompleted() } returns true
-        }
-        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
-        val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
-        val deviceConfig = mockk<DeviceConfiguration> {
-            every { selectedModules } returns emptyList()
-        }
-
-        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = true)
-        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
+        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig)
 
         val viewModel = createViewModel()
 
@@ -167,12 +137,8 @@ internal class LogoutSyncViewModelTest {
         }
         val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
         val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
-        val deviceConfig = mockk<DeviceConfiguration> {
-            every { selectedModules } returns listOf(mockk())
-        }
 
-        mockProjectConfigExtension(projectConfig, isModuleSelectionAvailable = false)
-        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig, deviceConfig)
+        setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig)
 
         val viewModel = createViewModel()
 
@@ -180,16 +146,10 @@ internal class LogoutSyncViewModelTest {
         assertThat(result).isFalse()
     }
 
-    private fun mockProjectConfigExtension(projectConfig: ProjectConfiguration, isModuleSelectionAvailable: Boolean) {
-        mockkStatic("com.simprints.infra.config.store.models.ProjectConfigurationKt")
-        every { projectConfig.isModuleSelectionAvailable() } returns isModuleSelectionAvailable
-    }
-
     private fun setupSyncMocks(
         eventSyncState: EventSyncState,
         imageSyncStatus: ImageSyncStatus,
         projectConfig: ProjectConfiguration,
-        deviceConfig: DeviceConfiguration
     ) {
         mockkStatic("androidx.lifecycle.FlowLiveDataConversions")
         val eventSyncLiveData = mockk<LiveData<EventSyncState>>(relaxed = true)
