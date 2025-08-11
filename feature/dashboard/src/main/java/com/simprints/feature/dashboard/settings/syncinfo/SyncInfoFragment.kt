@@ -12,6 +12,8 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -113,7 +115,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     }
 
     private fun observeUI() {
-        renderSyncInfo(SyncInfo(), syncInfoConfig)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 renderSyncInfo(SyncInfo(), syncInfoConfig)
@@ -133,41 +134,40 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             }
         }
 
-        viewModel.loginNavigationEventLiveData.observe(
-            viewLifecycleOwner,
-            { loginParams ->
-                findNavController().navigate(com.simprints.feature.login.R.id.graph_login, loginParams.toBundle())
-            },
-        )
+        viewModel.loginNavigationEventLiveData.observe(viewLifecycleOwner) { loginParams ->
+            findNavController().navigate(com.simprints.feature.login.R.id.graph_login, loginParams.toBundle())
+        }
     }
 
     private fun renderSyncInfo(syncInfo: SyncInfo, config: SyncInfoFragmentConfig) {
+        // note: ".isGone = not" is preferred to ".isVisible =" below for non-ambiguity of the no-show state
+
         // App toolbar
-        binding.appBarLayout.visibility = if (config.isSyncInfoToolbarVisible) View.VISIBLE else View.GONE
+        binding.appBarLayout.isGone = !config.isSyncInfoToolbarVisible
 
         // Config loading progress bar
-        binding.progressConfigRefresh.visibility = if (syncInfo.isConfigurationLoadingProgressBarVisible) View.VISIBLE else View.INVISIBLE
+        binding.progressConfigRefresh.isInvisible = !syncInfo.isConfigurationLoadingProgressBarVisible
 
         // Sync info header
-        binding.syncStatusHeader.visibility = if (config.isSyncInfoStatusHeaderVisible) View.VISIBLE else View.GONE
-        binding.syncSettingsButton.visibility = if (config.isSyncInfoStatusHeaderSettingsButtonVisible) View.VISIBLE else View.GONE
+        binding.syncStatusHeader.isGone = !config.isSyncInfoStatusHeaderVisible
+        binding.syncSettingsButton.isGone = !config.isSyncInfoStatusHeaderSettingsButtonVisible
 
         // Section separators
-        binding.headerRecordSync.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
-        binding.sectionDivider1.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
-        binding.headerImageSync.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
-        binding.sectionDivider2.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
-        binding.headerModuleSelection.visibility = if (config.areSyncInfoSectionHeadersVisible) View.VISIBLE else View.GONE
-        binding.sectionFooter.visibility = if (config.areSyncInfoSectionHeadersVisible) View.GONE else View.VISIBLE
+        binding.headerRecordSync.isGone = !config.areSyncInfoSectionHeadersVisible
+        binding.sectionDivider1.isGone = !config.areSyncInfoSectionHeadersVisible
+        binding.headerImageSync.isGone = !config.areSyncInfoSectionHeadersVisible
+        binding.sectionDivider2.isGone = !config.areSyncInfoSectionHeadersVisible
+        binding.headerModuleSelection.isGone = !config.areSyncInfoSectionHeadersVisible
+        binding.sectionFooter.isGone = config.areSyncInfoSectionHeadersVisible
 
         // Re-login section
-        binding.syncReLoginRequiredSection.visibility = if (syncInfo.isLoginPromptSectionVisible) View.VISIBLE else View.GONE
+        binding.syncReLoginRequiredSection.isGone = !syncInfo.isLoginPromptSectionVisible
 
         // Records section
         renderRecordsSection(syncInfo.syncInfoSectionRecords, config)
 
         // Images section
-        binding.layoutImagesSync.visibility = if (config.isSyncInfoImageSyncVisible) View.VISIBLE else View.GONE
+        binding.layoutImagesSync.isGone = !config.isSyncInfoImageSyncVisible
         renderImagesSection(syncInfo.syncInfoSectionImages)
 
         // Modules section
@@ -176,36 +176,36 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun renderRecordsSection(records: SyncInfoSectionRecords, config: SyncInfoFragmentConfig) {
         // Counter - total records
-        binding.totalRecordsCount.visibility = if (records.counterTotalRecords.isBlank()) View.GONE else View.VISIBLE
+        binding.totalRecordsCount.isGone = records.counterTotalRecords.isBlank()
         binding.totalRecordsCount.text = records.counterTotalRecords
-        binding.totalRecordsProgress.visibility = if (records.counterTotalRecords.isBlank()) View.VISIBLE else View.GONE
+        binding.totalRecordsProgress.isGone = records.counterTotalRecords.isNotBlank()
 
         // Counter - records to upload
-        binding.layoutRecordsToDownload.visibility = if (records.isCounterRecordsToDownloadVisible) View.VISIBLE else View.GONE
-        binding.recordsToUploadCount.visibility = if (records.counterRecordsToUpload.isBlank()) View.GONE else View.VISIBLE
+        binding.layoutRecordsToDownload.isGone = !records.isCounterRecordsToDownloadVisible
+        binding.recordsToUploadCount.isGone = records.counterRecordsToUpload.isBlank()
         binding.recordsToUploadCount.text = records.counterRecordsToUpload
-        binding.recordsToUploadProgress.visibility = if (records.counterRecordsToUpload.isBlank()) View.VISIBLE else View.GONE
+        binding.recordsToUploadProgress.isGone = records.counterRecordsToUpload.isNotBlank()
 
         // Counter - records to download
-        binding.recordsToDownloadCount.visibility = if (records.counterRecordsToDownload.isBlank()) View.GONE else View.VISIBLE
+        binding.recordsToDownloadCount.isGone = records.counterRecordsToDownload.isBlank()
         binding.recordsToDownloadCount.text = records.counterRecordsToDownload
-        binding.recordsToDownloadProgress.visibility = if (records.counterRecordsToDownload.isBlank()) View.VISIBLE else View.GONE
+        binding.recordsToDownloadProgress.isGone = records.counterRecordsToDownload.isNotBlank()
 
         // Counter - images to upload (may be combined with records)
-        binding.layoutComboImageCounter.visibility = if (config.isSyncInfoRecordsImagesCombined) View.VISIBLE else View.GONE
-        binding.comboImagesToUploadCount.visibility = if (records.counterImagesToUpload.isBlank()) View.GONE else View.VISIBLE
+        binding.layoutComboImageCounter.isGone = !config.isSyncInfoRecordsImagesCombined
+        binding.comboImagesToUploadCount.isGone = records.counterImagesToUpload.isBlank()
         binding.comboImagesToUploadCount.text = records.counterImagesToUpload
-        binding.comboImagesToUploadProgress.visibility = if (records.counterImagesToUpload.isBlank()) View.VISIBLE else View.GONE
+        binding.comboImagesToUploadProgress.isGone = records.counterImagesToUpload.isNotBlank()
 
         // Instructions
-        binding.textEventSyncInstructionsDefault.visibility = if (records.isInstructionDefaultVisible) View.VISIBLE else View.GONE
-        binding.textEventSyncInstructionsOffline.visibility = if (records.isInstructionOfflineVisible) View.VISIBLE else View.GONE
-        binding.textEventSyncInstructionsNoModules.visibility = if (records.isInstructionNoModulesVisible) View.VISIBLE else View.GONE
-        binding.textEventSyncInstructionsError.visibility = if (records.isInstructionErrorVisible) View.VISIBLE else View.GONE
+        binding.textEventSyncInstructionsDefault.isGone = !records.isInstructionDefaultVisible
+        binding.textEventSyncInstructionsOffline.isGone = !records.isInstructionOfflineVisible
+        binding.textEventSyncInstructionsNoModules.isGone = !records.isInstructionNoModulesVisible
+        binding.textEventSyncInstructionsError.isGone = !records.isInstructionErrorVisible
         records.instructionPopupErrorInfo.configureErrorPopup()
 
         // Progress
-        binding.layoutEventSyncProgress.visibility = if (records.isProgressVisible) View.VISIBLE else View.INVISIBLE
+        binding.layoutEventSyncProgress.isInvisible = !records.isProgressVisible
         renderProgress(
             records.progress,
             binding.eventSyncProgressBar,
@@ -217,7 +217,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Sync button
         val isSyncButtonVisible = !config.isSyncInfoLogoutOnComplete || records.isSyncButtonVisible
-        binding.buttonSyncRecordsNow.visibility = if (isSyncButtonVisible) View.VISIBLE else View.GONE
+        binding.buttonSyncRecordsNow.isGone = !isSyncButtonVisible
         binding.buttonSyncRecordsNow.isEnabled = records.isSyncButtonEnabled
         binding.buttonSyncRecordsNow.text = getString(
             when {
@@ -229,10 +229,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Footer
         val isFooterSyncInProgressVisible = config.isSyncInfoLogoutOnComplete && records.isFooterSyncInProgressVisible
-        binding.textFooterRecordSyncInProgress.visibility = if (isFooterSyncInProgressVisible) View.VISIBLE else View.GONE
-        binding.textFooterRecordLoggingOut.visibility = if (records.isFooterReadyToLogOutVisible) View.VISIBLE else View.GONE
-        binding.textFooterRecordSyncIncomplete.visibility = if (records.isFooterSyncIncompleteVisible) View.VISIBLE else View.GONE
-        binding.textFooterRecordLastSyncedWhen.visibility = if (records.isFooterLastSyncTimeVisible) View.VISIBLE else View.GONE
+        binding.textFooterRecordSyncInProgress.isGone = !isFooterSyncInProgressVisible
+        binding.textFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
+        binding.textFooterRecordSyncIncomplete.isGone = !records.isFooterSyncIncompleteVisible
+        binding.textFooterRecordLastSyncedWhen.isGone = !records.isFooterLastSyncTimeVisible
         binding.textFooterRecordLastSyncedWhen.text = formatLastSyncTime(records.footerLastSyncMinutesAgo)
     }
 
@@ -261,16 +261,16 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun renderImagesSection(images: SyncInfoSectionImages) {
         // Counter - images to upload
-        binding.imagesToUploadCount.visibility = if (images.counterImagesToUpload.isBlank()) View.GONE else View.VISIBLE
+        binding.imagesToUploadCount.isGone = images.counterImagesToUpload.isBlank()
         binding.imagesToUploadCount.text = images.counterImagesToUpload
-        binding.imagesToUploadProgress.visibility = if (images.counterImagesToUpload.isBlank()) View.VISIBLE else View.GONE
+        binding.imagesToUploadProgress.isGone = images.counterImagesToUpload.isNotBlank()
 
         // Handle instruction visibility
-        binding.textImageSyncInstructionsDefault.visibility = if (images.isInstructionDefaultVisible) View.VISIBLE else View.GONE
-        binding.textImageSyncInstructionsOffline.visibility = if (images.isInstructionOfflineVisible) View.VISIBLE else View.GONE
+        binding.textImageSyncInstructionsDefault.isGone = !images.isInstructionDefaultVisible
+        binding.textImageSyncInstructionsOffline.isGone = !images.isInstructionOfflineVisible
 
         // Progress
-        binding.layoutImageSyncProgress.visibility = if (images.isProgressVisible) View.VISIBLE else View.INVISIBLE
+        binding.layoutImageSyncProgress.isInvisible = !images.isProgressVisible
         renderProgress(images.progress, binding.imageSyncProgressBar, binding.textImageSyncProgress, IDR.string.sync_info_item_image)
         binding.imageSyncProgressBar.setPulseAnimation(isEnabled = images.isProgressVisible)
 
@@ -301,15 +301,15 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         )
 
         // Footer
-        binding.textFooterImageLastSyncedWhen.visibility = if (images.isFooterLastSyncTimeVisible) View.VISIBLE else View.INVISIBLE
+        binding.textFooterImageLastSyncedWhen.isInvisible = !images.isFooterLastSyncTimeVisible
         binding.textFooterImageLastSyncedWhen.text = formatLastSyncTime(images.footerLastSyncMinutesAgo)
     }
 
     private fun renderModulesSection(modules: SyncInfoSectionModules, config: SyncInfoFragmentConfig) {
         val isModuleSectionVisible =
             modules.isSectionAvailable && (config.isSyncInfoModuleListVisible || modules.moduleCounts.isEmpty())
-        binding.layoutModuleSelection.visibility = if (isModuleSectionVisible) View.VISIBLE else View.GONE
-        binding.selectedModulesView.visibility = if (config.isSyncInfoModuleListVisible) View.VISIBLE else View.GONE
+        binding.layoutModuleSelection.isGone = !isModuleSectionVisible
+        binding.selectedModulesView.isGone = !config.isSyncInfoModuleListVisible
 
         val moduleCountsForAdapter = modules.moduleCounts.map { syncInfoModuleCount ->
             ModuleCount(
