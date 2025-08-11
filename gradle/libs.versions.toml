@@ -36,7 +36,7 @@ gsm_plugin_version = "4.4.3"
 play_publisher_version = "3.12.1"
 play_barcode_version = "18.3.1"
 
-firebase_auth_version = "24.0.0"
+firebase_auth_version = "24.0.1"
 firebase_storage_version = "22.0.0"
 firebase_crashlytics_version = "20.0.0"
 firebase_analytics_version = "23.0.0"
