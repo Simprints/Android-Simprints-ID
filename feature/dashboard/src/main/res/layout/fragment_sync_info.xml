@@ -431,7 +431,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginHorizontal="8dp"
                                     android:layout_marginVertical="8dp"
-                                    android:progress="63"
+                                    tools:progress="63"
                                     android:visibility="visible" />
 
                             </LinearLayout>
@@ -502,7 +502,7 @@
                 <View
                     android:id="@+id/sectionDivider1"
                     android:layout_width="match_parent"
-                    android:layout_height="5dp"/>
+                    android:layout_height="2dp"/>
 
                 <!-- Image sync -->
 
@@ -627,7 +627,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="8dp"
                                 android:layout_marginVertical="8dp"
-                                android:progress="63"
+                                tools:progress="63"
                                 android:visibility="visible" />
 
                         </LinearLayout>
@@ -658,7 +658,7 @@
                 <View
                     android:id="@+id/sectionDivider2"
                     android:layout_width="match_parent"
-                    android:layout_height="5dp"/>
+                    android:layout_height="2dp"/>
 
 
                 <!-- Module sync -->
