@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.simprints.core.livedata.LiveDataEventWithContent
 import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
@@ -213,22 +214,22 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<Unit?>>(relaxed = true)
-        val slot = slot<Unit?>()
-        val capturedValues = mutableListOf<Unit?>()
-        every { observer.onChanged(captureNullable(slot)) } answers {
+        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
+        val slot = slot<LiveDataEventWithContent<Unit>>()
+        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
+        every { observer.onChanged(capture(slot)) } answers {
             capturedValues.add(slot.captured)
         }
 
         viewModel.logoutEventLiveData.observeForever(observer)
         advanceTimeBy(3100L) // after the logout delay (3000ms)
 
-        assertThat(capturedValues).contains(Unit)
+        assertThat(capturedValues.map { it.peekContent() }).contains(Unit)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `should emit and reset a logout event after the intended delay since ready to logout`() = runTest {
+    fun `should emit a logout event after the intended delay since ready to logout`() = runTest {
         val mockCompletedEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncCompleted() } returns true
         }
@@ -241,10 +242,10 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<Unit?>>(relaxed = true)
-        val slot = slot<Unit?>()
-        val capturedValues = mutableListOf<Unit?>()
-        every { observer.onChanged(captureNullable(slot)) } answers {
+        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
+        val slot = slot<LiveDataEventWithContent<Unit>>()
+        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
+        every { observer.onChanged(capture(slot)) } answers {
             capturedValues.add(slot.captured)
         }
 
@@ -255,7 +256,8 @@ class SyncInfoViewModelTest {
 
         advanceTimeBy(200L) // after the debounce delay (total 3100ms > 3000ms)
 
-        assertThat(capturedValues).isEqualTo(listOf(Unit, null)) // "flicked" the logout event to prevent persistence
+        assertThat(capturedValues).hasSize(1)
+        assertThat(capturedValues[0].peekContent()).isEqualTo(Unit)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -273,10 +275,10 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = false
-        val observer = mockk<Observer<Unit?>>(relaxed = true)
-        val slot = slot<Unit?>()
-        val capturedValues = mutableListOf<Unit?>()
-        every { observer.onChanged(captureNullable(slot)) } answers {
+        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
+        val slot = slot<LiveDataEventWithContent<Unit>>()
+        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
+        every { observer.onChanged(capture(slot)) } answers {
             capturedValues.add(slot.captured)
         }
 
@@ -302,10 +304,10 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<Unit?>>(relaxed = true)
-        val slot = slot<Unit?>()
-        val capturedValues = mutableListOf<Unit?>()
-        every { observer.onChanged(captureNullable(slot)) } answers {
+        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
+        val slot = slot<LiveDataEventWithContent<Unit>>()
+        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
+        every { observer.onChanged(capture(slot)) } answers {
             capturedValues.add(slot.captured)
         }
 
@@ -330,10 +332,10 @@ class SyncInfoViewModelTest {
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
         createViewModel()
         viewModel.isPreLogoutUpSync = true
-        val observer = mockk<Observer<Unit?>>(relaxed = true)
-        val slot = slot<Unit?>()
-        val capturedValues = mutableListOf<Unit?>()
-        every { observer.onChanged(captureNullable(slot)) } answers {
+        val observer = mockk<Observer<LiveDataEventWithContent<Unit>>>(relaxed = true)
+        val slot = slot<LiveDataEventWithContent<Unit>>()
+        val capturedValues = mutableListOf<LiveDataEventWithContent<Unit>>()
+        every { observer.onChanged(capture(slot)) } answers {
             capturedValues.add(slot.captured)
         }
 

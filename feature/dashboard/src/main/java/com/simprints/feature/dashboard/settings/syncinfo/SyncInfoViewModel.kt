@@ -7,6 +7,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.extentions.combine8
 import com.simprints.core.tools.extentions.onChange
 import com.simprints.core.tools.time.TimeHelper
@@ -37,10 +38,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
@@ -71,19 +72,17 @@ internal class SyncInfoViewModel @Inject constructor(
     private val imageSyncStatusFlow =
         syncOrchestrator.observeImageSyncStatus()
 
-    val logoutEventLiveData: LiveData<Unit?> = combine(
+    val logoutEventLiveData: LiveData<LiveDataEventWithContent<Unit>> = combine(
         eventSyncStateFlow,
         imageSyncStatusFlow,
     ) { eventSyncState, imageSyncStatus ->
         val isReadyToLogOut =
             isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
         return@combine isReadyToLogOut
-    }.debounce(LOGOUT_DELAY_MILLIS).transformLatest { isReadyToLogOut ->
-        if (isReadyToLogOut) {
-            // "flick" the logout event to prevent persistence while not observed, and to avoid unexpected logout later
-            emit(Unit)
-            emit(null)
-        }
+    }.debounce(LOGOUT_DELAY_MILLIS).filter { isReadyToLogOut ->
+        isReadyToLogOut // only when ready
+    }.map {
+        LiveDataEventWithContent(Unit)
     }.asLiveData()
 
     val syncInfoLiveData: LiveData<SyncInfo> = combine8(

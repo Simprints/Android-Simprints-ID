@@ -20,6 +20,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import kotlinx.coroutines.launch
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.R
@@ -126,11 +127,9 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.logoutEventLiveData.observe(viewLifecycleOwner) { logoutIfNotNull ->
-                    logoutIfNotNull?.let {
-                        viewModel.logout()
-                    }
-                }
+                viewModel.logoutEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
+                    viewModel.logout()
+                })
             }
         }
 
