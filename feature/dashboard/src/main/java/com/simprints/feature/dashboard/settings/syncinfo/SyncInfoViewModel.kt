@@ -246,12 +246,12 @@ internal class SyncInfoViewModel @Inject constructor(
         )
 
         val syncInfoSectionRecords = SyncInfoSectionRecords(
-            counterTotalRecords = recordsTotal?.toString() ?: "",
-            counterRecordsToUpload = recordsToUpload?.toString() ?: "",
+            counterTotalRecords = recordsTotal?.toString().orEmpty(),
+            counterRecordsToUpload = recordsToUpload?.toString().orEmpty(),
             isCounterRecordsToDownloadVisible = !isPreLogoutUpSync && !isProjectEnding,
-            counterRecordsToDownload = recordsToDownload?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" } ?: "",
+            counterRecordsToDownload = recordsToDownload?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty(),
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
-            counterImagesToUpload = imagesToUpload?.toString() ?: "",
+            counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
             isInstructionDefaultVisible = !isModuleSelectionRequired && isConnected && !eventSyncState.isSyncFailed()
                 && !eventSyncState.isSyncInProgress() && !isPreLogoutUpSync,
             isInstructionNoModulesVisible = isConnected && isModuleSelectionRequired && !isEventSyncInProgress,
@@ -268,15 +268,14 @@ internal class SyncInfoViewModel @Inject constructor(
             isSyncButtonEnabled = isEventSyncAvailable,
             isSyncButtonForRetry = eventSyncState.isSyncFailed(),
             isFooterSyncInProgressVisible = isPreLogoutUpSync && isEventSyncInProgress,
-            isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
-                && !isModuleSelectionRequired,
+            isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing,
             isFooterSyncIncompleteVisible = isPreLogoutUpSync && eventSyncState.isSyncFailed(),
             isFooterLastSyncTimeVisible = !isPreLogoutUpSync && !eventSyncState.isSyncInProgress() && eventLastSyncMinutes >= 0,
             footerLastSyncMinutesAgo = eventLastSyncMinutes,
         )
 
         val syncInfoSectionImages = SyncInfoSectionImages(
-            counterImagesToUpload = imagesToUpload?.toString() ?: "",
+            counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
             isInstructionDefaultVisible = !imageSyncStatus.isSyncing && isConnected,
             isInstructionOfflineVisible = !isConnected,
             isProgressVisible = imageSyncStatus.isSyncing,
