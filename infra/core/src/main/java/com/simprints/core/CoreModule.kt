@@ -9,6 +9,8 @@ import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.KronosTimeHelperImpl
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timer
+import com.simprints.core.tools.time.TimerImpl
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.SimNetworkUtils
@@ -44,6 +46,10 @@ object CoreModule {
             cacheExpirationMs = TimeUnit.MINUTES.toMillis(30),
         ),
     )
+
+    @Provides
+    @Singleton
+    fun provideTimer(): Timer = TimerImpl()
 
     @Provides
     @Singleton

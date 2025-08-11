@@ -1,7 +1,6 @@
 package com.simprints.core.tools.time
 
 import androidx.annotation.Keep
-import kotlinx.coroutines.flow.Flow
 
 @Keep
 interface TimeHelper {
@@ -18,6 +17,4 @@ interface TimeHelper {
     fun todayInMillis(): Long
 
     fun tomorrowInMillis(): Long
-
-    fun observeTickOncePerMinute(): Flow<Unit>
 }

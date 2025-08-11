@@ -8,6 +8,7 @@ import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timer
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.login.LoginResult
@@ -70,6 +71,7 @@ class SyncInfoViewModelTest {
     private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val recentUserActivityManager = mockk<RecentUserActivityManager>()
     private val timeHelper = mockk<TimeHelper>()
+    private val timer = mockk<Timer>()
     private val logoutUseCase = mockk<LogoutUseCase>(relaxed = true)
 
     private lateinit var viewModel: SyncInfoViewModel
@@ -156,7 +158,7 @@ class SyncInfoViewModelTest {
         coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 0
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
-        every { timeHelper.observeTickOncePerMinute() } returns MutableStateFlow(Unit)
+        every { timer.observeTickOncePerMinute() } returns MutableStateFlow(Unit)
         every { timeHelper.now() } returns TEST_TIMESTAMP
         every { timeHelper.msBetweenNowAndTime(any()) } returns 0L
 
@@ -183,6 +185,7 @@ class SyncInfoViewModelTest {
             tokenizationProcessor = tokenizationProcessor,
             recentUserActivityManager = recentUserActivityManager,
             timeHelper = timeHelper,
+            timer = timer,
             logoutUseCase = logoutUseCase,
         )
     }
@@ -1052,7 +1055,7 @@ class SyncInfoViewModelTest {
         every { timeHelper.now() } returnsMany listOf(TEST_TIMESTAMP, Timestamp(TEST_TIMESTAMP.ms + 60_000))
         // MutableStateFlow of Unit won't emit another (identical) Unit, so we'll count minutes and map to Units
         val timePaceFlow = MutableStateFlow(0)
-        every { timeHelper.observeTickOncePerMinute() } returns timePaceFlow.map { Unit }
+        every { timer.observeTickOncePerMinute() } returns timePaceFlow.map { Unit }
         createViewModel()
 
         val initialResult = viewModel.syncInfoLiveData.getOrAwaitValue()

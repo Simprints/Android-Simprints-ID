@@ -11,6 +11,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.extentions.combine8
 import com.simprints.core.tools.extentions.onChange
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timer
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.login.LoginParams
@@ -59,6 +60,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val tokenizationProcessor: TokenizationProcessor,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
+    timer: Timer,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     var isPreLogoutUpSync = false
@@ -93,7 +95,7 @@ internal class SyncInfoViewModel @Inject constructor(
         imageSyncStatusFlow,
         configManager.observeProjectConfiguration(),
         configManager.observeDeviceConfiguration(),
-        timeHelper.observeTickOncePerMinute(),
+        timer.observeTickOncePerMinute(),
     ) { isConnected, isLoggedIn, isRefreshing, eventSyncState, imageSyncStatus, projectConfig, deviceConfig, _ ->
 
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0
