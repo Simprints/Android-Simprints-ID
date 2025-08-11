@@ -42,7 +42,7 @@ firebase_crashlytics_version = "20.0.0"
 firebase_analytics_version = "23.0.0"
 firebase_perf_version = "22.0.0"
 firebase_crashlyticsPlugin_version = "3.0.5"
-firebase_perfPlugin_version = "2.0.0"
+firebase_perfPlugin_version = "2.0.1"
 
 # [MS-483] Newer versions of Retrofit (>=2.10.0) don't support android apis <=25 beacuse of the internal Jackson library
 retrofit_version = "2.9.0"
