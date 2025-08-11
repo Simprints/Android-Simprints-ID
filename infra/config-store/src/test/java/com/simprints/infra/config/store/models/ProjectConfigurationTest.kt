@@ -522,7 +522,7 @@ class ProjectConfigurationTest {
     }
 
     @Test
-    fun `isModuleSelectionAvailable should return true when project has MODULE and ONLY_PERIODICALLY_UP_SYNC`() {
+    fun `isModuleSelectionAvailable should return true when project has MODULE and not ONLY_PERIODICALLY_UP_SYNC`() {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
@@ -532,7 +532,7 @@ class ProjectConfigurationTest {
                 ),
                 up = synchronizationConfiguration.up.copy(
                     simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
+                        frequency = Frequency.PERIODICALLY,
                     ),
                 ),
             ),
@@ -560,7 +560,7 @@ class ProjectConfigurationTest {
     }
 
     @Test
-    fun `isModuleSelectionAvailable should return false when frequency is not ONLY_PERIODICALLY_UP_SYNC`() {
+    fun `isModuleSelectionAvailable should return false when frequency is ONLY_PERIODICALLY_UP_SYNC`() {
         val config = projectConfiguration.copy(
             synchronization = synchronizationConfiguration.copy(
                 down = synchronizationConfiguration.down.copy(
@@ -570,7 +570,7 @@ class ProjectConfigurationTest {
                 ),
                 up = synchronizationConfiguration.up.copy(
                     simprints = simprintsUpSyncConfigurationConfiguration.copy(
-                        frequency = Frequency.PERIODICALLY,
+                        frequency = Frequency.ONLY_PERIODICALLY_UP_SYNC,
                     ),
                 ),
             ),
