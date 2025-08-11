@@ -15,16 +15,16 @@ class ConfigurableSyncInfoFragmentContainer @JvmOverloads constructor(
 
     val syncInfoFragmentConfig: SyncInfoFragmentConfig? = attrs?.let {
         var config: SyncInfoFragmentConfig? = null
-        context.withStyledAttributes(attrs, R.styleable.FragmentContainerView) {
+        context.withStyledAttributes(attrs, R.styleable.SyncFragmentContainerView) {
             config = SyncInfoFragmentConfig(
-                isSyncInfoToolbarVisible = getBoolean(R.styleable.FragmentContainerView_isSyncInfoToolbarVisible, true),
-                isSyncInfoStatusHeaderVisible = getBoolean(R.styleable.FragmentContainerView_isSyncInfoStatusHeaderVisible, false),
-                isSyncInfoStatusHeaderSettingsButtonVisible = getBoolean(R.styleable.FragmentContainerView_isSyncInfoStatusHeaderSettingsButtonVisible, false),
-                areSyncInfoSectionHeadersVisible = getBoolean(R.styleable.FragmentContainerView_areSyncInfoSectionHeadersVisible, true),
-                isSyncInfoImageSyncVisible = getBoolean(R.styleable.FragmentContainerView_isSyncInfoImageSyncVisible, true),
-                isSyncInfoRecordsImagesCombined = getBoolean(R.styleable.FragmentContainerView_isSyncInfoRecordsImagesCombined, false),
-                isSyncInfoLogoutOnComplete = getBoolean(R.styleable.FragmentContainerView_isSyncInfoLogoutOnComplete, false),
-                isSyncInfoModuleListVisible = getBoolean(R.styleable.FragmentContainerView_isSyncInfoModuleListVisible, true)
+                isSyncInfoToolbarVisible = getBoolean(R.styleable.SyncFragmentContainerView_isSyncInfoToolbarVisible, true),
+                isSyncInfoStatusHeaderVisible = getBoolean(R.styleable.SyncFragmentContainerView_isSyncInfoStatusHeaderVisible, false),
+                isSyncInfoStatusHeaderSettingsButtonVisible = getBoolean(R.styleable.SyncFragmentContainerView_isSyncInfoStatusHeaderSettingsButtonVisible, false),
+                areSyncInfoSectionHeadersVisible = getBoolean(R.styleable.SyncFragmentContainerView_areSyncInfoSectionHeadersVisible, true),
+                isSyncInfoImageSyncVisible = getBoolean(R.styleable.SyncFragmentContainerView_isSyncInfoImageSyncVisible, true),
+                isSyncInfoRecordsImagesCombined = getBoolean(R.styleable.SyncFragmentContainerView_isSyncInfoRecordsImagesCombined, false),
+                isSyncInfoLogoutOnComplete = getBoolean(R.styleable.SyncFragmentContainerView_isSyncInfoLogoutOnComplete, false),
+                isSyncInfoModuleListVisible = getBoolean(R.styleable.SyncFragmentContainerView_isSyncInfoModuleListVisible, true)
             )
         }
         config

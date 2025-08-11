@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="FragmentContainerView">
+    <declare-styleable name="SyncFragmentContainerView">
         <attr name="isSyncInfoToolbarVisible" format="boolean" />
         <attr name="isSyncInfoStatusHeaderVisible" format="boolean" />
         <attr name="isSyncInfoStatusHeaderSettingsButtonVisible" format="boolean" />
