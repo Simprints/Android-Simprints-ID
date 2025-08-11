@@ -149,16 +149,16 @@ class ConfigManagerTest {
     }
 
     @Test
-    fun `watchProjectConfiguration should emit values from the local data source`() = runTest {
+    fun `observeProjectConfiguration should emit values from the local data source`() = runTest {
         val config1 = projectConfiguration.copy(projectId = "project1")
         val config2 = projectConfiguration.copy(projectId = "project2")
 
-        coEvery { configRepository.watchProjectConfiguration() } returns flow {
+        coEvery { configRepository.observeProjectConfiguration() } returns flow {
             emit(config1)
             emit(config2)
         }
 
-        val emittedConfigs = configManager.watchProjectConfiguration().toList()
+        val emittedConfigs = configManager.observeProjectConfiguration().toList()
 
         assertThat(emittedConfigs).hasSize(2)
         assertThat(emittedConfigs[0]).isEqualTo(config1)
@@ -166,12 +166,12 @@ class ConfigManagerTest {
     }
 
     @Test
-    fun `watchProjectConfiguration should call getProjectConfiguration on start to invoke download if config empty`() = runTest {
-        coEvery { configRepository.watchProjectConfiguration() } returns flow {
+    fun `observeProjectConfiguration should call getProjectConfiguration on start to invoke download if config empty`() = runTest {
+        coEvery { configRepository.observeProjectConfiguration() } returns flow {
             emit(projectConfiguration)
         }
 
-        val emittedConfigs = configManager.watchProjectConfiguration().toList()
+        val emittedConfigs = configManager.observeProjectConfiguration().toList()
 
         coVerify(exactly = 1) { configRepository.getProjectConfiguration() }
 
@@ -180,50 +180,50 @@ class ConfigManagerTest {
     }
 
     @Test
-    fun `watchIfProjectRefreshing should initially emit false`() = runTest {
-        val isRefreshing = configManager.watchIfProjectRefreshing().first()
+    fun `observeIsProjectRefreshing should initially emit false`() = runTest {
+        val isRefreshing = configManager.observeIsProjectRefreshing().first()
         assertThat(isRefreshing).isFalse()
     }
 
     @Test
-    fun `watchIfProjectRefreshing should emit false after refreshProject completes`() = runTest {
+    fun `observeIsProjectRefreshing should emit false after refreshProject completes`() = runTest {
         coEvery { configRepository.refreshProject(PROJECT_ID) } returns projectWithConfig
         configManager.refreshProject(PROJECT_ID)
 
-        val isRefreshing = configManager.watchIfProjectRefreshing().first()
+        val isRefreshing = configManager.observeIsProjectRefreshing().first()
 
         assertThat(isRefreshing).isFalse()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `watchIfProjectRefreshing should emit true during refreshProject and false when done`() = runTest {
+    fun `observeIsProjectRefreshing should emit true during refreshProject and false when done`() = runTest {
         coEvery { configRepository.refreshProject(PROJECT_ID) } coAnswers {
             delay(1000)
             projectWithConfig
         }
 
-        assertThat(configManager.watchIfProjectRefreshing().first()).isFalse() // before
+        assertThat(configManager.observeIsProjectRefreshing().first()).isFalse() // before
 
         launch { configManager.refreshProject(PROJECT_ID) }
         advanceTimeBy(500)
 
-        assertThat(configManager.watchIfProjectRefreshing().first()).isTrue() // during
+        assertThat(configManager.observeIsProjectRefreshing().first()).isTrue() // during
 
         advanceTimeBy(1000)
 
-        assertThat(configManager.watchIfProjectRefreshing().first()).isFalse() // after
+        assertThat(configManager.observeIsProjectRefreshing().first()).isFalse() // after
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `watchIfProjectRefreshing should emit false even when refreshProject fails`() = runTest {
+    fun `observeIsProjectRefreshing should emit false even when refreshProject fails`() = runTest {
         coEvery { configRepository.refreshProject(PROJECT_ID) } coAnswers {
             delay(500)
             throw Exception("Test exception")
         }
 
-        assertThat(configManager.watchIfProjectRefreshing().first()).isFalse() // before
+        assertThat(configManager.observeIsProjectRefreshing().first()).isFalse() // before
 
         launch {
             try {
@@ -234,6 +234,6 @@ class ConfigManagerTest {
         }
         advanceTimeBy(1000)
 
-        assertThat(configManager.watchIfProjectRefreshing().first()).isFalse() // after failure
+        assertThat(configManager.observeIsProjectRefreshing().first()).isFalse() // after failure
     }
 }

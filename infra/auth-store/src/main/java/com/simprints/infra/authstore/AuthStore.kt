@@ -14,7 +14,7 @@ interface AuthStore {
 
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
 
-    fun watchSignedInProjectId(): StateFlow<String>
+    fun observeSignedInProjectId(): StateFlow<String>
 
     fun cleanCredentials()
 

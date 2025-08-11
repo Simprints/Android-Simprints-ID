@@ -75,7 +75,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
 
-    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> =
+    override fun observeProjectConfiguration(): Flow<ProjectConfiguration> =
         configDataStore.data.map(ProtoProjectConfiguration::toDomain)
 
     override suspend fun clearProjectConfiguration() {
@@ -87,7 +87,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
             selectedModules = selectedModules.mapToTokenizedModuleIds()
         }
 
-    override fun watchDeviceConfiguration(): Flow<DeviceConfiguration> =
+    override fun observeDeviceConfiguration(): Flow<DeviceConfiguration> =
         deviceConfigDataStore.data.map(ProtoDeviceConfiguration::toDomain).map { config ->
             config.apply {
                 selectedModules = selectedModules.mapToTokenizedModuleIds()

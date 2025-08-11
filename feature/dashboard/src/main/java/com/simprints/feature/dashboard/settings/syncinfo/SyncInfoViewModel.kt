@@ -89,13 +89,13 @@ internal class SyncInfoViewModel @Inject constructor(
 
     val syncInfoLiveData: LiveData<SyncInfo> = combine8(
         connectivityTracker.observeIsConnected().asFlow(),
-        authStore.watchSignedInProjectId().map(String::isNotEmpty),
-        configManager.watchIfProjectRefreshing(),
+        authStore.observeSignedInProjectId().map(String::isNotEmpty),
+        configManager.observeIsProjectRefreshing(),
         eventSyncStateFlow,
         imageSyncStatusFlow,
-        configManager.watchProjectConfiguration(),
-        configManager.watchDeviceConfiguration(),
-        timeHelper.watchOncePerMinute(),
+        configManager.observeProjectConfiguration(),
+        configManager.observeDeviceConfiguration(),
+        timeHelper.observeTickOncePerMinute(),
     ) { isConnected, isLoggedIn, isRefreshing, eventSyncState, imageSyncStatus, projectConfig, deviceConfig, _ ->
 
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0

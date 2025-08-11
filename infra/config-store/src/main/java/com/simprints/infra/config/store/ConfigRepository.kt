@@ -15,13 +15,13 @@ interface ConfigRepository {
 
     suspend fun getProjectConfiguration(): ProjectConfiguration
 
-    fun watchProjectConfiguration(): Flow<ProjectConfiguration>
+    fun observeProjectConfiguration(): Flow<ProjectConfiguration>
 
     suspend fun getDeviceState(): DeviceState
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration
 
-    fun watchDeviceConfiguration(): Flow<DeviceConfiguration>
+    fun observeDeviceConfiguration(): Flow<DeviceConfiguration>
 
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
 

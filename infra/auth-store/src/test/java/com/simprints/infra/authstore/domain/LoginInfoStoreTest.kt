@@ -274,28 +274,28 @@ class LoginInfoStoreTest {
     }
 
     @Test
-    fun `watchSignedInProjectId should return flow with initial project id value`() = runTest {
+    fun `observeSignedInProjectId should return flow with initial project id value`() = runTest {
         loginInfoStoreImpl.signedInProjectId = "initial-project-id"
 
-        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+        val flow = loginInfoStoreImpl.observeSignedInProjectId()
         val initialValue = flow.first()
 
         assertThat(initialValue).isEqualTo("initial-project-id")
     }
 
     @Test
-    fun `watchSignedInProjectId should return flow with empty string when project id is empty`() = runTest {
+    fun `observeSignedInProjectId should return flow with empty string when project id is empty`() = runTest {
         loginInfoStoreImpl.signedInProjectId = ""
 
-        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+        val flow = loginInfoStoreImpl.observeSignedInProjectId()
         val initialValue = flow.first()
 
         assertThat(initialValue).isEqualTo("")
     }
 
     @Test
-    fun `watchSignedInProjectId should emit new values when signedInProjectId is updated`() = runTest {
-        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+    fun `observeSignedInProjectId should emit new values when signedInProjectId is updated`() = runTest {
+        val flow = loginInfoStoreImpl.observeSignedInProjectId()
         loginInfoStoreImpl.signedInProjectId = "initial-project-id"
         val initialValue = flow.first()
 
@@ -308,9 +308,9 @@ class LoginInfoStoreTest {
     }
 
     @Test
-    fun `watchSignedInProjectId should emit empty string when credentials are cleared`() = runTest {
+    fun `observeSignedInProjectId should emit empty string when credentials are cleared`() = runTest {
         loginInfoStoreImpl.signedInProjectId = "project-id"
-        val flow = loginInfoStoreImpl.watchSignedInProjectId()
+        val flow = loginInfoStoreImpl.observeSignedInProjectId()
         val initialValue = flow.first()
 
         assertThat(initialValue).isEqualTo("project-id")

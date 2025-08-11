@@ -125,15 +125,15 @@ class SyncInfoViewModelTest {
     private fun setupDefaultMocks() {
         every { authStore.signedInProjectId } returns TEST_PROJECT_ID
         every { authStore.signedInUserId } returns TokenizableString.Raw(TEST_USER_ID)
-        every { authStore.watchSignedInProjectId() } returns MutableStateFlow(TEST_PROJECT_ID)
+        every { authStore.observeSignedInProjectId() } returns MutableStateFlow(TEST_PROJECT_ID)
 
         val connectivityLiveData = MutableLiveData(true)
         every { connectivityTracker.observeIsConnected() } returns connectivityLiveData
         every { connectivityLiveData.asFlow() } returns flowOf(true)
 
-        every { configManager.watchIfProjectRefreshing() } returns MutableStateFlow(false)
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfiguration)
-        every { configManager.watchDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfiguration)
+        every { configManager.observeIsProjectRefreshing() } returns MutableStateFlow(false)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfiguration)
+        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfiguration)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfiguration
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfiguration
         coEvery { configManager.getProject(any()) } returns mockProject
@@ -155,7 +155,7 @@ class SyncInfoViewModelTest {
         coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 0
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
-        every { timeHelper.watchOncePerMinute() } returns MutableStateFlow(Unit)
+        every { timeHelper.observeTickOncePerMinute() } returns MutableStateFlow(Unit)
         every { timeHelper.now() } returns TEST_TIMESTAMP
         every { timeHelper.msBetweenNowAndTime(any()) } returns 0L
 
@@ -360,7 +360,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should show configuration loading when project is refreshing`() = runTest {
-        every { configManager.watchIfProjectRefreshing() } returns MutableStateFlow(true)
+        every { configManager.observeIsProjectRefreshing() } returns MutableStateFlow(true)
         createViewModel()
 
         val result = viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -491,8 +491,8 @@ class SyncInfoViewModelTest {
         val mockDeviceConfigWithModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(TokenizableString.Raw(TEST_MODULE_NAME))
         }
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.watchDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithModules)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
+        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithModules)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithModules
         coEvery { enrolmentRecordRepository.count(any()) } returns 50
@@ -722,8 +722,8 @@ class SyncInfoViewModelTest {
         val mockDeviceConfigWithModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(TokenizableString.Raw("module_1"), TokenizableString.Raw("module_2"))
         }
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.watchDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithModules)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
+        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithModules)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithModules
         coEvery { enrolmentRecordRepository.count(any()) } returnsMany listOf(10, 15, 25) // records total, module_1, module_2
@@ -757,8 +757,8 @@ class SyncInfoViewModelTest {
         val mockDeviceConfigWithoutModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns emptyList()
         }
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithoutModules)
-        every { configManager.watchDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithoutModules)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithoutModules)
+        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithoutModules)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithoutModules
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithoutModules
         every { mockProjectConfigWithoutModules.isModuleSelectionAvailable() } returns false
@@ -782,7 +782,7 @@ class SyncInfoViewModelTest {
         }
 
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
         coEvery { eventSyncManager.countEventsToDownload(any()) } returns DownSyncCounts(42, isLowerBound = false)
         every { mockProjectConfigWithDownSync.isEventDownSyncAllowed() } returns true
@@ -823,7 +823,7 @@ class SyncInfoViewModelTest {
         }
 
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
         coEvery { eventSyncManager.countEventsToDownload(any()) } throws Exception("Timeout")
         every { mockProjectConfigWithDownSync.isEventDownSyncAllowed() } returns true
@@ -847,7 +847,7 @@ class SyncInfoViewModelTest {
             every { isSyncInProgress() } returns false
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
         coEvery { eventSyncManager.countEventsToDownload(any()) } throws RuntimeException("Network error")
         every { mockProjectConfigWithDownSync.isEventDownSyncAllowed() } returns true
@@ -903,7 +903,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should handle changes in auth stream`() = runTest {
         val authFlow = MutableStateFlow("") // started not signed in
-        every { authStore.watchSignedInProjectId() } returns authFlow
+        every { authStore.observeSignedInProjectId() } returns authFlow
         createViewModel()
 
         val loggedOutResult = viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -920,7 +920,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should handle changes in project refreshing stream`() = runTest {
         val refreshingFlow = MutableStateFlow(false) // started non refreshing
-        every { configManager.watchIfProjectRefreshing() } returns refreshingFlow
+        every { configManager.observeIsProjectRefreshing() } returns refreshingFlow
         createViewModel()
 
         val notRefreshingResult = viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -988,7 +988,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should handle changes in project config stream`() = runTest {
         val projectConfigFlow = MutableStateFlow(mockProjectConfiguration)
-        every { configManager.watchProjectConfiguration() } returns projectConfigFlow // started without modules
+        every { configManager.observeProjectConfiguration() } returns projectConfigFlow // started without modules
         createViewModel()
 
         val initialResult = viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -1010,7 +1010,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should handle changes in device config stream`() = runTest {
-        every { configManager.watchProjectConfiguration() } returns flowOf(
+        every { configManager.observeProjectConfiguration() } returns flowOf(
             mockk<ProjectConfiguration> {
                 every { general } returns mockk<GeneralConfiguration> {
                     every { modalities } returns emptyList()
@@ -1022,7 +1022,7 @@ class SyncInfoViewModelTest {
                 every { selectedModules } returns emptyList()
             }
         ) // started without selected modules
-        every { configManager.watchDeviceConfiguration() } returns deviceConfigFlow
+        every { configManager.observeDeviceConfiguration() } returns deviceConfigFlow
         createViewModel()
 
         val noModulesResult = viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -1050,7 +1050,7 @@ class SyncInfoViewModelTest {
         every { timeHelper.now() } returnsMany listOf(TEST_TIMESTAMP, Timestamp(TEST_TIMESTAMP.ms + 60_000))
         // MutableStateFlow of Unit won't emit another (identical) Unit, so we'll count minutes and map to Units
         val timePaceFlow = MutableStateFlow(0)
-        every { timeHelper.watchOncePerMinute() } returns timePaceFlow.map { Unit }
+        every { timeHelper.observeTickOncePerMinute() } returns timePaceFlow.map { Unit }
         createViewModel()
 
         val initialResult = viewModel.syncInfoLiveData.getOrAwaitValue()
@@ -1165,8 +1165,8 @@ class SyncInfoViewModelTest {
             every { isSyncFailed() } returns false
             every { isSyncInProgress() } returns false
         }
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigRequiringModules)
-        every { configManager.watchDeviceConfiguration() } returns MutableStateFlow(mockEmptyDeviceConfig)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigRequiringModules)
+        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockEmptyDeviceConfig)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigRequiringModules
         coEvery { configManager.getDeviceConfiguration() } returns mockEmptyDeviceConfig
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
@@ -1234,8 +1234,8 @@ class SyncInfoViewModelTest {
         val mockDeviceConfigWithTokenizedModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(tokenizedModule)
         }
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.watchDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithTokenizedModules)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
+        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithTokenizedModules)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithTokenizedModules
         coEvery { enrolmentRecordRepository.count(any()) } returnsMany listOf(10, 10) // total, and the module
@@ -1264,8 +1264,8 @@ class SyncInfoViewModelTest {
         val mockDeviceConfigWithRawModules = mockk<DeviceConfiguration> {
             every { selectedModules } returns listOf(rawModule)
         }
-        every { configManager.watchProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
-        every { configManager.watchDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithRawModules)
+        every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithModules)
+        every { configManager.observeDeviceConfiguration() } returns MutableStateFlow(mockDeviceConfigWithRawModules)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithModules
         coEvery { configManager.getDeviceConfiguration() } returns mockDeviceConfigWithRawModules
         coEvery { enrolmentRecordRepository.count(any()) } returnsMany listOf(10, 10) // total, and the module

@@ -58,7 +58,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
         return tokenizeModules(config)
     }
 
-    override fun watchProjectConfiguration(): Flow<ProjectConfiguration> = localDataSource.watchProjectConfiguration().map { config ->
+    override fun observeProjectConfiguration(): Flow<ProjectConfiguration> = localDataSource.observeProjectConfiguration().map { config ->
         tokenizeModules(config)
     }
 
@@ -71,7 +71,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration = localDataSource.getDeviceConfiguration()
 
-    override fun watchDeviceConfiguration(): Flow<DeviceConfiguration> = localDataSource.watchDeviceConfiguration()
+    override fun observeDeviceConfiguration(): Flow<DeviceConfiguration> = localDataSource.observeDeviceConfiguration()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
         localDataSource.updateDeviceConfiguration(update)

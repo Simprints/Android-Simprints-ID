@@ -32,7 +32,7 @@ internal class LogoutSyncViewModel @Inject constructor(
 ) : ViewModel() {
 
     val logoutEventLiveData: LiveData<Unit> =
-        authStore.watchSignedInProjectId().filter { projectId ->
+        authStore.observeSignedInProjectId().filter { projectId ->
             projectId.isEmpty()
         }.distinctUntilChanged().map { /* Unit on every "true" */ }.asLiveData()
 

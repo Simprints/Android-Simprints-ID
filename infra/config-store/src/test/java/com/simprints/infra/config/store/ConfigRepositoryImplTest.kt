@@ -249,16 +249,16 @@ class ConfigRepositoryImplTest {
     }
 
     @Test
-    fun `watchProjectConfiguration should emit values from the local data source`() = runTest {
+    fun `observeProjectConfiguration should emit values from the local data source`() = runTest {
         val config1 = projectConfiguration.copy(projectId = "project1")
         val config2 = projectConfiguration.copy(projectId = "project2")
 
-        coEvery { localDataSource.watchProjectConfiguration() } returns flow {
+        coEvery { localDataSource.observeProjectConfiguration() } returns flow {
             emit(config1)
             emit(config2)
         }
 
-        val emittedConfigs = configServiceImpl.watchProjectConfiguration().toList()
+        val emittedConfigs = configServiceImpl.observeProjectConfiguration().toList()
 
         assertThat(emittedConfigs).hasSize(2)
         assertThat(emittedConfigs[0]).isEqualTo(config1)
@@ -316,7 +316,7 @@ class ConfigRepositoryImplTest {
     }
 
     @Test
-    fun `watchDeviceConfiguration should track values from the local data source`() = runTest {
+    fun `observeDeviceConfiguration should track values from the local data source`() = runTest {
         val config1 = deviceConfiguration.copy(selectedModules = emptyList())
         val config2 = deviceConfiguration.copy(
             selectedModules = listOf(
@@ -325,16 +325,16 @@ class ConfigRepositoryImplTest {
             )
         )
 
-        coEvery { localDataSource.watchDeviceConfiguration() } returns flow {
+        coEvery { localDataSource.observeDeviceConfiguration() } returns flow {
             emit(config1)
             emit(config2)
         }
 
-        val emittedConfigs = configServiceImpl.watchDeviceConfiguration().toList()
+        val emittedConfigs = configServiceImpl.observeDeviceConfiguration().toList()
 
         assertThat(emittedConfigs).hasSize(2)
         assertThat(emittedConfigs[0]).isEqualTo(config1)
         assertThat(emittedConfigs[1]).isEqualTo(config2)
-        coVerify(exactly = 1) { localDataSource.watchDeviceConfiguration() }
+        coVerify(exactly = 1) { localDataSource.observeDeviceConfiguration() }
     }
 }

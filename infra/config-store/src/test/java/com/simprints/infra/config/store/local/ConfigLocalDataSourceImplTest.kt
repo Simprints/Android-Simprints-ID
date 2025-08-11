@@ -300,7 +300,7 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `watchProjectConfiguration should emit updated values when configuration changes`() = runTest {
+    fun `observeProjectConfiguration should emit updated values when configuration changes`() = runTest {
         val config1 = projectConfiguration.copy(projectId = "project1")
         val config2 = projectConfiguration.copy(projectId = "project2")
         val config3 = projectConfiguration.copy(projectId = "project3")
@@ -311,7 +311,7 @@ class ConfigLocalDataSourceImplTest {
         configLocalDataSourceImpl.saveProjectConfiguration(config2) // will replay when collection starts below
 
         val job = launch {
-            configLocalDataSourceImpl.watchProjectConfiguration().collect { emittedConfigs.add(it) }
+            configLocalDataSourceImpl.observeProjectConfiguration().collect { emittedConfigs.add(it) }
         }
 
         configLocalDataSourceImpl.saveProjectConfiguration(config3)
@@ -325,7 +325,7 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
-    fun `watchDeviceConfiguration should emit updated values when configuration changes`() = runTest {
+    fun `observeDeviceConfiguration should emit updated values when configuration changes`() = runTest {
         configLocalDataSourceImpl.saveProject(project)
 
         val config1 = DeviceConfiguration("en", listOf(), "instruction1")
@@ -333,20 +333,20 @@ class ConfigLocalDataSourceImplTest {
 
         configLocalDataSourceImpl.updateDeviceConfiguration { config1 }
 
-        val result1 = configLocalDataSourceImpl.watchDeviceConfiguration().first()
+        val result1 = configLocalDataSourceImpl.observeDeviceConfiguration().first()
 
         assertThat(result1).isEqualTo(config1)
 
         configLocalDataSourceImpl.updateDeviceConfiguration { config2 }
 
-        val result2 = configLocalDataSourceImpl.watchDeviceConfiguration().first()
+        val result2 = configLocalDataSourceImpl.observeDeviceConfiguration().first()
 
         assertThat(result2).isEqualTo(config2)
     }
 
     @Test
-    fun `watchDeviceConfiguration should emit default configuration initially`() = runTest {
-        val result = configLocalDataSourceImpl.watchDeviceConfiguration().first()
+    fun `observeDeviceConfiguration should emit default configuration initially`() = runTest {
+        val result = configLocalDataSourceImpl.observeDeviceConfiguration().first()
 
         assertThat(result).isEqualTo(ConfigLocalDataSourceImpl.defaultDeviceConfiguration.toDomain())
     }

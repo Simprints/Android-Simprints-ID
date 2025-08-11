@@ -21,10 +21,10 @@ class ConfigManager @Inject constructor(
     private val configSyncCache: ConfigSyncCache,
     private val realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler,
 ) {
-    private val ifProjectRefreshingFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val isProjectRefreshingFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     suspend fun refreshProject(projectId: String): ProjectWithConfig {
-        ifProjectRefreshingFlow.tryEmit(true)
+        isProjectRefreshingFlow.tryEmit(true)
         try {
             return configRepository.refreshProject(projectId).also {
                 enrolmentRecordRepository.tokenizeExistingRecords(it.project)
@@ -32,7 +32,7 @@ class ConfigManager @Inject constructor(
                 realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             }
         } finally {
-            ifProjectRefreshingFlow.tryEmit(false)
+            isProjectRefreshingFlow.tryEmit(false)
         }
     }
 
@@ -60,16 +60,16 @@ class ConfigManager @Inject constructor(
         }
     }
 
-    fun watchIfProjectRefreshing(): Flow<Boolean> = ifProjectRefreshingFlow.asStateFlow()
+    fun observeIsProjectRefreshing(): Flow<Boolean> = isProjectRefreshingFlow.asStateFlow()
 
-    fun watchProjectConfiguration(): Flow<ProjectConfiguration> = configRepository
-        .watchProjectConfiguration()
+    fun observeProjectConfiguration(): Flow<ProjectConfiguration> = configRepository
+        .observeProjectConfiguration()
         .onStart { getProjectConfiguration() } // to invoke download if empty
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration = configRepository.getDeviceConfiguration()
 
-    fun watchDeviceConfiguration(): Flow<DeviceConfiguration> = configRepository
-        .watchDeviceConfiguration()
+    fun observeDeviceConfiguration(): Flow<DeviceConfiguration> = configRepository
+        .observeDeviceConfiguration()
         .onStart { getDeviceConfiguration() }
 
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =

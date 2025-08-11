@@ -19,5 +19,5 @@ interface TimeHelper {
 
     fun tomorrowInMillis(): Long
 
-    fun watchOncePerMinute(): Flow<Unit>
+    fun observeTickOncePerMinute(): Flow<Unit>
 }

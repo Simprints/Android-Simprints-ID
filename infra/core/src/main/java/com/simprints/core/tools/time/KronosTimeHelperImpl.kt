@@ -63,7 +63,7 @@ class KronosTimeHelperImpl @Inject constructor(
         timeInMillis
     }
 
-    override fun watchOncePerMinute(): Flow<Unit> = flow {
+    override fun observeTickOncePerMinute(): Flow<Unit> = flow {
         while (true) {
             emit(Unit)
             delay(ONE_MINUTE_IN_MILLIS)

@@ -29,7 +29,7 @@ internal class AuthStoreImpl @Inject constructor(
             loginInfoStore.signedInProjectId = value
         }
 
-    override fun watchSignedInProjectId(): StateFlow<String> = loginInfoStore.watchSignedInProjectId()
+    override fun observeSignedInProjectId(): StateFlow<String> = loginInfoStore.observeSignedInProjectId()
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean = loginInfoStore.isProjectIdSignedIn(possibleProjectId)
 

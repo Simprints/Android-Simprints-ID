@@ -83,7 +83,7 @@ internal class LogoutSyncViewModelTest {
 
     @Test
     fun `logoutEventLiveData should emit momentarily when user is signed out`() {
-        every { authStore.watchSignedInProjectId() } returns MutableStateFlow("")
+        every { authStore.observeSignedInProjectId() } returns MutableStateFlow("")
 
         val viewModel = createViewModel()
 
@@ -93,7 +93,7 @@ internal class LogoutSyncViewModelTest {
 
     @Test
     fun `logoutEventLiveData should not emit when user is signed in`() {
-        every { authStore.watchSignedInProjectId() } returns MutableStateFlow("userId123")
+        every { authStore.observeSignedInProjectId() } returns MutableStateFlow("userId123")
 
         val viewModel = createViewModel()
 
@@ -196,8 +196,7 @@ internal class LogoutSyncViewModelTest {
         every { eventSyncLiveData.asFlow() } returns flowOf(eventSyncState)
         every { eventSyncManager.getLastSyncState(useDefaultValue = true) } returns eventSyncLiveData
         every { syncOrchestrator.observeImageSyncStatus() } returns flowOf(imageSyncStatus)
-        every { configManager.watchProjectConfiguration() } returns flowOf(projectConfig)
-        every { configManager.watchDeviceConfiguration() } returns flowOf(deviceConfig)
+        every { configManager.observeProjectConfiguration() } returns flowOf(projectConfig)
     }
 
     private fun createViewModel() = LogoutSyncViewModel(

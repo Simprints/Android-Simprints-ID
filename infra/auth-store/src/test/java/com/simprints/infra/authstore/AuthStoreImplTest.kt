@@ -132,38 +132,38 @@ class AuthStoreImplTest {
     }
 
     @Test
-    fun `watchSignedInProjectId should return flow with initial project id value`() = runTest {
+    fun `observeSignedInProjectId should return flow with initial project id value`() = runTest {
         val expectedFlow = MutableStateFlow("initial-project-id")
-        every { loginInfoStore.watchSignedInProjectId() } returns expectedFlow
+        every { loginInfoStore.observeSignedInProjectId() } returns expectedFlow
 
-        val flow = loginManagerManagerImpl.watchSignedInProjectId()
+        val flow = loginManagerManagerImpl.observeSignedInProjectId()
         val initialValue = flow.first()
 
         assertThat(initialValue).isEqualTo("initial-project-id")
-        verify(exactly = 1) { loginInfoStore.watchSignedInProjectId() }
+        verify(exactly = 1) { loginInfoStore.observeSignedInProjectId() }
     }
 
     @Test
-    fun `watchSignedInProjectId should return flow with empty string when project id is empty`() = runTest {
+    fun `observeSignedInProjectId should return flow with empty string when project id is empty`() = runTest {
         val expectedFlow = MutableStateFlow("")
-        every { loginInfoStore.watchSignedInProjectId() } returns expectedFlow
+        every { loginInfoStore.observeSignedInProjectId() } returns expectedFlow
 
-        val flow = loginManagerManagerImpl.watchSignedInProjectId()
+        val flow = loginManagerManagerImpl.observeSignedInProjectId()
         val initialValue = flow.first()
 
         assertThat(initialValue).isEqualTo("")
-        verify(exactly = 1) { loginInfoStore.watchSignedInProjectId() }
+        verify(exactly = 1) { loginInfoStore.observeSignedInProjectId() }
     }
 
     @Test
-    fun `watchSignedInProjectId should listen to the logged in project id values`() = runTest {
+    fun `observeSignedInProjectId should listen to the logged in project id values`() = runTest {
         val expectedValues = MutableStateFlow("project1").apply { emit("project2") }
-        every { loginInfoStore.watchSignedInProjectId() } returns expectedValues
+        every { loginInfoStore.observeSignedInProjectId() } returns expectedValues
 
-        val receivedFlow = loginManagerManagerImpl.watchSignedInProjectId()
+        val receivedFlow = loginManagerManagerImpl.observeSignedInProjectId()
 
         assertThat(receivedFlow).isEqualTo(expectedValues)
-        verify(exactly = 1) { loginInfoStore.watchSignedInProjectId() }
+        verify(exactly = 1) { loginInfoStore.observeSignedInProjectId() }
     }
 
     companion object {

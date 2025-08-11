@@ -90,7 +90,7 @@ internal class LoginInfoStore @Inject constructor(
             signedInProjectIdFlow.tryEmit(value)
         }
 
-    fun watchSignedInProjectId(): StateFlow<String> = signedInProjectIdFlow.asStateFlow()
+    fun observeSignedInProjectId(): StateFlow<String> = signedInProjectIdFlow.asStateFlow()
 
     // Core Firebase Project details. We store them to initialize the core Firebase project.
     var coreFirebaseProjectId: String = ""

@@ -93,8 +93,8 @@ class KronosTimeHelperImplTest {
     }
 
     @Test
-    fun testWatchOncePerMinute_emitsImmediately() = runTest {
-        val result = timeHelperImpl.watchOncePerMinute()
+    fun testObserveTickOncePerMinute_emitsImmediately() = runTest {
+        val result = timeHelperImpl.observeTickOncePerMinute()
             .take(1)
             .toList()
 
@@ -103,8 +103,8 @@ class KronosTimeHelperImplTest {
     }
 
     @Test
-    fun testWatchOncePerMinute_emitsMultipleTimes() = runTest {
-        val result = timeHelperImpl.watchOncePerMinute()
+    fun testObserveTickOncePerMinute_emitsMultipleTimes() = runTest {
+        val result = timeHelperImpl.observeTickOncePerMinute()
             .take(3)
             .toList()
 
@@ -113,8 +113,8 @@ class KronosTimeHelperImplTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testWatchOncePerMinute_waitsForCorrectTime() = runTest {
-        val flow = timeHelperImpl.watchOncePerMinute()
+    fun testObserveTickOncePerMinute_waitsForCorrectTime() = runTest {
+        val flow = timeHelperImpl.observeTickOncePerMinute()
 
         // 1st tick immediately
         assertThat(flow.first()).isEqualTo(Unit)
