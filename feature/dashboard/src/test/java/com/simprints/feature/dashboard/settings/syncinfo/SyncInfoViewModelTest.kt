@@ -1500,7 +1500,7 @@ class SyncInfoViewModelTest {
     }
 
     @Test
-    fun `should not trigger initial sync when module selection required`() = runTest {
+    fun `should trigger initial sync when in pre-logout mode and module selection required`() = runTest {
         val mockProjectConfigRequiringModules = mockk<ProjectConfiguration> {
             every { general } returns mockk<GeneralConfiguration> {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
@@ -1515,6 +1515,28 @@ class SyncInfoViewModelTest {
         coEvery { eventSyncManager.getLastSyncTime() } returns null
         createViewModel()
         viewModel.isPreLogoutUpSync = true
+
+        viewModel.syncInfoLiveData.getOrAwaitValue()
+
+        coVerify(exactly = 1) { syncOrchestrator.startEventSync(any()) }
+    }
+
+    @Test
+    fun `should not trigger initial sync when not in pre-logout mode and module selection required`() = runTest {
+        val mockProjectConfigRequiringModules = mockk<ProjectConfiguration> {
+            every { general } returns mockk<GeneralConfiguration> {
+                every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+            }
+        }
+        val mockEmptyDeviceConfig = mockk<DeviceConfiguration> {
+            every { selectedModules } returns emptyList()
+        }
+        coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigRequiringModules
+        coEvery { configManager.getDeviceConfiguration() } returns mockEmptyDeviceConfig
+        every { mockProjectConfigRequiringModules.isModuleSelectionAvailable() } returns true
+        coEvery { eventSyncManager.getLastSyncTime() } returns null
+        createViewModel()
+        viewModel.isPreLogoutUpSync = false
 
         viewModel.syncInfoLiveData.getOrAwaitValue()
 

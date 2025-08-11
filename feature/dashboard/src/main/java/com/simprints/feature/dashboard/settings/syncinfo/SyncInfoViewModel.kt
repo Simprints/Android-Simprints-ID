@@ -77,7 +77,6 @@ internal class SyncInfoViewModel @Inject constructor(
     ) { eventSyncState, imageSyncStatus ->
         val isReadyToLogOut =
             isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
-                && !configManager.isModuleSelectionRequired()
         return@combine isReadyToLogOut
     }.debounce(LOGOUT_DELAY_MILLIS).transformLatest { isReadyToLogOut ->
         if (isReadyToLogOut) {
@@ -179,7 +178,7 @@ internal class SyncInfoViewModel @Inject constructor(
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
 
         val isModuleSelectionRequired =
-            projectConfig.isModuleSelectionAvailable() && deviceConfig.selectedModules.isEmpty()
+            !isPreLogoutUpSync && projectConfig.isModuleSelectionAvailable() && deviceConfig.selectedModules.isEmpty()
         val isEventSyncAvailable =
             !isReLoginRequired && isConnected && !eventSyncState.isSyncRunning() && !projectConfig.isMissingModulesToChooseFrom()
                 && !isModuleSelectionRequired
@@ -374,8 +373,8 @@ internal class SyncInfoViewModel @Inject constructor(
             val lastUpdate = eventSyncManager.getLastSyncTime()
 
             val isForceEventSync = when {
-                configManager.isModuleSelectionRequired() -> false
                 isPreLogoutUpSync -> true
+                configManager.isModuleSelectionRequired() -> false
                 isRunning -> false
                 lastUpdate == null -> true
                 timeHelper.msBetweenNowAndTime(lastUpdate) > RE_SYNC_TIMEOUT_MILLIS -> true
@@ -394,7 +393,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     .map { it.isSyncCompleted() }
                     .distinctUntilChanged()
                     .collect { isEventSyncCompleted ->
-                        if (isEventSyncCompleted && !configManager.isModuleSelectionRequired()) {
+                        if (isEventSyncCompleted) {
                             syncOrchestrator.startImageSync()
                         }
                     }
