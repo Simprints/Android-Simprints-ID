@@ -39,7 +39,7 @@ data class SyncInfoSectionRecords(
     val isFooterReadyToLogOutVisible: Boolean = false,
     val isFooterSyncIncompleteVisible: Boolean = false,
     val isFooterLastSyncTimeVisible: Boolean = false,
-    val footerLastSyncMinutesAgo: Int = -1,
+    val footerLastSyncMinutesAgo: String = "",
 )
 
 data class SyncInfoError(
@@ -65,7 +65,7 @@ data class SyncInfoSectionImages(
 
     // footer
     val isFooterLastSyncTimeVisible: Boolean = false,
-    val footerLastSyncMinutesAgo: Int = -1,
+    val footerLastSyncMinutesAgo: String = "",
 )
 
 data class SyncInfoProgress(

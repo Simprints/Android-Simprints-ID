@@ -368,14 +368,6 @@
     <string name="sync_info_footer_sync_in_progress">Sync in progress</string>
     <string name="sync_info_footer_sync_incomplete">Sync incomplete</string>
     <string name="sync_info_footer_sync_complete_logging_out">Sync complete, logging you out…</string>
-    <string name="sync_info_footer_time_none" translatable="false" />
-    <string name="sync_info_footer_time_now">Last synced just now</string>
-    <string name="sync_info_footer_time_1_minute">Last synced 1 minute ago</string>
-    <string name="sync_info_footer_time_minutes">Last synced %1$d minutes ago</string>
-    <string name="sync_info_footer_time_1_hour">Last synced 1 hour ago</string>
-    <string name="sync_info_footer_time_hours">Last synced %1$d hours ago</string>
-    <string name="sync_info_footer_time_1_day">Last synced 1 day ago</string>
-    <string name="sync_info_footer_time_days">Last synced %1$d days ago</string>
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">Activity: %1$s</string>

@@ -199,7 +199,7 @@ class SyncInfoViewModelTest {
             isFooterReadyToLogOutVisible = false,
             isFooterSyncIncompleteVisible = false,
             isFooterLastSyncTimeVisible = false,
-            footerLastSyncMinutesAgo = 0
+            footerLastSyncMinutesAgo = "",
         ),
         syncInfoSectionImages = SyncInfoSectionImages(
             counterImagesToUpload = "0",
@@ -209,7 +209,7 @@ class SyncInfoViewModelTest {
             progress = SyncInfoProgress(),
             isSyncButtonEnabled = true,
             isFooterLastSyncTimeVisible = false,
-            footerLastSyncMinutesAgo = 0
+            footerLastSyncMinutesAgo = "",
         ),
         syncInfoSectionModules = SyncInfoSectionModules(
             isSectionAvailable = false,

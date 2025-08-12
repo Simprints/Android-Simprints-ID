@@ -6,6 +6,7 @@ import com.simprints.core.tools.extentions.combine8
 import com.simprints.core.tools.extentions.onChange
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timer
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoError
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoModuleCount
@@ -138,12 +139,10 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             SyncInfoProgress()
         }
 
-        val eventLastSyncMinutes = eventSyncManager.getLastSyncTime()?.run {
-            (timeHelper.now().ms - ms) / 60 / 1000
-        }?.toInt() ?: -1
-        val imageLastSyncMinutes = imageSyncStatus.secondsSinceLastUpdate?.let {
-            (it / 60).toInt()
-        } ?: -1
+        val eventLastSyncTimestamp = eventSyncManager.getLastSyncTime() ?: Timestamp(-1)
+        val imageLastSyncTimestamp = imageSyncStatus.secondsSinceLastUpdate?.let {
+            Timestamp(it * 1000)
+        } ?: Timestamp(-1)
 
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
 
@@ -240,8 +239,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isFooterSyncInProgressVisible = isPreLogoutUpSync && isEventSyncInProgress,
             isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing,
             isFooterSyncIncompleteVisible = isPreLogoutUpSync && eventSyncState.isSyncFailed(),
-            isFooterLastSyncTimeVisible = !isPreLogoutUpSync && !eventSyncState.isSyncInProgress() && eventLastSyncMinutes >= 0,
-            footerLastSyncMinutesAgo = eventLastSyncMinutes,
+            isFooterLastSyncTimeVisible = !isPreLogoutUpSync && !eventSyncState.isSyncInProgress() && eventLastSyncTimestamp.ms >= 0,
+            footerLastSyncMinutesAgo = timeHelper.readableBetweenNowAndTime(eventLastSyncTimestamp),
         )
 
         val syncInfoSectionImages = SyncInfoSectionImages(
@@ -251,8 +250,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isProgressVisible = imageSyncStatus.isSyncing,
             progress = imageSyncProgress,
             isSyncButtonEnabled = isConnected && !isReLoginRequired,
-            isFooterLastSyncTimeVisible = !imageSyncStatus.isSyncing && imageLastSyncMinutes >= 0,
-            footerLastSyncMinutesAgo = imageLastSyncMinutes,
+            isFooterLastSyncTimeVisible = !imageSyncStatus.isSyncing && imageLastSyncTimestamp.ms >= 0,
+            footerLastSyncMinutesAgo = timeHelper.readableBetweenNowAndTime(imageLastSyncTimestamp),
         )
 
         val syncInfo = SyncInfo(

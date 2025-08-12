@@ -150,6 +150,7 @@ class ObserveSyncInfoUseCaseTest {
         every { timer.observeTickOncePerMinute() } returns MutableStateFlow(Unit)
         every { timeHelper.now() } returns TEST_TIMESTAMP
         every { timeHelper.msBetweenNowAndTime(any()) } returns 0L
+        every { timeHelper.readableBetweenNowAndTime(any()) } returns "0 minutes ago"
 
         every { tokenizationProcessor.decrypt(any(), any(), any()) } returns TokenizableString.Raw("decrypted_module")
 
@@ -294,7 +295,7 @@ class ObserveSyncInfoUseCaseTest {
         val result = useCase().first()
 
         assertThat(result.syncInfoSectionRecords.isFooterLastSyncTimeVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo(0)
+        assertThat(result.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo("0 minutes ago")
         assertThat(result.syncInfoSectionRecords.isFooterSyncInProgressVisible).isFalse()
     }
 
@@ -336,12 +337,13 @@ class ObserveSyncInfoUseCaseTest {
             every { secondsSinceLastUpdate } returns 120 // 2 minutes
         }
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageStatusWithLastSync)
+        every { timeHelper.readableBetweenNowAndTime(Timestamp(120 * 1000)) } returns "2 minutes ago"
         createUseCase()
 
         val result = useCase().first()
 
         assertThat(result.syncInfoSectionImages.isFooterLastSyncTimeVisible).isTrue()
-        assertThat(result.syncInfoSectionImages.footerLastSyncMinutesAgo).isEqualTo(2)
+        assertThat(result.syncInfoSectionImages.footerLastSyncMinutesAgo).isEqualTo("2 minutes ago")
     }
 
     @Test
@@ -905,6 +907,7 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(mockIdleEventSyncState)
         coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
         every { timeHelper.now() } returnsMany listOf(TEST_TIMESTAMP, Timestamp(TEST_TIMESTAMP.ms + 60_000))
+        every { timeHelper.readableBetweenNowAndTime(any()) } returnsMany listOf("0 minutes ago", "1 minute ago")
         // MutableStateFlow of Unit won't emit another (identical) Unit, so we'll count minutes and map to Units
         val timePaceFlow = MutableStateFlow(0)
         every { timer.observeTickOncePerMinute() } returns timePaceFlow.map { }
@@ -912,28 +915,28 @@ class ObserveSyncInfoUseCaseTest {
 
         val initialResult = useCase().first()
 
-        assertThat(initialResult.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo(0)
+        assertThat(initialResult.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo("0 minutes ago")
 
         timePaceFlow.value = -1 // just a different value for a time beat, doesn't matter which
 
         val updatedResult = useCase().first()
 
-        assertThat(updatedResult.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo(1)
+        assertThat(updatedResult.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo("1 minute ago")
     }
 
     // UI state tests
 
     @Test
     fun `should calculate correct record last sync time when sync time available`() = runTest {
-        val fiveMinutesAgo = Timestamp(TEST_TIMESTAMP.ms - 300000) // 5 minutes before test timestamp
-        coEvery { eventSyncManager.getLastSyncTime() } returns fiveMinutesAgo
-        every { timeHelper.msBetweenNowAndTime(fiveMinutesAgo) } returns 300000L // 5 minutes
+        val timestamp = Timestamp(0L)
+        coEvery { eventSyncManager.getLastSyncTime() } returns timestamp
+        every { timeHelper.readableBetweenNowAndTime(timestamp) } returns "5 minutes ago"
         createUseCase()
 
         val result = useCase().first()
 
         assertThat(result.syncInfoSectionRecords.isFooterLastSyncTimeVisible).isTrue()
-        assertThat(result.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo(5)
+        assertThat(result.syncInfoSectionRecords.footerLastSyncMinutesAgo).isEqualTo("5 minutes ago")
     }
 
     @Test
@@ -954,12 +957,13 @@ class ObserveSyncInfoUseCaseTest {
             every { secondsSinceLastUpdate } returns 180 // 3 minutes
         }
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageStatusWithLastSync)
+        every { timeHelper.readableBetweenNowAndTime(Timestamp(180 * 1000)) } returns "3 minutes ago"
         createUseCase()
 
         val result = useCase().first()
 
         assertThat(result.syncInfoSectionImages.isFooterLastSyncTimeVisible).isTrue()
-        assertThat(result.syncInfoSectionImages.footerLastSyncMinutesAgo).isEqualTo(3)
+        assertThat(result.syncInfoSectionImages.footerLastSyncMinutesAgo).isEqualTo("3 minutes ago")
     }
 
     @Test

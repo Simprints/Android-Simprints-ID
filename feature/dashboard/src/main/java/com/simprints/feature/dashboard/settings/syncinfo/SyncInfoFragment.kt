@@ -231,7 +231,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.textFooterRecordLoggingOut.isGone = !records.isFooterReadyToLogOutVisible
         binding.textFooterRecordSyncIncomplete.isGone = !records.isFooterSyncIncompleteVisible
         binding.textFooterRecordLastSyncedWhen.isGone = !records.isFooterLastSyncTimeVisible
-        binding.textFooterRecordLastSyncedWhen.text = formatLastSyncTime(records.footerLastSyncMinutesAgo)
+        binding.textFooterRecordLastSyncedWhen.text = records.footerLastSyncMinutesAgo
     }
 
     private fun SyncInfoError.configureErrorPopup() {
@@ -291,7 +291,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Footer
         binding.textFooterImageLastSyncedWhen.isInvisible = !images.isFooterLastSyncTimeVisible
-        binding.textFooterImageLastSyncedWhen.text = formatLastSyncTime(images.footerLastSyncMinutesAgo)
+        binding.textFooterImageLastSyncedWhen.text = images.footerLastSyncMinutesAgo
     }
 
     private fun renderModulesSection(modules: SyncInfoSectionModules, config: SyncInfoFragmentConfig) {
@@ -345,18 +345,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         textView.text = progressText
     }
-
-    private fun formatLastSyncTime(minutesAgo: Int): String =
-        when {
-            minutesAgo < 0 -> getString(IDR.string.sync_info_footer_time_none)
-            minutesAgo == 0 -> getString(IDR.string.sync_info_footer_time_now)
-            minutesAgo == 1 -> getString(IDR.string.sync_info_footer_time_1_minute)
-            minutesAgo < 60 -> getString(IDR.string.sync_info_footer_time_minutes, minutesAgo)
-            minutesAgo < 2 * 60 -> getString(IDR.string.sync_info_footer_time_1_hour)
-            minutesAgo < 24 * 60 -> getString(IDR.string.sync_info_footer_time_hours, minutesAgo / 60)
-            minutesAgo < 2 * 24 * 60 -> getString(IDR.string.sync_info_footer_time_1_day)
-            else -> getString(IDR.string.sync_info_footer_time_days, minutesAgo / 60 / 24)
-        }
 
     private fun View.setPulseAnimation(isEnabled: Boolean) {
         (tag as? ObjectAnimator?)?.run {
