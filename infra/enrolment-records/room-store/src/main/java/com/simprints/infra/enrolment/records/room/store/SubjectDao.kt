@@ -11,7 +11,6 @@ import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTempla
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
 import com.simprints.infra.enrolment.records.room.store.models.SubjectBiometrics
-import com.simprints.infra.enrolment.records.room.store.models.SubjectExternalCredentials
 
 @Dao
 interface SubjectDao {
