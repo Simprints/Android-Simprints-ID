@@ -32,6 +32,7 @@ import com.simprints.infra.sync.ImageSyncStatus
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -136,7 +137,7 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncLiveData.asFlow() } returns flowOf(mockEventSyncState)
         coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(0)
-        coEvery { eventSyncManager.countEventsToDownload(any()) } returns DownSyncCounts(0, isLowerBound = false)
+        coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(0, isLowerBound = false)
 
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageSyncStatus)
         coEvery { syncOrchestrator.startEventSync(any()) } returns Unit
@@ -519,7 +520,7 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
         coEvery { enrolmentRecordRepository.count(any()) } returns 25
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(5)
-        coEvery { eventSyncManager.countEventsToDownload(any()) } returns DownSyncCounts(8, isLowerBound = false)
+        coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(8, isLowerBound = false)
         createUseCase()
 
         val result = useCase().first()
@@ -647,7 +648,7 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
         every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
-        coEvery { eventSyncManager.countEventsToDownload(any()) } returns DownSyncCounts(42, isLowerBound = false)
+        coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(42, isLowerBound = false)
         every { mockProjectConfigWithDownSync.isEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
         createUseCase()
@@ -686,7 +687,7 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
         every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
-        coEvery { eventSyncManager.countEventsToDownload(any()) } throws Exception("Timeout")
+        coEvery { eventSyncManager.countEventsToDownload() } throws Exception("Timeout")
         every { mockProjectConfigWithDownSync.isEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
         createUseCase()
@@ -709,7 +710,7 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockIdleEventSyncState)
         every { configManager.observeProjectConfiguration() } returns MutableStateFlow(mockProjectConfigWithDownSync)
         coEvery { configManager.getProjectConfiguration() } returns mockProjectConfigWithDownSync
-        coEvery { eventSyncManager.countEventsToDownload(any()) } throws RuntimeException("Network error")
+        coEvery { eventSyncManager.countEventsToDownload() } throws RuntimeException("Network error")
         every { mockProjectConfigWithDownSync.isEventDownSyncAllowed() } returns true
         every { mockProjectConfigWithDownSync.isModuleSelectionAvailable() } returns false
         createUseCase()
@@ -738,6 +739,29 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(onlineResult.syncInfoSectionRecords.isInstructionOfflineVisible).isFalse()
         assertThat(onlineResult.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
         assertThat(onlineResult.syncInfoSectionImages.isSyncButtonEnabled).isTrue()
+    }
+
+
+    @Test
+    fun `down-sync event counter bypasses cache when exceeds max age`() = runTest {
+        every { timeHelper.now() } returnsMany listOf(TEST_TIMESTAMP, Timestamp(TEST_TIMESTAMP.ms + 60_000)) // over cache lifespan apart
+        createUseCase()
+
+        useCase().first() // initial counting
+        useCase().first() // cache expired, re-counting
+
+        coVerify(exactly = 2) { eventSyncManager.countEventsToDownload() }
+    }
+
+    @Test
+    fun `down-sync event counter uses cache when within max age`() = runTest {
+        every { timeHelper.now() } returnsMany listOf(TEST_TIMESTAMP, Timestamp(TEST_TIMESTAMP.ms + 5_000)) // under cache lifespan apart
+        createUseCase()
+
+        useCase().first() // initial counting
+        useCase().first() // cache hit, no re-counting
+
+        coVerify(exactly = 1) { eventSyncManager.countEventsToDownload() }
     }
 
     // Flow combination tests

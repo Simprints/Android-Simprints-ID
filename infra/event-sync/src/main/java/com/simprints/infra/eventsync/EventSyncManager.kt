@@ -22,7 +22,7 @@ interface EventSyncManager {
 
     suspend fun countEventsToUpload(types: List<EventType>): Flow<Int>
 
-    suspend fun countEventsToDownload(maxCacheAgeMillis: Long = 0): DownSyncCounts
+    suspend fun countEventsToDownload(): DownSyncCounts
 
     suspend fun downSyncSubject(
         projectId: String,

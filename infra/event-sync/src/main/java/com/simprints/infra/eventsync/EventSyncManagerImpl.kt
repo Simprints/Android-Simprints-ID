@@ -77,18 +77,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         types.map { eventRepository.observeEventCount(it) },
     ) { it.sum() }
 
-    private var cachedEventCountToDownload: DownSyncCounts? = null
-    private var cachedEventCountToDownloadTimestamp: Long = 0
-
-    override suspend fun countEventsToDownload(maxCacheAgeMillis: Long): DownSyncCounts {
-        val timeNowMs = timeHelper.now().ms
-        cachedEventCountToDownload?.takeIf {
-            timeNowMs - cachedEventCountToDownloadTimestamp < maxCacheAgeMillis
-        }?.let {
-            return it
-        }
-        cachedEventCountToDownloadTimestamp = timeNowMs
-
+    override suspend fun countEventsToDownload(): DownSyncCounts {
         val projectConfig = configRepository.getProjectConfiguration()
         val deviceConfig = configRepository.getDeviceConfiguration()
 
@@ -105,9 +94,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         return DownSyncCounts(
             count = counts.sumOf { it.count },
             isLowerBound = counts.any { it.isLowerBound },
-        ).also {
-            cachedEventCountToDownload = it
-        }
+        )
     }
 
     override suspend fun downSyncSubject(

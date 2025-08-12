@@ -135,7 +135,7 @@ class SyncInfoViewModelTest {
         every { eventSyncLiveData.asFlow() } returns flowOf(mockEventSyncState)
         coEvery { eventSyncManager.getLastSyncTime() } returns TEST_TIMESTAMP
         coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(0)
-        coEvery { eventSyncManager.countEventsToDownload(any()) } returns DownSyncCounts(0, isLowerBound = false)
+        coEvery { eventSyncManager.countEventsToDownload() } returns DownSyncCounts(0, isLowerBound = false)
 
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageSyncStatus)
         coEvery { syncOrchestrator.startEventSync(any()) } returns Unit

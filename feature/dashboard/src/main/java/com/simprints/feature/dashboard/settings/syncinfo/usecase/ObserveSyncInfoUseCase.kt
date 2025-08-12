@@ -169,7 +169,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isPreLogoutUpSync -> null
             projectConfig.isEventDownSyncAllowed() -> try {
                 withTimeout(COUNT_EVENTS_TIMEOUT_MILLIS) {
-                    eventSyncManager.countEventsToDownload(maxCacheAgeMillis = COUNT_EVENTS_TIMEOUT_MILLIS)
+                    countEventsToDownloadWithCaching()
                 }
             } catch (_: Throwable) {
                 DownSyncCounts(0, isLowerBound = false)
@@ -289,8 +289,27 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         )
 
 
+    // caching eventSyncManager.countEventsToDownload to avoid network-based delays on frequent calls
+
+    private var cachedEventCountToDownload: DownSyncCounts? = null
+    private var cachedEventCountToDownloadTimestamp: Long = 0
+
+    private suspend fun countEventsToDownloadWithCaching(): DownSyncCounts {
+        val timeNowMs = timeHelper.now().ms
+        cachedEventCountToDownload?.takeIf {
+            timeNowMs - cachedEventCountToDownloadTimestamp < COUNT_EVENTS_CACHE_LIFESPAN_MILLIS
+        }?.let {
+            return it
+        }
+        cachedEventCountToDownloadTimestamp = timeNowMs
+        return eventSyncManager.countEventsToDownload().also {
+            cachedEventCountToDownload = it
+        }
+    }
+
     private companion object {
         private const val SYNC_COMPLETION_HOLD_MILLIS = 1000L
         private const val COUNT_EVENTS_TIMEOUT_MILLIS = 10 * 1000L
+        private const val COUNT_EVENTS_CACHE_LIFESPAN_MILLIS = 10 * 1000L
     }
 }

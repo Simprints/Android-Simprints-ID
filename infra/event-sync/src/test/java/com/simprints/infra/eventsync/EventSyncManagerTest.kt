@@ -171,39 +171,6 @@ internal class EventSyncManagerTest {
     }
 
     @Test
-    fun `countEventsToDownload bypasses cache when exceeds max age`() = runTest {
-        every { timeHelper.now() } returnsMany listOf(Timestamp(1000), Timestamp(5000/* 4 seconds later */))
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
-        } returns SampleSyncScopes.modulesDownSyncScope
-        coEvery { eventRemoteDataSource.count(any()) } returns EventCount(10, false)
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID)
-        }
-
-        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
-        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch 4 seconds later
-
-        coVerify(exactly = 2) { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) }
-    }
-
-    @Test
-    fun `countEventsToDownload uses cache when within max age`() = runTest {
-        every { timeHelper.now() } returnsMany listOf(Timestamp(1000), Timestamp(2000/* 1 second later */))
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any())
-        } returns SampleSyncScopes.modulesDownSyncScope
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID)
-        }
-
-        eventSyncManagerImpl.countEventsToDownload(2000) // remote fetch
-        eventSyncManagerImpl.countEventsToDownload(2000) // cache hit 1 second later
-
-        coVerify(exactly = 1) { eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) }
-    }
-
-    @Test
     fun `downSync should call down sync helper`() = runTest {
         coEvery { eventRepository.createEventScope(any()) } returns eventScope
         coEvery { downSyncTask.downSync(any(), any(), eventScope, any()) } returns emptyFlow()
