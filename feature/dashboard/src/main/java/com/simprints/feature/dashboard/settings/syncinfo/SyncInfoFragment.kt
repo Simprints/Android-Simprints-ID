@@ -2,7 +2,6 @@ package com.simprints.feature.dashboard.settings.syncinfo
 
 import android.animation.ObjectAnimator
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
@@ -281,22 +280,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
                 else -> IDR.string.sync_info_button_sync_images
             }
         )
-        binding.buttonSyncImagesNow.backgroundTintList = ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_enabled), // enabled
-                intArrayOf(-android.R.attr.state_enabled) // disabled
-            ),
-            intArrayOf(
-                ContextCompat.getColor(
-                    requireContext(),
-                    if (images.isProgressVisible) {
-                        IDR.color.simprints_red_dark
-                    } else {
-                        IDR.color.simprints_orange
-                    }
-                ),
-                ContextCompat.getColor(requireContext(), IDR.color.simprints_grey_disabled),
-            ),
+        binding.buttonSyncImagesNow.backgroundTintList = ContextCompat.getColorStateList(
+            requireContext(),
+            if (images.isProgressVisible) {
+                IDR.color.button_sync_images_background_red
+            } else {
+                IDR.color.button_sync_images_background_default
+            }
         )
 
         // Footer
