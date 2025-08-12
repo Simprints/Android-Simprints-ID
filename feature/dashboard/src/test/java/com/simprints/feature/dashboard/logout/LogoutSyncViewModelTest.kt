@@ -103,7 +103,7 @@ internal class LogoutSyncViewModelTest {
         val eventSyncState = mockk<EventSyncState> {
             every { isSyncCompleted() } returns false
         }
-        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null)
         val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
 
         setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig)
@@ -119,7 +119,7 @@ internal class LogoutSyncViewModelTest {
         val eventSyncState = mockk<EventSyncState> {
             every { isSyncCompleted() } returns true
         }
-        val imageSyncStatus = ImageSyncStatus(isSyncing = true, progress = null, secondsSinceLastUpdate = null)
+        val imageSyncStatus = ImageSyncStatus(isSyncing = true, progress = null, lastUpdateTimeMillis = null)
         val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
 
         setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig)
@@ -135,7 +135,7 @@ internal class LogoutSyncViewModelTest {
         val eventSyncState = mockk<EventSyncState> {
             every { isSyncCompleted() } returns true
         }
-        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, secondsSinceLastUpdate = null)
+        val imageSyncStatus = ImageSyncStatus(isSyncing = false, progress = null, lastUpdateTimeMillis = null)
         val projectConfig = mockk<ProjectConfiguration>(relaxed = true)
 
         setupSyncMocks(eventSyncState, imageSyncStatus, projectConfig)

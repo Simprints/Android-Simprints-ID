@@ -57,45 +57,45 @@ class ImageSyncTimestampProviderTest {
     }
 
     @Test
-    fun `getSecondsSinceLastImageSync returns null when no timestamp exists`() {
+    fun `getMillisSinceLastImageSync returns null when no timestamp exists`() {
         every { sharedPreferences.contains("IMAGE_SYNC_COMPLETION_TIME_MILLIS") } returns false
         every { sharedPreferences.getLong("IMAGE_SYNC_COMPLETION_TIME_MILLIS", 0) } returns 0
 
-        val result = imageSyncTimestampProvider.getSecondsSinceLastImageSync()
+        val result = imageSyncTimestampProvider.getMillisSinceLastImageSync()
 
         assertThat(result).isNull()
     }
 
     @Test
-    fun `getSecondsSinceLastImageSync returns null when timestamp is zero`() {
+    fun `getMillisSinceLastImageSync returns null when timestamp is zero`() {
         every { sharedPreferences.contains("IMAGE_SYNC_COMPLETION_TIME_MILLIS") } returns false
         every { sharedPreferences.getLong("IMAGE_SYNC_COMPLETION_TIME_MILLIS", 0) } returns 0
 
-        val result = imageSyncTimestampProvider.getSecondsSinceLastImageSync()
+        val result = imageSyncTimestampProvider.getMillisSinceLastImageSync()
 
         assertThat(result).isNull()
     }
 
     @Test
-    fun `getSecondsSinceLastImageSync returns correct seconds when timestamp exists`() {
+    fun `getMillisSinceLastImageSync returns correct seconds when timestamp exists`() {
         val lastSyncTimeMillis = 1000000L
         val currentTimeMillis = 1005000L // 5 seconds later
-        val expectedSeconds = 5L
+        val expectedMillis = 5_000L
 
         every { sharedPreferences.contains("IMAGE_SYNC_COMPLETION_TIME_MILLIS") } returns true
         every { sharedPreferences.getLong("IMAGE_SYNC_COMPLETION_TIME_MILLIS", 0) } returns lastSyncTimeMillis
         every { timeHelper.now() } returns Timestamp(currentTimeMillis)
 
-        val result = imageSyncTimestampProvider.getSecondsSinceLastImageSync()
+        val result = imageSyncTimestampProvider.getMillisSinceLastImageSync()
 
-        assertThat(result).isEqualTo(expectedSeconds)
+        assertThat(result).isEqualTo(expectedMillis)
     }
 
     @Test
     fun `clearTimestamp clears all timestamp preferences`() {
         imageSyncTimestampProvider.clearTimestamp()
 
-        val result = imageSyncTimestampProvider.getSecondsSinceLastImageSync()
+        val result = imageSyncTimestampProvider.getMillisSinceLastImageSync()
 
         assertThat(result).isNull()
         verify {

@@ -340,24 +340,24 @@ class SyncOrchestratorImplTest {
     fun `observe image sync status returns syncing when worker is running`() = runTest {
         val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.RUNNING))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 30L
+        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 30_000L
 
         val status = syncOrchestrator.observeImageSyncStatus().first()
 
         assertThat(status.isSyncing).isTrue()
-        assertThat(status.secondsSinceLastUpdate).isEqualTo(30L)
+        assertThat(status.lastUpdateTimeMillis).isEqualTo(30_000L)
     }
 
     @Test
     fun `observe image sync status returns not syncing when worker is cancelled`() = runTest {
         val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.CANCELLED))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 120L
+        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 120_000L
 
         val status = syncOrchestrator.observeImageSyncStatus().first()
 
         assertThat(status.isSyncing).isFalse()
-        assertThat(status.secondsSinceLastUpdate).isEqualTo(120L)
+        assertThat(status.lastUpdateTimeMillis).isEqualTo(120_000L)
     }
 
     @Test
@@ -366,7 +366,7 @@ class SyncOrchestratorImplTest {
         val workInfo2 = createWorkInfoWithProgress(WorkInfo.State.RUNNING)
         val workInfoFlow = flowOf(workInfo1, workInfo2)
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 0L
+        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
 
         val status1 = syncOrchestrator.observeImageSyncStatus().first()
         assertThat(status1.progress).isEqualTo(5 to 10)
@@ -379,7 +379,7 @@ class SyncOrchestratorImplTest {
     fun `observe image sync status returns syncing momentarily when worker succeeds quickly`() = runTest {
         val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.SUCCEEDED))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
-        every { imageSyncTimestampProvider.getSecondsSinceLastImageSync() } returns 0L
+        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 0L
 
         val status1 = syncOrchestrator.observeImageSyncStatus().first()
         assertThat(status1.isSyncing).isTrue()

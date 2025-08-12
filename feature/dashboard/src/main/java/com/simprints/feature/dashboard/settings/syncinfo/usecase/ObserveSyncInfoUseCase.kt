@@ -140,8 +140,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
 
         val eventLastSyncTimestamp = eventSyncManager.getLastSyncTime() ?: Timestamp(-1)
-        val imageLastSyncTimestamp = imageSyncStatus.secondsSinceLastUpdate?.let {
-            Timestamp(it * 1000)
+        val imageLastSyncTimestamp = imageSyncStatus.lastUpdateTimeMillis?.let {
+            Timestamp(it)
         } ?: Timestamp(-1)
 
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()

@@ -154,13 +154,13 @@ internal class SyncOrchestratorImpl @Inject constructor(
             .getWorkInfosFlow(WorkQuery.fromUniqueWorkNames(SyncConstants.FILE_UP_SYNC_WORK_NAME))
             .associateWithIfSyncing()
             .map { (workInfos, isSyncing) ->
-                val secondsSinceLastUpdate = imageSyncTimestampProvider.getSecondsSinceLastImageSync()
+                val millisSinceLastUpdate = imageSyncTimestampProvider.getMillisSinceLastImageSync()
                 val currentIndex = workInfos.firstOrNull()?.progress
                     ?.getInt(SyncConstants.PROGRESS_CURRENT, 0)?.coerceAtLeast(0) ?: 0
                 val totalCount = workInfos.firstOrNull()?.progress
                     ?.getInt(SyncConstants.PROGRESS_MAX, 0)?.takeIf { it >= 1 }
                 val progress = totalCount?.let { currentIndex to totalCount }
-                ImageSyncStatus(isSyncing, progress, secondsSinceLastUpdate)
+                ImageSyncStatus(isSyncing, progress, millisSinceLastUpdate)
             }
     }
 
@@ -172,7 +172,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
      * This allows immediately succeeding syncs to be detected in the return flow.
      */
     private fun Flow<List<WorkInfo>>.associateWithIfSyncing() = transformLatest { workInfos ->
-        val isJustUpdated = imageSyncTimestampProvider.getSecondsSinceLastImageSync() == 0L
+        val isJustUpdated = imageSyncTimestampProvider.getMillisSinceLastImageSync() == 0L
         when {
             workInfos.any {
                 it.state == WorkInfo.State.RUNNING

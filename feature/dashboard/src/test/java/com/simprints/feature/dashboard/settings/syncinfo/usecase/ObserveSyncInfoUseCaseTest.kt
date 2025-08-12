@@ -101,7 +101,7 @@ class ObserveSyncInfoUseCaseTest {
     private val mockImageSyncStatus = mockk<ImageSyncStatus>(relaxed = true) {
         every { isSyncing } returns false
         every { progress } returns null
-        every { secondsSinceLastUpdate } returns null
+        every { lastUpdateTimeMillis } returns null
     }
 
     @Before
@@ -334,7 +334,7 @@ class ObserveSyncInfoUseCaseTest {
         val mockImageStatusWithLastSync = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns 120 // 2 minutes
+            every { lastUpdateTimeMillis } returns 120_000 // 2 minutes
         }
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageStatusWithLastSync)
         every { timeHelper.readableBetweenNowAndTime(Timestamp(120 * 1000)) } returns "2 minutes ago"
@@ -824,7 +824,7 @@ class ObserveSyncInfoUseCaseTest {
         val imageSyncStatusFlow = MutableStateFlow<ImageSyncStatus>(mockk {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns null
+            every { lastUpdateTimeMillis } returns null
         })  // started not syncing
         every { syncOrchestrator.observeImageSyncStatus() } returns imageSyncStatusFlow
         createUseCase()
@@ -836,7 +836,7 @@ class ObserveSyncInfoUseCaseTest {
         imageSyncStatusFlow.value = mockk {
             every { isSyncing } returns true
             every { progress } returns Pair(1, 2)
-            every { secondsSinceLastUpdate } returns null
+            every { lastUpdateTimeMillis } returns null
         } // changed to syncing
 
         val syncingResult = useCase().first()
@@ -954,7 +954,7 @@ class ObserveSyncInfoUseCaseTest {
         val mockImageStatusWithLastSync = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns 180 // 3 minutes
+            every { lastUpdateTimeMillis } returns 180_000 // 3 minutes
         }
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageStatusWithLastSync)
         every { timeHelper.readableBetweenNowAndTime(Timestamp(180 * 1000)) } returns "3 minutes ago"
@@ -971,7 +971,7 @@ class ObserveSyncInfoUseCaseTest {
         val mockImageStatusWithoutLastSync = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns null
+            every { lastUpdateTimeMillis } returns null
         }
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageStatusWithoutLastSync)
         createUseCase()

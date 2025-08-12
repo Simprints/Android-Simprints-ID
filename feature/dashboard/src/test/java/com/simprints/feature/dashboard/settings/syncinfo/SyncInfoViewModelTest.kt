@@ -101,7 +101,7 @@ class SyncInfoViewModelTest {
     private val mockImageSyncStatus = mockk<ImageSyncStatus>(relaxed = true) {
         every { isSyncing } returns false
         every { progress } returns null
-        every { secondsSinceLastUpdate } returns null
+        every { lastUpdateTimeMillis } returns null
     }
 
     @Before
@@ -238,7 +238,7 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns 0
+            every { lastUpdateTimeMillis } returns 0
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockCompletedEventSyncState)
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
@@ -266,7 +266,7 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns 0
+            every { lastUpdateTimeMillis } returns 0
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockCompletedEventSyncState)
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
@@ -299,7 +299,7 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns 0
+            every { lastUpdateTimeMillis } returns 0
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockCompletedEventSyncState)
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
@@ -328,7 +328,7 @@ class SyncInfoViewModelTest {
         val mockNotSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns false
             every { progress } returns null
-            every { secondsSinceLastUpdate } returns 0
+            every { lastUpdateTimeMillis } returns 0
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockInProgressEventSyncState)
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockNotSyncingImageStatus)
@@ -356,7 +356,7 @@ class SyncInfoViewModelTest {
         val mockSyncingImageStatus = mockk<ImageSyncStatus>(relaxed = true) {
             every { isSyncing } returns true
             every { progress } returns Pair(1, 2)
-            every { secondsSinceLastUpdate } returns null
+            every { lastUpdateTimeMillis } returns null
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockCompletedEventSyncState)
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockSyncingImageStatus)
