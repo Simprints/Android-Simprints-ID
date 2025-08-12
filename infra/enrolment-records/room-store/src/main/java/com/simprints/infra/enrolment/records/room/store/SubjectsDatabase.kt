@@ -5,6 +5,7 @@ import androidx.annotation.Keep
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase.Companion.SUBJECT_DB_VERSION
 import com.simprints.infra.enrolment.records.room.store.migration.MIGRATION_1_2
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
 import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential
@@ -19,7 +20,7 @@ import javax.inject.Singleton
         DbBiometricTemplate::class,
         DbExternalCredential::class,
     ],
-    version = 2,
+    version = SUBJECT_DB_VERSION,
     exportSchema = true,
 )
 @Keep
@@ -40,5 +41,6 @@ abstract class SubjectsDatabase : RoomDatabase() {
             }
             return builder.build()
         }
+        const val SUBJECT_DB_VERSION = 2
     }
 }

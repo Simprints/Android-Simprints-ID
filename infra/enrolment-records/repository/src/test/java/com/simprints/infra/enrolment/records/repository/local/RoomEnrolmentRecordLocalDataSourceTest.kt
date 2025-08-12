@@ -15,6 +15,7 @@ import com.simprints.infra.enrolment.records.repository.domain.models.BiometricD
 import com.simprints.infra.enrolment.records.repository.domain.models.Subject
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.repository.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase.Companion.SUBJECT_DB_VERSION
 import com.simprints.infra.enrolment.records.room.store.SubjectsDatabaseFactory
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -1484,7 +1485,7 @@ class RoomEnrolmentRecordLocalDataSourceTest {
         val result = dataSource.getLocalDBInfo()
         // Then
         assertThat(result).contains("Database Name: db-subjects")
-        assertThat(result).contains("Database Version: 1")
+        assertThat(result).contains("Database Version: $SUBJECT_DB_VERSION")
         assertThat(result).contains("Is Encrypted: false") // db not encrypted in tests
         assertThat(result).contains("Number of Subjects: 6")
     }
