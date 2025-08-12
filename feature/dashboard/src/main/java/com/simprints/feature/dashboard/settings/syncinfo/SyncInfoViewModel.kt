@@ -59,16 +59,18 @@ internal class SyncInfoViewModel @Inject constructor(
         val isReadyToLogOut =
             isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing
         return@combine isReadyToLogOut
-    }.debounce(LOGOUT_DELAY_MILLIS).filter { isReadyToLogOut ->
-        isReadyToLogOut // only when ready
-    }.map {
-        LiveDataEventWithContent(Unit)
-    }.asLiveData()
+    }.debounce(LOGOUT_DELAY_MILLIS)
+        .filter { isReadyToLogOut ->
+            isReadyToLogOut // only when ready
+        }.map {
+            LiveDataEventWithContent(Unit)
+        }.asLiveData()
 
-    val syncInfoLiveData: LiveData<SyncInfo> = observeSyncInfo(isPreLogoutUpSync).onStart {
-        startInitialSyncIfRequired()
-        syncImagesAfterEventsWhenRequired()
-    }.asLiveData()
+    val syncInfoLiveData: LiveData<SyncInfo> = observeSyncInfo(isPreLogoutUpSync)
+        .onStart {
+            startInitialSyncIfRequired()
+            syncImagesAfterEventsWhenRequired()
+        }.asLiveData()
 
     fun forceEventSync() {
         viewModelScope.launch {
@@ -100,7 +102,7 @@ internal class SyncInfoViewModel @Inject constructor(
                 LoginParams(
                     projectId = authStore.signedInProjectId,
                     userId = authStore.signedInUserId ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed,
-                )
+                ),
             )
         }
     }
@@ -110,7 +112,6 @@ internal class SyncInfoViewModel @Inject constructor(
             forceEventSync()
         }
     }
-
 
     // initial actions
 

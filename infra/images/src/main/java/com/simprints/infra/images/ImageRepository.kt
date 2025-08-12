@@ -36,7 +36,7 @@ interface ImageRepository {
      */
     suspend fun uploadStoredImagesAndDelete(
         projectId: String,
-        progressCallback: (suspend (Int, Int) -> Unit)? = null
+        progressCallback: (suspend (Int, Int) -> Unit)? = null,
     ): Boolean
 
     /**

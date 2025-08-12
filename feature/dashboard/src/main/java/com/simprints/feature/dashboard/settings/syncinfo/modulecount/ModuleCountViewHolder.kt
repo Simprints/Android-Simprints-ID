@@ -23,7 +23,7 @@ internal class ModuleCountViewHolder(
                 R.drawable.ic_global
             } else {
                 R.drawable.ic_module
-            }
+            },
         )
         moduleNameText.text = moduleCount.name
         moduleCountText.text = moduleCount.count.toString()

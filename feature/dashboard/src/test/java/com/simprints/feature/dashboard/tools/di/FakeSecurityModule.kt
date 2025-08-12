@@ -17,7 +17,6 @@ import javax.inject.Singleton
     replaces = [SecurityModule::class],
 )
 object FakeSecurityModule {
-
     @Provides
     @Singleton
     fun provideSecurityManager(): SecurityManager = mockk {

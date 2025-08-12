@@ -17,8 +17,8 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
-import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isMissingModulesToChooseFrom
+import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -27,8 +27,8 @@ import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -47,7 +47,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ObserveSyncInfoUseCaseTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -603,11 +602,11 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(result.syncInfoSectionModules.moduleCounts[0].count).isEqualTo("40")
         // module_1
         assertThat(result.syncInfoSectionModules.moduleCounts[1]).isEqualTo(
-            SyncInfoModuleCount(isTotal = false, name = "module_1", count = "15")
+            SyncInfoModuleCount(isTotal = false, name = "module_1", count = "15"),
         )
         // module_2
         assertThat(result.syncInfoSectionModules.moduleCounts[2]).isEqualTo(
-            SyncInfoModuleCount(isTotal = false, name = "module_2", count = "25")
+            SyncInfoModuleCount(isTotal = false, name = "module_2", count = "25"),
         )
     }
 
@@ -741,7 +740,6 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(onlineResult.syncInfoSectionImages.isSyncButtonEnabled).isTrue()
     }
 
-
     @Test
     fun `down-sync event counter bypasses cache when exceeds max age`() = runTest {
         every { timeHelper.now() } returnsMany listOf(TEST_TIMESTAMP, Timestamp(TEST_TIMESTAMP.ms + 60_000)) // over cache lifespan apart
@@ -845,11 +843,13 @@ class ObserveSyncInfoUseCaseTest {
 
     @Test
     fun `should handle changes in image sync status stream`() = runTest {
-        val imageSyncStatusFlow = MutableStateFlow<ImageSyncStatus>(mockk {
-            every { isSyncing } returns false
-            every { progress } returns null
-            every { lastUpdateTimeMillis } returns null
-        })  // started not syncing
+        val imageSyncStatusFlow = MutableStateFlow<ImageSyncStatus>(
+            mockk {
+                every { isSyncing } returns false
+                every { progress } returns null
+                every { lastUpdateTimeMillis } returns null
+            },
+        ) // started not syncing
         every { syncOrchestrator.observeImageSyncStatus() } returns imageSyncStatusFlow
         createUseCase()
 
@@ -898,12 +898,12 @@ class ObserveSyncInfoUseCaseTest {
                 every { general } returns mockk<GeneralConfiguration> {
                     every { modalities } returns emptyList()
                 }
-            }
+            },
         )
         val deviceConfigFlow = MutableStateFlow(
             mockk<DeviceConfiguration>(relaxed = true) {
                 every { selectedModules } returns emptyList()
-            }
+            },
         ) // started without selected modules
         every { configManager.observeDeviceConfiguration() } returns deviceConfigFlow
         createUseCase()
@@ -915,7 +915,7 @@ class ObserveSyncInfoUseCaseTest {
         deviceConfigFlow.emit(
             mockk<DeviceConfiguration>(relaxed = true) {
                 every { selectedModules } returns listOf(TokenizableString.Raw(TEST_MODULE_NAME))
-            }
+            },
         ) // now with selected modules
 
         val withModulesResult = useCase().first()
@@ -1163,6 +1163,4 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(result.syncInfoSectionModules.moduleCounts[1].name).isEqualTo("raw_module_name")
         verify(exactly = 0) { tokenizationProcessor.decrypt(any(), any(), any()) }
     }
-
 }
-

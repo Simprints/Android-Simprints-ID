@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ImageSyncTimestampProviderTest {
-
     @MockK
     private lateinit var securityManager: SecurityManager
 

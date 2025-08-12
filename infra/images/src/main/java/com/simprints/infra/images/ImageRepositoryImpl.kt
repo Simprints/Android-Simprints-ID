@@ -55,8 +55,7 @@ internal class ImageRepositoryImpl @Inject internal constructor(
     override suspend fun uploadStoredImagesAndDelete(
         projectId: String,
         progressCallback: (suspend (Int, Int) -> Unit)?,
-    ): Boolean =
-        getSampleUploader().uploadAllSamples(projectId, progressCallback)
+    ): Boolean = getSampleUploader().uploadAllSamples(projectId, progressCallback)
 
     override suspend fun deleteStoredImages() {
         metadataStore.deleteAllMetadata()

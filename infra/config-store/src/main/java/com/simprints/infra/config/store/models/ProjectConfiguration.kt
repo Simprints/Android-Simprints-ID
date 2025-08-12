@@ -82,11 +82,9 @@ fun ProjectConfiguration.isProjectWithModuleSync(): Boolean =
 fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
     synchronization.up.simprints.frequency == Frequency.ONLY_PERIODICALLY_UP_SYNC
 
-fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean =
-    isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
+fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
 
-fun ProjectConfiguration.areModuleOptionsEmpty(): Boolean =
-    synchronization.down.simprints.moduleOptions.isEmpty()
+fun ProjectConfiguration.areModuleOptionsEmpty(): Boolean = synchronization.down.simprints.moduleOptions
+    .isEmpty()
 
-fun ProjectConfiguration.isMissingModulesToChooseFrom(): Boolean =
-    isProjectWithModuleSync() && areModuleOptionsEmpty()
+fun ProjectConfiguration.isMissingModulesToChooseFrom(): Boolean = isProjectWithModuleSync() && areModuleOptionsEmpty()

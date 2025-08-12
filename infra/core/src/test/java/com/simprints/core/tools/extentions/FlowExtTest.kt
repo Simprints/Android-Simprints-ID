@@ -30,9 +30,10 @@ class FlowExtTest {
         val flow = flowOf(1, 2, 2, 3)
         val triggeredValues = mutableListOf<Int>()
 
-        val result = flow.onChange({ prev, curr -> prev != curr }) { value ->
-            triggeredValues.add(value)
-        }.toList()
+        val result = flow
+            .onChange({ prev, curr -> prev != curr }) { value ->
+                triggeredValues.add(value)
+            }.toList()
 
         assertThat(result).isEqualTo(listOf(1, 2, 2, 3))
         assertThat(triggeredValues).isEqualTo(listOf(2, 3))
@@ -43,9 +44,10 @@ class FlowExtTest {
         val flow = flowOf(1, 1, 1)
         val triggeredValues = mutableListOf<Int>()
 
-        val result = flow.onChange({ prev, curr -> prev != curr }) { value ->
-            triggeredValues.add(value)
-        }.toList()
+        val result = flow
+            .onChange({ prev, curr -> prev != curr }) { value ->
+                triggeredValues.add(value)
+            }.toList()
 
         assertThat(result).isEqualTo(listOf(1, 1, 1))
         assertThat(triggeredValues).isEmpty()
@@ -62,7 +64,7 @@ class FlowExtTest {
                 listOf(1, 2, 3),
                 listOf(2, 3, 4),
                 listOf(3, 4, 5),
-            )
+            ),
         )
     }
 
@@ -79,7 +81,7 @@ class FlowExtTest {
                 listOf(1, 2, 3),
                 listOf(2, 3, 4),
                 listOf(3, 4, 5),
-            )
+            ),
         )
     }
 

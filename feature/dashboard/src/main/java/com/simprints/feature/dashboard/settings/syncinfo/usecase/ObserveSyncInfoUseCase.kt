@@ -116,8 +116,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         )
 
         val isEventSyncInProgress =
-            eventSyncState.isSyncInProgress()
-                || (isPreLogoutUpSync && imageSyncStatus.isSyncing) // if combined with images
+            eventSyncState.isSyncInProgress() ||
+                (isPreLogoutUpSync && imageSyncStatus.isSyncing) // if combined with images
         val eventSyncProgress = if (isEventSyncInProgress) {
             SyncInfoProgress(
                 progressParts = if (isPreLogoutUpSync) {
@@ -149,8 +149,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val isModuleSelectionRequired =
             !isPreLogoutUpSync && projectConfig.isModuleSelectionAvailable() && deviceConfig.selectedModules.isEmpty()
         val isEventSyncAvailable =
-            !isReLoginRequired && isConnected && !eventSyncState.isSyncRunning() && !projectConfig.isMissingModulesToChooseFrom()
-                && !isModuleSelectionRequired
+            !isReLoginRequired &&
+                isConnected &&
+                !eventSyncState.isSyncRunning() &&
+                !projectConfig.isMissingModulesToChooseFrom() &&
+                !isModuleSelectionRequired
 
         val projectId = authStore.signedInProjectId
 
@@ -160,9 +163,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         }
         val recordsToUpload = when {
             isEventSyncInProgress -> null
-            else -> eventSyncManager.countEventsToUpload(
-                listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4)
-            ).firstOrNull() ?: 0
+            else ->
+                eventSyncManager
+                    .countEventsToUpload(
+                        listOf(EventType.ENROLMENT_V2, EventType.ENROLMENT_V4),
+                    ).firstOrNull() ?: 0
         }
         val recordsToDownload = when {
             isEventSyncInProgress -> null
@@ -204,14 +209,14 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val syncInfoSectionModules = SyncInfoSectionModules(
             isSectionAvailable = projectConfig.isModuleSelectionAvailable(),
             moduleCounts = listOfNotNull(
-                modulesCountTotal.takeIf { moduleCounts.isNotEmpty() }
+                modulesCountTotal.takeIf { moduleCounts.isNotEmpty() },
             ) + moduleCounts.map { moduleCount ->
                 SyncInfoModuleCount(
                     isTotal = false,
                     name = moduleCount.name,
                     count = moduleCount.count.toString(),
                 )
-            }
+            },
         )
 
         val syncInfoSectionRecords = SyncInfoSectionRecords(
@@ -221,15 +226,18 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             counterRecordsToDownload = recordsToDownload?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty(),
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
-            isInstructionDefaultVisible = !isModuleSelectionRequired && isConnected && !eventSyncState.isSyncFailed()
-                && !eventSyncState.isSyncInProgress() && !isPreLogoutUpSync,
+            isInstructionDefaultVisible = !isModuleSelectionRequired &&
+                isConnected &&
+                !eventSyncState.isSyncFailed() &&
+                !eventSyncState.isSyncInProgress() &&
+                !isPreLogoutUpSync,
             isInstructionNoModulesVisible = isConnected && isModuleSelectionRequired && !isEventSyncInProgress,
             isInstructionOfflineVisible = !isConnected,
             isInstructionErrorVisible = isConnected && eventSyncState.isSyncFailed(),
             instructionPopupErrorInfo = SyncInfoError(
                 isBackendMaintenance = eventSyncState.isSyncFailedBecauseBackendMaintenance(),
                 backendMaintenanceEstimatedOutage = eventSyncState.getEstimatedBackendMaintenanceOutage() ?: -1,
-                isTooManyRequests = eventSyncState.isSyncFailedBecauseTooManyRequests()
+                isTooManyRequests = eventSyncState.isSyncFailedBecauseTooManyRequests(),
             ),
             isProgressVisible = isEventSyncInProgress,
             progress = eventSyncProgress,
@@ -269,25 +277,21 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         delay(timeMillis = SYNC_COMPLETION_HOLD_MILLIS)
     }
 
-
     // sync info change detection helpers
 
-    private fun Flow<SyncInfo>.onRecordSyncComplete(action: suspend (SyncInfo) -> Unit) =
-        onChange(
-            comparator = { previous, current ->
-                previous.syncInfoSectionRecords.isProgressVisible && !current.syncInfoSectionRecords.isProgressVisible
-            },
-            action,
-        )
+    private fun Flow<SyncInfo>.onRecordSyncComplete(action: suspend (SyncInfo) -> Unit) = onChange(
+        comparator = { previous, current ->
+            previous.syncInfoSectionRecords.isProgressVisible && !current.syncInfoSectionRecords.isProgressVisible
+        },
+        action,
+    )
 
-    private fun Flow<SyncInfo>.onImageSyncComplete(action: suspend (SyncInfo) -> Unit) =
-        onChange(
-            comparator = { previous, current ->
-                previous.syncInfoSectionImages.isProgressVisible && !current.syncInfoSectionImages.isProgressVisible
-            },
-            action,
-        )
-
+    private fun Flow<SyncInfo>.onImageSyncComplete(action: suspend (SyncInfo) -> Unit) = onChange(
+        comparator = { previous, current ->
+            previous.syncInfoSectionImages.isProgressVisible && !current.syncInfoSectionImages.isProgressVisible
+        },
+        action,
+    )
 
     // caching eventSyncManager.countEventsToDownload to avoid network-based delays on frequent calls
 
@@ -296,11 +300,12 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
     private suspend fun countEventsToDownloadWithCaching(): DownSyncCounts {
         val timeNowMs = timeHelper.now().ms
-        cachedEventCountToDownload?.takeIf {
-            timeNowMs - cachedEventCountToDownloadTimestamp < COUNT_EVENTS_CACHE_LIFESPAN_MILLIS
-        }?.let {
-            return it
-        }
+        cachedEventCountToDownload
+            ?.takeIf {
+                timeNowMs - cachedEventCountToDownloadTimestamp < COUNT_EVENTS_CACHE_LIFESPAN_MILLIS
+            }?.let {
+                return it
+            }
         cachedEventCountToDownloadTimestamp = timeNowMs
         return eventSyncManager.countEventsToDownload().also {
             cachedEventCountToDownload = it

@@ -1,13 +1,13 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
-import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.testtools.faceConfiguration
 import com.simprints.infra.config.store.testtools.faceSdkConfiguration
 import com.simprints.infra.config.store.testtools.fingerprintConfiguration

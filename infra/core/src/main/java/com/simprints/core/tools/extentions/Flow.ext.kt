@@ -15,7 +15,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, R> combine8(
     flow6: Flow<T6>,
     flow7: Flow<T7>,
     flow8: Flow<T8>,
-    transform: suspend (T1, T2, T3, T4, T5, T6, T7, T8) -> R
+    transform: suspend (T1, T2, T3, T4, T5, T6, T7, T8) -> R,
 ): Flow<R> = combine(flow1, flow2, flow3, flow4, flow5, flow6, flow7, flow8) { args: Array<*> ->
     transform(
         args[0] as T1,
@@ -29,19 +29,23 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, R> combine8(
     )
 }
 
-fun <T> Flow<T>.onChange(comparator: (T, T) -> Boolean, action: suspend (T) -> Unit) =
-    windowed(2, partial = true).map { window ->
-        val previousOrCurrent = window.first()
-        val current = window.last()
-        if (comparator(previousOrCurrent, current)) {
-            action(current)
-        }
-        current
+fun <T> Flow<T>.onChange(
+    comparator: (T, T) -> Boolean,
+    action: suspend (T) -> Unit,
+) = windowed(2, partial = true).map { window ->
+    val previousOrCurrent = window.first()
+    val current = window.last()
+    if (comparator(previousOrCurrent, current)) {
+        action(current)
     }
+    current
+}
 
-fun <T> Flow<T>.windowed(size: Int, partial: Boolean = false): Flow<List<T>> =
-    scan(emptyList<T>()) { acc, value ->
-        (acc + value).takeLast(size)
-    }.drop(
-        if (partial) 1 else size
-    )
+fun <T> Flow<T>.windowed(
+    size: Int,
+    partial: Boolean = false,
+): Flow<List<T>> = scan(emptyList<T>()) { acc, value ->
+    (acc + value).takeLast(size)
+}.drop(
+    if (partial) 1 else size,
+)

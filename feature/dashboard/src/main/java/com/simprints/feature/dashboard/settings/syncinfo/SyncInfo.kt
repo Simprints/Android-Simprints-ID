@@ -17,23 +17,19 @@ data class SyncInfoSectionRecords(
     val counterRecordsToDownload: String = "",
     val isCounterImagesToUploadVisible: Boolean = false, // images may be combined with the records
     val counterImagesToUpload: String = "",
-
     // instructions
     val isInstructionDefaultVisible: Boolean = false,
     val isInstructionNoModulesVisible: Boolean = false,
     val isInstructionOfflineVisible: Boolean = false,
     val isInstructionErrorVisible: Boolean = false,
     val instructionPopupErrorInfo: SyncInfoError = SyncInfoError(),
-
     // progress text & progress bar
     val isProgressVisible: Boolean = false,
     val progress: SyncInfoProgress = SyncInfoProgress(),
-
     // sync button
     val isSyncButtonVisible: Boolean = false,
     val isSyncButtonEnabled: Boolean = false,
     val isSyncButtonForRetry: Boolean = false,
-
     // footer
     val isFooterSyncInProgressVisible: Boolean = true,
     val isFooterReadyToLogOutVisible: Boolean = false,
@@ -51,18 +47,14 @@ data class SyncInfoError(
 data class SyncInfoSectionImages(
     // counters
     val counterImagesToUpload: String = "",
-
     // instructions
     val isInstructionDefaultVisible: Boolean = false,
     val isInstructionOfflineVisible: Boolean = false,
-
     // progress text & progress bar
     val isProgressVisible: Boolean = false,
     val progress: SyncInfoProgress = SyncInfoProgress(),
-
     // sync button
     val isSyncButtonEnabled: Boolean = false,
-
     // footer
     val isFooterLastSyncTimeVisible: Boolean = false,
     val footerLastSyncMinutesAgo: String = "",

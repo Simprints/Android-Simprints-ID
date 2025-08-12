@@ -18,10 +18,10 @@ import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.EVENT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.FILE_UP_SYNC_WORK_NAME
 import com.simprints.infra.sync.SyncConstants.FIRMWARE_UPDATE_WORK_NAME
-import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
-import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.PROGRESS_CURRENT
 import com.simprints.infra.sync.SyncConstants.PROGRESS_MAX
+import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME
+import com.simprints.infra.sync.SyncConstants.PROJECT_SYNC_WORK_NAME_ONE_TIME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_ID_NAME
 import com.simprints.infra.sync.SyncConstants.RECORD_UPLOAD_INPUT_SUBJECT_IDS_NAME
 import com.simprints.infra.sync.firmware.ShouldScheduleFirmwareUpdateUseCase
@@ -478,10 +478,15 @@ class SyncOrchestratorImplTest {
         WorkInfo(UUID.randomUUID(), state, emptySet()),
     )
 
-    private fun createWorkInfoWithProgress(state: WorkInfo.State, current: Int? = null, max: Int? = null): List<WorkInfo> {
+    private fun createWorkInfoWithProgress(
+        state: WorkInfo.State,
+        current: Int? = null,
+        max: Int? = null,
+    ): List<WorkInfo> {
         val workInfo = mockk<WorkInfo> {
             every { this@mockk.state } returns state
-            every { progress } returns Data.Builder()
+            every { progress } returns Data
+                .Builder()
                 .apply {
                     current?.let { putInt(PROGRESS_CURRENT, current) }
                     max?.let { putInt(PROGRESS_MAX, max) }

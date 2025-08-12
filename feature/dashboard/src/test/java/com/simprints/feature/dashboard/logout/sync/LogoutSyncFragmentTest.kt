@@ -27,7 +27,6 @@ import org.robolectric.annotation.Config
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
 internal class LogoutSyncFragmentTest {
-
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -62,7 +61,6 @@ internal class LogoutSyncFragmentTest {
         onView(withId(R.id.logout_sync_info)).check(matches(not(isDisplayed())))
         onView(withId(R.id.logoutWithoutSyncButton)).check(matches(not(isDisplayed())))
     }
-
 
     @Test
     fun `should navigate to requestLoginFragment when logout event received`() {

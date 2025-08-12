@@ -18,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import kotlinx.coroutines.launch
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
@@ -26,12 +25,13 @@ import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
 import com.simprints.feature.dashboard.view.ConfigurableSyncInfoFragmentContainer
 import com.simprints.feature.login.LoginContract
-import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.toBundle
+import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.view.setPulseAnimation
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -42,7 +42,11 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private var syncInfoConfig: SyncInfoFragmentConfig = SyncInfoFragmentConfig()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
         syncInfoConfig =
             (container?.parent as? ConfigurableSyncInfoFragmentContainer)?.syncInfoFragmentConfig
                 ?: SyncInfoFragmentConfig()
@@ -105,7 +109,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun View.showInfoPopupOnClick(message: String) {
         setOnClickListener {
-            AlertDialog.Builder(requireContext())
+            AlertDialog
+                .Builder(requireContext())
                 .setMessage(message)
                 .setPositiveButton(IDR.string.sync_info_details_ok) { di, _ -> di.dismiss() }
                 .create()
@@ -125,9 +130,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.logoutEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-                    viewModel.performLogout()
-                })
+                viewModel.logoutEventLiveData.observe(
+                    viewLifecycleOwner,
+                    LiveDataEventWithContentObserver {
+                        viewModel.performLogout()
+                    },
+                )
             }
         }
 
@@ -136,7 +144,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
     }
 
-    private fun renderSyncInfo(syncInfo: SyncInfo, config: SyncInfoFragmentConfig) {
+    private fun renderSyncInfo(
+        syncInfo: SyncInfo,
+        config: SyncInfoFragmentConfig,
+    ) {
         // note: ".isGone = not" is preferred to ".isVisible =" below for non-ambiguity of the no-show state
 
         // App toolbar
@@ -171,7 +182,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         renderModulesSection(syncInfo.syncInfoSectionModules, config)
     }
 
-    private fun renderRecordsSection(records: SyncInfoSectionRecords, config: SyncInfoFragmentConfig) {
+    private fun renderRecordsSection(
+        records: SyncInfoSectionRecords,
+        config: SyncInfoFragmentConfig,
+    ) {
         // Counter - total records
         binding.totalRecordsCount.isGone = records.counterTotalRecords.isBlank()
         binding.totalRecordsCount.text = records.counterTotalRecords
@@ -221,7 +235,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
                 records.isSyncButtonForRetry -> IDR.string.sync_info_button_try_again
                 records.isProgressVisible -> IDR.string.sync_info_button_records_syncing
                 else -> IDR.string.sync_info_button_sync_records
-            }
+            },
         )
 
         // Footer
@@ -237,7 +251,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.textEventSyncInstructionsError.showInfoPopupOnClick(
             when {
                 isTooManyRequests -> getString(
-                    IDR.string.sync_info_details_too_many_modules
+                    IDR.string.sync_info_details_too_many_modules,
                 )
 
                 isBackendMaintenance && backendMaintenanceEstimatedOutage > 0 -> getString(
@@ -246,13 +260,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
                 )
 
                 isBackendMaintenance -> getString(
-                    IDR.string.error_backend_maintenance_message
+                    IDR.string.error_backend_maintenance_message,
                 )
 
                 else -> getString(
-                    IDR.string.sync_info_details_error
+                    IDR.string.sync_info_details_error,
                 )
-            }
+            },
         )
     }
 
@@ -277,7 +291,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             when {
                 images.isProgressVisible -> IDR.string.sync_info_button_images_sync_stop
                 else -> IDR.string.sync_info_button_sync_images
-            }
+            },
         )
         binding.buttonSyncImagesNow.backgroundTintList = ContextCompat.getColorStateList(
             requireContext(),
@@ -285,7 +299,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
                 IDR.color.button_sync_images_background_red
             } else {
                 IDR.color.button_sync_images_background_default
-            }
+            },
         )
 
         // Footer
@@ -293,7 +307,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.textFooterImageLastSyncedWhen.text = images.footerLastSyncMinutesAgo
     }
 
-    private fun renderModulesSection(modules: SyncInfoSectionModules, config: SyncInfoFragmentConfig) {
+    private fun renderModulesSection(
+        modules: SyncInfoSectionModules,
+        config: SyncInfoFragmentConfig,
+    ) {
         val isModuleSectionVisible =
             modules.isSectionAvailable && (config.isSyncInfoModuleListVisible || modules.moduleCounts.isEmpty())
         binding.layoutModuleSelection.isGone = !isModuleSectionVisible
@@ -306,7 +323,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
                 } else {
                     syncInfoModuleCount.name
                 },
-                count = syncInfoModuleCount.count.toIntOrNull() ?: 0
+                count = syncInfoModuleCount.count.toIntOrNull() ?: 0,
             )
         }
 
@@ -345,7 +362,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         textView.text = progressText
     }
 
-
     private fun getCurrentDestinationId() =
         parentFragment?.takeIf { !syncInfoConfig.isSyncInfoToolbarVisible }?.id // parent if this isn't standalone
             ?: id
@@ -353,5 +369,4 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
     private companion object {
         private const val MAX_MODULE_LIST_HEIGHT_ITEMS = 5
     }
-
 }

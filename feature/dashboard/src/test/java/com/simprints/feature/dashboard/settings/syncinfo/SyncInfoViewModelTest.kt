@@ -3,10 +3,10 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.simprints.core.livedata.LiveDataEventWithContent
 import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
@@ -19,15 +19,15 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
-import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isMissingModulesToChooseFrom
+import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.infra.sync.ImageSyncStatus
+import com.simprints.infra.sync.SyncOrchestrator
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -48,7 +48,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class SyncInfoViewModelTest {
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -188,7 +187,7 @@ class SyncInfoViewModelTest {
             instructionPopupErrorInfo = SyncInfoError(
                 isBackendMaintenance = false,
                 backendMaintenanceEstimatedOutage = -1,
-                isTooManyRequests = false
+                isTooManyRequests = false,
             ),
             isProgressVisible = false,
             progress = SyncInfoProgress(),
@@ -213,8 +212,8 @@ class SyncInfoViewModelTest {
         ),
         syncInfoSectionModules = SyncInfoSectionModules(
             isSectionAvailable = false,
-            moduleCounts = emptyList()
-        )
+            moduleCounts = emptyList(),
+        ),
     )
 
     // LiveData loginNavigationEventLiveData tests
@@ -637,5 +636,4 @@ class SyncInfoViewModelTest {
 
         coVerify(exactly = 0) { syncOrchestrator.startEventSync(any()) }
     }
-
 }

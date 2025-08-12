@@ -48,15 +48,14 @@ internal class EventSyncManagerImpl @Inject constructor(
 ) : EventSyncManager {
     override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
 
-    override fun getLastSyncState(useDefaultValue: Boolean): LiveData<EventSyncState> =
-        MediatorLiveData<EventSyncState>().apply {
-            if (useDefaultValue) {
-                value = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
-            }
-            addSource(eventSyncStateProcessor.getLastSyncState()) { lastSyncState ->
-                value = lastSyncState
-            }
+    override fun getLastSyncState(useDefaultValue: Boolean): LiveData<EventSyncState> = MediatorLiveData<EventSyncState>().apply {
+        if (useDefaultValue) {
+            value = EventSyncState(syncId = "", null, null, emptyList(), emptyList(), emptyList())
         }
+        addSource(eventSyncStateProcessor.getLastSyncState()) { lastSyncState ->
+            value = lastSyncState
+        }
+    }
 
     override fun getPeriodicWorkTags(): List<String> = listOf(
         MASTER_SYNC_SCHEDULERS,

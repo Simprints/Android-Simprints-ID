@@ -30,7 +30,8 @@ class TimerImplTest {
 
     @Test
     fun testObserveTickOncePerMinute_emitsImmediately() = runTest {
-        val result = timerImpl.observeTickOncePerMinute()
+        val result = timerImpl
+            .observeTickOncePerMinute()
             .take(1)
             .toList()
 
@@ -40,7 +41,8 @@ class TimerImplTest {
 
     @Test
     fun testObserveTickOncePerMinute_emitsMultipleTimes() = runTest {
-        val result = timerImpl.observeTickOncePerMinute()
+        val result = timerImpl
+            .observeTickOncePerMinute()
             .take(3)
             .toList()
 

@@ -149,20 +149,24 @@ internal class SyncOrchestratorImpl @Inject constructor(
         workManager.cancelWorkers(SyncConstants.FILE_UP_SYNC_WORK_NAME)
     }
 
-    override fun observeImageSyncStatus(): Flow<ImageSyncStatus> {
-        return workManager
-            .getWorkInfosFlow(WorkQuery.fromUniqueWorkNames(SyncConstants.FILE_UP_SYNC_WORK_NAME))
-            .associateWithIfSyncing()
-            .map { (workInfos, isSyncing) ->
-                val millisSinceLastUpdate = imageSyncTimestampProvider.getMillisSinceLastImageSync()
-                val currentIndex = workInfos.firstOrNull()?.progress
-                    ?.getInt(SyncConstants.PROGRESS_CURRENT, 0)?.coerceAtLeast(0) ?: 0
-                val totalCount = workInfos.firstOrNull()?.progress
-                    ?.getInt(SyncConstants.PROGRESS_MAX, 0)?.takeIf { it >= 1 }
-                val progress = totalCount?.let { currentIndex to totalCount }
-                ImageSyncStatus(isSyncing, progress, millisSinceLastUpdate)
-            }
-    }
+    override fun observeImageSyncStatus(): Flow<ImageSyncStatus> = workManager
+        .getWorkInfosFlow(WorkQuery.fromUniqueWorkNames(SyncConstants.FILE_UP_SYNC_WORK_NAME))
+        .associateWithIfSyncing()
+        .map { (workInfos, isSyncing) ->
+            val millisSinceLastUpdate = imageSyncTimestampProvider.getMillisSinceLastImageSync()
+            val currentIndex = workInfos
+                .firstOrNull()
+                ?.progress
+                ?.getInt(SyncConstants.PROGRESS_CURRENT, 0)
+                ?.coerceAtLeast(0) ?: 0
+            val totalCount = workInfos
+                .firstOrNull()
+                ?.progress
+                ?.getInt(SyncConstants.PROGRESS_MAX, 0)
+                ?.takeIf { it >= 1 }
+            val progress = totalCount?.let { currentIndex to totalCount }
+            ImageSyncStatus(isSyncing, progress, millisSinceLastUpdate)
+        }
 
     /**
      * Converts the flow of WorkInfo in the receiver into a flow of WorkInfo paired to whether sync is ongoing or not.
@@ -182,7 +186,8 @@ internal class SyncOrchestratorImpl @Inject constructor(
 
             workInfos.any {
                 it.state == WorkInfo.State.SUCCEEDED
-            } && isJustUpdated -> {
+            } &&
+                isJustUpdated -> {
                 emit(workInfos to true) // at least for a moment, in case if RUNNING was missed
                 emit(workInfos to false)
             }

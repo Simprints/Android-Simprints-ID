@@ -25,7 +25,10 @@ internal class SignedUrlSampleUploader @Inject constructor(
     private val uploadSampleWithTracking: UploadSampleWithTrackingUseCase,
     private val fetchUploadUrlsPerSample: FetchUploadUrlsPerSampleUseCase,
 ) : SampleUploader {
-    override suspend fun uploadAllSamples(projectId: String, progressCallback: (suspend (Int, Int) -> Unit)?): Boolean {
+    override suspend fun uploadAllSamples(
+        projectId: String,
+        progressCallback: (suspend (Int, Int) -> Unit)?,
+    ): Boolean {
         var allImagesUploaded = true
         val batchSize = getBatchSize()
         val urlRequestScope = eventRepository.createEventScope(type = EventScopeType.SAMPLE_UP_SYNC)

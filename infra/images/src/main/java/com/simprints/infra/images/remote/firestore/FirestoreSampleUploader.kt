@@ -22,7 +22,10 @@ internal class FirestoreSampleUploader @Inject constructor(
     private val localDataSource: ImageLocalDataSource,
     private val metadataStore: ImageMetadataStore,
 ) : SampleUploader {
-    override suspend fun uploadAllSamples(projectId: String, progressCallback: (suspend (Int, Int) -> Unit)?): Boolean {
+    override suspend fun uploadAllSamples(
+        projectId: String,
+        progressCallback: (suspend (Int, Int) -> Unit)?,
+    ): Boolean {
         val firebaseApp = authStore.getLegacyAppFallback()
         if (firebaseApp.options.projectId.isNullOrBlank()) {
             Simber.i("Firebase projectId is null", tag = SAMPLE_UPLOAD)

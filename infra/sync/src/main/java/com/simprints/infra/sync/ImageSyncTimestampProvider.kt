@@ -15,8 +15,9 @@ class ImageSyncTimestampProvider @Inject constructor(
         securePrefs.edit { putLong(IMAGE_SYNC_COMPLETION_TIME_MILLIS, timeHelper.now().ms) }
     }
 
-    fun getMillisSinceLastImageSync(): Long? =
-        securePrefs.getLong(IMAGE_SYNC_COMPLETION_TIME_MILLIS, 0).takeIf {
+    fun getMillisSinceLastImageSync(): Long? = securePrefs
+        .getLong(IMAGE_SYNC_COMPLETION_TIME_MILLIS, 0)
+        .takeIf {
             securePrefs.contains(IMAGE_SYNC_COMPLETION_TIME_MILLIS)
         }?.let { lastSyncTimestamp ->
             timeHelper.now().ms - lastSyncTimestamp

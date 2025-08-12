@@ -10,17 +10,20 @@ fun View.setPulseAnimation(isEnabled: Boolean) {
         tag = null
     }
     if (!isEnabled) return
-    val progressBarPulseAnimator = ObjectAnimator.ofFloat(
-        this,
-        View.ALPHA,
-        PULSE_ANIMATION_ALPHA_FULL, PULSE_ANIMATION_ALPHA_INTERMEDIATE, PULSE_ANIMATION_ALPHA_MIN,
-    ).apply {
-        duration = PULSE_ANIMATION_DURATION_MILLIS
-        repeatCount = ObjectAnimator.INFINITE
-        repeatMode = ObjectAnimator.REVERSE
-        interpolator = AccelerateDecelerateInterpolator()
-        start()
-    }
+    val progressBarPulseAnimator = ObjectAnimator
+        .ofFloat(
+            this,
+            View.ALPHA,
+            PULSE_ANIMATION_ALPHA_FULL,
+            PULSE_ANIMATION_ALPHA_INTERMEDIATE,
+            PULSE_ANIMATION_ALPHA_MIN,
+        ).apply {
+            duration = PULSE_ANIMATION_DURATION_MILLIS
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+            interpolator = AccelerateDecelerateInterpolator()
+            start()
+        }
     tag = progressBarPulseAnimator
 }
 

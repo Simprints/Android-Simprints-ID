@@ -79,7 +79,7 @@ internal class LoginInfoStore @Inject constructor(
         }
 
     private val signedInProjectIdFlow: MutableStateFlow<String> = MutableStateFlow(
-        getSecurePrefs().getString(PROJECT_ID, "").orEmpty()
+        getSecurePrefs().getString(PROJECT_ID, "").orEmpty(),
     )
 
     var signedInProjectId: String = ""

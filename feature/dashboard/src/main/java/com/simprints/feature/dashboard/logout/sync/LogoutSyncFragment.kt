@@ -58,5 +58,4 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
             )
         }
     }
-
 }

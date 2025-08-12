@@ -29,11 +29,14 @@ internal class LogoutSyncViewModel @Inject constructor(
     authStore: AuthStore,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
-
     val logoutEventLiveData: LiveData<Unit> =
-        authStore.observeSignedInProjectId().filter { projectId ->
-            projectId.isEmpty()
-        }.distinctUntilChanged().map { /* Unit on every "true" */ }.asLiveData()
+        authStore
+            .observeSignedInProjectId()
+            .filter { projectId ->
+                projectId.isEmpty()
+            }.distinctUntilChanged()
+            .map { /* Unit on every "true" */ }
+            .asLiveData()
 
     val isLogoutWithoutSyncVisibleLiveData: LiveData<Boolean> = combine(
         eventSyncManager.getLastSyncState(useDefaultValue = true).asFlow(),
