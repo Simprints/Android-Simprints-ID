@@ -5,6 +5,8 @@ import com.simprints.core.AvailableProcessors
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.enrolment.records.repository.commcare.CommCareCaseRepository
+import com.simprints.infra.enrolment.records.repository.commcare.CommCareCaseRepositoryImpl
 import com.simprints.infra.enrolment.records.repository.commcare.CommCareIdentityDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.repository.remote.EnrolmentRecordRemoteDataSourceImpl
@@ -30,6 +32,9 @@ abstract class EnrolmentRecordsStoreModule {
 
     @Binds
     internal abstract fun bindEnrolmentRecordRemoteDataSource(impl: EnrolmentRecordRemoteDataSourceImpl): EnrolmentRecordRemoteDataSource
+
+    @Binds
+    internal abstract fun bindCommCareCaseRepository(impl: CommCareCaseRepositoryImpl): CommCareCaseRepository
 }
 
 @Module
