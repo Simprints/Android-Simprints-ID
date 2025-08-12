@@ -164,9 +164,9 @@ class ProjectAuthenticatorTest {
         } returns Token("", "", "", "")
 
         coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
-            "id",
-            PROJECT_ID,
-            "",
+            id = "id",
+            projectId = PROJECT_ID,
+            updatedAt = "",
             general = GeneralConfiguration(
                 modalities = mockk(),
                 matchingModalities = mockk(),
@@ -176,12 +176,13 @@ class ProjectAuthenticatorTest {
                 duplicateBiometricEnrolmentCheck = false,
                 settingsPassword = mockk(),
             ),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
+            face = mockk(),
+            fingerprint = mockk(),
+            consent = mockk(),
+            identification = mockk(),
+            synchronization = mockk(),
+            multifactorId = mockk(),
+            custom = mockk(),
         )
         coEvery { configManager.getPrivacyNotice(any(), any()) } returns emptyFlow()
 

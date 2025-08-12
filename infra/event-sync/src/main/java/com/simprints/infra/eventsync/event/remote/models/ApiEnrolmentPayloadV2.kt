@@ -25,6 +25,7 @@ internal data class ApiEnrolmentPayloadV2(
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
         TokenKeyType.AttendantId -> "attendantId"
         TokenKeyType.ModuleId -> "moduleId"
+        TokenKeyType.ExternalCredential -> "externalCredential"
         TokenKeyType.Unknown -> null
     }
 }

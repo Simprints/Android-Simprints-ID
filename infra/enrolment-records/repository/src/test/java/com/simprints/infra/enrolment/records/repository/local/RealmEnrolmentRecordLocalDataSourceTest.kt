@@ -1,6 +1,8 @@
 package com.simprints.infra.enrolment.records.repository.local
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
@@ -316,6 +318,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
                     faceSamplesToAdd = listOf(getRandomFaceSample()),
                     fingerprintSamplesToAdd = listOf(getRandomFingerprintSample()),
                     referenceIdsToRemove = listOf(faceReferenceId, fingerReferenceId),
+                    externalCredentialsToAdd = listOf(),
                 ),
             ),
             project,
@@ -430,6 +433,9 @@ class RealmEnrolmentRecordLocalDataSourceTest {
             getRandomFaceSample(),
         ),
         fingerprintSamples: List<FingerprintSample> = listOf(),
+        externalCredentials: List<ExternalCredential> = listOf(
+            getRandomExternalCredential()
+        ),
     ): Subject = Subject(
         subjectId = patientId,
         projectId = projectId,
@@ -437,6 +443,7 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         moduleId = moduleId.asTokenizableRaw(),
         faceSamples = faceSamples,
         fingerprintSamples = fingerprintSamples,
+        externalCredentials = externalCredentials
     )
 
     private fun getRandomFaceSample(
@@ -448,4 +455,10 @@ class RealmEnrolmentRecordLocalDataSourceTest {
         id: String = UUID.randomUUID().toString(),
         referenceId: String = "referenceId",
     ) = FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, Random.nextBytes(64), "fingerprintTemplateFormat", referenceId, id)
+
+    private fun getRandomExternalCredential() = ExternalCredential(
+        value = "value".asTokenizableEncrypted(),
+        subjectId = "subjectId",
+        type = ExternalCredentialType.NHISCard
+    )
 }

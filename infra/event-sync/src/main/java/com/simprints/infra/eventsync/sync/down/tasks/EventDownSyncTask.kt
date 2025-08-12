@@ -266,6 +266,7 @@ internal class EventDownSyncTask @Inject constructor(
                 faceSamplesToAdd = subjectFactory.extractFaceSamplesFromBiometricReferences(biometricReferencesAdded),
                 fingerprintSamplesToAdd = subjectFactory.extractFingerprintSamplesFromBiometricReferences(biometricReferencesAdded),
                 referenceIdsToRemove = biometricReferencesRemoved,
+                externalCredentialsToAdd = externalCredentialAdded?.let { listOf(it) } ?: emptyList()
             ),
         )
     }

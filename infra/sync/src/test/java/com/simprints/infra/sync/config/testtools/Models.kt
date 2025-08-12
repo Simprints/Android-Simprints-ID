@@ -1,5 +1,6 @@
 package com.simprints.infra.sync.config.testtools
 
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.AgeGroup
 import com.simprints.infra.config.store.models.ConsentConfiguration
@@ -12,6 +13,7 @@ import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
+import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
@@ -114,6 +116,12 @@ internal val simprintsDownSyncConfigurationConfiguration = DownSynchronizationCo
     frequency = Frequency.PERIODICALLY,
 )
 
+internal val allowedExternalCredential = ExternalCredentialType.NHISCard
+
+internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
+    allowedExternalCredentials = listOf(allowedExternalCredential)
+)
+
 internal val synchronizationConfiguration = SynchronizationConfiguration(
     up = UpSynchronizationConfiguration(
         simprints = simprintsUpSyncConfigurationConfiguration,
@@ -131,16 +139,17 @@ internal val identificationConfiguration =
     IdentificationConfiguration(4, IdentificationConfiguration.PoolType.PROJECT)
 
 internal val projectConfiguration = ProjectConfiguration(
-    "id",
-    "projectId",
-    "updatedAt",
-    generalConfiguration,
-    faceConfiguration,
-    fingerprintConfiguration,
-    consentConfiguration,
-    identificationConfiguration,
-    synchronizationConfiguration,
-    null,
+    id = "id",
+    projectId = "projectId",
+    updatedAt = "updatedAt",
+    general = generalConfiguration,
+    face = faceConfiguration,
+    fingerprint = fingerprintConfiguration,
+    consent = consentConfiguration,
+    identification = identificationConfiguration,
+    synchronization = synchronizationConfiguration,
+    multifactorId = multiFactorIdConfiguration,
+    custom = null
 )
 
 internal const val TOKENIZATION_JSON =

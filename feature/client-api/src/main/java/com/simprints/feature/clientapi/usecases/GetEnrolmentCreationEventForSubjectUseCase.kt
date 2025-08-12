@@ -47,11 +47,13 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
     }
 
     private fun Subject.fromSubjectToEnrolmentCreationEvent() = EnrolmentRecordCreationEvent(
-        subjectId,
-        projectId,
-        moduleId,
-        attendantId,
-        EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
+        subjectId = subjectId,
+        projectId = projectId,
+        moduleId = moduleId,
+        attendantId = attendantId,
+        biometricReferences = EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
+        // TODO [CORE-3421] Review if EnrolmentRecordCreationEvent should contain List of external credentials, as it currently doesn't make sense
+        externalCredential = externalCredentials.firstOrNull()
     )
 
     companion object {

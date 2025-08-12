@@ -1,5 +1,6 @@
 package com.simprints.feature.orchestrator.usecases.response
 
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
@@ -25,6 +26,8 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
     ): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
+        // TODO [CORE-3421] When an external credential can be extracted from the UI-level steps, extract it here
+        val externalCredential: ExternalCredential? = null
 
         return try {
             val subject = subjectFactory.buildSubjectFromCaptureResults(
@@ -33,6 +36,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
                 moduleId = request.moduleId,
                 fingerprintResponse = fingerprintCapture,
                 faceResponse = faceCapture,
+                externalCredential = externalCredential,
             )
             enrolSubject(subject, project)
 

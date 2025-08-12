@@ -11,4 +11,10 @@ data class SubjectBiometrics(
         entityColumn = SUBJECT_ID_COLUMN,
     )
     val biometricTemplates: List<DbBiometricTemplate>,
+    @Relation(
+        parentColumn = SUBJECT_ID_COLUMN,
+        entityColumn = SUBJECT_ID_COLUMN,
+    )
+    /** New field */
+    val externalCredentials: List<DbExternalCredential>,
 )
