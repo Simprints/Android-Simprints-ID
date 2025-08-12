@@ -1,13 +1,11 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
-import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -31,6 +29,7 @@ import com.simprints.feature.login.LoginContract
 import com.simprints.infra.uibase.view.applySystemBarInsets
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.navigation.toBundle
+import com.simprints.infra.uibase.view.setPulseAnimation
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
@@ -346,37 +345,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         textView.text = progressText
     }
 
-    private fun View.setPulseAnimation(isEnabled: Boolean) {
-        (tag as? ObjectAnimator?)?.run {
-            cancel()
-            tag = null
-        }
-        if (!isEnabled) return
-        val progressBarPulseAnimator = ObjectAnimator.ofFloat(
-            this,
-            View.ALPHA,
-            PULSE_ANIMATION_ALPHA_FULL, PULSE_ANIMATION_ALPHA_INTERMEDIATE, PULSE_ANIMATION_ALPHA_MIN,
-        ).apply {
-            duration = PULSE_ANIMATION_DURATION_MILLIS
-            repeatCount = ObjectAnimator.INFINITE
-            repeatMode = ObjectAnimator.REVERSE
-            interpolator = AccelerateDecelerateInterpolator()
-            start()
-        }
-        tag = progressBarPulseAnimator
-    }
 
     private fun getCurrentDestinationId() =
         parentFragment?.takeIf { !syncInfoConfig.isSyncInfoToolbarVisible }?.id // parent if this isn't standalone
             ?: id
 
     private companion object {
-        private const val PULSE_ANIMATION_ALPHA_FULL = 1.0f
-        private const val PULSE_ANIMATION_ALPHA_INTERMEDIATE = 0.9f
-        private const val PULSE_ANIMATION_ALPHA_MIN = 0.6f
-
-        private const val PULSE_ANIMATION_DURATION_MILLIS = 2000L
-
         private const val MAX_MODULE_LIST_HEIGHT_ITEMS = 5
     }
 
