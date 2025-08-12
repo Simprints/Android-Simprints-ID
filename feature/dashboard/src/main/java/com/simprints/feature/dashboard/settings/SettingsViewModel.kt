@@ -32,7 +32,7 @@ internal class SettingsViewModel @Inject constructor(
         get() = _generalConfiguration
     private val _generalConfiguration = MutableLiveData<GeneralConfiguration>()
 
-    val experimentalConfiguration = configManager.watchProjectConfiguration()
+    val experimentalConfiguration = configManager.observeProjectConfiguration()
         .map(ProjectConfiguration::experimental)
         .asLiveData(viewModelScope.coroutineContext)
 

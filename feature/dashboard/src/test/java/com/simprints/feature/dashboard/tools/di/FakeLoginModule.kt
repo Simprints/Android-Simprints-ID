@@ -17,5 +17,5 @@ import javax.inject.Singleton
 object FakeLoginModule {
     @Provides
     @Singleton
-    fun provideAuthStore(): AuthStore = mockk()
+    fun provideAuthStore(): AuthStore = mockk(relaxed = true)
 }

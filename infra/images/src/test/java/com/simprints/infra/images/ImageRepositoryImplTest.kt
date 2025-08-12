@@ -43,7 +43,7 @@ internal class ImageRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { samplePathConverter.create(any(), any(), any(), any()) } returns Path(VALID_PATH)
-        coEvery { sampleUploader.uploadAllSamples(any()) } returns true
+        coEvery { sampleUploader.uploadAllSamples(any(), any()) } returns true
         coEvery { getUploaderUseCase.invoke() } returns sampleUploader
 
         repository = ImageRepositoryImpl(
@@ -117,7 +117,35 @@ internal class ImageRepositoryImplTest {
         val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
         assertThat(successful).isTrue()
-        coVerify { sampleUploader.uploadAllSamples(any()) }
+        coVerify { sampleUploader.uploadAllSamples(any(), any()) }
+    }
+
+    @Test
+    fun `delegates sample upload to uploader with progress callback`() = runTest {
+        val progressCallback: suspend (Int, Int) -> Unit = mockk(relaxed = true)
+        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID, progressCallback)
+
+        assertThat(successful).isTrue()
+        coVerify { sampleUploader.uploadAllSamples(PROJECT_ID, progressCallback) }
+    }
+
+    @Test
+    fun `progress callback receives correct values`() = runTest {
+        var (receivedCurrent, receivedTotal) = -1 to -1
+        val progressCallback: suspend (Int, Int) -> Unit = { current, total ->
+            receivedCurrent = current
+            receivedTotal = total
+        }
+        coEvery { sampleUploader.uploadAllSamples(any(), any()) } coAnswers {
+            val callback = secondArg<suspend (Int, Int) -> Unit>()
+            callback(3, 10)
+            true
+        }
+
+        repository.uploadStoredImagesAndDelete(PROJECT_ID, progressCallback)
+
+        assertThat(receivedCurrent).isEqualTo(3)
+        assertThat(receivedTotal).isEqualTo(10)
     }
 
     @Test
