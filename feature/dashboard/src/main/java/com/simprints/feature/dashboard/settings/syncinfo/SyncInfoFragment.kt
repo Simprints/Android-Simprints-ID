@@ -128,7 +128,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.logoutEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-                    viewModel.logout()
+                    viewModel.performLogout()
                 })
             }
         }
