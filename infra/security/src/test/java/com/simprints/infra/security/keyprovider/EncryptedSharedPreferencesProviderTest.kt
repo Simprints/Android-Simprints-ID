@@ -35,11 +35,11 @@ internal class EncryptedSharedPreferencesProviderTest {
     fun `when shared preferences are created should call EncryptedSharedPreferences_create`() {
         val spy = mockk<EncryptedSharedPreferences>()
         mockkStatic(EncryptedSharedPreferences::class)
-        every { EncryptedSharedPreferences.create(any(), any(), any(), any(), any()) } returns spy
+        every { EncryptedSharedPreferences.create(any<String>(), any(), any(), any(), any()) } returns spy
         provider.provideEncryptedSharedPreferences(
             filename = filename,
             masterKeyAlias = masterKeyAlias,
         )
-        verify(exactly = 1) { EncryptedSharedPreferences.create(any(), any(), any(), any(), any()) }
+        verify(exactly = 1) { EncryptedSharedPreferences.create(any<String>(), any(), any(), any(), any()) }
     }
 }

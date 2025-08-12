@@ -207,4 +207,7 @@ internal open class EventRepositoryImpl @Inject constructor(
 
         throw t
     }
+
+    override suspend fun executeRawEventInsertions(rawSqlInsertStatements: List<String>) =
+        eventLocalDataSource.executeRawEventInsertions(rawSqlInsertStatements)
 }

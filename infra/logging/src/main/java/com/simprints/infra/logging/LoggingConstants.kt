@@ -14,6 +14,8 @@ object LoggingConstants {
         const val DEVICE_ID = "Device_ID"
         const val SUBJECTS_DOWN_SYNC_TRIGGERS = "Down_sync_triggers"
         const val SESSION_ID = "Session_ID"
+
+        const val VERSION_HISTORY = "Version_History"
     }
 
     object AnalyticsUserProperties {
@@ -47,6 +49,7 @@ object LoggingConstants {
         MIGRATION,
         REALM_DB_MIGRATION,
         SAMPLE_UPLOAD,
+        APPLICATION,
     }
 
     // Tags eligible for Firebase Analytics logging

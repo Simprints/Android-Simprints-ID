@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.*
 import com.google.common.truth.Truth.*
 import com.simprints.feature.datagenerator.DataGeneratorViewModel
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase
+import com.simprints.feature.datagenerator.events.InsertSessionEventsUseCase
 import com.simprints.infra.authstore.AuthStore
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -28,6 +29,9 @@ internal class DataGeneratorViewModelTest {
     private lateinit var insertEnrollmentRecordsUseCase: InsertEnrollmentRecordsUseCase
 
     @MockK
+    private lateinit var insertSessionEventsUseCase: InsertSessionEventsUseCase
+
+    @MockK
     private lateinit var authStore: AuthStore
 
     companion object {
@@ -47,7 +51,11 @@ internal class DataGeneratorViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
         every { authStore.signedInProjectId } returns "test_project_id"
-        viewModel = DataGeneratorViewModel(insertEnrollmentRecordsUseCase, authStore)
+        viewModel = DataGeneratorViewModel(
+            insertEnrollmentRecordsUseCase,
+            insertSessionEventsUseCase,
+            authStore,
+        )
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -203,5 +211,61 @@ internal class DataGeneratorViewModelTest {
 
         val capturedFingerOrder = fingerOrderSlot.captured
         assertThat(capturedFingerOrder.getString("ISO_19794_2")).isEqualTo("LEFT_THUMB,LEFT_INDEX_FINGER")
+    }
+
+    @Test
+    fun `handleIntent with GENERATE_SESSION_EVENTS and valid extras calls use case and updates status`() = runTest {
+        // Given
+        val projectId = "proj1"
+        val moduleId = "mod1"
+        val attendantId = "att1"
+        val enrolCount = 10
+        val identifyCount = 5
+        val verifyCount = 3
+        val confirmIdentifyCount = 2
+        val enrolLastCount = 1
+
+        val intent = Intent("com.simprints.test.GENERATE_SESSION_EVENTS").apply {
+            putExtra(EXTRA_PROJECT_ID, projectId)
+            putExtra(EXTRA_MODULE_ID, moduleId)
+            putExtra(EXTRA_ATTENDANT_ID, attendantId)
+            putExtra("EXTRA_ENROL_COUNT", enrolCount)
+            putExtra("EXTRA_IDENTIFY_COUNT", identifyCount)
+            putExtra("EXTRA_VERIFY_COUNT", verifyCount)
+            putExtra("EXTRA_CONFIRM_IDENTIFY_COUNT", confirmIdentifyCount)
+            putExtra("EXTRA_ENROL_LAST_COUNT", enrolLastCount)
+        }
+
+        coEvery {
+            insertSessionEventsUseCase.invoke(
+                projectId,
+                moduleId,
+                attendantId,
+                enrolCount,
+                identifyCount,
+                verifyCount,
+                confirmIdentifyCount,
+                enrolLastCount,
+            )
+        } returns flowOf("Inserted session events successfully")
+
+        // When
+        viewModel.handleIntent(intent)
+
+        // Then
+        coVerify(exactly = 1) {
+            insertSessionEventsUseCase.invoke(
+                projectId,
+                moduleId,
+                attendantId,
+                enrolCount,
+                identifyCount,
+                verifyCount,
+                confirmIdentifyCount,
+                enrolLastCount,
+            )
+        }
+
+        assertThat(viewModel.statusMessage.value).isEqualTo("Inserted session events successfully")
     }
 }

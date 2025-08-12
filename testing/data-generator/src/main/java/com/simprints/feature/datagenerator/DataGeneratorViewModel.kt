@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.feature.datagenerator.enrollmentrecords.InsertEnrollmentRecordsUseCase
+import com.simprints.feature.datagenerator.events.InsertSessionEventsUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DataGeneratorViewModel @Inject constructor(
     private val insertEnrollmentRecords: InsertEnrollmentRecordsUseCase,
+    private val insertEvents: InsertSessionEventsUseCase,
     private val authStore: AuthStore,
 ) : ViewModel() {
     companion object {
@@ -103,7 +105,7 @@ internal class DataGeneratorViewModel @Inject constructor(
     /**
      * Parses extras for generating session events and calls the data creation function.
      */
-    private fun parseAndGenerateSessionEvents(intent: Intent) {
+    private suspend fun parseAndGenerateSessionEvents(intent: Intent) {
         val projectId = intent.getStringExtra(EXTRA_PROJECT_ID)
         val moduleId = intent.getStringExtra(EXTRA_MODULE_ID)
         val attendantId = intent.getStringExtra(EXTRA_ATTENDANT_ID)
@@ -120,7 +122,18 @@ internal class DataGeneratorViewModel @Inject constructor(
             )
         }
 
-        // Todo to be added later
+        insertEvents(
+            projectId = projectId,
+            moduleId = moduleId,
+            attendantId = attendantId,
+            enrolCount = enrolCount,
+            identifyCount = identifyCount,
+            confirmIdentifyCount = confirmIdentifyCount,
+            enrolLastCount = enrolLastCount,
+            verifyCount = verifyCount,
+        ).collect {
+            _statusMessage.postValue(it)
+        }
     }
 
     private fun extractBundleFromFlatExtras(
