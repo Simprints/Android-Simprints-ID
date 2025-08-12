@@ -532,6 +532,9 @@ class EventDownSyncTaskTest {
                 faceSamples = listOf(
                     FaceSample(byteArrayOf(), "format", "referenceId"),
                 ),
+                externalCredentials = listOf(
+                    ExternalCredential(value = "value".asTokenizableEncrypted(), subjectId = "subjectId", type = ExternalCredentialType.NHISCard)
+                )
             ),
         )
 
