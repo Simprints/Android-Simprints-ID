@@ -47,7 +47,7 @@ object FakeCoreModule {
 
     @Provides
     @Singleton
-    fun provideTimer(): Timer = mockk()
+    fun provideTimer(): Timer = mockk(relaxed = true)
 
     @Provides
     @Singleton
