@@ -33,22 +33,6 @@ class LibraryProtobufConventionPlugin : Plugin<Project> {
             dependencies {
                 implementation(libs, "protobuf")
             }
-
-            // Fox for known issue with KSP and protobuf
-            // https://github.com/google/ksp/issues/1590#issuecomment-1826387452
-            project.extensions.getByType(AndroidComponentsExtension::class.java).onVariants { variant ->
-                afterEvaluate {
-                    val variantName = variant.name.replaceFirstChar { it.uppercaseChar() }
-                    val generateTaskName = "generate${variantName}Proto"
-                    val kspTaskName = "ksp${variantName}Kotlin"
-
-                    val protoTask = project.tasks.getByName(generateTaskName) as GenerateProtoTask
-                    project.tasks.getByName(kspTaskName) {
-                        dependsOn(protoTask)
-                        (this as AbstractKotlinCompileTool<*>).setSource(protoTask.outputBaseDir)
-                    }
-                }
-            }
         }
     }
 }

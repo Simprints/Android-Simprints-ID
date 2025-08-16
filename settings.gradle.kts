@@ -2,6 +2,18 @@ pluginManagement {
     includeBuild("build-logic")
 
     repositories {
+        maven {
+            // for some reason, we have to declare the properties file here again
+            val properties = File(rootDir, "local.properties").inputStream().use {
+                java.util.Properties().apply { load(it) }
+            }
+            url = uri("https://maven.pkg.github.com/Simprints/realm-kotlin")
+            credentials {
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
+            }
+        }
         maven(url = "https://repo1.maven.org/maven2/")
 
         google()
@@ -67,6 +79,14 @@ dependencyResolutionManagement {
 
         maven {
             url = uri("https://maven.pkg.github.com/Simprints/Biometrics-SimFace")
+            credentials {
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
+            }
+        }
+        maven {
+            url = uri("https://maven.pkg.github.com/Simprints/realm-kotlin")
             credentials {
                 username =
                     properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
