@@ -9,7 +9,7 @@ class LibraryRealmConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("io.realm.kotlin")
+                apply("com.simprints.realm.kotlin")
             }
 
             configureDbEncryptionBuild()
