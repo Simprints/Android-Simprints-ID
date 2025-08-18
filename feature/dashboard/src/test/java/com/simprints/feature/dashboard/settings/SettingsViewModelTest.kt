@@ -68,7 +68,7 @@ class SettingsViewModelTest {
         val experimentalConfig1 = mapOf("key1" to "value1")
         val experimentalConfig2 = mapOf("key2" to "value2")
 
-        coEvery { configManager.watchProjectConfiguration() } returns flowOf(
+        coEvery { configManager.observeProjectConfiguration() } returns flowOf(
             mockk<ProjectConfiguration>(relaxed = true) {
                 every { custom } returns experimentalConfig1
             },

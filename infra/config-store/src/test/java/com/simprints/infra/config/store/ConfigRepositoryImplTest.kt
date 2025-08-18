@@ -18,6 +18,7 @@ import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.logging.Simber
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.syntax.assertThrows
@@ -31,6 +32,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -247,16 +249,16 @@ class ConfigRepositoryImplTest {
     }
 
     @Test
-    fun `watchProjectConfiguration should emit values from the local data source`() = runTest {
+    fun `observeProjectConfiguration should emit values from the local data source`() = runTest {
         val config1 = projectConfiguration.copy(projectId = "project1")
         val config2 = projectConfiguration.copy(projectId = "project2")
 
-        coEvery { localDataSource.watchProjectConfiguration() } returns kotlinx.coroutines.flow.flow {
+        coEvery { localDataSource.observeProjectConfiguration() } returns flow {
             emit(config1)
             emit(config2)
         }
 
-        val emittedConfigs = configServiceImpl.watchProjectConfiguration().toList()
+        val emittedConfigs = configServiceImpl.observeProjectConfiguration().toList()
 
         assertThat(emittedConfigs).hasSize(2)
         assertThat(emittedConfigs[0]).isEqualTo(config1)
@@ -311,5 +313,28 @@ class ConfigRepositoryImplTest {
         configServiceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE).toList()
 
         verify(exactly = 0) { Simber.i(any(), any()) }
+    }
+
+    @Test
+    fun `observeDeviceConfiguration should track values from the local data source`() = runTest {
+        val config1 = deviceConfiguration.copy(selectedModules = emptyList())
+        val config2 = deviceConfiguration.copy(
+            selectedModules = listOf(
+                "module1".asTokenizableEncrypted(),
+                "module2".asTokenizableEncrypted(),
+            )
+        )
+
+        coEvery { localDataSource.observeDeviceConfiguration() } returns flow {
+            emit(config1)
+            emit(config2)
+        }
+
+        val emittedConfigs = configServiceImpl.observeDeviceConfiguration().toList()
+
+        assertThat(emittedConfigs).hasSize(2)
+        assertThat(emittedConfigs[0]).isEqualTo(config1)
+        assertThat(emittedConfigs[1]).isEqualTo(config2)
+        coVerify(exactly = 1) { localDataSource.observeDeviceConfiguration() }
     }
 }
