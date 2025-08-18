@@ -2,11 +2,10 @@ package com.simprints.infra.eventsync.event.commcare
 
 import android.content.ContentResolver
 import android.content.Context
-import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.Uri
-import androidx.preference.PreferenceManager
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource.Companion.COLUMN_CASE_ID
 import com.simprints.infra.eventsync.event.commcare.CommCareEventDataSource.Companion.COLUMN_DATUM_ID
@@ -53,7 +52,6 @@ class CommCareEventDataSourceTest {
             mockDataUri = mockk(relaxed = true)
             mockDataCaseIdUri = mockk(relaxed = true)
             mockkStatic(Uri::class)
-            mockkStatic(PreferenceManager::class)
             every { Uri.parse("content://$TEST_PACKAGE_NAME.case/casedb/case") } returns mockMetadataUri
             every { Uri.parse("content://$TEST_PACKAGE_NAME.case/casedb/data") } returns mockDataUri
             every { mockDataUri.buildUpon().appendPath(any()).build() } returns mockDataCaseIdUri
@@ -65,7 +63,6 @@ class CommCareEventDataSourceTest {
             clearAllMocks()
             unmockkAll()
             unmockkStatic(Uri::class)
-            unmockkStatic(PreferenceManager::class)
         }
     }
 
@@ -76,7 +73,7 @@ class CommCareEventDataSourceTest {
     private lateinit var mockContentResolver: ContentResolver
 
     @MockK
-    private lateinit var mockSharedPreferences: SharedPreferences
+    private lateinit var mockLastCallingPackageStore: LastCallingPackageStore
 
     private lateinit var mockMetadataCursor: Cursor
 
@@ -90,8 +87,7 @@ class CommCareEventDataSourceTest {
 
         every { context.contentResolver } returns mockContentResolver
         every { context.getString(any()) } returns TEST_PACKAGE_NAME
-        every { PreferenceManager.getDefaultSharedPreferences(context) } returns mockSharedPreferences
-        every { mockSharedPreferences.getString(any(), any()) } returns TEST_PACKAGE_NAME
+        every { mockLastCallingPackageStore.lastCallingPackageName } returns TEST_PACKAGE_NAME
 
         every { Uri.parse(any()) } answers {
             val uriPath = it.invocation.args[0] as String
@@ -126,6 +122,7 @@ class CommCareEventDataSourceTest {
 
         dataSource = CommCareEventDataSource(
             JsonHelper,
+            mockLastCallingPackageStore,
             context,
         )
     }
@@ -357,9 +354,9 @@ class CommCareEventDataSourceTest {
     }
 
     @Test
-    fun `getPackageName uses preference value when available`() {
+    fun `uses custom package name when available`() {
         val customPackageName = "custom.commcare.package"
-        every { mockSharedPreferences.getString(any(), any()) } returns customPackageName
+        every { mockLastCallingPackageStore.lastCallingPackageName } returns customPackageName
 
         // We can't directly test private methods, but we can verify the URI creation behavior
         every { Uri.parse("content://$customPackageName.case/casedb/case") } returns mockMetadataUri
@@ -368,19 +365,19 @@ class CommCareEventDataSourceTest {
         val result = dataSource.getEvents()
 
         assertEquals(0, result.totalCount)
-        verify { mockSharedPreferences.getString(any(), any()) }
+        verify { mockLastCallingPackageStore.lastCallingPackageName }
     }
 
     @Test
-    fun `getPackageName falls back to default when preference is null`() {
-        every { mockSharedPreferences.getString(any(), any()) } returns null
+    fun `falls back to default when package name is null`() {
+        every { mockLastCallingPackageStore.lastCallingPackageName } returns null
 
-        // The fallback should use the default value passed to getString
+        // The fallback should use the default value from the store
         every { mockMetadataCursor.count } returns 0
 
         val result = dataSource.getEvents()
 
         assertEquals(0, result.totalCount)
-        verify { mockSharedPreferences.getString(any(), any()) }
+        verify { mockLastCallingPackageStore.lastCallingPackageName }
     }
 }

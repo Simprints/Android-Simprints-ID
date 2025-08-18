@@ -37,5 +37,4 @@ dependencies {
     implementation(libs.workManager.work)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
-    implementation(libs.androidX.ui.preference)
 }

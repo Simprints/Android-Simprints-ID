@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
@@ -16,6 +15,7 @@ import com.simprints.feature.setup.R
 import com.simprints.feature.setup.SetupResult
 import com.simprints.feature.setup.data.ErrorType
 import com.simprints.feature.setup.databinding.FragmentSetupBinding
+import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.license.models.LicenseState.Downloading
 import com.simprints.infra.license.models.LicenseState.FinishedWithBackendMaintenanceError
 import com.simprints.infra.license.models.LicenseState.FinishedWithError
@@ -31,11 +31,15 @@ import com.simprints.infra.uibase.navigation.navigateSafely
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
+import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class SetupFragment : Fragment(R.layout.fragment_setup) {
     private val viewModel: SetupViewModel by viewModels()
     private val binding by viewBinding(FragmentSetupBinding::bind)
+
+    @Inject
+    lateinit var lastCallingPackageStore: LastCallingPackageStore
     private val launchLocationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isLocationPermissionGranted ->
@@ -74,7 +78,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         }
         // Request CommCare permission
         viewModel.requestCommCarePermission.observe(viewLifecycleOwner) {
-            launchCommCarePermissionRequest.launch("${getLastCallingPackageName()}.provider.cases.read")
+            launchCommCarePermissionRequest.launch("${lastCallingPackageStore.lastCallingPackageName}.provider.cases.read")
         }
         // Request notification permission
         viewModel.requestNotificationPermission.observe(viewLifecycleOwner) {
@@ -90,13 +94,6 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         viewModel.start()
     }
 
-    private fun getLastCallingPackageName(): String {
-        return PreferenceManager.getDefaultSharedPreferences(requireContext())
-            .getString(
-                getString(IDR.string.preference_last_calling_package_name_key),
-                getString(IDR.string.default_commcare_package_name),
-            ) ?: getString(IDR.string.default_commcare_package_name)
-    }
 
     private fun observeOverallSetupResult() = viewModel.overallSetupResult.observe(viewLifecycleOwner) {
         // if the overall setup result is success, finish the setup flow else an alert will be shown

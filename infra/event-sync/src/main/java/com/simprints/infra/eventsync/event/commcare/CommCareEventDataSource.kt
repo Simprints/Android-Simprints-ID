@@ -3,20 +3,19 @@ package com.simprints.infra.eventsync.event.commcare
 import android.content.Context
 import android.database.Cursor
 import androidx.core.net.toUri
-import androidx.preference.PreferenceManager
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordCreationEventDeserializer
 import com.simprints.infra.events.event.cosync.CoSyncEnrolmentRecordEvents
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.COMMCARE_SYNC
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.resources.R as IDR
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +24,7 @@ import javax.inject.Inject
 
 internal class CommCareEventDataSource @Inject constructor(
     private val jsonHelper: JsonHelper,
+    private val lastCallingPackageStore: LastCallingPackageStore,
     @ApplicationContext private val context: Context,
 ) {
     fun getEvents(): CommCareEventSyncResult {
@@ -126,15 +126,9 @@ internal class CommCareEventDataSource @Inject constructor(
         }
     }
 
-    private fun getPackageName() = PreferenceManager.getDefaultSharedPreferences(context)
-        .getString(
-            context.getString(IDR.string.preference_last_calling_package_name_key),
-            context.getString(IDR.string.default_commcare_package_name)
-        ) ?: context.getString(IDR.string.default_commcare_package_name)
+    private fun getCaseMetadataUri() = "content://${lastCallingPackageStore.lastCallingPackageName}.case/casedb/case".toUri()
 
-    private fun getCaseMetadataUri() = "content://${getPackageName()}.case/casedb/case".toUri()
-
-    private fun getCaseDataUri() = "content://${getPackageName()}.case/casedb/data".toUri()
+    private fun getCaseDataUri() = "content://${lastCallingPackageStore.lastCallingPackageName}.case/casedb/data".toUri()
 
     private val coSyncSerializationModule = SimpleModule().apply {
         addSerializer(
