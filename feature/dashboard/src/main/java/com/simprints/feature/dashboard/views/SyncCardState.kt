@@ -37,6 +37,10 @@ internal sealed class SyncCardState(
         val estimatedOutage: Long? = null,
     ) : SyncCardState(lastTimeSyncSucceed)
 
+    data class SyncFailedCommCarePermissionMissing(
+        override val lastTimeSyncSucceed: String?,
+    ) : SyncCardState(lastTimeSyncSucceed)
+
     data class SyncTooManyRequests(
         override val lastTimeSyncSucceed: String?,
     ) : SyncCardState(lastTimeSyncSucceed)

@@ -33,7 +33,7 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configManager
                 .getProjectConfiguration()
-                .synchronization.down.simprints.frequency
+                .synchronization.down.simprints?.frequency
         } returns
             Frequency.PERIODICALLY
 
@@ -47,7 +47,7 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configManager
                 .getProjectConfiguration()
-                .synchronization.down.simprints.frequency
+                .synchronization.down.simprints?.frequency
         } returns
             Frequency.PERIODICALLY_AND_ON_SESSION_START
 
@@ -61,9 +61,22 @@ class StartBackgroundSyncUseCaseTest {
         coEvery {
             configManager
                 .getProjectConfiguration()
-                .synchronization.down.simprints.frequency
+                .synchronization.down.simprints?.frequency
         } returns
             Frequency.PERIODICALLY
+
+        useCase.invoke()
+
+        coVerify { syncOrchestrator.scheduleBackgroundWork(eq(true)) }
+    }
+
+    @Test
+    fun `Does not start event sync on start if not Simprints sync`() = runTest {
+        coEvery {
+            configManager
+                .getProjectConfiguration()
+                .synchronization.down.simprints
+        } returns null
 
         useCase.invoke()
 

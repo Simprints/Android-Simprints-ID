@@ -50,6 +50,7 @@ object LoggingConstants {
         REALM_DB_MIGRATION,
         SAMPLE_UPLOAD,
         APPLICATION,
+        COMMCARE_SYNC,
     }
 
     // Tags eligible for Firebase Analytics logging

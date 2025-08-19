@@ -1,4 +1,4 @@
-package com.simprints.infra.eventsync.sync.down.tasks
+package com.simprints.infra.eventsync.sync.common
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample

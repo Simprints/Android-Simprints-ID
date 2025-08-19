@@ -8,9 +8,9 @@ import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfigu
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
-class ProjectConfigSimprintsDownSyncConfigMigrationTest {
+class ProjectConfigSimprintsSyncConfigMigrationTest {
     @Test
-    fun `should not migrate if has down sync simprints object`() = runTest {
+    fun `should not migrate if has down sync Simprints object`() = runTest {
         val currentData = ProtoProjectConfiguration
             .newBuilder()
             .setSynchronization(
@@ -28,9 +28,28 @@ class ProjectConfigSimprintsDownSyncConfigMigrationTest {
             ).build()
         assertThat(ProjectConfigSimprintsSyncConfigMigration().shouldMigrate(currentData)).isFalse()
     }
+    @Test
+    fun `should not migrate if has down sync CommCare object`() = runTest {
+        val currentData = ProtoProjectConfiguration
+            .newBuilder()
+            .setSynchronization(
+                ProtoSynchronizationConfiguration
+                    .newBuilder()
+                    .setDown(
+                        ProtoDownSynchronizationConfiguration
+                            .newBuilder()
+                            .setCommCare(
+                                ProtoDownSynchronizationConfiguration.ProtoCommCareDownSynchronizationConfiguration
+                                    .newBuilder()
+                                    .build(),
+                            ).build(),
+                    ),
+            ).build()
+        assertThat(ProjectConfigSimprintsSyncConfigMigration().shouldMigrate(currentData)).isFalse()
+    }
 
     @Test
-    fun `should migrate if no down sync simprints object`() = runTest {
+    fun `should migrate if no down sync Simprints and CommCare objects`() = runTest {
         val currentData = ProtoProjectConfiguration
             .newBuilder()
             .setSynchronization(
@@ -40,6 +59,7 @@ class ProjectConfigSimprintsDownSyncConfigMigrationTest {
                         ProtoDownSynchronizationConfiguration
                             .newBuilder()
                             .clearSimprints()
+                            .clearCommCare()
                             .build(),
                     ),
             ).build()
@@ -47,7 +67,7 @@ class ProjectConfigSimprintsDownSyncConfigMigrationTest {
     }
 
     @Test
-    fun `migration moves old down sync values into simprints object`() = runTest {
+    fun `migration moves old down sync values into Simprints object`() = runTest {
         val currentData = ProtoProjectConfiguration
             .newBuilder()
             .setSynchronization(
@@ -82,7 +102,7 @@ class ProjectConfigSimprintsDownSyncConfigMigrationTest {
     }
 
     @Test
-    fun `migration moves frequency values into both simprints objects`() = runTest {
+    fun `migration moves frequency values into both Simprints objects`() = runTest {
         val currentData = ProtoProjectConfiguration
             .newBuilder()
             .setSynchronization(

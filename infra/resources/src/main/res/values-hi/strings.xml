@@ -325,7 +325,7 @@
     <string name="dashboard_sync_card_no_modules_message">कृपया सिंक करने के लिए मॉड्यूल चुनें</string>
     <string name="dashboard_sync_card_no_modules_button">मॉड्यूल्स</string>
     <string name="dashboard_sync_card_offline_message">कृपया सेटिंग में जाकर इंटरनेट को चालू करें</string>
-    <string name="dashboard_sync_card_offline_button">सेटिंग</string>
+    <string name="dashboard_sync_card_settings_button">सेटिंग</string>
     <string name="dashboard_sync_card_too_many_modules_message">बहुत सारे मॉड्यूल डाउनलोड किए जा चुके हैं.</string>
     <string name="dashboard_sync_card_relogin_required">सिंक करने के लिए आपको फिर से लॉग इन करना होगा</string>
 

@@ -412,7 +412,7 @@ class SyncFragmentTest {
     }
 
     private fun mockSyncToBFSIDAllowed(allowed: Boolean) {
-        every { viewModel.syncToBFSIDAllowed } returns mockk {
+        every { viewModel.isAnySyncAllowed } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<Boolean>>().onChanged(allowed)
             }
