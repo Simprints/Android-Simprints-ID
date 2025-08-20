@@ -128,6 +128,13 @@ internal class CommCareEventDataSource @Inject constructor(
      * This is called when a case is not found in the latest sync.
      */
     private fun generateEnrolmentRecordDeletionEvent(case: SyncedCaseEntity): Flow<EnrolmentRecordDeletionEvent> = flow {
+        if (case.simprintsId.isEmpty()) {
+            Simber.d("Skipping deletion event for caseId ${case.caseId} with empty simprintsId", tag = COMMCARE_SYNC)
+            // Directly remove the case from the cache if it has no simprintsId
+            commCareSyncCache.removeSyncedCase(case.caseId)
+            return@flow
+        }
+
         Simber.d("Generating deletion event for caseId ${case.caseId} with simprintsId ${case.simprintsId}", tag = COMMCARE_SYNC)
         pendingSyncedCases.add(case)
         emit(EnrolmentRecordDeletionEvent(
@@ -150,10 +157,18 @@ internal class CommCareEventDataSource @Inject constructor(
                 Simber.d(subjectActions)
                 val coSyncEnrolmentRecordEvents = parseRecordEvents(subjectActions)
 
+                if (coSyncEnrolmentRecordEvents == null) {
+                    Simber.d("No valid enrolment records found for caseId ${case.caseId}.", tag = COMMCARE_SYNC)
+                    // Add the case to the cache with an empty simprintsId so that we don't try to sync it again until updated
+                    commCareSyncCache.addSyncedCase(case)
+                    Simber.d("Added case ${case.caseId} with empty simprintsId to CommCareSyncCache", tag = COMMCARE_SYNC)
+                    return@flow
+                }
+
                 coSyncEnrolmentRecordEvents
-                    ?.events
-                    ?.filterIsInstance<EnrolmentRecordCreationEvent>()
-                    ?.forEach { event ->
+                    .events
+                    .filterIsInstance<EnrolmentRecordCreationEvent>()
+                    .forEach { event ->
                         pendingSyncedCases.add(case.copy(simprintsId = event.payload.subjectId))
                         emit(event)
                     }

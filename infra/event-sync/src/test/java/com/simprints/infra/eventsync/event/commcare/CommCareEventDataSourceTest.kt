@@ -636,4 +636,76 @@ class CommCareEventDataSourceTest {
             )
         }
     }
+
+    @Test
+    fun `generateEnrolmentRecordDeletionEvent skips deletion event and removes cache for empty simprintsId`() = runTest {
+        val caseIdPresent = "case_present"
+        val caseIdMissingWithEmptySimprints = "case_missing_empty_simprints"
+
+        // Setup scenario where CommCare has some cases (not empty)
+        every { mockMetadataCursor.count } returns 1
+        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockMetadataCursor.getString(COLUMN_INDEX_CASE_ID) } returns caseIdPresent
+
+        every { mockDataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockDataCursor.getString(COLUMN_INDEX_DATUM_ID) } returns SIMPRINTS_COSYNC_SUBJECT_ACTIONS
+        every { mockDataCursor.getString(COLUMN_INDEX_VALUE) } returns SUBJECT_ACTIONS_EVENT_1
+
+        // Setup previously synced cases - one present in CommCare, one missing with empty simprintsId
+        val previouslySyncedCases = listOf(
+            SyncedCaseEntity(caseIdPresent, "some_sid", 5000L),
+            SyncedCaseEntity(caseIdMissingWithEmptySimprints, "", 5000L) // Empty simprintsId
+        )
+        coEvery { mockCommCareSyncCache.getAllSyncedCases() } returns previouslySyncedCases
+
+        val result = dataSource.getEvents()
+        val events = result.eventFlow.toList()
+
+        // Should have one creation event for present case, no deletion event for missing case with empty simprintsId
+        assertEquals(1, result.totalCount)
+        assertEquals(1, events.size) // Only creation event, no deletion event
+
+        val creationEvent = events.find { it is EnrolmentRecordCreationEvent } as? EnrolmentRecordCreationEvent
+        assertEquals(SUBJECT_ACTIONS_EVENT_1_SUBJECT_ID, creationEvent?.payload?.subjectId)
+
+        // Verify no deletion events were generated
+        val deletionEvents = events.filterIsInstance<EnrolmentRecordDeletionEvent>()
+        assertEquals(0, deletionEvents.size)
+
+        // Verify that the case with empty simprintsId was removed from cache directly
+        coVerify { mockCommCareSyncCache.removeSyncedCase(caseIdMissingWithEmptySimprints) }
+    }
+
+    @Test
+    fun `loadEnrolmentRecordCreationEvents adds case to cache with empty simprintsId when no valid enrolment records found`() = runTest {
+        val caseId = "case1"
+        val lastModifiedTime = 15000L
+
+        every { mockMetadataCursor.count } returns 1
+        every { mockMetadataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockMetadataCursor.getString(COLUMN_INDEX_CASE_ID) } returns caseId
+        every { mockMetadataCursor.getString(COLUMN_INDEX_LAST_MODIFIED) } returns formatCommCareDate(lastModifiedTime)
+
+        // Setup cursor to return invalid/null JSON that results in null coSyncEnrolmentRecordEvents
+        every { mockDataCursor.moveToNext() } returnsMany listOf(true, false)
+        every { mockDataCursor.getString(COLUMN_INDEX_DATUM_ID) } returns SIMPRINTS_COSYNC_SUBJECT_ACTIONS
+        every { mockDataCursor.getString(COLUMN_INDEX_VALUE) } returns "" // This will cause null parsing
+
+        val result = dataSource.getEvents()
+        val events = result.eventFlow.toList()
+
+        assertEquals(1, result.totalCount)
+        assertEquals(0, events.size) // No events because invalid JSON resulted in null parsing
+
+        // Verify that case was added to cache with empty simprintsId
+        coVerify {
+            mockCommCareSyncCache.addSyncedCase(
+                match<SyncedCaseEntity> {
+                    it.caseId == caseId &&
+                    it.simprintsId == "" &&
+                    it.lastSyncedTimestamp == lastModifiedTime
+                }
+            )
+        }
+    }
 }
