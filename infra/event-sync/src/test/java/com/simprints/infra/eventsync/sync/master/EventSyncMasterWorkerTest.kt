@@ -135,21 +135,24 @@ internal class EventSyncMasterWorkerTest {
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
-        masterWorker = EventSyncMasterWorker(
-            appContext = ctx,
-            params = mockk(relaxed = true) {
-                every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-            },
-            downSyncWorkerBuilder = downSyncWorkerBuilder,
-            upSyncWorkerBuilder = upSyncWorkerBuilder,
-            configManager = configManager,
-            eventSyncCache = eventSyncCache,
-            eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
-            timeHelper = timeHelper,
-            dispatcher = testCoroutineRule.testCoroutineDispatcher,
-            securityManager = securityManager,
-            eventRepository = eventRepository,
+        masterWorker = spyk(
+            EventSyncMasterWorker(
+                appContext = ctx,
+                params = mockk(relaxed = true) {
+                    every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
+                },
+                downSyncWorkerBuilder = downSyncWorkerBuilder,
+                upSyncWorkerBuilder = upSyncWorkerBuilder,
+                configManager = configManager,
+                eventSyncCache = eventSyncCache,
+                eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
+                timeHelper = timeHelper,
+                dispatcher = testCoroutineRule.testCoroutineDispatcher,
+                securityManager = securityManager,
+                eventRepository = eventRepository,
+            )
         )
+        coEvery { masterWorker["showProgressNotification"]() } returns Unit
     }
 
     @Test
