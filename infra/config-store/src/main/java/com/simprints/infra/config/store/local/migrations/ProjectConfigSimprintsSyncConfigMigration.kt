@@ -17,7 +17,7 @@ class ProjectConfigSimprintsSyncConfigMigration @Inject constructor() : DataMigr
     }
 
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration) = with(currentData) {
-        !synchronization.down.hasSimprints()
+        !synchronization.down.hasSimprints() && !synchronization.down.hasCommCare()
     }
 
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {

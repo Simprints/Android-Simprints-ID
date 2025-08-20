@@ -4,7 +4,8 @@ import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.tokenization.TokenizableString
 
 data class DownSynchronizationConfiguration(
-    val simprints: SimprintsDownSynchronizationConfiguration,
+    val simprints: SimprintsDownSynchronizationConfiguration?,
+    val commCare: CommCareDownSynchronizationConfiguration?,
 ) {
     data class SimprintsDownSynchronizationConfiguration(
         val partitionType: PartitionType,
@@ -26,6 +27,8 @@ data class DownSynchronizationConfiguration(
             USER -> Partitioning.USER
         }
     }
+
+    data object CommCareDownSynchronizationConfiguration
 
     companion object {
         const val DEFAULT_DOWN_SYNC_MAX_AGE = "PT24H"

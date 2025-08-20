@@ -17,6 +17,7 @@ sealed class EventSyncWorkerState(
         val failedBecauseCloudIntegration: Boolean = false,
         val failedBecauseBackendMaintenance: Boolean = false,
         val failedBecauseTooManyRequest: Boolean = false,
+        val failedBecauseCommCarePermissionMissing: Boolean = false,
         val estimatedOutage: Long = 0L,
     ) : EventSyncWorkerState("Failed")
 
@@ -31,6 +32,7 @@ sealed class EventSyncWorkerState(
             failedBecauseCloudIntegration: Boolean = false,
             failedBecauseBackendMaintenance: Boolean = false,
             failedBecauseTooManyRequest: Boolean = false,
+            failedBecauseCommCarePermissionMissing: Boolean = false,
             estimatedOutage: Long = 0L,
         ) = when (state) {
             WorkInfo.State.ENQUEUED -> Enqueued
@@ -41,6 +43,7 @@ sealed class EventSyncWorkerState(
                 failedBecauseCloudIntegration,
                 failedBecauseBackendMaintenance,
                 failedBecauseTooManyRequest,
+                failedBecauseCommCarePermissionMissing,
                 estimatedOutage,
             )
             WorkInfo.State.BLOCKED -> Blocked

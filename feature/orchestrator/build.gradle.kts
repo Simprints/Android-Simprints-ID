@@ -38,4 +38,5 @@ dependencies {
     implementation(project(":infra:images"))
 
     implementation(libs.jackson.core)
+    implementation(libs.androidX.ui.preference)
 }

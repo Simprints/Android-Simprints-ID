@@ -330,7 +330,7 @@
     <string name="dashboard_sync_card_no_modules_message">Veuillez sélectionner les modules à synchroniser</string>
     <string name="dashboard_sync_card_no_modules_button">Modules</string>
     <string name="dashboard_sync_card_offline_message">Veuillez activer la connexion Internet dans les réglages</string>
-    <string name="dashboard_sync_card_offline_button">Réglages</string>
+    <string name="dashboard_sync_card_settings_button">Réglages</string>
     <string name="dashboard_sync_card_too_many_modules_message">Trop de modules ont été téléchargés.</string>
     <string name="dashboard_sync_card_relogin_required">Vous devez vous connecter pour synchroniser.</string>
 

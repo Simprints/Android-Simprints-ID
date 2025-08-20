@@ -1,4 +1,4 @@
-package com.simprints.infra.eventsync.sync.down.tasks
+package com.simprints.infra.eventsync.sync.common
 
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 
