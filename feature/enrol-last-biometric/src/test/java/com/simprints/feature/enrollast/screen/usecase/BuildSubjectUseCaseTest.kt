@@ -10,7 +10,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.infra.config.store.models.Finger
-import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
+import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.every

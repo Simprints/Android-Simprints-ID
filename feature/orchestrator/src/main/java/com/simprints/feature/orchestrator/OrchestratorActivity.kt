@@ -8,6 +8,7 @@ import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.clientapi.models.ClientApiConstants
 import com.simprints.feature.orchestrator.databinding.ActivityOrchestratorBinding
+import com.simprints.infra.config.store.LastCallingPackageStore
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ORCHESTRATION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.results.AppResult
@@ -22,6 +23,9 @@ internal class OrchestratorActivity : BaseActivity() {
 
     @Inject
     lateinit var activityTracker: ExecutionTracker
+
+    @Inject
+    lateinit var lastCallingPackageStore: LastCallingPackageStore
 
     /**
      * Flag for the navigation graph initialization state. The graph should only be initialized once
@@ -63,6 +67,7 @@ internal class OrchestratorActivity : BaseActivity() {
                 // Some co-sync functionality depends on the exact package name of the caller app,
                 // e.g. to switch content providers of debug and release variants of the caller app
                 extras.putString(ClientApiConstants.CALLER_PACKAGE_NAME, callingPackage)
+                lastCallingPackageStore.lastCallingPackageName = callingPackage
 
                 findNavController(R.id.orchestrationHost).setGraph(
                     R.navigation.graph_orchestration,

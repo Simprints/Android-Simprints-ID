@@ -214,7 +214,8 @@ message ProtoDownSynchronizationConfiguration {
     repeated string module_options = 3; // TODO: remove this field after migration to 2025.3.0
     bool is_tokenized = 4; // TODO: remove this field after migration to 2025.3.0
     string max_age = 5; // TODO: remove this field after migration to 2025.3.0
-    ProtoSimprintsDownSynchronizationConfiguration simprints = 6;
+    optional ProtoSimprintsDownSynchronizationConfiguration simprints = 6;
+    optional ProtoCommCareDownSynchronizationConfiguration comm_care = 7;
 
     message ProtoSimprintsDownSynchronizationConfiguration {
         PartitionType partition_type = 1;
@@ -223,6 +224,10 @@ message ProtoDownSynchronizationConfiguration {
         bool is_tokenized = 4;
         string max_age = 5;
         ProtoSyncFrequency frequency = 6;
+    }
+
+    message ProtoCommCareDownSynchronizationConfiguration {
+        // Empty for now, can be extended in the future
     }
 
     enum PartitionType {

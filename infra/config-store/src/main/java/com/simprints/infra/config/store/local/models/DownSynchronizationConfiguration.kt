@@ -6,12 +6,15 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
 import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration.ProtoSimprintsDownSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration.ProtoCommCareDownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
 
 internal fun DownSynchronizationConfiguration.toProto(): ProtoDownSynchronizationConfiguration = ProtoDownSynchronizationConfiguration
     .newBuilder()
-    .setSimprints(simprints.toProto())
+    .also { if (simprints != null) it.setSimprints(simprints.toProto()) }
+    .also { if (commCare != null) it.setCommCare(commCare.toProto()) }
     .build()
 
 internal fun SimprintsDownSynchronizationConfiguration.toProto(): ProtoSimprintsDownSynchronizationConfiguration {
@@ -27,6 +30,9 @@ internal fun SimprintsDownSynchronizationConfiguration.toProto(): ProtoSimprints
         .build()
 }
 
+internal fun CommCareDownSynchronizationConfiguration.toProto(): ProtoCommCareDownSynchronizationConfiguration =
+    ProtoCommCareDownSynchronizationConfiguration.newBuilder().build()
+
 internal fun DownSynchronizationConfiguration.PartitionType.toProto(): ProtoDownSynchronizationConfiguration.PartitionType = when (this) {
     DownSynchronizationConfiguration.PartitionType.PROJECT -> ProtoDownSynchronizationConfiguration.PartitionType.PROJECT
     DownSynchronizationConfiguration.PartitionType.MODULE -> ProtoDownSynchronizationConfiguration.PartitionType.MODULE
@@ -34,7 +40,8 @@ internal fun DownSynchronizationConfiguration.PartitionType.toProto(): ProtoDown
 }
 
 internal fun ProtoDownSynchronizationConfiguration.toDomain() = DownSynchronizationConfiguration(
-    simprints = simprints.toDomain(),
+    simprints = if (hasSimprints()) simprints.toDomain() else null,
+    commCare = if (hasCommCare()) commCare.toDomain() else null,
 )
 
 internal fun ProtoSimprintsDownSynchronizationConfiguration.toDomain() = SimprintsDownSynchronizationConfiguration(
@@ -55,3 +62,5 @@ internal fun ProtoDownSynchronizationConfiguration.PartitionType.toDomain(): Dow
         "invalid PartitionType $name",
     )
 }
+
+internal fun ProtoCommCareDownSynchronizationConfiguration.toDomain() = CommCareDownSynchronizationConfiguration

@@ -85,7 +85,7 @@ internal class AboutViewModel @Inject constructor(
     private fun load() = viewModelScope.launch {
         val configuration = configManager.getProjectConfiguration()
         val syncAndSearchConfig = SyncAndSearchConfig(
-            configuration.synchronization.down.simprints.partitionType.name,
+            configuration.synchronization.down.simprints?.partitionType?.name ?: "CommCare",
             configuration.identification.poolType.name,
         )
         _syncAndSearchConfig.postValue(syncAndSearchConfig)

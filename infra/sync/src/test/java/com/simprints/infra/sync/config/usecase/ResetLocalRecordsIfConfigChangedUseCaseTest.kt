@@ -36,12 +36,12 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
     }
 
     @Test
-    fun `should not reset local records when partition type not changes`() = runTest {
+    fun `should not reset local records when partition type has not changed`() = runTest {
         useCase(
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        simprints = synchronizationConfiguration.down.simprints.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
                             partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                         ),
                     ),
@@ -50,7 +50,7 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        simprints = synchronizationConfiguration.down.simprints.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
                             partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
                         ),
                     ),
@@ -67,12 +67,12 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
     }
 
     @Test
-    fun `should reset local records when partition type not changes`() = runTest {
+    fun `should reset local records when partition type changed`() = runTest {
         useCase(
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        simprints = synchronizationConfiguration.down.simprints.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
                             partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
                         ),
                     ),
@@ -81,8 +81,68 @@ class ResetLocalRecordsIfConfigChangedUseCaseTest {
             projectConfiguration.copy(
                 synchronization = synchronizationConfiguration.copy(
                     down = synchronizationConfiguration.down.copy(
-                        simprints = synchronizationConfiguration.down.simprints.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
                             partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        coVerify {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
+    fun `should reset local records when sync source changed from Simprints to CommCare`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
+                        ),
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = null,
+                        commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                    ),
+                ),
+            ),
+        )
+
+        coVerify {
+            syncOrchestrator.cancelEventSync()
+            syncOrchestrator.rescheduleEventSync()
+            eventSyncManager.resetDownSyncInfo()
+            enrolmentRecordRepository.deleteAll()
+        }
+    }
+
+    @Test
+    fun `should reset local records when sync source changed from CommCare to Simprints`() = runTest {
+        useCase(
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = null,
+                        commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                    ),
+                ),
+            ),
+            projectConfiguration.copy(
+                synchronization = synchronizationConfiguration.copy(
+                    down = synchronizationConfiguration.down.copy(
+                        simprints = synchronizationConfiguration.down.simprints?.copy(
+                            partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
                         ),
                     ),
                 ),

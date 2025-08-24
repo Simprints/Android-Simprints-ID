@@ -22,7 +22,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
+import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -63,7 +63,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var downSyncTask: EventDownSyncTask
+    lateinit var downSyncTask: SimprintsEventDownSyncTask
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
@@ -87,8 +87,7 @@ internal class EventSyncManagerTest {
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every {
-                synchronization.down.simprints.partitionType
-                    .toDomain()
+                synchronization.down.simprints?.partitionType?.toDomain()
             } returns Partitioning.MODULE
         }
 
@@ -99,7 +98,7 @@ internal class EventSyncManagerTest {
             eventRepository = eventRepository,
             upSyncScopeRepo = eventUpSyncScopeRepository,
             eventSyncCache = eventSyncCache,
-            downSyncTask = downSyncTask,
+            simprintsDownSyncTask = downSyncTask,
             eventRemoteDataSource = eventRemoteDataSource,
             configRepository = configRepository,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,

@@ -51,6 +51,9 @@ data class EventSyncState(
         ?.let { it.state as? EventSyncWorkerState.Failed }
         ?.estimatedOutage
 
+    fun isSyncFailedBecauseCommCarePermissionIsMissing() = syncWorkersInfo
+        .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCommCarePermissionMissing }
+
     fun isSyncFailed() = syncWorkersInfo
         .any {
             it.state is EventSyncWorkerState.Failed ||
