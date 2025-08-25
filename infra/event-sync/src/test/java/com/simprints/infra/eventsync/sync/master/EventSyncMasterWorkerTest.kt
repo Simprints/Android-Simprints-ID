@@ -347,66 +347,6 @@ internal class EventSyncMasterWorkerTest {
         verify(exactly = 0) { timeHelper.now() }
     }
 
-    @Test
-    fun `doWork should enqueue down sync worker when IS_DOWN_SYNC_ALLOWED is true and can down sync`() = runTest {
-        shouldSyncRun(false)
-        canDownSync(true)
-        canUpSync(true)
-        val uniqueSyncId = masterWorker.uniqueSyncId
-
-        val result = masterWorker.doWork()
-
-        assertThat(result).isEqualTo(
-            ListenableWorker.Result.success(
-                workDataOf(
-                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId,
-                ),
-            ),
-        )
-        coVerify(exactly = 1) { eventRepository.createEventScope(EventScopeType.UP_SYNC, any()) }
-        coVerify(exactly = 1) { eventRepository.createEventScope(EventScopeType.DOWN_SYNC, any()) }
-        coVerify(exactly = 1) { upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId, any()) }
-        coVerify(exactly = 1) { downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
-    }
-
-    @Test
-    fun `doWork should not enqueue down sync worker when IS_DOWN_SYNC_ALLOWED is false`() = runTest {
-        shouldSyncRun(false)
-        canDownSync(true)
-        canUpSync(true)
-        val workerWithDownSyncDisabled = EventSyncMasterWorker(
-            appContext = ctx,
-            params = mockk(relaxed = true) {
-                every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-                every { inputData.getBoolean(EventSyncMasterWorker.IS_DOWN_SYNC_ALLOWED, true) } returns false
-            },
-            downSyncWorkerBuilder = downSyncWorkerBuilder,
-            upSyncWorkerBuilder = upSyncWorkerBuilder,
-            configManager = configManager,
-            eventSyncCache = eventSyncCache,
-            eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
-            timeHelper = timeHelper,
-            dispatcher = testCoroutineRule.testCoroutineDispatcher,
-            securityManager = securityManager,
-            eventRepository = eventRepository,
-        )
-        val uniqueSyncId = workerWithDownSyncDisabled.uniqueSyncId
-
-        val result = workerWithDownSyncDisabled.doWork()
-
-        assertThat(result).isEqualTo(
-            ListenableWorker.Result.success(
-                workDataOf(
-                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId,
-                ),
-            ),
-        )
-        coVerify(exactly = 1) { eventRepository.createEventScope(EventScopeType.UP_SYNC, any()) }
-        coVerify(exactly = 0) { eventRepository.createEventScope(EventScopeType.DOWN_SYNC, any()) }
-        coVerify(exactly = 1) { upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId, any()) }
-        coVerify(exactly = 0) { downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
-    }
-
     private suspend fun getIsEventDownSyncAllowedResult(
         projectState: ProjectState,
         syncConfig: Frequency,

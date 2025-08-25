@@ -19,9 +19,9 @@ import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isMissingModulesToChooseFrom
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -172,7 +172,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val recordsToDownload = when {
             isEventSyncInProgress -> null
             isPreLogoutUpSync -> null
-            projectConfig.isEventDownSyncAllowed() -> try {
+            projectConfig.isSimprintsEventDownSyncAllowed() -> try {
                 withTimeout(COUNT_EVENTS_TIMEOUT_MILLIS) {
                     countEventsToDownloadWithCaching()
                 }

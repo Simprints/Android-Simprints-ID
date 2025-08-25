@@ -81,14 +81,14 @@ fun ProjectConfiguration.experimental(): ExperimentalProjectConfiguration = Expe
 // module sync
 
 fun ProjectConfiguration.isProjectWithModuleSync(): Boolean =
-    synchronization.down.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+    synchronization.down.simprints?.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
 fun ProjectConfiguration.isProjectWithPeriodicallyUpSync(): Boolean =
     synchronization.up.simprints.frequency == Frequency.ONLY_PERIODICALLY_UP_SYNC
 
 fun ProjectConfiguration.isModuleSelectionAvailable(): Boolean = isProjectWithModuleSync() && !isProjectWithPeriodicallyUpSync()
 
-fun ProjectConfiguration.areModuleOptionsEmpty(): Boolean = synchronization.down.simprints.moduleOptions
-    .isEmpty()
+fun ProjectConfiguration.areModuleOptionsEmpty(): Boolean = synchronization.down.simprints?.moduleOptions
+    ?.isEmpty() ?: true
 
 fun ProjectConfiguration.isMissingModulesToChooseFrom(): Boolean = isProjectWithModuleSync() && areModuleOptionsEmpty()
