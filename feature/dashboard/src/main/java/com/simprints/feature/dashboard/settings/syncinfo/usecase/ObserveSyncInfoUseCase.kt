@@ -19,6 +19,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isMissingModulesToChooseFrom
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
@@ -66,7 +67,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         configManager.observeProjectConfiguration(),
         configManager.observeDeviceConfiguration(),
         timer.observeTickOncePerMinute(),
-    ) { isConnected, isLoggedIn, isRefreshing, eventSyncState, imageSyncStatus, projectConfig, deviceConfig, _ ->
+    ) { isOnline, isLoggedIn, isRefreshing, eventSyncState, imageSyncStatus, projectConfig, deviceConfig, _ ->
+        val isEventSyncConnectionSufficient =
+            isOnline || (!isPreLogoutUpSync && projectConfig.isCommCareEventDownSyncAllowed())
+        val isImageSyncConnectionSufficient =
+            isOnline
 
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0
         val totalEvents = eventSyncState.total?.takeIf { it >= 1 } ?: 0
@@ -146,12 +151,16 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
         val isReLoginRequired = eventSyncState.isSyncFailedBecauseReloginRequired()
 
+        val isCommCarePermissionMissing =
+            eventSyncState.isSyncFailedBecauseCommCarePermissionIsMissing()
+
         val isModuleSelectionRequired =
             !isPreLogoutUpSync && projectConfig.isModuleSelectionAvailable() && deviceConfig.selectedModules.isEmpty()
         val isEventSyncAvailable =
             !isReLoginRequired &&
-                isConnected &&
+                isEventSyncConnectionSufficient &&
                 !eventSyncState.isSyncRunning() &&
+                !isCommCarePermissionMissing &&
                 !projectConfig.isMissingModulesToChooseFrom() &&
                 !isModuleSelectionRequired
 
@@ -227,13 +236,15 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
             isInstructionDefaultVisible = !isModuleSelectionRequired &&
-                isConnected &&
+                isEventSyncConnectionSufficient &&
                 !eventSyncState.isSyncFailed() &&
                 !eventSyncState.isSyncInProgress() &&
                 !isPreLogoutUpSync,
-            isInstructionNoModulesVisible = isConnected && isModuleSelectionRequired && !isEventSyncInProgress,
-            isInstructionOfflineVisible = !isConnected,
-            isInstructionErrorVisible = isConnected && eventSyncState.isSyncFailed(),
+            isInstructionCommCarePermissionVisible = isCommCarePermissionMissing,
+            isInstructionNoModulesVisible = isEventSyncConnectionSufficient && !isCommCarePermissionMissing && isModuleSelectionRequired
+                && !isEventSyncInProgress,
+            isInstructionOfflineVisible = !isEventSyncConnectionSufficient && !isCommCarePermissionMissing,
+            isInstructionErrorVisible = isEventSyncConnectionSufficient && !isCommCarePermissionMissing && eventSyncState.isSyncFailed(),
             instructionPopupErrorInfo = SyncInfoError(
                 isBackendMaintenance = eventSyncState.isSyncFailedBecauseBackendMaintenance(),
                 backendMaintenanceEstimatedOutage = eventSyncState.getEstimatedBackendMaintenanceOutage() ?: -1,
@@ -253,11 +264,11 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
 
         val syncInfoSectionImages = SyncInfoSectionImages(
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
-            isInstructionDefaultVisible = !imageSyncStatus.isSyncing && isConnected,
-            isInstructionOfflineVisible = !isConnected,
+            isInstructionDefaultVisible = !imageSyncStatus.isSyncing && isImageSyncConnectionSufficient,
+            isInstructionOfflineVisible = !isImageSyncConnectionSufficient,
             isProgressVisible = imageSyncStatus.isSyncing,
             progress = imageSyncProgress,
-            isSyncButtonEnabled = isConnected && !isReLoginRequired,
+            isSyncButtonEnabled = isImageSyncConnectionSufficient && !isReLoginRequired,
             isFooterLastSyncTimeVisible = !imageSyncStatus.isSyncing && imageLastSyncTimestamp.ms >= 0,
             footerLastSyncMinutesAgo = timeHelper.readableBetweenNowAndTime(imageLastSyncTimestamp),
         )

@@ -19,6 +19,7 @@ data class SyncInfoSectionRecords(
     val counterImagesToUpload: String = "",
     // instructions
     val isInstructionDefaultVisible: Boolean = false,
+    val isInstructionCommCarePermissionVisible: Boolean = false,
     val isInstructionNoModulesVisible: Boolean = false,
     val isInstructionOfflineVisible: Boolean = false,
     val isInstructionErrorVisible: Boolean = false,

@@ -1,6 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
@@ -95,6 +96,13 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
         binding.buttonSyncImagesNow.setOnClickListener {
             viewModel.toggleImageSync()
+        }
+        binding.textEventSyncInstructionsCommCarePermission.setOnClickListener {
+            startActivity(
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", requireContext().packageName, null)
+                }
+            )
         }
         binding.textEventSyncInstructionsOffline.setOnClickListener {
             startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
@@ -210,6 +218,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         // Instructions
         binding.textEventSyncInstructionsDefault.isGone = !records.isInstructionDefaultVisible
+        binding.textEventSyncInstructionsCommCarePermission.isGone = !records.isInstructionCommCarePermissionVisible
         binding.textEventSyncInstructionsOffline.isGone = !records.isInstructionOfflineVisible
         binding.textEventSyncInstructionsNoModules.isGone = !records.isInstructionNoModulesVisible
         binding.textEventSyncInstructionsError.isGone = !records.isInstructionErrorVisible

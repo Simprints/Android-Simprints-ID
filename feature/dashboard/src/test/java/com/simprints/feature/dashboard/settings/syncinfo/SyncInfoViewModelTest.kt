@@ -18,9 +18,9 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isMissingModulesToChooseFrom
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
@@ -150,7 +150,7 @@ class SyncInfoViewModelTest {
         }
 
         every { any<ProjectConfiguration>().isModuleSelectionAvailable() } returns false
-        every { any<ProjectConfiguration>().isEventDownSyncAllowed() } returns true
+        every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
         every { any<ProjectConfiguration>().isMissingModulesToChooseFrom() } returns false
 
         every { observeSyncInfo(any()) } returns flowOf(createDefaultSyncInfo())
