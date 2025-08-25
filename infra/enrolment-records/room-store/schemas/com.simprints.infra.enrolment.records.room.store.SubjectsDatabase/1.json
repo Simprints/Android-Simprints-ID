@@ -172,7 +172,7 @@
         ]
       },
       {
-        "tableName": "DbDbExternalCredential",
+        "tableName": "DbExternalCredential",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`value` TEXT NOT NULL, `subjectId` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`value`, `subjectId`), FOREIGN KEY(`subjectId`) REFERENCES `DbSubject`(`subjectId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {

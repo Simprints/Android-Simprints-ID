@@ -28,6 +28,6 @@ data class DbExternalCredential(
 ) {
     companion object {
         const val EXTERNAL_CREDENTIAL_VALUE_COLUMN = "value"
-        const val EXTERNAL_CREDENTIAL_TABLE_NAME = "DbDbExternalCredential"
+        const val EXTERNAL_CREDENTIAL_TABLE_NAME = "DbExternalCredential"
     }
 }

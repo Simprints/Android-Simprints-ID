@@ -66,10 +66,12 @@ class EventDownSyncTaskTest {
             moduleId = "moduleId".asTokenizableRaw(),
             attendantId = "attendantId".asTokenizableRaw(),
             biometricReferences = listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
-            externalCredential = ExternalCredential(
-                value = "value".asTokenizableEncrypted(),
-                subjectId = "subjectId",
-                type = ExternalCredentialType.NHISCard
+            externalCredentials = listOf(
+                ExternalCredential(
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard
+                )
             ),
         )
         val ENROLMENT_RECORD_MOVE_MODULE = EnrolmentRecordMoveEvent(
@@ -533,7 +535,11 @@ class EventDownSyncTaskTest {
                     FaceSample(byteArrayOf(), "format", "referenceId"),
                 ),
                 externalCredentials = listOf(
-                    ExternalCredential(value = "value".asTokenizableEncrypted(), subjectId = "subjectId", type = ExternalCredentialType.NHISCard)
+                    ExternalCredential(
+                        value = "value".asTokenizableEncrypted(),
+                        subjectId = "subjectId",
+                        type = ExternalCredentialType.NHISCard
+                    )
                 )
             ),
         )

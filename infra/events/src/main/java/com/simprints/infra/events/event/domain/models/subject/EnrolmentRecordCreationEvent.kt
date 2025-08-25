@@ -21,7 +21,7 @@ data class EnrolmentRecordCreationEvent(
         moduleId: TokenizableString,
         attendantId: TokenizableString,
         biometricReferences: List<BiometricReference>,
-        externalCredential: ExternalCredential?,
+        externalCredentials: List<ExternalCredential>,
     ) : this(
         UUID.randomUUID().toString(),
         EnrolmentRecordCreationPayload(
@@ -30,7 +30,7 @@ data class EnrolmentRecordCreationEvent(
             moduleId = moduleId,
             attendantId = attendantId,
             biometricReferences = biometricReferences,
-            externalCredential = externalCredential,
+            externalCredentials = externalCredentials,
         ),
     )
 
@@ -41,7 +41,7 @@ data class EnrolmentRecordCreationEvent(
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
         val biometricReferences: List<BiometricReference>,
-        val externalCredential: ExternalCredential?
+        val externalCredentials: List<ExternalCredential>
     )
 
     companion object {

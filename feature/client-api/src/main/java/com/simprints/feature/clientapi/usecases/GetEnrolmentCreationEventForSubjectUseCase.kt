@@ -53,7 +53,7 @@ internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(
         attendantId = attendantId,
         biometricReferences = EnrolmentRecordCreationEvent.buildBiometricReferences(fingerprintSamples, faceSamples, encoder),
         // TODO [CORE-3421] Review if EnrolmentRecordCreationEvent should contain List of external credentials, as it currently doesn't make sense
-        externalCredential = externalCredentials.firstOrNull()
+        externalCredentials = externalCredentials
     )
 
     companion object {

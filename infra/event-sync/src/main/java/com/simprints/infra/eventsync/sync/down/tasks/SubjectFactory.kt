@@ -33,7 +33,7 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
-            externalCredential = payload.externalCredential,
+            externalCredentials = payload.externalCredentials,
         )
     }
 
@@ -45,7 +45,7 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
-            externalCredential = null,
+            externalCredentials = emptyList(),
         )
     }
 
@@ -84,7 +84,7 @@ class SubjectFactory @Inject constructor(
             createdAt = Date(timeHelper.now().ms),
             fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
             faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
-            externalCredential = externalCredential,
+            externalCredentials = externalCredential?.let {  listOf(it) } ?: emptyList(),
         )
     }
 
@@ -97,7 +97,7 @@ class SubjectFactory @Inject constructor(
         updatedAt: Date? = null,
         fingerprintSamples: List<FingerprintSample> = emptyList(),
         faceSamples: List<FaceSample> = emptyList(),
-        externalCredential: ExternalCredential? = null,
+        externalCredentials: List<ExternalCredential> = emptyList(),
     ) = Subject(
         subjectId = subjectId,
         projectId = projectId,
@@ -107,7 +107,7 @@ class SubjectFactory @Inject constructor(
         updatedAt = updatedAt,
         fingerprintSamples = fingerprintSamples,
         faceSamples = faceSamples,
-        externalCredentials = externalCredential?.let {  listOf(it) } ?: emptyList()
+        externalCredentials = externalCredentials
     )
 
     private fun extractFingerprintSamples(fingerprintResponse: FingerprintCaptureResult) =

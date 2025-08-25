@@ -29,7 +29,7 @@ class Migration1to2Test {
         )
 
         // Verify external credentials table exists
-        val cursor = db2.query("SELECT name FROM sqlite_master WHERE name='DbDbExternalCredential'")
+        val cursor = db2.query("SELECT name FROM sqlite_master WHERE name='DbExternalCredential'")
         assertThat(cursor.count).isEqualTo(1)
         cursor.close()
         db1.close()

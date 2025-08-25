@@ -26,5 +26,5 @@ internal fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() = EnrolmentReco
     moduleId = moduleId.asTokenizableEncrypted(),
     attendantId = attendantId.asTokenizableEncrypted(),
     biometricReferences = biometricReferences?.map { it.fromApiToDomain() } ?: emptyList(),
-    externalCredential = externalCredential?.fromApiToDomain(subjectId)
+    externalCredentials = externalCredential?.let { listOf(it.fromApiToDomain(subjectId)) } ?: emptyList()
 )

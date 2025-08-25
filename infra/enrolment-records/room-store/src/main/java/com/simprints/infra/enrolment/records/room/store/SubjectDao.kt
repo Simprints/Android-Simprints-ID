@@ -30,7 +30,7 @@ interface SubjectDao {
     @Query("DELETE FROM DbBiometricTemplate WHERE uuid = :uuid")
     suspend fun deleteBiometricSample(uuid: String)
 
-    @Query("DELETE FROM DbDbExternalCredential WHERE value = :value")
+    @Query("DELETE FROM DbExternalCredential WHERE value = :value")
     suspend fun deleteExternalCredential(value: String)
 
     @RawQuery
@@ -42,7 +42,7 @@ interface SubjectDao {
     @RawQuery
     suspend fun loadSubjects(query: SupportSQLiteQuery): List<SubjectBiometrics>
 
-    @Query("SELECT * FROM DbDbExternalCredential")
+    @Query("SELECT * FROM DbExternalCredential")
     suspend fun getAllExternalCredentials(): List<DbExternalCredential>
 
     @RawQuery

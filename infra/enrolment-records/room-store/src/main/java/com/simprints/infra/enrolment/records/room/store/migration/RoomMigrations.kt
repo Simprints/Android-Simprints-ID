@@ -13,7 +13,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
             """
-            CREATE TABLE IF NOT EXISTS `DbDbExternalCredential` (
+            CREATE TABLE IF NOT EXISTS `DbExternalCredential` (
                 `value` TEXT NOT NULL,
                 `subjectId` TEXT NOT NULL,
                 `type` TEXT NOT NULL,

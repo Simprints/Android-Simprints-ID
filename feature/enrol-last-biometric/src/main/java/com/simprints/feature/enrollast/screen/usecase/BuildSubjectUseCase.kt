@@ -32,7 +32,7 @@ internal class BuildSubjectUseCase @Inject constructor(
         faceSamples = getFaceCaptureResult(params.steps)
             ?.let { result -> result.results.map { faceSample(result.referenceId, it) } }
             .orEmpty(),
-        externalCredential = getExternalCredentialResult(params.steps)
+        externalCredentials = getExternalCredentialResult(params.steps)?.let { listOf(it) } ?: emptyList()
     )
 
     // TODO [CORE-3421] When an external credential can be extracted from the UI-level steps, extract it here
