@@ -14,7 +14,6 @@ import com.simprints.infra.enrolment.records.room.store.models.SubjectBiometrics
 
 @Dao
 interface SubjectDao {
-    /*Remaining method*/
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSubject(subject: DbSubject)
 

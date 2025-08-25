@@ -45,7 +45,7 @@ class SubjectFactory @Inject constructor(
             moduleId = moduleId,
             fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
             faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences),
-            externalCredentials = emptyList(),
+            externalCredentials = externalCredential?.let { listOf(it) } ?: emptyList(),
         )
     }
 
