@@ -39,3 +39,4 @@ data class DbBiometricTemplate(
         const val FORMAT_COLUMN = "format"
     }
 }
+

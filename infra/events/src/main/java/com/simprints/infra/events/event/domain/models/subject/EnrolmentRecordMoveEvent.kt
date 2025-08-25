@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.externalcredential.ExternalCredential
 import com.simprints.core.domain.tokenization.TokenizableString
 import java.util.UUID
 
@@ -35,5 +36,6 @@ data class EnrolmentRecordMoveEvent(
         val moduleId: TokenizableString,
         val attendantId: TokenizableString,
         val biometricReferences: List<BiometricReference>?,
+        val externalCredential: ExternalCredential?,
     )
 }

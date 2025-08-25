@@ -15,6 +15,7 @@ internal fun SubjectBiometrics.toDomain() = Subject(
     updatedAt = subject.updatedAt?.toDate(),
     fingerprintSamples = biometricTemplates.filter { it.modality == Modality.FINGERPRINT.id }.map { it.toFingerprintSample() },
     faceSamples = biometricTemplates.filter { it.modality == Modality.FACE.id }.map { it.toFaceSample() },
+    externalCredentials = externalCredentials.map { it.toDomain() },
 )
 
 fun Long.toDate() = Date(this)

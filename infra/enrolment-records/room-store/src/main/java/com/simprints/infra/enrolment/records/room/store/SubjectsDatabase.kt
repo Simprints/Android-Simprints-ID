@@ -5,7 +5,10 @@ import androidx.annotation.Keep
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.simprints.infra.enrolment.records.room.store.SubjectsDatabase.Companion.SUBJECT_DB_VERSION
+import com.simprints.infra.enrolment.records.room.store.migration.MIGRATION_1_2
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
+import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Singleton
@@ -15,8 +18,9 @@ import javax.inject.Singleton
     entities = [
         DbSubject::class,
         DbBiometricTemplate::class,
+        DbExternalCredential::class,
     ],
-    version = 1,
+    version = SUBJECT_DB_VERSION,
     exportSchema = true,
 )
 @Keep
@@ -29,11 +33,14 @@ abstract class SubjectsDatabase : RoomDatabase() {
             factory: SupportOpenHelperFactory,
             dbName: String,
         ): SubjectsDatabase {
-            val builder = Room.databaseBuilder(context, SubjectsDatabase::class.java, dbName)
+            val builder = Room
+                .databaseBuilder(context, SubjectsDatabase::class.java, dbName)
+                .addMigrations(MIGRATION_1_2)
             if (BuildConfig.DB_ENCRYPTION) {
                 builder.openHelperFactory(factory)
             }
             return builder.build()
         }
+        const val SUBJECT_DB_VERSION = 2
     }
 }

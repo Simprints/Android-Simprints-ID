@@ -17,6 +17,7 @@ import com.simprints.infra.config.store.testtools.consentConfiguration
 import com.simprints.infra.config.store.testtools.faceConfiguration
 import com.simprints.infra.config.store.testtools.generalConfiguration
 import com.simprints.infra.config.store.testtools.identificationConfiguration
+import com.simprints.infra.config.store.testtools.multiFactorIdConfiguration
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
@@ -173,16 +174,17 @@ class ConfigLocalDataSourceImplTest {
     fun `should save the project configuration and update the device configuration correctly with an empty list of fingersToCollect if fingerprint config is missing`() =
         runTest {
             val projectConfigurationToSave = ProjectConfiguration(
-                "id",
-                "projectId",
-                "updatedAt",
-                generalConfiguration,
-                faceConfiguration,
-                null,
-                consentConfiguration,
-                identificationConfiguration,
-                synchronizationConfiguration,
-                null,
+                id = "id",
+                projectId = "projectId",
+                updatedAt = "updatedAt",
+                general = generalConfiguration,
+                face = faceConfiguration,
+                fingerprint = null,
+                consent = consentConfiguration,
+                identification = identificationConfiguration,
+                synchronization = synchronizationConfiguration,
+                multifactorId = multiFactorIdConfiguration,
+                custom = null,
             )
 
             configLocalDataSourceImpl.saveProjectConfiguration(projectConfigurationToSave)

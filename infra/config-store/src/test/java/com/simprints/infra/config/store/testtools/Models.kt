@@ -1,17 +1,20 @@
 package com.simprints.infra.config.store.testtools
 
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.local.models.ProtoAllowedAgeRange
 import com.simprints.infra.config.store.local.models.ProtoConsentConfiguration
 import com.simprints.infra.config.store.local.models.ProtoDecisionPolicy
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.store.local.models.ProtoDownSynchronizationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoExternalCredentialType
 import com.simprints.infra.config.store.local.models.ProtoFaceConfiguration
 import com.simprints.infra.config.store.local.models.ProtoFinger
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration
 import com.simprints.infra.config.store.local.models.ProtoFingerprintConfiguration.ProtoMaxCaptureAttempts
 import com.simprints.infra.config.store.local.models.ProtoGeneralConfiguration
 import com.simprints.infra.config.store.local.models.ProtoIdentificationConfiguration
+import com.simprints.infra.config.store.local.models.ProtoMultiFactorIdConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.store.local.models.ProtoSampleSynchronizationConfiguration
@@ -35,6 +38,7 @@ import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
 import com.simprints.infra.config.store.models.MaxCaptureAttempts
+import com.simprints.infra.config.store.models.MultiFactorIdConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
@@ -49,12 +53,14 @@ import com.simprints.infra.config.store.remote.models.ApiAllowedAgeRange
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiDeviceState
+import com.simprints.infra.config.store.remote.models.ApiExternalCredentialType
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration.ApiFaceSdkConfiguration
 import com.simprints.infra.config.store.remote.models.ApiFingerprintConfiguration
 import com.simprints.infra.config.store.remote.models.ApiGeneralConfiguration
 import com.simprints.infra.config.store.remote.models.ApiIdentificationConfiguration
 import com.simprints.infra.config.store.remote.models.ApiMaxCaptureAttempts
+import com.simprints.infra.config.store.remote.models.ApiMultiFactorIdConfiguration
 import com.simprints.infra.config.store.remote.models.ApiProject
 import com.simprints.infra.config.store.remote.models.ApiProjectConfiguration
 import com.simprints.infra.config.store.remote.models.ApiProjectState
@@ -405,6 +411,16 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     ),
 )
 
+internal val allowedExternalCredential = ExternalCredentialType.NHISCard
+
+internal val multiFactorIdConfiguration = MultiFactorIdConfiguration(
+    allowedExternalCredentials = listOf(allowedExternalCredential)
+)
+
+internal val protoMultiFactorIdConfiguration = ProtoMultiFactorIdConfiguration
+    .newBuilder()
+    .addAllowedExternalCredentials(ProtoExternalCredentialType.NHIS_CARD)
+
 internal val protoSynchronizationConfiguration = ProtoSynchronizationConfiguration
     .newBuilder()
     .setUp(
@@ -451,6 +467,12 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
             .build(),
     ).build()
 
+internal val apiAllowedExternalCredential = ApiExternalCredentialType.NHISCard
+
+internal val apiMultiFactorIdConfiguration = ApiMultiFactorIdConfiguration(
+    allowedExternalCredentials = listOf(apiAllowedExternalCredential)
+)
+
 internal val customKeyMap: Map<String, Any>? = mapOf(
     "key1" to 7,
     "key2" to 4.2,
@@ -460,29 +482,31 @@ internal val customKeyMap: Map<String, Any>? = mapOf(
 internal const val PROTO_CUSTOM_KEY_MAP_JSON = "{\"key1\":7,\"key2\":4.2,\"key3\":false,\"key4\":\"test\"}"
 
 internal val apiProjectConfiguration = ApiProjectConfiguration(
-    "id",
-    "projectId",
-    "updatedAt",
-    apiGeneralConfiguration,
-    apiFaceConfiguration,
-    apiFingerprintConfiguration,
-    apiConsentConfiguration,
-    apiIdentificationConfiguration,
-    apiSynchronizationConfiguration,
-    customKeyMap,
+    id = "id",
+    projectId = "projectId",
+    updatedAt = "updatedAt",
+    general = apiGeneralConfiguration,
+    face = apiFaceConfiguration,
+    fingerprint = apiFingerprintConfiguration,
+    consent = apiConsentConfiguration,
+    identification = apiIdentificationConfiguration,
+    synchronization = apiSynchronizationConfiguration,
+    multiFactorId = apiMultiFactorIdConfiguration,
+    custom = customKeyMap,
 )
 
 internal val projectConfiguration = ProjectConfiguration(
-    "id",
-    "projectId",
-    "updatedAt",
-    generalConfiguration,
-    faceConfiguration,
-    fingerprintConfiguration,
-    consentConfiguration,
-    identificationConfiguration,
-    synchronizationConfiguration,
-    customKeyMap,
+    id = "id",
+    projectId = "projectId",
+    updatedAt = "updatedAt",
+    general = generalConfiguration,
+    face = faceConfiguration,
+    fingerprint = fingerprintConfiguration,
+    consent = consentConfiguration,
+    identification = identificationConfiguration,
+    synchronization = synchronizationConfiguration,
+    multifactorId = multiFactorIdConfiguration,
+    custom = customKeyMap
 )
 
 internal val protoProjectConfiguration = ProtoProjectConfiguration
@@ -496,6 +520,7 @@ internal val protoProjectConfiguration = ProtoProjectConfiguration
     .setConsent(protoConsentConfiguration)
     .setIdentification(protoIdentificationConfiguration)
     .setSynchronization(protoSynchronizationConfiguration)
+    .setMultiFactorId(protoMultiFactorIdConfiguration)
     .setCustomJson(PROTO_CUSTOM_KEY_MAP_JSON)
     .build()
 

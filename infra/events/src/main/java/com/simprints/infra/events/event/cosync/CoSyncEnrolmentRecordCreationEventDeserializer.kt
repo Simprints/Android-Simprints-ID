@@ -50,11 +50,13 @@ class CoSyncEnrolmentRecordCreationEventDeserializer :
         return EnrolmentRecordCreationEvent(
             id,
             EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
-                subjectId,
-                projectId,
-                moduleId,
-                attendantId,
-                biometricReferences,
+                subjectId = subjectId,
+                projectId = projectId,
+                moduleId = moduleId,
+                attendantId = attendantId,
+                biometricReferences = biometricReferences,
+                // TODO [CORE-3421] Update when CoSync supports external credentials (MfID)
+                externalCredentials = emptyList()
             ),
         )
     }

@@ -75,6 +75,7 @@ internal data class OldProjectConfig(
         consent = consentConfiguration(),
         identification = identificationConfiguration(),
         synchronization = synchronizationConfiguration(),
+        multifactorId = null,
         custom = null,
     )
 
