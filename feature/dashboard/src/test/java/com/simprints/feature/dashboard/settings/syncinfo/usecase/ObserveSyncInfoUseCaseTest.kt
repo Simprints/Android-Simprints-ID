@@ -19,6 +19,8 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.canCoSyncData
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
@@ -84,6 +86,11 @@ class ObserveSyncInfoUseCaseTest {
         every { synchronization } returns mockk<SynchronizationConfiguration>(relaxed = true) {
             every { down } returns mockk<DownSynchronizationConfiguration>(relaxed = true) {
                 every { commCare } returns null
+            }
+            every { up } returns mockk<UpSynchronizationConfiguration>(relaxed = true) {
+                every { coSync } returns mockk<UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration>(relaxed = true) {
+                    every { kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+                }
             }
         }
     }
@@ -1003,7 +1010,7 @@ class ObserveSyncInfoUseCaseTest {
     }
 
     @Test
-    fun `should disable sync button when CommCare permission is missing`() = runTest {
+    fun `should enable sync button when CommCare permission is missing but co-sync up-sync possible`() = runTest {
         val mockFailedEventSyncState = mockk<EventSyncState>(relaxed = true) {
             every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns true
             every { isSyncRunning() } returns false
@@ -1011,27 +1018,29 @@ class ObserveSyncInfoUseCaseTest {
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
         every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
-        createUseCase()
-
-        val result = useCase().first()
-
-        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
-    }
-
-    @Test
-    fun `should allow sync when CommCare permission is granted and all conditions met`() = runTest {
-        val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
-            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns false
-            every { isSyncRunning() } returns false
-            every { isSyncFailedBecauseReloginRequired() } returns false
-        }
-        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockNormalEventSyncState)
-        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { mockProjectConfiguration.canCoSyncData() } returns true
         createUseCase()
 
         val result = useCase().first()
 
         assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
+    }
+
+    @Test
+    fun `should disable sync button when CommCare permission is missing and co-sync up-sync impossible`() = runTest {
+        val mockFailedEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns true
+            every { isSyncRunning() } returns false
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
+        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
+        every { mockProjectConfiguration.canCoSyncData() } returns false
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
     }
 
     @Test

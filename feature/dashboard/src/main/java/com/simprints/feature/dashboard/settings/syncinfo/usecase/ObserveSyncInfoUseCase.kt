@@ -20,6 +20,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.canCoSyncData
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
@@ -169,6 +170,12 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             else -> OnStandby
         }
 
+        val isUpSyncStillAllowedWhenCommCareSyncBlockedByDeniedPermission = // quite a specific case hence the name
+            isCommCareSyncBlockedByDeniedPermission && projectConfig.canCoSyncData()
+        val isSyncButtonEnabled =
+            ((eventSyncVisibleSection == OnStandby) || isUpSyncStillAllowedWhenCommCareSyncBlockedByDeniedPermission)
+                    && !isReLoginRequired
+
         val projectId = authStore.signedInProjectId
 
         val recordsTotal = when {
@@ -253,7 +260,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             isProgressVisible = eventSyncVisibleSection == InProgress,
             progress = eventSyncProgress,
             isSyncButtonVisible = !isPreLogoutUpSync || eventSyncState.isSyncFailed(),
-            isSyncButtonEnabled = eventSyncVisibleSection == OnStandby && !isReLoginRequired,
+            isSyncButtonEnabled = isSyncButtonEnabled,
             isSyncButtonForRetry = eventSyncState.isSyncFailed(),
             isFooterSyncInProgressVisible = isPreLogoutUpSync && isEventSyncInProgress,
             isFooterReadyToLogOutVisible = isPreLogoutUpSync && eventSyncState.isSyncCompleted() && !imageSyncStatus.isSyncing,
