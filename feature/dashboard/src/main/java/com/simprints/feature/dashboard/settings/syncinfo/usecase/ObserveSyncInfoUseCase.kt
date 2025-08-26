@@ -161,7 +161,8 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val isEventSyncConnectionBlocked =
             !isOnline && !isCommCareSyncExpected // CommCare would be able to sync even if device is offline
 
-        val eventSyncVisibleSection = when {
+        // an intermediate calculation of sync state shown in UI - not to be confused with the data layer-specific EventSyncState
+        val eventSyncVisibleState = when {
             isEventSyncInProgress -> InProgress
             isCommCareSyncBlockedByDeniedPermission -> CommCareError
             isModuleSelectionRequired -> NoModulesError
@@ -173,7 +174,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         val isUpSyncStillAllowedWhenCommCareSyncBlockedByDeniedPermission = // quite a specific case hence the name
             isCommCareSyncBlockedByDeniedPermission && projectConfig.canCoSyncData()
         val isSyncButtonEnabled =
-            ((eventSyncVisibleSection == OnStandby) || isUpSyncStillAllowedWhenCommCareSyncBlockedByDeniedPermission)
+            ((eventSyncVisibleState == OnStandby) || isUpSyncStillAllowedWhenCommCareSyncBlockedByDeniedPermission)
                     && !isReLoginRequired
 
         val projectId = authStore.signedInProjectId
@@ -247,17 +248,17 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
             counterRecordsToDownload = recordsToDownload?.let { "${it.count}${if (it.isLowerBound) "+" else ""}" }.orEmpty(),
             isCounterImagesToUploadVisible = isPreLogoutUpSync,
             counterImagesToUpload = imagesToUpload?.toString().orEmpty(),
-            isInstructionDefaultVisible = eventSyncVisibleSection == OnStandby,
-            isInstructionCommCarePermissionVisible = eventSyncVisibleSection == CommCareError,
-            isInstructionNoModulesVisible = eventSyncVisibleSection == NoModulesError,
-            isInstructionOfflineVisible = eventSyncVisibleSection == OfflineError,
-            isInstructionErrorVisible = eventSyncVisibleSection == Error,
+            isInstructionDefaultVisible = eventSyncVisibleState == OnStandby,
+            isInstructionCommCarePermissionVisible = eventSyncVisibleState == CommCareError,
+            isInstructionNoModulesVisible = eventSyncVisibleState == NoModulesError,
+            isInstructionOfflineVisible = eventSyncVisibleState == OfflineError,
+            isInstructionErrorVisible = eventSyncVisibleState == Error,
             instructionPopupErrorInfo = SyncInfoError(
                 isBackendMaintenance = eventSyncState.isSyncFailedBecauseBackendMaintenance(),
                 backendMaintenanceEstimatedOutage = eventSyncState.getEstimatedBackendMaintenanceOutage() ?: -1,
                 isTooManyRequests = eventSyncState.isSyncFailedBecauseTooManyRequests(),
             ),
-            isProgressVisible = eventSyncVisibleSection == InProgress,
+            isProgressVisible = eventSyncVisibleState == InProgress,
             progress = eventSyncProgress,
             isSyncButtonVisible = !isPreLogoutUpSync || eventSyncState.isSyncFailed(),
             isSyncButtonEnabled = isSyncButtonEnabled,
@@ -337,16 +338,21 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     }
 }
 
-private sealed class EventSyncVisibleSection
+/**
+ * A representation of a non-overlapping, exhaustive "sync state" as shown in UI.
+ * To be used in a temporary UI state calculation: good to be used with exhaustive pattern matching.
+ * Not to be confused with the data layer-specific EventSyncState.
+  */
+private sealed class EventSyncVisibleState
 
-private object OnStandby : EventSyncVisibleSection()
+private object OnStandby : EventSyncVisibleState()
 
-private object InProgress : EventSyncVisibleSection()
+private object InProgress : EventSyncVisibleState()
 
-private object CommCareError : EventSyncVisibleSection()
+private object CommCareError : EventSyncVisibleState()
 
-private object NoModulesError : EventSyncVisibleSection()
+private object NoModulesError : EventSyncVisibleState()
 
-private object OfflineError : EventSyncVisibleSection()
+private object OfflineError : EventSyncVisibleState()
 
-private object Error : EventSyncVisibleSection()
+private object Error : EventSyncVisibleState()
