@@ -49,10 +49,12 @@ class ApiEnrolmentRecordCreationEventTest {
                     "NEC_1",
                 ),
             ),
-            externalCredential = ExternalCredential(
-                value = "value".asTokenizableEncrypted(),
-                subjectId = "subjectId",
-                type = ExternalCredentialType.NHISCard
+            externalCredentials = listOf(
+                ExternalCredential(
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard
+                )
             ),
         )
 

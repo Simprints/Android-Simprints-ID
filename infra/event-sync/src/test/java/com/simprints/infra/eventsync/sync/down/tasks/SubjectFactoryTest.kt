@@ -64,7 +64,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
-            externalCredential = null
+            externalCredentials = emptyList()
         )
         val result = factory.buildSubjectFromCreationPayload(payload)
         val expected = Subject(
@@ -99,6 +99,7 @@ class SubjectFactoryTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference),
+            externalCredential = null
         )
         val result = factory.buildSubjectFromMovePayload(payload)
 
@@ -320,7 +321,7 @@ class SubjectFactoryTest {
             moduleId = expected.moduleId,
             fingerprintSamples = expected.fingerprintSamples,
             faceSamples = expected.faceSamples,
-            externalCredential = expected.externalCredentials.first()
+            externalCredentials = expected.externalCredentials
         )
         assertThat(result).isEqualTo(expected)
     }

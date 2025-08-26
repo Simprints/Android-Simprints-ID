@@ -81,6 +81,11 @@ class EventDownSyncTaskTest {
                 DEFAULT_MODULE_ID_2,
                 "attendantId".asTokenizableRaw(),
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                ExternalCredential(
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard
+                )
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
@@ -96,6 +101,11 @@ class EventDownSyncTaskTest {
                 "moduleId".asTokenizableRaw(),
                 DEFAULT_USER_ID,
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                ExternalCredential(
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard
+                )
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
@@ -111,6 +121,11 @@ class EventDownSyncTaskTest {
                 "moduleId".asTokenizableRaw(),
                 DEFAULT_USER_ID_2,
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
+                ExternalCredential(
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard
+                )
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
