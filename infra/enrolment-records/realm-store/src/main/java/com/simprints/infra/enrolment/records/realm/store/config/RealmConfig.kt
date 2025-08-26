@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.enrolment.records.realm.store.BuildConfig
 import com.simprints.infra.enrolment.records.realm.store.migration.RealmMigrations
+import com.simprints.infra.enrolment.records.realm.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.realm.store.models.DbFaceSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbFingerprintSample
 import com.simprints.infra.enrolment.records.realm.store.models.DbProject
@@ -26,6 +27,7 @@ class RealmConfig @Inject constructor() {
                 DbFaceSample::class,
                 DbSubject::class,
                 DbProject::class,
+                DbExternalCredential::class,
             ),
         ).name("$databaseName.realm")
         .schemaVersion(REALM_SCHEMA_VERSION)
@@ -36,6 +38,6 @@ class RealmConfig @Inject constructor() {
         .build()
 
     companion object {
-        private const val REALM_SCHEMA_VERSION: Long = 17
+        private const val REALM_SCHEMA_VERSION: Long = 18
     }
 }

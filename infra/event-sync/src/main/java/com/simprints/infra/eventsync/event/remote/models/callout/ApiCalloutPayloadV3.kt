@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.callout
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEventV3.ConfirmationCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEventV3.EnrolmentCalloutPayload
@@ -15,6 +16,7 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 @JsonInclude(Include.NON_NULL)
+@ExcludedFromGeneratedTestCoverageReports("Data class")
 internal data class ApiCalloutPayloadV3(
     override val startTime: ApiTimestamp,
     val callout: ApiCallout,
@@ -76,6 +78,7 @@ internal data class ApiCalloutPayloadV3(
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when (tokenKeyType) {
         TokenKeyType.AttendantId -> "callout.userId"
         TokenKeyType.ModuleId -> "callout.moduleId"
+        TokenKeyType.ExternalCredential -> "callout.externalCredential"
         TokenKeyType.Unknown -> null
     }
 }

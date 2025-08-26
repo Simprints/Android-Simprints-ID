@@ -1,6 +1,8 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.externalcredential.ExternalCredential
+import com.simprints.core.domain.externalcredential.ExternalCredentialType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
@@ -28,6 +30,11 @@ class ApiEnrolmentRecordMoveEventTest {
                         "NEC_1",
                     ),
                 ),
+                ApiExternalCredential(
+                    value = "value",
+                    id = "subjectId",
+                    type = ExternalCredentialType.NHISCard.toString()
+                )
             ),
             ApiEnrolmentRecordMovePayload.ApiEnrolmentRecordDeletionInMove(
                 "subjectId",
@@ -51,6 +58,11 @@ class ApiEnrolmentRecordMoveEventTest {
                         "NEC_1",
                     ),
                 ),
+                ExternalCredential(
+                    value = "value".asTokenizableEncrypted(),
+                    subjectId = "subjectId",
+                    type = ExternalCredentialType.NHISCard
+                )
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",

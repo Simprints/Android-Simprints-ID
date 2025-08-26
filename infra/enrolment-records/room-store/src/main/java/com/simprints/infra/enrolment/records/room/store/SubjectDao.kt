@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.simprints.infra.enrolment.records.room.store.models.DbBiometricTemplate
+import com.simprints.infra.enrolment.records.room.store.models.DbExternalCredential
 import com.simprints.infra.enrolment.records.room.store.models.DbSubject
 import com.simprints.infra.enrolment.records.room.store.models.SubjectBiometrics
 
@@ -19,11 +20,17 @@ interface SubjectDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBiometricSamples(samples: List<DbBiometricTemplate>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertExternalCredentials(value: List<DbExternalCredential>)
+
     @Query("DELETE FROM DbSubject WHERE subjectId = :subjectId")
     suspend fun deleteSubject(subjectId: String)
 
     @Query("DELETE FROM DbBiometricTemplate WHERE uuid = :uuid")
     suspend fun deleteBiometricSample(uuid: String)
+
+    @Query("DELETE FROM DbExternalCredential WHERE value = :value")
+    suspend fun deleteExternalCredential(value: String)
 
     @RawQuery
     suspend fun deleteSubjects(query: SupportSQLiteQuery): Int
@@ -33,6 +40,9 @@ interface SubjectDao {
 
     @RawQuery
     suspend fun loadSubjects(query: SupportSQLiteQuery): List<SubjectBiometrics>
+
+    @Query("SELECT * FROM DbExternalCredential")
+    suspend fun getAllExternalCredentials(): List<DbExternalCredential>
 
     @RawQuery
     suspend fun countSubjects(query: SupportSQLiteQuery): Int

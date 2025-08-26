@@ -289,6 +289,10 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
             val dbFaces = samples.map { it.toRoomDb(subject.subjectId) }
             subjectDao.insertBiometricSamples(dbFaces)
         }
+        subject.externalCredentials.takeIf { it.isNotEmpty() }?.let { credentials ->
+            val dbExternalCredentials = credentials.map { it.toRoomDb() }
+            subjectDao.insertExternalCredentials(dbExternalCredentials)
+        }
     }
 
     private suspend fun updateSubject(action: SubjectAction.Update) {
@@ -313,6 +317,9 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
                     action.fingerprintSamplesToAdd.map { it.toRoomDb(action.subjectId) }
             if (templatesToAdd.isNotEmpty()) {
                 subjectDao.insertBiometricSamples(templatesToAdd)
+            }
+            if (action.externalCredentialsToAdd.isNotEmpty()) {
+                subjectDao.insertExternalCredentials(action.externalCredentialsToAdd.map { it.toRoomDb() })
             }
         } else {
             Simber.e(

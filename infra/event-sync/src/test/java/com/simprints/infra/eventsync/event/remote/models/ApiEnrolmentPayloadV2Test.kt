@@ -14,7 +14,8 @@ class ApiEnrolmentPayloadV2Test {
             when (it) {
                 TokenKeyType.AttendantId -> assertThat(result).isEqualTo("attendantId")
                 TokenKeyType.ModuleId -> assertThat(result).isEqualTo("moduleId")
-                else -> assertThat(result).isNull()
+                TokenKeyType.ExternalCredential -> assertThat(result).isEqualTo("externalCredential")
+                TokenKeyType.Unknown -> assertThat(result).isNull()
             }
         }
     }
