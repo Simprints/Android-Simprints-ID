@@ -91,6 +91,27 @@ class ImageSyncTimestampProviderTest {
     }
 
     @Test
+    fun `getLastImageSyncTimestamp returns null when no timestamp exists`() {
+        every { sharedPreferences.contains("IMAGE_SYNC_COMPLETION_TIME_MILLIS") } returns false
+        every { sharedPreferences.getLong("IMAGE_SYNC_COMPLETION_TIME_MILLIS", 0) } returns 0
+
+        val result = imageSyncTimestampProvider.getLastImageSyncTimestamp()
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun `getLastImageSyncTimestamp returns correct timestamp when exists`() {
+        val storedTimestamp = 1234567890L
+        every { sharedPreferences.contains("IMAGE_SYNC_COMPLETION_TIME_MILLIS") } returns true
+        every { sharedPreferences.getLong("IMAGE_SYNC_COMPLETION_TIME_MILLIS", 0) } returns storedTimestamp
+
+        val result = imageSyncTimestampProvider.getLastImageSyncTimestamp()
+
+        assertThat(result).isEqualTo(storedTimestamp)
+    }
+
+    @Test
     fun `clearTimestamp clears all timestamp preferences`() {
         imageSyncTimestampProvider.clearTimestamp()
 

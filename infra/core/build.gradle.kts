@@ -18,6 +18,7 @@ dependencies {
     api(libs.androidX.multidex)
     api(libs.androidX.annotation.annotation)
     api(libs.androidX.lifecycle.livedata.ktx)
+    api(libs.androidX.lifecycle.process)
 
     api(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.camera2)

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timer
 import com.simprints.core.tools.time.Timestamp
@@ -19,7 +20,6 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
-import com.simprints.infra.config.store.models.isMissingModulesToChooseFrom
 import com.simprints.infra.config.store.models.isModuleSelectionAvailable
 import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
@@ -66,6 +66,7 @@ class ObserveSyncInfoUseCaseTest {
     private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val timeHelper = mockk<TimeHelper>()
     private val timer = mockk<Timer>()
+    private val appForegroundStateTracker = mockk<AppForegroundStateTracker>()
 
     private lateinit var useCase: ObserveSyncInfoUseCase
 
@@ -163,10 +164,11 @@ class ObserveSyncInfoUseCaseTest {
 
         every { tokenizationProcessor.decrypt(any(), any(), any()) } returns TokenizableString.Raw("decrypted_module")
 
+        every { appForegroundStateTracker.observeAppInForeground() } returns flowOf(true)
+
         every { any<ProjectConfiguration>().isModuleSelectionAvailable() } returns false
         every { any<ProjectConfiguration>().isSimprintsEventDownSyncAllowed() } returns true
         every { any<ProjectConfiguration>().isCommCareEventDownSyncAllowed() } returns false
-        every { any<ProjectConfiguration>().isMissingModulesToChooseFrom() } returns false
     }
 
     private fun createUseCase() {
@@ -181,6 +183,7 @@ class ObserveSyncInfoUseCaseTest {
             tokenizationProcessor = tokenizationProcessor,
             timeHelper = timeHelper,
             timer = timer,
+            appForegroundStateTracker = appForegroundStateTracker,
         )
     }
 
@@ -969,6 +972,7 @@ class ObserveSyncInfoUseCaseTest {
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
         createUseCase()
 
         val result = useCase().first()
@@ -1006,6 +1010,7 @@ class ObserveSyncInfoUseCaseTest {
         }
         every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockFailedEventSyncState)
         every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
         createUseCase()
 
         val result = useCase().first()
@@ -1077,6 +1082,21 @@ class ObserveSyncInfoUseCaseTest {
             every { lastUpdateTimeMillis } returns null
         }
         every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageStatusWithoutLastSync)
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionImages.isFooterLastSyncTimeVisible).isFalse()
+    }
+
+    @Test
+    fun `should have hidden image last sync time footer when timestamp is negative`() = runTest {
+        val mockImageStatusWithNegativeTimestamp = mockk<ImageSyncStatus>(relaxed = true) {
+            every { isSyncing } returns false
+            every { progress } returns null
+            every { lastUpdateTimeMillis } returns -1L
+        }
+        every { syncOrchestrator.observeImageSyncStatus() } returns MutableStateFlow(mockImageStatusWithNegativeTimestamp)
         createUseCase()
 
         val result = useCase().first()
@@ -1276,5 +1296,37 @@ class ObserveSyncInfoUseCaseTest {
         assertThat(result.syncInfoSectionModules.moduleCounts).hasSize(2) // total + the module
         assertThat(result.syncInfoSectionModules.moduleCounts[1].name).isEqualTo("raw_module_name")
         verify(exactly = 0) { tokenizationProcessor.decrypt(any(), any(), any()) }
+    }
+
+    @Test
+    fun `should show CommCare permission missing when does not have permission`() = runTest {
+        val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns true
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockNormalEventSyncState)
+        every { mockProjectConfiguration.isCommCareEventDownSyncAllowed() } returns true
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isInstructionCommCarePermissionVisible).isTrue()
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isFalse()
+        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isFalse()
+    }
+
+    @Test
+    fun `should hide CommCare permission instruction when does not have permission sync error`() = runTest {
+        val mockNormalEventSyncState = mockk<EventSyncState>(relaxed = true) {
+            every { isSyncFailedBecauseCommCarePermissionIsMissing() } returns false
+        }
+        every { eventSyncManager.getLastSyncState(any()) } returns MutableLiveData(mockNormalEventSyncState)
+        every { connectivityTracker.observeIsConnected().asFlow() } returns flowOf(true)
+        createUseCase()
+
+        val result = useCase().first()
+
+        assertThat(result.syncInfoSectionRecords.isInstructionCommCarePermissionVisible).isFalse()
+        assertThat(result.syncInfoSectionRecords.isSyncButtonEnabled).isTrue()
+        assertThat(result.syncInfoSectionRecords.isInstructionDefaultVisible).isTrue()
     }
 }

@@ -1,7 +1,6 @@
 package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -616,78 +615,5 @@ class ProjectConfigurationTest {
             ),
         )
         assertThat(config.isModuleSelectionAvailable()).isFalse()
-    }
-
-    @Test
-    fun `areModuleOptionsEmpty should return true when moduleOptions is empty`() {
-        val config = projectConfiguration.copy(
-            synchronization = synchronizationConfiguration.copy(
-                down = synchronizationConfiguration.down.copy(
-                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
-                        moduleOptions = emptyList(),
-                    ),
-                ),
-            ),
-        )
-        assertThat(config.areModuleOptionsEmpty()).isTrue()
-    }
-
-    @Test
-    fun `areModuleOptionsEmpty should return false when moduleOptions is not empty`() {
-        val config = projectConfiguration.copy(
-            synchronization = synchronizationConfiguration.copy(
-                down = synchronizationConfiguration.down.copy(
-                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
-                        moduleOptions = listOf("module1".asTokenizableEncrypted()),
-                    ),
-                ),
-            ),
-        )
-        assertThat(config.areModuleOptionsEmpty()).isFalse()
-    }
-
-    @Test
-    fun `isMissingModulesToChooseFrom should return true when project has module sync and empty module options`() {
-        val config = projectConfiguration.copy(
-            synchronization = synchronizationConfiguration.copy(
-                down = synchronizationConfiguration.down.copy(
-                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                        moduleOptions = emptyList(),
-                    ),
-                ),
-            ),
-        )
-        assertThat(config.isMissingModulesToChooseFrom()).isTrue()
-    }
-
-    @Test
-    fun `isMissingModulesToChooseFrom should return false when project has module sync but non-empty module options`() {
-        val config = projectConfiguration.copy(
-            synchronization = synchronizationConfiguration.copy(
-                down = synchronizationConfiguration.down.copy(
-                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
-                        moduleOptions = listOf("module1".asTokenizableEncrypted()),
-                    ),
-                ),
-            ),
-        )
-        assertThat(config.isMissingModulesToChooseFrom()).isFalse()
-    }
-
-    @Test
-    fun `isMissingModulesToChooseFrom should return false when project has non-module sync and empty module options`() {
-        val config = projectConfiguration.copy(
-            synchronization = synchronizationConfiguration.copy(
-                down = synchronizationConfiguration.down.copy(
-                    simprints = simprintsDownSyncConfigurationConfiguration.copy(
-                        partitionType = DownSynchronizationConfiguration.PartitionType.PROJECT,
-                        moduleOptions = listOf(),
-                    ),
-                ),
-            ),
-        )
-        assertThat(config.isMissingModulesToChooseFrom()).isFalse()
     }
 }

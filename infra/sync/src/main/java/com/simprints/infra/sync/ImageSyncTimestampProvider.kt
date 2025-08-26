@@ -23,6 +23,12 @@ class ImageSyncTimestampProvider @Inject constructor(
             timeHelper.now().ms - lastSyncTimestamp
         }
 
+    fun getLastImageSyncTimestamp(): Long? = securePrefs
+        .getLong(IMAGE_SYNC_COMPLETION_TIME_MILLIS, 0)
+        .takeIf {
+            securePrefs.contains(IMAGE_SYNC_COMPLETION_TIME_MILLIS)
+        }
+
     fun clearTimestamp() {
         securePrefs.edit { clear() }
     }
