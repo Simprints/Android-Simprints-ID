@@ -18,6 +18,7 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.eventsync.event.commcare.cache.CommCareSyncCache
 import com.simprints.infra.eventsync.event.commcare.cache.SyncedCaseEntity
 import com.simprints.infra.eventsync.status.down.domain.CommCareEventSyncResult
+import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.COMMCARE_SYNC
 import com.simprints.infra.logging.Simber
 import com.simprints.libsimprints.Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS
@@ -35,23 +36,50 @@ internal class CommCareEventDataSource @Inject constructor(
     private val lastCallingPackageStore: LastCallingPackageStore,
     @ApplicationContext private val context: Context,
 ) {
-
     private val pendingSyncedCases = CopyOnWriteArrayList<SyncedCaseEntity>()
-    
+
     // Pre-created date formatters to avoid repeated instantiation during sync
     private val commCareDateFormats = listOf(
-        SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US),  // Standard Date.toString() format
-        SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US)     // Numeric timezone fallback
+        SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US), // Standard Date.toString() format
+        SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US), // Numeric timezone fallback
     )
-    fun getEvents(): CommCareEventSyncResult {
-        pendingSyncedCases.clear() // Clear any leftover state from previous syncs
-        val totalCount = count()
-        val eventFlow = loadDataFromCommCare()
 
-        return CommCareEventSyncResult(
-            totalCount = totalCount,
-            eventFlow = eventFlow,
-        )
+    fun getEvents(queryEvent: RemoteEventQuery): CommCareEventSyncResult {
+        pendingSyncedCases.clear() // Clear any leftover state from previous syncs
+
+        return if (queryEvent.externalIds.isNullOrEmpty()) {
+            CommCareEventSyncResult(
+                totalCount = count(),
+                eventFlow = syncAllUpdatedCases(),
+            )
+        } else {
+            CommCareEventSyncResult(
+                totalCount = queryEvent.externalIds.size,
+                eventFlow = syncSpecificCases(queryEvent.externalIds),
+            )
+        }
+    }
+
+    private fun syncSpecificCases(caseIds: List<String>) = flow {
+        caseIds.forEach { caseId ->
+            Simber.i("Processing caseId: $caseId", tag = COMMCARE_SYNC)
+            var commCareLastModifiedTime = 0L
+            val caseMetadataUri = getCaseMetadataUri().buildUpon().appendPath(caseId).build()
+            context.contentResolver
+                .query(caseMetadataUri, arrayOf(COLUMN_CASE_ID, COLUMN_LAST_MODIFIED), null, null, null)
+                ?.use { cursor ->
+                    while (cursor.moveToNext()) {
+                        val commCareLastModifiedString = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_MODIFIED))
+                        commCareLastModifiedTime = parseCommCareDateToMillis(commCareLastModifiedString)
+                    }
+                }
+
+            // We don't know the simprintsId until we parse its subjectActions so it will be filled later
+            loadEnrolmentRecordCreationEvents(SyncedCaseEntity(caseId, "", commCareLastModifiedTime))
+                .collect {
+                    emit(it)
+                }
+        }
     }
 
     private fun count(): Int {
@@ -62,14 +90,15 @@ internal class CommCareEventDataSource @Inject constructor(
         return count
     }
 
-    private fun loadDataFromCommCare(): Flow<EnrolmentRecordEvent> = flow {
+    private fun syncAllUpdatedCases(): Flow<EnrolmentRecordEvent> = flow {
         try {
             Simber.i("Start listing caseIds for CommCare sync", tag = COMMCARE_SYNC)
 
             val casesToParse = mutableListOf<SyncedCaseEntity>()
             val caseIdsPresentInCommCare = mutableSetOf<String>()
             // Fetch all previously synced cases with their details (including lastSyncedTimestamp)
-            val previouslySyncedCasesMap = commCareSyncCache.getAllSyncedCases()
+            val previouslySyncedCasesMap = commCareSyncCache
+                .getAllSyncedCases()
                 .associateBy { it.caseId }
 
             context.contentResolver
@@ -91,12 +120,13 @@ internal class CommCareEventDataSource @Inject constructor(
                             if (commCareLastModifiedTime > 0L && commCareLastModifiedTime <= cachedCase.lastSyncedTimestamp) {
                                 Simber.d(
                                     "Skipping caseId $caseId: CommCare lastModified ($commCareLastModifiedTime) is not newer than lastSyncedTimestamp (${cachedCase.lastSyncedTimestamp})",
-                                    tag = COMMCARE_SYNC
+                                    tag = COMMCARE_SYNC,
                                 )
                                 continue // Skip cases not modified since last sync
                             }
                         }
 
+                        // We don't know the simprintsId until we parse its subjectActions so it will be filled later
                         casesToParse.add(SyncedCaseEntity(caseId, "", commCareLastModifiedTime))
                     }
                 }
@@ -137,12 +167,14 @@ internal class CommCareEventDataSource @Inject constructor(
 
         Simber.d("Generating deletion event for caseId ${case.caseId} with simprintsId ${case.simprintsId}", tag = COMMCARE_SYNC)
         pendingSyncedCases.add(case)
-        emit(EnrolmentRecordDeletionEvent(
-            subjectId = case.simprintsId,
-            projectId = "", // Only subjectId is required for deletion events
-            moduleId = "",
-            attendantId = "",
-        ))
+        emit(
+            EnrolmentRecordDeletionEvent(
+                subjectId = case.simprintsId,
+                projectId = "", // Only subjectId is required for deletion events
+                moduleId = "",
+                attendantId = "",
+            ),
+        )
     }
 
     private fun loadEnrolmentRecordCreationEvents(case: SyncedCaseEntity): Flow<EnrolmentRecordCreationEvent> = flow {
@@ -220,7 +252,7 @@ internal class CommCareEventDataSource @Inject constructor(
                 continue
             }
         }
-        
+
         Simber.w("All date parsing attempts failed for: $dateString", tag = COMMCARE_SYNC)
         return 0L
     }

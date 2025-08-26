@@ -5,6 +5,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
+import com.simprints.core.tools.utils.ExtractCommCareCaseIdUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
@@ -26,6 +27,7 @@ import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_SCHEDULED_AT
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
+import com.simprints.infra.eventsync.sync.down.tasks.CommCareEventSyncTask
 import com.simprints.infra.eventsync.sync.down.tasks.SimprintsEventDownSyncTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -43,8 +45,10 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val commCareSyncCache: CommCareSyncCache,
     private val simprintsDownSyncTask: SimprintsEventDownSyncTask,
+    private val commCareSyncTask: CommCareEventSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val configRepository: ConfigRepository,
+    private val extractCommCareCaseId: ExtractCommCareCaseIdUseCase,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
     override suspend fun getLastSyncTime(): Timestamp? = eventSyncCache.readLastSuccessfulSyncTime()
@@ -98,23 +102,32 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun downSyncSubject(
         projectId: String,
         subjectId: String,
+        metadata: String,
     ): Unit = withContext(dispatcher) {
         val projectConfiguration = configRepository.getProjectConfiguration()
 
-        //TODO(MS-1091): Handle CommCare down sync
-        if (projectConfiguration.synchronization.down.simprints == null) {
-            return@withContext
-        }
-
         val eventScope = eventRepository.createEventScope(EventScopeType.DOWN_SYNC)
-        val op = EventDownSyncOperation(
-            RemoteEventQuery(
-                projectId = projectId,
-                subjectId = subjectId,
-                modes = getProjectModes(projectConfiguration),
-            ),
-        )
-        simprintsDownSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
+        if (projectConfiguration.synchronization.down.simprints != null) {
+            val op = EventDownSyncOperation(
+                RemoteEventQuery(
+                    projectId = projectId,
+                    subjectId = subjectId,
+                    modes = getProjectModes(projectConfiguration),
+                ),
+            )
+            simprintsDownSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
+        } else if (projectConfiguration.synchronization.down.commCare != null) {
+            val caseId = extractCommCareCaseId(metadata)
+            val op = EventDownSyncOperation(
+                RemoteEventQuery(
+                    projectId = projectId,
+                    subjectId = subjectId,
+                    externalIds = caseId?.let { listOf(it) },
+                    modes = getProjectModes(projectConfiguration),
+                ),
+            )
+            commCareSyncTask.downSync(this, op, eventScope, configRepository.getProject()).toList()
+        }
         eventRepository.closeEventScope(eventScope, EventScopeEndCause.WORKFLOW_ENDED)
     }
 
