@@ -6,7 +6,7 @@ import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.extentions.combine9
 import com.simprints.core.tools.extentions.onChange
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.time.Timer
+import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfo
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoError
@@ -52,7 +52,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
     syncOrchestrator: SyncOrchestrator,
     private val tokenizationProcessor: TokenizationProcessor,
     private val timeHelper: TimeHelper,
-    private val timer: Timer,
+    private val ticker: Ticker,
     private val appForegroundStateTracker: AppForegroundStateTracker,
 ) {
     private val eventSyncStateFlow =
@@ -69,7 +69,7 @@ internal class ObserveSyncInfoUseCase @Inject constructor(
         configManager.observeProjectConfiguration(),
         configManager.observeDeviceConfiguration(),
         appForegroundStateTracker.observeAppInForeground().filter { it }, // only when going to foreground
-        timer.observeTickOncePerMinute(),
+        ticker.observeTickOncePerMinute(),
     ) { isOnline, isLoggedIn, isRefreshing, eventSyncState, imageSyncStatus, projectConfig, deviceConfig, _, _ ->
         val currentEvents = eventSyncState.progress?.coerceAtLeast(0) ?: 0
         val totalEvents = eventSyncState.total?.takeIf { it >= 1 } ?: 0

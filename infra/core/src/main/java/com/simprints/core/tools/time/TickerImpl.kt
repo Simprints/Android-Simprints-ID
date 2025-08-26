@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class TimerImpl @Inject constructor() : Timer {
+class TickerImpl @Inject constructor() : Ticker {
     override fun observeTickOncePerMinute(): Flow<Unit> = flow {
         while (true) {
             emit(Unit)

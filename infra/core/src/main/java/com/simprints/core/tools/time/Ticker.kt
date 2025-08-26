@@ -4,6 +4,6 @@ import androidx.annotation.Keep
 import kotlinx.coroutines.flow.Flow
 
 @Keep
-interface Timer {
+interface Ticker {
     fun observeTickOncePerMinute(): Flow<Unit>
 }

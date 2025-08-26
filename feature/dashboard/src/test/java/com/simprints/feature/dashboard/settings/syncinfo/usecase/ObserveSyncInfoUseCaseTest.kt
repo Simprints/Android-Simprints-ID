@@ -7,7 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.lifecycle.AppForegroundStateTracker
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.time.Timer
+import com.simprints.core.tools.time.Ticker
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.dashboard.settings.syncinfo.SyncInfoModuleCount
 import com.simprints.infra.authstore.AuthStore
@@ -65,7 +65,7 @@ class ObserveSyncInfoUseCaseTest {
     private val syncOrchestrator = mockk<SyncOrchestrator>()
     private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val timeHelper = mockk<TimeHelper>()
-    private val timer = mockk<Timer>()
+    private val ticker = mockk<Ticker>()
     private val appForegroundStateTracker = mockk<AppForegroundStateTracker>()
 
     private lateinit var useCase: ObserveSyncInfoUseCase
@@ -157,7 +157,7 @@ class ObserveSyncInfoUseCaseTest {
         coEvery { imageRepository.getNumberOfImagesToUpload(any()) } returns 0
         coEvery { enrolmentRecordRepository.count(any()) } returns 0
 
-        every { timer.observeTickOncePerMinute() } returns MutableStateFlow(Unit)
+        every { ticker.observeTickOncePerMinute() } returns MutableStateFlow(Unit)
         every { timeHelper.now() } returns TEST_TIMESTAMP
         every { timeHelper.msBetweenNowAndTime(any()) } returns 0L
         every { timeHelper.readableBetweenNowAndTime(any()) } returns "0 minutes ago"
@@ -182,7 +182,7 @@ class ObserveSyncInfoUseCaseTest {
             syncOrchestrator = syncOrchestrator,
             tokenizationProcessor = tokenizationProcessor,
             timeHelper = timeHelper,
-            timer = timer,
+            ticker = ticker,
             appForegroundStateTracker = appForegroundStateTracker,
         )
     }
@@ -947,7 +947,7 @@ class ObserveSyncInfoUseCaseTest {
         every { timeHelper.readableBetweenNowAndTime(any()) } returnsMany listOf("0 minutes ago", "1 minute ago")
         // MutableStateFlow of Unit won't emit another (identical) Unit, so we'll count minutes and map to Units
         val timePaceFlow = MutableStateFlow(0)
-        every { timer.observeTickOncePerMinute() } returns timePaceFlow.map { }
+        every { ticker.observeTickOncePerMinute() } returns timePaceFlow.map { }
         createUseCase()
 
         val initialResult = useCase().first()

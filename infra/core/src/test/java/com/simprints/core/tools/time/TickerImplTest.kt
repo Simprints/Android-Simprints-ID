@@ -15,22 +15,22 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class TimerImplTest {
+class TickerImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private lateinit var timerImpl: TimerImpl
+    private lateinit var tickerImpl: TickerImpl
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        timerImpl = TimerImpl()
+        tickerImpl = TickerImpl()
     }
 
     @Test
     fun testObserveTickOncePerMinute_emitsImmediately() = runTest {
-        val result = timerImpl
+        val result = tickerImpl
             .observeTickOncePerMinute()
             .take(1)
             .toList()
@@ -41,7 +41,7 @@ class TimerImplTest {
 
     @Test
     fun testObserveTickOncePerMinute_emitsMultipleTimes() = runTest {
-        val result = timerImpl
+        val result = tickerImpl
             .observeTickOncePerMinute()
             .take(3)
             .toList()
@@ -52,7 +52,7 @@ class TimerImplTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testObserveTickOncePerMinute_waitsForCorrectTime() = runTest {
-        val flow = timerImpl.observeTickOncePerMinute()
+        val flow = tickerImpl.observeTickOncePerMinute()
 
         // 1st tick immediately
         assertThat(flow.first()).isEqualTo(Unit)

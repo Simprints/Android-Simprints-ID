@@ -34,10 +34,11 @@ internal class SignedUrlSampleUploader @Inject constructor(
         val urlRequestScope = eventRepository.createEventScope(type = EventScopeType.SAMPLE_UP_SYNC)
 
         Simber.i("Starting image upload in batches of $batchSize (Scope ID: ${urlRequestScope.id}")
-        val sampleReferences = localDataSource
-            .listImages(projectId)
         var sampleIndex = 0
-        val sampleReferenceBatches = sampleReferences
+        var samplesSize = 0
+        val sampleReferenceBatches = localDataSource
+            .listImages(projectId)
+            .also { samplesSize = it.size }
             // Preparing the file for upload requires reading each of them to calculate md5 and size,
             // therefore splitting the list into batches before preparing allows to avoid some work in
             // cases where there are large amounts of files and the coroutine is being interrupted,
@@ -81,7 +82,7 @@ internal class SignedUrlSampleUploader @Inject constructor(
                     break
                 }
                 Simber.i("Uploading ${sample.sampleId}")
-                progressCallback?.invoke(sampleIndex++, sampleReferences.size)
+                progressCallback?.invoke(sampleIndex++, samplesSize)
 
                 val url = sampleIdToUrlMap[sample.sampleId]
                 if (url == null) {

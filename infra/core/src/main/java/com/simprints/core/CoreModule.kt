@@ -9,8 +9,8 @@ import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.KronosTimeHelperImpl
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.time.Timer
-import com.simprints.core.tools.time.TimerImpl
+import com.simprints.core.tools.time.Ticker
+import com.simprints.core.tools.time.TickerImpl
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.SimNetworkUtils
@@ -49,7 +49,7 @@ object CoreModule {
 
     @Provides
     @Singleton
-    fun provideTimer(): Timer = TimerImpl()
+    fun provideTicker(): Ticker = TickerImpl()
 
     @Provides
     @Singleton

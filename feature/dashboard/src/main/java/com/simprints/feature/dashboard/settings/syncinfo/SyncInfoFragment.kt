@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.R
@@ -352,7 +353,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun renderProgress(
         progress: SyncInfoProgress,
-        progressBar: com.google.android.material.progressindicator.LinearProgressIndicator,
+        progressBar: LinearProgressIndicator,
         textView: TextView,
         vararg itemNameResIDs: Int,
     ) {
