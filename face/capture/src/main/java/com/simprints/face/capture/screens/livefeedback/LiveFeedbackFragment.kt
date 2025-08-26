@@ -3,7 +3,6 @@ package com.simprints.face.capture.screens.livefeedback
 import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Size
@@ -17,6 +16,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -66,6 +66,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private var cameraControl: CameraControl? = null
 
+    private val validCaptureProgressColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_green_light)
+    private val defaultCaptureProgressColor = ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey_light)
+
     private val launchPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -90,15 +93,25 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
+        binding.captureProgress.max = 1 // normalized progress
 
-        binding.captureFeedbackBtn.setOnClickListener { vm.startCapture() }
-        binding.captureProgress.max = mainVm.samplesToCapture
+        binding.captureFeedbackBtn.setOnClickListener {
+            vm.startCapture()
+            if (vm.isAutoCapture) {
+                binding.captureFeedbackBtn.isClickable = false
+            }
+        }
 
         // Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
             if (view != null) {
                 vm.initCapture(mainVm.bioSDK, mainVm.samplesToCapture, mainVm.attemptNumber)
             }
+        }
+        if (vm.isAutoCapture) {
+            // Await until capture button is pressed
+            vm.holdOffAutoCapture()
+            binding.captureFeedbackBtn.isClickable = true
         }
 
         binding.captureInstructionsBtn.setOnClickListener {
@@ -199,11 +212,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
 
         vm.capturingState.observe(viewLifecycleOwner) {
-            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA") when (it) {
-                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
-
+            when (it) {
+                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCaptureNotStarted()
                 LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
-
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigateSafely(
@@ -240,39 +251,45 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         }
     }
 
-    private fun renderCapturingStateColors() {
-        with(binding) {
+    private fun renderCaptureNotStarted() {
+        binding.apply {
+            if (vm.isAutoCapture) {
+                captureFeedbackBtn.setText(IDR.string.face_capture_start_capture)
+                captureFeedbackBtn.isChecked = true
+            } else {
+                captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
+            }
+
+            captureOverlay.drawSemiTransparentTarget()
+            captureFeedbackBtn.isVisible = true
+            captureFeedbackPermissionButton.isGone = true
+            setManualCaptureButtonClickable(false)
+        }
+    }
+
+    private fun renderCapturing() {
+        binding.apply {
             captureOverlay.drawWhiteTarget()
             captureFeedbackTxtExplanation.setTextColor(
                 ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey),
             )
-        }
-    }
 
-    private fun renderCapturingNotStarted() {
-        binding.apply {
-            captureOverlay.drawSemiTransparentTarget()
-            captureFeedbackBtn.setText(IDR.string.face_capture_title_previewing)
-            captureFeedbackBtn.isVisible = true
-            captureFeedbackPermissionButton.isGone = true
-        }
-        toggleCaptureButtons(false)
-    }
-
-    private fun renderCapturing() {
-        renderCapturingStateColors()
-        binding.apply {
             captureProgress.isVisible = true
             captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
+            setManualCaptureButtonClickable(false)
         }
-        toggleCaptureButtons(false)
     }
 
     private fun renderValidFace() {
         binding.apply {
-            captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+            if (vm.isAutoCapture) {
+                captureFeedbackBtn.setText(IDR.string.face_capture_prep_begin_button_capturing)
+            } else {
+                captureFeedbackBtn.setText(IDR.string.face_capture_begin_button)
+            }
+
             captureFeedbackTxtExplanation.text = null
             captureFeedbackBtn.isVisible = true
             captureFeedbackPermissionButton.isGone = true
@@ -281,8 +298,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 true,
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
             )
+            setManualCaptureButtonClickable(false)
         }
-        toggleCaptureButtons(true)
     }
 
     private fun renderValidCapturingFace() {
@@ -296,9 +313,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                 true,
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp),
             )
+            renderProgressBar(false)
         }
-
-        renderProgressBar(true)
     }
 
     private fun renderFaceTooFar() {
@@ -309,10 +325,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackPermissionButton.isGone = true
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
+            setManualCaptureButtonClickable(false)
+            renderProgressBar(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderFaceTooClose() {
@@ -323,10 +338,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackPermissionButton.isGone = true
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
+            setManualCaptureButtonClickable(false)
+            renderProgressBar(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderNoFace() {
@@ -337,10 +351,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackPermissionButton.isGone = true
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
+            setManualCaptureButtonClickable(false)
+            renderProgressBar(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderFaceNotStraight() {
@@ -351,10 +364,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackPermissionButton.isGone = true
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
+            setManualCaptureButtonClickable(false)
+            renderProgressBar(false)
         }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
     }
 
     private fun renderBadQuality() {
@@ -365,31 +377,20 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
             captureFeedbackPermissionButton.isGone = true
 
             captureFeedbackBtn.setCheckedWithLeftDrawable(false)
-        }
-
-        toggleCaptureButtons(false)
-        renderProgressBar(false)
-    }
-
-    private fun renderProgressBar(valid: Boolean) {
-        binding.apply {
-            val progressColor = if (valid) {
-                IDR.color.simprints_green_light
-            } else {
-                IDR.color.simprints_blue_grey_light
-            }
-
-            captureProgress.progressColor = ContextCompat.getColor(
-                requireContext(),
-                progressColor,
-            )
-
-            captureProgress.value = vm.userCaptures.size.toFloat()
+            setManualCaptureButtonClickable(false)
+            renderProgressBar(false)
         }
     }
 
-    private fun toggleCaptureButtons(valid: Boolean) {
-        binding.captureFeedbackBtn.isClickable = valid
+    private fun FragmentLiveFeedbackBinding.renderProgressBar(validCapture: Boolean) {
+        captureProgress.progressColor = if (validCapture) validCaptureProgressColor else defaultCaptureProgressColor
+        captureProgress.value = vm.getNormalizedProgress()
+    }
+
+    private fun FragmentLiveFeedbackBinding.setManualCaptureButtonClickable(clickable: Boolean) {
+        if (!vm.isAutoCapture) {
+            captureFeedbackBtn.isClickable = clickable
+        }
     }
 
     private fun renderNoPermission(shouldOpenSettings: Boolean) {
@@ -403,14 +404,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
                     requireActivity().startActivity(
                         Intent(
                             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.parse("package:${requireActivity().packageName}"),
+                            "package:${requireActivity().packageName}".toUri(),
                         ),
                     )
                 } else {
                     launchPermissionRequest.launch(Manifest.permission.CAMERA)
                 }
             }
+            setManualCaptureButtonClickable(false)
         }
-        toggleCaptureButtons(false)
     }
 }
