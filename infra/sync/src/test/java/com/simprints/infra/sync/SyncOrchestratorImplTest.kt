@@ -341,11 +341,12 @@ class SyncOrchestratorImplTest {
         val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.RUNNING))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
         every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 30_000L
+        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns 1234567890L
 
         val status = syncOrchestrator.observeImageSyncStatus().first()
 
         assertThat(status.isSyncing).isTrue()
-        assertThat(status.lastUpdateTimeMillis).isEqualTo(30_000L)
+        assertThat(status.lastUpdateTimeMillis).isEqualTo(1234567890L)
     }
 
     @Test
@@ -353,11 +354,25 @@ class SyncOrchestratorImplTest {
         val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.CANCELLED))
         every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
         every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns 120_000L
+        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns 1234567890L
 
         val status = syncOrchestrator.observeImageSyncStatus().first()
 
         assertThat(status.isSyncing).isFalse()
-        assertThat(status.lastUpdateTimeMillis).isEqualTo(120_000L)
+        assertThat(status.lastUpdateTimeMillis).isEqualTo(1234567890L)
+    }
+
+    @Test
+    fun `observe image sync status returns null timestamp when no sync has occurred`() = runTest {
+        val workInfoFlow = flowOf(createWorkInfo(WorkInfo.State.CANCELLED))
+        every { workManager.getWorkInfosFlow(any()) } returns workInfoFlow
+        every { imageSyncTimestampProvider.getMillisSinceLastImageSync() } returns null
+        every { imageSyncTimestampProvider.getLastImageSyncTimestamp() } returns null
+
+        val status = syncOrchestrator.observeImageSyncStatus().first()
+
+        assertThat(status.isSyncing).isFalse()
+        assertThat(status.lastUpdateTimeMillis).isNull()
     }
 
     @Test

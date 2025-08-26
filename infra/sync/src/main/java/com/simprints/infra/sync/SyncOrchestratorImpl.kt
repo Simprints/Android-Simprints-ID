@@ -153,7 +153,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
         .getWorkInfosFlow(WorkQuery.fromUniqueWorkNames(SyncConstants.FILE_UP_SYNC_WORK_NAME))
         .associateWithIfSyncing()
         .map { (workInfos, isSyncing) ->
-            val millisSinceLastUpdate = imageSyncTimestampProvider.getMillisSinceLastImageSync()
+            val lastUpdateTimestamp = imageSyncTimestampProvider.getLastImageSyncTimestamp()
             val currentIndex = workInfos
                 .firstOrNull()
                 ?.progress
@@ -165,7 +165,7 @@ internal class SyncOrchestratorImpl @Inject constructor(
                 ?.getInt(SyncConstants.PROGRESS_MAX, 0)
                 ?.takeIf { it >= 1 }
             val progress = totalCount?.let { currentIndex to totalCount }
-            ImageSyncStatus(isSyncing, progress, millisSinceLastUpdate)
+            ImageSyncStatus(isSyncing, progress, lastUpdateTimestamp)
         }
 
     /**
