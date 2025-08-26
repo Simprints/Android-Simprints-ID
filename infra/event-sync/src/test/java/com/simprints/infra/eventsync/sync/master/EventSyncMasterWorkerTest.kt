@@ -14,6 +14,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.*
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.Frequency.ONLY_PERIODICALLY_UP_SYNC
 import com.simprints.infra.config.store.models.Frequency.PERIODICALLY
@@ -30,7 +31,8 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
-import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
+import com.simprints.infra.eventsync.sync.down.CommCareEventSyncWorkersBuilder
+import com.simprints.infra.eventsync.sync.down.SimprintsEventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -53,7 +55,7 @@ internal class EventSyncMasterWorkerTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    val ctx: Context = getApplicationContext()
+    private val ctx: Context = getApplicationContext()
 
     @MockK
     lateinit var workContinuation: WorkContinuation
@@ -71,10 +73,16 @@ internal class EventSyncMasterWorkerTest {
     lateinit var upSyncWorker: OneTimeWorkRequest
 
     @MockK
-    lateinit var downSyncWorker: OneTimeWorkRequest
+    lateinit var simprintsDownSyncWorker: OneTimeWorkRequest
 
     @MockK
-    lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
+    lateinit var commCareDownSyncWorker: OneTimeWorkRequest
+
+    @MockK
+    lateinit var simprintsDownSyncWorkerBuilder: SimprintsEventDownSyncWorkersBuilder
+
+    @MockK
+    lateinit var commCareDownSyncWorkerBuilder: CommCareEventSyncWorkersBuilder
 
     @MockK
     lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
@@ -123,8 +131,11 @@ internal class EventSyncMasterWorkerTest {
         every { workManager.beginWith(any<OneTimeWorkRequest>()) } returns workContinuation
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { downSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
-            downSyncWorker,
+        coEvery { simprintsDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
+            simprintsDownSyncWorker,
+        )
+        coEvery { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(any(), any()) } returns listOf(
+            commCareDownSyncWorker,
         )
         coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any(), any()) } returns listOf(upSyncWorker)
         every { eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns startSyncReporterWorker
@@ -135,21 +146,25 @@ internal class EventSyncMasterWorkerTest {
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
-        masterWorker = EventSyncMasterWorker(
-            appContext = ctx,
-            params = mockk(relaxed = true) {
-                every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-            },
-            downSyncWorkerBuilder = downSyncWorkerBuilder,
-            upSyncWorkerBuilder = upSyncWorkerBuilder,
-            configManager = configManager,
-            eventSyncCache = eventSyncCache,
-            eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
-            timeHelper = timeHelper,
-            dispatcher = testCoroutineRule.testCoroutineDispatcher,
-            securityManager = securityManager,
-            eventRepository = eventRepository,
+        masterWorker = spyk(
+            EventSyncMasterWorker(
+                appContext = ctx,
+                params = mockk(relaxed = true) {
+                    every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
+                },
+                simprintsDownSyncWorkerBuilder = simprintsDownSyncWorkerBuilder,
+                commCareDownSyncWorkerBuilder = commCareDownSyncWorkerBuilder,
+                upSyncWorkerBuilder = upSyncWorkerBuilder,
+                configManager = configManager,
+                eventSyncCache = eventSyncCache,
+                eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
+                timeHelper = timeHelper,
+                dispatcher = testCoroutineRule.testCoroutineDispatcher,
+                securityManager = securityManager,
+                eventRepository = eventRepository,
+            )
         )
+        coEvery { masterWorker["showProgressNotification"]() } returns Unit
     }
 
     @Test
@@ -161,7 +176,7 @@ internal class EventSyncMasterWorkerTest {
 
     @Test
     fun `doWork should do nothing if it can't up or down sync to BFSID`() = runTest {
-        canDownSync(false)
+        canDownSyncFromSimprints(false)
         canUpSync(false)
 
         val uniqueSyncId = masterWorker.uniqueSyncId
@@ -173,14 +188,14 @@ internal class EventSyncMasterWorkerTest {
             eventRepository.createEventScope(any(), any())
         }
         assertUpSyncWorkerPresence(false, uniqueSyncId)
-        assertDownSyncWorkerPresence(false, uniqueSyncId)
+        assertSimprintsDownSyncWorkerPresence(false, uniqueSyncId)
         assertWorkerChainBuild(false, uniqueSyncId)
     }
 
     @Test
     fun `doWork should only enqueue the up sync worker it can't down sync to BFSID`() = runTest {
         shouldSyncRun(false)
-        canDownSync(false)
+        canDownSyncFromSimprints(false)
         canUpSync(true)
 
         val uniqueSyncId = masterWorker.uniqueSyncId
@@ -199,14 +214,14 @@ internal class EventSyncMasterWorkerTest {
             eventRepository.createEventScope(EventScopeType.UP_SYNC, any())
         }
         assertUpSyncWorkerPresence(true, uniqueSyncId)
-        assertDownSyncWorkerPresence(false, uniqueSyncId)
+        assertSimprintsDownSyncWorkerPresence(false, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
     }
 
     @Test
     fun `doWork should only enqueue the down sync worker it can't up sync to BFSID`() = runTest {
         shouldSyncRun(false)
-        canDownSync(true)
+        canDownSyncFromSimprints(true)
         canUpSync(false)
 
         val uniqueSyncId = masterWorker.uniqueSyncId
@@ -224,15 +239,16 @@ internal class EventSyncMasterWorkerTest {
             eventSyncCache.clearProgresses()
             eventRepository.createEventScope(EventScopeType.DOWN_SYNC, any())
         }
+
         assertUpSyncWorkerPresence(false, uniqueSyncId)
-        assertDownSyncWorkerPresence(true, uniqueSyncId)
+        assertSimprintsDownSyncWorkerPresence(true, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
     }
 
     @Test
     fun `doWork should enqueue the down and up sync worker it can sync to BFSID`() = runTest {
         shouldSyncRun(false)
-        canDownSync(true)
+        canDownSyncFromSimprints(true)
         canUpSync(true)
 
         val uniqueSyncId = masterWorker.uniqueSyncId
@@ -248,15 +264,41 @@ internal class EventSyncMasterWorkerTest {
 
         coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
         coVerify(exactly = 2) { eventRepository.createEventScope(any(), any()) }
+
         assertUpSyncWorkerPresence(true, uniqueSyncId)
-        assertDownSyncWorkerPresence(true, uniqueSyncId)
+        assertSimprintsDownSyncWorkerPresence(true, uniqueSyncId)
+        assertWorkerChainBuild(true, uniqueSyncId)
+    }
+
+    @Test
+    fun `doWork should enqueue the down sync worker if CommCare sync`() = runTest {
+        shouldSyncRun(false)
+        canDownSyncFromCommCare(true)
+        canUpSync(true)
+
+        val uniqueSyncId = masterWorker.uniqueSyncId
+        val result = masterWorker.doWork()
+
+        assertThat(result).isEqualTo(
+            ListenableWorker.Result.success(
+                workDataOf(
+                    EventSyncMasterWorker.OUTPUT_LAST_SYNC_ID to uniqueSyncId,
+                ),
+            ),
+        )
+
+        coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
+        coVerify(exactly = 2) { eventRepository.createEventScope(any(), any()) }
+
+        assertUpSyncWorkerPresence(true, uniqueSyncId)
+        assertCommCareDownSyncWorkerPresence(true, uniqueSyncId)
         assertWorkerChainBuild(true, uniqueSyncId)
     }
 
     @Test
     fun `doWork should not enqueue the workers is one is already running`() = runTest {
         shouldSyncRun(true)
-        canDownSync(true)
+        canDownSyncFromSimprints(true)
         canUpSync(false)
 
         val uniqueSyncId = masterWorker.uniqueSyncId
@@ -272,7 +314,7 @@ internal class EventSyncMasterWorkerTest {
 
         coVerify(exactly = 0) { eventSyncCache.clearProgresses() }
         assertUpSyncWorkerPresence(false, uniqueSyncId)
-        assertDownSyncWorkerPresence(false, uniqueSyncId)
+        assertSimprintsDownSyncWorkerPresence(false, uniqueSyncId)
         assertWorkerChainBuild(false, uniqueSyncId)
     }
 
@@ -312,8 +354,9 @@ internal class EventSyncMasterWorkerTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { projectId } returns "projectId"
             every { synchronization } returns mockk {
-                every { down.simprints.frequency } returns syncConfig
+                every { down.simprints?.frequency } returns syncConfig
                 every { up.simprints.kind } returns NONE
+                every { down.commCare } returns null
             }
         }
         return masterWorker.doWork()
@@ -331,8 +374,16 @@ internal class EventSyncMasterWorkerTest {
         }
     }
 
-    private fun canDownSync(should: Boolean) {
-        every { synchronizationConfiguration.down.simprints.frequency } returns if (should) PERIODICALLY else ONLY_PERIODICALLY_UP_SYNC
+    private fun canDownSyncFromSimprints(should: Boolean) {
+        every { synchronizationConfiguration.down.simprints?.frequency } returns if (should) PERIODICALLY else ONLY_PERIODICALLY_UP_SYNC
+        every { synchronizationConfiguration.down.commCare } returns null
+    }
+
+    private fun canDownSyncFromCommCare(should: Boolean) {
+        every { synchronizationConfiguration.down.simprints } returns null
+        every { synchronizationConfiguration.down.commCare } returns
+            if (should) DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+            else null
     }
 
     private fun canUpSync(should: Boolean) {
@@ -374,16 +425,31 @@ internal class EventSyncMasterWorkerTest {
         }
     }
 
-    private fun assertDownSyncWorkerPresence(
+    private fun assertSimprintsDownSyncWorkerPresence(
         isPresent: Boolean,
         uniqueSyncId: String,
     ) {
         val times = if (isPresent) 1 else 0
-        coVerify(exactly = times) { downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
+        coVerify(exactly = times) { simprintsDownSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
         verify(exactly = times) {
             workContinuation.then(
                 match<List<OneTimeWorkRequest>> {
-                    it.contains(downSyncWorker)
+                    it.contains(simprintsDownSyncWorker)
+                },
+            )
+        }
+    }
+
+    private fun assertCommCareDownSyncWorkerPresence(
+        isPresent: Boolean,
+        uniqueSyncId: String,
+    ) {
+        val times = if (isPresent) 1 else 0
+        coVerify(exactly = times) { commCareDownSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId, any()) }
+        verify(exactly = times) {
+            workContinuation.then(
+                match<List<OneTimeWorkRequest>> {
+                    it.contains(commCareDownSyncWorker)
                 },
             )
         }

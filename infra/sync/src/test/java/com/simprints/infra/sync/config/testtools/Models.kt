@@ -131,6 +131,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     ),
     down = DownSynchronizationConfiguration(
         simprints = simprintsDownSyncConfigurationConfiguration,
+        commCare = null,
     ),
     samples = SampleSynchronizationConfiguration(3),
 )

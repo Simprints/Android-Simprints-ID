@@ -26,7 +26,7 @@ jobs:
 
         steps:
             -   name: Checkout repository
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
 
             -   name: Set up Node.js
                 uses: actions/setup-node@v4
@@ -44,7 +44,7 @@ jobs:
                     echo GOOGLE_APPLICATION_CREDENTIALS=$HOME/firebase-service-account.json >> $GITHUB_ENV
 
             -   name: Download APK artifact
-                uses: actions/download-artifact@v4
+                uses: actions/download-artifact@v5
                 with:
                     name: ${{ inputs.upload-artifact }}
 

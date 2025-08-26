@@ -66,4 +66,12 @@ interface EventRepository {
     ): Event
 
     suspend fun deleteAll()
+
+    /**
+     * Uses raw SQL insertion commands to insert events into the database.
+     * This is useful for bulk inserts or when the events are pre-formatted as SQL commands
+     * Only use this method in debugging or testing scenarios where you have control over the SQL commands.
+     * it throws an exception if called in production code.
+     */
+    suspend fun executeRawEventInsertions(rawSqlInsertStatements: List<String>)
 }

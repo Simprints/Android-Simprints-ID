@@ -336,4 +336,8 @@ internal class RoomEnrolmentRecordLocalDataSource @Inject constructor(
         Simber.d("[deleteSubject] Deleting subject: $subjectId", tag = ROOM_RECORDS_DB)
         subjectDao.deleteSubject(subjectId)
     }
+
+    override suspend fun getAllSubjectIds(): List<String> = withContext(dispatcherIO) {
+        subjectDao.getAllSubjectIds()
+    }
 }

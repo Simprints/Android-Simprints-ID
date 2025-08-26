@@ -1,0 +1,28 @@
+# Exclude all build outputs
+**/build/**
+.kotlin/
+# NDK build outputs
+**/.cxx/**
+**/.cxx_parts/**
+
+
+# Exclude dependency caches and wrappers
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+**/libs/**
+**/vendor/**
+
+# Exclude IDE-specific files and folders
+.idea/
+*.iml
+*.ipr
+*.iws
+.gradle/
+.DS_Store # macOS specific
+
+# Exclude local configuration files
+local.properties
+signing_info.gradle.kts
+*.keystore
+*.jks
+google-services.json

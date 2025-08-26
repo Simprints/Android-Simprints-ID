@@ -265,6 +265,7 @@ internal data class OldProjectConfig(
                     else -> Frequency.PERIODICALLY
                 },
             ),
+            commCare = null,
         ),
         samples = SampleSynchronizationConfiguration(
             signedUrlBatchSize = DEFAULT_BATCH_SIZE,

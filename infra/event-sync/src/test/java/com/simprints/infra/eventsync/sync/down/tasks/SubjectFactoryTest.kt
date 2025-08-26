@@ -21,6 +21,7 @@ import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.eventsync.sync.common.SubjectFactory
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

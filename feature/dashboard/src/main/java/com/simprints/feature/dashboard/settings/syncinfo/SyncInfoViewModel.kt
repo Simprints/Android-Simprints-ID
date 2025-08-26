@@ -14,10 +14,11 @@ import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration.SimprintsDownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.repository.EnrolmentRecordRepository
@@ -189,20 +190,29 @@ internal class SyncInfoViewModel @Inject constructor(
         isSyncRunning: Boolean?,
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
-    ) = isConnected == true &&
-        isSyncRunning == false &&
-        syncConfiguration?.let {
-            !isModuleSync(it.down) ||
-                isModuleSyncAndModuleIdOptionsNotEmpty(
-                    it,
-                )
-        } == true
+    ): Boolean {
+        if (isSyncRunning == true) return false
 
-    private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
-        syncConfiguration.simprints.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        val simprintsDownConfig = syncConfiguration?.down?.simprints
+        if (simprintsDownConfig != null &&
+            isConnected == true &&
+            (!isModuleSync(simprintsDownConfig) ||
+             isModuleSyncAndModuleIdOptionsNotEmpty(simprintsDownConfig))
+        ) {
+            return true
+        }
 
-    fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
-        synchronizationConfiguration.down.let { it.simprints.moduleOptions.isNotEmpty() && isModuleSync(it) }
+        val commCareDownConfig = syncConfiguration?.down?.commCare
+        if (commCareDownConfig != null) return true
+
+        return false
+    }
+
+    private fun isModuleSync(simprintsDownConfig: SimprintsDownSynchronizationConfiguration) =
+        simprintsDownConfig.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+
+    fun isModuleSyncAndModuleIdOptionsNotEmpty(simprintsDownConfig: SimprintsDownSynchronizationConfiguration?) =
+        simprintsDownConfig != null && isModuleSync(simprintsDownConfig) && simprintsDownConfig.moduleOptions.isNotEmpty()
 
     private suspend fun getRecordsInLocal(projectId: String): Int = enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
 
@@ -211,7 +221,7 @@ internal class SyncInfoViewModel @Inject constructor(
         .collect { _recordsToUpSync.postValue(it) }
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
-        if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
+        if (configManager.getProjectConfiguration().isSimprintsEventDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             DownSyncCounts(0, isLowerBound = false)

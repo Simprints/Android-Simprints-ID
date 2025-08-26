@@ -1,6 +1,7 @@
 package com.simprints.feature.dashboard.main.sync
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -41,6 +42,11 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         ) { result -> viewModel.handleLoginResult(result) }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
+    }
+
     private fun initViews() = with(binding.dashboardSyncCard) {
         onSyncButtonClick = { viewModel.sync() }
         onOfflineButtonClick = { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
@@ -51,10 +57,16 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
             )
         }
         onLoginButtonClick = { viewModel.login() }
+        onSettingsButtonClick = {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+            startActivity(intent)
+        }
     }
 
     private fun observeLiveData() {
-        viewModel.syncToBFSIDAllowed.observe(viewLifecycleOwner) {
+        viewModel.isAnySyncAllowed.observe(viewLifecycleOwner) {
             if (it) {
                 binding.dashboardSyncCard.visibility = View.VISIBLE
             } else {

@@ -53,7 +53,6 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
     private val resolveFaceBioSdk: ResolveFaceBioSdkUseCase,
     private val saveLicenseCheckEvent: SaveLicenseCheckEventUseCase,
-    private val isUsingAutoCapture: IsUsingAutoCaptureUseCase,
     private val shouldShowInstructions: ShouldShowInstructionsScreenUseCase,
     @DeviceID private val deviceID: String,
 ) : ViewModel() {
@@ -86,10 +85,6 @@ internal class FaceCaptureViewModel @Inject constructor(
     val invalidLicense: LiveData<LiveDataEvent>
         get() = _invalidLicense
     private val _invalidLicense = MutableLiveData<LiveDataEvent>()
-
-    val isAutoCaptureEnabled: LiveData<Boolean>
-        get() = _isAutoCaptureEnabled
-    private val _isAutoCaptureEnabled = MutableLiveData<Boolean>()
 
     fun setupCapture(samplesToCapture: Int) {
         this.samplesToCapture = samplesToCapture
@@ -140,10 +135,6 @@ internal class FaceCaptureViewModel @Inject constructor(
         } else {
             initialize(activity, NO_LICENSE)
         }
-    }
-
-    fun setupAutoCapture() = viewModelScope.launch {
-        _isAutoCaptureEnabled.postValue(isUsingAutoCapture())
     }
 
     fun shouldShowInstructionsScreen(): Boolean = shouldShowInstructions()

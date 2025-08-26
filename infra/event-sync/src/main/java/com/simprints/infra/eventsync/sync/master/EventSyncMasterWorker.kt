@@ -10,19 +10,20 @@ import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.config.store.models.Frequency
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
+import com.simprints.infra.config.store.models.isSimprintsEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.eventsync.sync.down.CommCareEventSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.getAllSubjectsSyncWorkersInfo
 import com.simprints.infra.eventsync.sync.common.getUniqueSyncId
 import com.simprints.infra.eventsync.sync.common.sortByScheduledTime
-import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
+import com.simprints.infra.eventsync.sync.down.SimprintsEventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -36,7 +37,8 @@ import java.util.UUID
 class EventSyncMasterWorker @AssistedInject internal constructor(
     @Assisted private val appContext: Context,
     @Assisted params: WorkerParameters,
-    private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
+    private val simprintsDownSyncWorkerBuilder: SimprintsEventDownSyncWorkersBuilder,
+    private val commCareDownSyncWorkerBuilder: CommCareEventSyncWorkersBuilder,
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
     private val configManager: ConfigManager,
     private val eventSyncCache: EventSyncCache,
@@ -96,17 +98,33 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
                         ).also { Simber.d("Scheduled ${it.size} up workers", tag = tag) }
                 }
 
-                if (configuration.isEventDownSyncAllowed()) {
+                if (configuration.isSimprintsEventDownSyncAllowed()) {
+                    // TODO: Remove after all users have updated to 2025.3.0
+                    // In versions before 2025.3.0 a bug prevented single subject down-sync scopes from being closed and uploaded.
+                    // Attempting to close any such scopes and recover at least some of the data.
+                    eventRepository.closeAllOpenScopes(EventScopeType.DOWN_SYNC, null)
+
                     eventRepository.createEventScope(
                         EventScopeType.DOWN_SYNC,
                         downSyncWorkerScopeId,
                     )
 
-                    workerChain += downSyncWorkerBuilder
+                    workerChain += simprintsDownSyncWorkerBuilder
                         .buildDownSyncWorkerChain(
                             uniqueSyncId,
                             downSyncWorkerScopeId,
-                        ).also { Simber.d("Scheduled ${it.size} down workers", tag = tag) }
+                        ).also { Simber.d("Scheduled ${it.size} Simprints down workers", tag = tag) }
+                } else if (configuration.isCommCareEventDownSyncAllowed()) {
+                    eventRepository.createEventScope(
+                        EventScopeType.DOWN_SYNC,
+                        downSyncWorkerScopeId,
+                    )
+
+                    workerChain += commCareDownSyncWorkerBuilder
+                        .buildDownSyncWorkerChain(
+                            uniqueSyncId,
+                            downSyncWorkerScopeId,
+                        ).also { Simber.d("Scheduled ${it.size} CommCare down workers", tag = tag) }
                 }
 
                 val endSyncReporterWorker =
@@ -144,18 +162,17 @@ class EventSyncMasterWorker @AssistedInject internal constructor(
     private suspend fun isEventDownSyncAllowed(configuration: ProjectConfiguration): Boolean {
         val isProjectPaused =
             configManager.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
+        val isSimprintsDownSyncEnabled = configuration.isSimprintsEventDownSyncAllowed()
+        val isCommCareDownSyncEnabled = configuration.isCommCareEventDownSyncAllowed()
 
-        val isDownSyncConfigEnabled =
-            configuration.synchronization.down.simprints.frequency != Frequency.ONLY_PERIODICALLY_UP_SYNC
-
-        return !isProjectPaused && isDownSyncConfigEnabled
+        return !isProjectPaused && (isSimprintsDownSyncEnabled || isCommCareDownSyncEnabled)
     }
 
     private fun getLastSyncId(): String? = syncWorkers.last().getUniqueSyncId()
 
-    private fun isSyncRunning(): Boolean = !getWorkInfoForRunningSyncWorkers().isNullOrEmpty()
+    private fun isSyncRunning(): Boolean = getWorkInfoForRunningSyncWorkers().isNotEmpty()
 
-    private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? = syncWorkers?.filter {
+    private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo> = syncWorkers.filter {
         it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED
     }
 

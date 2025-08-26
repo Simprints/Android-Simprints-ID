@@ -1,5 +1,6 @@
 package com.simprints.feature.setup.screen
 
+import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,7 @@ import com.simprints.infra.config.store.models.FaceConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.isCommCareEventDownSyncAllowed
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseStatus
@@ -49,19 +51,66 @@ internal class SetupViewModel @Inject constructor(
         get() = _requestNotificationPermission
     private val _requestNotificationPermission = MutableLiveData<Unit>()
 
+    val requestCommCarePermission: LiveData<Unit>
+        get() = _requestCommCarePermission
+    private val _requestCommCarePermission = MutableLiveData<Unit>()
+
+    // The setup steps are:
+    // 1. Request location permission
+    // 2. Request CommCare permission (if needed)
+    // 3. Request notification permission
+    // 4. Download required licenses
+    // 5. Return overall setup result
     fun start() {
+        requestLocationPermissionIfNeeded()
+    }
+
+    private fun requestLocationPermissionIfNeeded() {
         viewModelScope.launch {
             if (shouldCollectLocation()) {
-                // request location permissions
                 _requestLocationPermission.postValue(Unit)
             } else {
-                // proceed to requesting notification permission right away
-                _requestNotificationPermission.postValue(Unit)
+                locationPermissionCheckDone(false)
             }
         }
     }
 
-    fun downloadRequiredLicenses() {
+    fun locationPermissionCheckDone(granted: Boolean) {
+        if (granted) {
+            locationStore.collectLocationInBackground()
+        }
+        requestCommCarePermissionIfNeeded()
+    }
+
+    private fun requestCommCarePermissionIfNeeded() {
+        viewModelScope.launch {
+            if (shouldRequestCommCarePermission()) {
+                _requestCommCarePermission.postValue(Unit)
+            } else {
+                commCarePermissionCheckDone()
+            }
+        }
+    }
+
+    fun commCarePermissionCheckDone() {
+        requestNotificationPermission()
+    }
+
+    private fun requestNotificationPermission() {
+        viewModelScope.launch {
+            if (shouldRequestNotificationPermission()) {
+                _requestNotificationPermission.postValue(Unit)
+            } else {
+                notificationPermissionCheckDone()
+            }
+        }
+    }
+
+    fun notificationPermissionCheckDone() {
+        downloadRequiredLicenses()
+    }
+
+    private fun downloadRequiredLicenses() {
         viewModelScope.launch {
             requiredLicenses = configManager.getProjectConfiguration().requiredLicenses
 
@@ -95,15 +144,11 @@ internal class SetupViewModel @Inject constructor(
         }
     }
 
-    fun requestNotificationsPermission() {
-        _requestNotificationPermission.postValue(Unit)
-    }
-
-    fun collectLocation() {
-        locationStore.collectLocationInBackground()
-    }
-
     private suspend fun shouldCollectLocation() = configManager.getProjectConfiguration().general.collectLocation
+
+    private suspend fun shouldRequestCommCarePermission() = configManager.getProjectConfiguration().isCommCareEventDownSyncAllowed()
+
+    private fun shouldRequestNotificationPermission() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 }
 
 private val ProjectConfiguration.requiredLicenses: List<Pair<Vendor, LicenseVersion>>

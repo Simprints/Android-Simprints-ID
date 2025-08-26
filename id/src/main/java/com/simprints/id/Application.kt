@@ -10,9 +10,12 @@ import com.simprints.core.tools.extentions.deviceHardwareId
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.enrolment.records.repository.local.migration.RealmToRoomMigrationScheduler
 import com.simprints.infra.eventsync.BuildConfig.DB_ENCRYPTION
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.APPLICATION
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
+import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.VERSION_HISTORY
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
+import com.simprints.infra.logging.usecases.UpdateAndGetVersionHistoryUseCase
 import com.simprints.infra.sync.SyncOrchestrator
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +34,10 @@ open class Application :
     @Inject
     lateinit var syncOrchestrator: SyncOrchestrator
 
-    @Inject lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
+    @Inject
+    lateinit var realmToRoomMigrationScheduler: RealmToRoomMigrationScheduler
+
+    private val getVersionNames = UpdateAndGetVersionHistoryUseCase()
 
     @AppScope
     @Inject
@@ -45,10 +51,22 @@ open class Application :
 
     override fun onCreate() {
         super.onCreate()
+        Simber.i("Application created", tag = APPLICATION)
         initApplication()
     }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        Simber.i("Low memory", tag = APPLICATION)
+    }
+
+    override fun onTrimMemory(level: Int) {
+        Simber.i("Trim memory: $level", tag = APPLICATION)
+        super.onTrimMemory(level)
+    }
+
     override fun onTerminate() {
+        Simber.i("Application terminated", tag = APPLICATION)
         super.onTerminate()
         appScope.cancel()
     }
@@ -62,6 +80,8 @@ open class Application :
     open fun initApplication() {
         SimberBuilder.initialize(this)
         Simber.setUserProperty(DEVICE_ID, deviceHardwareId)
+        Simber.setUserProperty(VERSION_HISTORY, getVersionNames(this, BuildConfig.VERSION_NAME))
+
         appScope.launch {
             realmToRoomMigrationScheduler.scheduleMigrationWorkerIfNeeded()
             syncOrchestrator.cleanupWorkers()

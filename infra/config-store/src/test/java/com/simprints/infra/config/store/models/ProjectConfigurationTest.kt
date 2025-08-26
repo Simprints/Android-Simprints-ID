@@ -205,7 +205,7 @@ class ProjectConfigurationTest {
     }
 
     @Test
-    fun `isEventDownSyncAllowed should return the correct value`() {
+    fun `isSimprintsEventDownSyncAllowed should return the correct value for enabled Simprints config`() {
         val values = mapOf(
             Frequency.ONLY_PERIODICALLY_UP_SYNC to false,
             Frequency.PERIODICALLY to true,
@@ -222,8 +222,48 @@ class ProjectConfigurationTest {
                     ),
                 ),
             )
-            assertThat(config.isEventDownSyncAllowed()).isEqualTo(it.value)
+
+            assertThat(config.isSimprintsEventDownSyncAllowed()).isEqualTo(it.value)
         }
+    }
+
+    @Test
+    fun `isSimprintsEventDownSyncAllowed should return false for disabled Simprints config`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    simprints = null
+                ),
+            ),
+        )
+
+        assertThat(config.isSimprintsEventDownSyncAllowed()).isEqualTo(false)
+    }
+
+    @Test
+    fun `isCommCareEventDownSyncAllowed should return true for enabled CommCare config`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    commCare = DownSynchronizationConfiguration.CommCareDownSynchronizationConfiguration
+                ),
+            ),
+        )
+
+        assertThat(config.isCommCareEventDownSyncAllowed()).isEqualTo(true)
+    }
+
+    @Test
+    fun `isCommCareEventDownSyncAllowed should return false for disabled CommCare config`() {
+        val config = projectConfiguration.copy(
+            synchronization = synchronizationConfiguration.copy(
+                down = synchronizationConfiguration.down.copy(
+                    commCare = null
+                ),
+            ),
+        )
+
+        assertThat(config.isCommCareEventDownSyncAllowed()).isEqualTo(false)
     }
 
     @Test

@@ -358,4 +358,12 @@ internal class RealmEnrolmentRecordLocalDataSource @Inject constructor(
             }
         }
     }
+
+    override suspend fun getAllSubjectIds(): List<String> = realmWrapper.readRealm { realm ->
+        realm
+            .query(DbSubject::class)
+            .sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
+            .find()
+            .map { it.subjectId.toString() }
+    }
 }
