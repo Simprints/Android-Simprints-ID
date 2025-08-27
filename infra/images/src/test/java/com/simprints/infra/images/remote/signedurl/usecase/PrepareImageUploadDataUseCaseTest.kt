@@ -1,10 +1,10 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.usecase.CalculateFileMd5AndSizeUseCase
 import com.simprints.infra.images.usecase.SamplePathConverter
 import io.mockk.*

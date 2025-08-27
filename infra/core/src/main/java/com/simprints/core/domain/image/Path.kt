@@ -1,4 +1,4 @@
-package com.simprints.infra.images.model
+package com.simprints.core.domain.image
 
 import android.os.Parcelable
 import androidx.annotation.Keep

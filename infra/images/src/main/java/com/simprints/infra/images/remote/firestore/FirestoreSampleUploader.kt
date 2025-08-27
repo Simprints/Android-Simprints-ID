@@ -3,11 +3,11 @@ package com.simprints.infra.images.remote.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SAMPLE_UPLOAD
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC

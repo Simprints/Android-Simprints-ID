@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.capture.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.state.CaptureState
@@ -9,8 +11,6 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

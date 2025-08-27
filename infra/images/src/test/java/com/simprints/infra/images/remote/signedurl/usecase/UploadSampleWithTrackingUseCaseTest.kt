@@ -1,6 +1,8 @@
 package com.simprints.infra.images.remote.signedurl.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
@@ -8,8 +10,6 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.samples.SampleUpSyncRequestEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.images.local.ImageLocalDataSource
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.signedurl.SampleUploadData
 import com.simprints.infra.images.remote.signedurl.api.ApiSampleUploadUrlResponse
 import com.simprints.infra.images.remote.signedurl.api.SampleUploadApiInterface

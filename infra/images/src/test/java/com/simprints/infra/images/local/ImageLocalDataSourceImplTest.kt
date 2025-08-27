@@ -1,8 +1,8 @@
 package com.simprints.infra.images.local
 
 import androidx.security.crypto.EncryptedFile
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.infra.security.SecurityManager
 import io.mockk.every
 import io.mockk.mockk

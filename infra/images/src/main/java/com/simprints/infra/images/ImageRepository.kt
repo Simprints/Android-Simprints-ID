@@ -1,7 +1,7 @@
 package com.simprints.infra.images
 
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.domain.modality.Modality
-import com.simprints.infra.images.model.SecuredImageRef
 
 /**
  * Repository for handling local and remote image file operations

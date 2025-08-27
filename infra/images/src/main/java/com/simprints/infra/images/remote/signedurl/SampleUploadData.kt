@@ -1,6 +1,6 @@
 package com.simprints.infra.images.remote.signedurl
 
-import com.simprints.infra.images.model.SecuredImageRef
+import com.simprints.core.domain.image.SecuredImageRef
 
 internal data class SampleUploadData(
     val imageRef: SecuredImageRef,

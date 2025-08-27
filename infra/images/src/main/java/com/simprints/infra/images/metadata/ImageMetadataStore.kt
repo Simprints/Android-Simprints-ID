@@ -1,8 +1,8 @@
 package com.simprints.infra.images.metadata
 
+import com.simprints.core.domain.image.Path
 import com.simprints.infra.images.metadata.database.DbImageMetadata
 import com.simprints.infra.images.metadata.database.ImageMetadataDao
-import com.simprints.infra.images.model.Path
 import javax.inject.Inject
 
 internal class ImageMetadataStore @Inject constructor(

@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.capture.usecase
 
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.domain.modality.Modality
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
@@ -9,7 +10,6 @@ import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerInfo
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.session.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject

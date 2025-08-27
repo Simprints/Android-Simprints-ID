@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.capture
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.domain.sample.SampleIdentifier
 import com.simprints.core.domain.step.StepResult
-import com.simprints.infra.images.model.SecuredImageRef
 
 @Keep
 data class FingerprintCaptureResult(

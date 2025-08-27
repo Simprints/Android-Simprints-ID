@@ -1,11 +1,11 @@
 package com.simprints.infra.images
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.image.Path
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
-import com.simprints.infra.images.model.Path
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.SampleUploader
 import com.simprints.infra.images.usecase.GetUploaderUseCase
 import com.simprints.infra.images.usecase.SamplePathConverter

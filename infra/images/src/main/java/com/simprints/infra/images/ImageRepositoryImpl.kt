@@ -1,9 +1,9 @@
 package com.simprints.infra.images
 
+import com.simprints.core.domain.image.SecuredImageRef
 import com.simprints.core.domain.modality.Modality
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.metadata.ImageMetadataStore
-import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.usecase.GetUploaderUseCase
 import com.simprints.infra.images.usecase.SamplePathConverter
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FACE_CAPTURE

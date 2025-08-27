@@ -1,8 +1,8 @@
 package com.simprints.infra.images.usecase
 
 import com.google.common.truth.Truth.*
+import com.simprints.core.domain.image.Path
 import com.simprints.core.domain.modality.Modality
-import com.simprints.infra.images.model.Path
 import org.junit.Before
 import org.junit.Test
 

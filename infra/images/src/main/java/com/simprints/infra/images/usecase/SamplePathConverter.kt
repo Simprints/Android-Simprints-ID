@@ -1,7 +1,7 @@
 package com.simprints.infra.images.usecase
 
+import com.simprints.core.domain.image.Path
 import com.simprints.core.domain.modality.Modality
-import com.simprints.infra.images.model.Path
 import javax.inject.Inject
 
 internal class SamplePathConverter @Inject constructor() {
